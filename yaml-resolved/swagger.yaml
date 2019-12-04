@@ -28,7 +28,7 @@ paths:
         explode: false
         schema:
           type: string
-          description: Equipment Event ID/Transport Event ID/Shipment Event ID
+          description: Booking Reference that uniquely identifies a shipment
           example: YCH698840
       responses:
         "200":
@@ -36,10 +36,45 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/shipment'
+                $ref: '#/components/schemas/inline_response_200'
             application/xml:
               schema:
-                $ref: '#/components/schemas/shipment'
+                $ref: '#/components/schemas/inline_response_200'
+        "400":
+          description: Invalid Booking Reference supplied
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Booking Reference not found
+  /shipments/billOfLadingNumber={billOfLadingNumber}:
+    get:
+      tags:
+      - Shipments
+      summary: Find shipment by Bill of Lading
+      description: Returns a single shipment
+      parameters:
+      - name: billOfLadingNumber
+        in: path
+        description: Bill of Lading of shipment to return
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          description: Bill of Lading that uniquely identifies a shipment
+          example: "855230418"
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
         "400":
           description: Invalid Booking Reference supplied
         "401":
@@ -90,10 +125,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/events'
+                $ref: '#/components/schemas/inline_response_200_1'
             application/xml:
               schema:
-                $ref: '#/components/schemas/events'
+                $ref: '#/components/schemas/inline_response_200_1'
         "400":
           description: Invalid Booking Reference supplied
         "401":
@@ -124,12 +159,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/transport'
+                $ref: '#/components/schemas/inline_response_200_2'
             application/xml:
               schema:
-                $ref: '#/components/schemas/transport'
+                $ref: '#/components/schemas/inline_response_200_2'
         "400":
           description: Invalid Transport Reference supplied
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
         "404":
           description: Transport Reference not found
   /equipments/{equipmentReference}:
@@ -155,10 +194,45 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/equipment'
+                $ref: '#/components/schemas/inline_response_200_3'
             application/xml:
               schema:
-                $ref: '#/components/schemas/equipment'
+                $ref: '#/components/schemas/inline_response_200_3'
+        "400":
+          description: Invalid Equipment Reference supplied
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Equipment Reference not found
+  /equipments/{equipmentReference}/activeShipmentEvents:
+    get:
+      tags:
+      - Equipments
+      summary: Find active shipment events related to Equipment Reference
+      description: Returns a list of active events
+      parameters:
+      - name: equipmentReference
+        in: path
+        description: Equipment Reference of the active events to return
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          description: The unique identifier for the equipment
+          example: EQ APZU4812090
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_4'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/inline_response_200_4'
         "400":
           description: Invalid Equipment Reference supplied
         "401":
@@ -178,6 +252,7 @@ components:
           example: YCH698840
         billOfLadingNumber:
           type: string
+          description: Bill of Lading Number that uniquely identifies a shipment
           example: "855230418"
         bookingDateTime:
           type: string
@@ -253,6 +328,8 @@ components:
             example: "5"
           facilityType:
             type: string
+            description: Facility Types, two characters to define the specific type
+              of sublocation
             example: PT
           location:
             type: string
@@ -346,6 +423,25 @@ components:
             - $ref: '#/components/schemas/shipmentEvent'
             - $ref: '#/components/schemas/equipmentEvent'
             - $ref: '#/components/schemas/transportEquipmentEvent'
+    equipmentEvents:
+      type: object
+      properties:
+        bookingReference:
+          type: string
+          description: Booking Reference that uniquely identifies a shipment
+          example: YCH698840
+        shipmentLink:
+          pattern: /shipments/[A-z0-9-%]+
+          type: string
+          example: /shipments/YCH698840
+        events:
+          type: array
+          items:
+            discriminator:
+              propertyName: event
+            anyOf:
+            - $ref: '#/components/schemas/equipmentEvent'
+            - $ref: '#/components/schemas/transportEquipmentEvent'
     equipment:
       type: object
       properties:
@@ -380,3 +476,31 @@ components:
           description: The unique reference for the voyage as defined by the vessel
             operator
           example: "20"
+    meta:
+      type: object
+      properties:
+        dcsaVersion:
+          type: string
+          description: Version code, specifying the version of the implemented Open
+            API Specification
+          example: 1.0.0
+    inline_response_200:
+      allOf:
+      - $ref: '#/components/schemas/shipment'
+      - $ref: '#/components/schemas/meta'
+    inline_response_200_1:
+      allOf:
+      - $ref: '#/components/schemas/events'
+      - $ref: '#/components/schemas/meta'
+    inline_response_200_2:
+      allOf:
+      - $ref: '#/components/schemas/transport'
+      - $ref: '#/components/schemas/meta'
+    inline_response_200_3:
+      allOf:
+      - $ref: '#/components/schemas/equipment'
+      - $ref: '#/components/schemas/meta'
+    inline_response_200_4:
+      allOf:
+      - $ref: '#/components/schemas/equipmentEvents'
+      - $ref: '#/components/schemas/meta'
