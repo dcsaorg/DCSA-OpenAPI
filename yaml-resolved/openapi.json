@@ -287,7 +287,7 @@
       "get" : {
         "tags" : [ "Equipments" ],
         "summary" : "Find active shipment events related to Equipment Reference",
-        "description" : "Returns a list of active events",
+        "description" : "Returns a list of active events for a single equipment",
         "parameters" : [ {
           "name" : "equipmentReference",
           "in" : "path",
@@ -366,7 +366,8 @@
           "eventsLink" : {
             "$ref" : "#/components/schemas/eventsLink"
           }
-        }
+        },
+        "description" : "The shipment entity is a reference entity that describes a shipment in the context of tracking of shipments."
       },
       "event" : {
         "type" : "object",
@@ -386,9 +387,11 @@
           "eventType" : {
             "$ref" : "#/components/schemas/eventType"
           }
-        }
+        },
+        "description" : "The event entity is described as a generalization of all the specific event categories. An event always takes place in relation to a shipment and can additionally be linked to a transport or an equipment"
       },
       "transportEquipmentEvent" : {
+        "description" : "The transport equipment event entity is a specialization of the event entity to support specification of data that applies to both transport and equipment events.",
         "allOf" : [ {
           "$ref" : "#/components/schemas/event"
         }, {
@@ -419,6 +422,7 @@
         } ]
       },
       "transportEvent" : {
+        "description" : "The transport event entity is a specialization of the event entity to support specification of data that only applies to a transport event.",
         "allOf" : [ {
           "$ref" : "#/components/schemas/event"
         }, {
@@ -443,6 +447,7 @@
         } ]
       },
       "equipmentEvent" : {
+        "description" : "The equipment event entity is a specialization of the event entity to support specification of data that only applies to an equipment event.",
         "allOf" : [ {
           "$ref" : "#/components/schemas/event"
         }, {
@@ -462,6 +467,7 @@
         } ]
       },
       "shipmentEvent" : {
+        "description" : "The shipment event entity is a specialization of the event entity to support specification of data that only applies to a shipment event.",
         "allOf" : [ {
           "$ref" : "#/components/schemas/event"
         }, {
@@ -501,7 +507,8 @@
               } ]
             }
           }
-        }
+        },
+        "description" : "A list of event-subentity objects for a single Booking Reference"
       },
       "equipmentEvents" : {
         "required" : [ "bookingReference", "events", "shipmentLink" ],
@@ -526,7 +533,8 @@
               } ]
             }
           }
-        }
+        },
+        "description" : "A list of event-subentities that are associated with a piece of equipment"
       },
       "equipment" : {
         "required" : [ "equipmentNumber", "equipmentType" ],
@@ -538,7 +546,8 @@
           "equipmentType" : {
             "$ref" : "#/components/schemas/equipmentType"
           }
-        }
+        },
+        "description" : "The equipment entity is a reference entity that describes an equipment in the context of tracking of shipments. An event can contain a reference to the equipment entity if it is of the appropriate event category."
       },
       "transport" : {
         "required" : [ "meansOfTransport", "transportReference", "vesselNumber", "voyageNumber" ],
@@ -556,15 +565,17 @@
           "voyageNumber" : {
             "$ref" : "#/components/schemas/voyageNumber"
           }
-        }
+        },
+        "description" : "The transport entity is a reference entity that describes a transport in the context of tracking of shipments. An event can contain a reference to the transport entity if it is of the appropriate event category."
       },
-      "meta" : {
+      "metadata" : {
         "type" : "object",
         "properties" : {
           "metadata" : {
-            "$ref" : "#/components/schemas/meta_metadata"
+            "$ref" : "#/components/schemas/metadata_metadata"
           }
-        }
+        },
+        "description" : "The metadata entity is an entity that describes the responses metadata"
       },
       "bookingReference" : {
         "type" : "string",
@@ -600,21 +611,6 @@
         "type" : "string",
         "description" : "Event sublocation code",
         "example" : "AEJEADPWJA"
-      },
-      "transportLink" : {
-        "pattern" : "/transports/[A-z0-9-%]+",
-        "type" : "string",
-        "example" : "/transports/5"
-      },
-      "equipmentLink" : {
-        "pattern" : "/equipments/[A-z0-9-%]+",
-        "type" : "string",
-        "example" : "/equipments/EQ%20APZU4812090"
-      },
-      "shipmentLink" : {
-        "pattern" : "/shipments/[A-z0-9-%]+",
-        "type" : "string",
-        "example" : "/shipments/YCH698840"
       },
       "emptyIndicator" : {
         "type" : "boolean",
@@ -709,44 +705,63 @@
       "eventsLink" : {
         "pattern" : "/shipments/[A-z0-9-%]+/events",
         "type" : "string",
+        "description" : "A relative url to the events for the booking reference",
         "example" : "/shipments/YCH698840/events"
+      },
+      "transportLink" : {
+        "pattern" : "/transports/[A-z0-9-%]+",
+        "type" : "string",
+        "description" : "A relative URL to the transport for the transport reference",
+        "example" : "/transports/5"
+      },
+      "equipmentLink" : {
+        "pattern" : "/equipments/[A-z0-9-%]+",
+        "type" : "string",
+        "description" : "A relative URL to the equipment for the equipment reference",
+        "example" : "/equipments/EQ%20APZU4812090"
+      },
+      "shipmentLink" : {
+        "pattern" : "/shipments/[A-z0-9-%]+",
+        "type" : "string",
+        "description" : "A relative URL to the shipment for the booking reference",
+        "example" : "/shipments/YCH698840"
       },
       "inline_response_200" : {
         "allOf" : [ {
           "$ref" : "#/components/schemas/shipment"
         }, {
-          "$ref" : "#/components/schemas/meta"
+          "$ref" : "#/components/schemas/metadata"
         } ]
       },
       "inline_response_200_1" : {
         "allOf" : [ {
           "$ref" : "#/components/schemas/events"
         }, {
-          "$ref" : "#/components/schemas/meta"
+          "$ref" : "#/components/schemas/metadata"
         } ]
       },
       "inline_response_200_2" : {
         "allOf" : [ {
           "$ref" : "#/components/schemas/transport"
         }, {
-          "$ref" : "#/components/schemas/meta"
+          "$ref" : "#/components/schemas/metadata"
         } ]
       },
       "inline_response_200_3" : {
         "allOf" : [ {
           "$ref" : "#/components/schemas/equipment"
         }, {
-          "$ref" : "#/components/schemas/meta"
+          "$ref" : "#/components/schemas/metadata"
         } ]
       },
       "inline_response_200_4" : {
         "allOf" : [ {
           "$ref" : "#/components/schemas/equipmentEvents"
         }, {
-          "$ref" : "#/components/schemas/meta"
+          "$ref" : "#/components/schemas/metadata"
         } ]
       },
-      "meta_metadata" : {
+      "metadata_metadata" : {
         "required" : [ "dcsaVersion", "self" ],
         "type" : "object",
         "properties" : {
