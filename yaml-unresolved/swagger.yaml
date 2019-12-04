@@ -1,0 +1,555 @@
+openapi: 3.0.0
+info:
+  version: '0.1.0'
+  title: 'DCSA.org Interface Track Standards Open Api Specification'
+  description: 'Open Api Specification for the DCSA Interface Tracking Standards'
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  contact:
+    name: Digital Container Shipping Association (DCSA)
+    url: https://dcsa.org
+    email: info@dcsa.org
+tags:
+  - name: Shipments
+    description: Shipment operations
+  - name: Transports
+    description: Transport operations
+  - name: Equipments
+    description: Equipment operations
+paths:
+  /shipments/{bookingReference}:
+    get:
+      tags:
+        - Shipments
+      summary: Find shipment by Booking Reference
+      description: Returns a single shipment
+      parameters:
+        - name: bookingReference
+          in: path
+          description: Booking Reference of shipment to return
+          required: true
+          schema:
+            $ref: '#/components/schemas/bookingReference'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/shipment'
+                  - $ref: '#/components/schemas/metadata'
+            application/xml:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/shipment'
+                  - $ref: '#/components/schemas/metadata'
+        '400':
+          description: Invalid Booking Reference supplied
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Booking Reference not found
+  /shipments/billOfLadingNumber={billOfLadingNumber}:
+    get:
+      tags:
+        - Shipments
+      summary: Find shipment by Bill of Lading
+      description: Returns a single shipment
+      parameters:
+        - name: billOfLadingNumber
+          in: path
+          description: Bill of Lading of shipment to return
+          required: true
+          schema:
+            $ref: '#/components/schemas/billOfLadingNumber'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/shipment'
+                  - $ref: '#/components/schemas/metadata'
+            application/xml:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/shipment'
+                  - $ref: '#/components/schemas/metadata'
+        '400':
+          description: Invalid Booking Reference supplied
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Booking Reference not found
+  /shipments/{bookingReference}/events:
+    get:
+      tags:
+        - Shipments
+      summary: Find events by Booking Reference
+      description: Returns all events of a single shipment
+      parameters:
+        - in: path
+          name: bookingReference
+          description: Booking Reference of shipment to return
+          required: true
+          schema:
+            $ref: '#/components/schemas/bookingReference'
+        - in: query
+          name: equipmentReference
+          description: Equipment Reference of equipment to filter events by
+          required: false
+          schema:
+            $ref: '#/components/schemas/equipmentReference'
+        - in: query
+          name: transportReference
+          description: Transport Reference of transport to filter events by
+          required: false
+          schema:
+            $ref: '#/components/schemas/transportReference'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/events'
+                  - $ref: '#/components/schemas/metadata'
+            application/xml:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/events'
+                  - $ref: '#/components/schemas/metadata'
+        '400':
+          description: Invalid Booking Reference supplied
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Booking Reference not found
+  /transports/{transportReference}:
+    get:
+      tags:
+        - Transports
+      summary: Find transports by Transport Reference
+      description: Returns a single transport
+      parameters:
+      - name: transportReference
+        in: path
+        description: Transport Reference of transport to return
+        required: true
+        schema:
+          $ref: '#/components/schemas/transportReference'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/transport'
+                  - $ref: '#/components/schemas/metadata'
+            application/xml:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/transport'
+                  - $ref: '#/components/schemas/metadata'
+        '400':
+          description: Invalid Transport Reference supplied
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Transport Reference not found
+  /equipments/{equipmentReference}:
+    get:
+      tags:
+        - Equipments
+      summary: Find equipments by Equipment Reference
+      description: returns a single equipment
+      parameters:
+      - name: equipmentReference
+        in: path
+        description: Equipment Reference of equipment to return
+        required: true
+        schema:
+         $ref: '#/components/schemas/equipmentReference'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/equipment'
+                  - $ref: '#/components/schemas/metadata'
+            application/xml:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/equipment'
+                  - $ref: '#/components/schemas/metadata'
+        '400':
+          description: Invalid Equipment Reference supplied
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Equipment Reference not found
+  /equipments/{equipmentReference}/activeShipmentEvents:
+    get:
+      tags:
+        - Equipments
+      summary: Find active shipment events related to Equipment Reference
+      description: Returns a list of active events for a single equipment
+      parameters:
+      - name: equipmentReference
+        in: path
+        description: Equipment Reference of the active events to return
+        required: true
+        schema:
+          $ref: '#/components/schemas/equipmentReference'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/equipmentEvents'
+                  - $ref: '#/components/schemas/metadata'
+            application/xml:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/equipmentEvents'
+                  - $ref: '#/components/schemas/metadata'
+        '400':
+          description: Invalid Equipment Reference supplied
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Equipment Reference not found
+components:
+  schemas:
+    shipment:
+      description: The shipment entity is a reference entity that describes a shipment in the context of tracking of shipments.
+      type: object
+      properties:
+        bookingReference:
+          $ref: '#/components/schemas/bookingReference'
+        billOfLadingNumber:
+          $ref: '#/components/schemas/billOfLadingNumber'
+        bookingDateTime:
+          $ref: '#/components/schemas/bookingDateTime'
+        carrierCode:
+          $ref: '#/components/schemas/carrierCode'
+        shipperName:
+          $ref: '#/components/schemas/shipperName'
+        consigneeName:
+          $ref: '#/components/schemas/consigneeName'
+        origin:
+          $ref: '#/components/schemas/origin'
+        destination:
+          $ref: '#/components/schemas/destination'
+        actualDeliveryDateTime:
+          $ref: '#/components/schemas/actualDeliveryDateTime'
+        eventsLink:
+          $ref: '#/components/schemas/eventsLink'
+    event:
+      description: The event entity is described as a generalization of all the specific event categories. An event always takes place in relation to a shipment and can additionally be linked to a transport or an equipment
+      type: object
+      properties:
+        bookingReference:
+          $ref: '#/components/schemas/bookingReference'
+        eventDateTime:
+          $ref: '#/components/schemas/eventDateTime'
+        eventID:
+          $ref: '#/components/schemas/eventID'
+        eventStatus:
+          $ref: '#/components/schemas/eventStatus'
+        eventType:
+          $ref: '#/components/schemas/eventType'
+    transportEquipmentEvent:
+      description: The transport equipment event entity is a specialization of the event entity to support specification of data that applies to both transport and equipment events.
+      allOf:
+        - $ref: '#/components/schemas/event'
+        - type: object
+          properties:
+            equipmentReference:
+              $ref: '#/components/schemas/equipmentReference'
+            transportReference:
+              $ref: '#/components/schemas/transportReference'
+            facilityType:
+              $ref: '#/components/schemas/facilityType'
+            location:
+              $ref: '#/components/schemas/location'
+            sublocation:
+              $ref: '#/components/schemas/sublocation'
+            transportLink:
+              $ref: '#/components/schemas/transportLink'
+            equipmentLink:
+              $ref: '#/components/schemas/equipmentLink'
+    transportEvent:
+      description: The transport event entity is a specialization of the event entity to support specification of data that only applies to a transport event.
+      allOf:
+        - $ref: '#/components/schemas/event'
+        - type: object
+          properties:
+            transportReference:
+              $ref: '#/components/schemas/transportReference'
+            facilityType:
+              $ref: '#/components/schemas/facilityType'
+            location:
+              $ref: '#/components/schemas/location'
+            sublocation:
+              $ref: '#/components/schemas/sublocation'
+            transportLink:
+              $ref: '#/components/schemas/transportLink'
+    equipmentEvent:
+      description: The equipment event entity is a specialization of the event entity to support specification of data that only applies to an equipment event.
+      allOf:
+        - $ref: '#/components/schemas/event'
+        - type: object
+          properties:
+            equipmentReference:
+              $ref: '#/components/schemas/equipmentReference'
+            emptyIndicator:
+              $ref: '#/components/schemas/emptyIndicator'
+            equipmentLink:
+              $ref: '#/components/schemas/equipmentLink'
+          required:
+            - equipmentReference
+            - emptyIndicator
+            - equipmentLink
+    shipmentEvent:
+      description: The shipment event entity is a specialization of the event entity to support specification of data that only applies to a shipment event.
+      allOf:
+        - $ref: '#/components/schemas/event'
+        - type: object
+          properties:
+            informationType:
+              $ref: '#/components/schemas/informationType'
+          required:
+            - informationType
+    events:
+      type: object
+      description: A list of event-subentity objects for a single Booking Reference
+      properties:
+        bookingReference:
+          $ref: '#/components/schemas/bookingReference'
+        shipmentLink:
+          $ref: '#/components/schemas/shipmentLink'
+        events:
+          type: array
+          items:
+            anyOf:
+              - $ref: '#/components/schemas/transportEvent'
+              - $ref: '#/components/schemas/shipmentEvent'
+              - $ref: '#/components/schemas/equipmentEvent'
+              - $ref: '#/components/schemas/transportEquipmentEvent'
+            discriminator:
+              propertyName: event
+      required:
+        - bookingReference
+        - shipmentLink
+        - events
+    equipmentEvents:
+      description: A list of event-subentities that are associated with a piece of equipment
+      type: object
+      properties:
+        bookingReference:
+          $ref: '#/components/schemas/bookingReference'
+        shipmentLink:
+          $ref: '#/components/schemas/shipmentLink'
+        events:
+          type: array
+          items:
+            anyOf:
+              - $ref: '#/components/schemas/equipmentEvent'
+              - $ref: '#/components/schemas/transportEquipmentEvent'
+            discriminator:
+              propertyName: event
+      required:
+        - bookingReference
+        - shipmentLink
+        - events
+    equipment:
+      type: object
+      description: The equipment entity is a reference entity that describes an equipment in the context of tracking of shipments. An event can contain a reference to the equipment entity if it is of the appropriate event category.
+      properties:
+        equipmentNumber:
+          $ref: '#/components/schemas/equipmentNumber'
+        equipmentType:
+          $ref: '#/components/schemas/equipmentType'
+      required:
+        - equipmentNumber
+        - equipmentType
+    transport:
+      type: object
+      description: The transport entity is a reference entity that describes a transport in the context of tracking of shipments. An event can contain a reference to the transport entity if it is of the appropriate event category.
+      properties:
+        meansOfTransport:
+          $ref: '#/components/schemas/meansOfTransport'
+        transportReference:
+          $ref: '#/components/schemas/transportReference'
+        vesselNumber:
+          $ref: '#/components/schemas/vesselNumber'
+        voyageNumber:
+          $ref: '#/components/schemas/voyageNumber'
+      required:
+          - meansOfTransport
+          - transportReference
+          - vesselNumber
+          - voyageNumber
+    metadata:
+      type: object
+      description: The metadata entity is an entity that describes the responses metadata
+      properties:
+        metadata:
+          type: object
+          properties:
+            dcsaVersion:
+              type: string
+              example: 1.0.0
+              description: Version code, specifying the version of the implemented Open API Specification
+            self:
+              type: string
+              example: /shipments/YCH698840
+              description: Relative url of the current endpoint
+          required:
+            - dcsaVersion
+            - self
+    bookingReference:
+      type: string
+      example: YCH698840
+      description: Booking Reference that uniquely identifies a shipment
+    transportReference:
+      type: string
+      example: 5
+      description: The reference for the means of transport that will be used to transport the equipment
+    equipmentReference:
+      type: string
+      example: EQ APZU4812090
+      description: The unique identifier for the equipment
+    billOfLadingNumber:
+      type: string
+      example: 855230418
+      description: Bill of Lading that uniquely identifies a shipment
+    facilityType:
+      type: string
+      example: PT
+      description: Facility Types, two characters to define the specific type of sublocation
+    location:
+      type: string
+      example: USNYC
+      description: Location code
+    sublocation:
+      type: string
+      example: AEJEADPWJA
+      description: Event sublocation code
+    emptyIndicator:
+      type: boolean
+      example: false
+      description: Status denoting whether the equipment is empty or not at the time of the event
+    informationType:
+      type: string
+      example: Cargo Release Message Issued
+      description: The code to identify the type of information that is related to the Shipment
+    equipmentNumber:
+      type: string
+      example: 17
+      description: '*MISSING DESCRIPTION* This attribute only exists in the class diagram at the moment'
+    equipmentType:
+      type: string
+      example: 10G0
+      description: Unique Code for the different container "size/type" used for transporting commodities
+    meansOfTransport:
+      type: string
+      example: 5
+      description: A code specifying a type of transport means
+    vesselNumber:
+      type: string
+      example: 9188403
+      description: The unique reference for a registered Vessel
+    voyageNumber:
+      type: string
+      example: 20
+      description: The unique reference for the voyage as defined by the vessel operator
+    eventDateTime:
+      type: string
+      format: date-time
+      example: '2019-12-02T16:34:28Z'
+      description: 'Event Date Time, following the RFC3339 standard, in the format YYYY-MM-DDTHH:MM:SSZ'
+    eventID:
+      type: string
+      example: 1
+      description: Equipment Event ID/Transport Event ID/Shipment Event ID
+    eventStatus:
+      type: string
+      example: ACT
+      description: Event Status Code (Planned, Estimated or Actual)
+    eventType:
+      type: string
+      example: ARI
+      description: Unique identifier for Event Type Code
+    bookingDateTime:
+      type: string
+      format: date-time
+      example: '2019-12-02T16:34:28Z'
+      description: 'Booking Date Time, following the RFC3339 standard, in the format YYYY-MM-DDTHH:MM:SSZ'
+    carrierCode:
+      type: string
+      example: MAEU
+      description: Carrier SCAC code
+    shipperName:
+      type: string
+      example: Computer Corp.
+      description: Shipper name
+    consigneeName:
+      type: string
+      example: ARI
+      description: Unique identifier for Event Type Code
+    origin:
+      type: string
+      example: USNYC
+      description: Collection origin
+    destination:
+      type: string
+      example: USNYC
+      description: Delivery destination
+    actualDeliveryDateTime:
+      type: string
+      format: date-time
+      example: '2019-12-02T16:34:28Z'
+      description: 'Actual Delivery Date Time, following the RFC3339 standard, in the format YYYY-MM-DDTHH:MM:SSZ'
+    eventsLink:
+      type: string
+      pattern: /shipments/[A-z0-9-%]+/events
+      example: /shipments/YCH698840/events
+      description: A relative url to the events for the booking reference
+    transportLink:
+      type: string
+      pattern: /transports/[A-z0-9-%]+
+      example: /transports/5
+      description: A relative URL to the transport for the transport reference
+    equipmentLink:
+      type: string
+      pattern: /equipments/[A-z0-9-%]+
+      example: /equipments/EQ%20APZU4812090
+      description: A relative URL to the equipment for the equipment reference
+    shipmentLink:
+      type: string
+      pattern: /shipments/[A-z0-9-%]+
+      example: /shipments/YCH698840
+      description: A relative URL to the shipment for the booking reference
