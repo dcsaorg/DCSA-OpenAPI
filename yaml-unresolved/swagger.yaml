@@ -258,48 +258,81 @@ components:
           $ref: '#/components/schemas/shipperName'
         consigneeName:
           $ref: '#/components/schemas/consigneeName'
-        origin:
-          $ref: '#/components/schemas/origin'
-        destination:
-          $ref: '#/components/schemas/destination'
-        actualDeliveryDateTime:
-          $ref: '#/components/schemas/actualDeliveryDateTime'
+        collectionOrigin:
+          $ref: '#/components/schemas/collectionOrigin'
+        collectionDateTime:
+          $ref: '#/components/schemas/collectionDateTime'
+        deliveryDestination:
+          $ref: '#/components/schemas/deliveryDestination'
+        deliveryDateTime:
+          $ref: '#/components/schemas/deliveryDateTime'
+        estimatedArrivalDateTime:
+          $ref: '#/components/schemas/estimatedArrivalDateTime'
         eventsLink:
           $ref: '#/components/schemas/eventsLink'
+      required:
+        - bookingReference
+        - bookingDateTime
+        - carrierCode
+        - collectionOrigin
+        - collectionDateTime
+        - deliveryDestination
+        - deliveryDateTime
+        - events
     event:
       description: The event entity is described as a generalization of all the specific event categories. An event always takes place in relation to a shipment and can additionally be linked to a transport or an equipment
       type: object
       properties:
+        eventID:
+          $ref: '#/components/schemas/eventID'
         bookingReference:
           $ref: '#/components/schemas/bookingReference'
         eventDateTime:
           $ref: '#/components/schemas/eventDateTime'
-        eventID:
-          $ref: '#/components/schemas/eventID'
-        eventStatus:
-          $ref: '#/components/schemas/eventStatus'
+        eventClassifierCode:
+          $ref: '#/components/schemas/eventClassifierCode'
         eventType:
           $ref: '#/components/schemas/eventType'
+      required:
+        - eventID
+        - bookingReference
+        - eventDateTime
+        - eventClassifierCode
+        - eventType
     transportEquipmentEvent:
       description: The transport equipment event entity is a specialization of the event entity to support specification of data that applies to both transport and equipment events.
       allOf:
         - $ref: '#/components/schemas/event'
         - type: object
           properties:
-            equipmentReference:
-              $ref: '#/components/schemas/equipmentReference'
             transportReference:
               $ref: '#/components/schemas/transportReference'
+            transportLegReference:
+              $ref: '#/components/schemas/transportLegReference'
+            equipmentReference:
+              $ref: '#/components/schemas/equipmentReference'
             facilityType:
               $ref: '#/components/schemas/facilityType'
-            location:
-              $ref: '#/components/schemas/location'
-            sublocation:
-              $ref: '#/components/schemas/sublocation'
+            UNLocationCode:
+              $ref: '#/components/schemas/UNLocationCode'
+            facilityCode:
+              $ref: '#/components/schemas/facilityCode'
+            otherFacility:
+              $ref: '#/components/schemas/otherFacility'
+            emptyIndicatorCode:
+              $ref: '#/components/schemas/emptyIndicatorCode'
             transportLink:
               $ref: '#/components/schemas/transportLink'
             equipmentLink:
               $ref: '#/components/schemas/equipmentLink'
+          required:
+            - transportReference
+            - transportLegReference
+            - equipmentReference
+            - facilityType
+            - UNLocationCode
+            - facilityCode
+            - emptyIndicatorCode
     transportEvent:
       description: The transport event entity is a specialization of the event entity to support specification of data that only applies to a transport event.
       allOf:
@@ -308,14 +341,25 @@ components:
           properties:
             transportReference:
               $ref: '#/components/schemas/transportReference'
+            transportLegReference:
+              $ref: '#/components/schemas/transportLegReference'
             facilityType:
               $ref: '#/components/schemas/facilityType'
-            location:
-              $ref: '#/components/schemas/location'
-            sublocation:
-              $ref: '#/components/schemas/sublocation'
+            UNLocationCode:
+              $ref: '#/components/schemas/UNLocationCode'
+            facilityCode:
+              $ref: '#/components/schemas/facilityCode'
+            otherFacility:
+              $ref: '#/components/schemas/otherFacility'
             transportLink:
               $ref: '#/components/schemas/transportLink'
+          required:
+            - transportReference
+            - transportLegReference
+            - facilityType
+            - UNLocationCode
+            - facilityCode
+
     equipmentEvent:
       description: The equipment event entity is a specialization of the event entity to support specification of data that only applies to an equipment event.
       allOf:
@@ -324,13 +368,24 @@ components:
           properties:
             equipmentReference:
               $ref: '#/components/schemas/equipmentReference'
-            emptyIndicator:
-              $ref: '#/components/schemas/emptyIndicator'
+            facilityType:
+              $ref: '#/components/schemas/facilityType'
+            UNLocationCode:
+              $ref: '#/components/schemas/UNLocationCode'
+            facilityCode:
+              $ref: '#/components/schemas/facilityCode'
+            otherFacility:
+              $ref: '#/components/schemas/otherFacility'
+            emptyIndicatorCode:
+              $ref: '#/components/schemas/emptyIndicatorCode'
             equipmentLink:
               $ref: '#/components/schemas/equipmentLink'
           required:
             - equipmentReference
-            - emptyIndicator
+            - facilityType
+            - UNLocationCode
+            - facilityCode
+            - emptyIndicatorCode
             - equipmentLink
     shipmentEvent:
       description: The shipment event entity is a specialization of the event entity to support specification of data that only applies to a shipment event.
@@ -338,10 +393,10 @@ components:
         - $ref: '#/components/schemas/event'
         - type: object
           properties:
-            informationType:
-              $ref: '#/components/schemas/informationType'
+            informationTypeCode:
+              $ref: '#/components/schemas/informationTypeCode'
           required:
-            - informationType
+            - informationTypeCode
     events:
       type: object
       description: A list of event-subentity objects for a single Booking Reference
@@ -388,30 +443,32 @@ components:
       type: object
       description: The equipment entity is a reference entity that describes an equipment in the context of tracking of shipments. An event can contain a reference to the equipment entity if it is of the appropriate event category.
       properties:
-        equipmentNumber:
-          $ref: '#/components/schemas/equipmentNumber'
-        equipmentType:
-          $ref: '#/components/schemas/equipmentType'
+        equipmentReference:
+          $ref: '#/components/schemas/equipmentReference'
+        ISOEquipmentCode:
+          $ref: '#/components/schemas/ISOEquipmentCode'
+        ActiveShipmentBookingReference:
+          $ref: '#/components/schemas/ActiveShipmentBookingReference'
       required:
-        - equipmentNumber
-        - equipmentType
+        - equipmentReference
+        - ISOEquipmentCode
     transport:
       type: object
       description: The transport entity is a reference entity that describes a transport in the context of tracking of shipments. An event can contain a reference to the transport entity if it is of the appropriate event category.
       properties:
-        meansOfTransport:
-          $ref: '#/components/schemas/meansOfTransport'
         transportReference:
           $ref: '#/components/schemas/transportReference'
-        vesselNumber:
-          $ref: '#/components/schemas/vesselNumber'
-        voyageNumber:
-          $ref: '#/components/schemas/voyageNumber'
+        modeOfTransportCode:
+          $ref: '#/components/schemas/modeOfTransportCode'
+        transportLegReference:
+          $ref: '#/components/schemas/transportLegReference'
+        transportName:
+          $ref: '#/components/schemas/transportName'
       required:
-          - meansOfTransport
           - transportReference
-          - vesselNumber
-          - voyageNumber
+          - modeOfTransportCode
+          - transportLegReference
+          - transportName
     metadata:
       type: object
       description: The metadata entity is an entity that describes the responses metadata
@@ -432,107 +489,134 @@ components:
             - self
     bookingReference:
       type: string
-      example: YCH698840
-      description: Booking Reference that uniquely identifies a shipment
+      example: ABC709951
+      description: The unique identifier for a Shipment, which is issued by the carrier. The booking reference must be unique across the entire shipping industry.
     transportReference:
       type: string
-      example: 5
-      description: The reference for the means of transport that will be used to transport the equipment
+      example: 9648714
+      description: The particular transport that the shipment relates to. The reference for the transport where the equipment will be loaded onto. In the case of a Vessel, this will be the Vessel IMO Number.
     equipmentReference:
       type: string
       example: EQ APZU4812090
-      description: The unique identifier for the equipment
+      description: The unique identifier for the equipment. Made up of the equipment prefix and the equipment number. Usually follows the ISO 6346 standard.
     billOfLadingNumber:
       type: string
-      example: 855230418
-      description: Bill of Lading that uniquely identifies a shipment
+      example: ABCD421911263977
+      description: |
+        The bill of lading number.
+        UN/EDIFACT 1001 Document name code (UNTDD00A)
+        1001 = 705 Bill of lading
+        Negotiable document/message which evidences a contract of carriage by sea and the taking over or loading of goods by carrier, and by which carrier undertakes to deliver goods against surrender of the document. A provision in the document that goods are to be delivered to the order of a named person, or to order, or to bearer, constitutes such an undertaking.
     facilityType:
       type: string
-      example: PT
-      description: Facility Types, two characters to define the specific type of sublocation
-    location:
+      example: POTE
+      description: Facility Types, four characters to define the specific type of facility.
+    UNLocationCode:
       type: string
       example: USNYC
-      description: Location code
-    sublocation:
+      description: UN Location Code identifies a location in the sense of a city / a town / a village, being the smaller administrative area existing as defined by the competent national authority in each country. A complete UN/LOCODE is a combination of a 2-character country code and a 3-character area code.
+    facilityCode:
       type: string
-      example: AEJEADPWJA
-      description: Event sublocation code
-    emptyIndicator:
-      type: boolean
-      example: false
-      description: Status denoting whether the equipment is empty or not at the time of the event
-    informationType:
+      example: AEAUHADT
+      description: The unique code used for identifying the specific facility. Up to 10 characters, including the five characters from the UN/LOCODE. Unknown value possible.
+    otherFacility:
       type: string
-      example: Cargo Release Message Issued
-      description: The code to identify the type of information that is related to the Shipment
-    equipmentNumber:
+      example: Depot location or address
+      description: The location when a DCSA standardized facility code is not available.
+    emptyIndicatorCode:
       type: string
-      example: 17
-      description: '*MISSING DESCRIPTION* This attribute only exists in the class diagram at the moment'
-    equipmentType:
+      example: Empty
+      description: The classifier of the equipment as to whether is empty or laden. These are the only two values that are tracked.
+    informationTypeCode:
+      type: string
+      example: Shipment Release Message Issued
+      description: The code to identify the type of information that is related to the Shipment.
+    ISOEquipmentCode:
       type: string
       example: 10G0
-      description: Unique Code for the different container "size/type" used for transporting commodities
-    meansOfTransport:
+      description: |
+        'Unique Code for the different container "size/type" used for transporting commodities.
+        (IFSTA) Different container "size/type" used for transporting commodities. The most common equipment size/type is 20'/40' Dry Freight Container, but a number of different versions exists.'
+    ActiveShipmentBookingReference:
       type: string
-      example: 5
-      description: A code specifying a type of transport means
-    vesselNumber:
+      example: ABC709951
+      description: Booking reference of the active shipment that the equipment is currently allocated to.
+    modeOfTransportCode:
       type: string
-      example: 9188403
-      description: The unique reference for a registered Vessel
-    voyageNumber:
+      example: 1
+      description: A code specifying a type of transport mode
+    transportLegReference:
       type: string
-      example: 20
-      description: The unique reference for the voyage as defined by the vessel operator
+      example: 3
+      description: |
+        'The reference will be specific per mode of transport:
+        - Vessel: Voyage number (10 characters) as specified by the Vessel Operator
+        - Truck: None specified, for release 1
+        - Rail: None specified, for release 1
+        - Barge: None specified, for release 1'
+    transportName:
+      type: string
+      example: ZIM ANT WERP
+      description: The actual name of the vessel. Transport names do not change depending on the operator of the vessel. Follows the vessel registration and mortgage recording procedures of the Republic of the Marshall Islands (RMI).
     eventDateTime:
       type: string
       format: date-time
-      example: '2019-12-02T16:34:28Z'
-      description: 'Event Date Time, following the RFC3339 standard, in the format YYYY-MM-DDTHH:MM:SSZ'
+      example: '2019-11-12T07:41:00+08:30'
+      description: Event DateTime in the format “YYYY-MM-DDTHH:MM:SSZHH:MM”
     eventID:
       type: string
       example: 1
       description: Equipment Event ID/Transport Event ID/Shipment Event ID
-    eventStatus:
+    eventClassifierCode:
       type: string
       example: ACT
-      description: Event Status Code (Planned, Estimated or Actual)
+      description: Event Classifier Code (Planned, Estimated or Actual)
     eventType:
       type: string
-      example: ARI
+      example: ARRI
       description: Unique identifier for Event Type Code
     bookingDateTime:
       type: string
       format: date-time
-      example: '2019-12-02T16:34:28Z'
-      description: 'Booking Date Time, following the RFC3339 standard, in the format YYYY-MM-DDTHH:MM:SSZ'
+      example: '2019-11-12T07:41:00+08:30'
+      description: 'Booking Date Time in the format “YYYY-MM-DDTHH:MM:SSZHH:MM”:'
     carrierCode:
       type: string
       example: MAEU
-      description: Carrier SCAC code
+      description: The unique carrier identifier as set by the National Motor Freight Traffic Association (NMFTA)
     shipperName:
       type: string
       example: Computer Corp.
-      description: Shipper name
+      description: The name of the shipper party
     consigneeName:
       type: string
-      example: ARI
-      description: Unique identifier for Event Type Code
-    origin:
+      example: Computer Corp.
+      description: The name of the consignee
+    collectionOrigin:
       type: string
       example: USNYC
-      description: Collection origin
-    destination:
+      description: The customer (shipper) needs to place a booking in order to ship the cargo (commodity) from an origin to destination. This attribute specifies the location of the origin.
+    deliveryDestination:
       type: string
       example: USNYC
-      description: Delivery destination
-    actualDeliveryDateTime:
+      description: |
+        "The customer (shipper) needs to place a booking in order to ship the cargo (commodity) from an origin to destination. This attribute specifies the location of the destination.
+         aka - 'place of carrier delivery'"
+    collectionDateTime:
       type: string
       format: date-time
-      example: '2019-12-02T16:34:28Z'
-      description: 'Actual Delivery Date Time, following the RFC3339 standard, in the format YYYY-MM-DDTHH:MM:SSZ'
+      example: '2019-11-12T07:41:00+08:30'
+      description: Collection DateTime in the format “YYYY-MM-DDTHH:MM:SSZHH:MM”
+    deliveryDateTime:
+      type: string
+      format: date-time
+      example: '2019-11-12T07:41:00+08:30'
+      description: Delivery DateTime in the format “YYYY-MM-DDTHH:MM:SSZHH:MM”
+    estimatedArrivalDateTime:
+      type: string
+      format: date-time
+      example: '2019-11-12T07:41:00+08:30'
+      description: Calculated estimated date and time for a shipment based on estimated and planned events for that same shipment in the format “YYYY-MM-DDTHH:MM:SSZHH:MM”.
     eventsLink:
       type: string
       pattern: /shipments/[A-z0-9-%]+/events
