@@ -13,81 +13,9 @@ info:
 tags:
   - name: Shipments
     description: Shipment operations
-  - name: Transports
-    description: Transport operations
   - name: Equipments
     description: Equipment operations
 paths:
-  /shipments/{bookingReference}:
-    get:
-      tags:
-        - Shipments
-      summary: Find shipment by Booking Reference
-      description: Returns a single shipment
-      parameters:
-        - name: bookingReference
-          in: path
-          description: Booking Reference of shipment to return
-          required: true
-          schema:
-            $ref: '#/components/schemas/bookingReference'
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/shipment'
-                  - $ref: '#/components/schemas/shipmentsMetadata'
-            application/xml:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/shipment'
-                  - $ref: '#/components/schemas/shipmentsMetadata'
-        '400':
-          description: Invalid Booking Reference supplied
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-        '404':
-          description: Booking Reference not found
-  /shipments/billOfLadingNumber={billOfLadingNumber}:
-    get:
-      tags:
-        - Shipments
-      summary: Find shipment by Bill of Lading
-      description: Returns a single shipment
-      parameters:
-        - name: billOfLadingNumber
-          in: path
-          description: Bill of Lading of shipment to return
-          required: true
-          schema:
-            $ref: '#/components/schemas/billOfLadingNumber'
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/shipment'
-                  - $ref: '#/components/schemas/billOfLadingMetadata'
-            application/xml:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/shipment'
-                  - $ref: '#/components/schemas/billOfLadingMetadata'
-        '400':
-          description: Invalid Booking Reference supplied
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-        '404':
-          description: Booking Reference not found
   /shipments/{bookingReference}/events:
     get:
       tags:
@@ -119,14 +47,10 @@ paths:
           content:
             application/json:
               schema:
-                allOf:
-                  - $ref: '#/components/schemas/events'
-                  - $ref: '#/components/schemas/shipmentsEventsMetadata'
+                $ref: '#/components/schemas/events'
             application/xml:
               schema:
-                allOf:
-                  - $ref: '#/components/schemas/events'
-                  - $ref: '#/components/schemas/shipmentsEventsMetadata'
+                $ref: '#/components/schemas/events'
         '400':
           description: Invalid Booking Reference supplied
         '401':
@@ -135,19 +59,31 @@ paths:
           description: Forbidden
         '404':
           description: Booking Reference not found
-  /transports/{transportReference}:
+  /shipments/billOfLadingNumber={billOfLadingNumber}/events:
     get:
       tags:
-        - Transports
-      summary: Find transports by Transport Reference
-      description: Returns a single transport
+        - Shipments
+      summary: Find events by Bill of Lading Number
+      description: Returns all events of a single shipment
       parameters:
-      - name: transportReference
-        in: path
-        description: Transport Reference of transport to return
-        required: true
-        schema:
-          $ref: '#/components/schemas/transportReference'
+        - in: path
+          name: billOfLadingNumber
+          description: Bill of Lading Number of shipment to return
+          required: true
+          schema:
+            $ref: '#/components/schemas/billOfLadingNumber'
+        - in: query
+          name: equipmentReference
+          description: Equipment Reference of equipment to filter events by
+          required: false
+          schema:
+            $ref: '#/components/schemas/equipmentReference'
+        - in: query
+          name: transportReference
+          description: Transport Reference of transport to filter events by
+          required: false
+          schema:
+            $ref: '#/components/schemas/transportReference'
       responses:
         '200':
           description: Successful operation
@@ -155,56 +91,19 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/transport'
-                  - $ref: '#/components/schemas/transportsMetadata'
+                  - $ref: '#/components/schemas/events'
             application/xml:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/transport'
-                  - $ref: '#/components/schemas/transportsMetadata'
+                  - $ref: '#/components/schemas/events'
         '400':
-          description: Invalid Transport Reference supplied
+          description: Invalid Booking Reference supplied
         '401':
           description: Unauthorized
         '403':
           description: Forbidden
         '404':
-          description: Transport Reference not found
-  /equipments/{equipmentReference}:
-    get:
-      tags:
-        - Equipments
-      summary: Find equipments by Equipment Reference
-      description: returns a single equipment
-      parameters:
-      - name: equipmentReference
-        in: path
-        description: Equipment Reference of equipment to return
-        required: true
-        schema:
-         $ref: '#/components/schemas/equipmentReference'
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/equipment'
-                  - $ref: '#/components/schemas/equipmentsMetadata'
-            application/xml:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/equipment'
-                  - $ref: '#/components/schemas/equipmentsMetadata'
-        '400':
-          description: Invalid Equipment Reference supplied
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-        '404':
-          description: Equipment Reference not found
+          description: Booking Reference not found
   /equipments/{equipmentReference}/activeShipmentEvents:
     get:
       tags:
@@ -224,14 +123,10 @@ paths:
           content:
             application/json:
               schema:
-                allOf:
-                  - $ref: '#/components/schemas/equipmentEvents'
-                  - $ref: '#/components/schemas/equipmentsEventsMetadata'
+                $ref: '#/components/schemas/equipmentEvents'
             application/xml:
               schema:
-                allOf:
-                  - $ref: '#/components/schemas/equipmentEvents'
-                  - $ref: '#/components/schemas/equipmentsEventsMetadata'
+                $ref: '#/components/schemas/equipmentEvents'
 
         '400':
           description: Invalid Equipment Reference supplied
@@ -243,81 +138,12 @@ paths:
           description: Equipment Reference not found
 components:
   schemas:
-    shipment:
-      description: The shipment entity is a reference entity that describes a shipment in the context of tracking of shipments.
-      type: object
-      properties:
-        bookingReference:
-          $ref: '#/components/schemas/bookingReference'
-        billOfLadingNumber:
-          $ref: '#/components/schemas/billOfLadingNumber'
-        bookingDateTime:
-          $ref: '#/components/schemas/bookingDateTime'
-        carrierCode:
-          $ref: '#/components/schemas/carrierCode'
-        shipperName:
-          $ref: '#/components/schemas/shipperName'
-        consigneeName:
-          $ref: '#/components/schemas/consigneeName'
-        collectionOrigin:
-          $ref: '#/components/schemas/collectionOrigin'
-        collectionDateTime:
-          $ref: '#/components/schemas/collectionDateTime'
-        deliveryDestination:
-          $ref: '#/components/schemas/deliveryDestination'
-        deliveryDateTime:
-          $ref: '#/components/schemas/deliveryDateTime'
-        estimatedArrivalDateTime:
-          $ref: '#/components/schemas/estimatedArrivalDateTime'
-        eventsLink:
-          $ref: '#/components/schemas/eventsLink'
-      required:
-        - bookingReference
-        - bookingDateTime
-        - carrierCode
-        - collectionOrigin
-        - collectionDateTime
-        - deliveryDestination
-        - deliveryDateTime
-        - events
-    transport:
-      type: object
-      description: The transport entity is a reference entity that describes a transport in the context of tracking of shipments. An event can contain a reference to the transport entity if it is of the appropriate event category.
-      properties:
-        transportReference:
-          $ref: '#/components/schemas/transportReference'
-        modeOfTransportCode:
-          $ref: '#/components/schemas/modeOfTransportCode'
-        transportLegReference:
-          $ref: '#/components/schemas/transportLegReference'
-        transportName:
-          $ref: '#/components/schemas/transportName'
-      required:
-          - transportReference
-          - modeOfTransportCode
-          - transportLegReference
-          - transportName
-    equipment:
-      type: object
-      description: The equipment entity is a reference entity that describes an equipment in the context of tracking of shipments. An event can contain a reference to the equipment entity if it is of the appropriate event category.
-      properties:
-        equipmentReference:
-          $ref: '#/components/schemas/equipmentReference'
-        ISOEquipmentCode:
-          $ref: '#/components/schemas/ISOEquipmentCode'
-        ActiveShipmentBookingReference:
-          $ref: '#/components/schemas/ActiveShipmentBookingReference'
-      required:
-        - equipmentReference
-        - ISOEquipmentCode
     event:
       description: The event entity is described as a generalization of all the specific event categories. An event always takes place in relation to a shipment and can additionally be linked to a transport or an equipment
       type: object
       properties:
         eventID:
           $ref: '#/components/schemas/eventID'
-        bookingReference:
-          $ref: '#/components/schemas/bookingReference'
         eventDateTime:
           $ref: '#/components/schemas/eventDateTime'
         eventClassifierCode:
@@ -326,7 +152,6 @@ components:
           $ref: '#/components/schemas/eventTypeCode'
       required:
         - eventID
-        - bookingReference
         - eventDateTime
         - eventClassifierCode
         - eventTypeCode
@@ -358,8 +183,6 @@ components:
               $ref: '#/components/schemas/facilityCode'
             otherFacility:
               $ref: '#/components/schemas/otherFacility'
-            transportLink:
-              $ref: '#/components/schemas/transportLink'
           required:
             - transportReference
             - transportLegReference
@@ -384,8 +207,6 @@ components:
               $ref: '#/components/schemas/otherFacility'
             emptyIndicatorCode:
               $ref: '#/components/schemas/emptyIndicatorCode'
-            equipmentLink:
-              $ref: '#/components/schemas/equipmentLink'
           required:
             - equipmentReference
             - facilityType
@@ -414,10 +235,6 @@ components:
               $ref: '#/components/schemas/otherFacility'
             emptyIndicatorCode:
               $ref: '#/components/schemas/emptyIndicatorCode'
-            transportLink:
-              $ref: '#/components/schemas/transportLink'
-            equipmentLink:
-              $ref: '#/components/schemas/equipmentLink'
           required:
             - transportReference
             - transportLegReference
@@ -430,10 +247,6 @@ components:
       type: object
       description: List of events.
       properties:
-        bookingReference:
-          $ref: '#/components/schemas/bookingReference'
-        shipmentLink:
-          $ref: '#/components/schemas/shipmentLink'
         events:
           type: array
           items:
@@ -445,16 +258,11 @@ components:
             discriminator:
               propertyName: event
       required:
-        - bookingReference
         - events
     equipmentEvents:
       description: List of all equipment-related events for the shipment journey.
       type: object
       properties:
-        bookingReference:
-          $ref: '#/components/schemas/bookingReference'
-        shipmentLink:
-          $ref: '#/components/schemas/shipmentLink'
         events:
           type: array
           items:
@@ -464,128 +272,7 @@ components:
             discriminator:
               propertyName: event
       required:
-        - bookingReference
         - events
-    transportsMetadata:
-      type: object
-      description: The metadata entity is an entity that describes the responses metadata.
-      properties:
-        metadata:
-          type: object
-          properties:
-            dcsaVersion:
-              type: string
-              example: 1.0.0
-              description: Version code, specifying the version of the implemented Open API Specification.
-            self:
-              type: string
-              example: /transports/9648714
-              description: Relative url of the current endpoint
-          required:
-            - dcsaVersion
-            - self
-      required:
-        - metadata
-    shipmentsMetadata:
-      type: object
-      description: The metadata entity is an entity that describes the responses metadata.
-      properties:
-        metadata:
-          type: object
-          properties:
-            dcsaVersion:
-              type: string
-              example: 1.0.0
-              description: Version code, specifying the version of the implemented Open API Specification.
-            self:
-              type: string
-              example: /shipments/ABC709951
-              description: Relative url of the current endpoint
-          required:
-            - dcsaVersion
-            - self
-      required:
-        - metadata
-    shipmentsEventsMetadata:
-      type: object
-      description: The metadata entity is an entity that describes the responses metadata.
-      properties:
-        metadata:
-          type: object
-          properties:
-            dcsaVersion:
-              type: string
-              example: 1.0.0
-              description: Version code, specifying the version of the implemented Open API Specification.
-            self:
-              type: string
-              example: /shipments/ABC709951/events
-              description: Relative url of the current endpoint
-          required:
-            - dcsaVersion
-            - self
-      required:
-        - metadata
-    billOfLadingMetadata:
-      type: object
-      description: The metadata entity is an entity that describes the responses metadata.
-      properties:
-        metadata:
-          type: object
-          properties:
-            dcsaVersion:
-              type: string
-              example: 1.0.0
-              description: Version code, specifying the version of the implemented Open API Specification.
-            self:
-              type: string
-              example: /shipments/billOfLadingNumber=ABC709951
-              description: Relative url of the current endpoint
-          required:
-            - dcsaVersion
-            - self
-      required:
-        - metadata
-    equipmentsMetadata:
-      type: object
-      description: The metadata entity is an entity that describes the responses metadata.
-      properties:
-        metadata:
-          type: object
-          properties:
-            dcsaVersion:
-              type: string
-              example: 1.0.0
-              description: Version code, specifying the version of the implemented Open API Specification.
-            self:
-              type: string
-              example: /equipments/APZU4812090
-              description: Relative url of the current endpoint
-          required:
-            - dcsaVersion
-            - self
-      required:
-        - metadata
-    equipmentsEventsMetadata:
-      type: object
-      description: The metadata entity is an entity that describes the responses metadata.
-      properties:
-        metadata:
-          type: object
-          properties:
-            dcsaVersion:
-              type: string
-              example: 1.0.0
-              description: Version code, specifying the version of the implemented Open API Specification.
-            self:
-              type: string
-              example: /equipments/ZCSU2785124/activeShipmentEvents
-              description: Relative url of the current endpoint
-          required:
-            - dcsaVersion
-            - self
-      required:
-        - metadata
 ####String variables below
     bookingReference:
       type: string
@@ -627,26 +314,10 @@ components:
       type: string
       example: SRM
       description: The code to identify the type of information that is related to the shipment.
-    ISOEquipmentCode:
-      type: string
-      example: 10G0
-      description: Unique Code for the different container "size/type" used for transporting commodities
-    ActiveShipmentBookingReference:
-      type: string
-      example: ABC709951
-      description: Booking reference of the active shipment that the equipment is currently allocated to.
-    modeOfTransportCode:
-      type: string
-      example: 1
-      description: A code specifying a type of transport mode.
     transportLegReference:
       type: string
       example: 025E
       description: The reference specifying a single section of the complete transport of a shipment. For a vessel this will be the voyage number.
-    transportName:
-      type: string
-      example: CARX VESSEL
-      description: The actual name of the vessel.
     eventDateTime:
       type: string
       format: date-time
@@ -664,63 +335,3 @@ components:
       type: string
       example: ARRI
       description: Unique identifier for Event Type Code.
-    bookingDateTime:
-      type: string
-      format: date-time
-      example: '2019-11-12T07:41:00+08:30'
-      description: The time stamp of the booking request.
-    carrierCode:
-      type: string
-      example: CARX
-      description: A unique carrier identifier.
-    shipperName:
-      type: string
-      example: Computer Corp.
-      description: The name of the shipper, who requested the booking.
-    consigneeName:
-      type: string
-      example: Computer Corp.
-      description: The name of the consignee.
-    collectionOrigin:
-      type: string
-      example: USNYC
-      description: The customer (shipper) needs to place a booking in order to ship the cargo (commodity) from an origin to destination.
-    deliveryDestination:
-      type: string
-      example: USNYC
-      description: The customer (shipper) needs to place a booking in order to ship the cargo (commodity) from an origin to destination.
-    collectionDateTime:
-      type: string
-      format: date-time
-      example: '2019-11-12T07:41:00+08:30'
-      description: The date and the time that the shipment items need to be collected from the origin.
-    deliveryDateTime:
-      type: string
-      format: date-time
-      example: '2019-11-12T07:41:00+08:30'
-      description: The date (and when possible time) that the shipment items need to be delivered to the destination.
-    estimatedArrivalDateTime:
-      type: string
-      format: date-time
-      example: '2019-11-12T07:41:00+08:30'
-      description: Calculated estimated date and time for a shipment based on estimated and planned events for that same shipment.
-    eventsLink:
-      type: string
-      pattern: /shipments/[A-z0-9-%]+/events
-      example: /shipments/ABC709951/events
-      description: A relative url to the events for the booking reference
-    transportLink:
-      type: string
-      pattern: /transports/[A-z0-9-%]+
-      example: /transports/9648714
-      description: A relative URL to the transport for the transport reference
-    equipmentLink:
-      type: string
-      pattern: /equipments/[A-z0-9-%]+
-      example: /equipments/APZU4812090
-      description: A relative URL to the equipment for the equipment reference
-    shipmentLink:
-      type: string
-      pattern: /shipments/[A-z0-9-%]+
-      example: /shipments/ABC709951
-      description: A relative URL to the shipment for the booking reference
