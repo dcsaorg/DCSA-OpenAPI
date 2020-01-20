@@ -1,8 +1,8 @@
 openapi: 3.0.0
 info:
   version: '0.1.0'
-  title: 'DCSA Track and Trace API'
-  description: 'API specifications for the Track and Trace interface standard issued by DCSA.org'
+  title: 'DCSA.org Interface Track Standards Open Api Specification'
+  description: 'Open Api Specification for the DCSA Interface Tracking Standards'
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -97,13 +97,13 @@ paths:
                 allOf:
                   - $ref: '#/components/schemas/events'
         '400':
-          description: Invalid Booking Reference supplied
+          description: Invalid Bill of Lading Number supplied
         '401':
           description: Unauthorized
         '403':
           description: Forbidden
         '404':
-          description: Booking Reference not found
+          description: Bill of Lading Number not found
   /equipments/{equipmentReference}/activeShipmentEvents:
     get:
       tags:
@@ -175,8 +175,8 @@ components:
               $ref: '#/components/schemas/transportReference'
             transportLegReference:
               $ref: '#/components/schemas/transportLegReference'
-            facilityType:
-              $ref: '#/components/schemas/facilityType'
+            facilityTypeCode:
+              $ref: '#/components/schemas/facilityTypeCode'
             UNLocationCode:
               $ref: '#/components/schemas/UNLocationCode'
             facilityCode:
@@ -186,7 +186,7 @@ components:
           required:
             - transportReference
             - transportLegReference
-            - facilityType
+            - facilityTypeCode
             - UNLocationCode
             - facilityCode
     equipmentEvent:
@@ -197,8 +197,8 @@ components:
           properties:
             equipmentReference:
               $ref: '#/components/schemas/equipmentReference'
-            facilityType:
-              $ref: '#/components/schemas/facilityType'
+            facilityTypeCode:
+              $ref: '#/components/schemas/facilityTypeCode'
             UNLocationCode:
               $ref: '#/components/schemas/UNLocationCode'
             facilityCode:
@@ -209,7 +209,7 @@ components:
               $ref: '#/components/schemas/emptyIndicatorCode'
           required:
             - equipmentReference
-            - facilityType
+            - facilityTypeCode
             - UNLocationCode
             - facilityCode
             - emptyIndicatorCode
@@ -225,8 +225,8 @@ components:
               $ref: '#/components/schemas/transportLegReference'
             equipmentReference:
               $ref: '#/components/schemas/equipmentReference'
-            facilityType:
-              $ref: '#/components/schemas/facilityType'
+            facilityTypeCode:
+              $ref: '#/components/schemas/facilityTypeCode'
             UNLocationCode:
               $ref: '#/components/schemas/UNLocationCode'
             facilityCode:
@@ -239,13 +239,13 @@ components:
             - transportReference
             - transportLegReference
             - equipmentReference
-            - facilityType
+            - facilityTypeCode
             - UNLocationCode
             - facilityCode
             - emptyIndicatorCode
     events:
       type: object
-      description: List of events.
+      description: List of events for shipment journey.
       properties:
         events:
           type: array
@@ -277,27 +277,27 @@ components:
     bookingReference:
       type: string
       example: ABC709951
-      description: The unique identifier for a shipment.
+      description: The identifier for a shipment, which is issued by and unique within each of the carriers.
     transportReference:
       type: string
       example: 9648714
-      description: The reference for the transport that the shipment is related to.
+      description: The reference for the transport, e.g. when the mode of transport is a vessel, the transport reference will be the vessel IMO number.
     equipmentReference:
       type: string
       example: APZU4812090
-      description: The unique identifier for the equipment.
+      description: The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible. If a container is not yet assigned to a shipment, the interface cannot return any information when an equipment reference is given as input. If a container is assigned to an (active) shipment, the interface returns information on the active shipment.
     billOfLadingNumber:
       type: string
       example: ABCD421911263977
-      description: Bill of Lading is the legal document issued to the customer.
-    facilityType:
+      description: Bill of lading number is an identifier that links to a shipment. Bill of Lading is the legal document issued to the customer, which confirms the carrier's receipt of the cargo from the customer acknowledging goods being shipped and specifying the terms of delivery.
+    facilityTypeCode:
       type: string
       example: POTE
       description: The code to identify the specific type of facility.
     UNLocationCode:
       type: string
       example: USNYC
-      description: UN Location Code identifies a location in the sense of a city / a town / a village.
+      description: The UN Location Code identifies a location in the sense of a city/a town/a village, being the smaller administrative area existing as defined by the competent national authority in each country.
     facilityCode:
       type: string
       example: AEAUHADT
@@ -309,7 +309,7 @@ components:
     emptyIndicatorCode:
       type: string
       example: Empty
-      description: Code to denote whether the equipment is empty or not.
+      description: Code to denote whether the equipment is empty or laden.
     informationTypeCode:
       type: string
       example: SRM
@@ -317,12 +317,17 @@ components:
     transportLegReference:
       type: string
       example: 025E
-      description: The reference specifying a single section of the complete transport of a shipment. For a vessel this will be the voyage number.
+      description: |
+        The transport leg reference will be specific per mode of transport:
+        - Vessel: Voyage number as specified by the vessel operator
+        - Truck: Not yet specified
+        - Rail: Not yet specified
+        - Barge: Not yet specified.
     eventDateTime:
       type: string
       format: date-time
       example: '2019-11-12T07:41:00+08:30'
-      description: The date and time that the event took place.
+      description: The local date and time, where the event took place, in ISO 8601 format.
     eventID:
       type: string
       example: 1
@@ -330,7 +335,7 @@ components:
     eventClassifierCode:
       type: string
       example: ACT
-      description: Event Classifier Code (Planned, Estimated or Actual).
+      description: Code for the event classifier, either PLN, ACT or EST.
     eventTypeCode:
       type: string
       example: ARRI
