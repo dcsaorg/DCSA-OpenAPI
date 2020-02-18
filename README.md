@@ -35,6 +35,7 @@ In response, all APIs must return an HTTP header indicating the version of the A
 `DCSA-Content-Type: dcsa.tnt; version=X.Y.Z`
 
 Where,
+
 X represents the major version number.
 
 Y represents the minor version number.
