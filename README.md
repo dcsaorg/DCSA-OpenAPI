@@ -16,8 +16,10 @@ The DCSA Interface Standard for Track and Trace 1.0 is documented on [**DCSA Swa
 ### Versioning
 DCSA’s OpenAPI definitions on Swaggerhub are being versioned in accordance with the semantic versioning scheme (http://semver.org). There are many ways a version can be represented in an API implementation. The API provider compliant with the DCSA specifications is welcome to support multiple methods of representing versions. However, every provider should at least support URI based versioning.
 
-In order to be compliant with the DCSA track and trace interface standard, every endpoint URI must be prefixed with,<br/>
-`/dcsa/tnt/vX`<br/>
+In order to be compliant with the DCSA track and trace interface standard, every endpoint URI must be prefixed with,
+
+`/dcsa/tnt/vX`
+
 Where,<br/>
 X represents the major version number.<br/>
 
@@ -27,7 +29,9 @@ Here’s an example for track and trace version 1.0.0,<br/>
 Every provider must host only the major version, ensuring backwards compatibility for minor and patch versions.
 
 In response, all APIs must return an HTTP header indicating the version of the API. The version returned should be the complete version number including the major, minor and patch number. It should follow the format as specified below,
+
 `DCSA-Content-Type: dcsa.tnt; version=X.Y.Z`
+
 Where,<br/>
 X represents the major version number.<br/>
 Y represents the minor version number.<br/>
