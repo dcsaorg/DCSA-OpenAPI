@@ -20,9 +20,7 @@ In order to be compliant with the DCSA track and trace interface standard, every
 
 `/dcsa/tnt/vX`
 
-Where,
-
-X represents the major version number.
+Where X represents the major version number.
 
 Here’s an example for track and trace version 1.0.0,
 
