@@ -39,20 +39,3 @@ Z represents the patch version number.<br/>
 
 Here’s an example of the response HTTP header for version 1.0.0,<br/>
 `DCSA-Content-Type: dcsa.tnt; version=1.0.0`<br/>
-
-
-|                             |                         |               |
-|-----------------------------|-------------------------|---------------|
-| HTTP code                   | Error code              | Error message |
-| 400 – Bad Request           | invalidParameter        | An invalid parameter or parameter value was supplied in the  |
-| 400 – Bad Request           | missingParameter        | The API request is missing a required |
-| 400 – Bad Request           | invalidQuery            | The request query was invalid\. Check the documentation to ensure that the supplied parameters are supported, and check if the request contains an invalid combination of parameters, or an invalid value\. |
-| 401 \- Unauthorized         | missingCredentials      | The user is not authorized to make the |
-| 401 \- Unauthorized         | invalidCredentials      | The supplied authorization credentials for the request are  |
-| 401 \- Unauthorized         | expiredAccessToken      | The supplied Access Token has expired |
-| 403 \- Forbidden            | accessDenied            | The requested operation is forbidden\.|
-| 403 \- Forbidden            | insufficientPermissions | The authenticated user is not permitted to execute this request\.|
-| 404 – Not found             | notFound                | The requested resource could not found\.|
-| 405 – Method not allowed    | httpMethodNotAllowed    | The HTTP method for the request is not supported\.|
-| 429 – Too many requests     | rateLimitExceeded       | Too many requests have been sent recently\.|
-| 500 – Internal server error | internalError           | The request failed due to an internal error\.|
