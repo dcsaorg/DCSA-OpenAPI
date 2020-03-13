@@ -63,7 +63,10 @@ Here’s an example of the response HTTP header for version 1.0.0,<br/>
 * Improved error handling
 * Added "modeOfTransportCode" to Transport events, and Transport Equipment events
   * Since we removed Transport and Equipment objects to keep the API focused on just Track & Trace, the Mode of Transport was missing, so it has been added
-* Removed discriminator from the "events" object. 
+* Removed discriminator from the "events" object.
   * The discriminator did not make sense in the way it was used, and would not add any value, so we removed it
-
+* Renamed informationTypeCode to shipmentInformationTypeCode
+  * The field did not have the same name as what was specified in the interface document, hence the change
+* Made equipmentReference optional in Transport Equipment events and Equipment events
+  * The interface document specified that this should be optional
 
