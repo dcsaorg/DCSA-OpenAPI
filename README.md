@@ -40,6 +40,8 @@ Z represents the patch version number.<br/>
 Here’s an example of the response HTTP header for version 1.0.0,<br/>
 `DCSA-Content-Type: dcsa.tnt; version=1.0.0`<br/>
 
+### Error handling
+The table below shows the error codes; This is not an exhaustive list, other codes may be used in implementations.
 
 |                             |                         |               |
 |-----------------------------|-------------------------|---------------|
@@ -58,8 +60,10 @@ Here’s an example of the response HTTP header for version 1.0.0,<br/>
 | 500 – Internal server error | internalError           | The request failed due to an internal error\.|
 
 ### Releasenotes
+#### 1.0
+ * Initial release of the DSCA OpenAPI definitions for Track & Trace
 
-#### Release 1.1
+####  1.1
 * Improved error handling
 * Added "modeOfTransportCode" to Transport events, and Transport Equipment events
   * Since we removed Transport and Equipment objects to keep the API focused on just Track & Trace, the Mode of Transport was missing, so it has been added
