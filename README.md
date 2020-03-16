@@ -45,7 +45,7 @@ The table below shows the error codes; This is not an exhaustive list, other cod
 
 |                             |                         |               |
 |-----------------------------|-------------------------|---------------|
-| HTTP code                   | Error code              | Error message |
+| **HTTP code**                   | **Error code**              | **Error message** |
 | 400 – Bad Request           | invalidParameter        | An invalid parameter or parameter value was supplied in the  |
 | 400 – Bad Request           | missingParameter        | The API request is missing a required |
 | 400 – Bad Request           | invalidQuery            | The request query was invalid\. Check the documentation to ensure that the supplied parameters are supported, and check if the request contains an invalid combination of parameters, or an invalid value\. |
