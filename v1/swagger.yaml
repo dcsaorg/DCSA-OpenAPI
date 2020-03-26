@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: '1.0.0'
+  version: "1.1.0"
   title: 'DCSA Track and Trace API'
   description: 'API specifications for the Track and Trace interface standard 1.0 issued by DCSA.org'
   license:
@@ -49,14 +49,12 @@ paths:
             application/xml:
               schema:
                 $ref: '#/components/schemas/events'
-        '400':
-          description: Invalid parameter supplied
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-        '404':
-          description: Parameter not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
 components:
   schemas:
     event:
@@ -82,10 +80,10 @@ components:
         - $ref: '#/components/schemas/event'
         - type: object
           properties:
-            informationTypeCode:
-              $ref: '#/components/schemas/informationTypeCode'
+            shipmentInformationTypeCode:
+              $ref: '#/components/schemas/shipmentInformationTypeCode'
           required:
-            - informationTypeCode
+            - shipmentInformationTypeCode
     transportEvent:
       description: The transport event entity is a specialization of the event entity to support specification of data that only applies to a transport event.
       allOf:
@@ -104,6 +102,8 @@ components:
               $ref: '#/components/schemas/facilityCode'
             otherFacility:
               $ref: '#/components/schemas/otherFacility'
+            modeOfTransportCode:
+              $ref: '#/components/schemas/modeOfTransportCode'
           required:
             - transportReference
             - transportLegReference
@@ -129,7 +129,6 @@ components:
             emptyIndicatorCode:
               $ref: '#/components/schemas/emptyIndicatorCode'
           required:
-            - equipmentReference
             - facilityTypeCode
             - UNLocationCode
             - facilityCode
@@ -156,10 +155,11 @@ components:
               $ref: '#/components/schemas/otherFacility'
             emptyIndicatorCode:
               $ref: '#/components/schemas/emptyIndicatorCode'
+            modeOfTransportCode:
+              $ref: '#/components/schemas/modeOfTransportCode'
           required:
             - transportReference
             - transportLegReference
-            - equipmentReference
             - facilityTypeCode
             - UNLocationCode
             - facilityCode
@@ -176,10 +176,56 @@ components:
               - $ref: '#/components/schemas/shipmentEvent'
               - $ref: '#/components/schemas/equipmentEvent'
               - $ref: '#/components/schemas/transportEquipmentEvent'
-            discriminator:
-              propertyName: event
       required:
         - events
+    error:
+      type: object
+      required:
+        - httpMethod
+        - requestUri
+        - errors
+        - statusCode
+        - statusCodeText
+        - errorDateTime
+      properties:
+        httpMethod:
+          description: The HTTP request method type
+          type: string
+          example: POST
+        requestUri:
+          description: The request URI.
+          type: string
+          example: https://dcsa.org/dcsa/tnt/v1/events
+        errors:
+          $ref: '#/components/schemas/errors'
+        statusCode:
+          description: The HTTP status code
+          type: string
+          example: 400  
+        statusCodeText:
+          description: The textual representation of the response status.
+          type: string
+          example: Bad Request
+        errorDateTime:
+          description: The date and time (in ISO 8601 format) the error occured.
+          type: string
+          example: '2019-11-12T07:41:00+08:30'
+    errors:
+      type: array
+      items: 
+        type: object
+        properties:
+          reason:
+            description: High level error message.
+            type: string
+            example: invalidQuery
+          message:
+            description: Detailed error message.
+            type: string
+            example: The request did not contain one of the three required query parameters. 
+        required: 
+         - reason
+         - message
 ####String variables below
     bookingReference:
       type: string
@@ -217,7 +263,7 @@ components:
       type: string
       example: Empty
       description: Code to denote whether the equipment is empty or laden.
-    informationTypeCode:
+    shipmentInformationTypeCode:
       type: string
       example: SRM
       description: The code to identify the type of information that is related to the shipment.
@@ -247,3 +293,7 @@ components:
       type: string
       example: ARRI
       description: Unique identifier for Event Type Code.
+    modeOfTransportCode:
+      type: string
+      example: 1
+      description: A code specifying a type of transport mode.
