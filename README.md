@@ -50,8 +50,8 @@ The table below shows the error codes; This is not an exhaustive list, other cod
 | 400 – Bad Request           | missingParameter        | The API request is missing a required parameter. |
 | 400 – Bad Request           | invalidQuery            | The request query was invalid. Check the documentation to ensure that the supplied parameters are supported, and check if the request contains an invalid combination of parameters, or an invalid value. |
 | 401 \- Unauthorized         | missingCredentials      | The user is not authorized to make the request. |
-| 401 \- Unauthorized         | invalidCredentials      | The supplied authorization credentials for the request are invalid  |
-| 401 \- Unauthorized         | expiredAccessToken      | The supplied Access Token has expired |
+| 401 \- Unauthorized         | invalidCredentials      | The supplied authorization credentials for the request are invalid. |
+| 401 \- Unauthorized         | expiredAccessToken      | The supplied Access Token has expired. |
 | 403 \- Forbidden            | accessDenied            | The requested operation is forbidden.|
 | 403 \- Forbidden            | insufficientPermissions | The authenticated user is not permitted to execute this request.|
 | 404 – Not found             | notFound                | The requested resource could not be found.|
