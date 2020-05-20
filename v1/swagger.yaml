@@ -1,8 +1,8 @@
 openapi: 3.0.0
 info:
-  version: "1.1.0"
+  version: "1.2.0"
   title: 'DCSA Track and Trace API'
-  description: 'API specifications for the Track and Trace interface standard 1.0 issued by DCSA.org'
+  description: 'API specifications for the Track and Trace interface standard 1.0 issued by DCSA.org. THIS IS NOT A RELEASE VERSION. THIS IS A PUBLIC DRAFT FOR REVIEW AND EVERYTHING IS SUBJECT TO CHANGE'
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -18,9 +18,15 @@ paths:
     get:
       tags:
         - Events
-      summary: Find events by Booking Reference, Bill of Lading or Equipment Reference. 
-      description: Returns all events related to the query parameter. The endpoint **requires** at least 1 of the 3 query parameters to be used.
+      summary: Find events by type, Booking Reference, Bill of Lading or Equipment Reference. 
+      description: Returns all events filtered by the parameters.
       parameters:
+        - in: query
+          name: eventTypeList
+          description: The type of event(s) to filter by.
+          required: false
+          schema:
+            $ref: '#/components/schemas/eventType'
         - in: query
           name: bookingReference
           description: The identifier for a shipment, which is issued by and unique within each of the carriers.
@@ -55,6 +61,112 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error'
+  /event-subscriptions:
+    get:
+      tags:
+      - Subscriptions
+      summary: Receive a list of your active subscriptionIds
+      responses: 
+        '200':
+          description: List of subscriptionId's returned
+          content:
+            application/json:
+             schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/subscriptionId'
+    post:
+      tags:
+      - Subscriptions
+      summary: Subscribe to an event webhook
+      requestBody:
+        description: Parameters used to configure the subscription
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/eventSubscriptionsBody'
+      responses:
+        '201':
+          description: Webhook created  
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/subscriptionId'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'  
+      callbacks:
+        event:
+          '{$request.body.callbackUrl}':
+            post:   # Method
+              requestBody: # Contents of the callback message
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/events'
+              responses:   # Expected responses to the callback message
+                '200':
+                  description: Your server returns this code if it accepts the callback
+  /event-subscriptions/{subscriptionId}:
+    delete:
+      tags:
+      - Subscriptions
+      summary: Stop an event subscription, using the subscription ID
+      parameters:
+        - in: path
+          name: subscriptionId
+          schema:
+            type: string
+          required: true
+          description: The ID of the subscription to delete
+      responses:
+        '200':
+          description: Webhook deleted  
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'  
+    put:
+      tags:
+      - Subscriptions
+      summary: Alter an event webhook
+      parameters:
+        - in: path
+          name: subscriptionId
+          schema:
+            type: string
+          required: true
+          description: The ID of the subscription to alter
+      requestBody:
+        description: Parameters used to configure the subscription
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/eventSubscriptionsBody'
+      responses:
+        '201':
+          description: Webhook created  
+          content:
+            application/json:
+              schema:
+               $ref: '#/components/schemas/subscriptionId'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'              
+    
+  
+      
 components:
   schemas:
     event:
@@ -63,6 +175,8 @@ components:
       properties:
         eventID:
           $ref: '#/components/schemas/eventID'
+        eventType:
+          $ref: '#/components/schemas/eventType'
         eventDateTime:
           $ref: '#/components/schemas/eventDateTime'
         eventClassifierCode:
@@ -71,6 +185,7 @@ components:
           $ref: '#/components/schemas/eventTypeCode'
       required:
         - eventID
+        - eventType
         - eventDateTime
         - eventClassifierCode
         - eventTypeCode
@@ -80,6 +195,12 @@ components:
         - $ref: '#/components/schemas/event'
         - type: object
           properties:
+            eventType: #Overriding this property to have correct payload response examples
+              type: string
+              example: SHIPMENT
+              nullable: false
+              enum:
+                - SHIPMENT
             shipmentInformationTypeCode:
               $ref: '#/components/schemas/shipmentInformationTypeCode'
           required:
@@ -90,6 +211,12 @@ components:
         - $ref: '#/components/schemas/event'
         - type: object
           properties:
+            eventType: #Overriding this property to have correct payload response examples
+              type: string
+              example: TRANSPORT
+              nullable: false
+              enum:
+                - TRANSPORT
             transportReference:
               $ref: '#/components/schemas/transportReference'
             transportLegReference:
@@ -116,6 +243,12 @@ components:
         - $ref: '#/components/schemas/event'
         - type: object
           properties:
+            eventType: #Overriding this property to have correct payload response examples
+              type: string
+              example: EQUIPMENT
+              nullable: false
+              enum:
+                - EQUIPMENT
             equipmentReference:
               $ref: '#/components/schemas/equipmentReference'
             facilityTypeCode:
@@ -139,6 +272,12 @@ components:
         - $ref: '#/components/schemas/event'
         - type: object
           properties:
+            eventType: #Overriding this property to have correct payload response examples
+              type: string
+              example: TRANSPORTEQUIPMENT
+              nullable: false
+              enum:
+                - TRANSPORTEQUIPMENT
             transportReference:
               $ref: '#/components/schemas/transportReference'
             transportLegReference:
@@ -176,6 +315,8 @@ components:
               - $ref: '#/components/schemas/shipmentEvent'
               - $ref: '#/components/schemas/equipmentEvent'
               - $ref: '#/components/schemas/transportEquipmentEvent'
+            discriminator:
+              propertyName: eventType  
       required:
         - events
     error:
@@ -226,6 +367,22 @@ components:
         required: 
          - reason
          - message
+    eventSubscriptionsBody:
+      description: The object used by the POST event-subscriptions endpoint
+      type: object
+      properties:
+        callbackUrl:
+          $ref: '#/components/schemas/callbackUrl'
+        eventType:
+          $ref: '#/components/schemas/eventTypeList'
+        bookingReference:
+          $ref: '#/components/schemas/bookingReference'
+        billOfLadingNumber:
+          $ref: '#/components/schemas/billOfLadingNumber'
+        equipmentReference:
+          $ref: '#/components/schemas/equipmentReference'
+      required:
+        - callbackUrl
 ####String variables below
     bookingReference:
       type: string
@@ -297,3 +454,38 @@ components:
       type: string
       example: 1
       description: A code specifying a type of transport mode.
+    subscriptionId:
+      type: object
+      properties:
+        subscriptionId:
+          type: string
+          example: jlke123j
+      description: The carrier issues a unique ID to the shipper or consignee for that subscription
+    callbackUrl:   # Callback URL
+      type: string
+      format: uri
+      example: https://myserver.com/send/callback/here
+      description: Your server, where the API server should send the event data
+    eventType:
+      description: The Event Type of the object.
+      nullable: false
+      type: string
+      enum: 
+        - EQUIPMENT
+        - SHIPMENT
+        - TRANSPORT
+        - TRANSPORTEQUIPMENT
+        - TRANSPORTEQUIPMENT
+        
+        
+    eventTypeList:
+      description: A list of event types. Default is all events
+      example: [EQUIPMENT,SHIPMENT,TRANSPORT,TRANSPORTEQUIPMENT]
+      default: [EQUIPMENT,SHIPMENT,TRANSPORT,TRANSPORTEQUIPMENT]
+      type: array
+      items:
+        $ref: '#/components/schemas/eventType'
+# Added by API Auto Mocking Plugin
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/dcsaorg/DCSA_OAS/1.2.0a
