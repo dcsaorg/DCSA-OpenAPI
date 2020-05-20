@@ -65,16 +65,16 @@ paths:
     get:
       tags:
       - Subscriptions
-      summary: Receive a list of your active subscriptionIds
+      summary: Receive a list of your active subscriptionIDs
       responses: 
         '200':
-          description: List of subscriptionId's returned
+          description: List of subscriptionID's returned
           content:
             application/json:
-             schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/subscriptionId'
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/eventSubscription'
     post:
       tags:
       - Subscriptions
@@ -85,14 +85,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/eventSubscriptionsBody'
+              $ref: '#/components/schemas/eventSubscriptionCreate'
       responses:
         '201':
           description: Webhook created  
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/subscriptionId'
+                $ref: '#/components/schemas/eventSubscription'
         default:
           description: Unexpected error
           content:
@@ -112,20 +112,20 @@ paths:
               responses:   # Expected responses to the callback message
                 '200':
                   description: Your server returns this code if it accepts the callback
-  /event-subscriptions/{subscriptionId}:
+  /event-subscriptions/{subscriptionID}:
     delete:
       tags:
       - Subscriptions
       summary: Stop an event subscription, using the subscription ID
       parameters:
         - in: path
-          name: subscriptionId
+          name: subscriptionID
           schema:
             type: string
           required: true
           description: The ID of the subscription to delete
       responses:
-        '200':
+        '204':
           description: Webhook deleted  
         default:
           description: Unexpected error
@@ -139,7 +139,7 @@ paths:
       summary: Alter an event webhook
       parameters:
         - in: path
-          name: subscriptionId
+          name: subscriptionID
           schema:
             type: string
           required: true
@@ -150,14 +150,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/eventSubscriptionsBody'
+              $ref: '#/components/schemas/eventSubscription'
       responses:
-        '201':
-          description: Webhook created  
+        '200':
+          description: Webhook updated  
           content:
             application/json:
               schema:
-               $ref: '#/components/schemas/subscriptionId'
+               $ref: '#/components/schemas/eventSubscription'
         default:
           description: Unexpected error
           content:
@@ -367,7 +367,7 @@ components:
         required: 
          - reason
          - message
-    eventSubscriptionsBody:
+    eventSubscriptionCreate:
       description: The object used by the POST event-subscriptions endpoint
       type: object
       properties:
@@ -383,6 +383,10 @@ components:
           $ref: '#/components/schemas/equipmentReference'
       required:
         - callbackUrl
+    eventSubscription:
+      allOf:
+        - $ref: '#/components/schemas/subscriptionID'
+        - $ref: '#/components/schemas/eventSubscriptionCreate'
 ####String variables below
     bookingReference:
       type: string
@@ -454,10 +458,10 @@ components:
       type: string
       example: 1
       description: A code specifying a type of transport mode.
-    subscriptionId:
+    subscriptionID:
       type: object
       properties:
-        subscriptionId:
+        subscriptionID:
           type: string
           example: jlke123j
       description: The carrier issues a unique ID to the shipper or consignee for that subscription
@@ -474,7 +478,6 @@ components:
         - EQUIPMENT
         - SHIPMENT
         - TRANSPORT
-        - TRANSPORTEQUIPMENT
         - TRANSPORTEQUIPMENT
     eventTypeList:
       description: A list of event types. Default is all events
