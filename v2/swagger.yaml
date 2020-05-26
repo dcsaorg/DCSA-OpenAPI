@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: "1.2.0"
+  version: "2.0.0"
   title: 'DCSA Track and Trace API'
   description: 'API specifications for the Track and Trace interface standard 1.0 issued by DCSA.org'
   license:
@@ -13,6 +13,10 @@ info:
 tags:
   - name: Events
     description: Event operations 
+  - name: Operational Vessel Schedules
+    description: Operational Vessel Schedules operations
+  - name: Subscriptions
+    description: Subscription operations
 paths:
   /events:
     get:
@@ -52,15 +56,43 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/events'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/events'
         default:
           description: Unexpected error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/error'
+  /events/{eventID}:
+    get:
+      parameters:
+        - in: path
+          name: eventID
+          schema:
+            type: string
+          required: true
+          description: The ID of the event to receive
+      tags:
+        - Events
+      summary: Find events by eventID. 
+      description: Returns event with the specified eventID.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/transportEvent'
+                  - $ref: '#/components/schemas/shipmentEvent'
+                  - $ref: '#/components/schemas/equipmentEvent'
+                  - $ref: '#/components/schemas/transportEquipmentEvent'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+
   /event-subscriptions:
     get:
       tags:
@@ -187,9 +219,501 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'              
-    
-  
+                $ref: '#/components/schemas/error'   
+  /schedules:
+    get:
+      tags:
+        - Operational Vessel Schedules
+      summary: Find schedules
+      description: Returns all schedules filtered by the parameters.
+      parameters:
+        - in: query
+          name: dateRange
+          description: |
+             The time period in weeks for which schedule information should be sent. Any numeric value between 1 and 12 weeks is allowed. If not provided, the schedule will be sent for the whole period the vessel operator has defined a schedule.  The vessel operator should send the schedule for the whole period it is defined, if less than the range requested. If a voyage begins during the date range but extends past the end of the range, the schedule for the entire voyage will be sent. Similarly, if a voyage has already begun prior to the period but is still ongoing it will also be included.
+          required: true
+          schema:
+            $ref: '#/components/schemas/dateRange'
+        - in: query
+          name: carrierServiceCode
+          description: The code of the service for which information should be sent. This is the code used by the vessel operator for that service and should be part of a VSA agreement between the subscribing vessel operator and the vessel operator
+          required: false
+          schema:
+            $ref: '#/components/schemas/carrierServiceCode'
+        - in: query
+          name: vesselIMONumber
+          description: The identifier of the vessel for which schedule information is sent. If not provided, the schedule is sent for all vessels.
+          required: false
+          schema:
+            $ref: '#/components/schemas/vesselIMONumber'    
+        - in: query
+          name: voyageNumber
+          description: The vessel operator assigned voyage number for the respective voyage.
+          required: false
+          schema:
+            $ref: '#/components/schemas/carrierVoyageNumber'
+        - in: query
+          name: UNLocationCode
+          description: The UN location code identifies a location in the sense of a city/a town/a village, being the smaller administrative area existing as defined by the competent national authority in each country.
+          required: false
+          schema:
+            $ref: '#/components/schemas/UNLocationCode'    
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/schedule'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+  /schedules/{scheduleID}:
+    get:
+      parameters:
+        - in: path
+          name: scheduleID
+          schema:
+            type: string
+          required: true
+          description: The ID of the schedule to receive
+      tags:
+        - Operational Vessel Schedules
+      summary: Find schedule by scheduleID. 
+      description: Returns event with the specified scheduleID.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schedule'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+  /schedules/{scheduleID}/transport-calls:
+    get:
+      tags:
+        - Operational Vessel Schedules
+      summary: Find transport Calls
+      description: Returns all Transport Calls filtered by the parameters.
+      parameters:
+        - in: path
+          name: scheduleID
+          schema:
+            type: string
+          required: true
+          description: The ID of the Schedule to filter by. This value can be * for all Schedules.
+        - in: query
+          name: carrierServiceCode
+          description: The code of the service for which information should be sent. This is the code used by the vessel operator for that service and should be part of a VSA agreement between the subscribing vessel operator and the vessel operator
+          required: false
+          schema:
+            $ref: '#/components/schemas/carrierServiceCode'
+        - in: query
+          name: vesselIMONumber
+          description: The identifier of the vessel for which schedule information is sent. If not provided, the schedule is sent for all vessels.
+          required: false
+          schema:
+            $ref: '#/components/schemas/vesselIMONumber'    
+        - in: query
+          name: carrierVoyageNumber
+          description: The vessel operator assigned voyage number for the respective voyage.
+          required: false
+          schema:
+            $ref: '#/components/schemas/carrierVoyageNumber'
+        - in: query
+          name: UNLocationCode
+          description: The UN location code identifies a location in the sense of a city/a town/a village, being the smaller administrative area existing as defined by the competent national authority in each country.
+          required: false
+          schema:
+            $ref: '#/components/schemas/UNLocationCode'    
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/transportCall'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+  /schedules/{scheduleID}/transport-calls/{transportCallID}:
+    get:
+      parameters:
+        - in: path
+          name: scheduleID
+          schema:
+            type: string
+          required: true
+          description: The ID of the Schedule to filter by. This value can be * for all Schedules.
+        - in: path
+          name: transportCallID
+          schema:
+            type: string
+          required: true
+          description: The ID of the Transport Call to filter by. 
+      tags:
+        - Operational Vessel Schedules
+      summary: Find schedule by transportCallID. 
+      description: Returns event with the specified transportCallID.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/transportCall'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+  /schedules/{scheduleID}/transport-calls/{transportCallID}/transportevents:
+    get:
+      tags:
+        - Operational Vessel Schedules
+      summary: Find Transport Events by transportCallID
+      description: Returns all Transport Events related to the scheduleID and transportCallID.
+      parameters:
+        - in: path
+          name: scheduleID
+          schema:
+            type: string
+          required: true
+          description: The ID of the Schedule to filter by. This value can be * for all Schedules.
+        - in: path
+          name: transportCallID
+          schema:
+            type: string
+          required: true
+          description: The ID of the Transport Call to filter by. This value can be * for all Transport Calls.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/transportCall'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+  /schedule/{scheduleID}/transport-calls/{transportCallID}/transportEvents/{eventID}:
+    get:
+      parameters:
+        - in: path
+          name: scheduleID
+          schema:
+            type: string
+          required: true
+          description: The ID of the Schedule to filter by. This value can be * for all Schedules.
+        - in: path
+          name: transportCallID
+          schema:
+            type: string
+          required: true
+          description: The ID of the Transport Call to filter by. This value can be * for all Transport Calls.
+        - in: path
+          name: eventID
+          schema:
+            type: string
+          required: true
+          description: The ID of the Event to filter by. 
+      tags:
+        - Operational Vessel Schedules
+      summary: Find Transport Event by eventID. 
+      description: Returns Tranport Event with the specified eventID.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/transportEvent'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+  /schedule-subscriptions:
+    get:
+      tags:
+      - Subscriptions
+      summary: Receive a list of your active subscriptionIDs
+      responses: 
+        '200':
+          description: Returns a list of schedule subscriptions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/scheduleSubscription'
+    post:
+      tags:
+      - Subscriptions
+      summary: Subscribe to a schedule webhook
+      requestBody:
+        description: Parameters used to configure the subscription
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/scheduleSubscriptionCreate'
+      responses:
+        '201':
+          description: Webhook created  
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/scheduleSubscription'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'  
+      callbacks:
+        event:
+          '{$request.body.callbackUrl}':
+            post:   # Method
+              requestBody: # Contents of the callback message
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/schedule'
+              responses:   # Expected responses to the callback message
+                '200':
+                  description: Your server returns this code if it accepts the callback
+  /schedule-subscriptions/{subscriptionID}:
+    get:
+      tags:
+      - Subscriptions
+      summary: Find schedule subscription by subscription ID
+      parameters:
+        - in: path
+          name: subscriptionID
+          schema:
+            type: string
+          required: true
+          description: The ID of the subscription to receive
+      responses:
+        '200':
+          description: Subscription returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/scheduleSubscription'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'  
+    delete:
+      tags:
+      - Subscriptions
+      summary: Stop a schedule subscription, using the subscription ID
+      parameters:
+        - in: path
+          name: subscriptionID
+          schema:
+            type: string
+          required: true
+          description: The ID of the subscription to delete
+      responses:
+        '204':
+          description: Webhook deleted  
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'  
+    put:
+      tags:
+      - Subscriptions
+      summary: Alter a schedule webhook
+      parameters:
+        - in: path
+          name: subscriptionID
+          schema:
+            type: string
+          required: true
+          description: The ID of the subscription to alter
+      requestBody:
+        description: Parameters used to configure the subscription
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/scheduleSubscription'
+      responses:
+        '200':
+          description: Webhook updated  
+          content:
+            application/json:
+              schema:
+               $ref: '#/components/schemas/scheduleSubscription'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'   
+
+  /transport-call-subscriptions:
+    get:
+      tags:
+      - Subscriptions
+      summary: Receive a list of your active subscriptionIDs
+      responses: 
+        '200':
+          description: Returns a list of Transport Call subscriptions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/transportCallSubscription'
+    post:
+      tags:
+      - Subscriptions
+      summary: Subscribe to a Transport Call webhook
+      requestBody:
+        description: Parameters used to configure the subscription
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/transportCallSubscriptionCreate'
+      responses:
+        '201':
+          description: Webhook created  
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/transportCallSubscription'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'  
+      callbacks:
+        event:
+          '{$request.body.callbackUrl}':
+            post:   # Method
+              requestBody: # Contents of the callback message
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/transportCall'
+              responses:   # Expected responses to the callback message
+                '200':
+                  description: Your server returns this code if it accepts the callback
+  /tranport-call-subscriptions/{subscriptionID}:
+    get:
+      tags:
+      - Subscriptions
+      summary: Find Transport Call subscription by subscription ID
+      parameters:
+        - in: path
+          name: subscriptionID
+          schema:
+            type: string
+          required: true
+          description: The ID of the subscription to receive
+      responses:
+        '200':
+          description: Subscription returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/transportCallSubscription'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'  
+    delete:
+      tags:
+      - Subscriptions
+      summary: Stop a Transport Call subscription, using the subscription ID
+      parameters:
+        - in: path
+          name: subscriptionID
+          schema:
+            type: string
+          required: true
+          description: The ID of the subscription to delete
+      responses:
+        '204':
+          description: Webhook deleted  
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'  
+    put:
+      tags:
+      - Subscriptions
+      summary: Alter a Transport Call webhook
+      parameters:
+        - in: path
+          name: subscriptionID
+          schema:
+            type: string
+          required: true
+          description: The ID of the subscription to alter
+      requestBody:
+        description: Parameters used to configure the subscription
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/transportCallSubscription'
+      responses:
+        '200':
+          description: Webhook updated  
+          content:
+            application/json:
+              schema:
+               $ref: '#/components/schemas/transportCallSubscription'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'  
       
 components:
   schemas:
@@ -241,23 +765,21 @@ components:
               nullable: false
               enum:
                 - TRANSPORT
-            transportReference:
-              $ref: '#/components/schemas/transportReference'
-            transportLegReference:
-              $ref: '#/components/schemas/transportLegReference'
+            transportCallID:
+              $ref: '#/components/schemas/transportCallID'
+            voyageFacilitySequenceNumber:
+              $ref: '#/components/schemas/voyageFacilitySequenceNumber'
             facilityTypeCode:
               $ref: '#/components/schemas/facilityTypeCode'
-            UNLocationCode:
-              $ref: '#/components/schemas/UNLocationCode'
             facilityCode:
               $ref: '#/components/schemas/facilityCode'
             otherFacility:
               $ref: '#/components/schemas/otherFacility'
-            modeOfTransportCode:
-              $ref: '#/components/schemas/modeOfTransportCode'
+            delayReasonCode:
+              $ref: '#/components/schemas/delayReasonCode'
+            vesselScheduleChangeRemark:
+              $ref: '#/components/schemas/vesselScheduleChangeRemark'
           required:
-            - transportReference
-            - transportLegReference
             - facilityTypeCode
             - UNLocationCode
             - facilityCode
@@ -411,6 +933,81 @@ components:
       allOf:
         - $ref: '#/components/schemas/subscriptionID'
         - $ref: '#/components/schemas/eventSubscriptionCreate'
+
+    transportCallSubscriptionCreate:
+      description: The object used by the POST transport-calls-subscriptions endpoint
+      type: object
+      properties:
+        callbackUrl:
+          $ref: '#/components/schemas/callbackUrl'
+        vesselIMONumber:
+          $ref: '#/components/schemas/vesselIMONumber'
+        carrierVoyageNumber:
+          $ref: '#/components/schemas/carrierVoyageNumber'
+        UNLocationCode:
+          $ref: '#/components/schemas/UNLocationCode'
+      required:
+        - callbackUrl
+    transportCallSubscription:
+      allOf:
+        - $ref: '#/components/schemas/subscriptionID'
+        - $ref: '#/components/schemas/transportCallSubscriptionCreate'    
+    scheduleSubscriptionCreate:
+      description: The object used by the POST event-subscriptions endpoint
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/transportCallSubscriptionCreate' 
+      properties:
+        callbackUrl:
+          $ref: '#/components/schemas/callbackUrl'
+        dateRange:
+          $ref: '#/components/schemas/dateRange'
+        carrierServiceCode:
+          $ref: '#/components/schemas/carrierServiceCode'
+      required:
+        - callbackUrl
+    scheduleSubscription:
+      allOf:
+        - $ref: '#/components/schemas/subscriptionID'
+        - $ref: '#/components/schemas/scheduleSubscriptionCreate'    
+    transportCall:
+      description: placeholder
+      type: object
+      properties:
+        transportCallID:
+          $ref: '#/components/schemas/transportCallID'
+        scheduleID:
+          $ref: '#/components/schemas/scheduleID'
+        carrierServiceCode:
+         $ref: '#/components/schemas/carrierServiceCode'
+        vesselIMONumber:
+          $ref: '#/components/schemas/vesselIMONumber'
+        vesselName:
+          $ref: '#/components/schemas/vesselName'
+        carrierVoyageNumber:
+          $ref: '#/components/schemas/carrierVoyageNumber'
+        UNLocationCode:
+          $ref: '#/components/schemas/UNLocationCode'
+        UNLocationName:
+          $ref: '#/components/schemas/UNLocationName'
+        voyagePortSequenceNumber:
+          $ref: '#/components/schemas/voyagePortSequenceNumber'
+    schedule:
+      description: placeholder
+      type: object
+      properties:
+        scheduleID:
+          $ref: '#/components/schemas/scheduleID'
+        vesselOperatorCarrierCode:
+          $ref: '#/components/schemas/vesselOperatorCarrierCode'
+        vesselOperatorCarrierCodeListProvider:
+          $ref: '#/components/schemas/vesselOperatorCarrierCodeListProvider'
+        vesselPartnerCarrierCode:
+          $ref: '#/components/schemas/vesselPartnerCarrierCode'
+        vesselPartnerCarrierCodeListProvider:
+          $ref: '#/components/schemas/vesselPartnerCarrierCodeListProvider'
+        dateRange:
+          $ref: '#/components/schemas/dateRange'
 ####String variables below
     bookingReference:
       type: string
@@ -436,6 +1033,10 @@ components:
       type: string
       example: USNYC
       description: The UN Location Code identifies a location in the sense of a city/a town/a village, being the smaller administrative area existing as defined by the competent national authority in each country.
+    UNLocationName:
+      description: The name of the UN Location identified by the UN location code above.
+      type: string
+      example: Singapore
     facilityCode:
       type: string
       example: AEAUHADT
@@ -510,7 +1111,65 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/eventType'
-# Added by API Auto Mocking Plugin
-servers:
-  - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/dcsaorg/DCSA_OAS/1.2.0
+    voyageFacilitySequenceNumber:
+      description: Field contains sequence of facility call within port.
+      type: string
+      example: 2
+    delayReasonCode:
+      description: Reason code for the delay. The SMDG reference codes are used for this attribute.
+      type: string
+      example: WEA
+    vesselScheduleChangeRemark:
+      description: Free text information provided by the vessel operator regarding the reasons for the change in schedule and/or plans to mitigate schedule slippage.
+      type: string
+      example: Bad weather
+    carrierServiceCode:
+      description: The code of the service for which the schedule details are published.
+      type: string
+      example: FE1
+    vesselIMONumber: 
+      description: The identifier of vessel for which schedule details are published. Depending on schedule type, this may not be available yet.
+      type: string
+      example: 1801323
+    vesselName:
+      description: Name of the vessel identified by the IMO number.
+      type: string
+      example: EMMA MAERSK
+    carrierVoyageNumber:
+      description: The vessel operator assigned voyage number for the respective voyage.
+      type: string
+      example: 2015W
+    voyagePortSequenceNumber:
+      description: This field contains the sequence of the port call within the voyage. It is used to differentiate between two port calls to the same port as part of the voyage, for example.
+      type: string
+      example: 1
+    scheduleID:
+      description: ID uniquely identifying a schedule
+      type: number
+      example: 3
+    vesselOperatorCarrierCode:
+      description: The identifier of the vessel operator publishing the event.
+      type: string
+      example: MAEU
+    vesselOperatorCarrierCodeListProvider:
+      description: Identifies the code list provider used for the operator and partner carriercodes.
+      type: string
+      enum: [SMDG,NMFTA]
+      example: NMFTA
+    vesselPartnerCarrierCode:
+      description: The identifier of the vessel partner for which the current message is intended. This field allows specifying multiple, comma-separated values if there is more than one vessel partner involved.
+      type: string
+      example: MSCU,HLCU
+    vesselPartnerCarrierCodeListProvider:
+      description: Identifies the code list provider used for the vessel operator and partner carrier codes. If 'vesselPartnerCarrierCode' is populated, the code list provider field is to be populated as well.
+      type: string
+      enum: [SMDG, NMFTA]
+      example: NMFTA
+    dateRange:
+      description: The time period in weeks for which schedule information is sent. If a voyage begins during the date range but extends past the end of the range, the schedule for the entire voyage is being sent.
+      type: string
+      example: 4
+    transportCallID:
+      description: The unique identifier for a transport call
+      type: number
+      example: 7
