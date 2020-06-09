@@ -13,6 +13,8 @@ info:
 tags:
   - name: Events
     description: Event operations 
+  - name: Subscriptions
+    description: Subscription operations
 paths:
   /events:
     get:
@@ -52,15 +54,52 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/events'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/events'
         default:
           description: Unexpected error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/error'
+  /events/{eventID}:
+    get:
+      parameters:
+        - in: path
+          name: eventID
+          schema:
+            type: string
+          required: true
+          description: The ID of the event to receive
+      tags:
+        - Events
+      summary: Find events by eventID. 
+      description: Returns event with the specified eventID.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/transportEvent'
+                  - $ref: '#/components/schemas/shipmentEvent'
+                  - $ref: '#/components/schemas/equipmentEvent'
+                  - $ref: '#/components/schemas/transportEquipmentEvent'
+                discriminator: 
+                  propertyName: eventType
+                example: #Couldn't use $ref in this example. Should be updated manually if shipmentEvent changes
+                  eventID: 1
+                  eventType: "SHIPMENT"
+                  eventDateTime: "2019-11-12T07:41:00+08:30"
+                  eventClassifierCode: "ACT"
+                  eventTypeCode: "ARRI"
+                  shipmentInformationTypeCode: "SRM"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+
   /event-subscriptions:
     get:
       tags:
@@ -78,7 +117,7 @@ paths:
     post:
       tags:
       - Subscriptions
-      summary: Subscribe to an event webhook
+      summary: Create an event subscription
       requestBody:
         description: Parameters used to configure the subscription
         required: true
@@ -88,7 +127,7 @@ paths:
               $ref: '#/components/schemas/eventSubscriptionCreate'
       responses:
         '201':
-          description: Webhook created  
+          description: Subscription created  
           content:
             application/json:
               schema:
@@ -150,7 +189,7 @@ paths:
           description: The ID of the subscription to delete
       responses:
         '204':
-          description: Webhook deleted  
+          description: Subscription stopped  
         default:
           description: Unexpected error
           content:
@@ -160,7 +199,7 @@ paths:
     put:
       tags:
       - Subscriptions
-      summary: Alter an event webhook
+      summary: Alter an event subscription
       parameters:
         - in: path
           name: subscriptionID
@@ -177,7 +216,7 @@ paths:
               $ref: '#/components/schemas/eventSubscription'
       responses:
         '200':
-          description: Webhook updated  
+          description: Subscription updated  
           content:
             application/json:
               schema:
