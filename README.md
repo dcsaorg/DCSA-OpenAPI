@@ -73,4 +73,14 @@ The table below shows the error codes; This is not an exhaustive list, other cod
   * The field did not have the same name as what was specified in the interface document, hence the change
 * Made equipmentReference optional in Transport Equipment events and Equipment events
   * The interface document specified that this should be optional
+#### 1.2
+* Added event-subscription endpoints
+  * Endpoint for creating subscription
+  * Endpoint for deleting subscription
+  * Endpoint for updating subscription
+  * Endpoint for receiving list of subscriptions
+  * Endpoint for reading a single subscription
+* Added eventType discriminator
+* Added endpoint for reading a single event by eventID
+
 
