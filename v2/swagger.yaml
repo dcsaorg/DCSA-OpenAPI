@@ -249,30 +249,7 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/dateRange'
-        - in: query
-          name: carrierServiceCode
-          description: The code of the service for which information should be sent. This is the code used by the vessel operator for that service and should be part of a VSA agreement between the subscribing vessel operator and the vessel operator
-          required: false
-          schema:
-            $ref: '#/components/schemas/carrierServiceCode'
-        - in: query
-          name: vesselIMONumber
-          description: The identifier of the vessel for which schedule information is sent. If not provided, the schedule is sent for all vessels.
-          required: false
-          schema:
-            $ref: '#/components/schemas/vesselIMONumber'
-        - in: query
-          name: carrierVoyageNumber
-          description: The vessel operator assigned voyage number for the respective voyage.
-          required: false
-          schema:
-            $ref: '#/components/schemas/carrierVoyageNumber'
-        - in: query
-          name: UNLocationCode
-          description: The UN location code identifies a location in the sense of a city/a town/a village, being the smaller administrative area existing as defined by the competent national authority in each country.
-          required: false
-          schema:
-            $ref: '#/components/schemas/UNLocationCode'
+
       responses:
         '200':
           description: Successful operation
@@ -318,15 +295,61 @@ paths:
     get:
       tags:
         - Operational Vessel Schedules
-      summary: Find transport calls
+      summary: Find transport calls by scheduleID
       description: Returns all Transport Calls filtered by the parameters.
       parameters:
+        - in: query
+          name: carrierServiceCode
+          description: The code of the service for which information should be sent. This is the code used by the vessel operator for that service and should be part of a VSA agreement between the subscribing vessel operator and the vessel operator
+          required: false
+          schema:
+            $ref: '#/components/schemas/carrierServiceCode'
         - in: path
           name: scheduleID
           schema:
             type: string
           required: true
-          description: The ID of the Schedule to filter by. This value can be * for all Schedules.
+          description: The ID of the schedule to filter by
+        - in: query
+          name: vesselIMONumber
+          description: The identifier of the vessel for which schedule information is sent. If not provided, the schedule is sent for all vessels.
+          required: false
+          schema:
+            $ref: '#/components/schemas/vesselIMONumber'
+        - in: query
+          name: carrierVoyageNumber
+          description: The vessel operator assigned voyage number for the respective voyage.
+          required: false
+          schema:
+            $ref: '#/components/schemas/carrierVoyageNumber'
+        - in: query
+          name: UNLocationCode
+          description: The UN location code identifies a location in the sense of a city/a town/a village, being the smaller administrative area existing as defined by the competent national authority in each country.
+          required: false
+          schema:
+            $ref: '#/components/schemas/UNLocationCode'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/transportCall'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'              
+  /transport-calls:
+    get:
+      tags:
+        - Operational Vessel Schedules
+      summary: Find transport calls
+      description: Returns all Transport Calls filtered by the parameters.
+      parameters:
         - in: query
           name: carrierServiceCode
           description: The code of the service for which information should be sent. This is the code used by the vessel operator for that service and should be part of a VSA agreement between the subscribing vessel operator and the vessel operator
@@ -366,15 +389,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error'
-  /schedules/{scheduleID}/transport-calls/{transportCallID}:
+  /transport-calls/{transportCallID}:
     get:
       parameters:
-        - in: path
-          name: scheduleID
-          schema:
-            type: string
-          required: true
-          description: The ID of the Schedule to filter by. This value can be * for all Schedules.
         - in: path
           name: transportCallID
           schema:
@@ -383,8 +400,8 @@ paths:
           description: The ID of the Transport Call to filter by.
       tags:
         - Operational Vessel Schedules
-      summary: Find schedule by transportCallID.
-      description: Returns event with the specified transportCallID.
+      summary: Find transport call by transportCallID.
+      description: Returns transport calls with the specified transportCallID.
       responses:
         '200':
           description: Successful operation
@@ -398,7 +415,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error'
-  /schedules/{scheduleID}/transport-calls/{transportCallID}/transport-events:
+  /transport-calls/{transportCallID}/transport-events:
     get:
       tags:
         - Operational Vessel Schedules
@@ -406,17 +423,11 @@ paths:
       description: Returns all transport events related to the scheduleID and transportCallID.
       parameters:
         - in: path
-          name: scheduleID
-          schema:
-            type: string
-          required: true
-          description: The ID of the schedule to filter by. This value can be * for all schedules.
-        - in: path
           name: transportCallID
           schema:
             type: string
           required: true
-          description: The ID of the transport call to filter by. This value can be * for all transport calls.
+          description: The ID of the transport call to filter by. 
       responses:
         '200':
           description: Successful operation
@@ -432,44 +443,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error'
-  /schedule/{scheduleID}/transport-calls/{transportCallID}/transport-events/{eventID}:
-    get:
-      parameters:
-        - in: path
-          name: scheduleID
-          schema:
-            type: string
-          required: true
-          description: The ID of the Schedule to filter by. This value can be * for all Schedules.
-        - in: path
-          name: transportCallID
-          schema:
-            type: string
-          required: true
-          description: The ID of the Transport Call to filter by. This value can be * for all Transport Calls.
-        - in: path
-          name: eventID
-          schema:
-            type: string
-          required: true
-          description: The ID of the Event to filter by.
-      tags:
-        - Operational Vessel Schedules
-      summary: Find Transport Event by eventID.
-      description: Returns Tranport Event with the specified eventID.
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/transportEvent'
-        default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/error'
+  
   /schedule-subscriptions:
     get:
       tags:
@@ -1184,7 +1158,7 @@ components:
       description: The start date of the period for which schedule information is requested. The value is populated in ISO 8601 Date format. If not provided, the current date is used by default.
       type: string
       format: date
-      example: 2020-04-06
+      example: '2020-04-06'
     transportCallID:
       description: The unique identifier for a transport call
       type: number
