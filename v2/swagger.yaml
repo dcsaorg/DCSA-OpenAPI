@@ -49,6 +49,22 @@ paths:
           required: false
           schema:
             $ref: '#/components/schemas/equipmentReference'
+        - in: query
+          name: limit
+          schema:
+            $ref: '#/components/parameters/limitParam'
+        - in: query
+          name: scheduleID
+          description: ID uniquely identifying a schedule, to filter events by.
+          required: false
+          schema:
+            $ref: '#/components/schemas/scheduleID'
+        - in: query
+          name: transportCallID
+          description: ID uniquely identifying a transport call, to filter events by.
+          required: false
+          schema:
+            $ref: '#/components/schemas/transportCallID'    
       responses:
         '200':
           description: Successful operation
@@ -144,6 +160,13 @@ paths:
         event:
           '{$request.body.callbackUrl}':
             post:   # Method
+              parameters:
+                - in: header
+                  name: Signature
+                  required: true
+                  explode: true
+                  schema:
+                    $ref: '#/components/headers/signatureHeader'
               requestBody: # Contents of the callback message
                 required: true
                 content:
@@ -249,7 +272,10 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/dateRange'
-
+        - in: query
+          name: limit
+          schema:
+            $ref: '#/components/parameters/limitParam'
       responses:
         '200':
           description: Successful operation
@@ -328,6 +354,10 @@ paths:
           required: false
           schema:
             $ref: '#/components/schemas/UNLocationCode'
+        - in: query
+          name: limit
+          schema:
+            $ref: '#/components/parameters/limitParam'   
       responses:
         '200':
           description: Successful operation
@@ -374,6 +404,10 @@ paths:
           required: false
           schema:
             $ref: '#/components/schemas/UNLocationCode'
+        - in: query
+          name: limit
+          schema:
+            $ref: '#/components/parameters/limitParam'    
       responses:
         '200':
           description: Successful operation
@@ -427,7 +461,11 @@ paths:
           schema:
             type: string
           required: true
-          description: The ID of the transport call to filter by. 
+          description: The ID of the transport call to filter by.
+        - in: query
+          name: limit
+          schema:
+            $ref: '#/components/parameters/limitParam' 
       responses:
         '200':
           description: Successful operation
@@ -486,6 +524,13 @@ paths:
         event:
           '{$request.body.callbackUrl}':
             post:   # Method
+              parameters:
+                - in: header
+                  name: Signature
+                  required: true
+                  explode: true
+                  schema:
+                    $ref: '#/components/headers/signatureHeader'
               requestBody: # Contents of the callback message
                 required: true
                 content:
@@ -616,6 +661,13 @@ paths:
         event:
           '{$request.body.callbackUrl}':
             post:   # Method
+              parameters:
+                - in: header
+                  name: Signature
+                  required: true
+                  explode: true
+                  schema:
+                    $ref: '#/components/headers/signatureHeader'
               requestBody: # Contents of the callback message
                 required: true
                 content:
@@ -865,7 +917,7 @@ components:
           $ref: '#/components/schemas/errors'
         statusCode:
           description: The HTTP status code
-          type: string
+          type: integer
           example: 400
         statusCodeText:
           description: The textual representation of the response status.
@@ -905,6 +957,10 @@ components:
           $ref: '#/components/schemas/billOfLadingNumber'
         equipmentReference:
           $ref: '#/components/schemas/equipmentReference'
+        scheduleID:  
+          $ref: '#/components/schemas/scheduleID'
+        transportCallID:  
+          $ref: '#/components/schemas/transportCallID'
       required:
         - callbackUrl
     eventSubscription:
@@ -996,23 +1052,27 @@ components:
           $ref: '#/components/schemas/startDate'
         dateRange:
           $ref: '#/components/schemas/dateRange'
-          
+    
 ####String variables below
     bookingReference:
       type: string
+      maxLength: 35
       example: ABC709951
       description: The identifier for a shipment, which is issued by and unique within each of the carriers.
     transportReference:
       type: string
       example: 9648714
+      maxLength: 50
       description: The reference for the transport, e.g. when the mode of transport is a vessel, the transport reference will be the vessel IMO number.
     equipmentReference:
       type: string
       example: APZU4812090
+      maxLength: 15
       description: The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible. If a container is not yet assigned to a shipment, the interface cannot return any information when an equipment reference is given as input. If a container is assigned to an (active) shipment, the interface returns information on the active shipment.
     billOfLadingNumber:
       type: string
       example: ABCD421911263977
+      maxLength: 20
       description: Bill of lading number is an identifier that links to a shipment. Bill of Lading is the legal document issued to the customer, which confirms the carrier's receipt of the cargo from the customer acknowledging goods being shipped and specifying the terms of delivery.
     facilityTypeCode:
       type: string
@@ -1036,11 +1096,15 @@ components:
       description: An alternative way to capture the facility when no standardized DCSA facility code can be found.
     emptyIndicatorCode:
       type: string
-      example: Empty
+      example: EMPTY
+      enum:
+        - EMPTY
+        - LADEN
       description: Code to denote whether the equipment is empty or laden.
     shipmentInformationTypeCode:
       type: string
       example: SRM
+      maxLength: 4
       description: The code to identify the type of information that is related to the shipment.
     transportLegReference:
       type: string
@@ -1063,13 +1127,15 @@ components:
     eventClassifierCode:
       type: string
       example: ACT
+      maxLength: 3
       description: Code for the event classifier, either PLN, ACT or EST.
     eventTypeCode:
       type: string
       example: ARRI
+      maxLength: 4
       description: Unique identifier for Event Type Code.
     modeOfTransportCode:
-      type: string
+      type: number
       example: 1
       description: A code specifying a type of transport mode.
     subscriptionID:
@@ -1107,6 +1173,7 @@ components:
     delayReasonCode:
       description: Reason code for the delay. The SMDG reference codes are used for this attribute.
       type: string
+      maxLength: 3
       example: WEA
     vesselScheduleChangeRemark:
       description: Free text information provided by the vessel operator regarding the reasons for the change in schedule and/or plans to mitigate schedule slippage.
@@ -1119,11 +1186,13 @@ components:
     vesselIMONumber:
       description: The identifier of vessel for which schedule details are published. Depending on schedule type, this may not be available yet.
       type: string
+      maxLength: 7
       example: 1801323
     vesselName:
       description: Name of the vessel identified by the IMO number.
       type: string
       example: Vessel A
+      maxLength: 35
     carrierVoyageNumber:
       description: The vessel operator assigned voyage number for the respective voyage.
       type: string
@@ -1136,6 +1205,7 @@ components:
       description: The identifier of the vessel operator publishing the event.
       type: string
       example: MAEU
+      maxLength: 10
     vesselOperatorCarrierCodeListProvider:
       description: Identifies the code list provider used for the operator and partner carriercodes.
       type: string
@@ -1163,3 +1233,34 @@ components:
       description: The unique identifier for a transport call
       type: number
       example: 7
+  headers:
+    signatureHeader:
+      schema:
+        type: object
+        properties:
+          keyId:
+            type: string
+            format: uuid
+            example: 123e4567-e89b-12d3-a456-426614174000
+          created:
+            type: integer
+            example: 1591960384 
+          headers:
+            type: string
+            example: "(request-target) (created) date host"
+          signature:
+            type: string
+            example: aGkgZnJvbSBkZW5tYXJr
+  parameters:    
+    limitParam:
+      name: limit
+      in: query
+      description: Maximum number of items to return.
+      required: false
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+      #  maximum: 100
+        default: 100 
+      example: 100
