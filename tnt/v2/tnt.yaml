@@ -48,10 +48,6 @@ paths:
           schema:
             $ref: '#/components/schemas/equipmentReference'
         - in: query
-          name: limit
-          schema:
-            $ref: '#/components/parameters/limitParam'
-        - in: query
           name: scheduleID
           description: ID uniquely identifying a schedule, to filter events by.
           required: false
@@ -62,7 +58,17 @@ paths:
           description: ID uniquely identifying a transport call, to filter events by.
           required: false
           schema:
-            $ref: '#/components/schemas/transportCallID'    
+            $ref: '#/components/schemas/transportCallID'   
+        - in: query
+          name: limit
+          description: Maximum number of items to return. 
+          schema:
+            $ref: '#/components/parameters/limitParam'
+        - in: query
+          name: cursor
+          description: A server generated value to specify a specific point in a collection result, used for pagination.
+          schema:
+            $ref: '#/components/parameters/cursorParam'    
       responses:
         '200':
           description: Successful operation
@@ -102,7 +108,7 @@ paths:
                 discriminator:
                   propertyName: eventType
                 example: #Couldn't use $ref in this example. Should be updated manually if shipmentEvent changes
-                  eventID: 1
+                  eventID: "1"
                   eventType: "SHIPMENT"
                   eventDateTime: "2019-11-12T07:41:00+08:30"
                   eventClassifierCode: "ACT"
@@ -120,7 +126,7 @@ paths:
     get:
       tags:
       - Subscriptions
-      summary: Receive a list of your active subscriptionIDs
+      summary: Receive a list of your active event subscriptions
       responses:
         '200':
           description: Returns a list of event subscriptions
@@ -182,10 +188,10 @@ paths:
       parameters:
         - in: path
           name: subscriptionID
-          schema:
-            type: string
           required: true
-          description: The ID of the subscription to receive
+          description: The universal unique ID of the subscription to receive.
+          schema:
+            $ref: '#/components/parameters/subscriptionIDPathParam'
       responses:
         '200':
           description: Subscription returned
@@ -206,10 +212,9 @@ paths:
       parameters:
         - in: path
           name: subscriptionID
-          schema:
-            type: string
           required: true
-          description: The ID of the subscription to delete
+          schema:
+            $ref: '#/components/parameters/subscriptionIDPathParam'
       responses:
         '204':
           description: Subscription stopped
@@ -226,10 +231,9 @@ paths:
       parameters:
         - in: path
           name: subscriptionID
-          schema:
-            type: string
           required: true
-          description: The ID of the subscription to alter
+          schema:
+            $ref: '#/components/parameters/subscriptionIDPathParam'
       requestBody:
         description: Parameters used to configure the subscription
         required: true
@@ -311,6 +315,9 @@ components:
               $ref: '#/components/schemas/vesselScheduleChangeRemark'
           required:
             - transportCallID
+            - facilityTypeCode
+            - UNLocationCode
+            - facilityCode
     equipmentEvent:
       description: The equipment event entity is a specialization of the event entity to support specification of data that only applies to an equipment event.
       allOf:
@@ -325,10 +332,20 @@ components:
                 - EQUIPMENT
             equipmentReference:
               $ref: '#/components/schemas/equipmentReference'
+            facilityTypeCode:
+              $ref: '#/components/schemas/facilityTypeCode'
+            UNLocationCode:
+              $ref: '#/components/schemas/UNLocationCode'
+            facilityCode:
+              $ref: '#/components/schemas/facilityCode'
+            otherFacility:
+              $ref: '#/components/schemas/otherFacility'
             emptyIndicatorCode:
               $ref: '#/components/schemas/emptyIndicatorCode'
           required:
-
+            - facilityTypeCode
+            - UNLocationCode
+            - facilityCode
             - emptyIndicatorCode
     events:
       type: array
@@ -431,6 +448,29 @@ components:
       example: ABCD421911263977
       maxLength: 20
       description: Bill of lading number is an identifier that links to a shipment. Bill of Lading is the legal document issued to the customer, which confirms the carrier's receipt of the cargo from the customer acknowledging goods being shipped and specifying the terms of delivery.
+    facilityTypeCode:
+      type: string
+      example: POTE
+      description: The code to identify the specific type of facility.
+      nullable: false
+      maxLength: 4
+    UNLocationCode:
+      type: string
+      example: USNYC
+      description: The UN Location Code identifies a location in the sense of a city/a town/a village, being the smaller administrative area existing as defined by the competent national authority in each country.
+      nullable: false
+      maxLength: 5
+    facilityCode:
+      type: string
+      example: AEAUHADT
+      description: The code used for identifying the specific facility.
+      nullable: false
+      maxLength: 11
+    otherFacility:
+      type: string
+      example: Depot location or address
+      description: An alternative way to capture the facility when no standardized DCSA facility code can be found.
+      maxLength: 50
     emptyIndicatorCode:
       type: string
       example: EMPTY
@@ -452,7 +492,7 @@ components:
       description: The local date and time, where the event took place, in ISO 8601 format.
     eventID:
       type: string
-      example: 1
+      example: "1"
       description: The unique identifier for the Equipment Event ID/Transport Event ID/Shipment Event ID.
       nullable: false
     eventClassifierCode:
@@ -479,8 +519,8 @@ components:
       properties:
         subscriptionID:
           type: string
-          example: jlke123j
-          nullable: false
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
       description: The carrier issues a unique ID to the shipper or consignee for that subscription
     callbackUrl:   # Callback URL
       type: string
@@ -553,3 +593,20 @@ components:
       #  maximum: 100
         default: 100 
       example: 100
+    cursorParam:
+      name: cursor
+      in: query
+      description: A server generated value to specify a specific point in a collection result, used for pagination.
+      required: false
+      schema:
+        type: string
+      example: abc123 
+    subscriptionIDPathParam:
+      name: subscriptionID
+      in: path
+      description: The universal unique ID of the subscription to receive.
+      required: true
+      schema:
+        type: string
+        format: uuid
+      example: 123e4567-e89b-12d3-a456-426614174000
