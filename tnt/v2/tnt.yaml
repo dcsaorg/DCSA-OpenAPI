@@ -48,10 +48,6 @@ paths:
           schema:
             $ref: '#/components/schemas/equipmentReference'
         - in: query
-          name: limit
-          schema:
-            $ref: '#/components/parameters/limitParam'
-        - in: query
           name: scheduleID
           description: ID uniquely identifying a schedule, to filter events by.
           required: false
@@ -62,7 +58,17 @@ paths:
           description: ID uniquely identifying a transport call, to filter events by.
           required: false
           schema:
-            $ref: '#/components/schemas/transportCallID'    
+            $ref: '#/components/schemas/transportCallID'   
+        - in: query
+          name: limit
+          description: Maximum number of items to return.
+          schema:
+            $ref: '#/components/parameters/limitParam'
+        - in: query
+          name: cursor
+          description: A server generated value to specify a specific point in a collection result, used for pagination.
+          schema:
+            $ref: '#/components/parameters/cursorParam'    
       responses:
         '200':
           description: Successful operation
@@ -102,7 +108,7 @@ paths:
                 discriminator:
                   propertyName: eventType
                 example: #Couldn't use $ref in this example. Should be updated manually if shipmentEvent changes
-                  eventID: 1
+                  eventID: "1"
                   eventType: "SHIPMENT"
                   eventDateTime: "2019-11-12T07:41:00+08:30"
                   eventClassifierCode: "ACT"
@@ -120,7 +126,7 @@ paths:
     get:
       tags:
       - Subscriptions
-      summary: Receive a list of your active subscriptionIDs
+      summary: Receive a list of your active event subscriptions
       responses:
         '200':
           description: Returns a list of event subscriptions
@@ -182,10 +188,9 @@ paths:
       parameters:
         - in: path
           name: subscriptionID
-          schema:
-            type: string
           required: true
-          description: The ID of the subscription to receive
+          schema:
+            $ref: '#/components/parameters/subscriptionIDPathParam'
       responses:
         '200':
           description: Subscription returned
@@ -206,10 +211,9 @@ paths:
       parameters:
         - in: path
           name: subscriptionID
-          schema:
-            type: string
           required: true
-          description: The ID of the subscription to delete
+          schema:
+            $ref: '#/components/parameters/subscriptionIDPathParam'
       responses:
         '204':
           description: Subscription stopped
@@ -226,10 +230,9 @@ paths:
       parameters:
         - in: path
           name: subscriptionID
-          schema:
-            type: string
           required: true
-          description: The ID of the subscription to alter
+          schema:
+            $ref: '#/components/parameters/subscriptionIDPathParam'
       requestBody:
         description: Parameters used to configure the subscription
         required: true
@@ -488,7 +491,7 @@ components:
       description: The local date and time, where the event took place, in ISO 8601 format.
     eventID:
       type: string
-      example: 1
+      example: "1"
       description: The unique identifier for the Equipment Event ID/Transport Event ID/Shipment Event ID.
       nullable: false
     eventClassifierCode:
@@ -515,8 +518,8 @@ components:
       properties:
         subscriptionID:
           type: string
-          example: jlke123j
-          nullable: false
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
       description: The carrier issues a unique ID to the shipper or consignee for that subscription
     callbackUrl:   # Callback URL
       type: string
@@ -589,3 +592,20 @@ components:
       #  maximum: 100
         default: 100 
       example: 100
+    cursorParam:
+      name: cursor
+      in: query
+      description: A server generated value to specify a specific point in a collection result, used for pagination.
+      required: false
+      schema:
+        type: string
+      example: abc123 
+    subscriptionIDPathParam:
+      name: subscriptionID
+      in: path
+      description: The universal unique ID of the subscription to receive.
+      required: true
+      schema:
+        type: string
+        format: uuid
+      example: 123e4567-e89b-12d3-a456-426614174000
