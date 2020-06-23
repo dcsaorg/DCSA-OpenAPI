@@ -142,6 +142,13 @@ paths:
         event:
           '{$request.body.callbackUrl}':
             post:   # Method
+              parameters: 
+                - in: header
+                  name: Signature
+                  required: true
+                  explode: true
+                  schema:
+                    $ref: '#/components/headers/signatureHeader'
               requestBody: # Contents of the callback message
                 required: true
                 content:
@@ -525,7 +532,6 @@ components:
           type: string
           format: uuid
           example: 123e4567-e89b-12d3-a456-426614174000
-          nullable: false
       description: The carrier issues a unique ID to the shipper or consignee for that subscription
     callbackUrl:   # Callback URL
       type: string
@@ -554,12 +560,30 @@ components:
     subscriptionIDPathParam:
       name: subscriptionID
       in: path
-      description: The unique ID associated with the subscription.
+      description: The universal unique ID of the subscription to receive
       required: true
       schema:
         type: string
         format: uuid
-      example: 123e4567-e89b-12d3-a456-426614174000   
+      example: 123e4567-e89b-12d3-a456-426614174000  
+  headers:
+    signatureHeader:
+      schema:
+        type: object
+        properties:
+          keyId:
+            type: string
+            format: uuid
+            example: 123e4567-e89b-12d3-a456-426614174000
+          created:
+            type: integer
+            example: 1591960384 
+          headers:
+            type: string
+            example: "(request-target) (created) date host"
+          signature:
+            type: string
+            example: aGkgZnJvbSBkZW5tYXJr    
 servers:
   - description: SwaggerHub API Auto Mocking
     url: https://virtserver.swaggerhub.com/dcsaorg/DCSA_OAS/1.2.0
