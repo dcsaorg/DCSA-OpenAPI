@@ -28,18 +28,24 @@ paths:
           description: The start date of the period for which schedule information is requested. The value is populated in ISO 8601 Date format. If not provided, the current date is used by default.
           required: false
           schema:
-            $ref: '#/components/schemas/dateRange'
+            $ref: '#/components/schemas/startDate'
         - in: query
           name: dateRange
           description: |
              The time period in weeks for which schedule information should be sent. Any numeric value between 1 and 12 weeks is allowed. The vessel operator should send the schedule for the whole period it is defined, if less than the range requested. If a voyage begins during the date range but extends past the end of the range, the schedule for the entire voyage will be sent. Similarly, if a voyage has already begun prior to the period but is still ongoing it will also be included.
-          required: true
+          required: false
           schema:
             $ref: '#/components/schemas/dateRange'
         - in: query
           name: limit
+          description: Maximum number of items to return.
           schema:
             $ref: '#/components/parameters/limitParam'
+        - in: query
+          name: cursor
+          description: A server generated value to specify a specific point in a collection result, used for pagination.
+          schema:
+            $ref: '#/components/parameters/cursorParam'     
       responses:
         '200':
           description: Successful operation
@@ -120,8 +126,14 @@ paths:
             $ref: '#/components/schemas/UNLocationCode'
         - in: query
           name: limit
+          description: Maximum number of items to return.
           schema:
             $ref: '#/components/parameters/limitParam'   
+        - in: query
+          name: cursor
+          description: A server generated value to specify a specific point in a collection result, used for pagination.
+          schema:
+            $ref: '#/components/parameters/cursorParam'     
       responses:
         '200':
           description: Successful operation
@@ -170,8 +182,14 @@ paths:
             $ref: '#/components/schemas/UNLocationCode'
         - in: query
           name: limit
+          description: Maximum number of items to return.
           schema:
-            $ref: '#/components/parameters/limitParam'    
+            $ref: '#/components/parameters/limitParam'
+        - in: query
+          name: cursor
+          description: A server generated value to specify a specific point in a collection result, used for pagination.
+          schema:
+            $ref: '#/components/parameters/cursorParam'     
       responses:
         '200':
           description: Successful operation
@@ -281,10 +299,9 @@ paths:
       parameters:
         - in: path
           name: subscriptionID
-          schema:
-            type: string
           required: true
-          description: The ID of the subscription to receive
+          schema:
+            $ref: '#/components/parameters/subscriptionIDPathParam'
       responses:
         '200':
           description: Subscription returned
@@ -305,10 +322,9 @@ paths:
       parameters:
         - in: path
           name: subscriptionID
-          schema:
-            type: string
           required: true
-          description: The ID of the subscription to delete
+          schema:
+            $ref: '#/components/parameters/subscriptionIDPathParam'
       responses:
         '204':
           description: Subscription stopped
@@ -325,10 +341,9 @@ paths:
       parameters:
         - in: path
           name: subscriptionID
-          schema:
-            type: string
           required: true
-          description: The ID of the subscription to alter
+          schema:
+            $ref: '#/components/parameters/subscriptionIDPathParam'
       requestBody:
         description: Parameters used to configure the subscription
         required: true
@@ -418,10 +433,9 @@ paths:
       parameters:
         - in: path
           name: subscriptionID
-          schema:
-            type: string
           required: true
-          description: The ID of the subscription to receive
+          schema:
+            $ref: '#/components/parameters/subscriptionIDPathParam'
       responses:
         '200':
           description: Subscription returned
@@ -442,10 +456,9 @@ paths:
       parameters:
         - in: path
           name: subscriptionID
-          schema:
-            type: string
           required: true
-          description: The ID of the subscription to delete
+          schema:
+            $ref: '#/components/parameters/subscriptionIDPathParam'
       responses:
         '204':
           description: Subscription stopped
@@ -462,10 +475,9 @@ paths:
       parameters:
         - in: path
           name: subscriptionID
-          schema:
-            type: string
           required: true
-          description: The ID of the subscription to alter
+          schema:
+            $ref: '#/components/parameters/subscriptionIDPathParam'
       requestBody:
         description: Parameters used to configure the subscription
         required: true
@@ -543,12 +555,15 @@ components:
       properties:
         callbackUrl:
           $ref: '#/components/schemas/callbackUrl'
+        carrierServiceCode:
+          $ref: '#/components/schemas/carrierServiceCode'  
         vesselIMONumber:
           $ref: '#/components/schemas/vesselIMONumber'
         carrierVoyageNumber:
           $ref: '#/components/schemas/carrierVoyageNumber'
         UNLocationCode:
           $ref: '#/components/schemas/UNLocationCode'
+
       required:
         - callbackUrl
     transportCallSubscription:
@@ -558,8 +573,6 @@ components:
     scheduleSubscriptionBody:
       description: The object used by the POST event-subscriptions endpoint
       type: object
-      allOf:
-        - $ref: '#/components/schemas/transportCallSubscriptionBody'
       properties:
         callbackUrl:
           $ref: '#/components/schemas/callbackUrl'
@@ -567,8 +580,6 @@ components:
           $ref: '#/components/schemas/dateRange'
         startDate:
           $ref: '#/components/schemas/startDate'  
-        carrierServiceCode:
-          $ref: '#/components/schemas/carrierServiceCode'
       required:
         - callbackUrl
     scheduleSubscription:
@@ -667,8 +678,8 @@ components:
       properties:
         subscriptionID:
           type: string
-          example: jlke123j
-          nullable: false
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
       description: The carrier issues a unique ID to the shipper or consignee for that subscription
     callbackUrl:   # Callback URL
       type: string
@@ -676,7 +687,7 @@ components:
       example: https://myserver.com/send/callback/here
       description: Your server, where the API server should send the event data
     transportCallNumber:
-      description: This field contains sequence of the facility call within port.
+      description: This field contains number of the facility call within port.
       type: integer
       example: 2
     carrierServiceCode:
@@ -701,8 +712,8 @@ components:
       maxLength: 50
     scheduleID:
       description: ID uniquely identifying a schedule
-      type: number
-      example: 3
+      type: string
+      example: "3"
       nullable: false
     vesselOperatorCarrierCode:
       description: The identifier of the vessel operator publishing the event.
@@ -737,8 +748,8 @@ components:
       example: '2020-04-06'
     transportCallID:
       description: The unique identifier for a transport call
-      type: number
-      example: 7
+      type: string
+      example: "7"
       nullable: false
   headers:
     signatureHeader:
@@ -771,6 +782,23 @@ components:
       #  maximum: 100
         default: 100 
       example: 100
+    cursorParam:
+      name: cursor
+      in: query
+      description: A server generated value to specify a specific point in a collection result, used for pagination.
+      required: false
+      schema:
+        type: string
+      example: abc123   
+    subscriptionIDPathParam:
+      name: subscriptionID
+      in: path
+      description: The universal unique ID of the subscription to receive
+      required: true
+      schema:
+        type: string
+        format: uuid
+      example: 123e4567-e89b-12d3-a456-426614174000   
 # Added by API Auto Mocking Plugin
 servers:
   - description: SwaggerHub API Auto Mocking
