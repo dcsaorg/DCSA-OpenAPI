@@ -12,15 +12,13 @@ Digital Container Shipping Association is a neutral and non-profit organization 
 
 ### OpenAPI definition
 The DCSA Interface Standard for Track and Trace 1.0 is documented on [**DCSA SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OAS).
-The DCSA Interface Standard for Track and Trace 2.0+ is documented on [**DCSA SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_TNT).
-The DCSA Interface Standard for Operational Vessel Schedules is documented on [**DCSA SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS).
 
 
 ### Releasenotes
-#### Track and Trace 1.0
+#### 1.0
  * Initial release of the DSCA OpenAPI definitions for Track & Trace
 
-####  Track and Trace 1.1
+####  1.1
 * Improved error handling
 * Added "modeOfTransportCode" to Transport events, and Transport Equipment events
   * Since we removed Transport and Equipment objects to keep the API focused on just Track & Trace, the Mode of Transport was missing, so it has been added
@@ -30,21 +28,4 @@ The DCSA Interface Standard for Operational Vessel Schedules is documented on [*
   * The field did not have the same name as what was specified in the interface document, hence the change
 * Made equipmentReference optional in Transport Equipment events and Equipment events
   * The interface document specified that this should be optional
-  
-#### Track and Trace 1.2
-* Added event-subscription endpoints
-  * Endpoint for creating subscription
-  * Endpoint for deleting subscription
-  * Endpoint for updating subscription
-  * Endpoint for receiving list of subscriptions
-  * Endpoint for reading a single subscription
-* Added eventType discriminator
-* Added endpoint for reading a single event by eventID
 
-#### Track and Trace 2.0 
-* Updated event structure to use Transport Calls
-* Added Pagination
-* Added Signature header to callbacks
-
-#### Operational Vessel Schedules 1.0
-* Initial release of the DCSA OpenAPI definitions for Operational Vessel Schedules
