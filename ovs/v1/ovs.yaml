@@ -37,8 +37,14 @@ paths:
             $ref: '#/components/schemas/dateRange'
         - in: query
           name: limit
+          description: Maximum number of items to return. 
           schema:
             $ref: '#/components/parameters/limitParam'
+        - in: query
+          name: cursor
+          description: A server generated value to specify a specific point in a collection result, used for pagination.
+          schema:
+            $ref: '#/components/parameters/cursorParam'        
       responses:
         '200':
           description: Successful operation
@@ -120,7 +126,13 @@ paths:
         - in: query
           name: limit
           schema:
-            $ref: '#/components/parameters/limitParam'   
+            $ref: '#/components/parameters/limitParam'
+          description: Maximum number of items to return.   
+        - in: query
+          name: cursor
+          description: A server generated value to specify a specific point in a collection result, used for pagination.
+          schema:
+            $ref: '#/components/parameters/cursorParam'            
       responses:
         '200':
           description: Successful operation
@@ -169,8 +181,14 @@ paths:
             $ref: '#/components/schemas/UNLocationCode'
         - in: query
           name: limit
+          description: Maximum number of items to return.
           schema:
-            $ref: '#/components/parameters/limitParam'    
+            $ref: '#/components/parameters/limitParam'
+        - in: query
+          name: cursor
+          description: A server generated value to specify a specific point in a collection result, used for pagination.
+          schema:
+            $ref: '#/components/parameters/cursorParam'        
       responses:
         '200':
           description: Successful operation
@@ -348,7 +366,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error'
-
+      callbacks:
+        event:
+          '{$request.body.callbackUrl}':
+            post:   # Method
+              parameters:
+                - in: header
+                  name: Signature
+                  required: true
+                  explode: true
+                  schema:
+                    $ref: '#/components/headers/signatureHeader'
+              requestBody: # Contents of the callback message
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/schedule'
+              responses:   # Expected responses to the callback message
+                '200':
+                  description: Your server returns this code if it accepts the callback
   /transport-call-subscriptions:
     get:
       tags:
@@ -485,7 +524,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error'
-
+      callbacks:
+        event:
+          '{$request.body.callbackUrl}':
+            post:   # Method
+              parameters:
+                - in: header
+                  name: Signature
+                  required: true
+                  explode: true
+                  schema:
+                    $ref: '#/components/headers/signatureHeader'
+              requestBody: # Contents of the callback message
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/transportCall'
+              responses:   # Expected responses to the callback message
+                '200':
+                  description: Your server returns this code if it accepts the callback
 components:
   schemas:
     error:
@@ -675,7 +735,7 @@ components:
       example: https://myserver.com/send/callback/here
       description: Your server, where the API server should send the event data
     transportCallNumber:
-      description: This field contains sequence of the facility call within port.
+      description: This field contains the number of the facility call within port.
       type: integer
       example: 2
     carrierServiceCode:
@@ -770,6 +830,14 @@ components:
       #  maximum: 100
         default: 100 
       example: 100
+    cursorParam:
+      name: cursor
+      in: query
+      description: A server generated value to specify a specific point in a collection result, used for pagination.
+      required: false
+      schema:
+        type: string
+      example: abc123     
 # Added by API Auto Mocking Plugin
 servers:
   - description: SwaggerHub API Auto Mocking
