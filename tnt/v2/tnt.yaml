@@ -1,0 +1,670 @@
+openapi: 3.0.0
+info:
+  version: "2.0.0"
+  title: 'DCSA OpenAPI specification for Track & Trace'
+  description: 'API specification issued by DCSA.org'
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  contact:
+    name: Digital Container Shipping Association (DCSA)
+    url: https://dcsa.org
+    email: info@dcsa.org
+tags:
+  - name: Events
+    description: Event operations
+  - name: Subscriptions
+    description: Subscription operations
+paths:
+  /events:
+    get:
+      tags:
+        - Events
+      summary: Find events.
+      description: Returns all events filtered by the parameters.
+      parameters:
+        - in: query
+          name: eventType
+          description: The type of event(s) to filter by.
+          required: false
+          schema:
+            $ref: '#/components/schemas/eventTypeList'
+        - in: query
+          name: bookingReference
+          description: The identifier for a shipment, which is issued by and unique within each of the carriers.
+          required: false
+          schema:
+            $ref: '#/components/schemas/bookingReference'
+        - in: query
+          name: transportDocumentID
+          description:  The Transport Document ID number is an identifier that links to a shipment, i.e. a Bill of Lading or a Sea Waybill. A bill of lading is the document of title to the goods issued to the customer which confirms the carrier's receipt of the cargo from the customer, acknowledging goods being shipped and specifying the terms of delivery. 
+            The Sea Waybill is a simpler document, the main difference being that it is non-negotiable. 
+          required: false
+          schema:
+            $ref: '#/components/schemas/transportDocumentID'
+        - in: query
+          name: equipmentReference
+          description: The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.
+          required: false
+          schema:
+            $ref: '#/components/schemas/equipmentReference'
+        - in: query
+          name: scheduleID
+          description: ID uniquely identifying a schedule, to filter events by.
+          required: false
+          schema:
+            $ref: '#/components/schemas/scheduleID'
+        - in: query
+          name: transportCallID
+          description: ID uniquely identifying a transport call, to filter events by.
+          required: false
+          schema:
+            $ref: '#/components/schemas/transportCallID'   
+        - in: query
+          name: limit
+          description: Maximum number of items to return. 
+          schema:
+            $ref: '#/components/parameters/limitParam'
+        - in: query
+          name: cursor
+          description: A server generated value to specify a specific point in a collection result, used for pagination.
+          schema:
+            $ref: '#/components/parameters/cursorParam'    
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/events'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+  /events/{eventID}:
+    get:
+      parameters:
+        - in: path
+          name: eventID
+          schema:
+            type: string
+          required: true
+          description: The ID of the event to receive
+      tags:
+        - Events
+      summary: Find events by eventID.
+      description: Returns event with the specified eventID.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/transportEvent'
+                  - $ref: '#/components/schemas/shipmentEvent'
+                  - $ref: '#/components/schemas/equipmentEvent'
+                discriminator:
+                  propertyName: eventType
+                example: #Couldn't use $ref in this example. Should be updated manually if shipmentEvent changes
+                  eventID: "1"
+                  eventType: "SHIPMENT"
+                  eventDateTime: "2019-11-12T07:41:00+08:30"
+                  eventClassifierCode: "ACT"
+                  eventTypeCode: "ARRI"
+                  transportCallID: 7
+                  shipmentInformationTypeCode: "SRM"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+
+  /event-subscriptions:
+    get:
+      tags:
+      - Subscriptions
+      summary: Receive a list of your active event subscriptions
+      responses:
+        '200':
+          description: Returns a list of event subscriptions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/eventSubscription'
+    post:
+      tags:
+      - Subscriptions
+      summary: Create an event subscription
+      requestBody:
+        description: Parameters used to configure the subscription
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/eventSubscriptionBody'
+      responses:
+        '201':
+          description: Subscription created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eventSubscription'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      callbacks:
+        event:
+          '{$request.body.callbackUrl}':
+            post:   # Method
+              parameters:
+                - in: header
+                  name: Signature
+                  required: true
+                  explode: true
+                  schema:
+                    $ref: '#/components/headers/signatureHeader'
+              requestBody: # Contents of the callback message
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/events'
+              responses:   # Expected responses to the callback message
+                '200':
+                  description: Your server returns this code if it accepts the callback
+  /event-subscriptions/{subscriptionID}:
+    get:
+      tags:
+      - Subscriptions
+      summary: Find event subscription by subscription ID
+      parameters:
+        - in: path
+          name: subscriptionID
+          required: true
+          description: The universal unique ID of the subscription to receive.
+          schema:
+            $ref: '#/components/parameters/subscriptionIDPathParam'
+      responses:
+        '200':
+          description: Subscription returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/eventSubscription'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+    delete:
+      tags:
+      - Subscriptions
+      summary: Stop an event subscription, using the subscription ID
+      parameters:
+        - in: path
+          name: subscriptionID
+          required: true
+          schema:
+            $ref: '#/components/parameters/subscriptionIDPathParam'
+      responses:
+        '204':
+          description: Subscription stopped
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+    put:
+      tags:
+      - Subscriptions
+      summary: Alter an event subscription
+      parameters:
+        - in: path
+          name: subscriptionID
+          required: true
+          schema:
+            $ref: '#/components/parameters/subscriptionIDPathParam'
+      requestBody:
+        description: Parameters used to configure the subscription
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/eventSubscription'
+      responses:
+        '200':
+          description: Subscription updated
+          content:
+            application/json:
+              schema:
+               $ref: '#/components/schemas/eventSubscription'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      callbacks:
+        event:
+          '{$request.body.callbackUrl}':
+            post:   # Method
+              parameters:
+                - in: header
+                  name: Signature
+                  required: true
+                  explode: true
+                  schema:
+                    $ref: '#/components/headers/signatureHeader'
+              requestBody: # Contents of the callback message
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/events'
+              responses:   # Expected responses to the callback message
+                '200':
+                  description: Your server returns this code if it accepts the callback
+ 
+
+components:
+  schemas:
+    event:
+      description: The event entity is described as a generalization of all the specific event categories. An event always takes place in relation to a shipment and can additionally be linked to a transport or an equipment
+      type: object
+      properties:
+        eventID:
+          $ref: '#/components/schemas/eventID'
+        eventType:
+          $ref: '#/components/schemas/eventType'
+        eventDateTime:
+          $ref: '#/components/schemas/eventDateTime'
+        eventClassifierCode:
+          $ref: '#/components/schemas/eventClassifierCode'
+        eventTypeCode:
+          $ref: '#/components/schemas/eventTypeCode'
+        transportCallID:
+          $ref: '#/components/schemas/transportCallID'    
+      required:
+        - eventID
+        - eventType
+        - eventDateTime
+        - eventClassifierCode
+        - eventTypeCode
+    shipmentEvent:
+      description: The shipment event entity is a specialization of the event entity to support specification of data that only applies to a shipment event.
+      allOf:
+        - $ref: '#/components/schemas/event'
+        - type: object
+          properties:
+            eventType: #Overriding this property to have correct payload response examples
+              type: string
+              example: SHIPMENT
+              nullable: false
+              enum:
+                - SHIPMENT
+            eventTypeCode:
+              type: string
+              example: RECE
+              enum: 
+                - RECE
+                - CONF
+                - ISSU
+                - APPR
+                - SUBM
+                - SURR
+                - REJE
+                - PENA
+              nullable: false
+              maxLength: 4
+              description: | 
+                Unique identifier for Event Type Code. For shipment events this can be:
+                - RECE (Received)
+                - CONF (Confirmed)
+                - ISSU (Issued)
+                - APPR (Approved)
+                - SUBM (Submitted)
+                - SURR (Surrendered)
+                - REJE (Rejected)
+                - PENA (Pending approval)
+            shipmentInformationTypeCode:
+              $ref: '#/components/schemas/shipmentInformationTypeCode'
+          required:
+            - shipmentInformationTypeCode
+    transportEvent:
+      description: The transport event entity is a specialization of the event entity to support specification of data that only applies to a transport event.
+      allOf:
+        - $ref: '#/components/schemas/event'
+        - type: object
+          properties:
+            eventType: #Overriding this property to have correct payload response examples
+              type: string
+              example: TRANSPORT
+              nullable: false
+              enum:
+                - TRANSPORT
+            eventTypeCode:
+              type: string
+              example: ARRI
+              enum: 
+                - ARRI
+                - DEPA
+              nullable: false
+              maxLength: 4
+              description: Unique identifier for Event Type Code, for transport events this is either ARRI (Arrival) or DEPA (Departure). 
+            delayReasonCode:
+              $ref: '#/components/schemas/delayReasonCode'
+            vesselScheduleChangeRemark:
+              $ref: '#/components/schemas/vesselScheduleChangeRemark'
+          required:
+            - transportCallID
+    equipmentEvent:
+      description: The equipment event entity is a specialization of the event entity to support specification of data that only applies to an equipment event.
+      allOf:
+        - $ref: '#/components/schemas/event'
+        - type: object
+          properties:
+            eventType: #Overriding this property to have correct payload response examples
+              type: string
+              example: EQUIPMENT
+              nullable: false
+              enum:
+                - EQUIPMENT
+            eventTypeCode:
+              type: string
+              example: LOAD
+              enum: 
+                - LOAD
+                - DISC
+                - GTIN
+                - GTOT
+                - STUF
+                - STRP
+              nullable: false
+              maxLength: 4
+              description: | 
+                Unique identifier for Event Type Code. For equipment events this can be:
+                - LOAD (Load)
+                - DISC (Discharge)
+                - GTIN (Gate in)
+                - GTOT (Gate out)
+                - STUF (Stuffing)
+                - STRP (Stripping)
+            equipmentReference:
+              $ref: '#/components/schemas/equipmentReference'
+            emptyIndicatorCode:
+              $ref: '#/components/schemas/emptyIndicatorCode'
+          required:
+            - emptyIndicatorCode
+    events:
+      type: array
+      description: List of events for shipment journey.
+      items:
+        anyOf:
+          - $ref: '#/components/schemas/transportEvent'
+          - $ref: '#/components/schemas/shipmentEvent'
+          - $ref: '#/components/schemas/equipmentEvent'
+        discriminator:
+          propertyName: eventType
+      required:
+        - events
+    error:
+      type: object
+      required:
+        - httpMethod
+        - requestUri
+        - errors
+        - statusCode
+        - statusCodeText
+        - errorDateTime
+      properties:
+        httpMethod:
+          description: The HTTP request method type
+          type: string
+          example: POST
+        requestUri:
+          description: The request URI.
+          type: string
+          example: https://dcsa.org/dcsa/tnt/v1/events
+        errors:
+          $ref: '#/components/schemas/errors'
+        statusCode:
+          description: The HTTP status code
+          type: integer
+          example: 400
+        statusCodeText:
+          description: The textual representation of the response status.
+          type: string
+          example: Bad Request
+        errorDateTime:
+          description: The date and time (in ISO 8601 format) the error occured.
+          type: string
+          example: '2019-11-12T07:41:00+08:30'
+    errors:
+      type: array
+      items:
+        type: object
+        properties:
+          reason:
+            description: High level error message.
+            type: string
+            example: invalidQuery
+          message:
+            description: Detailed error message.
+            type: string
+            example: The request did not contain one of the three required query parameters.
+        required:
+         - reason
+         - message
+    eventSubscriptionBody:
+      description: The object used by the POST event-subscriptions endpoint
+      type: object
+      properties:
+        callbackUrl:
+          $ref: '#/components/schemas/callbackUrl'
+        eventType:
+          $ref: '#/components/schemas/eventTypeList'
+        bookingReference:
+          $ref: '#/components/schemas/bookingReference'
+        transportDocumentID:
+          $ref: '#/components/schemas/transportDocumentID'
+        transportDocumentType:
+          $ref: '#/components/schemas/transportDocumentType'  
+        equipmentReference:
+          $ref: '#/components/schemas/equipmentReference'
+        scheduleID:  
+          $ref: '#/components/schemas/scheduleID'
+        transportCallID:  
+          $ref: '#/components/schemas/transportCallID'
+      required:
+        - callbackUrl
+    eventSubscription:
+      allOf:
+        - $ref: '#/components/schemas/subscriptionID'
+        - $ref: '#/components/schemas/eventSubscriptionBody'
+    
+####String variables below
+    bookingReference:
+      type: string
+      maxLength: 35
+      example: ABC709951
+      description: The identifier for a shipment, which is issued by and unique within each of the carriers.
+    equipmentReference:
+      type: string
+      example: APZU4812090
+      maxLength: 15
+      description: The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible. If a container is not yet assigned to a shipment, the interface cannot return any information when an equipment reference is given as input. If a container is assigned to an (active) shipment, the interface returns information on the active shipment.
+    transportDocumentID:
+      type: string
+      example: ABCD421911263977
+      maxLength: 20
+      description: The Transport Document ID number is an identifier that links to a shipment, i.e. a Bill of Lading or a Sea Waybill. A bill of lading is the document of title to the goods issued to the customer which confirms the carrier's receipt of the cargo from the customer, acknowledging goods being shipped and specifying the terms of delivery. 
+        The Sea Waybill is a simpler document, the main difference being that it is non-negotiable. 
+    transportDocumentType:
+      type: string
+      enum:
+        - BOL
+        - SWB
+      description: | 
+        The Transport Document Type is used to identify which type of document, the value of "transportDocumentID" represents. The values available are:
+        - BOL (Bill of Lading)
+        - SWB (Sea Waybill)
+    emptyIndicatorCode:
+      type: string
+      example: EMPTY
+      enum:
+        - EMPTY
+        - LADEN
+      nullable: false
+      description: Code to denote whether the equipment is empty or laden.
+    shipmentInformationTypeCode:
+      type: string
+      example: SRM
+      enum:
+        - BOK
+        - SHI
+        - VGM
+        - SRM
+        - TRD
+        - ARN
+      maxLength: 3
+      description: | 
+        The code to identify the type of information that is related to the shipment. This code can have the values:
+        - BOK (Booking)
+        - SHI (Shipping Instruction)
+        - VGM (Verified Gross Mass)
+        - SRM (Shipment Release Message)
+        - TRD (Transport Document)
+        - ARN (Arrival Notice)
+      nullable: false
+    eventDateTime:
+      type: string
+      format: date-time
+      example: '2019-11-12T07:41:00+08:30'
+      description: The local date and time, where the event took place, in ISO 8601 format.
+    eventID:
+      type: string
+      example: "1"
+      description: The unique identifier for the Equipment Event ID/Transport Event ID/Shipment Event ID.
+      nullable: false
+    eventClassifierCode:
+      type: string
+      enum:
+        - PLN
+        - ACT
+        - EST
+      example: ACT
+      maxLength: 3
+      nullable: false
+      description: Code for the event classifier, either PLN (Planned), ACT (Actual) or EST (Estimated).
+    eventTypeCode:
+      type: string
+      example: ARRI
+      maxLength: 4
+      description: Unique identifier for Event Type Code. This code has different ENUM values depending on the type of event
+    subscriptionID:
+      type: object
+      properties:
+        subscriptionID:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+      description: The carrier issues a unique ID to the shipper or consignee for that subscription
+    callbackUrl:   # Callback URL
+      type: string
+      format: uri
+      example: https://myserver.com/send/callback/here
+      description: Your server, where the API server should send the event data
+    eventType:
+      description: The Event Type of the object.
+      nullable: false
+      type: string
+      enum:
+        - EQUIPMENT
+        - SHIPMENT
+        - TRANSPORT
+    eventTypeList:
+      description: A list of event types. Default is all events
+      example: [EQUIPMENT,SHIPMENT,TRANSPORT]
+      default: [EQUIPMENT,SHIPMENT,TRANSPORT]
+      type: array
+      items:
+        $ref: '#/components/schemas/eventType'
+    delayReasonCode:
+      description: Reason code for the delay. The SMDG-Delay-Reason-Codes are used for this attribute. The code list can be found at http://www.smdg.org/smdg-code-lists/
+      type: string
+      maxLength: 3
+      example: WEA
+    vesselScheduleChangeRemark:
+      description: Free text information provided by the vessel operator regarding the reasons for the change in schedule and/or plans to mitigate schedule slippage.
+      type: string
+      example: Bad weather
+      maxLength: 250
+    scheduleID:
+      description: ID uniquely identifying a schedule
+      type: number
+      example: 3
+      nullable: false
+    transportCallID:
+      description: The unique identifier for a transport call
+      type: number
+      example: 7
+      nullable: false
+  headers:
+    signatureHeader:
+      schema:
+        type: object
+        properties:
+          keyId:
+            type: string
+            format: uuid
+            example: 123e4567-e89b-12d3-a456-426614174000
+          created:
+            type: integer
+            example: 1591960384 
+          headers:
+            type: string
+            example: "(request-target) (created) date host"
+          signature:
+            type: string
+            example: aGkgZnJvbSBkZW5tYXJr
+  parameters:    
+    limitParam:
+      name: limit
+      in: query
+      description: Maximum number of items to return.
+      required: false
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+      #  maximum: 100
+        default: 100 
+      example: 100
+    cursorParam:
+      name: cursor
+      in: query
+      description: A server generated value to specify a specific point in a collection result, used for pagination.
+      required: false
+      schema:
+        type: string
+      example: abc123 
+    subscriptionIDPathParam:
+      name: subscriptionID
+      in: path
+      description: The universal unique ID of the subscription to receive.
+      required: true
+      schema:
+        type: string
+        format: uuid
+      example: 123e4567-e89b-12d3-a456-426614174000
