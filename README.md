@@ -9,9 +9,9 @@ Data and Interface Standard project workstream is to strengthen the container sh
 -	[DCSA Interface for Operational Vessel Schedules 1.0]( https://dcsa.org/wp-content/uploads/2020/07/DCSA-Interface-Standard-for-Operational-Vessel-Schedules-1.0-vF.pdf)
 -	[DCSA Interface for Operational Vessel Schedules Reading Guide]( https://dcsa.org/wp-content/uploads/2020/07/DCSA-Interface-Standard-for-Operational-Vessel-Schedules-1.0-Reading-Guide-vF.pdf)
 -	[Operational Vessel Schedule Definitions 1.0]( https://dcsa.org/wp-content/uploads/2020/07/Operational-Vessel-Schedule-definitions-1.0-vF.pdf)
--	[Glossary of Terms 2.0]( https://dcsa.org/wp-content/uploads/2020/07/GLOSSARY-OF-TERMS-2.0-vF.pdf)
 -	[DCSA Interface for Track and Trace 1.0]( https://dcsa.org/wp-content/uploads/2020/01/DCSA-Interface-Standard-for-Track-and-Trace-1.0.pdf)
 -	[DCSA Interface for Track and Trace Reading Guide]( https://dcsa.org/wp-content/uploads/2020/01/DCSA-Interface-Standard-for-Track-and-Trace-1.0-Reading-Guide.pdf)
+-	[Glossary of Terms 2.0]( https://dcsa.org/wp-content/uploads/2020/07/GLOSSARY-OF-TERMS-2.0-vF.pdf)
 
 ### OpenAPI definition
 The DCSA Interface Standard for Track and Trace 1.0 is documented on the [**DCSA SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OAS).
