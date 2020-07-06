@@ -255,7 +255,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error'
-
+      callbacks:
+        event:
+          '{$request.body.callbackUrl}':
+            post:   # Method
+              parameters:
+                - in: header
+                  name: Signature
+                  required: true
+                  explode: true
+                  schema:
+                    $ref: '#/components/headers/signatureHeader'
+              requestBody: # Contents of the callback message
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/events'
+              responses:   # Expected responses to the callback message
+                '200':
+                  description: Your server returns this code if it accepts the callback
  
 
 components:
@@ -582,7 +601,7 @@ components:
       items:
         $ref: '#/components/schemas/eventType'
     delayReasonCode:
-      description: Reason code for the delay. The SMDG reference codes are used for this attribute.
+      description: Reason code for the delay. The SMDG-Delay-Reason-Codes are used for this attribute. The code list can be found at http://www.smdg.org/smdg-code-lists/
       type: string
       maxLength: 3
       example: WEA
