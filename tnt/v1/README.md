@@ -11,7 +11,7 @@ Digital Container Shipping Association is a neutral and non-profit organization 
 -	[Glossary of Terms 1.1]( https://dcsa.org/wp-content/uploads/2020/01/GLOSSARY-OF-TERMS-1.1.pdf)
 
 ### OpenAPI definition
-The DCSA Interface Standard for Track and Trace 1.0 is documented on [**DCSA SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OAS).
+The DCSA Interface Standard for Track and Trace 1.0 is documented on [**DCSA SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_TNT).
 
 
 ### Releasenotes
