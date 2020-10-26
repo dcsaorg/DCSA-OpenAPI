@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: "2.0.0"
+  version: 2.0.1
   title: 'DCSA OpenAPI specification for Track & Trace'
   description: 'API specification issued by DCSA.org'
   license:
@@ -109,12 +109,12 @@ paths:
                 discriminator:
                   propertyName: eventType
                 example: #Couldn't use $ref in this example. Should be updated manually if shipmentEvent changes
-                  eventID: "1"
+                  eventID: "84db923d-2a19-4eb0-beb5-446c1ec57d34"
                   eventType: "SHIPMENT"
                   eventDateTime: "2019-11-12T07:41:00+08:30"
                   eventClassifierCode: "ACT"
                   eventTypeCode: "ARRI"
-                  transportCallID: 7
+                  shipmentID: "123e4567-e89b-12d3-a456-426614174000"
                   shipmentInformationTypeCode: "SRM"
         default:
           description: Unexpected error
@@ -293,8 +293,6 @@ components:
           $ref: '#/components/schemas/eventClassifierCode'
         eventTypeCode:
           $ref: '#/components/schemas/eventTypeCode'
-        transportCallID:
-          $ref: '#/components/schemas/transportCallID'    
       required:
         - eventID
         - eventType
@@ -339,6 +337,8 @@ components:
                 - PENA (Pending approval)
             shipmentInformationTypeCode:
               $ref: '#/components/schemas/shipmentInformationTypeCode'
+            shipmentID:
+              $ref: '#/components/schemas/shipmentID'
           required:
             - shipmentInformationTypeCode
     transportEvent:
@@ -366,6 +366,8 @@ components:
               $ref: '#/components/schemas/delayReasonCode'
             vesselScheduleChangeRemark:
               $ref: '#/components/schemas/vesselScheduleChangeRemark'
+            transportCallID:
+              $ref: '#/components/schemas/transportCallID'      
           required:
             - transportCallID
     equipmentEvent:
@@ -404,8 +406,11 @@ components:
               $ref: '#/components/schemas/equipmentReference'
             emptyIndicatorCode:
               $ref: '#/components/schemas/emptyIndicatorCode'
+            transportCallID:
+              $ref: '#/components/schemas/transportCallID'    
           required:
             - emptyIndicatorCode
+            - transportCallID
     events:
       type: array
       description: List of events for shipment journey.
@@ -447,7 +452,7 @@ components:
           type: string
           example: Bad Request
         errorDateTime:
-          description: The date and time (in ISO 8601 format) the error occured.
+          description: The date and time (in ISO 8601 format) the error occurred.
           type: string
           example: '2019-11-12T07:41:00+08:30'
     errors:
@@ -554,7 +559,8 @@ components:
       description: The local date and time, where the event took place, in ISO 8601 format.
     eventID:
       type: string
-      example: "1"
+      format: uuid
+      example: "84db923d-2a19-4eb0-beb5-446c1ec57d34"
       description: The unique identifier for the Equipment Event ID/Transport Event ID/Shipment Event ID.
       nullable: false
     eventClassifierCode:
@@ -610,15 +616,23 @@ components:
       type: string
       example: Bad weather
       maxLength: 250
+    shipmentID:
+      description: ID uniquely identifying a shipment
+      type: string
+      format: uuid
+      example: 123e4567-e89b-12d3-a456-426614174000
+      nullable: false
     scheduleID:
       description: ID uniquely identifying a schedule
-      type: number
-      example: 3
+      type: string
+      format: uuid
+      example: 123e4567-e89b-12d3-a456-426614174000
       nullable: false
     transportCallID:
       description: The unique identifier for a transport call
-      type: number
-      example: 7
+      type: string
+      format: uuid
+      example: 123e4567-e89b-12d3-a456-426614174000
       nullable: false
   headers:
     signatureHeader:
