@@ -23,10 +23,14 @@ components:
           $ref: '#/components/schemas/transportDocumentID'
         shippingInstructionID:
           $ref: '#/components/schemas/shippingInstructionID'
+        documentReferenceNumber:
+          $ref: '#/components/schemas/documentReferenceNumber'
         transportDocumentTypeCode:
           $ref: '#/components/schemas/transportDocumentTypeCode'
         documentStatus:
           $ref: '#/components/schemas/documentStatus'
+        numberOfOriginals:
+          $ref: '#/components/schemas/numberOfOriginals'
         totalContainerWeight:
           $ref: '#/components/schemas/totalContainerWeight'
         onboardDate:
@@ -47,6 +51,13 @@ components:
           $ref: '#/components/schemas/receivedForShipmentDate'
         currencyCode:
           $ref: '#/components/schemas/currencyCode'
+      required:
+        - transportDocumentID
+        - shippingInstructionID
+        - documentReferenceNumber
+        - transportDocumentTypeCode
+        - paymentTerm
+        - termsAndConditions
     shippingInstruction:
       description: The Shipping Instruction is ‘an enrichment to the original booking shared by the shipper to the carrier. The shipping instruction includes volume/weight, shipping dates, origin, destination and other special instructions. The information given by the shipper through the shipping instructions is the information, which is required to create the Bill of Lading.
       type: object
@@ -84,12 +95,16 @@ components:
       properties:
         shipmentID:
           $ref: '#/components/schemas/shipmentID'
-        carrierCode:
-          $ref: '#/components/schemas/carrierCode'
+        serviceType:
+          $ref: '#/components/schemas/serviceType'      
+        shipmentTerm:
+          $ref: '#/components/schemas/shipmentTerm'
         exportReferenceNumber:
           $ref: '#/components/schemas/exportReferenceNumber'
         transportReference:
           $ref: '#/components/schemas/transportReference'
+        vesselName:
+          $ref: '#/components/schemas/vesselName'
         carrierVoyageNumber:
           $ref: '#/components/schemas/carrierVoyageNumber'
         parties:
@@ -100,36 +115,34 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/location'
-        serviceType:
-          $ref: '#/components/schemas/serviceType'
-        shipmentTerm:
-          $ref: '#/components/schemas/shipmentTerm'
         freightPayableAt:
           $ref: '#/components/schemas/freightPayableAt'
+        isChargeDisplayed:
+          $ref: '#/components/schemas/isChargeDisplayed'
         shipmentEquipmentQuantity:
           $ref: '#/components/schemas/shipmentEquipmentQuantity'
+        currencyAmount:
+          $ref: '#/components/schemas/currencyAmount'
         currencyCode:
-          $ref: '#/components/schemas/currencyCode'
+          $ref: '#/components/schemas/currencyCode'  
+        carrierCode:
+          $ref: '#/components/schemas/carrierCode'
         SVCContract:
           $ref: '#/components/schemas/SVCContract'
       required:
-        - carrierBookingReference
-        - carrierCode
-        - exportReferenceNumber
-        - transportReference
+        - shipmentID
+        - serviceType
+        - shipmentTerm
+        - vesselName
         - carrierVoyageNumber
         - parties
         - locations
-        - serviceType
-        - shipmentTerm
         - freightPayableAt
-        - paymentTerm
+        - isChargeDisplayed
         - shipmentEquipmentQuantity
     equipment:
       type: object
       properties:
-        equimentID:
-          $ref: '#/components/schemas/equipmentID'
         equipmentReference:
           $ref: '#/components/schemas/equipmentReference'
         ISOEquipmentCode:
@@ -140,6 +153,8 @@ components:
           $ref: '#/components/schemas/sealSource'
         tareWeight:
           $ref: '#/components/schemas/tareWeight'
+        verifiedGrossMass:
+          $ref: '#/components/schemas/verifiedGrossMass'
       required:
         - equipmentReference
         - ISOEquipmentCode
@@ -147,14 +162,16 @@ components:
     cargoItem:
       type: object
       properties:
-        cargoItemID:
-          $ref: '#/components/schemas/cargoItemID'
+        shippingMarks:
+          $ref: '#/components/schemas/shippingMarks'  
         descriptionOfGoods:
           $ref: '#/components/schemas/descriptionOfGoods'
-        carrierBookingReference:
-          $ref: '#/components/schemas/carrierBookingReference'  
         HSCode:
-          $ref: '#/components/schemas/HSCode'
+          $ref: '#/components/schemas/HSCode'  
+        carrierBookingReference:
+          $ref: '#/components/schemas/carrierBookingReference'
+        numberOfPackages:
+          $ref: '#/components/schemas/numberOfPackages'
         weight:
           $ref: '#/components/schemas/weight'
         volume:
@@ -163,20 +180,27 @@ components:
           $ref: '#/components/schemas/weightUnit'
         volumeUnit:
           $ref: '#/components/schemas/volumeUnit'
-        verifiedGrossMass:
-          $ref: '#/components/schemas/verifiedGrossMass'
         declaredValue:
           $ref: '#/components/schemas/declaredValue'
         packageCode:
           $ref: '#/components/schemas/packageCode'
-        shippingMarks:
-          $ref: '#/components/schemas/shippingMarks'
+      
       required:
+        - shippingMarks
         - descriptionOfGoods
         - HSCode
+        - carrierBookingReference
+        - numberOfPackages
         - weight
-        - volume
         - weightUnit
+    numberOfPackages:
+      type: integer
+      description: Specifies the number of packages associated with this cargo item.
+      example: 18
+    numberOfRiderPages:
+      type: integer
+      description: Amount of Rider Pages as addendum
+      example: 2
     isElectronic:
       type: boolean
       description: Indicates whether the Transport Document is electronic or not
@@ -195,6 +219,14 @@ components:
       description: Name of the party.
       example: "Great Books ApS"
       maxLength: 100
+    carrierVoyageNumber:
+      type: string
+      maxLength: 50
+      description: The vessel operator specific identifier of the Voyage.
+    isChargeDisplayed:
+      type: boolean
+      description: An indicator of whether the charges are displayed.
+      example: true
     phoneNumber: 
       type: string
       description: The contact number of the individual or party, including country specific dialing codes.
@@ -224,6 +256,10 @@ components:
       example: MISSING
       maxLength: 20
       description: 'It is an identifying number of consignee or shipper (Individual or entity) used for tax purposes. Condition: Conditional based on customs requirements.'
+    vesselName:
+      type: string
+      description: The name of the vessel given by the Vessel Operator
+      example: MISSING
     sealSource:
       type: integer
       example: MISSING
@@ -271,11 +307,6 @@ components:
       type: string
       example: MISSING
       description: The reference for the transport, e.g. when the mode of transport is a vessel, the Transport Reference will be the vessel IMO number.
-      maxLength: 50
-    carrierVoyageNumber:
-      type: string
-      example: 2013W
-      description: The vessel operator specific identifier of the Voyage
       maxLength: 50
     descriptionOfGoods:
       type: string
@@ -392,16 +423,6 @@ components:
       example: d9c69bc8-294d-46d1-807c-654598341374
       format: uuid
       description: The identifier for a shipping instruction
-    cargoItemID:
-      type: string
-      example: d9c69bc8-294d-46d1-807c-654598341374
-      format: uuid
-      description: The identifier for a Cargo Item
-    equipmentID:
-      type: string
-      example: d9c69bc8-294d-46d1-807c-654598341374
-      format: uuid
-      description: The identifier for an equipment
     shipmentID:
       type: string
       example: d9c69bc8-294d-46d1-807c-654598341374
