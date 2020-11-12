@@ -25,14 +25,12 @@ components:
           $ref: '#/components/schemas/shippingInstructionID'
         documentReferenceNumber:
           $ref: '#/components/schemas/documentReferenceNumber'
-        transportDocumentTypeCode:
-          $ref: '#/components/schemas/transportDocumentTypeCode'
+        transportDocumentType:
+          $ref: '#/components/schemas/transportDocumentType'
         documentStatus:
           $ref: '#/components/schemas/documentStatus'
         numberOfOriginals:
           $ref: '#/components/schemas/numberOfOriginals'
-        totalContainerWeight:
-          $ref: '#/components/schemas/totalContainerWeight'
         onboardDate:
           $ref: '#/components/schemas/onboardDate'
         paymentTerm:
@@ -41,21 +39,29 @@ components:
           $ref: '#/components/schemas/termsAndConditions'
         placeOfIssue:
           $ref: '#/components/schemas/placeOfIssue'
-        tareWeight:
-          $ref: '#/components/schemas/tareWeight'
-        chargeType:
-          $ref: '#/components/schemas/chargeType'
+        charges:
+          type: array
+          items:
+            $ref: '#/components/schemas/charge'
+        references:
+          type: array
+          items:
+            $ref: '#/components/schemas/reference'    
         clauseContent:
           $ref: '#/components/schemas/clauseContent'
         receivedForShipmentDate:
           $ref: '#/components/schemas/receivedForShipmentDate'
-        currencyCode:
+        declaredValueCurrency:
           $ref: '#/components/schemas/currencyCode'
+        declaredValue:
+          $ref: '#/components/schemas/currencyAmount'
+        issuer:
+          $ref: '#/components/schemas/partyID'
       required:
         - transportDocumentID
         - shippingInstructionID
         - documentReferenceNumber
-        - transportDocumentTypeCode
+        - transportDocumentType
         - paymentTerm
         - termsAndConditions
     shippingInstruction:
@@ -68,16 +74,10 @@ components:
           $ref: '#/components/schemas/shippingInstructionID'
         isElectronic:
           $ref: '#/components/schemas/isElectronic'
-        shipment:
-          $ref: '#/components/schemas/shipment'
-        equipments:
-          type: array
-          items:
-            $ref: '#/components/schemas/equipment'
-        cargoItems:
-          type: array
-          items:
-            $ref: '#/components/schemas/cargoItem'
+        numberOfRiderPages:
+          $ref: '#/components/schemas/numberOfRiderPages'
+        carrierBookingReference:
+          $ref: '#/components/schemas/carrierBookingReference'
         stuffing:
           type: array
           items:
@@ -115,6 +115,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/location'
+        references:
+          type: array
+          items:
+            $ref: '#/components/schemas/reference'
         freightPayableAt:
           $ref: '#/components/schemas/freightPayableAt'
         isChargeDisplayed:
@@ -160,12 +164,36 @@ components:
       required:
         - equipmentReference
         - ISOEquipmentCode
-      
+    booking:
+      type: object
+      properties:
+        carrierBookingReference:
+          $ref: '#/components/schemas/carrierBookingReference'
+        shipmentID:
+          $ref: '#/components/schemas/shipmentID'
+        serviceTypeAtOrigin:
+          $ref: '#/components/schemas/serviceType'
+        serviceTypeAtDestination:
+          $ref: '#/components/schemas/serviceType'
+        shipmentTermAtOrigin:
+          $ref: '#/components/schemas/shipmentTerm'
+        shipmentTermAtDestination:
+          $ref: '#/components/schemas/shipmentTerm'
+        bookingDateTime:
+          $ref: '#/components/schemas/bookingDateTime'
+        serviceContract:
+          $ref: '#/components/schemas/serviceContract'
     cargoItem:
       type: object
       properties:
+        cargoItemID:
+          $ref: '#/components/schemas/cargoItemID'
+        shipmentID:
+          $ref: '#/components/schemas/shipmentID'
         shippingMarks:
           $ref: '#/components/schemas/shippingMarks'  
+        commodityType:
+          $ref: '#/components/schemas/commodityType'
         descriptionOfGoods:
           $ref: '#/components/schemas/descriptionOfGoods'
         HSCode:
@@ -186,7 +214,6 @@ components:
           $ref: '#/components/schemas/declaredValue'
         packageCode:
           $ref: '#/components/schemas/packageCode'
-      
       required:
         - shippingMarks
         - descriptionOfGoods
@@ -195,6 +222,15 @@ components:
         - numberOfPackages
         - weight
         - weightUnit
+    bookingDateTime:
+        type: string
+        format: $date-time
+        description: MISSING
+    serviceContract:
+        type: string
+        maxLength: 30
+        example: MISSING
+        description: MISSING
     numberOfPackages:
       type: integer
       description: Specifies the number of packages associated with this cargo item.
@@ -270,6 +306,7 @@ components:
       type: integer
       example: 12000
       description: 'The weight of an empty container. Condition: Only with shipper owned containers.'
+    
     clauseContent:
       type: string
       example: MISSING
@@ -333,9 +370,11 @@ components:
       maxLength: 20
     volumeUnit:
       type: string 
-      example: MISSING
-      description: The unit of measure. It can be in either Kilograms or Pounds as provided by the shipper.
-      maxLength: 20
+      example: MTQ
+      enum:
+        - FTQ
+        - MTQ
+      description: The unit of measure. It can be in either cubic meters or cubic feet, as provided by the shipper.
     freightPayableAt:
       type: string
       format: uuid
@@ -422,14 +461,20 @@ components:
       example: "+33 (5) 35 1231 11"
     shippingInstructionID:
       type: string
-      example: d9c69bc8-294d-46d1-807c-654598341374
+      example: e0559d83-00e2-438e-afd9-fdd610c1a008
       format: uuid
       description: The identifier for a shipping instruction
     shipmentID:
       type: string
       example: d9c69bc8-294d-46d1-807c-654598341374
       format: uuid
-      description: The identifier for an equipment  
+      description: The identifier for an object  
+    cargoItemID:
+      type: string
+      example: 6700963c-3ddd-4ada-ac29-d65852f2ac3d
+      format: uuid
+      description: The identifier for an object    
+      
       
     documentStatus:
       type: string
@@ -502,6 +547,8 @@ components:
       description: ‘Party’ is an array of Party Type, Party Name, E-mail, Phone number, Fax and Tax Reference attributes. Classification for this Use Case (Required (R), Conditional (C), Optional (O), Not Applicable (N/A)) is given per attribute.
       type: object
       properties:
+        partyID:
+          $ref: '#/components/schemas/partyID'
         partyRole:
           $ref: '#/components/schemas/partyRole'
         partyName:
@@ -528,9 +575,108 @@ components:
       properties:
         locationID:
           $ref: '#/components/schemas/locationID'
-        locationTypeCode:
-          $ref: '#/components/schemas/locationTypeCode'
-          
+        UNLocationCode:
+          $ref: '#/components/schemas/UNLocationCode'
+        latitude:
+          $ref: '#/components/schemas/latitude'
+        longitude:
+          $ref: '#/components/schemas/longitude'
+        address:
+          $ref: '#/components/schemas/address'
+    partyID:
+      type: string
+      format: uuid
+    charge:
+      type: object
+      properties:
+        chargeID:
+          $ref: '#/components/schemas/chargeID'
+        chargeType:
+          $ref: '#/components/schemas/chargeType'
+        amount:
+          $ref: '#/components/schemas/currencyAmount'
+        currency:
+          $ref: '#/components/schemas/currencyCode'
+        paymentTerm:
+          $ref: '#/components/schemas/paymentTerm'
+        calculationBasis:
+          $ref: '#/components/schemas/calculationBasis'
+        freightPayableAt:
+          $ref: '#/components/schemas/freightPayableAt'
+        displayCharges:
+          $ref: '#/components/schemas/displayCharges'
+        unitPrice:
+          $ref: '#/components/schemas/unitPrice'
+        quantity:
+          $ref: '#/components/schemas/quantity'
+    reference:
+      type: object
+      properties:
+        referenceID:
+          $ref: '#/components/schemas/referenceID'
+        referenceType:
+          $ref: '#/components/schemas/referenceType'
+        referenceValue:
+          $ref: '#/components/schemas/referenceValue'
+    
+    
+    ###Simple types
+    referenceType:
+      type: string
+      enum:
+        - SI
+        - FF
+        - PO
+        - CR
+    referenceValue:
+      type: string
+      
+    referenceID:
+      type: string
+      format: uuid
+    calculationBasis:
+      type: string
+      maxLength: 50
+      example: MISSING
+      description: MISSING
+    quantity:
+      type: number
+      example: 34.4
+    unitPrice:
+      type: number
+      example: 3456.6
+    chargeID:
+      type: string
+      format: uuid
+    displayCharges:
+      type: boolean
+      example: TRUE
+      
+    address:
+      type: string
+      description: MISSING
+      example: MISSING
+    longitude:
+      type: string
+      maxLength: 11
+      description: MISSING
+      example: MISSING
+    latitude:
+      type: string
+      maxLength: 10
+      description: MISSING
+      example: MISSING
+    UNLocationCode:
+      type: string
+      example: USNYC
+      description: The UN Location Code identifies a location in the sense of a city/a town/a village, being the smaller administrative area existing as defined by the competent national authority in each country.
+      nullable: false
+      maxLength: 5
+    commodityType:      
+      type: string
+      description: MISSING
+      maxLength: 20
+      example: MISSING
     callbackObject:
       description: The standard callback object.
       type: object
@@ -561,7 +707,7 @@ components:
       format: uri
       example: https://myserver.com/send/callback/here
       description: Your server, where the API server should send the event data
-    transportDocumentTypeCode:
+    transportDocumentType:
       type: string
       enum:
         - BOL
@@ -574,12 +720,10 @@ components:
     stuffingItem:
       type: object
       properties:
+        cargoItem:
+          $ref: '#/components/schemas/cargoItem'
         equipmentReference:
           $ref: '#/components/schemas/equipmentReference'
-        shippingMarks:
-          type: array
-          items:
-            $ref: '#/components/schemas/shippingMarks'
     error:
       type: object
       required:
