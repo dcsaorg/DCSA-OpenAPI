@@ -25,8 +25,6 @@ components:
           $ref: '#/components/schemas/shippingInstructionID'
         documentReferenceNumber:
           $ref: '#/components/schemas/documentReferenceNumber'
-        transportDocumentType:
-          $ref: '#/components/schemas/transportDocumentType'
         documentStatus:
           $ref: '#/components/schemas/documentStatus'
         numberOfOriginals:
@@ -57,6 +55,12 @@ components:
           $ref: '#/components/schemas/currencyAmount'
         issuer:
           $ref: '#/components/schemas/partyID'
+        partLoad:
+          $ref: '#/components/schemas/partLoad'
+        EBLEndorsementChain:
+          type: array
+          items:
+            $ref: '#/components/schemas/EBLEndorsement'
       required:
         - transportDocumentID
         - shippingInstructionID
@@ -78,6 +82,8 @@ components:
           $ref: '#/components/schemas/numberOfRiderPages'
         carrierBookingReference:
           $ref: '#/components/schemas/carrierBookingReference'
+        transportDocumentType:
+          $ref: '#/components/schemas/transportDocumentType'  
         cargoItems:
           type: array
           items:
@@ -90,6 +96,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/stuffingItem'
+        parties:
+          type: array
+          items:
+            $ref: '#/components/schemas/party'
       required:
         - callbackUrl
         - shippingInstructionID
@@ -143,6 +153,10 @@ components:
           $ref: '#/components/schemas/SVCContract'
         numberOfRiderPages:
           $ref: '#/components/schemas/numberOfRiderPages'
+        confirmedEquipment:
+          type: array
+          items:
+            $ref: '#/components/schemas/equipmentEntity'
       required:
         - shipmentID
         - serviceType
@@ -200,6 +214,26 @@ components:
           $ref: '#/components/schemas/bookingDateTime'
         serviceContract:
           $ref: '#/components/schemas/serviceContract'
+        requestedEquipment:
+          type: array
+          items:
+            $ref: '#/components/schemas/equipmentEntity'
+    equipmentEntity:
+      type: object
+      properties:
+        equipmentType:
+          $ref: '#/components/schemas/equipmentType'
+        equipmentUnit:
+          $ref: '#/components/schemas/equipmentUnit'
+
+    equipmentType:
+      type: string
+      description: Size and type of the Equipment for this shipment
+      maxLength: 4
+    equipmentUnit:
+      type: integer
+      description: Number of confirmed equipment units
+      example: 6
     cargoItem:
       type: object
       properties:
@@ -239,6 +273,7 @@ components:
         - weightUnit
     liveReeferSettings:
       type: object
+      description: Specifies the settings for alive reefer container used to a shipment.
       properties:
         temperature:
           $ref: '#/components/schemas/temperature'
@@ -246,24 +281,53 @@ components:
           $ref: '#/components/schemas/temperatureUnit'
         humidity:
           $ref: '#/components/schemas/humidity'
-        humidityUnit:
-          $ref: '#/components/schemas/humidityUnit'
+        ventilation:
+          $ref: '#/components/schemas/ventilation'
+    EBLEndorsement:
+      type: object
+      properties:
+        titleHolder:
+          $ref: '#/components/schemas/titleHolder'
+        signature:
+          $ref: '#/components/schemas/signature'
+        endorsementDate:
+          $ref: '#/components/schemas/endorsementDateTime'
+        endorsee:
+          $ref: '#/components/schemas/endorsee'
+    titleHolder:
+      type: string
+      description: Links to the Party ID to the tile holder
+      format: uuid
+    endorsementDateTime:
+      type: string
+      format: $date-time
+      description: The date of endorsement
+    endorsee:
+      type: string
+      format: uuid
+      description: Links to the party ID to specifty the next title holder to whom the title is endorsed by the current title holder.
+      
+    ventilation:
+      type: number
+      description: Indicates the ventilation setting on the container CBM/Hr
+      example: 266
     temperature:
+      description: indicates the temperature setting on the container.
       type: number
       example: 54.3
     temperatureUnit:
+      description: Celsius (CEL) or Fahrenheit (FAH)
       type: string
       enum:
         - CEL
-        - FA
+        - FAH
     humidity:
+      description: Indicates the humidity ssetting on the container in percent.
       type: number
       example: 80.0
-    humidityUnit:
-      type: string
-      example: P1
-      enum:
-        - P1
+    partLoad:
+      type: integer
+      description: Identifies number of TD per container ( when more than one) when moving FCL/FCL.
     bookingDateTime:
         type: string
         format: $date-time
