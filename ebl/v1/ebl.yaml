@@ -1,7 +1,7 @@
 openapi: 3.0.0
 servers: []
 info:
-  version: 0.2.0
+  version: 0.4.0
   title: 'DCSA OpenAPI specification for Electronic Bill of Lading'
   description: 'API specification issued by DCSA.org'
   license:
@@ -12,116 +12,11 @@ info:
     url: https://dcsa.org
     email: info@dcsa.org
 paths:
-  /shipping-instructions/{shippingInstructionID}:
-    get:
-      tags:
-       - Shipping Instruction
-      summary: Get shipping instruction
-      description: Retrieves the shipping instruction with the ID in the path
-      parameters:
-        - in: path
-          name: shippingInstructionID
-          schema:
-            type: string
-          required: true
-      responses:
-        '200':
-          description: Request successful        
-          content:
-            application/json:
-              schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/shippingInstruction'
-          
-        default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'
-    patch:
-      tags:
-       - Shipping Instruction
-      summary: Post shipping instruction
-      parameters:
-        - in: path
-          name: shippingInstructionID
-          schema:
-            type: string
-          required: true
-      description: |
-        Updates a shipping instruction
-      requestBody:
-        description: Parameters used to create the shipping instruction
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/shippingInstructionBody'
-      responses:
-        '200':
-          description: Shipping Instruction updated
-        default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'
-    put:
-      tags:
-       - Shipping Instruction
-      summary: Post shipping instruction
-      parameters:
-        - in: path
-          name: shippingInstructionID
-          schema:
-            type: string
-          required: true
-      description: |
-        Updates a shipping instruction
-      requestBody:
-        description: Parameters used to create the shipping instruction
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/shippingInstructionBody'
-      responses:
-        '201':
-          description: Subscription created
-          content:
-            application/json:
-              schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/shippingInstructionID'
-        default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'
-      callbacks:
-        callbackObject:
-          '{$request.body.callbackUrl}':
-            post:   # Method
-              parameters:
-              - in: header
-                name: Signature
-                required: true
-                explode: true
-                schema:
-                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/signatureHeader'
-              requestBody: # Contents of the callback message
-                required: true
-                content:
-                  application/json:
-                    schema:
-                      $ref: '#/components/schemas/callbackObject'
-              responses:   # Expected responses to the callback message
-                '200':
-                  description: Your server returns this code if it accepts the callback           
+
   /shipping-instructions:
     post:
       tags:
-       - Shipping Instruction
+       - Shipping Instructions
       summary: Post shipping instruction
       description: |
         Creates a new shipping instruction
@@ -167,9 +62,20 @@ paths:
                   description: Your server returns this code if it accepts the callback          
     get:
       tags:
-       - Shipping Instruction
+       - Shipping Instructions
       summary: Get shipping instruction
-      description: Retrieves the shipping instruction with the ID in the path
+      description: Retrieves the shipping instruction with the ID in the path. The ID can be a transportDocumentID or a shippingInstructionID.
+      parameters:
+        - in: query
+          name: limit
+          description: Maximum number of items to return. 
+          schema:
+            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/parameters/limitParam'
+        - in: query
+          name: cursor
+          description: A server generated value to specify a specific point in a collection result, used for pagination.
+          schema:
+            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/parameters/cursorParam'
       responses:
         '200':
           description: Request successful        
@@ -185,13 +91,236 @@ paths:
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'                            
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'            
+  /shipping-instructions/{shippingInstructionID}:
+    get:
+      tags:
+       - Shipping Instructions
+      summary: Get shipping instruction
+      description: Retrieves the shipping instruction with the ID in the path.
+      parameters:
+        - in: path
+          name: shippingInstructionID
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Request successful        
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/shippingInstruction'
+          
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'
+    patch:
+      tags:
+       - Shipping Instructions
+      summary: Patch shipping instruction
+      parameters:
+        - in: path
+          name: shippingInstructionID
+          schema:
+            type: string
+          required: true
+      description: |
+        Updates a shipping instruction
+      requestBody:
+        description: Parameters used to create the shipping instruction
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                callbackUrl:
+                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/callbackUrl'
+                isElectronic:
+                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/isElectronic'
+                carrierBookingReference:
+                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/carrierBookingReference'
+                numberOfRiderPages:
+                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/numberOfRiderPages'
+      responses:
+        '200':
+          description: Shipping Instruction updated
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'            
+    
+  /shipping-instructions/{shippingInstructionID}/stuffing:
+    put:
+      tags:
+       - Shipping Instructions
+      summary: Put shipping instruction stuffing
+      parameters:
+        - in: path
+          name: shippingInstructionID
+          schema:
+            type: string
+          required: true
+      description: |
+        Updates a shipping instruction
+      requestBody:
+        description: Parameters used to create the shipping instruction
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/stuffingItem' 
+      responses:
+        '201':
+          description: Stuffing created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/stuffingItem' 
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'
+  /shipping-instructions/{shippingInstructionID}/equipments:
+    put:
+      tags:
+       - Shipping Instructions
+      summary: Put shipping instruction equipments
+      parameters:
+        - in: path
+          name: shippingInstructionID
+          schema:
+            type: string
+          required: true
+      description: |
+        Updates a shipping instruction
+      requestBody:
+        description: Parameters used to create the equipments
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/reeferEquipment'
+      responses:
+        '201':
+          description: Equipments created
+          content:
+            application/json:
+             schema:
+                type: array
+                items:
+                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/reeferEquipment' 
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error' 
+  /shipping-instructions/{shippingInstructionID}/cargo-items:
+    put:
+      tags:
+       - Shipping Instructions
+      summary: Put shipping instruction cargoItems
+      parameters:
+        - in: path
+          name: shippingInstructionID
+          schema:
+            type: string
+          required: true
+      description: |
+        Updates a shipping instruction
+      requestBody:
+        description: Parameters used to create the cargoItems
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/cargoItem'
+      responses:
+        '201':
+          description: Cargo-items created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/cargoItem'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error' 
+  /shipping-instructions/{shippingInstructionID}/parties:
+    put:
+      tags:
+       - Shipping Instructions
+      summary: Put Shipping Instruction parties
+      parameters:
+        - in: path
+          name: shippingInstructionID
+          schema:
+            type: string
+          required: true
+      description: |
+        Updates parties in a shipping instruction
+      requestBody:
+        description: Parameters used to update the shipping instruction parties
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/party'
+      responses:
+        '201':
+          description: Parties created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/party'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'              
   /transport-documents:
     get:
       tags:
-       - Transport Document
+       - Transport Documents
       summary: Get Transport Documents
       description: Retrieves all Transport Documents
+      parameters:
+        - in: query
+          name: limit
+          description: Maximum number of items to return. 
+          schema:
+            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/parameters/limitParam'
+        - in: query
+          name: cursor
+          description: A server generated value to specify a specific point in a collection result, used for pagination.
+          schema:
+            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/parameters/cursorParam'
       responses:
         '200':
           description: Request successful        
@@ -206,13 +335,406 @@ paths:
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'               
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'              
+  /cargo-items/{shippingMarks}:
+    get:
+      tags:
+       - Cargo Items
+      summary: Get Cargo Item
+      description: Retrieves  Cargo Item
+      parameters:
+        - in: path
+          name: shippingMarks
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Request successful        
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/cargoItem'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'
+  /equipments:
+    post:
+      tags:
+       - Equipments
+      summary: Post Equipment
+      description: |
+        Creates a new Equipment
+      requestBody:
+        description: Parameters used to create an equipment
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/equipment'
+      responses:
+        '201':
+          description: Shipping Instruction created
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/equipment'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'
+    get:
+      tags:
+       - Equipments
+      summary: Get Equipments
+      description: Retrieves Equipments
+      parameters:
+        - in: query
+          name: limit
+          description: Maximum number of items to return. 
+          schema:
+            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/parameters/limitParam'
+        - in: query
+          name: cursor
+          description: A server generated value to specify a specific point in a collection result, used for pagination.
+          schema:
+            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/parameters/cursorParam'
+      responses:
+        '200':
+          description: Request successful        
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/equipment'
+          
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'                    
+  /equipments/{equipmentReference}:
+    get:
+      tags:
+       - Equipments
+      summary: Get Equipment
+      description: Retrieves Equipment
+      parameters:
+        - in: path
+          name: equipmentReference
+          schema:
+            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/equipmentReference'
+          required: true
+      responses:
+        '200':
+          description: Request successful        
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/equipment'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'      
+  /parties:
+    post:
+      tags:
+       - Parties
+      summary: Post party
+      description: |
+        Creates a new party
+      requestBody:
+        description: Parameters used to create an equipment
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/party'
+      responses:
+        '201':
+          description: Shipping Instruction created
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/party'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'
+    get:
+      tags:
+       - Parties
+      summary: Get Parties
+      description: Retrieves Parties
+      parameters:
+        - in: query
+          name: limit
+          description: Maximum number of items to return. 
+          schema:
+            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/parameters/limitParam'
+        - in: query
+          name: cursor
+          description: A server generated value to specify a specific point in a collection result, used for pagination.
+          schema:
+            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/parameters/cursorParam'
+      responses:
+        '200':
+          description: Request successful        
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/party'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'              
+  /parties/{partyID}:
+    get:
+      tags:
+       - Parties
+      summary: Get Party
+      description: Retrieves Party
+      parameters:
+        - in: path
+          name: partyID
+          schema:
+            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/partyID'
+          required: true
+      responses:
+        '200':
+          description: Request successful        
+          content:
+            application/json:
+              schema:
+                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/party'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'
+  /shipments/{shipmentID}:
+    get:
+      tags:
+       - Shipments
+      summary: Get Shipment
+      description: Retrieves Shipment
+      parameters:
+        - in: path
+          name: shipmentID
+          schema:
+            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/shipmentID'
+          required: true
+      responses:
+        '200':
+          description: Request successful        
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/shipment'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'
+  /shipments:
+    get:
+      tags:
+       - Shipments
+      summary: Get Shipments
+      description: Retrieves Shipments
+      parameters:
+        - in: query
+          name: limit
+          description: Maximum number of items to return. 
+          schema:
+            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/parameters/limitParam'
+        - in: query
+          name: cursor
+          description: A server generated value to specify a specific point in a collection result, used for pagination.
+          schema:
+            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/parameters/cursorParam'
+      responses:
+        '200':
+          description: Request successful        
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/shipment'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'
+        
+                
+  /bookings:
+    get:
+      tags:
+       - Bookings
+      summary: Get Bookings
+      description: Retrieves Bookings
+      parameters:
+        - in: query
+          name: limit
+          description: Maximum number of items to return. 
+          schema:
+            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/parameters/limitParam'
+        - in: query
+          name: cursor
+          description: A server generated value to specify a specific point in a collection result, used for pagination.
+          schema:
+            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/parameters/cursorParam'
+      responses:
+        '200':
+          description: Request successful        
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/booking'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'  
+  /bookings/{carrierBookingReference}:
+    get:
+      tags:
+       - Bookings
+      summary: Get booking
+      description: Retrieves booking
+      parameters:
+        - in: path
+          name: carrierBookingReference
+          schema:
+            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/carrierBookingReference'
+          required: true
+      responses:
+        '200':
+          description: Request successful        
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/booking'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'      
+  /locations:
+    post:
+      tags:
+       - Locations
+      summary: Post locations
+      description: |
+        Creates a new locations
+      requestBody:
+        description: Parameters used to create a location
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/location'
+      responses:
+        '201':
+          description: Location created
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/location'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'
+    get:
+      tags:
+       - Locations
+      summary: Get Locations
+      description: Retrieves Locations
+      parameters:
+        - in: query
+          name: limit
+          description: Maximum number of items to return. 
+          schema:
+            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/parameters/limitParam'
+        - in: query
+          name: cursor
+          description: A server generated value to specify a specific point in a collection result, used for pagination.
+          schema:
+            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/parameters/cursorParam'
+      responses:
+        '200':
+          description: Request successful        
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/location'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'     
+  /locations/{locationID}:
+    get:
+      tags:
+       - Locations
+      summary: Get location
+      description: Retrieves location
+      parameters:
+        - in: path
+          name: locationID
+          schema:
+            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/locationID'
+          required: true
+      responses:
+        '200':
+          description: Request successful        
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/location'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'                 
   /transport-documents/{ID}:
     get:
       tags:
-       - Transport Document
-      summary: Get transport document
-      description: Retrieves the transport document with the ID in the path
+       - Transport Documents
+      summary: Get Transport Document
+      description: Retrieves the transport document with the ID in the path. The ID can be a transportDocumentID or a shippingInstructionID.
       parameters:
         - in: path
           name: ID
@@ -234,59 +756,10 @@ paths:
             application/json:
               schema:
                 $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'  
-    put:
-      tags:
-       - Transport Document
-      summary: Put transport document
-      description: |
-        Updates an entire transport document
-      parameters:
-        - in: path
-          name: ID
-          description: The transportDocumentID or shippingInstructionID of the transportDocument
-          schema:
-            type: string
-          required: true  
-      requestBody:
-        description: Parameters used to update the transport document
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/transportDocument'
-      responses:
-        '200':
-          description: Transport Document updated
-        default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'  
-      callbacks:
-        callbackObject:
-          '{$request.body.callbackUrl}':
-            post:   # Method
-              parameters:
-              - in: header
-                name: Signature
-                required: true
-                explode: true
-                schema:
-                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/signatureHeader'
-              requestBody: # Contents of the callback message
-                required: true
-                content:
-                  application/json:
-                    schema:
-                      $ref: '#/components/schemas/callbackObject'
-              responses:   # Expected responses to the callback message
-                '200':
-                  description: Your server returns this code if it accepts the callback        
     patch:
       tags:
-       - Transport Document
-      summary: Patch transport document
+       - Transport Documents
+      summary: Patch transport document. The ID can be a transportDocumentID or a shippingInstructionID.
       description: |
         Updates part of a Transport Document
       parameters:
@@ -302,7 +775,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/transportDocument'
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/transportDocumentNoLists'
       responses:
         '200':
           description: Transport Document updated
@@ -332,6 +805,80 @@ paths:
               responses:   # Expected responses to the callback message
                 '200':
                   description: Your server returns this code if it accepts the callback        
+  /transport-documents/{ID}/charges:
+    put:
+      tags:
+       - Transport Documents
+      summary: Put Transport Document charges. The ID can be a transportDocumentID or a shippingInstructionID.
+      parameters:
+        - in: path
+          name: ID
+          schema:
+            type: string
+          required: true
+      description: |
+        Updates a shipping instruction
+      requestBody:
+        description: Parameters used to create the charges
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/chargeNoID'
+      responses:
+        '201':
+          description: Charges updated
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/chargeNoID'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'
+  /transport-documents/{ID}/ebl-endorsement-chain:
+    put:
+      tags:
+       - Transport Documents
+      summary: Put Transport Document EBL Endorsement Chain. The ID can be a transportDocumentID or a shippingInstructionID.
+      parameters:
+        - in: path
+          name: ID
+          schema:
+            type: string
+          required: true
+      description: |
+        Updates a shipping instruction
+      requestBody:
+        description: Parameters used to create the EBL Endorsement Chain
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/EBLEndorsement'
+      responses:
+        '201':
+          description: EBLEndorsementChain created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/EBLEndorsement'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'                 
 components:
   schemas:
     reason:
@@ -342,18 +889,14 @@ components:
       type: string
       format: uuid
       description: The id of the object in question, for the callback response.
-    callbackStatus:
+    notificationSubject:
       type: string
       enum:
-        - REQUEST_UPDATE_SI
-        - PUBLISH_DRAFT_TD
-        - PUBLISH_FINAL_DRAFT_TD
-        - APPROVE_FINAL_DRAFT_TD
-        - REQUEST_AMENDMENTS_FINAL_DRAFT_TD
-        - APPROVE_AMENDMENTS_FINAL_DRAFT_TD
-        - PUBLISH_TD
-        - REQUEST_AMENDMENTS_TD
-        - APPROVE_AMENDMENTS_TD
+        - SI_UPDATE_REQUESTED
+        - DRAFT_TD_PUBLISHED
+        - TD_ISSUED
+        - DRAFT_TD_AMENDMENTS_APPROVED
+        - TD_AMENDMENTS_APPROVED
       description: The type of callback response, indicating what has happened to the object in question.
       example: REQUEST_AMENDMENTS_FINAL_DRAFT_TD
     documentType:
@@ -372,31 +915,37 @@ components:
           $ref: '#/components/schemas/documentID'
         documentType:
           $ref: '#/components/schemas/documentType'
-        callbackStatus:
-          $ref: '#/components/schemas/callbackStatus'
+        notificationSubject:
+          $ref: '#/components/schemas/notificationSubject'
         reason:
           $ref: '#/components/schemas/reason'
+        documentSignature:
+          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/signature'
     shippingInstructionBody:
       description: The Shipping instruction object, used when POSTing the object. This is the same as the shippingInstruction, but without an ID
       type: object
       properties:
         callbackUrl:
           $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/callbackUrl'
-        transportDocumentTypeCode:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/transportDocumentTypeCode'
         isElectronic:
           $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/isElectronic'
-        documentReferenceNumber:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/documentReferenceNumber'
-        numberOfOriginals:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/numberOfOriginals'
-        shipment:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/shipment'
-        equipments:
-          type: array
-          items:
-            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/equipment'
+        carrierBookingReference:
+          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/carrierBookingReference'
+        numberOfRiderPages:
+          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/numberOfRiderPages'
         cargoItems:
           type: array
           items:
             $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/cargoItem'
+        equipments:
+          type: array
+          items:
+            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/reeferEquipment'
+        stuffing:
+          type: array
+          items:
+            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/stuffingItem'
+        parties:
+          type: array
+          items:
+            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/party'
