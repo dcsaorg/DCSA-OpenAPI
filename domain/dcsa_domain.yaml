@@ -31,14 +31,12 @@ components:
           $ref: '#/components/schemas/numberOfOriginals'
         onboardDate:
           $ref: '#/components/schemas/onboardDate'
-        paymentTerm:
-          $ref: '#/components/schemas/paymentTerm'
         termsAndConditions:
           $ref: '#/components/schemas/termsAndConditions'
         placeOfIssue:
           $ref: '#/components/schemas/placeOfIssue'
-        clauseContent:
-          $ref: '#/components/schemas/clauseContent'
+        dateOfIssue:
+          $ref: '#/components/schemas/dateOfIssue'
         receivedForShipmentDate:
           $ref: '#/components/schemas/receivedForShipmentDate'
         declaredValueCurrency:
@@ -47,8 +45,6 @@ components:
           $ref: '#/components/schemas/currencyAmount'
         issuer:
           $ref: '#/components/schemas/partyID'
-        signature:
-          $ref: '#/components/schemas/signature'
         charges:
           type: array
           items:
@@ -76,8 +72,6 @@ components:
           $ref: '#/components/schemas/isElectronic'
         numberOfRiderPages:
           $ref: '#/components/schemas/numberOfRiderPages'
-        carrierBookingReference:
-          $ref: '#/components/schemas/carrierBookingReference'
         transportDocumentType:
           $ref: '#/components/schemas/transportDocumentType'  
         cargoItems:
@@ -95,7 +89,7 @@ components:
         parties:
           type: array
           items:
-            $ref: '#/components/schemas/party'
+            $ref: '#/components/schemas/shippingInstructionParty'
       required:
         - callbackUrl
         - shippingInstructionID
@@ -104,6 +98,7 @@ components:
         - equipments
         - cargoItems
         - stuffing
+        - parties
     shipment:
       type: object
       properties:
@@ -179,14 +174,12 @@ components:
           $ref: '#/components/schemas/numberOfOriginals'
         onboardDate:
           $ref: '#/components/schemas/onboardDate'
-        paymentTerm:
-          $ref: '#/components/schemas/paymentTerm'
         termsAndConditions:
           $ref: '#/components/schemas/termsAndConditions'
         placeOfIssue:
           $ref: '#/components/schemas/placeOfIssue'
-        clauseContent:
-          $ref: '#/components/schemas/clauseContent'
+        dateOfIssue:
+          $ref: '#/components/schemas/dateOfIssue'
         receivedForShipmentDate:
           $ref: '#/components/schemas/receivedForShipmentDate'
         declaredValueCurrency:
@@ -195,8 +188,6 @@ components:
           $ref: '#/components/schemas/currencyAmount'
         issuer:
           $ref: '#/components/schemas/partyID'
-        partLoad:
-          $ref: '#/components/schemas/partLoad'   
     shipmentNoLists:
       type: object
       properties:
@@ -235,12 +226,20 @@ components:
       properties:
         equipmentReference:
           $ref: '#/components/schemas/equipmentReference'
-        grossWeight:
-          $ref: '#/components/schemas/grossWeight'
+        verifiedGrossMass:
+          $ref: '#/components/schemas/verifiedGrossMass'
+        weightUnit:
+          $ref: '#/components/schemas/weightUnit'
+        totalContainerWeight:
+          $ref: '#/components/schemas/totalContainerWeight'
         partLoad:
           $ref: '#/components/schemas/partLoad'  
         liveReeferSettings:
           $ref: '#/components/schemas/liveReeferSettings'
+        seals:
+          type: array
+          items:
+            $ref: '#/components/schemas/seal'
     equipment:
       type: object
       properties:
@@ -274,6 +273,8 @@ components:
           $ref: '#/components/schemas/bookingDateTime'
         serviceContract:
           $ref: '#/components/schemas/serviceContract'
+        commercialVoyageID:
+          $ref: '#/components/schemas/commercialVoyageID'
         requestedEquipment:
           type: array
           items:
@@ -319,8 +320,6 @@ components:
           $ref: '#/components/schemas/weightUnit'
         volumeUnit:
           $ref: '#/components/schemas/volumeUnit'
-        declaredValue:
-          $ref: '#/components/schemas/declaredValue'
         packageCode:
           $ref: '#/components/schemas/packageCode'
       required:
@@ -349,6 +348,16 @@ components:
           $ref: '#/components/schemas/ventilation'
         maxVentilation:
           $ref: '#/components/schemas/ventilation'
+    seal:
+      type: object
+      description: addresses the seal-related information associated with the shipment equipment. A seal is put on a shipment equipment once it is loaded. This seal is meant to stay on until the shipment equipment reaches its final destination.
+      properties:
+        sealNumber:
+          $ref: '#/components/schemas/sealNumber'
+        sealSource:
+          $ref: '#/components/schemas/sealSource'
+        sealType:
+          $ref: '#/components/schemas/sealType'
     EBLEndorsement:
       type: object
       properties:
@@ -403,6 +412,10 @@ components:
         maxLength: 30
         example: MISSING
         description: MISSING
+    commercialVoyageID:
+      type: string
+      format: uuid
+      description: The identifier of the Commercial Voyage.
     numberOfPackages:
       type: integer
       description: Specifies the number of packages associated with this cargo item.
@@ -471,9 +484,15 @@ components:
       description: The name of the vessel given by the Vessel Operator
       example: MISSING
     sealSource:
-      type: integer
+      type: string
+      maxLength: 5
       example: MISSING
       description: 'The source of seal, namely who has affixed the seal. This attribute links to the Seal Source ID defined in the Seal Source reference data entity. Condition: Conditional on type of commodity'
+    sealType:
+      type: string
+      maxLength: 5
+      example: MISSING
+      description: 'addresses the type of seals'
     tareWeight:
       type: integer
       example: 12000
@@ -710,6 +729,18 @@ components:
       example: REQUEST_AMENDMENTS_FINAL_DRAFT_TD
       
       ### objects
+    shippingInstructionParty:
+      description: MISSING
+      type: object
+      properties:
+        partyID:
+          $ref: '#/components/schemas/partyID'
+        partyFunction:
+          $ref: '#/components/schemas/partyFunction'
+        displayedAddress:
+          $ref: '#/components/schemas/displayedAddress'
+        partyContactDetails: 
+          $ref: '#/components/schemas/partyContactDetails'
     party:
       description: ‘Party’ is an array of Party Type, Party Name, E-mail, Phone number, Fax and Tax Reference attributes. Classification for this Use Case (Required (R), Conditional (C), Optional (O), Not Applicable (N/A)) is given per attribute.
       type: object
@@ -758,9 +789,26 @@ components:
           $ref: '#/components/schemas/longitude'
         address:
           $ref: '#/components/schemas/address'
+    locationNoID:
+      description: Locations are arrays of a location identifier (e.g. ‘Location ID’) attribute and the Location Type Code attribute
+      type: object    
+      properties:
+        UNLocationCode:
+          $ref: '#/components/schemas/UNLocationCode'
+        latitude:
+          $ref: '#/components/schemas/latitude'
+        longitude:
+          $ref: '#/components/schemas/longitude'
+        address:
+          $ref: '#/components/schemas/address'
     partyID:
       type: string
       format: uuid
+    partyFunction:
+      type: string
+      maxLength: 3
+      example: MISSING
+      description: MISSING
     charge:
       type: object
       properties:
