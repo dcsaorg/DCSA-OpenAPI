@@ -45,6 +45,8 @@ components:
           $ref: '#/components/schemas/currencyAmount'
         issuer:
           $ref: '#/components/schemas/partyID'
+        clauseContent:
+          $ref: '#/components/schemas/clauseContent'
         charges:
           type: array
           items:
@@ -78,10 +80,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/cargoItem'
-        equipments:
+        shipmentEquipments:
           type: array
           items:
-            $ref: '#/components/schemas/reeferEquipment'
+            $ref: '#/components/schemas/shipmentEquipment'
         stuffing:
           type: array
           items:
@@ -188,6 +190,8 @@ components:
           $ref: '#/components/schemas/currencyAmount'
         issuer:
           $ref: '#/components/schemas/partyID'
+        clauseContent:
+          $ref: '#/components/schemas/clauseContent'
     shipmentNoLists:
       type: object
       properties:
@@ -221,7 +225,7 @@ components:
           $ref: '#/components/schemas/SVCContract'
         numberOfRiderPages:
           $ref: '#/components/schemas/numberOfRiderPages'
-    reeferEquipment:
+    shipmentEquipment:
       type: object
       properties:
         equipmentReference:
@@ -259,8 +263,10 @@ components:
       properties:
         carrierBookingReference:
           $ref: '#/components/schemas/carrierBookingReference'
-        shipmentID:
-          $ref: '#/components/schemas/shipmentID'
+        shipments:
+          type: array
+          items:
+            $ref: '#/components/schemas/shipmentID'
         serviceTypeAtOrigin:
           $ref: '#/components/schemas/serviceType'
         serviceTypeAtDestination:
@@ -298,8 +304,11 @@ components:
     cargoItem:
       type: object
       properties:
-        shippingMarks:
-          $ref: '#/components/schemas/shippingMarks'  
+        cargoItemID:
+          $ref: '#/components/schemas/cargoItemID'
+        cargoLines:
+         items:
+          $ref: '#/components/schemas/cargoLine'
         shipmentID:
           $ref: '#/components/schemas/shipmentID'
         commodityType:
@@ -330,6 +339,14 @@ components:
         - numberOfPackages
         - weight
         - weightUnit
+        
+    cargoLine:
+      type: object
+      properties:
+        cargoLineID:
+          $ref: '#/components/schemas/cargoLineID'
+        shippingMarks:
+          $ref: '#/components/schemas/shippingMarks'
     liveReeferSettings:
       type: object
       description: Specifies the settings for alive reefer container used to a shipment.
@@ -564,10 +581,10 @@ components:
       maxLength: 20
     volumeUnit:
       type: string 
-      example: MTQ
+      example: CBM
       enum:
-        - FTQ
-        - MTQ
+        - CBM
+        - CFT
       description: The unit of measure. It can be in either cubic meters or cubic feet, as provided by the shipper.
     freightPayableAt:
       type: string
@@ -601,17 +618,6 @@ components:
       maxLength: 20
       example: MISSING
 
-    partyRole:
-      type: string
-      enum:
-        - ISSUER
-        - SHIPPER
-        - CONSIGNEE
-        - NOTIFY_PARTY
-        - ALSO_NOTIFY
-        - FORWARDING_AGENT
-      example: ISSUER
-      description: MISSING
     locationID:
       type: string
       format: uuid
@@ -654,12 +660,15 @@ components:
       type: string
       example: d9c69bc8-294d-46d1-807c-654598341374
       format: uuid
-      description: The identifier for an object  
+      description: The identifier for a shipment 
+    cargoLineID:
+      type: string
+      description: The identifier for a cargo line   
     cargoItemID:
       type: string
       example: 6700963c-3ddd-4ada-ac29-d65852f2ac3d
       format: uuid
-      description: The identifier for an object    
+      description: The identifier for a cargo item
       
       
     documentStatus:
@@ -806,8 +815,14 @@ components:
       format: uuid
     partyFunction:
       type: string
-      maxLength: 3
-      example: MISSING
+      enum:
+        - ISSUER
+        - SHIPPER
+        - CONSIGNEE
+        - NOTIFY_PARTY
+        - ALSO_NOTIFY
+        - FORWARDING_AGENT
+      example: ISSUER
       description: MISSING
     charge:
       type: object
@@ -964,8 +979,10 @@ components:
     stuffingItem:
       type: object
       properties:
-        cargoItem:
-          $ref: '#/components/schemas/shippingMarks'
+        cargoLines:
+          type: array
+          items:
+            $ref:   '#/components/schemas/cargoLine'
         equipmentReference:
           $ref: '#/components/schemas/equipmentReference'
     error:
