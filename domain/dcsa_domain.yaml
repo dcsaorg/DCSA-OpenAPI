@@ -16,975 +16,1313 @@ components:
   # Common data models
   ####################
   schemas:
-    transportDocument:
+    locationParam:
+      type: string
+      format: uuid
+      example: 123e4567-e89b-12d3-a456-426614174000
+      description: 'The identifier for a location.' 
+    carrierBookingReferenceParam:
+      type: string
+      maxLength: 35
+      description: 'A set of unique characters provided by carrier to identify a booking.'
+      example: ABC709951
+
+  ######################################
+  # Callback object
+  ######################################
+
+    callbackObject:
+      description: The standard callback object.
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/documentID'
+        - $ref: '#/components/schemas/documentType'
+        - $ref: '#/components/schemas/callbackStatus'
+        - $ref: '#/components/schemas/reason'
+
+    documentID:
       type: object
       properties:
-        transportDocumentID: 
-          $ref: '#/components/schemas/transportDocumentID'
-        shippingInstructionID:
-          $ref: '#/components/schemas/shippingInstructionID'
-        documentReferenceNumber:
-          $ref: '#/components/schemas/documentReferenceNumber'
-        documentStatus:
-          $ref: '#/components/schemas/documentStatus'
-        numberOfOriginals:
-          $ref: '#/components/schemas/numberOfOriginals'
-        onboardDate:
-          $ref: '#/components/schemas/onboardDate'
-        termsAndConditions:
-          $ref: '#/components/schemas/termsAndConditions'
-        placeOfIssue:
-          $ref: '#/components/schemas/placeOfIssue'
-        dateOfIssue:
-          $ref: '#/components/schemas/dateOfIssue'
-        receivedForShipmentDate:
-          $ref: '#/components/schemas/receivedForShipmentDate'
-        declaredValueCurrency:
-          $ref: '#/components/schemas/currency'
-        declaredValue:
-          $ref: '#/components/schemas/currencyAmount'
-        issuer:
-          $ref: '#/components/schemas/partyID'
-        clauseContent:
-          $ref: '#/components/schemas/clauseContent'
-        charges:
-          type: array
-          items:
-            $ref: '#/components/schemas/charge'  
-        EBLEndorsementChain:
-          type: array
-          items:
-            $ref: '#/components/schemas/EBLEndorsement'
+        documentID:
+          type: string
+          format: uuid
+          description: 'The id of the object in question, for the callback response.'
+          example: 123e4567-e89b-12d3-a456-426614174000
+    documentType:
+      type: object
+      properties:
+        documentType:
+          type: string
+          description: 'The type of the ID - can either be a ShippingInstructionID (SI) or TransportDocumentID (TD)'
+          enum:
+            - SI
+            - TD
+          example: 123e4567-e89b-12d3-a456-426614174000
+    callbackStatus:
+      type: object
+      properties:
+        callbackStatus:
+          type: string
+          description: The type of callback response, indicating what has happened to the object in question.
+          enum:
+            - RECE
+            - DRFT
+            - PENA
+            - PENU
+            - REJE
+            - APPR
+            - ISSU
+            - SURR
+            - SUBM
+            - VOID
+          example: DRFT
+    reason:
+      type: object
+      properties:
+        reason:
+          type: string
+          description: 'Text field as part of the request message, describing the reasons for requesting the update, including their ‘category’ (e.g. mandatory, missing information, clauses, etc.)'
+          example: Please update the final draft TD.
+      
+  ######################################
+  # Shipping Instruction Related objects
+  ######################################
+  
+    shippingInstructionHeaderNoID:
+      description: 'an enrichment to the original booking shared by the shipper to the carrier. The shipping instruction includes volume or weight, cargo items, shipping dates, origin, destination, and other special instructions. The information given by the shipper through the shipping instruction is the information required to create a Transport Document.'
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/transportDocumentType'
+        - $ref: '#/components/schemas/numberOfCopies'
+        - $ref: '#/components/schemas/numberOfOriginals'
+        - $ref: '#/components/schemas/isPartLoad'
+        - $ref: '#/components/schemas/isElectronic'
+        - $ref: '#/components/schemas/carrierBookingReference'
+        - $ref: '#/components/schemas/callbackUrl'
+    
+    shippingInstructionHeader:
+      description: 'an enrichment to the original booking shared by the shipper to the carrier. The shipping instruction includes volume or weight, cargo items, shipping dates, origin, destination, and other special instructions. The information given by the shipper through the shipping instruction is the information required to create a Transport Document.'
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/shippingInstructionID'
+        - $ref: '#/components/schemas/documentStatus'
+        - $ref: '#/components/schemas/shippingInstructionHeaderNoID'
+
+    shippingInstructionNoID:
+      description: 'an enrichment to the original booking shared by the shipper to the carrier. The shipping instruction includes volume or weight, cargo items, shipping dates, origin, destination, and other special instructions. The information given by the shipper through the shipping instruction is the information required to create a Transport Document.'
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/shippingInstructionHeaderNoID'
+        - $ref: '#/components/schemas/cargoItemNoIDList'
+        - $ref: '#/components/schemas/shipmentEquipmentNoIDList'
+        - $ref: '#/components/schemas/documentPartyList'
+        - $ref: '#/components/schemas/shipmentLocationList'
+        - $ref: '#/components/schemas/referenceNoIDList'
       required:
-        - transportDocumentID
-        - shippingInstructionID
-        - documentReferenceNumber
-        - transportDocumentType
-        - paymentTerm
-        - termsAndConditions
+        - callbackUrl
+
     shippingInstruction:
-      description: The Shipping Instruction is ‘an enrichment to the original booking shared by the shipper to the carrier. The shipping instruction includes volume/weight, shipping dates, origin, destination and other special instructions. The information given by the shipper through the shipping instructions is the information, which is required to create the Bill of Lading.
+      description: 'The Shipping Instruction is an enrichment to the original booking shared by the shipper to the carrier. The shipping instruction includes volume or weight, cargo items, shipping dates, origin, destination, and other special instructions. The information given by the shipper through the shipping instruction is the information required to create a Transport Document.'
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/shippingInstructionHeader'
+        - $ref: '#/components/schemas/cargoItemList'
+        - $ref: '#/components/schemas/shipmentEquipmentList'
+        - $ref: '#/components/schemas/documentPartyList'
+        - $ref: '#/components/schemas/shipmentLocationList'
+        - $ref: '#/components/schemas/referenceList'
+      required:
+        - callbackUrl
+  
+  ######################################
+  # Cargo Item Related objects
+  ######################################
+  
+    cargoItemList:
       type: object
       properties:
-        callbackUrl:
-          $ref: '#/components/schemas/callbackUrl'
-        shippingInstructionID:
-          $ref: '#/components/schemas/shippingInstructionID'
-        isElectronic:
-          $ref: '#/components/schemas/isElectronic'
-        numberOfRiderPages:
-          $ref: '#/components/schemas/numberOfRiderPages'
-        transportDocumentType:
-          $ref: '#/components/schemas/transportDocumentType'  
         cargoItems:
           type: array
           items:
             $ref: '#/components/schemas/cargoItem'
+    cargoItemNoIDList:
+      type: object
+      properties:
+        cargoItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/cargoItemNoID'
+  
+    commonCargoItem:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/cargoLineItems'
+        - $ref: '#/components/schemas/descriptionOfGoods'
+        - $ref: '#/components/schemas/HSCode'
+        - $ref: '#/components/schemas/weight'
+        - $ref: '#/components/schemas/volume'
+        - $ref: '#/components/schemas/weightUnit'
+        - $ref: '#/components/schemas/volumeUnit'
+        - $ref: '#/components/schemas/numberOfPackages'
+        - $ref: '#/components/schemas/packageCode'
+      
+    cargoItemNoID:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/commonCargoItem'
+        - $ref: '#/components/schemas/equipmentReference'
+
+    cargoItem:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/cargoItemID'
+        - $ref: '#/components/schemas/commonCargoItem'
+        - $ref: '#/components/schemas/shipmentEquipmentID'
+
+  ######################################
+  # Cargo Line Item Related objects
+  ######################################
+  
+    cargoLineItems:
+      type: object
+      properties:
+        cargoLineItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/cargoLineItem'
+    cargoLineItem:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/cargoLineItemID'
+        - $ref: '#/components/schemas/shippingMarks'
+      required:
+        - cargoLineItemID
+        - shippingMarks
+
+  ######################################
+  # Shipment Equipment Related objects
+  ######################################
+
+    shipmentEquipmentList:
+      type: object
+      properties:
         shipmentEquipments:
           type: array
           items:
             $ref: '#/components/schemas/shipmentEquipment'
-        stuffing:
-          type: array
-          items:
-            $ref: '#/components/schemas/stuffingItem'
-        parties:
-          type: array
-          items:
-            $ref: '#/components/schemas/shippingInstructionParty'
-      required:
-        - callbackUrl
-        - shippingInstructionID
-        - isElectronic
-        - shipment
-        - equipments
-        - cargoItems
-        - stuffing
-        - parties
-    shipment:
+    shipmentEquipmentNoIDList:
       type: object
       properties:
-        shipmentID:
-          $ref: '#/components/schemas/shipmentID'
-        serviceType:
-          $ref: '#/components/schemas/serviceType'      
-        shipmentTerm:
-          $ref: '#/components/schemas/shipmentTerm'
-        exportReferenceNumber:
-          $ref: '#/components/schemas/exportReferenceNumber'
-        transportReference:
-          $ref: '#/components/schemas/transportReference'
-        vesselName:
-          $ref: '#/components/schemas/vesselName'
-        carrierVoyageNumber:
-          $ref: '#/components/schemas/carrierVoyageNumber'
-        freightPayableAt:
-          $ref: '#/components/schemas/freightPayableAt'
-        isChargeDisplayed:
-          $ref: '#/components/schemas/isChargeDisplayed'
-        shipmentEquipmentQuantity:
-          $ref: '#/components/schemas/shipmentEquipmentQuantity'
-        currencyAmount:
-          $ref: '#/components/schemas/currencyAmount'
-        currency:
-          $ref: '#/components/schemas/currency'  
-        carrierCode:
-          $ref: '#/components/schemas/carrierCode'
-        SVCContract:
-          $ref: '#/components/schemas/SVCContract'
-        numberOfRiderPages:
-          $ref: '#/components/schemas/numberOfRiderPages'
-        parties:
-          type: array
-          items: 
-            $ref: '#/components/schemas/party'
-        locations:
+        shipmentEquipments:
           type: array
           items:
-            $ref: '#/components/schemas/location'  
-        confirmedEquipment:
-          type: array
-          items:
-            $ref: '#/components/schemas/equipmentEntity'
-        references:
-          type: array
-          items:
-            $ref: '#/components/schemas/reference'        
-      required:
-        - shipmentID
-        - serviceType
-        - shipmentTerm
-        - vesselName
-        - carrierVoyageNumber
-        - parties
-        - locations
-        - freightPayableAt
-        - isChargeDisplayed
-        - shipmentEquipmentQuantity
-    transportDocumentNoLists:
+            $ref: '#/components/schemas/shipmentEquipmentNoID'
+
+    shipmentEquipmentCommon:
       type: object
-      properties:
-        transportDocumentID: 
-          $ref: '#/components/schemas/transportDocumentID'
-        shippingInstructionID:
-          $ref: '#/components/schemas/shippingInstructionID'
-        documentReferenceNumber:
-          $ref: '#/components/schemas/documentReferenceNumber'
-        documentStatus:
-          $ref: '#/components/schemas/documentStatus'
-        numberOfOriginals:
-          $ref: '#/components/schemas/numberOfOriginals'
-        onboardDate:
-          $ref: '#/components/schemas/onboardDate'
-        termsAndConditions:
-          $ref: '#/components/schemas/termsAndConditions'
-        placeOfIssue:
-          $ref: '#/components/schemas/placeOfIssue'
-        dateOfIssue:
-          $ref: '#/components/schemas/dateOfIssue'
-        receivedForShipmentDate:
-          $ref: '#/components/schemas/receivedForShipmentDate'
-        declaredValueCurrency:
-          $ref: '#/components/schemas/currency'
-        declaredValue:
-          $ref: '#/components/schemas/currencyAmount'
-        issuer:
-          $ref: '#/components/schemas/partyID'
-        clauseContent:
-          $ref: '#/components/schemas/clauseContent'
-    shipmentNoLists:
+      allOf:
+        - $ref: '#/components/schemas/equipmentReference'
+        - $ref: '#/components/schemas/verifiedGrossMass'
+        - $ref: '#/components/schemas/weightUnit'
+        - $ref: '#/components/schemas/cargoGrossWeight'
+        - properties:
+            activeReeferSettings:
+              type: object
+              description: specifies the settings for an active reefer container used to a shipment.
+              allOf:
+                - $ref: '#/components/schemas/temperatureMin'
+                - $ref: '#/components/schemas/temperatureMax'
+                - $ref: '#/components/schemas/temperatureUnit'
+                - $ref: '#/components/schemas/humidityMin'
+                - $ref: '#/components/schemas/humidityMax'
+                - $ref: '#/components/schemas/ventilationMin'
+                - $ref: '#/components/schemas/ventilationMax'
+
+    shipmentEquipmentNoID:
       type: object
-      properties:
-        shipmentID:
-          $ref: '#/components/schemas/shipmentID'
-        serviceType:
-          $ref: '#/components/schemas/serviceType'      
-        shipmentTerm:
-          $ref: '#/components/schemas/shipmentTerm'
-        exportReferenceNumber:
-          $ref: '#/components/schemas/exportReferenceNumber'
-        transportReference:
-          $ref: '#/components/schemas/transportReference'
-        vesselName:
-          $ref: '#/components/schemas/vesselName'
-        carrierVoyageNumber:
-          $ref: '#/components/schemas/carrierVoyageNumber'
-        freightPayableAt:
-          $ref: '#/components/schemas/freightPayableAt'
-        isChargeDisplayed:
-          $ref: '#/components/schemas/isChargeDisplayed'
-        shipmentEquipmentQuantity:
-          $ref: '#/components/schemas/shipmentEquipmentQuantity'
-        currencyAmount:
-          $ref: '#/components/schemas/currencyAmount'
-        currency:
-          $ref: '#/components/schemas/currency'  
-        carrierCode:
-          $ref: '#/components/schemas/carrierCode'
-        SVCContract:
-          $ref: '#/components/schemas/SVCContract'
-        numberOfRiderPages:
-          $ref: '#/components/schemas/numberOfRiderPages'
+      allOf:
+        - $ref: '#/components/schemas/shipmentEquipmentCommon'
+        - $ref: '#/components/schemas/sealNoIDList'
+
     shipmentEquipment:
       type: object
+      allOf:
+        - $ref: '#/components/schemas/shipmentEquipmentID'
+        - $ref: '#/components/schemas/shipmentEquipmentCommon'
+        - $ref: '#/components/schemas/sealList'
+
+  ##########################
+  # Seal Related objects
+  ##########################
+    sealNoIDList:
+      type: object
       properties:
-        equipmentReference:
-          $ref: '#/components/schemas/equipmentReference'
-        verifiedGrossMass:
-          $ref: '#/components/schemas/verifiedGrossMass'
-        weightUnit:
-          $ref: '#/components/schemas/weightUnit'
-        totalContainerWeight:
-          $ref: '#/components/schemas/totalContainerWeight'
-        partLoad:
-          $ref: '#/components/schemas/partLoad'  
-        liveReeferSettings:
-          $ref: '#/components/schemas/liveReeferSettings'
+        seals:
+          type: array
+          items:
+            $ref: '#/components/schemas/sealNoID'
+    sealList:
+      type: object
+      properties:
         seals:
           type: array
           items:
             $ref: '#/components/schemas/seal'
-    equipment:
+    sealNoID:
       type: object
-      properties:
-        equipmentReference:
-          $ref: '#/components/schemas/equipmentReference'
-        ISOEquipmentCode:
-          $ref: '#/components/schemas/ISOEquipmentCode'
-        tareWeight:
-          $ref: '#/components/schemas/tareWeight'
-        weightUnit:
-          $ref: '#/components/schemas/weightUnit'
-      required:
-        - equipmentReference
-        - ISOEquipmentCode
-    booking:
-      type: object
-      properties:
-        carrierBookingReference:
-          $ref: '#/components/schemas/carrierBookingReference'
-        shipments:
-          type: array
-          items:
-            $ref: '#/components/schemas/shipmentID'
-        serviceTypeAtOrigin:
-          $ref: '#/components/schemas/serviceType'
-        serviceTypeAtDestination:
-          $ref: '#/components/schemas/serviceType'
-        shipmentTermAtOrigin:
-          $ref: '#/components/schemas/shipmentTerm'
-        shipmentTermAtDestination:
-          $ref: '#/components/schemas/shipmentTerm'
-        bookingDateTime:
-          $ref: '#/components/schemas/bookingDateTime'
-        serviceContract:
-          $ref: '#/components/schemas/serviceContract'
-        commercialVoyageID:
-          $ref: '#/components/schemas/commercialVoyageID'
-        requestedEquipment:
-          type: array
-          items:
-            $ref: '#/components/schemas/equipmentEntity'
-    equipmentEntity:
-      type: object
-      properties:
-        equipmentType:
-          $ref: '#/components/schemas/equipmentType'
-        equipmentUnits:
-          $ref: '#/components/schemas/equipmentUnits'
-
-    equipmentType:
-      type: string
-      description: Size and type of the Equipment for this shipment
-      maxLength: 4
-    equipmentUnits:
-      type: integer
-      description: Number of confirmed equipment units
-      example: 6
-    cargoItem:
-      type: object
-      properties:
-        cargoItemID:
-          $ref: '#/components/schemas/cargoItemID'
-        cargoLines:
-         items:
-          $ref: '#/components/schemas/cargoLine'
-        shipmentID:
-          $ref: '#/components/schemas/shipmentID'
-        commodityType:
-          $ref: '#/components/schemas/commodityType'
-        descriptionOfGoods:
-          $ref: '#/components/schemas/descriptionOfGoods'
-        HSCode:
-          $ref: '#/components/schemas/HSCode'  
-        carrierBookingReference:
-          $ref: '#/components/schemas/carrierBookingReference'
-        numberOfPackages:
-          $ref: '#/components/schemas/numberOfPackages'
-        weight:
-          $ref: '#/components/schemas/weight'
-        volume:
-          $ref: '#/components/schemas/volume'
-        weightUnit:
-          $ref: '#/components/schemas/weightUnit'
-        volumeUnit:
-          $ref: '#/components/schemas/volumeUnit'
-        packageCode:
-          $ref: '#/components/schemas/packageCode'
-      required:
-        - shippingMarks
-        - descriptionOfGoods
-        - HSCode
-        - carrierBookingReference
-        - numberOfPackages
-        - weight
-        - weightUnit
-        
-    cargoLine:
-      type: object
-      properties:
-        cargoLineID:
-          $ref: '#/components/schemas/cargoLineID'
-        shippingMarks:
-          $ref: '#/components/schemas/shippingMarks'
-    liveReeferSettings:
-      type: object
-      description: Specifies the settings for alive reefer container used to a shipment.
-      properties:
-        mintemperature:
-          $ref: '#/components/schemas/temperature'
-        maxTemperature:
-          $ref: '#/components/schemas/temperature'
-        temperatureUnit:
-          $ref: '#/components/schemas/temperatureUnit'
-        minHumidity:
-          $ref: '#/components/schemas/humidity'
-        maxHumidity:
-          $ref: '#/components/schemas/humidity'
-        minVentilation:
-          $ref: '#/components/schemas/ventilation'
-        maxVentilation:
-          $ref: '#/components/schemas/ventilation'
+      description: 'addresses the seal-related information associated with the shipment equipment. A seal is put on a shipment equipment once it is loaded. This seal is meant to stay on until the shipment equipment reaches its final destination.'
+      allOf:
+        - $ref: '#/components/schemas/sealNumber'
+        - $ref: '#/components/schemas/sealSource'
+        - $ref: '#/components/schemas/sealType'
     seal:
       type: object
       description: addresses the seal-related information associated with the shipment equipment. A seal is put on a shipment equipment once it is loaded. This seal is meant to stay on until the shipment equipment reaches its final destination.
-      properties:
-        sealNumber:
-          $ref: '#/components/schemas/sealNumber'
-        sealSource:
-          $ref: '#/components/schemas/sealSource'
-        sealType:
-          $ref: '#/components/schemas/sealType'
-    EBLEndorsement:
-      type: object
-      properties:
-        titleHolder:
-          $ref: '#/components/schemas/titleHolder'
-        signature:
-          $ref: '#/components/schemas/signature'
-        endorsementDate:
-          $ref: '#/components/schemas/endorsementDateTime'
-        endorsee:
-          $ref: '#/components/schemas/endorsee'
-    titleHolder:
-      type: string
-      description: Links to the Party ID to the tile holder
-      format: uuid
-    endorsementDateTime:
-      type: string
-      format: $date-time
-      description: The date of endorsement
-    endorsee:
-      type: string
-      format: uuid
-      description: Links to the party ID to specifty the next title holder to whom the title is endorsed by the current title holder.
-      
-    ventilation:
-      type: number
-      description: Indicates the ventilation setting on the container CBM/Hr
-      example: 266
-    temperature:
-      description: indicates the temperature setting on the container.
-      type: number
-      example: 54.3
-    temperatureUnit:
-      description: Celsius (CEL) or Fahrenheit (FAH)
-      type: string
-      enum:
-        - CEL
-        - FAH
-    humidity:
-      description: Indicates the humidity ssetting on the container in percent.
-      type: number
-      example: 80.0
-    partLoad:
-      type: integer
-      description: Identifies number of TD per container ( when more than one) when moving FCL/FCL.
-    bookingDateTime:
-        type: string
-        format: $date-time
-        description: MISSING
-    serviceContract:
-        type: string
-        maxLength: 30
-        example: MISSING
-        description: MISSING
-    commercialVoyageID:
-      type: string
-      format: uuid
-      description: The identifier of the Commercial Voyage.
-    numberOfPackages:
-      type: integer
-      description: Specifies the number of packages associated with this cargo item.
-      example: 18
-    numberOfRiderPages:
-      type: integer
-      description: Amount of Rider Pages as addendum
-      example: 2
-    isElectronic:
-      type: boolean
-      description: Indicates whether the Transport Document is electronic or not
-      example: true
-    HSCode:
-      type: string
-      maxLength: 10
-      description: The Harmonized System is an international nomenclature for the classification of products. It allows participating countries to classify traded goods on a common basis for customs purposes. At the international level, the Harmonized System (HS) for classifying goods is a six-digit code system.
-      example: MISSING
-    packageCode:
-      type: string
-      maxLength: 10
-      example: MISSING
-    partyName:
-      type: string
-      description: Name of the party.
-      example: "Great Books ApS"
-      maxLength: 100
-    carrierVoyageNumber:
-      type: string
-      maxLength: 50
-      description: The vessel operator specific identifier of the Voyage.
-    isChargeDisplayed:
-      type: boolean
-      description: An indicator of whether the charges are displayed.
-      example: true
-    shipmentTerm:
-      type: string
-      description: 
-        'Indicates the shipment term for the loading of the cargo into the Container or for the unloading of the cargo out of the Container. Three options are defined by DCSA: FCL, LCL and BB.'
-      enum:
-        - FCL
-        - LCL
-        - BB
-      example: FCL
-    numberOfOriginals:
-      type: integer
-      example: 3
-      maxLength: 10
-      description: 'Number of original copies of the negotiable bill of lading which has been issued to the customer. Condition: only applicable for physical Bill of Lading'
-    taxReference:
-      type: string
-      example: MISSING
-      maxLength: 20
-      description: 'It is an identifying number of consignee or shipper (Individual or entity) used for tax purposes. Condition: Conditional based on customs requirements.'
-    displayedAddress:
-      type: string
-      example: MISSING
-      maxLength: 250
-      description: 'The address of the party to be displayed on the transport document.'
-    partyContactDetails:
-      type: string
-      example: MISSING
-      maxLength: 250
-      description: 'The contact details of the person to contact in relation to the Transport Document (changes, notifications etc.).'
-    vesselName:
-      type: string
-      description: The name of the vessel given by the Vessel Operator
-      example: MISSING
-    sealSource:
-      type: string
-      maxLength: 5
-      example: MISSING
-      description: 'The source of seal, namely who has affixed the seal. This attribute links to the Seal Source ID defined in the Seal Source reference data entity. Condition: Conditional on type of commodity'
-    sealType:
-      type: string
-      maxLength: 5
-      example: MISSING
-      description: 'addresses the type of seals'
-    tareWeight:
-      type: integer
-      example: 12000
-      description: 'The weight of an empty container. Condition: Only with shipper owned containers.'
-    
-    clauseContent:
-      type: string
-      example: MISSING
-      description: "The content of the clause. Condition: Clauses added by the carrier to the bill of lading subject to local rules / guidelines or certain mandatory information required to be shared with the customer. Is not a separate field on the bill of lading and usually printed below cargo description"
-    shippingMarks:
-      type: string
-      description: The identifying details on a package or the actual markings that appear on the package(s). This information is provided by the customer.
-      example: MISSING
-    exportReferenceNumber:
-      type: integer
-      description: The unique identifier of the export license classification provided by the shipper for control purposes relevant to regulatory procedures.
-      example: QWQ12313832
-    carrierCode: 
-      type: string
-      description: The Carrier Code represents a concatenation of the Code List Provider Code and the Code List Provider. A hyphen is used between the two codes. The unique carrier identifier is sourced from either the NMFTA SCAC codes list or the SMDG Liner Code List.
-      maxLength: 10
-      example: MISSING
-    currency: 
-      type: string
-      maxLength: 3
-      description: The currency code for the amount of the charge, using a 3-character code (ISO 4217).
-      example: DKK
-    paymentTerm:
-      type: string
-      maxLength: 3
-      description: An indicator of whether a charge is prepaid or collect, using a 3-character code to identify INCO terms.
-    currencyAmount: 
-      type: number
-      description: The monetary value of all freight and other service charges for this consignment item, with a maximum of 2 digits decimals.
-      example: 1012.12
-    SVCContract:
-      type: string
-      maxLength: 30
-      description: Reference number for agreement between shipper and carrier through which the shipper commits to provide a certain minimum quantity of cargo over a fixed period and the carrier commits to a certain rate or rate schedule
-      example: MISSING
-    transportReference:
-      type: string
-      example: MISSING
-      description: The reference for the transport, e.g. when the mode of transport is a vessel, the Transport Reference will be the vessel IMO number.
-      maxLength: 50
-    descriptionOfGoods:
-      type: string
-      example: MISSING
-      description: The cargo description are details which accurately and properly describe the cargo being shipped in the container(s) as provided by the shipper.
-      maxLength: 2000
-    grossWeight:
-     type: number
-     example: 345.1
-    weight:
-      type: number
-      example: 13000.3
-      description: The total weight of the cargo including packaging items being carried in the container(s). Excludes the tare weight of the container(s)
-    volume:
-      type: integer
-      example: 12
-      description: Calculated by multiplying the width, height and length of the packed cargo
-    weightUnit:
-      type: string
-      example: KGM
-      description: The unit of measure; it can be in either Kilograms or Pounds as provided by the shipper.
-      enum:
-        - KGM
-        - LBR
-      maxLength: 20
-    volumeUnit:
-      type: string 
-      example: CBM
-      enum:
-        - CBM
-        - CFT
-      description: The unit of measure. It can be in either cubic meters or cubic feet, as provided by the shipper.
-    freightPayableAt:
-      type: string
-      format: uuid
-      description: It is the location where payment will take place by the customer. Usually refers to Basic Ocean Freight alone. This attribute links to the Location ID.
-    dateOfIssue:
-      type: string
-      format: date
-      description: Date when the original transport document (bill of lading) has been issued.
+      allOf:
+        - $ref: '#/components/schemas/sealID'
+        - $ref: '#/components/schemas/sealNoID'
 
-    ISOEquipmentCode:
-      type: string
-      example: MISSING
-      description: Unique code for the different equipment size/type used for transporting commodities. The code is a concatenation of ISO Equipment Size Code and ISO Equipment Type Code A and follows the ISO 6346 standard.
-      maxLength: 4
-    shipmentEquipmentQuantity:
-      type: integer
-      example: 2
-      description: The number of containers linked to the shipment.
-    serviceType:
-      type: string
-      enum:
-        - CY
-        - SD
-        - CFS
-      description: 'Indicates the type of service offered at the origin or destination. Three options are defined by DCSA: CY, SD and CFS.'
-      example: CY
-    documentReferenceNumber:
-      type: string
-      description: Addresses the bill of lading number when the document type is bill of lading. It is a unique number allocated by the shipping line and is the main number used for the tracking of the status of the shipment.
-      maxLength: 20
-      example: MISSING
+  ##########################
+  # Document Party Related objects
+  ##########################
 
-    locationID:
-      type: string
-      format: uuid
-      description: MISSING 
-    locationTypeCode:
-      type: string
-      description: Code for location types. PRE (Place of Receipt), PDE (Place of Delivery), PCB (Pre-carriage by), OIR (Onward In-land Routing), PLO (Port of Loading), PDI (Port of Discharge), ORI (Origin of Goods)
-      enum:
-        - PRE
-        - PDE
-        - PCB 
-        - OIR
-        - PLO
-        - PDI
-        - ORI
-    sealNumber:
-      type: string
-      maxLength: 15
-      description: An Identification of a seal affixed to the container
-      example: MISSING
-    verifiedGrossMass:
-      type: number
-      description: A document informing the carrier of the weight of the container, signed by an authorized person from the shipper or on beholf of said shipper. This includes cargo weight, bracing, dunnage and container tare weight
-      example: 2342.5
-    declaredValue:
-      type: number
-      description: The value of the cargo that the shipper declares in order to avoid the carrier's limitation of liability and "Ad Valorem" freight, i.e. freight which is calculated based on the value of the goods declared by the shipper.
-      example : 1231.10
-    signature:
-      type: string
-      maxLength: 500
-      description: Digital signature
-      example: MISSING
-    shippingInstructionID:
-      type: string
-      example: e0559d83-00e2-438e-afd9-fdd610c1a008
-      format: uuid
-      description: The identifier for a shipping instruction
-    shipmentID:
-      type: string
-      example: d9c69bc8-294d-46d1-807c-654598341374
-      format: uuid
-      description: The identifier for a shipment 
-    cargoLineID:
-      type: string
-      description: The identifier for a cargo line   
-    cargoItemID:
-      type: string
-      example: 6700963c-3ddd-4ada-ac29-d65852f2ac3d
-      format: uuid
-      description: The identifier for a cargo item
-      
-      
-    documentStatus:
-      type: string
-      enum:
-        - SI
-        - RECEIVED
-        - DRAFTED
-        - PENDING_APPROVAL
-        - APPROVED
-        - ISSUED
-        - SURRENDERED
-      description: The current status of the transport document, e.g. SI, Received, Drafted, Pending Approval, Approved, Issued, and Surrended. 
-    totalContainerWeight:
-      type: number
-      description: Total Container Weight includes Cargo Gross Weight and Container Tare Weight
-    onboardDate:
-      type: string
-      format: date
-      description: The date when the last cntainer linked to the bill of lading is loaded on board the vessel indicated on the bill of lading.
-    shippedOnboardDate:
-      type: string
-      format: date
-      description: The date when the last container linked to the bill of lading is loaded on board the vessel indicated on the bill of lading.
-    termsAndConditions:
-      type: string
-      description: Additional carrier terms and conditions aside from the general terms and conditions.
-    placeOfIssue:
-      type: string
-      format: uuid
-      description: 'Links to the locationID to specify where the original transport document (bill of lading) has been issued. Condition: Only applicable for physical Bill of Lading'
-    chargeType:
-      type: string
-      maxLength: 20
-      description: 'Description of the charge type applied. Condition: Subject to country requirements'
-    receivedForShipmentDate:
-      type: string
-      format: date
-      description: Date when the last container linked to the transpot document is physically in the terminal (Customers cleared against the intended vessel)
-      example: "2020-12-12"
-    transportDocumentID:
-      type: string
-      format: uuid
-      description: The unique identifier for a transport document
+    documentPartyList:
+      type: object
+      properties:
+        documentParties:
+          type: array
+          items:
+            $ref: '#/components/schemas/documentParty'
     
-    reason:
-      type: string
-      description: Reason field in a callback response. This field can be used to explain why a specific callbackStatus has been sent.
-      example: Please update the final draft TD.
-    documentID:
-      type: string
-      format: uuid
-      description: The id of the object in question, for the callback response.
-    callbackStatus:
-      type: string
-      enum:
-        - REQUEST_UPDATE_SI
-        - PUBLISH_DRAFT_TD
-        - PUBLISH_FINAL_DRAFT_TD
-        - APPROVE_FINAL_DRAFT_TD
-        - REQUEST_AMENDMENTS_FINAL_DRAFT_TD
-        - APPROVE_AMENDMENTS_FINAL_DRAFT_TD
-        - PUBLISH_TD
-        - REQUEST_AMENDMENTS_TD
-        - APPROVE_AMENDMENTS_TD
-      description: The type of callback response, indicating what has happened to the object in question.
-      example: REQUEST_AMENDMENTS_FINAL_DRAFT_TD
-      
-      ### objects
-    shippingInstructionParty:
-      description: MISSING
+    documentParty:
+      description: stores the parties involved in the transport document.
       type: object
-      properties:
-        partyID:
-          $ref: '#/components/schemas/partyID'
-        partyFunction:
-          $ref: '#/components/schemas/partyFunction'
-        displayedAddress:
-          $ref: '#/components/schemas/displayedAddress'
-        partyContactDetails: 
-          $ref: '#/components/schemas/partyContactDetails'
-    party:
-      description: ‘Party’ is an array of Party Type, Party Name, E-mail, Phone number, Fax and Tax Reference attributes. Classification for this Use Case (Required (R), Conditional (C), Optional (O), Not Applicable (N/A)) is given per attribute.
-      type: object
-      properties:
-        partyID:
-          $ref: '#/components/schemas/partyID'
-        partyName:
-          $ref: '#/components/schemas/partyName'
-        taxReference: 
-          $ref: '#/components/schemas/taxReference'
-        displayedAddress: 
-          $ref: '#/components/schemas/displayedAddress'
-        partyContactDetails: 
-          $ref: '#/components/schemas/partyContactDetails'
+      allOf:
+        - $ref: '#/components/schemas/partyID'
+        - $ref: '#/components/schemas/partyFunction'
+        - $ref: '#/components/schemas/displayedAddress'
+        - $ref: '#/components/schemas/partyContactDetails'
+        - $ref: '#/components/schemas/shouldBeNotified'
+
+  #######################
+  # Party Related objects
+  #######################
+  
     partyNoID:
-      description: ‘Party’ is an array of Party Type, Party Name, E-mail, Phone number, Fax and Tax Reference attributes. Classification for this Use Case (Required (R), Conditional (C), Optional (O), Not Applicable (N/A)) is given per attribute.
+      description: 'refers to a company or a legal entity.'
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/partyName'
+        - $ref: '#/components/schemas/taxReference1'
+        - $ref: '#/components/schemas/taxReference2'
+        - $ref: '#/components/schemas/publicKey'
+        - $ref: '#/components/schemas/streetName'
+        - $ref: '#/components/schemas/streetNumber'
+        - $ref: '#/components/schemas/floor'
+        - $ref: '#/components/schemas/postalCode'
+        - $ref: '#/components/schemas/cityName'
+        - $ref: '#/components/schemas/stateRegion'
+        - $ref: '#/components/schemas/country'
+        - $ref: '#/components/schemas/nmftaCode'
+
+    party:
+      description: 'refers to a company or a legal entity.'
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/partyID'
+        - $ref: '#/components/schemas/partyNoID'
+
+  ###################################
+  # Shipment Location Related objects
+  ###################################
+  
+    shipmentLocationList:
       type: object
       properties:
-        partyName:
-          $ref: '#/components/schemas/partyName'
-        taxReference: 
-          $ref: '#/components/schemas/taxReference'      
-        displayedAddress: 
-          $ref: '#/components/schemas/displayedAddress'      
-        partyContactDetails: 
-          $ref: '#/components/schemas/partyContactDetails'      
-    parties:
-      type: array
-      items:
-        $ref: '#/components/schemas/party'
-    locations:
-      type: array
-      items:
-        $ref: '#/components/schemas/location'
-    location:
-      description: Locations are arrays of a location identifier (e.g. ‘Location ID’) attribute and the Location Type Code attribute
-      type: object    
+        shipmentLocations:
+          type: array
+          items:
+            $ref: '#/components/schemas/shipmentLocation'
+            
+    shipmentLocation:
+      type: object
+      description: 'maps the relationship between Shipment and Location, e.g., the place of receipt and the places of delivery for a specific shipment.'
+      allOf:
+        - $ref: '#/components/schemas/locationID'
+        - $ref: '#/components/schemas/locationType'
+        - $ref: '#/components/schemas/displayedName'
+
+  ###################################
+  # Reference Related objects
+  ###################################
+  
+    referenceNoIDList:
+      type: object
       properties:
-        locationID:
-          $ref: '#/components/schemas/locationID'
-        UNLocationCode:
-          $ref: '#/components/schemas/UNLocationCode'
-        latitude:
-          $ref: '#/components/schemas/latitude'
-        longitude:
-          $ref: '#/components/schemas/longitude'
-        address:
-          $ref: '#/components/schemas/address'
-    locationNoID:
-      description: Locations are arrays of a location identifier (e.g. ‘Location ID’) attribute and the Location Type Code attribute
-      type: object    
+        references:
+          type: array
+          items:
+            $ref: '#/components/schemas/referenceNoID'
+    referenceList:
+      type: object
       properties:
-        UNLocationCode:
-          $ref: '#/components/schemas/UNLocationCode'
-        latitude:
-          $ref: '#/components/schemas/latitude'
-        longitude:
-          $ref: '#/components/schemas/longitude'
-        address:
-          $ref: '#/components/schemas/address'
-    partyID:
-      type: string
-      format: uuid
-    partyFunction:
-      type: string
-      enum:
-        - ISSUER
-        - SHIPPER
-        - CONSIGNEE
-        - NOTIFY_PARTY
-        - ALSO_NOTIFY
-        - FORWARDING_AGENT
-      example: ISSUER
-      description: MISSING
+        references:
+          type: array
+          items:
+            $ref: '#/components/schemas/reference'
+    referenceNoID:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/referenceType'
+        - $ref: '#/components/schemas/referenceValue'
+      required:
+        - referenceType
+        - referenceValue
+    reference:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/referenceID'
+        - $ref: '#/components/schemas/referenceNoID'
+      required:
+        - referenceID
+        
+  ##########################
+  # Transport Document Related objects
+  ##########################
+  
+    transportDocumentHeader:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/transportDocumentID'
+        - $ref: '#/components/schemas/placeOfIssue'
+        - $ref: '#/components/schemas/dateOfIssue'
+        - $ref: '#/components/schemas/onboardDate'
+        - $ref: '#/components/schemas/receivedForShipmentDate'
+        - $ref: '#/components/schemas/documentReferenceNumber'
+        - $ref: '#/components/schemas/termsAndConditions'
+        - $ref: '#/components/schemas/issuer'
+        - $ref: '#/components/schemas/shippingInstructionID'
+        - $ref: '#/components/schemas/declaredValueCurrency'
+        - $ref: '#/components/schemas/declaredValue'
+        - $ref: '#/components/schemas/numberOfRiderPages'
+        - $ref: '#/components/schemas/binaryCopy'
+        - $ref: '#/components/schemas/documentHash'
+
+    transportDocument:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/transportDocumentHeader'
+        - type: object
+          properties:
+            shippingInstruction:
+              allOf:
+                - $ref: '#/components/schemas/shippingInstruction'
+        - $ref: '#/components/schemas/chargeList'
+
+  ##########################
+  # Charge Related objects
+  ##########################
+
+    chargeList:
+      type: object
+      properties:
+        charges:
+          type: array
+          items:
+            $ref: '#/components/schemas/charge'
+  
     charge:
       type: object
+      allOf:
+        - $ref: '#/components/schemas/chargeID'
+        - $ref: '#/components/schemas/chargeType'
+        - $ref: '#/components/schemas/currencyAmount'
+        - $ref: '#/components/schemas/currencyCode'
+        - $ref: '#/components/schemas/paymentTerm'
+        - $ref: '#/components/schemas/calculationBasis'
+        - $ref: '#/components/schemas/freightPayableAt'
+        - $ref: '#/components/schemas/isChargeDisplayed'
+        - $ref: '#/components/schemas/unitPrice'
+        - $ref: '#/components/schemas/quantity'
+  
+  ###########################
+  # Equipment Related objects
+  ###########################
+  
+    equipment:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/equipmentReference'
+        - $ref: '#/components/schemas/ISOEquipmentCode'
+        - $ref: '#/components/schemas/tareWeight'
+        - $ref: '#/components/schemas/weightUnit'
+      required:
+        - equipmentReference
+
+  ##########################
+  # Shipment Related objects
+  ##########################
+
+    shipment:
+      type: object
+      description: 'an identifiable collection of one or more Cargo Items (available to be) transported together from the Seller(s) (Original Consignor/Shipper), to the Buyer(s) (Final/Ultimate Consignee).'
+      allOf:
+        - $ref: '#/components/schemas/shipmentID'
+        - $ref: '#/components/schemas/carrierBookingReference'
+        - $ref: '#/components/schemas/collectionDateTime'
+        - $ref: '#/components/schemas/deliveryDateTime'
+        - $ref: '#/components/schemas/carrierID'
+      required:
+        - shipmentID
+        - carrierBookingReference
+        - collectionDateTime
+        - deliveryDateTime
+        - carrierID
+
+  ##########################
+  # Booking Related objects
+  ##########################
+  
+    booking:
+      type: object
+      description: 'a unique number assigned to a scheduled transportation movement during booking, which allocates assets, space needed, and a transport plan.'
+      allOf:
+        - $ref: '#/components/schemas/carrierBookingReference'
+        - $ref: '#/components/schemas/serviceTypeOriginDestination'
+        - $ref: '#/components/schemas/shipmentTermOriginDestination'
+        - $ref: '#/components/schemas/bookingDateTime'
+        - $ref: '#/components/schemas/serviceContract'
+
+
+  ##########################
+  # Location Related objects
+  ##########################
+  
+    locationNoID:
+      type: object
+      description: 'generally used to capture location-related data, also for locations without UN Location Codes.'
+      allOf:
+        - $ref: '#/components/schemas/locationName'
+        - $ref: '#/components/schemas/address'
+        - $ref: '#/components/schemas/latitude'
+        - $ref: '#/components/schemas/longitude'
+        - $ref: '#/components/schemas/UNLocationCode'
+
+    location:
+      type: object
+      description: 'generally used to capture location-related data, also for locations without UN Location Codes.'
+      allOf:
+        - $ref: '#/components/schemas/locationID'
+        - $ref: '#/components/schemas/locationNoID'
+        
+  ##########################
+  # Simple types
+  ##########################
+  
+    address:
+      type: object
       properties:
-        chargeID:
-          $ref: '#/components/schemas/chargeID'
-        chargeType:
-          $ref: '#/components/schemas/chargeType'
-        amount:
-          $ref: '#/components/schemas/currencyAmount'
-        currency:
-          $ref: '#/components/schemas/currency'
-        paymentTerm:
-          $ref: '#/components/schemas/paymentTerm'
+        address:
+          type: string
+          description: 'The physical address of the location.'
+          maxLength: 250
+          example: 'Champ de Mars, 5 Avenue Anatole France, 75007 Paris, France'
+    binaryCopy:
+      type: object
+      properties:
+        binaryCopy:
+          type: string
+          description: 'Snapshot of the document base-64 encoded'
+    bookingDateTime:
+      type: object
+      properties:
+        bookingDateTime:
+          type: string
+          format: $date-time
+          description: 'The date and time of the booking request.'
+    calculationBasis:
+      type: object
+      properties:
         calculationBasis:
-          $ref: '#/components/schemas/calculationBasis'
-        freightPayableAt:
-          $ref: '#/components/schemas/freightPayableAt'
-        isChargeDisplayed:
-          $ref: '#/components/schemas/isChargeDisplayed'
-        unitPrice:
-          $ref: '#/components/schemas/unitPrice'
-        quantity:
-          $ref: '#/components/schemas/quantity'
-    chargeOptionalID:
+          type: string
+          maxLength: 50
+          description: 'The code specifying the measure unit used for the corresponding unit price for this cost, such as per day, per ton, per square metre.'
+          example: Per day
+    callbackUrl:
+      type: object
+      properties:
+        callbackUrl:  
+          type: string
+          format: uri
+          description: 'Your server, where the API server should send the event data'
+          example: https://myserver.com/send/callback/here
+    cargoGrossWeight:
+      type: object
+      properties:
+        cargoGrossWeight:
+          type: number
+          example: 12000.0
+          description: The grand total weight of the cargo and weight per container(s) including packaging items being carried, which can be expressed in imperial or metric terms, as provided by the shipper. Excludes the tare weight of the container(s).
+    cargoItemID:
+      type: object
+      properties:
+        cargoItemID:
+          type: string
+          format: uuid
+          description: 'Identifies the cargo item to be stuffed.'
+          example: 6700963c-3ddd-4ada-ac29-d65852f2ac3d
+    cargoLineItemID:
+      type: object
+      properties:
+        cargoLineItemID:
+          type: string
+          description: 'Identifies the cargo line item (package) within the cargo. The cargo line item ID is provided by the shipper and is used to define the stuffing. Cargo line items belonging to the same cargo items are stuffed in the same container.'
+    carrierID:
+      type: object
+      properties:
+        carrierID:
+          type: string
+          format: uuid
+          description: 'Unique internal identifier for the carrier.'
+          example: 123e4567-e89b-12d3-a456-426614174000
+    carrierBookingReference:
+      type: object
+      properties:
+        carrierBookingReference:
+          type: string
+          maxLength: 35
+          example: ABC709951
+          description: 'A set of unique characters provided by carrier to identify a booking.'
+    chargeID:
       type: object
       properties:
         chargeID:
-          $ref: '#/components/schemas/chargeID'
+          type: string
+          format: uuid
+          description: 'The identifier of a charge.'
+          example: 123e4567-e89b-12d3-a456-426614174000
+    chargeType:
+      type: object
+      properties:
         chargeType:
-          $ref: '#/components/schemas/chargeType'
-        amount:
-          $ref: '#/components/schemas/currencyAmount'
-        currency:
-          $ref: '#/components/schemas/currency'
-        paymentTerm:
-          $ref: '#/components/schemas/paymentTerm'
-        calculationBasis:
-          $ref: '#/components/schemas/calculationBasis'
+          type: string
+          maxLength: 20
+          description: 'Description of the charge type applied.'
+    cityName:
+      type: object
+      properties:
+        cityName:
+          type: string
+          example: 'København'
+          maxLength: 65
+          description: 'The city name of the party’s address.'
+    country:
+      type: object
+      properties:
+        country:
+          type: string
+          maxLength: 75
+          description: 'The country of the party’s address.'
+          example: 'Denmark'
+    collectionDateTime:
+      type: object
+      properties:
+        collectionDateTime:
+          type: string
+          format: $date-time
+          description: 'The date and time that the cargo items need to be collected from the origin.'
+    currencyCode: 
+      type: object
+      properties:
+        currency: 
+          type: string
+          maxLength: 3
+          description: 'The currency for the charge, using a 3-character code (ISO 4217).'
+          example: DKK
+    currencyAmount: 
+      type: object
+      properties:
+        currencyAmount: 
+          type: number
+          description: 'The monetary value of all freight and other service charges for a transport document, with a maximum of 2-digit decimals.'
+          example: 1012.12
+    dateOfIssue:
+      type: object
+      properties:
+        dateOfIssue:
+          type: string
+          format: date
+          description: 'Date when the transport document has been issued'
+          example: '2020-12-12'
+    declaredValue:
+      type: object
+      properties:
+        declaredValue:
+          type: number
+          description: 'The value of the cargo that the shipper declares to avoid the carrier&apos;s limitation of liability and "Ad Valorem" freight, i.e. freight which is calculated based on the value of the goods declared by the shipper.'
+          example : 1231.10
+    declaredValueCurrency:
+      type: object
+      properties:
+        currency: 
+          type: string
+          maxLength: 3
+          description: 'The currency used for the declared value, using the 3-character code defined by ISO 4217.'
+          example: DKK
+    deliveryDateTime:
+      type: object
+      properties:
+        deliveryDateTime:
+          type: string
+          format: $date-time
+          description: 'The date and, when possible, time that the cargo items need to be delivered to the destination.'
+    descriptionOfGoods:
+      type: object
+      properties:
+        descriptionOfGoods:
+          type: string
+          description: 'The cargo description are details which accurately and properly describe the cargo being shipped in the container(s) as provided by the shipper.'
+    displayedAddress:
+      type: object
+      properties:
+        displayedAddress:
+          type: string
+          maxLength: 250
+          description: 'The address of the party to be displayed on the transport document.'
+    displayedName:
+      type: object
+      properties:
+        displayedName:
+          type: string
+          maxLength: 250
+          description: 'The address of the party to be displayed on the transport document.'
+    documentHash:
+      type: object
+      properties:
+        documentHash:
+          type: string
+          description: 'Cryptographic hash of the binary copy using the SHA-256 algorithm.'
+    documentReferenceNumber:
+      type: object
+      properties:
+        documentReferenceNumber:
+          type: string
+          maxLength: 20
+          description: 'A unique number allocated by the shipping line to the transport document and the main number used for the tracking of the status of the shipment. '
+    documentStatus:
+      type: object
+      properties:
+        documentStatus:
+          type: string
+          description: 'The status of the document in the process. For possible values see reference table ‘Transport Document version reference data entity’.'
+          enum:
+            - RECE
+            - DRFT
+            - PENA
+            - PENU
+            - REJE
+            - APPR
+            - ISSU
+            - SURR
+            - SUBM
+            - VOID
+          example: DRFT
+    equipmentReference:
+      type: object
+      properties:
+        equipmentReference:
+          type: string
+          maxLength: 15
+          description: |
+            'The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.
+            According to ISO 6346, a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit). If a container does not comply with ISO 6346, it is suggested to follow Recommendation #2 “Container with non-ISO identification” from SMDG.'
+          example: APZU4812090
+    floor:
+      type: object
+      properties:
+        floor:
+          type: string
+          maxLength: 50
+          description: 'The floor of the party’s street number.'
+          example: '5. sal'
+    freightPayableAt:
+      type: object
+      properties:
         freightPayableAt:
-          $ref: '#/components/schemas/freightPayableAt'
+          type: string
+          format: uuid
+          description: 'Location where payment will take place by the customer. Usually refers to Basic Ocean Freight alone. This attribute links to the Location ID.'
+          example: 123e4567-e89b-12d3-a456-426614174000
+    HSCode:
+      type: object
+      properties:
+        HSCode:
+          type: string
+          maxLength: 10
+          description: 'Used by customs to classify the product being shipped.'
+    humidityMax:
+      type: object
+      properties:
+        humidityMax:
+          type: number
+          description: 'Indicates the maximum humidity setting on the container in percent.'
+          example: 100.0
+    humidityMin:
+      type: object
+      properties:
+        humidityMin:
+          type: number
+          description: 'Indicates the minimum humidity setting on the container in percent.'
+          example: 80.0
+    isElectronic:
+      type: object
+      properties:
+        isElectronic:
+          type: boolean
+          description: 'An indicator whether the transport document is electronically transferred.'
+          example: true
+    isChargeDisplayed:
+      type: object
+      properties:
         isChargeDisplayed:
-          $ref: '#/components/schemas/isChargeDisplayed'
-        unitPrice:
-          $ref: '#/components/schemas/unitPrice'
+          type: boolean
+          description: 'An indicator of whether the charge is displayed.'
+          example: true
+    ISOEquipmentCode:
+      type: object
+      properties:
+        ISOEquipmentCode:
+          type: string
+          maxLength: 4
+          description: 'Unique code for the different equipment size/type used for transporting commodities. The code is a concatenation of ISO Equipment Size Code and ISO Equipment Type Code A and follows the ISO 6346 standard.'
+    isPartLoad:
+      type: object
+      properties:
+        isPartLoad:
+          type: boolean
+          description: 'Indicates whether the carrier can expect more shipping instruction to be submitted.'
+          example: true
+    issuer:
+      type: object
+      properties:
+        issuer:
+          type: string
+          format: uuid
+          description: 'Links to the Party ID to specify the issuing carrier.'
+          example: 123e4567-e89b-12d3-a456-426614174000
+    latitude:
+      type: object
+      properties:
+        latitude:
+          type: string
+          maxLength: 10
+          description: 'Geographic coordinate that specifies the north–south position of a point on the Earth&apos;s surface.'
+          example: '48.85855005644273'
+    locationID:
+      type: object
+      properties:
+        locationID:
+          type: string
+          format: uuid
+          description: 'The identifier for a location.'
+          example: 123e4567-e89b-12d3-a456-426614174000
+    locationName:
+      type: object
+      properties:
+        locationName:
+          type: string
+          maxLength: 100
+          description: 'The name of the location.'
+          example: 'Eiffel Tower'
+    locationType:
+      type: object
+      properties:
+        locationType:
+          type: string
+          description: 'Links to the Location Type Code defined by DCSA.'
+          enum:
+            - PRE
+            - PDE
+            - PCF 
+            - OIR
+            - POL
+            - POD
+            - ORI
+            - DRL
+          example: PRE
+    longitude:
+      type: object
+      properties:
+        longitude:
+          type: string
+          maxLength: 11
+          description: 'Geographic coordinate that specifies the east–west position of a point on the Earth&apos;s surface.'
+          example: '2.294492036190964'
+    nmftaCode:
+      type: object
+      properties:
+        nmftaCode:
+          type: string
+          maxLength: 4
+          description: 'The Standard Carrier Alpha Code (SCAC) provided by NMFTA.'
+    numberOfCopies:
+      type: object
+      properties:
+        numberOfCopies:
+          type: number
+          description: 'The requested number of copies of the Transport document to be issued by the carrier. Only applicable for physical documents'
+          example: 2
+    numberOfOriginals:
+      type: object
+      properties:
+        numberOfOriginals:
+          type: number
+          description: 'Number of original copies of the negotiable bill of lading that has been issued to the customer.'
+          example: 4
+    numberOfPackages:
+      type: object
+      properties:
+        numberOfPackages:
+          type: integer
+          description: 'Specifies the number of packages associated with this cargo item'
+          example: 18
+    numberOfRiderPages:
+      type: object
+      properties:
+        numberOfRiderPages:
+          type: integer
+          description: 'The number of additional pages required to contain the goods description on a transport document. Only applicable for physical transport documents.'
+          example: 2
+    onboardDate:
+      type: object
+      properties:
+        onboardDate:
+          type: string
+          format: date
+          description: 'Date when the last container that is linked to the transport document is physically loaded onboard the vessel indicated on the transport document.'
+          example: '2020-12-12'
+    packageCode:
+      type: object
+      properties:
+        packageCode:
+          type: string
+          maxLength: 3
+          description: 'The unique identifier for the package type'
+          example: 5H
+    partyContactDetails:
+      type: object
+      properties:
+        partyContactDetails:
+          type: string
+          maxLength: 250
+          description: 'The contact details of the person to contact in relation to the Transport Document (changes, notifications etc.).'
+    partyFunction:
+      type: object
+      properties:
+        partyFunction:
+          type: string
+          description: 'Specifies the role of the party in the context of the given Shipping Instruction.'
+          enum:
+            - FW
+            - OS
+            - CN
+            - COW
+            - COX
+            - N1
+            - N2
+            - SFA
+            - CFA
+          example: FW
+    partyID:
+      type: object
+      properties:
+        partyID:
+          type: string
+          format: uuid
+          description: Identifier of a party.
+          example: 123e4567-e89b-12d3-a456-426614174000
+    partyName:
+      type: object
+      properties:
+        partyName:
+          type: string
+          maxLength: 100
+          description: 'Name of the party.'
+          example: 'Asseco Denmark'
+    paymentTerm:
+      type: object
+      properties:
+        paymentTerm:
+          type: string
+          maxLength: 3
+          description: 'An indicator of whether a charge is prepaid or collect, using a 3-character code to identify INCO terms.'
+          example: FOB
+    placeOfIssue:
+      type: object
+      properties:
+        placeOfIssue:
+          type: string
+          format: uuid
+          description: 'Links to the Location ID to specify where the original transport document (bill of lading) has been issued.'
+          example: 123e4567-e89b-12d3-a456-426614174000
+    postalCode:
+      type: object
+      properties:
+        postalCode:
+          type: string
+          maxLength: 10
+          description: 'The postal code of the party’s address.'
+          example: '1306'
+    publicKey:
+      type: object
+      properties:
+        publicKey:
+          type: string
+          description: 'The public key used for a digital signature.'
+          maxLength: 500
+          example: 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IkFzaW'
+    quantity:
+      type: object
+      properties:
         quantity:
-          $ref: '#/components/schemas/quantity'      
-    reference:
+          type: number
+          description: 'The amount of unit for this charge item.'
+          example: 34.4
+    receivedForShipmentDate:
+      type: object
+      properties:
+        receivedForShipmentDate:
+          type: string
+          format: date
+          description: 'Date when the last container linked to the transport document is physically in the terminal (customers cleared against the intended vessel).'
+          example: '2020-12-12'
+    referenceID:
       type: object
       properties:
         referenceID:
-          $ref: '#/components/schemas/referenceID'
-        referenceType:
-          $ref: '#/components/schemas/referenceType'
-        referenceValue:
-          $ref: '#/components/schemas/referenceValue'
-    
-    
-    ###Simple types
+          type: string
+          format: uuid
+          description: The unique identifier for a reference. 
+          example: 123e4567-e89b-12d3-a456-426614174000
     referenceType:
-      type: string
-      enum:
-        - SI
-        - FF
-        - PO
-        - CR
+      type: object
+      properties:
+        referenceType:
+          type: string
+          description: The reference type codes defined by DCSA. 
+          enum:
+            - FF
+            - SI
+            - PO
+            - CR
+            - AAO
+          example: FF
     referenceValue:
-      type: string
-      
-    referenceID:
-      type: string
-      format: uuid
-    calculationBasis:
-      type: string
-      maxLength: 50
-      example: MISSING
-      description: MISSING
-    quantity:
-      type: number
-      example: 34.4
-    unitPrice:
-      type: number
-      example: 3456.6
-    chargeID:
-      type: string
-      format: uuid
-      description: MISSING
-      example: MISSING
-    address:
-      type: string
-      description: MISSING
-      example: '1600 Pennsylvania Avenue NW'
-    longitude:
-      type: string
-      maxLength: 11
-      description: MISSING
-      example: MISSING
-    latitude:
-      type: string
-      maxLength: 10
-      description: MISSING
-      example: MISSING
-    UNLocationCode:
-      type: string
-      example: USNYC
-      description: The UN Location Code identifies a location in the sense of a city/a town/a village, being the smaller administrative area existing as defined by the competent national authority in each country.
-      nullable: false
-      maxLength: 5
-    commodityType:      
-      type: string
-      description: MISSING
-      maxLength: 20
-      example: MISSING
-    callbackObject:
-      description: The standard callback object.
       type: object
       properties:
-        documentID:
-          $ref: '#/components/schemas/documentID'
-        callbackStatus:
-          $ref: '#/components/schemas/callbackStatus'
-        reason:
-          $ref: '#/components/schemas/reason'
-    vesselIMONumber:
-      description: The identifier of vessel for which schedule details are published. Depending on schedule type, this may not be available yet.
-      type: string
-      maxLength: 7
-      example: 1801323    
-    equipmentReference:
-      type: string
-      example: APZU4812090
-      maxLength: 15
-      description: The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible. If a container is not yet assigned to a shipment, the interface cannot return any information when an equipment reference is given as input. If a container is assigned to an (active) shipment, the interface returns information on the active shipment.
-    carrierBookingReference:
-      type: string
-      maxLength: 35
-      example: ABC709951
-      description: The identifier for a shipment, which is issued by and unique within each of the carriers.
-    callbackUrl:  
-      type: string
-      format: uri
-      example: https://myserver.com/send/callback/here
-      description: Your server, where the API server should send the event data
+        referenceValue:
+          type: string
+          maxLength: 100
+          description: The actual value of the reference. 
+    sealID:
+      type: object
+      properties:
+        sealID:
+          type: string
+          format: uuid
+          description: 'The technical identifier of a seal.'
+          example: 6700963c-3ddd-4ada-ac29-d65852f2ac3d
+    sealNumber:
+      type: object
+      properties:
+        sealNumber:
+          type: string
+          maxLength: 15
+          description: 'Identifies a seal affixed to the container.'
+    sealSource:
+      type: object
+      properties:
+        sealSource:
+          type: string
+          maxLength: 5
+          description: 'The source of the seal, namely who has affixed the seal. This attribute links to the Seal Source ID defined in the Seal Source reference data entity.'
+    sealType:
+      type: object
+      properties:
+        sealType:
+          type: string
+          maxLength: 5
+          description: 'The type of seal. This attribute links to the Seal Type ID defined in the Seal Type reference data entity.'
+    serviceContract:
+      type: object
+      properties:
+        serviceContract:
+          type: string
+          maxLength: 30
+          description: 'Reference number for agreement between shipper and carrier through which the shipper commits to provide a certain minimum quantity of cargo over a fixed period, and the carrier commits to a certain rate or rate schedule.'
+    serviceTypeOriginDestination:
+      type: object
+      properties:
+        serviceTypeAtOrigin:
+          type: string
+          description: 'Indicates the type of service offered at Origin. Options are defined in the Service Type entity.'
+          enum:
+            - CY
+            - SD
+            - CFS
+          example: CY
+        serviceTypeAtDestination:
+          type: string
+          description: 'Indicates the type of service offered at Destination. Options are defined in the Service Type entity.'
+          enum:
+            - CY
+            - SD
+            - CFS
+          example: CY
+    shipmentEquipmentID:
+      type: object
+      properties:
+        shipmentEquipmentID:
+          type: string
+          format: uuid
+          description: The identifier for a shipment equipment
+          example: d9c69bc8-294d-46d1-807c-654598341374
+    shipmentID:
+      type: object
+      properties:
+        shipmentID:
+          type: string
+          format: uuid
+          description: 'The identifier for a shipment'
+          example: d9c69bc8-294d-46d1-807c-654598341374
+    shipmentTermOriginDestination:
+      type: object
+      properties:
+        shipmentTermAtOrigin:
+          type: string
+          description: 'Refers to the shipment term at the loading of the cargo into the container. Options are defined in the Shipment Term entity.'
+          enum:
+            - FCL
+            - LCL
+            - BB
+          example: FCL
+        shipmentTermAtDestination:
+          type: string
+          description: 'Refers to the shipment term at the unloading of the cargo out of the container. Options are defined in the Shipment Term entity.'
+          enum:
+            - FCL
+            - LCL
+            - BB
+          example: FCL
+    shippingInstructionID:
+      type: object
+      properties:
+        shippingInstructionID:
+          type: string
+          format: uuid
+          description: 'The identifier for a shipping instruction provided by the carrier for system purposes.'
+          example: e0559d83-00e2-438e-afd9-fdd610c1a008
+    shippingMarks:
+      type: object
+      properties:
+        shippingMarks:
+          type: string
+          description: 'The identifying details of a package or the actual markings that appear on the package(s). This information is provided by the shipper.'
+    shouldBeNotified:
+      type: object
+      properties:
+        shouldBeNotified:
+          type: boolean
+          description: 'Used to decide whether the party will be notified of the arrival of the cargo.'
+          example: true
+    stateRegion:
+      type: object
+      properties:
+        stateRegion:
+          type: string
+          maxLength: 65
+          description: 'The state/region of the party’s address.'
+          example: 'N/A'
+    streetName:
+      type: object
+      properties:
+        streetName:
+          type: string
+          maxLength: 100
+          description: 'The name of the street of the party’s address.'
+          example: Kronprincessegade
+    streetNumber:
+      type: object
+      properties:
+        streetNumber:
+          type: string
+          maxLength: 50
+          description: 'The number of the street of the party’s address.'
+          example: '54'
+    tareWeight:
+      type: object
+      properties:
+        tareWeight:
+          type: number
+          example: 12000.0
+          description: 'The weight of an empty container (gross container weight).'
+    taxReference1:
+      type: object
+      properties:
+        taxReference1:
+          type: string
+          maxLength: 20
+          description: 'The identifying number of the consignee or shipper (Individual or entity) used for tax purposes.'
+          example: 'CVR-25645774'
+    taxReference2:
+      type: object
+      properties:
+        taxReference2:
+          type: string
+          maxLength: 20
+          description: 'Optional second identifying number of the consignee or shipper (Individual or entity) used for tax purposes.'
+          example: 'CVR-25645774'
+    temperatureMax:
+      type: object
+      properties:
+        temperatureMax:
+          description: Indicates the maximum temperature setting on the container.
+          type: number
+          example: 64.3
+    temperatureMin:
+      type: object
+      properties:
+        temperatureMin:
+          type: number
+          description: Indicates the minimum temperature setting on the container.
+          example: -18.1
+    temperatureUnit:
+      type: object
+      properties:
+        temperatureUnit:
+          type: string
+          description: Celsius (CEL) or Fahrenheit (FAH).
+          enum:
+            - CEL
+            - FAH
+    termsAndConditions:
+      type: object
+      properties:
+        termsAndConditions:
+          type: string
+          description: 'Carrier general terms and conditions for this transport document.'
+    transportDocumentID:
+      type: object
+      properties:
+        transportDocumentID:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+          description: 'The unique identifier of a transport document.'
     transportDocumentType:
-      type: string
-      enum:
-        - BOL
-        - SWB
-      description: | 
-        The Transport Document Type is used to identify which type of document, the value of "transportDocumentID" represents. The values available are:
-        - BOL (Bill of Lading)
-        - SWB (Sea Waybill)
-      example: SWB
-    stuffingItem:
       type: object
       properties:
-        cargoLines:
-          type: array
-          items:
-            $ref:   '#/components/schemas/cargoLine'
-        equipmentReference:
-          $ref: '#/components/schemas/equipmentReference'
+        transportDocumentType:
+          type: string
+          description: 'Specifies the type of the transport document (a Bill of Lading (BOL) or a Sea Waybill (SWB)).'
+          example: SWB
+          enum:
+            - BOL
+            - SWB
+    unitPrice:
+      type: object
+      properties:
+        unitPrice:
+          type: number
+          description: 'The unit price of this charge item in the currency of the charge.'
+          example: 3456.6
+    UNLocationCode:
+      type: object
+      properties:
+        UNLocationCode:
+          type: string
+          maxLength: 5
+          description: 'The UN Location code specifying where the place is located.'
+          example: USNYC
+    ventilationMax:
+      type: object
+      properties:
+        ventilationMax:
+          type: number
+          description: 'Indicates the maximum ventilation setting on the container in CBM/Hr.'
+          example: 296
+    ventilationMin:
+      type: object
+      properties:
+        ventilationMin:
+          type: number
+          description: 'Indicates the minimum ventilation setting on the container in CBM/Hr.'
+          example: 266
+    verifiedGrossMass:
+      type: object
+      properties:
+        verifiedGrossMass:
+          type: string
+          maxLength: 250
+          description: 'A declaration informing the carrier of the weight of the container, verified by an authorised person from the shipper or on behalf of said shipper. This includes cargo weight, bracing, dunnage and container tare weight.'
+    volume:
+      type: object
+      properties:
+        volume:
+          type: number
+          example: 12.0
+          description: 'Calculated by multiplying the width, height, and length of the packed cargo.'
+    volumeUnit:
+      type: object
+      properties:
+        volumeUnit:
+          type: string 
+          description: 'The unit of measure which can be expressed in either imperial or metric terms'
+          example: MTQ
+          enum:
+            - MTQ
+            - FTQ
+    weight:
+      type: object
+      properties:
+        weight:
+          type: number
+          example: 13000.3
+          description: 'The total weight of the cargo including packaging items being carried in the container(s). Excludes the tare weight of the container(s).'
+    weightUnit:
+      type: object
+      properties:
+        weightUnit:
+          type: string
+          description: 'The unit of measure which can be expressed in imperial or metric terms'
+          example: KGM
+          enum:
+            - KGM
+            - LBR
+
+
+
+
+  ####################
+  # Error object
+  ####################
+    errors:
+      type: array
+      items:
+        type: object
+        properties:
+          reason:
+            description: High level error message.
+            type: string
+            example: invalidQuery
+          message:
+            description: Detailed error message.
+            type: string
+            example: The request did not contain one of the three required query parameters.
+        required:
+         - reason
+         - message
+         
     error:
       type: object
       required:
@@ -1017,22 +1355,6 @@ components:
           description: The date and time (in ISO 8601 format) the error occured.
           type: string
           example: '2019-11-12T07:41:00+08:30'
-    errors:
-      type: array
-      items:
-        type: object
-        properties:
-          reason:
-            description: High level error message.
-            type: string
-            example: invalidQuery
-          message:
-            description: Detailed error message.
-            type: string
-            example: The request did not contain one of the three required query parameters.
-        required:
-         - reason
-         - message
 
   ####################
   # Common parameters
