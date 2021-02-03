@@ -856,7 +856,12 @@ paths:
           required: false
       responses:
         '200':
-          description: Request successful        
+          description: Request successful
+          headers:
+            X-Document-Signature:
+              schema:
+                type: string
+              description: The Signature of the Transport Document
           content:
             application/json:
               schema:
@@ -1032,8 +1037,8 @@ paths:
   #           application/json:
   #             schema:
   #               $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error' 
-  /transport-documents/{transportDocumentID}/approve:
-    put:
+  /transport-documents/{transportDocumentID}/approval:
+    post:
       tags:
        - Transport Documents
       summary: Approve a Transport Document.
@@ -1046,6 +1051,12 @@ paths:
           schema:
             type: string
           required: true  
+        - in: query
+          name: documentSignature
+          description: The signature of the Transport Document to approve
+          schema:
+            type: string
+          required: true
       responses:
         '200':
           description: The Transport Document
@@ -1069,6 +1080,20 @@ components:
           type: string
           format: uuid
           description: 'The id of the object defined by the Shipment Information Type, for the callback response.'
+    notificationID:
+      type: object
+      properties:
+        notificationID:
+          type: string
+          format: uuid
+          description: 'The id of the callback object'
+    timeStamp:
+      type: object
+      properties:
+        timeStamp:
+          type: string
+          format: $date-time
+          description: 'The timestamp of the callback object'
     reason:
       type: object
       properties:
@@ -1076,25 +1101,6 @@ components:
           type: string
           description: 'Reason field in a callback response. This field can be used to explain why a specific callbackStatus has been sent.'
           example: 'The following attributes are missing...'
-    shipmentEventTypeCode:
-      type: object
-      properties:
-        shipmentEventTypeCode:
-          type: string
-          maxLength: 4
-          description: 'The code to identify the event type that is related to the shipment.'
-          example: PENU
-          enum:
-            - RECE
-            - DRFT
-            - PENA
-            - PENU
-            - REJE
-            - APPR
-            - ISSU
-            - SURR
-            - SUBM
-            - VOID
     shipmentInformationType:
       type: object
       properties:
@@ -1121,8 +1127,10 @@ components:
       description: The standard callback object.
       type: object
       allOf:
+        - $ref: '#/components/schemas/notificationID'
+        - $ref: '#/components/schemas/timeStamp'
         - $ref: '#/components/schemas/documentID'
-        - $ref: '#/components/schemas/shipmentEventTypeCode'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/documentStatus'
         - $ref: '#/components/schemas/shipmentInformationType'
         - $ref: '#/components/schemas/reason'
         - $ref: '#/components/schemas/signature'
