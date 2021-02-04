@@ -255,6 +255,89 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error'
+  /transport-calls/{transportCallID}/timestamps:
+    get:
+      tags:
+        - Operational Vessel Schedules
+      summary: Find timestamps by transport-callID
+      description: Returns all timestamps by a transport-callID
+      parameters:
+        - in: path
+          name: transportCallID
+          schema:
+            type: string
+          required: true
+          description: The ID of the transport-call to filter by
+      
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/timestamp'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'  
+  /timestamps/{timestampID}:
+    get:
+      tags:
+        - Operational Vessel Schedules
+      summary: Find timestamps by its timestampID
+      description: Returns a timestamps by its timestampID
+      parameters:
+        - in: path
+          name: timestampID
+          schema:
+            type: string
+          required: true
+          description: The ID of the timestampID to filter by
+      
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/timestamp'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'      
+  /timestamps:
+    post:
+      tags:
+        - Operational Vessel Schedules
+      summary: Post a new timestamp
+      requestBody:
+        description: The new TransportCall 
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/timestamp'
+      responses:
+        '201':
+          description: Transport-call successfully posted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/timestamp'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'  
   /schedule-subscriptions:
     get:
       tags:
@@ -694,6 +777,36 @@ components:
         - UNLocationCode
         - facilityTypeCode
         - facilityCode
+    timestamp:
+      description:  A list of all the timestamps involved in a portCall.
+      type: object
+      properties:
+        transportCallID:
+          $ref: '#/components/schemas/transportCallID'
+        timestampID:
+         $ref: '#/components/schemas/timestampID'
+        eventClassiefierCode:
+          $ref: '#/components/schemas/eventClassifierCode'
+        transportEventTypeCode:
+          $ref: '#/components/schemas/eventTypeCode'
+        locationType:
+          $ref: '#/components/schemas/locationType'
+        locationID:
+          $ref: '#/components/schemas/timestampLocationID'
+        eventDateTime:
+          $ref: '#/components/schemas/timestampEventDateTime'
+        comment:
+          $ref: '#/components/schemas/timestampComment'
+        delayReasonCode:
+          $ref: '#/components/schemas/delayReasonCode'
+      required:
+        - transportCallID
+        - timestampID
+        - eventClassiefierCode
+        - transportEventTypeCode
+        - locationType
+        - locationID
+        - eventDateTime
     schedule:
       description: A timed plan that defines at what date or time terminals will be serviced by an ocean vessel. Schedules can have single (on a specific day/time only) or repetitive occurrences (e.g. every weekday at x hours).
       type: object
@@ -828,6 +941,66 @@ components:
       format: uuid
       example: 123e4567-e89b-12d3-a456-426614174000
       nullable: false
+    timestampID:
+      description: The unique identifier for a timestamp
+      type: string
+      format: uuid
+      example: 123e4567-e89b-12d3-a456-426614174000
+      nullable: false
+    eventClassifierCode:
+      type: string
+      enum:
+        - PLN
+        - ACT
+        - EST
+      example: ACT
+      maxLength: 3
+      nullable: false
+      description: Code for the event classifier, either PLN (Planned), ACT (Actual) or EST (Estimated).
+    locationType:
+      type: string
+      enum:
+        - BERTH
+        - PBP
+        - CARGO_OPS
+      example: BERTH
+      maxLength: 3
+      nullable: false
+      description: Code for the event classifier, either PLN (Planned), ACT (Actual) or EST (Estimated).
+    eventTypeCode:
+      type: string
+      enum:
+        - ARRI
+        - COPS
+        - SOPS
+        - SERV
+        - DEPT
+      example: ARRI
+      maxLength: 4
+      description: Unique identifier for Event Type Code. This code has different ENUM values depending on the type of event
+    timestampLocationID:
+      description: The identifier of a location e.g. at the Berth
+      example: BOLLARD 15-25
+      maxLength: 40
+      minLength: 5
+      type: string
+    timestampEventDateTime:
+      description: The start date of the period for which schedule information is sent. The value is populated in ISO 8601 Date format.
+      type: string
+      format: date-time
+      example: '2020-04-06 15:00:00 + 00:00'
+    timestampComment:
+      description: an additional Comment to a timestamp that can be shared with the receiver party.
+      example: "Delay due to bad weather"
+      maxLength: 250
+      minLength: 0
+      type: string
+    delayReasonCode:
+      description: Reason code for the delay. The SMDG-Delay-Reason-Codes are used for this attribute. The code list can be found at http://www.smdg.org/smdg-code-lists/
+      type: string
+      maxLength: 3
+      example: WEA
+    
   headers:
     signatureHeader:
       schema:
