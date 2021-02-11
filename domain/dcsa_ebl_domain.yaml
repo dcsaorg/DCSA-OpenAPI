@@ -1,0 +1,607 @@
+# OpenAPI version identifier - required for OpenAPI 3.0 domains
+openapi: 3.0.0
+
+#######################
+# Optional info section
+#######################
+info:
+  title: DCSA - Electronic Bill of Lading (EBL) Components
+  description: Common components for DCSA APIs
+  version: '1.0.0'
+
+components:
+  schemas:
+    ######################################
+    # Shipping Instruction Related objects
+    ######################################
+  
+    shippingInstructionHeaderNoID:
+      description: 'an enrichment to the original booking shared by the shipper to the carrier. The shipping instruction includes volume or weight, cargo items, shipping dates, origin, destination, and other special instructions. The information given by the shipper through the shipping instruction is the information required to create a Transport Document.'
+      type: object
+      allOf:
+        - type: object
+          properties:
+            transportDocumentType:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/transportDocumentType'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/numberOfCopies'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/numberOfOriginals'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/preCarriageUnderShippersResponsibility'
+        - type: object
+          properties:
+            freightPayableAt:
+              $ref: '#/components/schemas/location'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/isPartLoad'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/isElectronic'
+        - type: object
+          properties:
+            carrierBookingReference:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/carrierBookingReference'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/callbackUrl'
+    
+    shippingInstructionHeaderNoDS:
+      description: 'an enrichment to the original booking shared by the shipper to the carrier. The shipping instruction includes volume or weight, cargo items, shipping dates, origin, destination, and other special instructions. The information given by the shipper through the shipping instruction is the information required to create a Transport Document.'
+      type: object
+      allOf:
+        - type: object
+          properties:
+            shippingInstructionID:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/shippingInstructionID'
+        - $ref: '#/components/schemas/shippingInstructionHeaderNoID'
+      required:
+        - shippingInstructionID
+
+    shippingInstructionHeader:
+      description: 'an enrichment to the original booking shared by the shipper to the carrier. The shipping instruction includes volume or weight, cargo items, shipping dates, origin, destination, and other special instructions. The information given by the shipper through the shipping instruction is the information required to create a Transport Document.'
+      type: object
+      allOf:
+        - type: object
+          properties:
+            shippingInstructionID:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/shippingInstructionID'
+        - type: object
+          properties:
+            documentStatus:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/documentStatus'
+        - $ref: '#/components/schemas/shippingInstructionHeaderNoID'
+      required:
+        - shippingInstructionID
+        - documentStatus
+
+    shippingInstructionNoID:
+      description: 'an enrichment to the original booking shared by the shipper to the carrier. The shipping instruction includes volume or weight, cargo items, shipping dates, origin, destination, and other special instructions. The information given by the shipper through the shipping instruction is the information required to create a Transport Document.'
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/shippingInstructionHeaderNoID'
+        - $ref: '#/components/schemas/cargoItemNoIDList'
+        - $ref: '#/components/schemas/shipmentEquipmentNoIDList'
+        - $ref: '#/components/schemas/documentPartyList'
+        - $ref: '#/components/schemas/shipmentLocationList'
+        - $ref: '#/components/schemas/referenceNoIDList'
+      required:
+        - transportDocumentType
+        - isElectronic
+        - callbackUrl
+
+    shippingInstructionNoDS:
+      description: 'The Shipping Instruction is an enrichment to the original booking shared by the shipper to the carrier. The shipping instruction includes volume or weight, cargo items, shipping dates, origin, destination, and other special instructions. The information given by the shipper through the shipping instruction is the information required to create a Transport Document.'
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/shippingInstructionHeaderNoDS'
+        - $ref: '#/components/schemas/cargoItemList'
+        - $ref: '#/components/schemas/shipmentEquipmentList'
+        - $ref: '#/components/schemas/documentPartyList'
+        - $ref: '#/components/schemas/shipmentLocationList'
+        - $ref: '#/components/schemas/referenceList'
+      required:
+        - callbackUrl
+        
+    shippingInstruction:
+      description: 'The Shipping Instruction is an enrichment to the original booking shared by the shipper to the carrier. The shipping instruction includes volume or weight, cargo items, shipping dates, origin, destination, and other special instructions. The information given by the shipper through the shipping instruction is the information required to create a Transport Document.'
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/shippingInstructionHeader'
+        - $ref: '#/components/schemas/cargoItemList'
+        - $ref: '#/components/schemas/shipmentEquipmentList'
+        - $ref: '#/components/schemas/documentPartyList'
+        - $ref: '#/components/schemas/shipmentLocationList'
+        - $ref: '#/components/schemas/referenceList'
+      required:
+        - callbackUrl
+  
+    ######################################
+    # Cargo Item Related objects
+    ######################################
+  
+    cargoItemList:
+      type: object
+      properties:
+        cargoItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/cargoItem'
+    cargoItemNoIDList:
+      type: object
+      properties:
+        cargoItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/cargoItemNoID'
+  
+    commonCargoItem:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/cargoLineItems'
+        - type: object
+          properties:
+            carrierBookingReference:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/carrierBookingReference'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/descriptionOfGoods'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/HSCode'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/weight'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/volume'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/weightUnit'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/volumeUnit'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/numberOfPackages'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/packageCode'
+      required:
+        - descriptionOfGoods
+        - HSCode
+        - numberOfPackages
+        - weight
+        - weightUnit
+        - packageCode
+      
+    cargoItemNoID:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/commonCargoItem'
+        - type: object
+          properties:
+            equipmentReference:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/equipmentReference'
+      required:
+        - equipmentReference
+
+    cargoItem:
+      type: object
+      allOf:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/cargoItemID'
+        - $ref: '#/components/schemas/commonCargoItem'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/shipmentEquipmentID'
+
+    ######################################
+    # Cargo Line Item Related objects
+    ######################################
+
+    cargoLineItems:
+      type: object
+      properties:
+        cargoLineItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/cargoLineItem'
+    cargoLineItem:
+      type: object
+      allOf:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/cargoLineItemID'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/shippingMarks'
+      required:
+        - cargoLineItemID
+        - shippingMarks
+
+    ######################################
+    # Shipment Equipment Related objects
+    ######################################
+
+    shipmentEquipmentList:
+      type: object
+      properties:
+        shipmentEquipments:
+          type: array
+          items:
+            $ref: '#/components/schemas/shipmentEquipment'
+    shipmentEquipmentNoIDList:
+      type: object
+      properties:
+        shipmentEquipments:
+          type: array
+          items:
+            $ref: '#/components/schemas/shipmentEquipmentNoID'
+
+    shipmentEquipmentCommon:
+      type: object
+      allOf:
+        - type: object
+          properties:
+            equipment:
+              $ref: '#/components/schemas/equipment'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/weightUnit'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/cargoGrossWeight'
+        - type: object
+          properties:
+            activeReeferSettings:
+              type: object
+              description: specifies the settings for an active reefer container used to a shipment.
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/temperatureMin'
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/temperatureMax'
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/temperatureUnit'
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/humidityMin'
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/humidityMax'
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/ventilationMin'
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/ventilationMax'
+      required:
+        - weightUnit
+        - cargoGrossWeight
+    shipmentEquipmentNoID:
+      type: object
+      allOf:
+        - $ref: 'h#/components/schemas/shipmentEquipmentCommon'
+        - $ref: '#/components/schemas/sealNoIDList'
+
+    shipmentEquipment:
+      type: object
+      allOf:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/shipmentEquipmentID'
+        - $ref: '#/components/schemas/shipmentEquipmentCommon'
+        - $ref: '#/components/schemas/sealList'
+
+    ##########################
+    # Seal Related objects
+    ##########################
+
+    sealNoIDList:
+      type: object
+      properties:
+        seals:
+          type: array
+          items:
+            $ref: '#/components/schemas/sealNoID'
+    sealList:
+      type: object
+      properties:
+        seals:
+          type: array
+          items:
+            $ref: '#/components/schemas/seal'
+    sealNoID:
+      type: object
+      description: 'addresses the seal-related information associated with the shipment equipment. A seal is put on a shipment equipment once it is loaded. This seal is meant to stay on until the shipment equipment reaches its final destination.'
+      allOf:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/sealNumber'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/sealSource'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/sealType'
+      required:
+        - sealNumber
+        - sealType
+    seal:
+      type: object
+      description: addresses the seal-related information associated with the shipment equipment. A seal is put on a shipment equipment once it is loaded. This seal is meant to stay on until the shipment equipment reaches its final destination.
+      allOf:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/sealID'
+        - $ref: '#/components/schemas/sealNoID'
+      required:
+        - sealID
+
+    ##########################
+    # Document Party Related objects
+    ##########################
+
+    documentPartyList:
+      type: object
+      properties:
+        documentParties:
+          type: array
+          items:
+            $ref: '#/components/schemas/documentParty'
+    
+    documentParty:
+      description: stores the parties involved in the transport document.
+      type: object
+      allOf:
+        - type: object
+          properties:
+            party:
+              $ref: '#/components/schemas/party'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/partyFunction'
+        - type: object
+          properties:
+            displayedAddress:
+              type: array
+              items:
+                type: object
+                allOf:
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/addressLine'
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/addressLineNumber'
+        - type: object
+          properties:
+            partyContactDetails:
+              type: object
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/name'
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/phone'
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/email'
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/fax'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/shouldBeNotified'
+      required:
+        - partyFunction
+        - shouldBeNotified
+
+    #######################
+    # Party Related objects
+    #######################
+  
+    partyNoID:
+      description: 'refers to a company or a legal entity.'
+      type: object
+      allOf:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/partyName'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/taxReference1'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/taxReference2'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/publicKey'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/streetName'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/streetNumber'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/floor'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/postalCode'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/cityName'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/stateRegion'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/country'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/nmftaCode'
+
+    party:
+      description: 'refers to a company or a legal entity.'
+      type: object
+      allOf:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/partyID'
+        - $ref: '#/components/schemas/partyNoID'
+
+    ###################################
+    # Shipment Location Related objects
+    ###################################
+  
+    shipmentLocationList:
+      type: object
+      properties:
+        shipmentLocations:
+          type: array
+          items:
+            $ref: '#/components/schemas/shipmentLocation'
+            
+    shipmentLocation:
+      type: object
+      description: 'maps the relationship between Shipment and Location, e.g., the place of receipt and the places of delivery for a specific shipment.'
+      allOf:
+        - type: object
+          properties:
+            location:
+              $ref: '#/components/schemas/location'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/locationType'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/displayedName'
+      required:
+        - locationType
+
+    ###################################
+    # Reference Related objects
+    ###################################
+  
+    referenceNoIDList:
+      type: object
+      properties:
+        references:
+          type: array
+          items:
+            $ref: '#/components/schemas/referenceNoID'
+    referenceList:
+      type: object
+      properties:
+        references:
+          type: array
+          items:
+            $ref: '#/components/schemas/reference'
+    referenceNoID:
+      type: object
+      allOf:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/referenceType'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/referenceValue'
+      required:
+        - referenceType
+        - referenceValue
+    reference:
+      type: object
+      allOf:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/referenceID'
+        - $ref: '#/components/schemas/referenceNoID'
+      required:
+        - referenceID
+        
+    ##########################
+    # Transport Document Related objects
+    ##########################
+  
+    transportDocumentHeader:
+      type: object
+      allOf:
+        - type: object
+          properties:
+            transportDocumentID:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/transportDocumentID'
+        - type: object
+          properties:
+            placeOfIssue:
+              $ref: '#/components/schemas/location'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/dateOfIssue'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/onboardDate'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/receivedForShipmentDate'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/documentReferenceNumber'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/termsAndConditions'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/issuer'
+        - type: object
+          properties:
+            shippingInstructionID:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/shippingInstructionID'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/declaredValueCurrency'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/declaredValue'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/numberOfRiderPages'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/shipmentTermAtOrigin'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/shipmentTermAtDestination'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/serviceTypeAtOrigin'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/serviceTypeAtDestination'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/serviceContract'
+      required:
+        - transportDocumentID
+        - shippingInstructionID
+        - documentReferenceNumber
+        - termsAndConditions
+        - serviceTypeAtOrigin
+        - serviceTypeAtDestination
+        - shipmentTermAtOrigin
+        - shipmentTermAtDestination
+        - dateOfIssue
+        - issuer
+    transportDocument:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/transportDocumentHeader'
+        - type: object
+          properties:
+            shippingInstruction:
+              allOf:
+                - $ref: '#/components/schemas/shippingInstruction'
+        - $ref: '#/components/schemas/chargeList'
+        - $ref: '#/components/schemas/clauseList'
+        - $ref: '#/components/schemas/transportPlan'
+
+    ##########################
+    # Charge Related objects
+    ##########################
+
+    chargeList:
+      type: object
+      properties:
+        charges:
+          type: array
+          items:
+            $ref: '#/components/schemas/charge'
+  
+    charge:
+      type: object
+      allOf:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/chargeID'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/chargeType'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/currencyAmount'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/currencyCode'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/paymentTerm'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/calculationBasis'
+        - properties:
+            freightPayableAt:
+              $ref: '#/components/schemas/location'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/unitPrice'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/quantity'
+      required:
+        - chargeID
+        - chargeType
+        - currencyAmount
+        - currencyCode
+        - paymentTerm
+        - calculationBasis
+        - freightPayableAt
+        - unitPrice
+        - quantity
+    ##########################
+    # Clause Related objects
+    ##########################
+
+    clauseList:
+      type: object
+      properties:
+        clauses:
+          type: array
+          items:
+            $ref: '#/components/schemas/clause'
+  
+    clause:
+      type: object
+      allOf:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/clauseID'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/clauseContent'
+
+    ######################
+    # TransportPlan object
+    ######################
+
+    transportPlan:
+      type: object
+      properties:
+        transportPlan:
+          type: object
+          allOf:
+            - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/vesselName'
+            - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/carrierVoyageNumber'
+            - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/preCarriageBy'
+            - $ref: '#/components/schemas/shipmentLocationList'
+            - $ref: '#/components/schemas/transportList'
+
+    ##########################
+    # Transport Related objects
+    ##########################
+
+    transportList:
+      type: object
+      properties:
+        transports:
+          type: array
+          items:
+            $ref: '#/components/schemas/transport'
+  
+    transport:
+      type: object
+      allOf:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/transportID'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/loadLocation'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/dischargeLocation'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/modeOfTransportCode'
+
+    ###########################
+    # Equipment Related objects
+    ###########################
+  
+    equipment:
+      type: object
+      allOf:
+        - type: object
+          properties:
+            equipmentReference:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/equipmentReference'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/ISOEquipmentCode'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/tareWeight'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/weightUnit'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/isShipperOwned'
+      required:
+        - equipmentReference
+
+    ##########################
+    # Location Related objects
+    ##########################
+  
+    locationNoID:
+      type: object
+      description: 'generally used to capture location-related data, also for locations without UN Location Codes.'
+      allOf:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/locationName'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/latitude'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/longitude'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/UNLocationCode'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/streetName'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/streetNumber'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/floor'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/postalCode'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/cityName'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/stateRegion'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/country'
+
+    location:
+      type: object
+      description: 'generally used to capture location-related data, also for locations without UN Location Codes.'
+      allOf:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/locationID'
+        - $ref: '#/components/schemas/locationNoID'
