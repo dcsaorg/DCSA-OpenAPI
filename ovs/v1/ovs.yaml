@@ -308,7 +308,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/error'
                 
-  /transport-calls/{transportCallID}/timestamps:
+  /transport-calls/{transportCallID}/port-call-events:
     get:
       tags:
         - Operational Vessel Schedules
@@ -330,14 +330,14 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/timestamp'
+                  $ref: '#/components/schemas/portCallEvent'
         default:
           description: Unexpected error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/error'  
-  /timestamps/{timestampID}:
+  /transport-calls/port-call-events/{timestampID}:
     get:
       tags:
         - Operational Vessel Schedules
@@ -359,14 +359,14 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/timestamp'
+                  $ref: '#/components/schemas/portCallEvent'
         default:
           description: Unexpected error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/error'      
-  /timestamps:
+  /transport-calls/port-call-events:
     post:
       tags:
         - Operational Vessel Schedules
@@ -377,14 +377,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/timestamp'
+              $ref: '#/components/schemas/portCallEvent'
       responses:
         '201':
           description: Transport-call successfully posted
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/timestamp'
+                $ref: '#/components/schemas/portCallEvent'
         default:
           description: Unexpected error
           content:
@@ -830,24 +830,26 @@ components:
         - UNLocationCode
         - facilityTypeCode
         - facilityCode
-    timestamp:
+    portCallEvent:
       description:  A list of all the timestamps involved in a portCall.
       type: object
       properties:
-        transportCallID:
-          $ref: '#/components/schemas/transportCallID'
-        timestampID:
-         $ref: '#/components/schemas/timestampID'
+        eventID:
+          $ref: '#/components/schemas/timestampID'
+        eventType:
+          $ref: '#/components/schemas/eventType'
+        eventDateTime:
+          $ref: '#/components/schemas/timestampEventDateTime'
         eventClassiefierCode:
           $ref: '#/components/schemas/eventClassifierCode'
-        transportEventTypeCode:
+        EventTypeCode:
           $ref: '#/components/schemas/eventTypeCode'
+        transportCallID:  
+          $ref: '#/components/schemas/transportCallID'
         locationType:
           $ref: '#/components/schemas/locationType'
         locationID:
           $ref: '#/components/schemas/timestampLocationID'
-        eventDateTime:
-          $ref: '#/components/schemas/timestampEventDateTime'
         comment:
           $ref: '#/components/schemas/timestampComment'
         delayReasonCode:
@@ -1000,6 +1002,14 @@ components:
       format: uuid
       example: 123e4567-e89b-12d3-a456-426614174000
       nullable: false
+    eventType:
+      description: The Event Type of the object.
+      nullable: false
+      type: string
+      enum:
+        - EQUIPMENT
+        - SHIPMENT
+        - TRANSPORT
     eventClassifierCode:
       type: string
       enum:
