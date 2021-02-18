@@ -1,0 +1,316 @@
+openapi: 3.0.0
+info:
+  version: 3.0.0
+  title: 'DCSA OpenAPI specification for Track & Trace'
+  description: 'API specification issued by DCSA.org'
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  contact:
+    name: Digital Container Shipping Association (DCSA)
+    url: https://dcsa.org
+    email: info@dcsa.org
+tags:
+  - name: Notifications
+    description: Notification operations
+  - name: Subscriptions
+    description: Subscription operations
+paths:
+  /notifications:
+    get:
+      tags:
+        - Notifications
+      summary: Find notifications.
+      description: Returns all notifications filtered by the parameters.
+      parameters:
+        - $ref: '#/components/parameters/notificationTypeQueryParam'
+        - $ref: '#/components/parameters/carrierBookingReferenceQueryParam'
+        - $ref: '#/components/parameters/transportDocumentIDQueryParam'
+        - $ref: '#/components/parameters/equipmentReferenceQueryParam'
+        - $ref: '#/components/parameters/scheduleIDQueryParam'
+        - $ref: '#/components/parameters/transportCallIDQueryParam'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/parameters/limitQueryParam'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/parameters/cursorQueryParam'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_NOTIFICATION_DOMAIN/1.0.0#/components/schemas/notifications'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'
+  /notifications/{notificationID}:
+    get:
+      tags:
+        - Notifications
+      summary: Find notification by notificationID.
+      description: Returns notification with the specified notificationID.
+      parameters:
+        - $ref: '#/components/parameters/notificationIDPathParam'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_NOTIFICATION_DOMAIN/1.0.0#/components/schemas/shipmentNotification'
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_NOTIFICATION_DOMAIN/1.0.0#/components/schemas/transportNotification'
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_NOTIFICATION_DOMAIN/1.0.0#/components/schemas/equipmentNotification'
+                discriminator:
+                  propertyName: notificationType
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'
+
+  /notification-subscriptions:
+    get:
+      tags:
+      - Subscriptions
+      summary: Receive a list of your active notification subscriptions
+      responses:
+        '200':
+          description: Returns a list of notification subscriptions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/notificationSubscription'
+    post:
+      tags:
+      - Subscriptions
+      summary: Create a notification subscription
+      requestBody:
+        description: 'Parameters used to configure the subscription. It is possible to only receive cirtain types of notifications by adding filter values to the subscription.'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/notificationSubscriptionNoID'
+      responses:
+        '201':
+          description: Subscription created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/notificationSubscription'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'
+      callbacks:
+        notification:
+          '{$request.body.callbackUrl}':
+            post:
+              parameters:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_NOTIFICATION_DOMAIN/1.0.0#/components/parameters/signatureHeaderParam'
+              requestBody: # Contents of the callback message
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_NOTIFICATION_DOMAIN/1.0.0#/components/schemas/notification'
+              responses:   # Expected responses to the callback message
+                '200':
+                  description: 'Your server returns this code if it accepts the callback'
+  /notification-subscriptions/{subscriptionID}:
+    get:
+      tags:
+      - Subscriptions
+      summary: Find notification subscription by subscription ID
+      parameters:
+        - $ref: '#/components/parameters/subscriptionIDPathParam'
+      responses:
+        '200':
+          description: Subscription returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/notificationSubscription'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'
+    delete:
+      tags:
+      - Subscriptions
+      summary: Stop a notification subscription, using the subscription ID
+      parameters:
+        - $ref: '#/components/parameters/subscriptionIDPathParam'
+      responses:
+        '204':
+          description: Subscription stopped
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'
+    put:
+      tags:
+      - Subscriptions
+      summary: Alter a notification subscription
+      parameters:
+        - $ref: '#/components/parameters/subscriptionIDPathParam'
+      requestBody:
+        description: Parameters used to configure the subscription
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/notificationSubscription'
+      responses:
+        '200':
+          description: Subscription updated
+          content:
+            application/json:
+              schema:
+               $ref: '#/components/schemas/notificationSubscription'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'
+
+components:
+  schemas:
+
+    ###########################################
+    # Notification Subscription related objects
+    ###########################################
+    
+    notificationSubscriptionNoID:
+      type: object
+      description: 'The object used by the POST notification-subscriptions endpoint'
+      allOf:
+        - type: object
+          properties:
+            callbackUrl:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_NOTIFICATION_DOMAIN/1.0.0#/components/schemas/callbackUrl'
+        - type: object
+          properties:
+            notificationType:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_NOTIFICATION_DOMAIN/1.0.0#/components/schemas/notificationTypeList'
+        - type: object
+          properties:
+            carrierBookingReference:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/carrierBookingReference'
+        - type: object
+          properties:
+            shippingInstructionID:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/shippingInstructionID'
+        - type: object
+          properties:
+            transportDocumentID:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/transportDocumentID'
+        - type: object
+          properties:
+            transportDocumentType:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/transportDocumentType'
+        - type: object
+          properties:
+            equipmentReference:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/equipmentReference'
+        - type: object
+          properties:
+            scheduleID:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/scheduleID'
+        - type: object
+          properties:
+            transportCallID:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/transportCallID'
+      required:
+        - callbackUrl
+
+    notificationSubscription:
+      allOf:
+        - type: object
+          properties:
+            subscriptionID:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_NOTIFICATION_DOMAIN/1.0.0#/components/schemas/subscriptionID'
+        - $ref: '#/components/schemas/notificationSubscriptionNoID'
+
+  parameters:
+
+    #################
+    # Path parameters
+    #################
+
+    notificationIDPathParam:
+      in: path
+      name: notificationID
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_NOTIFICATION_DOMAIN/1.0.0#/components/schemas/notificationID'
+      required: true
+      description: 'The ID of the notification to receive'
+      example: 123e4567-e89b-12d3-a456-426614174000
+    subscriptionIDPathParam:
+      in: path
+      name: subscriptionID
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_NOTIFICATION_DOMAIN/1.0.0#/components/schemas/subscriptionID'
+      required: true
+      description: 'The universal unique ID of the subscription to receive.'
+      example: 123e4567-e89b-12d3-a456-426614174000
+
+    ##################
+    # Query parameters
+    ##################
+    
+    carrierBookingReferenceQueryParam:
+      in: query
+      name: carrierBookingReference
+      description: 'A set of unique characters provided by carrier to identify a booking.'
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/carrierBookingReference'
+    equipmentReferenceQueryParam:
+      in: query
+      name: equipmentReference
+      description: 'The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.'
+      required: false
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/equipmentReference'
+    notificationTypeQueryParam:
+      in: query
+      name: notificationType
+      description: 'The type of notification(s) to filter by. Default value is all notification types if no value(s) is selected. It is possible to select any combination of values by comma separating values'
+      required: false
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_NOTIFICATION_DOMAIN/1.0.0#/components/schemas/notificationTypeList'
+    scheduleIDQueryParam:
+      in: query
+      name: scheduleID
+      description: 'ID uniquely identifying a schedule, to filter notifications by.'
+      required: false
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/scheduleID'
+    transportCallIDQueryParam:
+      in: query
+      name: transportCallID
+      description: 'ID uniquely identifying a transport call, to filter notifications by.'
+      required: false
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/transportCallID'
+    transportDocumentIDQueryParam:
+      in: query
+      name: transportDocumentID
+      description: |
+        The Transport Document ID identifier is an identifier that links to a shipment, i.e. a Bill of Lading or a Sea Waybill. A bill of lading is the document of title to the goods issued to the customer which confirms the carrier&apos;s receipt of the cargo from the customer, acknowledging goods being shipped and specifying the terms of delivery.
+        The Sea Waybill is a simpler document, the main difference being that it is non-negotiable.
+      required: false
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/transportDocumentID'

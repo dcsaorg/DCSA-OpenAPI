@@ -1,0 +1,329 @@
+# OpenAPI version identifier - required for OpenAPI 3.0 domains
+openapi: 3.0.0
+
+#######################
+# Optional info section
+#######################
+info:
+  title: DCSA Notificaton Components
+  description: Common components for DCSA Notifications
+  version: '1.0.0'
+
+components:
+  parameters:
+
+    ####################
+    ## Header parameters
+    ####################
+
+    signatureHeaderParam:
+      in: header
+      name: Signature
+      required: true
+      description: 'The signature certifying the request originates from the carrier.'
+      explode: true
+      schema:
+        properties:
+          keyId:
+            type: string
+            format: uuid
+            example: 123e4567-e89b-12d3-a456-426614174000
+          created:
+            type: integer
+            example: 1591960384 
+          headers:
+            type: string
+            example: '(request-target) (created) date host'
+          signature:
+            type: string
+            example: aGkgZnJvbSBkZW5tYXJr
+
+  ####################
+  # Common data models
+  ####################
+  
+  schemas:
+  
+    ##########################
+    # Base notification object
+    ##########################
+
+    notifications:
+      type: array
+      description: List of notifications for shipment journey.
+      items:
+        $ref: '#/components/schemas/notification'
+
+    notification:
+      oneOf:
+        - $ref: '#/components/schemas/shipmentNotification'
+        - $ref: '#/components/schemas/equipmentNotification'
+        - $ref: '#/components/schemas/transportNotification'
+      discriminator:
+        propertyName: notificationType
+
+    baseNotification:
+      type: object
+      description: 'The Notification entity is described as a generalization of all the specific notification categories. A notification always takes place in relation to a shipment and can additionally be linked to a transport or an equipment'
+      properties:
+        notificationID:
+          $ref: '#/components/schemas/notificationID'
+        notificationType:
+          $ref: '#/components/schemas/notificationType'
+        notificationDateTime:
+          $ref: '#/components/schemas/notificationDateTime'
+        notificationSubtype:
+          $ref: '#/components/schemas/notificationSubtype'
+      required:
+        - notificationID
+        - notificationType
+        - notificationDateTime
+
+    ##########################
+    # Shipment Notification object
+    ##########################
+    
+    shipmentNotification:
+      type: object
+      description: 'The shipment notification entity is a specialization of the notification entity to support specification of data that only applies to a shipment notification.'
+      allOf:
+        - $ref: '#/components/schemas/baseNotification'
+        - type: object
+          properties:
+            notificationType: #Overriding this property to have correct payload response examples
+              example: SHIPMENT
+              enum:
+                - SHIPMENT
+        - type: object
+          properties:
+            documentID:
+              $ref: '#/components/schemas/documentID'
+        - type: object
+          properties:
+            shipmentInformationType:
+              $ref: '#/components/schemas/shipmentInformationType'
+        - type: object
+          properties:
+            notificationSubtype:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/documentStatus'
+        - type: object
+          properties:
+            reason:
+              $ref: '#/components/schemas/reason'
+      required:
+        - shipmentInformationTypeCode
+
+    ###############################
+    # Transport Notification object
+    ###############################
+    
+    transportNotification:
+      type: object
+      description: 'The transport notification entity is a specialization of the notification entity to support specification of data that only applies to a transport notification.'
+      allOf:
+        - $ref: '#/components/schemas/baseNotification'
+        - type: object
+          properties:
+            notificationType: #Overriding this property to have correct payload response examples
+              example: TRANSPORT
+              enum:
+                - TRANSPORT
+        ##########################
+        # TODO: Look at this again
+        ##########################
+        - type: object
+          properties:
+            eventClassifierCode:
+              $ref: '#/components/schemas/eventClassifierCode'
+        - type: object
+          properties:
+            notificationSubtype:
+              type: string
+              example: ARRI
+              enum: 
+                - ARRI
+                - DEPA
+              nullable: false
+              maxLength: 4
+              description: Unique identifier for Event Type Code, for transport events this is either ARRI (Arrival) or DEPA (Departure). 
+        - type: object
+          properties:
+            delayReasonCode:
+              $ref: '#/components/schemas/delayReasonCode'
+        - type: object
+          properties:
+            vesselScheduleChangeRemark:
+              $ref: '#/components/schemas/vesselScheduleChangeRemark'
+        - type: object
+          properties:
+            transportCallID:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/transportCallID'
+      required:
+        - transportCallID
+
+    ###############################
+    # Transport Notification object
+    ###############################
+    
+    equipmentNotification:
+      type: object
+      description: 'The equipment notification entity is a specialization of the notification entity to support specification of data that only applies to an equipment notification.'
+      allOf:
+        - $ref: '#/components/schemas/baseNotification'
+        - type: object
+          properties:
+            notificationType: #Overriding this property to have correct payload response examples
+              example: EQUIPMENT
+              enum:
+                - EQUIPMENT
+        
+        
+        ##########################
+        # TODO: Look at this again
+        ##########################
+        
+        
+        - type: object
+          properties:
+            notificationSubtype:
+              type: string
+              example: LOAD
+              enum: 
+                - LOAD
+                - DISC
+                - GTIN
+                - GTOT
+                - STUF
+                - STRP
+              nullable: false
+              maxLength: 4
+              description: | 
+                Unique identifier for Event Type Code. For equipment events this can be:
+                - LOAD (Load)
+                - DISC (Discharge)
+                - GTIN (Gate in)
+                - GTOT (Gate out)
+                - STUF (Stuffing)
+                - STRP (Stripping)
+        - type: object
+          properties:
+            equipmentReference:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/equipmentReference'
+        - type: object
+          properties:
+            emptyIndicatorCode:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/emptyIndicatorCode'
+        - type: object
+          properties:
+            transportCallID:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/transportCallID'
+      required:
+        - emptyIndicatorCode
+        - transportCallID
+
+
+    ##########################
+    # Simple types
+    ##########################
+    
+    callbackUrl:  
+      type: string
+      format: uri
+      description: 'The endPoint where a Carrier whould send back notifications to the client'
+      example: https://myserver.com/send/callback/here
+    documentID:
+      type: string
+      description: 'The id of the object defined by the Shipment Information Type. In some cases this is a UUID in other cases this is a string.'
+    eventClassifierCode:
+      type: string
+      description: 'Code for the event classifier, either PLN (Planned), ACT (Actual), REQ (Requested) or EST (Estimated).'
+      enum:
+        - PLN
+        - ACT
+        - REQ
+        - EST
+    notificationID:
+      type: string
+      format: uuid
+      description: 'The unique identifier for the notification.'
+      nullable: false
+      example: '84db923d-2a19-4eb0-beb5-446c1ec57d34'
+    notificationDateTime:
+      type: string
+      format: $date-time
+      description: 'The timestamp of the notification object'
+      example: 2021-01-09T14:12:56+01:00
+    notificationType:
+      type: string
+      description: 'The Notification Type of the object - to be used as a discriminator.'
+      nullable: false
+      enum:
+        - EQUIPMENT
+        - SHIPMENT
+        - TRANSPORT
+    notificationSubtype:
+      type: string
+      maxLength: 4
+      description: 'The subType of the notification. Values can vary depending on notificationType'
+    notificationTypeList:
+      description: 'A list of notification types. Default is all notifications.'
+      example: [EQUIPMENT,SHIPMENT,TRANSPORT]
+      default: [EQUIPMENT,SHIPMENT,TRANSPORT]
+      type: array
+      items:
+        $ref: '#/components/schemas/notificationType'
+    reason:
+      type: string
+      description: 'Reason field in a Shipment notification. This field can be used to explain why a specific notification has been sent.'
+      example: 'The following attributes are missing...'
+    shipmentInformationType:
+      type: string
+      maxLength: 3
+      description: 'The code to identify the type of information that is related to the shipment notification.'
+      example: SHI
+      enum:
+        - BOK
+        - SHI
+        - VGM
+        - SRM
+        - TRD
+        - ARN
+    signature:
+      type: object
+      properties:
+        keyId:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+        created:
+          type: integer
+          example: 1591960384 
+        headers:
+          type: string
+          example: '(request-target) (created) date host'
+        signature:
+          type: string
+          example: aGkgZnJvbSBkZW5tYXJr
+    subscriptionID:
+      type: string
+      format: uuid
+      example: 123e4567-e89b-12d3-a456-426614174000
+      description: 'A unique identifier for the subscription'
+
+
+    ######################
+    # Not verified objects
+    ######################
+
+
+
+    delayReasonCode:
+      description: Reason code for the delay. The SMDG-Delay-Reason-Codes are used for this attribute. The code list can be found at http://www.smdg.org/smdg-code-lists/
+      type: string
+      maxLength: 3
+      example: WEA
+    vesselScheduleChangeRemark:
+      description: Free text information provided by the vessel operator regarding the reasons for the change in schedule and/or plans to mitigate schedule slippage.
+      type: string
+      example: Bad weather
+      maxLength: 250
