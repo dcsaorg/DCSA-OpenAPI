@@ -17,9 +17,9 @@ components:
 
   schemas:
 
-    ##########################
+    ##############
     # Simple types
-    ##########################
+    ##############
   
     addressLine:
       type: string
@@ -52,7 +52,7 @@ components:
     cargoGrossWeight:
       type: number
       example: 12000.0
-      description: The grand total weight of the cargo and weight per container(s) including packaging items being carried, which can be expressed in imperial or metric terms, as provided by the shipper. Excludes the tare weight of the container(s).
+      description: 'The grand total weight of the cargo and weight per container(s) including packaging items being carried, which can be expressed in imperial or metric terms, as provided by the shipper. Excludes the tare weight of the container(s).'
     cargoItemID:
       type: string
       format: uuid
@@ -81,6 +81,10 @@ components:
       allOf:
         - $ref: '#/components/schemas/carrierBookingReference'
       description: 'The associated booking number provided by the carrier for this cargo item. Cannot be used in combination with Shipping Instruction header level carrierBookingReference'
+    carrierServiceCode:
+      description: The code of the service for which the schedule details are published.
+      type: string
+      example: FE1
     carrierVoyageNumber:
       type: string
       maxLength: 50
@@ -127,6 +131,11 @@ components:
       format: date
       description: 'Date when the transport document has been issued'
       example: '2020-12-12'
+    dateRange:
+      description: The time period for which schedule information is sent. The duration is populated in ISO 8601 Duration format.
+      type: string
+      format: iso8601
+      example: P4W 
     declaredValue:
       type: number
       description: 'The value of the cargo that the shipper declares to avoid the carrier&apos;s limitation of liability and "Ad Valorem" freight, i.e. freight which is calculated based on the value of the goods declared by the shipper.'
@@ -136,6 +145,11 @@ components:
       maxLength: 3
       description: 'The currency used for the declared value, using the 3-character code defined by ISO 4217.'
       example: DKK
+    delayReasonCode:
+      description: 'Reason code for the delay. The SMDG-Delay-Reason-Codes are used for this attribute. The code list can be found at http://www.smdg.org/smdg-code-lists/'
+      type: string
+      maxLength: 3
+      example: WEA
     descriptionOfGoods:
       type: string
       description: 'The cargo description are details which accurately and properly describe the cargo being shipped in the container(s) as provided by the shipper.'
@@ -180,6 +194,24 @@ components:
       description: |
         The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.
         According to ISO 6346, a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit). If a container does not comply with ISO 6346, it is suggested to follow Recommendation #2 “Container with non-ISO identification” from SMDG.
+    eventComment:
+      description: 'an additional Comment to a timestamp that can be shared with the receiver party.'
+      example: "Delay due to bad weather"
+      maxLength: 250
+      minLength: 0
+      type: string
+    facilityCode:
+      type: string
+      example: AEAUHADT
+      description: 'The code used for identifying the specific facility.'
+      nullable: false
+      maxLength: 11
+    facilityTypeCode:
+      type: string
+      example: POTE
+      description: 'The code to identify the specific type of facility.'
+      nullable: false
+      maxLength: 4
     fax:
       type: string
       description: 'Fax number for the contact'
@@ -209,10 +241,6 @@ components:
       type: string
       maxLength: 4
       description: 'Unique code for the different equipment size/type used for transporting commodities. The code is a concatenation of ISO Equipment Size Code and ISO Equipment Type Code A and follows the ISO 6346 standard.'
-    isPartLoad:
-      type: boolean
-      description: 'Indicates whether the carrier can expect more shipping instruction to be submitted.'
-      example: true
     isShippedOnboardType:
       type: boolean
       description: 'Specifies whether the Transport document is a received for shipment, or shipped onboard. date bill of lading'
@@ -294,10 +322,6 @@ components:
       type: integer
       description: 'Specifies the number of packages associated with this cargo item'
       example: 18
-    numberOfPartloads:
-      type: number
-      description: 'Missing description...'
-      example: 4
     numberOfRiderPages:
       type: integer
       description: 'The number of additional pages required to contain the goods description on a transport document. Only applicable for physical transport documents.'
@@ -307,20 +331,20 @@ components:
       format: date
       description: 'Date when the last container that is linked to the transport document is physically loaded onboard the vessel indicated on the transport document.'
       example: '2020-12-12'
+    otherFacility:
+      type: string
+      example: Depot location or address
+      description: 'An alternative way to capture the facility when no standardized DCSA facility code can be found.'
+      maxLength: 50
     packageCode:
       type: string
       maxLength: 3
       description: 'The unique identifier for the package type'
       example: 5H
-    partloadSequenceNumber:
-      type: number
-      description: 'the sequence identifier for this partload in the equipment'
-      example: 3
     partyFunction:
       type: string
       description: 'Specifies the role of the party in the context of the given Shipping Instruction.'
       enum:
-        - FW
         - OS
         - CN
         - COW
@@ -330,7 +354,7 @@ components:
         - SFA
         - CFA
         - CNO
-      example: FW
+      example: CNO
     partyID:
       type: string
       format: uuid
@@ -343,9 +367,9 @@ components:
       example: 'Asseco Denmark'
     paymentTerm:
       type: string
-      maxLength: 3
-      description: 'An indicator of whether a charge is prepaid or collect, using a 3-character code to identify INCO terms.'
-      example: FOB
+      maxLength: 7
+      description: 'An indicator of whether a charge is prepaid or collect.'
+      example: PREPAID
     phone:
       type: string
       description: 'Phone number for the contact'
@@ -355,6 +379,14 @@ components:
       maxLength: 10
       description: 'The postal code of the party’s address.'
       example: '1306'
+    preCarriageUnderShippersResponsibility:
+      type: string
+      description: 'Mode of transportation for pre-carriage (e.g., truck, barge, rail), under shipper&apos;s responsibility'
+      enum:
+        - VESSEL
+        - RAIL
+        - TRUCK
+        - BARGE
     publicKey:
       type: string
       description: 'The public key used for a digital signature.'
@@ -376,7 +408,7 @@ components:
       example: 123e4567-e89b-12d3-a456-426614174000
     referenceType:
       type: string
-      description: The reference type codes defined by DCSA. 
+      description: 'The reference type codes defined by DCSA.'
       enum:
         - FF
         - SI
@@ -472,6 +504,11 @@ components:
       type: boolean
       description: 'Used to decide whether the party will be notified of the arrival of the cargo.'
       example: true
+    startDate:
+      description: 'The start date of the period for which schedule information is sent. The value is populated in ISO 8601 Date format.'
+      type: string
+      format: date
+      example: '2020-04-06'
     stateRegion:
       type: string
       maxLength: 65
@@ -487,6 +524,11 @@ components:
       maxLength: 50
       description: 'The number of the street of the party’s address.'
       example: '54'
+    subscriptionID:
+      type: string
+      example: jlke123j
+      nullable: false
+      description: 'The carrier issues a unique ID to the shipper or consignee for that subscription'
     tareWeight:
       type: number
       example: 12000.0
@@ -502,12 +544,12 @@ components:
       description: 'Optional second identifying number of the consignee or shipper (Individual or entity) used for tax purposes.'
       example: 'CVR-25645774'
     temperatureMax:
-      description: Indicates the maximum temperature setting on the container.
+      description: 'Indicates the maximum temperature setting on the container.'
       type: number
       example: 64.3
     temperatureMin:
       type: number
-      description: Indicates the minimum temperature setting on the container.
+      description: 'Indicates the minimum temperature setting on the container.'
       example: -18.1
     temperatureUnit:
       type: string
@@ -523,6 +565,10 @@ components:
       type: string
       format: uuid
       example: 123e4567-e89b-12d3-a456-426614174000
+    transportCallNumber:
+      description: This field contains the number of the facility call within port.
+      type: integer
+      example: 2
     transportDocumentID:
       type: string
       format: uuid
@@ -549,6 +595,11 @@ components:
       maxLength: 5
       description: 'The UN Location code specifying where the place is located.'
       example: USNYC
+    UNLocationName:
+      description: The name of the UN Location identified by the UN location code above.
+      type: string
+      example: New York
+      maxLength: 70
     ventilationMax:
       type: number
       description: 'Indicates the maximum ventilation setting on the container in CBM/Hr.'
@@ -557,11 +608,38 @@ components:
       type: number
       description: 'Indicates the minimum ventilation setting on the container in CBM/Hr.'
       example: 266
+    vesselIMONumber:
+      type: integer
+      description: 'The identifier of vessel for which schedule details are published. Depending on schedule type, this may not be available yet.'
+      example: 1801323
     vesselName:
       type: string
       maxLength: 35
       description: 'The name of the Vessel given by the Vessel Operator and registered with IMO.'
       example: 'King of the Seas'
+    vesselOperatorCarrierCode:
+      description: 'The identifier of the vessel operator publishing the event.'
+      type: string
+      example: MAEU
+      maxLength: 10
+      nullable: false
+    vesselOperatorCarrierCodeListProvider:
+      description: 'Identifies the code list provider used for the operator and partner carriercodes.'
+      type: string
+      enum: [SMDG,NMFTA]
+      example: NMFTA
+      nullable: false
+    vesselPartnerCarrierCode:
+      description: 'The identifier of the vessel partner for which the current message is intended. This field allows specifying multiple, comma-separated values if there is more than one vessel partner involved.'
+      type: string
+      example: MSCU,HLCU
+      maxLength: 10
+      minLength: 10
+    vesselPartnerCarrierCodeListProvider:
+      description: 'Identifies the code list provider used for the vessel operator and partner carrier codes. If "vesselPartnerCarrierCode" is populated, the code list provider field is to be populated as well.'
+      type: string
+      enum: [SMDG, NMFTA]
+      example: NMFTA
     volume:
       type: number
       example: 12.0
