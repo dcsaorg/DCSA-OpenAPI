@@ -1,9 +1,10 @@
 # OpenAPI version identifier - required for OpenAPI 3.0 domains
-openapi: 3.0.0
+openapi: 3.0.3
 
 #######################
 # Optional info section
 #######################
+
 info:
   title: DCSA - Electronic Bill of Lading (EBL) Components
   description: Common components for DCSA APIs
@@ -11,6 +12,7 @@ info:
 
 components:
   schemas:
+  
     ######################################
     # Shipping Instruction Related objects
     ######################################
@@ -39,10 +41,10 @@ components:
           properties:
             freightPayableAt:
               $ref: '#/components/schemas/unLocodeCityLocationExample'
-        # - type: object
-        #   properties:
-        #     isPartLoad:
-        #       $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/isPartLoad'
+        - type: object
+          properties:
+            preCarriageUnderShippersResponsibility:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/preCarriageUnderShippersResponsibility'
         - type: object
           properties:
             isElectronic:
@@ -90,11 +92,10 @@ components:
       type: object
       allOf:
         - $ref: '#/components/schemas/shippingInstructionHeaderNoID'
-        - $ref: '#/components/schemas/cargoItemNoIDList'
-        - $ref: '#/components/schemas/shipmentEquipmentNoIDList'
+        - $ref: '#/components/schemas/cargoItemList'
+        - $ref: '#/components/schemas/shipmentEquipmentList'
         - $ref: '#/components/schemas/documentPartyList'
-        # - $ref: '#/components/schemas/shipmentLocationList'
-        - $ref: '#/components/schemas/referenceNoIDList'
+        - $ref: '#/components/schemas/referenceList'
       required:
         - transportDocumentType
         - isElectronic
@@ -108,7 +109,6 @@ components:
         - $ref: '#/components/schemas/cargoItemList'
         - $ref: '#/components/schemas/shipmentEquipmentList'
         - $ref: '#/components/schemas/documentPartyList'
-        # - $ref: '#/components/schemas/shipmentLocationList'
         - $ref: '#/components/schemas/referenceList'
       required:
         - callbackUrl
@@ -121,14 +121,13 @@ components:
         - $ref: '#/components/schemas/cargoItemList'
         - $ref: '#/components/schemas/shipmentEquipmentList'
         - $ref: '#/components/schemas/documentPartyList'
-        # - $ref: '#/components/schemas/shipmentLocationList'
         - $ref: '#/components/schemas/referenceList'
       required:
         - callbackUrl
   
-    ######################################
+    ############################
     # Cargo Item Related objects
-    ######################################
+    ############################
   
     cargoItemList:
       type: object
@@ -137,15 +136,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/cargoItem'
-    cargoItemNoIDList:
-      type: object
-      properties:
-        cargoItems:
-          type: array
-          items:
-            $ref: '#/components/schemas/cargoItemNoID'
-  
-    cargoItemCommon:
+
+    cargoItem:
       type: object
       allOf:
         - $ref: '#/components/schemas/cargoLineItems'
@@ -187,8 +179,8 @@ components:
               $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/packageCode'
         - type: object
           properties:
-            partloadSequenceNumber:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/partloadSequenceNumber'
+            equipmentReference:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/equipmentReference'
       required:
         - descriptionOfGoods
         - HSCode
@@ -196,34 +188,11 @@ components:
         - weight
         - weightUnit
         - packageCode
-      
-    cargoItemNoID:
-      type: object
-      allOf:
-        - $ref: '#/components/schemas/cargoItemCommon'
-        - type: object
-          properties:
-            equipmentReference:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/equipmentReference'
-      required:
         - equipmentReference
-
-    cargoItem:
-      type: object
-      allOf:
-        - type: object
-          properties:
-            cargoITemID:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/cargoItemID'
-        - $ref: '#/components/schemas/cargoItemCommon'
-        - type: object
-          properties:
-            shipmentEquipmentID:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/shipmentEquipmentID'
-
-    ######################################
+      
+    #################################
     # Cargo Line Item Related objects
-    ######################################
+    #################################
 
     cargoLineItems:
       type: object
@@ -247,9 +216,9 @@ components:
         - cargoLineItemID
         - shippingMarks
 
-    ######################################
+    ####################################
     # Shipment Equipment Related objects
-    ######################################
+    ####################################
 
     shipmentEquipmentList:
       type: object
@@ -258,15 +227,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/shipmentEquipment'
-    shipmentEquipmentNoIDList:
-      type: object
-      properties:
-        shipmentEquipments:
-          type: array
-          items:
-            $ref: '#/components/schemas/shipmentEquipmentNoID'
 
-    shipmentEquipmentCommon:
+    shipmentEquipment:
       type: object
       allOf:
         - type: object
@@ -315,36 +277,16 @@ components:
                   properties:
                     ventilationMax:
                       $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/ventilationMax'
+        - $ref: '#/components/schemas/sealList'
       required:
         - weightUnit
         - cargoGrossWeight
-    shipmentEquipmentNoID:
-      type: object
-      allOf:
-        - $ref: '#/components/schemas/shipmentEquipmentCommon'
-        - $ref: '#/components/schemas/sealNoIDList'
+        - equipment
 
-    shipmentEquipment:
-      type: object
-      allOf:
-        - type: object
-          properties:
-            shipmentEquipmentID:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/shipmentEquipmentID'
-        - $ref: '#/components/schemas/shipmentEquipmentCommon'
-        - $ref: '#/components/schemas/sealList'
-
-    ##########################
+    ######################
     # Seal Related objects
-    ##########################
+    ######################
 
-    sealNoIDList:
-      type: object
-      properties:
-        seals:
-          type: array
-          items:
-            $ref: '#/components/schemas/sealNoID'
     sealList:
       type: object
       properties:
@@ -352,7 +294,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/seal'
-    sealNoID:
+    seal:
       type: object
       description: 'addresses the seal-related information associated with the shipment equipment. A seal is put on a shipment equipment once it is loaded. This seal is meant to stay on until the shipment equipment reaches its final destination.'
       allOf:
@@ -371,21 +313,10 @@ components:
       required:
         - sealNumber
         - sealType
-    seal:
-      type: object
-      description: addresses the seal-related information associated with the shipment equipment. A seal is put on a shipment equipment once it is loaded. This seal is meant to stay on until the shipment equipment reaches its final destination.
-      allOf:
-        - type: object
-          properties:
-            sealID:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/sealID'
-        - $ref: '#/components/schemas/sealNoID'
-      required:
-        - sealID
 
-    ##########################
+    ################################
     # Document Party Related objects
-    ##########################
+    ################################
 
     documentPartyList:
       type: object
@@ -506,37 +437,58 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/shipmentLocation'
-            
-    shipmentLocation:
+    
+    shipmentLocationNoLocationType:
       type: object
-      description: 'maps the relationship between Shipment and Location, e.g., the place of receipt and the places of delivery for a specific shipment.'
       allOf:
         - type: object
           properties:
             location:
-              $ref: '#/components/schemas/location'
-        - type: object
-          properties:
-            locationType:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/locationType'
+              allOf:
+                - $ref: '#/components/schemas/location'
         - type: object
           properties:
             displayedName:
               $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/displayedName'
+
+    shipmentLocationNoLocationTypeExample:
+      allOf:
+        - $ref: '#/components/schemas/shipmentLocationNoLocationType'
+      example:
+        location:
+          UNLocationCode: "USNYC"
+        displayedName: "Kvædevej 55"
+    shipmentLocationNoLocationTypeExample2:
+      allOf:
+        - $ref: '#/components/schemas/shipmentLocationNoLocationType'
+      example:
+        location:
+          UNLocationCode: "NLRTM"
+        displayedName: "Rotterdam"
+    shipmentLocationNoLocationTypeExample3:
+      allOf:
+        - $ref: '#/components/schemas/shipmentLocationNoLocationType'
+      example:
+        location:
+          UNLocationCode: "DEDUS"
+        displayedName: "Düsseldorf"
+      
+    shipmentLocation:
+      type: object
+      description: 'maps the relationship between Shipment and Location, e.g., the place of receipt and the places of delivery for a specific shipment.'
+      allOf:
+        - $ref: '#/components/schemas/shipmentLocationNoLocationType'
+        - type: object
+          properties:
+            locationType:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/locationType'
       required:
         - locationType
 
-    ###################################
+    ###########################
     # Reference Related objects
-    ###################################
+    ###########################
   
-    referenceNoIDList:
-      type: object
-      properties:
-        references:
-          type: array
-          items:
-            $ref: '#/components/schemas/referenceNoID'
     referenceList:
       type: object
       properties:
@@ -544,7 +496,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/reference'
-    referenceNoID:
+    reference:
       type: object
       allOf:
         - type: object
@@ -558,20 +510,10 @@ components:
       required:
         - referenceType
         - referenceValue
-    reference:
-      type: object
-      allOf:
-        - type: object
-          properties:
-            referenceID:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/referenceID'
-        - $ref: '#/components/schemas/referenceNoID'
-      required:
-        - referenceID
-        
-    ##########################
+
+    ####################################
     # Transport Document Related objects
-    ##########################
+    ####################################
   
     transportDocumentHeader:
       type: object
@@ -583,7 +525,7 @@ components:
         - type: object
           properties:
             placeOfIssue:
-              $ref: '#/components/schemas/unLocodeLocationExample'
+              $ref: '#/components/schemas/shipmentLocationNoLocationTypeExample'
         - type: object
           properties:
             dateOfIssue:
@@ -668,9 +610,9 @@ components:
         - $ref: '#/components/schemas/clauseList'
         - $ref: '#/components/schemas/transportPlan'
 
-    ##########################
+    ########################
     # Charge Related objects
-    ##########################
+    ########################
 
     chargeList:
       type: object
@@ -683,10 +625,6 @@ components:
     charge:
       type: object
       allOf:
-        - type: object
-          properties:
-            chargeID:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/chargeID'
         - type: object
           properties:
             chargeType:
@@ -707,9 +645,6 @@ components:
           properties:
             calculationBasis:
               $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/calculationBasis'
-        # - properties:
-        #     freightPayableAt:
-        #       $ref: '#/components/schemas/unLocodeCityLocationExample'
         - type: object
           properties:
             unitPrice:
@@ -719,7 +654,6 @@ components:
             quantity:
               $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/quantity'
       required:
-        - chargeID
         - chargeType
         - currencyAmount
         - currencyCode
@@ -728,9 +662,10 @@ components:
         - freightPayableAt
         - unitPrice
         - quantity
-    ##########################
+
+    ########################
     # Clause Related objects
-    ##########################
+    ########################
 
     clauseList:
       type: object
@@ -743,10 +678,6 @@ components:
     clause:
       type: object
       allOf:
-        - type: object
-          properties:
-            clauseID:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/clauseID'
         - type: object
           properties:
             clauseContent:
@@ -765,9 +696,9 @@ components:
             - $ref: '#/components/schemas/shipmentLocationList'
             - $ref: '#/components/schemas/transportList'
 
-    ##########################
+    ###########################
     # Transport Related objects
-    ##########################
+    ###########################
 
     transportList:
       type: object
@@ -783,24 +714,20 @@ components:
       allOf:
         - type: object
           properties:
-            transportID:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/transportID'
-        - type: object
-          properties:
             loadLocation:
-              $ref: '#/components/schemas/unLocodeLocationExample'
+              $ref: '#/components/schemas/shipmentLocationNoLocationTypeExample2'
         - type: object
           properties:
             dischargeLocation:
-              $ref: '#/components/schemas/unLocodeLocationExample'
+              $ref: '#/components/schemas/shipmentLocationNoLocationTypeExample3'
         - type: object
           properties:
-            modeOfTransportCode:
+            modeOfTransport:
               $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/modeOfTransportCode'
         - type: object
           properties:
             vesselIMONumber:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_OVS_DOMAIN/1.0.0#/components/schemas/vesselIMONumber'
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/vesselIMONumber'
         - type: object
           properties:
             carrierVoyageNumber:
@@ -874,14 +801,6 @@ components:
               allOf:
                 - $ref: '#/components/schemas/address'
 
-    unLocodeLocationExample:
-      type: object
-      description: 'A location object - here with an example with only UN location code is present'
-      allOf:
-        - $ref: '#/components/schemas/location'
-      example: #Display example only using UNLocode and City
-        locationID: "123e4567-e89b-12d3-a456-426614174000"
-        UNLocationCode: "USNYC"
     unLocodeCityLocationExample:
       type: object
       description: 'A location object - here with an example with only UN location code and City name present'
