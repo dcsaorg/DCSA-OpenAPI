@@ -2,7 +2,20 @@ openapi: 3.0.3
 info:
   version: 0.4.0
   title: 'DCSA OpenAPI specification for Electronic Bill of Lading'
-  description: 'API specification issued by DCSA.org.<br>For explanation to specific values or objects please refer to the <a href="https://dcsa.org/wp-content/uploads/2020/12/20201208-DCSA-P1-DCSA-Information-Model-v3.0-FINAL.pdf">Information Model v3.0</a>'
+  description: |
+    API specification issued by DCSA.org.
+    
+    For explanation to specific values or objects please refer to the <a href='https://dcsa.org/wp-content/uploads/2020/12/20201208-DCSA-P1-DCSA-Information-Model-v3.0-FINAL.pdf'>Information Model v3.0</a>
+
+    It is possible to use this API as a standalone API. In order to do so it is necessary to use the poll-endPoints
+    - /v1/shipping-instructions/{shippingInstructionID}/events
+    - /v1/transport-document/{transportDocumentID}/events
+    - /v1/document-status/{ID}
+
+    in order to poll event information.
+
+    It is recomended to implement the <a href='https://app.swaggerhub.com/apis/dcsaorg/EBL_EVENT'>DCSA Electronic Bill of Lading Event Hub</a> in order to use the push model. Here events are pushed as they occur.
+    
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -11,7 +24,7 @@ info:
     url: https://dcsa.org
     email: info@dcsa.org
 paths:
-  /v1/shipping-instructions-summeries:
+  /v1/shipping-instructions-summaries:
     get:
       tags:
        - Shipping Instructions
@@ -20,7 +33,7 @@ paths:
       parameters:
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/parameters/limitQueryParam'
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/parameters/cursorQueryParam'
-        - $ref: '#/components/parameters/carrierBookingReferenceQueryParam'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/carrierBookingReferenceQueryParam'
         - $ref: '#/components/parameters/documentStatusQueryParam'
         - $ref: '#/components/parameters/equipmentReferenceQueryParam'
       responses:
@@ -68,13 +81,13 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_EBL_DOMAIN/1.0.0#/components/schemas/shippingInstructionHeader'
+                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EBL_DOMAIN/1.0.0#/components/schemas/shippingInstructionHeader'
         default:
           description: Unexpected error
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.0.0#/components/schemas/error'
   /v1/shipping-instructions:
     post:
       tags:
@@ -88,35 +101,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_EBL_DOMAIN/1.0.0#/components/schemas/shippingInstructionNoID'
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EBL_DOMAIN/1.0.0#/components/schemas/shippingInstructionNoID'
       responses:
         '202':
           description: Shipping Instruction accepted
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_EBL_DOMAIN/1.0.0#/components/schemas/shippingInstruction'
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EBL_DOMAIN/1.0.0#/components/schemas/shippingInstruction'
         default:
           description: Unexpected error
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'
-      callbacks:
-        shipmentEvent:
-          '{$request.body.callbackUrl}':
-            post:
-              parameters:
-                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_EVENT_DOMAIN/1.0.0#/components/parameters/signatureHeaderParam'
-              requestBody:
-                required: true
-                content:
-                  application/json:
-                    schema:
-                      $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_EVENT_DOMAIN/1.0.0#/components/schemas/shipmentEvent'
-              responses:
-                '200':
-                  description: 'Your server returns this code if it accepts the callback'          
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.0.0#/components/schemas/error'
   /v1/shipping-instructions/{shippingInstructionID}:
     get:
       tags:
@@ -138,13 +136,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_EBL_DOMAIN/1.0.0#/components/schemas/shippingInstruction'
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EBL_DOMAIN/1.0.0#/components/schemas/shippingInstruction'
         default:
           description: Unexpected error
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.0.0#/components/schemas/error'
     put:
       tags:
        - Shipping Instructions
@@ -159,7 +157,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_EBL_DOMAIN/1.0.0#/components/schemas/shippingInstructionNoDS'
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EBL_DOMAIN/1.0.0#/components/schemas/shippingInstruction'
       responses:
         '202':
           description: Shipping Instruction accepted
@@ -173,14 +171,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_EBL_DOMAIN/1.0.0#/components/schemas/shippingInstruction'
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EBL_DOMAIN/1.0.0#/components/schemas/shippingInstruction'
         default:
           description: Unexpected error
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'            
-  /v1/transport-documents-summeries:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.0.0#/components/schemas/error'
+  /v1/transport-documents-summaries:
     get:
       tags:
        - Transport Documents
@@ -189,7 +187,7 @@ paths:
       parameters:
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/parameters/limitQueryParam'
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/parameters/cursorQueryParam'
-        - $ref: '#/components/parameters/carrierBookingReferenceQueryParam'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/carrierBookingReferenceQueryParam'
         - $ref: '#/components/parameters/documentStatusQueryParam'
         - $ref: '#/components/parameters/equipmentReferenceQueryParam'
       responses:
@@ -237,13 +235,13 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_EBL_DOMAIN/1.0.0#/components/schemas/transportDocumentHeader'
+                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EBL_DOMAIN/1.0.0#/components/schemas/transportDocumentHeader'
         default:
           description: Unexpected error
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.0.0#/components/schemas/error'
   /v1/transport-documents/{transportDocumentID}:
     get:
       tags:
@@ -252,7 +250,7 @@ paths:
       description: Retrieves the transport document with the ID in the path.
       parameters:
         - $ref: '#/components/parameters/transportDocumentIDPathParam'
-        - $ref: '#/components/parameters/displayChargesQueryParam'
+        # - $ref: '#/components/parameters/displayChargesQueryParam'
       responses:
         '200':
           description: Request successful
@@ -270,13 +268,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_EBL_DOMAIN/1.0.0#/components/schemas/transportDocument'
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EBL_DOMAIN/1.0.0#/components/schemas/transportDocument'
         default:
           description: Unexpected error
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.0.0#/components/schemas/error'
   /v1/transport-documents/{transportDocumentID}/approval:
     post:
       tags:
@@ -300,13 +298,48 @@ paths:
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_EBL_DOMAIN/1.0.0#/components/schemas/transportDocument'
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EBL_DOMAIN/1.0.0#/components/schemas/transportDocument'
         default:
           description: Unexpected error
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error' 
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.0.0#/components/schemas/error'
+  /v1/events/:
+    get:
+      tags:
+       - Status
+      summary: Get Shipment events
+      description: |
+        Retrieves Shipment events. It is possible to filter on ShippingInstructionID, transportDocumentID or carrierBookingReference.
+      
+        The default sort order is by <i>eventCreatedDateTime</i> in descending order (DESC)
+      parameters:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/shippingInstructionIDQueryParam'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/transportDocumentIDQueryParam'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/carrierBookingReferenceQueryParam'
+      responses:
+        '200':
+          description: Request successful
+          headers:
+            API-Version:
+              schema:
+                type: string
+                example: '1.0.0'
+              description: SemVer used to indicate the version of the contract (API version) returned.
+              required: false
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/shipmentEvent'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.0.0#/components/schemas/error'
 
 components:
   parameters:
@@ -328,21 +361,26 @@ components:
       required: true
       schema:
         $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/transportDocumentID'
-  
+
     ##############
     # Query params
     ##############
     
-    carrierBookingReferenceQueryParam:
-      in: query
-      name: carrierBookingReference
-      description: 'Filter by the unique characters provided by carrier to identify a booking.'
-      schema:
-        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/carrierBookingReference'
     documentStatusQueryParam:
       in: query
       name: documentStatus
-      description: 'Filter by the status of the document in the process. For possible values see reference table ‘Transport Document version reference data entity’.'
+      description: |
+        Filter by the status of the document in the process. Possible values are:
+        - RECE (Received)
+        - DRFT (Drafted)
+        - PENA (Pending Approval)
+        - PENU (Pending Update)
+        - REJE (Rejected)
+        - APPR (Approved)
+        - ISSU (Issued)
+        - SURR (Surrendered)
+        - SUBM (Submitted)
+        - VOID (Void)
       schema:
         $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/documentStatus'
     equipmentReferenceQueryParam:
@@ -353,16 +391,6 @@ components:
         According to ISO 6346, a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit). If a container does not comply with ISO 6346, it is suggested to follow Recommendation #2 “Container with non-ISO identification” from SMDG.
       schema:
         $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/equipmentReference'
-    displayChargesQueryParam:
-      in: query
-      name: displayCharges
-      description: 'If set to true the payload will contain a list of charges connected to the TransportDocument. If <i>displayCharges</i> is <b>omitted</b> or set to false - no charges will be included in the payload.'
-      schema:
-        type: boolean
-        enum:
-          - true
-          - false
-      required: false
     documentSignatureQueryParam:
       in: query
       name: documentSignature
