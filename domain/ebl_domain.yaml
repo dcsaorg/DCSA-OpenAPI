@@ -59,6 +59,10 @@ components:
               $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/isElectronic'
         - type: object
           properties:
+            isChargesDisplayed:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/isChargesDisplayed'
+        - type: object
+          properties:
             carrierBookingReference:
               $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/carrierBookingReference'
         # Extend the carrierBookingReference description for SI
@@ -66,22 +70,10 @@ components:
           properties:
             carrierBookingReference:
               description: 'The associated booking number provided by the carrier. Cannot be used in combination with Cargo Item level carrierBookingReference'
-        - type: object
-          properties:
-            callbackUrl:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/callbackUrl'
-    
-    shippingInstructionHeaderNoDS:
-      description: 'an enrichment to the original booking shared by the shipper to the carrier. The shipping instruction includes volume or weight, cargo items, shipping dates, origin, destination, and other special instructions. The information given by the shipper through the shipping instruction is the information required to create a Transport Document.'
-      type: object
-      allOf:
-        - type: object
-          properties:
-            shippingInstructionID:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/shippingInstructionID'
-        - $ref: '#/components/schemas/shippingInstructionHeaderNoID'
       required:
-        - shippingInstructionID
+        - transportDocumentType
+        - freightPayableAt
+        - isShippedOnboardType
 
     shippingInstructionHeader:
       description: 'an enrichment to the original booking shared by the shipper to the carrier. The shipping instruction includes volume or weight, cargo items, shipping dates, origin, destination, and other special instructions. The information given by the shipper through the shipping instruction is the information required to create a Transport Document.'
@@ -91,14 +83,9 @@ components:
           properties:
             shippingInstructionID:
               $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/shippingInstructionID'
-        - type: object
-          properties:
-            documentStatus:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/documentStatus'
         - $ref: '#/components/schemas/shippingInstructionHeaderNoID'
       required:
         - shippingInstructionID
-        - documentStatus
 
     shippingInstructionNoID:
       description: 'an enrichment to the original booking shared by the shipper to the carrier. The shipping instruction includes volume or weight, cargo items, shipping dates, origin, destination, and other special instructions. The information given by the shipper through the shipping instruction is the information required to create a Transport Document.'
@@ -109,23 +96,7 @@ components:
         - $ref: '#/components/schemas/shipmentEquipmentList'
         - $ref: '#/components/schemas/documentPartyList'
         - $ref: '#/components/schemas/referenceList'
-      required:
-        - transportDocumentType
-        - isElectronic
-        - callbackUrl
 
-    shippingInstructionNoDS:
-      description: 'The Shipping Instruction is an enrichment to the original booking shared by the shipper to the carrier. The shipping instruction includes volume or weight, cargo items, shipping dates, origin, destination, and other special instructions. The information given by the shipper through the shipping instruction is the information required to create a Transport Document.'
-      type: object
-      allOf:
-        - $ref: '#/components/schemas/shippingInstructionHeaderNoDS'
-        - $ref: '#/components/schemas/cargoItemList'
-        - $ref: '#/components/schemas/shipmentEquipmentList'
-        - $ref: '#/components/schemas/documentPartyList'
-        - $ref: '#/components/schemas/referenceList'
-      required:
-        - callbackUrl
-        
     shippingInstruction:
       description: 'The Shipping Instruction is an enrichment to the original booking shared by the shipper to the carrier. The shipping instruction includes volume or weight, cargo items, shipping dates, origin, destination, and other special instructions. The information given by the shipper through the shipping instruction is the information required to create a Transport Document.'
       type: object
@@ -135,9 +106,7 @@ components:
         - $ref: '#/components/schemas/shipmentEquipmentList'
         - $ref: '#/components/schemas/documentPartyList'
         - $ref: '#/components/schemas/referenceList'
-      required:
-        - callbackUrl
-  
+
     ############################
     # Cargo Item Related objects
     ############################
@@ -158,6 +127,7 @@ components:
           properties:
             carrierBookingReference:
               $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/carrierBookingReference'
+
         # Extend the carrierBookingReference description for CargoItem
         - type: object
           properties:
@@ -256,7 +226,7 @@ components:
               $ref: '#/components/schemas/equipment'
         - type: object
           properties:
-            weightUnit:
+            cargoCrossWeightUnit:
               $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/weightUnit'
         - type: object
           properties:
@@ -298,7 +268,7 @@ components:
                       $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/ventilationMax'
         - $ref: '#/components/schemas/sealList'
       required:
-        - weightUnit
+        - cargoCrossWeightUnit
         - cargoGrossWeight
         - equipment
 
@@ -450,6 +420,7 @@ components:
     
     shipmentLocationNoLocationType:
       type: object
+      title: shipmentLocation
       allOf:
         - type: object
           properties:
@@ -461,28 +432,6 @@ components:
             displayedName:
               $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/displayedName'
 
-    shipmentLocationNoLocationTypeExample:
-      allOf:
-        - $ref: '#/components/schemas/shipmentLocationNoLocationType'
-      example:
-        location:
-          UNLocationCode: "USNYC"
-        displayedName: "Kvædevej 55"
-    shipmentLocationNoLocationTypeExample2:
-      allOf:
-        - $ref: '#/components/schemas/shipmentLocationNoLocationType'
-      example:
-        location:
-          UNLocationCode: "NLRTM"
-        displayedName: "Rotterdam"
-    shipmentLocationNoLocationTypeExample3:
-      allOf:
-        - $ref: '#/components/schemas/shipmentLocationNoLocationType'
-      example:
-        location:
-          UNLocationCode: "DEDUS"
-        displayedName: "Düsseldorf"
-      
     shipmentLocation:
       type: object
       description: 'maps the relationship between Shipment and Location, e.g., the place of receipt and the places of delivery for a specific shipment.'
@@ -535,7 +484,11 @@ components:
         - type: object
           properties:
             placeOfIssue:
-              $ref: '#/components/schemas/shipmentLocationNoLocationTypeExample'
+              allOf:
+                - $ref: '#/components/schemas/location'
+              # Extending location component example to only show UNLocationCode
+              example:
+                UNLocationCode: "USNYC"
         - type: object
           properties:
             dateOfIssue:
@@ -633,6 +586,10 @@ components:
       allOf:
         - type: object
           properties:
+            chargeID:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/chargeID'
+        - type: object
+          properties:
             chargeType:
               $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/chargeType'
         - type: object
@@ -721,11 +678,17 @@ components:
         - type: object
           properties:
             loadLocation:
-              $ref: '#/components/schemas/shipmentLocationNoLocationTypeExample2'
+              allOf:
+                - $ref: '#/components/schemas/location'
+              example:
+                UNLocationCode: "NLRTM"
         - type: object
           properties:
             dischargeLocation:
-              $ref: '#/components/schemas/shipmentLocationNoLocationTypeExample3'
+              allOf:
+                - $ref: '#/components/schemas/location'
+              example:
+                UNLocationCode: "DEDUS"
         - type: object
           properties:
             modeOfTransport:
@@ -818,7 +781,7 @@ components:
               $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/addressName'
         - type: object
           properties:
-            streetName:
+            street:
               $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/streetName'
         - type: object
           properties:
@@ -834,7 +797,7 @@ components:
               $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/postalCode'
         - type: object
           properties:
-            cityName:
+            city:
               $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/cityName'
         - type: object
           properties:
