@@ -37,6 +37,102 @@ components:
           signature:
             type: string
             example: aGkgZnJvbSBkZW5tYXJr
+    subscriptionIDHeaderParam:
+      in: header
+      name: SubscriptionID
+      required: true
+      description: 'The ID of the subscription triggering the event being sent.'
+      explode: true
+      schema:
+        type: string
+        format: uuid
+        example: 123e4567-e89b-12d3-a456-426614174000
+
+    #################
+    # Path parameters
+    #################
+
+    eventIDPathParam:
+      in: path
+      name: eventID
+      schema:
+        $ref: '#/components/schemas/eventID'
+      required: true
+      description: 'The ID of the event to receive'
+      example: 123e4567-e89b-12d3-a456-426614174000
+    subscriptionIDPathParam:
+      in: path
+      name: subscriptionID
+      schema:
+        $ref: '#/components/schemas/subscriptionID'
+      required: true
+      description: 'The universal unique ID of the subscription.'
+      example: 123e4567-e89b-12d3-a456-426614174000
+
+    ##################
+    # Query parameters
+    ##################
+    
+    bookingReferenceQueryParam:
+      in: query
+      name: bookingReference
+      deprecated: true
+      description: Deprecated - use carrierBookingReference instead.
+      required: false
+      schema:
+        type: string
+    carrierBookingReferenceQueryParam:
+      in: query
+      name: carrierBookingReference
+      description: 'A set of unique characters provided by carrier to identify a booking.'
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/carrierBookingReference'
+    equipmentReferenceQueryParam:
+      in: query
+      name: equipmentReference
+      description: 'The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.'
+      required: false
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/equipmentReference'
+    # eventTypeQueryParam:
+    #   in: query
+    #   name: eventType
+    #   description: 'The type of event(s) to filter by. Default value is all event types if no value(s) is selected. It is possible to select any combination of values by comma separating values'
+    #   required: false
+    #   schema:
+    #     $ref: '#/components/schemas/eventTypeList'
+    scheduleIDQueryParam:
+      in: query
+      name: scheduleID
+      description: 'ID uniquely identifying a schedule, to filter events by.'
+      required: false
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/scheduleID'
+    shippingInstructionIDQueryParam:
+      in: query
+      name: transportDocumentID
+      description: |
+        The Shipping Instruction ID identifier is an identifier that links to a shipping instruction
+      required: false
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/shippingInstructionID'
+    transportCallIDQueryParam:
+      in: query
+      name: transportCallID
+      description: 'ID uniquely identifying a transport call, to filter events by.'
+      required: false
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/transportCallID'
+    transportDocumentIDQueryParam:
+      in: query
+      name: transportDocumentID
+      description: |
+        The Transport Document ID identifier is an identifier that links to a shipment, i.e. a Bill of Lading or a Sea Waybill. A bill of lading is the document of title to the goods issued to the customer which confirms the carrier&apos;s receipt of the cargo from the customer, acknowledging goods being shipped and specifying the terms of delivery.
+        The Sea Waybill is a simpler document, the main difference being that it is non-negotiable.
+      required: false
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/transportDocumentID'
+
 
   ####################
   # Common data models
@@ -48,36 +144,15 @@ components:
     # Base Event object
     ###################
 
-    events:
-      type: array
-      description: 'List of events for shipment journey.'
-      items:
-        $ref: '#/components/schemas/event'
-
-    event:
-      oneOf:
-        - $ref: '#/components/schemas/shipmentEvent'
-        - $ref: '#/components/schemas/equipmentEvent'
-        - $ref: '#/components/schemas/transportEvent'
-      discriminator:
-        propertyName: eventType
-
-    baseEvent:
+    baseEventBody:
       type: object
-      description: 'The Event entity is described as a generalization of all the specific event categories. An event always takes place in relation to a shipment and can additionally be linked to a transport or an equipment'
+      description: |
+        The Event entity is described as a generalization of all the specific event categories. An event always takes place in relation to a shipment and can additionally be linked to a transport or an equipment
       allOf:
-        - type: object
-          properties:
-            eventID:
-              $ref: '#/components/schemas/eventID'
         - type: object
           properties:
             eventType:
               $ref: '#/components/schemas/eventType'
-        - type: object
-          properties:
-            eventCreatedDateTime:
-              $ref: '#/components/schemas/eventCreatedDateTime'
         - type: object
           properties:
             eventSubtype:
@@ -91,32 +166,76 @@ components:
             eventDateTime:
               $ref: '#/components/schemas/eventDateTime'
       required:
-        - eventID
         - eventType
-        - eventCreatedDateTime
         - eventSubtype
         - eventClassifierCode
         - eventDateTime
+    
+    baseEvent:
+      type: object
+      allOf:
+        - type: object
+          properties:
+            eventID:
+              $ref: '#/components/schemas/eventID'
+        - type: object
+          properties:
+            eventCreatedDateTime:
+              $ref: '#/components/schemas/eventCreatedDateTime'
+        - $ref: '#/components/schemas/baseEventBody'
+      required:
+        - eventID
+        - eventCreatedDateTime
+
 
     ##########################
     # Shipment Event object
     ##########################
-    
-    shipmentEvent:
+
+
+    baseShipmentEvent:
       type: object
-      description: 'The shipment event entity is a specialization of the event entity to support specification of data that only applies to a shipment event.'
+      description: |
+        The shipment event entity is a specialization of the event entity to support specification of data that only applies to a shipment event.
       allOf:
-        - $ref: '#/components/schemas/baseEvent'
+        #Overriding this property to have correct payload response examples
         - type: object
           properties:
-            eventType: #Overriding this property to have correct payload response examples
+            eventType:
               example: SHIPMENT
               enum:
                 - SHIPMENT
+        #Overriding this property to have correct payload
         - type: object
           properties:
-            eventSubtype: #Overriding this property to have correct payload
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/documentStatus'
+            eventSubtype:
+              type: string
+              description: |
+                The status of the document in the process. Possible values are:
+                - RECE (Received)
+                - DRFT (Drafted)
+                - PENA (Pending Approval)
+                - PENU (Pending Update)
+                - REJE (Rejected)
+                - APPR (Approved)
+                - ISSU (Issued)
+                - SURR (Surrendered)
+                - SUBM (Submitted)
+                - VOID (Void)
+                - CONF (Confirmed)
+              enum:
+                - RECE
+                - DRFT
+                - PENA
+                - PENU
+                - REJE
+                - APPR
+                - ISSU
+                - SURR
+                - SUBM
+                - VOID
+                - CONF
+              example: DRFT
         - type: object
           properties:
             documentID:
@@ -129,11 +248,6 @@ components:
           properties:
             reason:
               $ref: '#/components/schemas/reason'
-        
-        #####################################
-        # Deprecated ShipmentEvent attributes
-        #####################################
-        
         - type: object
           properties:
             eventDateTime:
@@ -145,6 +259,11 @@ components:
               enum:
                 - ACT
               example: ACT
+        
+        #####################################
+        # Deprecated ShipmentEvent attributes
+        #####################################
+        
         - type: object
           properties:
             eventTypeCode:
@@ -191,25 +310,41 @@ components:
         - documentID
         - shipmentInformationTypeCode
 
+    shipmentEventBody:
+      type: object
+      description: |
+        The shipment event entity is a specialization of the event entity to support specification of data that only applies to a shipment event.
+        
+        <b>NB:</b> This version of the entity is to be used when creating new Shipment events - this does not contain an eventID or an eventCreatedDateTime
+      allOf:
+        - $ref: '#/components/schemas/baseEventBody'
+        - $ref: '#/components/schemas/baseShipmentEvent'
+
+    shipmentEvent:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/baseEvent'
+        - $ref: '#/components/schemas/baseShipmentEvent'
+
+
     ###############################
     # Transport Event object
     ###############################
-    
-    transportEvent:
+
+
+    baseTransportEvent:
       type: object
-      description: 'The transport event entity is a specialization of the event entity to support specification of data that only applies to a transport event.'
+      description: |
+        The transport event entity is a specialization of the event entity to support specification of data that only applies to a transport event.
       allOf:
-        - $ref: '#/components/schemas/baseEvent'
+        #Overriding this property to have correct payload response examples
         - type: object
           properties:
-            eventType: #Overriding this property to have correct payload response examples
+            eventType:
               example: TRANSPORT
               enum:
                 - TRANSPORT
-        - type: object
-          properties:
-            eventClassifierCode:
-              $ref: '#/components/schemas/eventClassifierCode'
+        #Overriding this property to have correct payload response examples
         - type: object
           properties:
             eventClassifierCode:
@@ -227,6 +362,7 @@ components:
                 - REQ
                 # - OPL
               example: ACT
+        #Overriding this property to have correct payload response examples
         - type: object
           properties:
             eventSubtype:
@@ -258,8 +394,8 @@ components:
               $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/transportCallID'
         - type: object
           properties:
-            locationType:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/transportLocationType'
+            facilityType:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/facilityTypeCode'
         - type: object
           properties:
             locationID:
@@ -291,18 +427,37 @@ components:
         - eventClassifierCode
         - transportCallID
 
+    transportEventBody:
+      type: object
+      description: |
+        The transport event entity is a specialization of the event entity to support specification of data that only applies to a transport event.
+        
+        <b>NB:</b> This version of the entity is to be used when creating new Transport events - this does not contain an eventID or an eventCreatedDateTime
+      allOf:
+        - $ref: '#/components/schemas/baseEventBody'
+        - $ref: '#/components/schemas/baseTransportEvent'
+
+    transportEvent:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/baseEvent'
+        - $ref: '#/components/schemas/baseTransportEvent'
+
+
     ########################
     # Equipment Event object
     ########################
-    
-    equipmentEvent:
+
+
+    baseEquipmentEvent:
       type: object
-      description: 'The equipment event entity is a specialization of the event entity to support specification of data that only applies to an equipment event.'
+      description: |
+        The equipment event entity is a specialization of the event entity to support specification of data that only applies to an equipment event.
       allOf:
-        - $ref: '#/components/schemas/baseEvent'
+        #Overriding this property to have correct payload response examples
         - type: object
           properties:
-            eventType: #Overriding this property to have correct payload response examples
+            eventType:
               example: EQUIPMENT
               enum:
                 - EQUIPMENT
@@ -310,6 +465,7 @@ components:
           properties:
             eventDateTime:
               $ref: '#/components/schemas/eventDateTime'
+        #Overriding this property to have correct payload response examples
         - type: object
           properties:
             eventSubtype:
@@ -331,17 +487,20 @@ components:
                 - GTOT (Gate out)
                 - STUF (Stuffing)
                 - STRP (Stripping)
+        #Overriding this property to have correct payload response examples
         - type: object
           properties:
             eventClassifierCode:
               description: |
                 Code for the event classifier can be:
-                - EST (Estimated)
+                - PLN (Planned)
                 - ACT (Actual)
+                - EST (Estimated)
               enum:
+                - PLN
                 - ACT
                 - EST
-              example: ACT
+              example: EST
         - type: object
           properties:
             equipmentReference:
@@ -354,11 +513,19 @@ components:
           properties:
             transportCallID:
               $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/transportCallID'
-        
+        - type: object
+          properties:
+            facilityType:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/facilityTypeCode'
+        - type: object
+          properties:
+            locationID:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/locationID'
+
         ######################################
         # Deprecated EquipmentEvent attributes
         ######################################
-        
+
         - type: object
           properties:
             eventTypeCode:
@@ -386,30 +553,224 @@ components:
                 - STRP
       required:
         - emptyIndicatorCode
-        - equipmentReference
         - transportCallID
+
+    equipmentEventBody:
+      type: object
+      description: |
+        The equipment event entity is a specialization of the event entity to support specification of data that only applies to an equipment event.
+        
+        <b>NB:</b> This version of the entity is to be used when creating new Equipment events - this does not contain an eventID or an eventCreatedDateTime
+      allOf:
+        - $ref: '#/components/schemas/baseEventBody'
+        - $ref: '#/components/schemas/baseEquipmentEvent'
+
+    equipmentEvent:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/baseEvent'
+        - $ref: '#/components/schemas/baseEquipmentEvent'
+
+
+    #########################
+    # Operations Event object
+    #########################
+
+
+    baseOperationsEvent:
+      type: object
+      description: |
+        The operations event entity is a specialization of the event entity to support specification of data that only applies to an operations event.
+      allOf:
+        #Overriding this property to have correct payload response examples
+        - type: object
+          properties:
+            eventType:
+              example: OPERATIONS
+              enum:
+                - OPERATIONS
+        #Overriding this property to have correct payload response examples
+        - type: object
+          properties:
+            eventClassifierCode:
+              description: |
+                Code for the event classifier can be:
+                - PLN (Planned)
+                - ACT (Actual)
+                - REQ (Requested)
+                - EST (Estimated)
+                <!-- - OPL (Operations planned) <font color="red"><- OBS - breaking change</font> -->
+              enum:
+                - ACT
+                - EST
+                - PLN
+                - REQ
+                # - OPL
+              example: ACT
+        - type: object
+          properties:
+            operationsEventTypeCode:
+              type: string
+              description: Missing
+              enum:
+                - x
+                - y
+                - z
+        - type: object
+          properties:
+            eventLocation:
+              type: string
+              format: uuid
+              description: Missing
+        - type: object
+          properties:
+            portCallServiceTypeCode:
+              type: string
+              description: Missing
+              enum:
+                - a
+                - b
+                - c
+        - type: object
+          properties:
+            facilityTypeCode:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/facilityTypeCode'
+
+    operationsEventBody:
+      type: object
+      description: |
+        The operations event entity is a specialization of the event entity to support specification of data that only applies to an operations event.
+        
+        <b>NB:</b> This version of the entity is to be used when creating new Operations events - this does not contain an eventID or an eventCreatedDateTime
+      allOf:
+        - $ref: '#/components/schemas/baseEventBody'
+        - $ref: '#/components/schemas/baseOperationsEvent'
+
+    operationsEvent:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/baseEvent'
+        - $ref: '#/components/schemas/baseOperationsEvent'
+
+
+    ##############################
+    # Shipment Subscription object
+    ##############################
+
+
+    shipmentSubscriptionBody:
+      type: object
+      allOf:
+        - type: object
+          properties:
+            carrierBookingReference:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/carrierBookingReference'
+        - type: object
+          properties:
+            bookingReference:
+              type: string
+              maxLength: 35
+              example: ABC709951
+              description: |
+                The identifier for a shipment, which is issued by and unique within each of the carriers.
+                
+                Deprecated - use carrierBookingReference instead
+              deprecated: true
+        - type: object
+          properties:
+            transportDocumentID:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/transportDocumentID'
+        - type: object
+          properties:
+            transportDocumentTypeCode:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/transportDocumentType'
+
+
+    ###############################
+    # Equipment Subscription object
+    ###############################
+
+
+    equipmentSubscriptionBody:
+      type: object
+      allOf:
+        - type: object
+          properties:
+            equipmentReference:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/equipmentReference'
+
+
+    ###############################
+    # Transport Subscription object
+    ###############################
+
+
+    transportSubscriptionBody:
+      type: object
+      allOf:
+        - type: object
+          properties:
+            scheduleID:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/scheduleID'
+        - type: object
+          properties:
+            transportCallID:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/transportCallID'
+        - type: object
+          properties:
+            vesselIMONumber:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/vesselIMONumber'
+        - type: object
+          properties:
+            carrierVoyageNumber:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/carrierVoyageNumber'
+        # - type: object
+        #   properties:
+        #     carrierServiceNumber:
+        #       $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/carrierServiceCode'
+
+
+    ################################
+    # Operations Subscription object
+    ################################
+
+
+    operationsSubscriptionBody:
+      type: object
+      # allOf:
+      #   - type: object
+      #     properties:
+      #
+      #   - type: object
+      #     properties:
+      #
 
 
     ##########################
     # Simple types
     ##########################
-    
+
+
     callbackUrl:
       type: string
       format: uri
-      description: 'The endPoint where a Carrier would send back events to the client'
-      example: https://myserver.com/send/callback/here
+      description: |
+        The endPoint where a Carrier whould send back events to the Shipper. The callback can contain query parameters uniquely identifying the originator of the events.
+      example: https://myserver.com/send/callback/here?shipperRef=<shipper defined unique id>
     delayReasonCode:
-      description: Reason code for the delay. The SMDG-Delay-Reason-Codes are used for this attribute. The code list can be found at http://www.smdg.org/smdg-code-lists/
+      description: |
+        Reason code for the delay. The SMDG-Delay-Reason-Codes are used for this attribute. The code list can be found at http://www.smdg.org/smdg-code-lists/
       type: string
       maxLength: 3
       example: WEA
     documentID:
       type: string
-      description: 'The id of the object defined by the Shipment Information Type. In some cases this is a UUID in other cases this is a string.'
+      description: |
+        The id of the object defined by the Shipment Information Type. In some cases this is a UUID in other cases this is a string.
     eventClassifierCode:
       type: string
-      description: 'Code for the event classifier. Values can vary depending on eventType'
+      description: |
+        Code for the event classifier. Values can vary depending on eventType
       #   - PLN (Planned)
       #   - ACT (Actual)
       #   - REQ (Requested)
@@ -434,31 +795,33 @@ components:
       type: string
       format: date-time
       example: '2019-11-12T07:41:00+08:30'
-      description: The local date and time, where the event took place, in ISO 8601 format.
+      description: The local date and time, where the event took place or when the event will take place, in ISO 8601 format.
     eventType:
       type: string
       description: 'The Event Type of the object - to be used as a discriminator.'
-      enum:
-        - EQUIPMENT
-        - SHIPMENT
-        - TRANSPORT
+      # enum:
+      #   - EQUIPMENT
+      #   - SHIPMENT
+      #   - TRANSPORT
+      #   - OPERATIONS
     eventTypeCode:
       type: string
       example: ARRI
       maxLength: 4
-      description: Deprecated - Unique identifier for Event Type Code. This code has different ENUM values depending on the type of event
+      description: |
+        Deprecated - Unique identifier for Event Type Code. This code has different ENUM values depending on the type of event
       deprecated: true
     eventSubtype:
       type: string
       maxLength: 4
       description: 'The subType of the event. Values can vary depending on eventType'
-    eventTypeList:
-      description: 'A list of event types. Default is all events.'
-      example: [EQUIPMENT,SHIPMENT,TRANSPORT]
-      default: [EQUIPMENT,SHIPMENT,TRANSPORT]
-      type: array
-      items:
-        $ref: '#/components/schemas/eventType'
+    # eventTypeList:
+    #   description: 'A list of event types. Default is all events.'
+    #   example: [EQUIPMENT,SHIPMENT,TRANSPORT,OPERATIONS]
+    #   default: [EQUIPMENT,SHIPMENT,TRANSPORT,OPERATIONS]
+    #   type: array
+    #   items:
+    #     $ref: '#/components/schemas/eventType'
     reason:
       type: string
       description: 'Reason field in a Shipment event. This field can be used to explain why a specific event has been sent.'
