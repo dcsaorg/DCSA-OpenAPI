@@ -72,10 +72,16 @@ paths:
                   propertyName: eventType
                 example: #Couldn't use $ref in this example. Should be updated manually if transportEvent changes
                   eventID: '84db923d-2a19-4eb0-beb5-446c1ec57d34'
+                  eventCreatedDateTime: '2021-01-09T14:12:56+01:00'
                   eventType: 'TRANSPORT'
-                  eventCreatedDateTime: '2019-11-12T07:41:00+08:30'
-                  eventSubtype: 'ARRI'
-                  missing: missing
+                  eventClassifierCode: 'ACT'
+                  eventDateTime: '2019-11-12T07:41:00+08:30'
+                  transportEventtype: 'ARRI'
+                  delayReasonCode: 'WEA'
+                  vesselScheduleChangeRemark: 'Bad weather'
+                  transportCallID: '123e4567-e89b-12d3-a456-426614174000'
+                  facilityTypeCode: 'POTE'
+                  locationID: '123e4567-e89b-12d3-a456-426614174000'
         default:
           description: Unexpected error
           content:
@@ -128,6 +134,7 @@ paths:
               parameters:
                 - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/signatureHeaderParam'
                 - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/subscriptionIDHeaderParam'
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/authenticationSecretParam'
               requestBody: # Contents of the callback message
                 required: true
                 content:
@@ -214,19 +221,17 @@ components:
           - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/transportEvent'
           - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/operationsEvent'
     
-    eventType:
-      type: string
-      description: 'The Event Type of the object - to be used as a discriminator.'
-      enum:
-        - OPERATIONS
-        - TRANSPORT
     eventTypeList:
       description: 'A list of event types. Default is all events.'
       example: [OPERATIONS,TRANSPORT]
       default: [OPERATIONS,TRANSPORT]
       type: array
       items:
-        $ref: '#/components/schemas/eventType'
+        type: string
+        enum:
+          - OPERATIONS
+          - TRANSPORT
+        # $ref: '#/components/schemas/eventType'
 
     subscriptionBody:
       type: object
@@ -238,7 +243,7 @@ components:
         - type: object
           properties:
             eventType:
-              $ref: '#/components/schemas/eventType'
+              $ref: '#/components/schemas/eventTypeList'
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/transportSubscriptionBody'
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/operationsSubscriptionBody'
       required:

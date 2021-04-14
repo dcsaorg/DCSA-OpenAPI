@@ -6,7 +6,12 @@ openapi: 3.0.3
 #######################
 info:
   title: DCSA Event Components
-  description: Common components for DCSA Events
+  description: |
+    Common components for DCSA Events. This domain is central for all Event Hubs and is used by
+    - Event Hub (General event hub for <a href="#/components/schemas/transportEvent">TransportEvent</a>, <a href="#/components/schemas/equipmentEvent">EquipmentEvent</a>, <a href="#/components/schemas/shipmentEvent">ShipmentEvents</a> and <a href="#/components/schemas/operationsEvent">OperationsEvent</a>)
+    - T&T v2.1 and later (event hub for <a href="#/components/schemas/transportEvent">TransportEvent</a>, <a href="#/components/schemas/equipmentEvent">EquipmentEvent</a> and <a href="#/components/schemas/shipmentEvent">ShipmentEvents</a>)
+    - Documentation Hub used by eBL (event hub for <a href="#/components/schemas/shipmentEvent">ShipmentEvents</a>)
+    - OVS Hub used by OVS (event hub for <a href="#/components/schemas/transportEvent">TransportEvent</a> and <a href="#/components/schemas/operationsEvent">OperationsEvent</a>)
   version: '1.0.0'
 
 components:
@@ -16,11 +21,24 @@ components:
     ## Header parameters
     ####################
 
-    signatureHeaderParam:
+    authenticationSecret:
+      in: header
+      name: Authentication-Secret
+      required: true
+      description: |
+        This is a shared secret between Sender and Receiver, which is used in the callbacks to authenticate a request.  In many ways, this works like a password or an API key and should be treated in the same manner.
+      explode: true
+      schema:
+        type: string
+        pattern: '^[a-zA-Z0-9]{25,}$'
+        example: 'e4567A89bB12d3a4TZ564Eh26'
+    signatureHeader:
       in: header
       name: Signature
       required: true
-      description: 'The signature certifying the request originates from the carrier.'
+      description: |
+        The signature certifying the request originates from the carrier.
+      deprecated: true
       explode: true
       schema:
         properties:
@@ -37,7 +55,7 @@ components:
           signature:
             type: string
             example: aGkgZnJvbSBkZW5tYXJr
-    subscriptionIDHeaderParam:
+    subscriptionIDHeader:
       in: header
       name: SubscriptionID
       required: true
@@ -52,7 +70,7 @@ components:
     # Path parameters
     #################
 
-    eventIDPathParam:
+    eventID:
       in: path
       name: eventID
       schema:
@@ -60,7 +78,7 @@ components:
       required: true
       description: 'The ID of the event to receive'
       example: 123e4567-e89b-12d3-a456-426614174000
-    subscriptionIDPathParam:
+    subscriptionID:
       in: path
       name: subscriptionID
       schema:
@@ -73,7 +91,7 @@ components:
     # Query parameters
     ##################
     
-    bookingReferenceQueryParam:
+    bookingReference:
       in: query
       name: bookingReference
       deprecated: true
@@ -81,34 +99,118 @@ components:
       required: false
       schema:
         type: string
-    carrierBookingReferenceQueryParam:
+    carrierBookingReference:
       in: query
       name: carrierBookingReference
       description: 'A set of unique characters provided by carrier to identify a booking.'
       schema:
         $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/carrierBookingReference'
-    equipmentReferenceQueryParam:
+    carrierVoyageNumber:
+      in: query
+      name: carrierVoyageNumber
+      description: |
+        The vessel operator-specific identifier of the Voyage.
+      required: false
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/carrierVoyageNumber'
+    equipmentEventType:
+      in: query
+      name: equipmentEventType
+      description: |
+        Unique identifier for equipmentEventType.
+        - LOAD (Loaded)
+        - DISC (Discharged)
+        - GTIN (Gated in)
+        - GTOT (Gated out)
+        - STUF (Stuffed)
+        - STRP (Stripped)
+
+        It is possible to select multiple values by comma (,) separating them. For multiple values the OR-operator is used. For example <i>equipmentEventType=GTIN,GTOT</i> matches <b>both</b> Gated in (GTIN) and Gated out (GTOT) equipment events. Default is all equipmentEventTypes.
+      example: [GTIN,GTOT]
+      schema:
+        default: [LOAD,DISC,GTIN,GTOT,STUF,STRP]
+        type: array
+        items:
+          $ref: '#/components/schemas/equipmentEventType'
+    equipmentReference:
       in: query
       name: equipmentReference
       description: 'The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.'
       required: false
       schema:
         $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/equipmentReference'
-    # eventTypeQueryParam:
-    #   in: query
-    #   name: eventType
-    #   description: 'The type of event(s) to filter by. Default value is all event types if no value(s) is selected. It is possible to select any combination of values by comma separating values'
-    #   required: false
-    #   schema:
-    #     $ref: '#/components/schemas/eventTypeList'
-    scheduleIDQueryParam:
+    eventCreatedDateTime:
+      in: query
+      name: eventCreatedDateTime
+      description: |
+        Limit the result based on a date. It is possible to use operators on this query parameter. This is done by adding an operator at the beginning of the value followed by a colon&#58;<br><i>eventCreatedDateTime=<b>gte&#58;</b>2021-04-01T14&#58;12&#58;56+01&#58;00</i><br>
+        would result in all events created &gt;= 2021-04-01T14&#58;12&#58;56+01&#58;00<br>
+        The following operators are supported
+        - gte&#58; (>= Greater than or equal)
+        - gt&#58; (> Greater than)
+        - lte&#58; (<= Less than or equal)
+        - lt&#58; (< Less than)
+        - eq&#58; (= Equal to)
+        
+        If no operator is provided, a <b>strictly equal</b> is used (this is equivalent to <b>eq&#58;</b> operator).
+      required: false
+      example: gte:2021-04-01T14:12:56+01:00
+      #        gte&#58;2021-04-01T14&#58;12&#58;56+01&#58;00
+      schema:
+        $ref: '#/components/schemas/eventCreatedDateTime'
+    operationsEventType:
+      in: query
+      name: operationsEventType
+      description: |
+        The code to identify the type of event that is related to the operation
+        - STRT (Started)
+        - CMPL (Completed)
+        - ARRI (Arrived)
+        - DEPA (Departed)
+
+        It is possible to select multiple values by comma (,) separating them. For multiple values the OR-operator is used. For example <i>operationsEventType=ARRI,CMPL</i> matches <b>both</b> Arrived (ARRI) and Completed (CMPL) operations events. Default is all operationsEventTypes.
+      example: [ARRI,CMPL]
+      schema:
+        default: [STRT,CMPL,ARRI,DEPA]
+        type: array
+        items:
+          $ref: '#/components/schemas/operationsEventType'
+    scheduleID:
       in: query
       name: scheduleID
-      description: 'ID uniquely identifying a schedule, to filter events by.'
+      description: |
+        ID uniquely identifying a schedule, to filter events by.
+        
+        This filter was added by mistake and is thus deprecated.
       required: false
       schema:
         $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/scheduleID'
-    shippingInstructionIDQueryParam:
+      deprecated: true
+    shipmentEventType:
+      in: query
+      name: shipmentEventType
+      description: |
+        The status of the document in the process. Possible values are
+        - RECE (Received)
+        - DRFT (Drafted)
+        - PENA (Pending Approval)
+        - PENU (Pending Update)
+        - REJE (Rejected)
+        - APPR (Approved)
+        - ISSU (Issued)
+        - SURR (Surrendered)
+        - SUBM (Submitted)
+        - VOID (Void)
+        - CONF (Confirmed)
+        
+        It is possible to select multiple values by comma (,) separating them. For multiple values the OR-operator is used. For example <i>shipmentEventType=RECE,DRFT</i>  Matches <b>both</b> Received (RECE) and Drafted (DRFT) shipment events. Default is all shipmentEventTypes.
+      example: [RECE,DRFT]
+      schema:
+        default: [RECE,DRFT,PENA,PENU,REJE,APPR,ISSU,SURR,SUBM,VOID,CONF]
+        type: array
+        items:
+          $ref: '#/components/schemas/shipmentEventType'
+    shippingInstructionID:
       in: query
       name: shippingInstructionID
       description: |
@@ -116,14 +218,14 @@ components:
       required: false
       schema:
         $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/shippingInstructionID'
-    transportCallIDQueryParam:
+    transportCallID:
       in: query
       name: transportCallID
       description: 'ID uniquely identifying a transport call, to filter events by.'
       required: false
       schema:
         $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/transportCallID'
-    transportDocumentIDQueryParam:
+    transportDocumentID:
       in: query
       name: transportDocumentID
       description: |
@@ -132,7 +234,40 @@ components:
       required: false
       schema:
         $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/transportDocumentID'
+    transportDocumentTypeCode:
+      in: query
+      name: transportDocumentTypeCode
+      description: |
+        Specifies the type of the transport document (a Bill of Lading (BOL) or a Sea Waybill (SWB)). Default is both.
+      required: false
+      schema:
+        default: [BOL,SWB]
+        type: array
+        items:
+          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/transportDocumentType'
+    transportEventType:
+      in: query
+      name: transportEventType
+      description: |
+        Identifier for type of Transport event
+        - ARRI (Arrived)
+        - DEPA (Departed)
 
+        It is possible to select multiple values by comma (,) separating them. For multiple values the OR-operator is used. For example <i>transportEventType=ARRI,DEPA</i> matches <b>both</b> Arrived (ARRI) and Departed (DEPA) transport events. Default is all transportEventTypes.
+      example: [ARRI,DEPA]
+      schema:
+        default: [ARRI,DEPA]
+        type: array
+        items:
+          $ref: '#/components/schemas/transportEventType'
+    vesselIMONumber:
+      in: query
+      name: vesselIMONumber
+      description: |
+        The identifier of vessel for which schedule details are published. Depending on schedule type, this may not be available yet.
+      required: false
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/vesselIMONumber'
 
   ####################
   # Common data models
@@ -152,11 +287,8 @@ components:
         - type: object
           properties:
             eventType:
-              $ref: '#/components/schemas/eventType'
-        - type: object
-          properties:
-            eventSubtype:
-              $ref: '#/components/schemas/eventSubtype'
+              allOf:
+                - $ref: '#/components/schemas/eventType'
         - type: object
           properties:
             eventClassifierCode:
@@ -167,7 +299,6 @@ components:
               $ref: '#/components/schemas/eventDateTime'
       required:
         - eventType
-        - eventSubtype
         - eventClassifierCode
         - eventDateTime
     
@@ -205,37 +336,30 @@ components:
               example: SHIPMENT
               enum:
                 - SHIPMENT
-        #Overriding this property to have correct payload
+        #Overriding this property to have correct payload response examples
         - type: object
           properties:
-            eventSubtype:
-              type: string
+            eventDateTime:
               description: |
-                The status of the document in the process. Possible values are:
-                - RECE (Received)
-                - DRFT (Drafted)
-                - PENA (Pending Approval)
-                - PENU (Pending Update)
-                - REJE (Rejected)
-                - APPR (Approved)
-                - ISSU (Issued)
-                - SURR (Surrendered)
-                - SUBM (Submitted)
-                - VOID (Void)
-                - CONF (Confirmed)
+                Value for eventDateTime must be the same value as eventCreatedDateTime
+        #Overriding this property to have correct payload response examples
+        - type: object
+          properties:
+            eventClassifierCode:
+              description: |
+                Code for the event classifier must be
+                - ACT (ACTUAL)
+                - PLN (Planned)
+                - EST (Estimated)
               enum:
-                - RECE
-                - DRFT
-                - PENA
-                - PENU
-                - REJE
-                - APPR
-                - ISSU
-                - SURR
-                - SUBM
-                - VOID
-                - CONF
-              example: DRFT
+                - ACT
+                - PLN
+                - EST
+              example: ACT
+        - type: object
+          properties:
+            shipmentEventType:
+              $ref: '#/components/schemas/shipmentEventType'
         - type: object
           properties:
             documentID:
@@ -248,17 +372,6 @@ components:
           properties:
             reason:
               $ref: '#/components/schemas/reason'
-        - type: object
-          properties:
-            eventDateTime:
-              description: 'Value for eventDateTime must be the same value as eventCreatedDateTime'
-        - type: object
-          properties:
-            eventClassifierCode:
-              description: 'Code for the event classifier must be ACT (ACTUAL)'
-              enum:
-                - ACT
-              example: ACT
         
         #####################################
         # Deprecated ShipmentEvent attributes
@@ -272,7 +385,7 @@ components:
           properties:
             eventTypeCode:
               description: |
-                Unique identifier for Event Type Code. For shipment events this can be:
+                Unique identifier for Event Type Code. For shipment events this can be
                 - RECE (Received)
                 - CONF (Confirmed)
                 - ISSU (Issued)
@@ -282,7 +395,7 @@ components:
                 - REJE (Rejected)
                 - PENA (Pending approval)
                 
-                Deprecated - use eventSubtype instead
+                Deprecated - use shipmentEventType instead
               deprecated: true
               example: RECE
               enum:
@@ -308,6 +421,7 @@ components:
               deprecated: true
       required:
         - documentID
+        - shipmentEventType
         - shipmentInformationTypeCode
 
     shipmentEventBody:
@@ -349,58 +463,34 @@ components:
           properties:
             eventClassifierCode:
               description: |
-                Code for the event classifier can be:
-                - PLN (Planned)
+                Code for the event classifier can be
                 - ACT (Actual)
-                - REQ (Requested)
+                - PLN (Planned)
                 - EST (Estimated)
-                <!-- - OPL (Operations planned) <font color="red"><- OBS - breaking change</font> -->
+                - REQ (Requested)
               enum:
                 - ACT
-                - EST
                 - PLN
+                - EST
                 - REQ
-                # - OPL
               example: ACT
-        #Overriding this property to have correct payload response examples
         - type: object
           properties:
-            eventSubtype:
-              type: string
-              example: ARRI
-              enum: 
-                - ARRI
-                - DEPA
-              maxLength: 4
-              description: |
-                Unique identifier for EventSubtype, for transport events this is either:
-                - ARRI (Arrival)
-                - DEPA (Departure)
-        - type: object
-          properties:
-            eventDateTime:
-              $ref: '#/components/schemas/eventDateTime'
+            transportEventType:
+              $ref: '#/components/schemas/transportEventType'
         - type: object
           properties:
             delayReasonCode:
               $ref: '#/components/schemas/delayReasonCode'
         - type: object
           properties:
-            vesselScheduleChangeRemark:
-              $ref: '#/components/schemas/vesselScheduleChangeRemark'
+            changeRemark:
+              $ref: '#/components/schemas/changeRemark'
         - type: object
           properties:
             transportCallID:
               $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/transportCallID'
-        - type: object
-          properties:
-            facilityType:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/facilityTypeCode'
-        - type: object
-          properties:
-            locationID:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/locationID'
-        
+
         ######################################
         # Deprecated TransportEvent attributes
         ######################################
@@ -413,18 +503,16 @@ components:
           properties:
             eventTypeCode:
               description: |
-                Unique identifier for Event Type Code, for transport events this is either:
+                Unique identifier for Event Type Code, for transport events this is either
                 - ARRI (Arrival)
                 - DEPA (Departure)
                 
-                Deprecated - use eventSubType instead
+                Deprecated - use transportEventType instead
               deprecated: true
               enum:
                 - ARRI
                 - DEPA
       required:
-        - eventDateTime
-        - eventClassifierCode
         - transportCallID
 
     transportEventBody:
@@ -461,32 +549,6 @@ components:
               example: EQUIPMENT
               enum:
                 - EQUIPMENT
-        - type: object
-          properties:
-            eventDateTime:
-              $ref: '#/components/schemas/eventDateTime'
-        #Overriding this property to have correct payload response examples
-        - type: object
-          properties:
-            eventSubtype:
-              type: string
-              example: LOAD
-              enum: 
-                - LOAD
-                - DISC
-                - GTIN
-                - GTOT
-                - STUF
-                - STRP
-              maxLength: 4
-              description: | 
-                Unique identifier for EventSubtype. For equipment events this can be:
-                - LOAD (Load)
-                - DISC (Discharge)
-                - GTIN (Gate in)
-                - GTOT (Gate out)
-                - STUF (Stuffing)
-                - STRP (Stripping)
         #Overriding this property to have correct payload response examples
         - type: object
           properties:
@@ -503,6 +565,10 @@ components:
               example: EST
         - type: object
           properties:
+            equipmentEventType:
+              $ref: '#/components/schemas/equipmentEventType'
+        - type: object
+          properties:
             equipmentReference:
               $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/equipmentReference'
         - type: object
@@ -513,14 +579,6 @@ components:
           properties:
             transportCallID:
               $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/transportCallID'
-        - type: object
-          properties:
-            facilityType:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/facilityTypeCode'
-        - type: object
-          properties:
-            locationID:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/locationID'
 
         ######################################
         # Deprecated EquipmentEvent attributes
@@ -534,15 +592,15 @@ components:
           properties:
             eventTypeCode:
               description: |
-                Unique identifier for Event Type Code, for transport events this is either:
-                - LOAD (Load)
-                - DISC (Discharge)
-                - GTIN (Gate in)
-                - GTOT (Gate out)
-                - STUF (Stuffing)
-                - STRP (Stripping)
+                Unique identifier for Event Type Code, for transport events this is either
+                - LOAD (Loaded)
+                - DISC (Discharged)
+                - GTIN (Gated in)
+                - GTOT (Gated out)
+                - STUF (Stuffed)
+                - STRP (Stripped)
                 
-                Deprecated - use eventSubType instead
+                Deprecated - use equipmentEventType instead
               deprecated: true
               enum: 
                 - LOAD
@@ -594,47 +652,93 @@ components:
           properties:
             eventClassifierCode:
               description: |
-                Code for the event classifier can be:
-                - PLN (Planned)
+                Code for the event classifier can be
                 - ACT (Actual)
-                - REQ (Requested)
+                - PLN (Planned)
                 - EST (Estimated)
-                <!-- - OPL (Operations planned) <font color="red"><- OBS - breaking change</font> -->
+                - REQ (Requested)
               enum:
                 - ACT
-                - EST
                 - PLN
+                - EST
                 - REQ
-                # - OPL
               example: ACT
         - type: object
           properties:
-            operationsEventTypeCode:
+            operationsEventType:
+              $ref: '#/components/schemas/operationsEventType'
+        - type: object
+          properties:
+            publisher:
               type: string
-              description: Missing
-              enum:
-                - x
-                - y
-                - z
+              maxLength: 50
+              description: |
+                The publisher (source) of the event 
+        - type: object
+          properties:
+            publisherRole:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/partyFunction'
+                - description: The party function code of the publisher
         - type: object
           properties:
             eventLocation:
               type: string
               format: uuid
-              description: Missing
+              description: |
+                The location where the event takes place.
         - type: object
           properties:
             portCallServiceTypeCode:
               type: string
-              description: Missing
+              description: |
+                The type of the service provided in the port call
+                - PILO (Pilotage)
+                - MOOR (Mooring)
+                - CRGO (Cargo operations)
+                - TOWG (Towage)
+                - BUNK (Bunkering)
+                - WSDP (Waste disposal)
               enum:
-                - a
-                - b
-                - c
+                - PILO
+                - MOOR
+                - CRGO
+                - TOWG
+                - BUNK
+                - WSDP
+              example: BUNK
         - type: object
           properties:
             facilityTypeCode:
               $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/facilityTypeCode'
+        # Extend facilityTypeCode to ONLY include PBPL and BRTH
+        - type: object
+          properties:
+            facilityTypeCode:
+              type: string
+              example: BRTH
+              description: |
+                The code to identify the specific type of facility.
+                - PBPL (Pilot boarding place)
+                - BRTH (Berth)
+              maxLength: 4
+              enum:
+                - PBPL
+                - BRTH
+        - type: object
+          properties:
+            delayReasonCode:
+              $ref: '#/components/schemas/delayReasonCode'
+        - type: object
+          properties:
+            changeRemark:
+              $ref: '#/components/schemas/changeRemark'
+        - type: object
+          properties:
+            transportCallID:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/transportCallID'
+      required:
+        - portCallServiceTypeCode
 
     operationsEventBody:
       type: object
@@ -663,6 +767,11 @@ components:
       allOf:
         - type: object
           properties:
+            shipmentEventType:
+              allOf:
+                - $ref: '#/components/schemas/shipmentEventTypeList'
+        - type: object
+          properties:
             carrierBookingReference:
               $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/carrierBookingReference'
         - type: object
@@ -683,7 +792,11 @@ components:
         - type: object
           properties:
             transportDocumentTypeCode:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/transportDocumentType'
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/transportDocumentType'
+              default: [BOL,SWB]
+              description: |
+                Specifies the type of the transport document (a Bill of Lading (BOL) or a Sea Waybill (SWB)). Default is both.
 
 
     ###############################
@@ -694,6 +807,11 @@ components:
     equipmentSubscriptionBody:
       type: object
       allOf:
+        - type: object
+          properties:
+            equipmentEventType:
+              allOf:
+                - $ref: '#/components/schemas/equipmentEventTypeList'
         - type: object
           properties:
             equipmentReference:
@@ -710,8 +828,16 @@ components:
       allOf:
         - type: object
           properties:
+            transportEventType:
+              allOf:
+                - $ref: '#/components/schemas/transportEventTypeList'
+        - type: object
+          properties:
             scheduleID:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/scheduleID'
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/scheduleID'
+                - deprecated: true
+                - description: 'ID uniquely identifying a schedul.<br>Deprecated as this was added by mistake'
         - type: object
           properties:
             transportCallID:
@@ -737,13 +863,12 @@ components:
 
     operationsSubscriptionBody:
       type: object
-      # allOf:
-      #   - type: object
-      #     properties:
-      #
-      #   - type: object
-      #     properties:
-      #
+      allOf:
+        - type: object
+          properties:
+            operationsEventType:
+              allOf:
+                - $ref: '#/components/schemas/operationsEventTypeList'
 
 
     ##########################
@@ -757,6 +882,11 @@ components:
       description: |
         The endPoint where a Carrier whould send back events to the Shipper. The callback can contain query parameters uniquely identifying the originator of the events.
       example: https://myserver.com/send/callback/here?shipperRef=<shipper defined unique id>
+    changeRemark:
+      description: 'Free text information provided by the vessel operator regarding the reasons for the change in schedule and/or plans to mitigate schedule slippage.'
+      type: string
+      example: Bad weather
+      maxLength: 250
     delayReasonCode:
       description: |
         Reason code for the delay. The SMDG-Delay-Reason-Codes are used for this attribute. The code list can be found at http://www.smdg.org/smdg-code-lists/
@@ -767,6 +897,48 @@ components:
       type: string
       description: |
         The id of the object defined by the Shipment Information Type. In some cases this is a UUID in other cases this is a string.
+    equipmentEventType:
+      type: string
+      description: |
+        Unique identifier for equipmentEventType.
+        - LOAD (Loaded)
+        - DISC (Discharged)
+        - GTIN (Gated in)
+        - GTOT (Gated out)
+        - STUF (Stuffed)
+        - STRP (Stripped)
+      enum: 
+        - LOAD
+        - DISC
+        - GTIN
+        - GTOT
+        - STUF
+        - STRP
+      example: LOAD
+    equipmentEventTypeList:
+      type: array
+      description: |
+        Unique identifier for equipmentEventType.
+        - LOAD (Loaded)
+        - DISC (Discharged)
+        - GTIN (Gated in)
+        - GTOT (Gated out)
+        - STUF (Stuffed)
+        - STRP (Stripped)
+
+        It is possible to select multiple values by comma (,) separating them. For multiple values the OR-operator is used. For example <i>equipmentEventType=GTIN,GTOT</i> matches <b>both</b> Gated in (GTIN) and Gated out (GTOT) equipment events. Default is all equipmentEventTypes.
+      example: [GTIN,GTOT]
+      default: [LOAD,DISC,GTIN,GTOT,STUF,STRP]
+      items:
+        type: string
+        enum:
+          - LOAD
+          - DISC
+          - GTIN
+          - GTOT
+          - STUF
+          - STRP
+        # $ref: '#/components/schemas/equipmentEventType'
     eventClassifierCode:
       type: string
       description: |
@@ -780,7 +952,7 @@ components:
       #   - ACT
       #   - REQ
       #   - EST
-      # example: EST
+      # example: ACT
     eventID:
       type: string
       format: uuid
@@ -788,7 +960,7 @@ components:
       example: '84db923d-2a19-4eb0-beb5-446c1ec57d34'
     eventCreatedDateTime:
       type: string
-      format: $date-time
+      format: date-time
       description: 'The timestamp of when the event was created'
       example: '2021-01-09T14:12:56+01:00'
     eventDateTime:
@@ -798,7 +970,8 @@ components:
       description: The local date and time, where the event took place or when the event will take place, in ISO 8601 format.
     eventType:
       type: string
-      description: 'The Event Type of the object - to be used as a discriminator.'
+      description: |
+        The Event Type of the object - to be used as a discriminator.
       # enum:
       #   - EQUIPMENT
       #   - SHIPMENT
@@ -809,28 +982,113 @@ components:
       example: ARRI
       maxLength: 4
       description: |
-        Deprecated - Unique identifier for Event Type Code. This code has different ENUM values depending on the type of event
+        Deprecated - Unique identifier for Event Type Code. This has been replaced by Specialized eventTypeCodes: shipmentEventType, transportEventType, equipmentEventType and opertaionsEventType
       deprecated: true
-    eventSubtype:
+    operationsEventType:
       type: string
-      maxLength: 4
-      description: 'The subType of the event. Values can vary depending on eventType'
-    # eventTypeList:
-    #   description: 'A list of event types. Default is all events.'
-    #   example: [EQUIPMENT,SHIPMENT,TRANSPORT,OPERATIONS]
-    #   default: [EQUIPMENT,SHIPMENT,TRANSPORT,OPERATIONS]
-    #   type: array
-    #   items:
-    #     $ref: '#/components/schemas/eventType'
+      description: |
+        The code to identify the type of event that is related to the operation
+        - STRT (Started)
+        - CMPL (Completed)
+        - ARRI (Arrived)
+        - DEPA (Departed)
+      enum:
+        - STRT
+        - CMPL
+        - ARRI
+        - DEPA
+      example: STRT
+    operationsEventTypeList:
+      type: array
+      description: |
+        The code to identify the type of event that is related to the operation
+        - STRT (Started)
+        - CMPL (Completed)
+        - ARRI (Arrived)
+        - DEPA (Departed)
+
+        It is possible to select multiple values by comma (,) separating them. For multiple values the OR-operator is used. For example <i>operationsEventType=ARRI,CMPL</i> matches <b>both</b> Arrived (ARRI) and Completed (CMPL) operations events. Default is all operationsEventTypes.
+      example: [ARRI,CMPL]
+      default: [STRT,CMPL,ARRI,DEPA]
+      items:
+        type: string
+        enum:
+          - STRT
+          - CMPL
+          - ARRI
+          - DEPA
+        # $ref: '#/components/schemas/operationsEventType'
     reason:
       type: string
       description: 'Reason field in a Shipment event. This field can be used to explain why a specific event has been sent.'
       example: 'The following attributes are missing...'
+    shipmentEventType:
+      type: string
+      description: |
+        The status of the document in the process. Possible values are
+        - RECE (Received)
+        - DRFT (Drafted)
+        - PENA (Pending Approval)
+        - PENU (Pending Update)
+        - REJE (Rejected)
+        - APPR (Approved)
+        - ISSU (Issued)
+        - SURR (Surrendered)
+        - SUBM (Submitted)
+        - VOID (Void)
+        - CONF (Confirmed)
+      enum:
+        - RECE
+        - DRFT
+        - PENA
+        - PENU
+        - REJE
+        - APPR
+        - ISSU
+        - SURR
+        - SUBM
+        - VOID
+        - CONF
+      example: DRFT
+    shipmentEventTypeList:
+      type: array
+      description: |
+        The status of the document in the process. Possible values are
+        - RECE (Received)
+        - DRFT (Drafted)
+        - PENA (Pending Approval)
+        - PENU (Pending Update)
+        - REJE (Rejected)
+        - APPR (Approved)
+        - ISSU (Issued)
+        - SURR (Surrendered)
+        - SUBM (Submitted)
+        - VOID (Void)
+        - CONF (Confirmed)
+        
+        It is possible to select multiple values by comma (,) separating them. For multiple values the OR-operator is used. For example <i>shipmentEventType=RECE,DRFT</i>  Matches <b>both</b> Received (RECE) and Drafted (DRFT) shipment events. Default is all shipmentEventTypes.
+      example: [RECE,DRFT]
+      default: [RECE,DRFT,PENA,PENU,REJE,APPR,ISSU,SURR,SUBM,VOID,CONF]
+      items:
+        type: string
+        enum:
+          - RECE
+          - DRFT
+          - PENA
+          - PENU
+          - REJE
+          - APPR
+          - ISSU
+          - SURR
+          - SUBM
+          - VOID
+          - CONF
+        # $ref: '#/components/schemas/shipmentEventType'
     shipmentInformationType:
       type: string
       maxLength: 3
       description: |
-        The code to identify the type of information documentID points to. Can be one of the following values:
+        The code to identify the type of information documentID points to. Can be one of the following values
         - BOK (Booking)
         - SHI (Shipping Instruction)
         - VGM (Verified Gross Mass)
@@ -845,29 +1103,34 @@ components:
         - SRM
         - TRD
         - ARN
-    signature:
-      type: object
-      properties:
-        keyId:
-          type: string
-          format: uuid
-          example: 123e4567-e89b-12d3-a456-426614174000
-        created:
-          type: integer
-          example: 1591960384 
-        headers:
-          type: string
-          example: '(request-target) (created) date host'
-        signature:
-          type: string
-          example: aGkgZnJvbSBkZW5tYXJr
     subscriptionID:
       type: string
       format: uuid
       example: 123e4567-e89b-12d3-a456-426614174000
       description: 'The carrier issues a unique ID to the shipper or consignee for that subscription'
-    vesselScheduleChangeRemark:
-      description: 'Free text information provided by the vessel operator regarding the reasons for the change in schedule and/or plans to mitigate schedule slippage.'
+    transportEventType:
       type: string
-      example: Bad weather
-      maxLength: 250
+      description: |
+        Identifier for type of Transport event
+        - ARRI (Arrived)
+        - DEPA (Departed)
+      enum:
+        - ARRI
+        - DEPA
+      example: ARRI
+    transportEventTypeList:
+      type: array
+      description: |
+        Identifier for type of Transport event
+        - ARRI (Arrived)
+        - DEPA (Departed)
+
+        It is possible to select multiple values by comma (,) separating them. For multiple values the OR-operator is used. For example <i>transportEventType=ARRI,DEPA</i> matches <b>both</b> Arrived (ARRI) and Departed (DEPA) transport events. Default is all transportEventTypes.
+      example: [ARRI,DEPA]
+      default: [ARRI,DEPA]
+      items:
+        type: string
+        enum:
+          - ARRI
+          - DEPA
+        # $ref: '#/components/schemas/transportEventType'
