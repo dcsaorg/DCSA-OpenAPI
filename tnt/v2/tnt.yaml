@@ -37,16 +37,25 @@ paths:
             $ref: '#/components/schemas/eventTypeList'
 
         # Chunk with Shipment related event parameters
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/shipmentEventTypeQueryParam'
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/carrierBookingReferenceQueryParam'
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/bookingReferenceQueryParam'
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/transportDocumentIDQueryParam'
-
-        # Chunk with Equipment related event parameters
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/equipmentReferenceQueryParam'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/transportDocumentTypeCodeQueryParam'
 
         # Chunk with Transport related event parameters
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/transportEventTypeQueryParam'
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/scheduleIDQueryParam'
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/transportCallIDQueryParam'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/vesselIMONumberQueryParam'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/carrierVoyageNumberQueryParam'
+
+        # Chunk with Equipment related event parameters
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/equipmentEventTypeQueryParam'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/equipmentReferenceQueryParam'
+
+        # Chunk with base event parameters
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/eventCreatedDateTimeQueryParam'
 
         # Chunk with event parameters needed to be included in all APIs
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/parameters/limitQueryParam'
@@ -215,10 +224,40 @@ paths:
             application/json:
               schema:
                 $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.0.0#/components/schemas/error'
+  /transport-calls/{transportCallID}:
+    get:
+      tags:
+      - TransportCalls
+      summary: Find a transport call by ID
+      parameters:
+        - $ref: '#/components/parameters/transportCallIDPathParam'
+      responses:
+        '200':
+          description: TransportCall returned
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/OVS_DOMAIN/1.0.0#/components/schemas/transportCall'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.0.0#/components/schemas/error'
 
 
 components:
 
+  parameters:
+    transportCallIDPathParam:
+      in: path
+      name: transportCallID
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/transportCallID'
+      required: true
+      description: 'The universal unique ID of the transport call.'
+      example: 123e4567-e89b-12d3-a456-426614174000
+    
   ##############################
   # All events and subscriptions
   ##############################
@@ -233,20 +272,18 @@ components:
           - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/transportEvent'
           - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/equipmentEvent'
 
-    eventType:
-      type: string
-      description: 'The Event Type of the object - to be used as a discriminator.'
-      enum:
-        - EQUIPMENT
-        - SHIPMENT
-        - TRANSPORT
     eventTypeList:
       description: 'A list of event types. Default is all events.'
-      example: [EQUIPMENT,SHIPMENT,TRANSPORT]
+      example: [EQUIPMENT,TRANSPORT]
       default: [EQUIPMENT,SHIPMENT,TRANSPORT]
       type: array
       items:
-        $ref: '#/components/schemas/eventType'
+        type: string
+        enum:
+          - EQUIPMENT
+          - SHIPMENT
+          - TRANSPORT
+        # $ref: '#/components/schemas/eventType'
 
     subscriptionBody:
       type: object
@@ -258,7 +295,7 @@ components:
         - type: object
           properties:
             eventType:
-              $ref: '#/components/schemas/eventType'
+              $ref: '#/components/schemas/eventTypeList'
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/shipmentSubscriptionBody'
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/transportSubscriptionBody'
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/equipmentSubscriptionBody'
