@@ -1,10 +1,10 @@
-#DCSA defined Domains
+# DCSA defined Domains
 Domains are used to specify global definitions used accross APIs.
 
-###Documentation
+### Documentation
 
-###Error
+### Error
 
-###Event
+### Event
 
-###OVS
+### OVS
