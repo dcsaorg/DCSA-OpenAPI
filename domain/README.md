@@ -4,7 +4,7 @@ Domains are stored with the version number as part of the filename as multiple v
 
 Once a Domain is published (on SwaggerHub) in a specific version - **that file never changes**. If changes are required - a new version of the Domain needs to be created.
 
-In order to follow Chapter 4.1 of the [DCSA API Guidelines](https://dcsa.org/wp-content/uploads/2020/09/20200921-DCSA-API-Design-Principles-1.0.pdf) SemVer is used as part of the fileName:
+Chapter 4.1 of the [DCSA API Guidelines](https://dcsa.org/wp-content/uploads/2020/09/20200921-DCSA-API-Design-Principles-1.0.pdf) should be followed when naming the file. SemVer is to be used as part of the fileName:
 
 {domain file}_vX.Y.Z
 
