@@ -6,7 +6,7 @@ Once a Domain is published (on SwaggerHub) in a specific version - **that file n
 
 Chapter 4.1 of the [DCSA API Guidelines](https://dcsa.org/wp-content/uploads/2020/09/20200921-DCSA-API-Design-Principles-1.0.pdf) should be followed when naming the file. SemVer is to be used as part of the fileName:
 
-{domain file}_vX.Y.Z
+`{domain file}_vX.Y.Z`
 
 Where X is the Major version, Y is the Minor version and Z is the patch version.
 
