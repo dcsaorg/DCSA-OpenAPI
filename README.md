@@ -5,14 +5,7 @@ DCSA envisions a digitally interconnected container shipping industry. Our missi
 ### The objective of DCSA
 Data and Interface Standard project workstream is to strengthen the container shipping industry’s ability to send and receive data across all parties in the industry. Furthermore, it aims at to enhance inter-carrier cooperation based on shared requirements and to ensure interoperability by using a shared data language. You can find relevant **publications** on [DCSA website](https://dcsa.org/) - they are also listen in each of the **project** folders above.
 
--	[DCSA Information Model 2.0](https://dcsa.org/wp-content/uploads/2020/07/DCSA-Information-model-2.0-vF.pdf), [DCSA Information Model 3.0](https://dcsa.org/wp-content/uploads/2020/12/20201208-DCSA-P1-DCSA-Information-Model-v3.0-FINAL.pdf)
--	[DCSA Information Model Reading Guide]( https://dcsa.org/wp-content/uploads/2020/07/DCSA-Information-Model-2.0-Reading-Guide-vF.pdf)
--	[DCSA Interface for Operational Vessel Schedules 1.0]( https://dcsa.org/wp-content/uploads/2020/07/DCSA-Interface-Standard-for-Operational-Vessel-Schedules-1.0-vF.pdf)
--	[DCSA Interface for Operational Vessel Schedules Reading Guide]( https://dcsa.org/wp-content/uploads/2020/07/DCSA-Interface-Standard-for-Operational-Vessel-Schedules-1.0-Reading-Guide-vF.pdf)
--	[Operational Vessel Schedule Definitions 1.0]( https://dcsa.org/wp-content/uploads/2020/07/Operational-Vessel-Schedule-definitions-1.0-vF.pdf)
--	[DCSA Interface for Track and Trace 1.2]( https://dcsa.org/wp-content/uploads/2020/05/DCSA-Interface-Standard-for-Track-and-Trace-1.2.pdf)
--	[DCSA Interface for Track and Trace 1.2 Reading Guide]( https://dcsa.org/wp-content/uploads/2020/05/DCSA-Interface-Standard-for-Track-and-Trace-Reading-Guide-1.2.pdf)
--	[Glossary of Terms](https://knowledge.dcsa.org/s/glossary)
+[A glossary of Terms can be found here](https://knowledge.dcsa.org/s/glossary)
 
 ### OpenAPI definition
 
