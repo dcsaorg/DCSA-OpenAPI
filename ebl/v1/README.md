@@ -2,6 +2,8 @@
 
 The DCSA Interface Standard for electronic Bill of Lading is documented on the [**DCSA EBL SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_EBL).
 
+- EBL is based on [Information Model v3.0](https://dcsa.org/wp-content/uploads/2020/12/20201208-DCSA-P1-DCSA-Information-Model-v3.0-FINAL.pdf)
+- [Interface standards for EBL](https://dcsa.org)
 
 ### Releasenotes
 
