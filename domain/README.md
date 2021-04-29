@@ -8,7 +8,7 @@ Chapter 4.1 of the [DCSA API Guidelines](https://dcsa.org/wp-content/uploads/202
 
 `{domain file}_vX.Y.Z`
 
-Where X is the Major version, Y is the Minor version and Z is the patch version.
+Where `X` is the Major version, `Y` is the Minor version and `Z` is the patch version.
 
 ### DCSA
 This domain is used to define single components (not objects) used in other Domains or APIs. No objects should be defined here.
