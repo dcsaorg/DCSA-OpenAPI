@@ -2,8 +2,6 @@
 
 The DCSA Interface Standard for Track and Trace is documented on the [**DCSA TNT SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_TNT).
 
-### Dependencies between Track and Trace and Operational Vessel Schedules APIs
-In the Information Model 2.0, details about locations have been removed from T&T events, and added to transport calls. Instead of containing location details, events contain a reference to a transport call. Transport calls are a part of the [OVS 1.0 API](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS/1.0.1), which means that the [Track & Trace](https://app.swaggerhub.com/apis/dcsaorg/DCSA_TNT) v2.0.0, v2.0.1 and v2.1.0 APIs depends on functionality from the OVS 1.0 API.
 
 ### Releasenotes
 
@@ -11,6 +9,10 @@ In the Information Model 2.0, details about locations have been removed from T&T
 
 
 #### [v2.0.0](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/2.0.0)
+
+#### Dependencies between Track and Trace and Operational Vessel Schedules APIs
+In the Information Model 2.0, details about locations have been removed from T&T events, and added to transport calls. Instead of containing location details, events contain a reference to a transport call. Transport calls are a part of the [OVS 1.0 API](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS/1.0.1), which means that the [Track & Trace](https://app.swaggerhub.com/apis/dcsaorg/DCSA_TNT) v2.0.0, v2.0.1 and v2.1.0 APIs depends on functionality from the OVS 1.0 API.
+
 * Updated event structure to use Transport Calls
 * Added Pagination
 * Added Signature header to callbacks
