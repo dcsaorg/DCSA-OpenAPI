@@ -6,7 +6,7 @@ The DCSA Interface Standard for Track and Trace is documented on the [**DCSA TNT
 ### Releasenotes
 
 ### [v2.0.1](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/2.0.1)
-This is supposed to be a Minor update correcting errors - but at the time this API was released no one had started implementing v2.0.0 so it was decided "just" to make this a patch release
+This is supposed to be a Major update correcting errors - but at the time this API was released no one had started implementing v2.0.0 so it was decided "just" to make this a patch release
 
 * transportCallID removed from ShipmentEvents
 * shipmentID is re-introduced into ShipmentEvents
