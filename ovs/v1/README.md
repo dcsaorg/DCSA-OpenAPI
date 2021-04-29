@@ -1,7 +1,7 @@
 ### Operational Vessecl Schedules (OVS)
 
 The DCSA Interface Standard for Operational Vessel Schedules is documented on the [**DCSA OVS SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS).
-
+-	[Operational Vessel Schedule Definitions 1.0]( https://dcsa.org/wp-content/uploads/2020/07/Operational-Vessel-Schedule-definitions-1.0-vF.pdf)
 
 ### Releasenotes
 
