@@ -13,15 +13,21 @@ Where `X` is the Major version, `Y` is the Minor version and `Z` is the patch ve
 ### DCSA
 This domain is used to define single components (not objects) used in other Domains or APIs. No objects should be defined here.
 
+Preferably a description, an example and a type is defined for all components.
+
 Parameters and headers used in all APIs is defined here for example: limit and cursor parameter, pagination and API-Version headers
 
 https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa
 
 ### Documentation
-This ddomain is used for the electronic documentation APIs (EBL).
+This domain is used for the electronic documentation APIs (ex: [Electronic Bill of Lading](https://app.swaggerhub.com/apis/dcsaorg/DCSA_EBL), Booking). The domain is a collection of objects consisting of components defined in the DCSA Domain.
+
+https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation
 
 ### Error
-Here the error object used by all APIs is defined.
+The error object used in all APIs is defined here. This allows for a consistent definition of how an error is defined and returned.
+
+https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/error
 
 ### Event
 
