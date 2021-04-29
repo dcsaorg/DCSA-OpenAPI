@@ -32,7 +32,7 @@ The error object used in all APIs is defined here. This allows for a consistent 
 https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/error
 
 ### Event
-The Events Domain contains all definitions and components used for Events. Events are primarily used in Event Hubs ([Track & Trace](https://app.swaggerhub.com/apis/dcsaorg/DCSA_TNT) (>= v2.1.0), [Documentation Hub](https://app.swaggerhub.com/apis/dcsaorg/DOCUMENTATION_EVENT_HUB) and [Operational Vessel Schedule Hub](https://app.swaggerhub.com/apis/dcsaorg/OVS_EVENT_HUB)). Events are also used in all polling endPoints in APIs where subscriptions are involved ([Electronic Bill of Lading](https://app.swaggerhub.com/apis/dcsaorg/DCSA_EBL), [Operational Vessel Schedules](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS))
+The Events Domain contains all definitions and components used for Events. Events are primarily used in Event Hubs ([Track & Trace](https://app.swaggerhub.com/apis/dcsaorg/DCSA_TNT) (>= v2.1.0), [Documentation Hub](https://app.swaggerhub.com/apis/dcsaorg/DOCUMENTATION_EVENT_HUB) and [Operational Vessel Schedule Hub](https://app.swaggerhub.com/apis/dcsaorg/OVS_EVENT_HUB)). Events are also used in all polling endPoints in APIs where subscriptions are involved ([Electronic Bill of Lading](https://app.swaggerhub.com/apis/dcsaorg/DCSA_EBL), [Operational Vessel Schedules](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS) (>= v1.1.1))
 
 https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event
 
