@@ -10,6 +10,8 @@ Chapter 4.1 of the [DCSA API Guidelines](https://dcsa.org/wp-content/uploads/202
 
 Where `X` is the Major version, `Y` is the Minor version and `Z` is the patch version.
 
+A changelog will be located in each folder describing differences between versions.
+
 ### DCSA
 This domain is used to define single components (not objects) used in other Domains or APIs. No objects should be defined here.
 
@@ -30,6 +32,11 @@ The error object used in all APIs is defined here. This allows for a consistent 
 https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/error
 
 ### Event
+The Events Domain contains all definitions and components used for Events. Events are primarily used in Event Hubs ([Track & Trace](https://app.swaggerhub.com/apis/dcsaorg/DCSA_TNT) (>= v2.1.0), [Documentation Hub](https://app.swaggerhub.com/apis/dcsaorg/DOCUMENTATION_EVENT_HUB) and [Operational Vessel Schedule Hub](https://app.swaggerhub.com/apis/dcsaorg/OVS_EVENT_HUB)). Events are also used in all polling endPoints in APIs where subscriptions are involved ([Electronic Bill of Lading](https://app.swaggerhub.com/apis/dcsaorg/DCSA_EBL), [Operational Vessel Schedules](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS))
 
+https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event
 
 ### OVS
+This domain is used for the [Operational Schedule Vessel](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS) API (>= v1.1.1). The domain is a collection of objects consisting of components defined in the DCSA Domain.
+
+https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/ovs
