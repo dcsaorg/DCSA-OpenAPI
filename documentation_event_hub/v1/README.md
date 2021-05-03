@@ -2,6 +2,7 @@
 
 The DCSA Interface Standard for eDocumentation Hub is documented on the [**DCSA DOCUMENTATION_EVENT_HUB SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DOCUMENTATION_EVENT_HUB).
 
+The purpose of an Event Hub is to send events and manage subscriptions. In case of the eDocumentation Hub, this hub **only** manages ShipmentEvents. It is only possible to receive ShipmentEvents and subscribe to ShipmentEvents when implementing this hub.
 
 ### Releasenotes
 
