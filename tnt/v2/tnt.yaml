@@ -1,8 +1,11 @@
-openapi: 3.0.0
+openapi: 3.0.3
 info:
   version: 2.1.0
   title: 'DCSA OpenAPI specification for Track & Trace'
-  description: 'API specification issued by DCSA.org'
+  description: |
+    Managing and sending Shipment-, Transport- and Equipment-events and subscriptions for Track &amp; Trace (T&amp;T).
+    
+#    This API is a subset of <a href='https://app.swaggerhub.com/apis/dcsaorg/EVENT_HUB'>DCSA Event Hub</a> which can send and manage all DCSA defined Events.
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -23,155 +26,185 @@ paths:
       summary: Find events.
       description: Returns all events filtered by the parameters.
       parameters:
+        # OBS: Be aware that changing the parameters requires a manual change in other APIs
+
+        # The eventType parameter is needed when more than one Event type can be returned
         - in: query
           name: eventType
-          description: The type of event(s) to filter by.
+          description: 'The type of event(s) to filter by. Default value is all event types if no value(s) is selected. It is possible to select any combination of values by comma separating values'
           required: false
           schema:
-            $ref: '#/components/schemas/eventTypeList'
-        - in: query
-          name: carrierBookingReference
-          description: The identifier for a shipment, which is issued by and unique within each of the carriers.
-          required: false
-          schema:
-            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/carrierBookingReference'
-        - in: query
-          name: transportDocumentID
-          description:  The Transport Document ID number is an identifier that links to a shipment, i.e. a Bill of Lading or a Sea Waybill. A bill of lading is the document of title to the goods issued to the customer which confirms the carrier's receipt of the cargo from the customer, acknowledging goods being shipped and specifying the terms of delivery. 
-            The Sea Waybill is a simpler document, the main difference being that it is non-negotiable. 
-          required: false
-          schema:
-            $ref: '#/components/schemas/transportDocumentID'
-        - in: query
-          name: equipmentReference
-          description: The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.
-          required: false
-          schema:
-            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/equipmentReference'
-        - in: query
-          name: scheduleID
-          description: ID uniquely identifying a schedule, to filter events by.
-          required: false
-          schema:
-            $ref: '#/components/schemas/scheduleID'
-        - in: query
-          name: transportCallID
-          description: ID uniquely identifying a transport call, to filter events by.
-          required: false
-          schema:
-            $ref: '#/components/schemas/transportCallID'   
-        - in: query
-          name: limit
-          description: Maximum number of items to return. 
-          schema:
-            $ref: '#/components/parameters/limitParam'
-        - in: query
-          name: cursor
-          description: A server generated value to specify a specific point in a collection result, used for pagination.
-          schema:
-            $ref: '#/components/parameters/cursorParam'    
+            $ref: '#/components/schemas/eventTypes'
+
+        # Chunk with Shipment related event parameters
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/shipmentEventType'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/carrierBookingReference'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/bookingReference'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/transportDocumentID'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/transportDocumentTypeCode'
+
+        # Chunk with Transport related event parameters
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/transportEventType'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/scheduleID'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/transportCallID'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/vesselIMONumber'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/carrierVoyageNumber'
+
+        # Chunk with Equipment related event parameters
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/equipmentEventType'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/equipmentReference'
+
+        # Chunk with base event parameters
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/eventCreatedDateTime'
+
+        # Chunk with event parameters needed to be included in all APIs
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/parameters/limit'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/parameters/cursor'
       responses:
         '200':
           description: Successful operation
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/API-Version'
+            Current-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/Current-Page'
+            Next-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/Next-Page'
+            Prev-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/Prev-Page'
+            Last-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/Last-Page'
+            First-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/First-Page'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/events'
         default:
           description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/API-Version'
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.0.0#/components/schemas/error'
   /events/{eventID}:
     get:
-      parameters:
-        - in: path
-          name: eventID
-          schema:
-            type: string
-          required: true
-          description: The ID of the event to receive
       tags:
         - Events
       summary: Find events by eventID.
       description: Returns event with the specified eventID.
+      parameters:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/eventID'
       responses:
         '200':
           description: Successful operation
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/API-Version'
           content:
             application/json:
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/transportEvent'
-                  - $ref: '#/components/schemas/shipmentEvent'
-                  - $ref: '#/components/schemas/equipmentEvent'
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/shipmentEvent'
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/transportEvent'
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/equipmentEvent'
                 discriminator:
                   propertyName: eventType
                 example: #Couldn't use $ref in this example. Should be updated manually if shipmentEvent changes
-                  eventID: "84db923d-2a19-4eb0-beb5-446c1ec57d34"
-                  eventType: "SHIPMENT"
-                  eventDateTime: "2019-11-12T07:41:00+08:30"
-                  eventClassifierCode: "ACT"
-                  eventTypeCode: "ARRI"
-                  shipmentID: "123e4567-e89b-12d3-a456-426614174000"
-                  shipmentInformationTypeCode: "SRM"
+                  eventID: '84db923d-2a19-4eb0-beb5-446c1ec57d34'
+                  eventType: 'SHIPMENT'
+                  eventCreatedDateTime: '2019-11-12T07:41:00+08:30'
+                  eventSubtype: 'ISSU'
+                  documentID: '84db923d-2a19-4eb0-beb5-446c1ec57d34'
+                  shipmentInformationType: "TRD"
+                  reason: 'All good'
         default:
           description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/API-Version'
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.0.0#/components/schemas/error'
 
   /event-subscriptions:
     get:
       tags:
       - Subscriptions
-      summary: Receive a list of your active event subscriptions
+      summary: Receive a list of your active subscriptions
       responses:
         '200':
-          description: Returns a list of event subscriptions
+          description: Returns a list of subscriptions
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/API-Version'
+            Current-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/Current-Page'
+            Next-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/Next-Page'
+            Prev-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/Prev-Page'
+            Last-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/Last-Page'
+            First-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/First-Page'
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/eventSubscription'
+                  $ref: '#/components/schemas/subscription'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.0.0#/components/schemas/error'
     post:
       tags:
       - Subscriptions
-      summary: Create an event subscription
+      summary: Create a subscription
       requestBody:
-        description: Parameters used to configure the subscription
+        description: 'Parameters used to configure the subscription. It is possible to only receive cirtain types of events by adding filter values to the subscription.'
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/eventSubscriptionBody'
+              $ref: '#/components/schemas/subscriptionBody'
       responses:
         '201':
           description: Subscription created
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/API-Version'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/eventSubscription'
+                $ref: '#/components/schemas/subscription'
         default:
           description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/API-Version'
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.0.0#/components/schemas/error'
       callbacks:
         event:
           '{$request.body.callbackUrl}':
             post:   # Method
               parameters:
-                - in: header
-                  name: Signature
-                  required: true
-                  explode: true
-                  schema:
-                    $ref: '#/components/headers/signatureHeader'
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/signatureHeader'
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/subscriptionIDHeader'
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/notificationSignature'
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/apiVersion'
               requestBody: # Contents of the callback message
                 required: true
                 content:
@@ -180,434 +213,135 @@ paths:
                       $ref: '#/components/schemas/events'
               responses:   # Expected responses to the callback message
                 '200':
-                  description: Your server returns this code if it accepts the callback
+                  description: 'Your server returns this code if it accepts the callback'
   /event-subscriptions/{subscriptionID}:
     get:
       tags:
       - Subscriptions
-      summary: Find event subscription by subscription ID
+      summary: Find a subscription by subscription ID
       parameters:
-        - in: path
-          name: subscriptionID
-          required: true
-          description: The universal unique ID of the subscription to receive.
-          schema:
-            $ref: '#/components/parameters/subscriptionIDPathParam'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/subscriptionID'
       responses:
         '200':
           description: Subscription returned
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/API-Version'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/eventSubscription'
+                $ref: '#/components/schemas/subscription'
         default:
           description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/API-Version'
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.0.0#/components/schemas/error'
     delete:
       tags:
       - Subscriptions
-      summary: Stop an event subscription, using the subscription ID
+      summary: Stop a subscription, using the subscription ID
       parameters:
-        - in: path
-          name: subscriptionID
-          required: true
-          schema:
-            $ref: '#/components/parameters/subscriptionIDPathParam'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/subscriptionID'
       responses:
         '204':
           description: Subscription stopped
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/API-Version'
         default:
           description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/API-Version'
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.0.0#/components/schemas/error'
     put:
       tags:
       - Subscriptions
-      summary: Alter an event subscription
+      summary: Alter a subscription
       parameters:
-        - in: path
-          name: subscriptionID
-          required: true
-          schema:
-            $ref: '#/components/parameters/subscriptionIDPathParam'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/subscriptionID'
       requestBody:
         description: Parameters used to configure the subscription
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/eventSubscription'
+              $ref: '#/components/schemas/subscription'
       responses:
         '200':
           description: Subscription updated
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/API-Version'
           content:
             application/json:
               schema:
-               $ref: '#/components/schemas/eventSubscription'
+                $ref: '#/components/schemas/subscription'
         default:
           description: Unexpected error
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/error'
-      callbacks:
-        event:
-          '{$request.body.callbackUrl}':
-            post:   # Method
-              parameters:
-                - in: header
-                  name: Signature
-                  required: true
-                  explode: true
-                  schema:
-                    $ref: '#/components/headers/signatureHeader'
-              requestBody: # Contents of the callback message
-                required: true
-                content:
-                  application/json:
-                    schema:
-                      $ref: '#/components/schemas/events'
-              responses:   # Expected responses to the callback message
-                '200':
-                  description: Your server returns this code if it accepts the callback
- 
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.0.0#/components/schemas/error'
 
 components:
+
+  ##############################
+  # All events and subscriptions
+  ##############################
+
   schemas:
-    event:
-      description: The event entity is described as a generalization of all the specific event categories. An event always takes place in relation to a shipment and can additionally be linked to a transport or an equipment
-      type: object
-      properties:
-        eventID:
-          $ref: '#/components/schemas/eventID'
-        eventType:
-          $ref: '#/components/schemas/eventType'
-        eventDateTime:
-          $ref: '#/components/schemas/eventDateTime'
-        eventClassifierCode:
-          $ref: '#/components/schemas/eventClassifierCode'
-        eventTypeCode:
-          $ref: '#/components/schemas/eventTypeCode'
-      required:
-        - eventID
-        - eventType
-        - eventDateTime
-        - eventClassifierCode
-        - eventTypeCode
-    shipmentEvent:
-      description: The shipment event entity is a specialization of the event entity to support specification of data that only applies to a shipment event.
-      allOf:
-        - $ref: '#/components/schemas/event'
-        - type: object
-          properties:
-            eventType: #Overriding this property to have correct payload response examples
-              type: string
-              example: SHIPMENT
-              nullable: false
-              enum:
-                - SHIPMENT
-            eventTypeCode:
-              type: string
-              example: RECE
-              enum: 
-                - RECE
-                - CONF
-                - ISSU
-                - APPR
-                - SUBM
-                - SURR
-                - REJE
-                - PENA
-              nullable: false
-              maxLength: 4
-              description: | 
-                Unique identifier for Event Type Code. For shipment events this can be:
-                - RECE (Received)
-                - CONF (Confirmed)
-                - ISSU (Issued)
-                - APPR (Approved)
-                - SUBM (Submitted)
-                - SURR (Surrendered)
-                - REJE (Rejected)
-                - PENA (Pending approval)
-            shipmentInformationTypeCode:
-              $ref: '#/components/schemas/shipmentInformationTypeCode'
-            shipmentID:
-              $ref: '#/components/schemas/shipmentID'
-          required:
-            - shipmentInformationTypeCode
-    transportEvent:
-      description: The transport event entity is a specialization of the event entity to support specification of data that only applies to a transport event.
-      allOf:
-        - $ref: '#/components/schemas/event'
-        - type: object
-          properties:
-            eventType: #Overriding this property to have correct payload response examples
-              type: string
-              example: TRANSPORT
-              nullable: false
-              enum:
-                - TRANSPORT
-            eventTypeCode:
-              type: string
-              example: ARRI
-              enum: 
-                - ARRI
-                - DEPA
-              nullable: false
-              maxLength: 4
-              description: Unique identifier for Event Type Code, for transport events this is either ARRI (Arrival) or DEPA (Departure). 
-            delayReasonCode:
-              $ref: '#/components/schemas/delayReasonCode'
-            vesselScheduleChangeRemark:
-              $ref: '#/components/schemas/vesselScheduleChangeRemark'
-            transportCallID:
-              $ref: '#/components/schemas/transportCallID'      
-          required:
-            - transportCallID
-    equipmentEvent:
-      description: The equipment event entity is a specialization of the event entity to support specification of data that only applies to an equipment event.
-      allOf:
-        - $ref: '#/components/schemas/event'
-        - type: object
-          properties:
-            eventType: #Overriding this property to have correct payload response examples
-              type: string
-              example: EQUIPMENT
-              nullable: false
-              enum:
-                - EQUIPMENT
-            eventTypeCode:
-              type: string
-              example: LOAD
-              enum: 
-                - LOAD
-                - DISC
-                - GTIN
-                - GTOT
-                - STUF
-                - STRP
-              nullable: false
-              maxLength: 4
-              description: | 
-                Unique identifier for Event Type Code. For equipment events this can be:
-                - LOAD (Load)
-                - DISC (Discharge)
-                - GTIN (Gate in)
-                - GTOT (Gate out)
-                - STUF (Stuffing)
-                - STRP (Stripping)
-            equipmentReference:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/equipmentReference'
-            emptyIndicatorCode:
-              $ref: '#/components/schemas/emptyIndicatorCode'
-            transportCallID:
-              $ref: '#/components/schemas/transportCallID'    
-          required:
-            - emptyIndicatorCode
-            - transportCallID
+
     events:
       type: array
-      description: List of events for shipment journey.
       items:
         anyOf:
-          - $ref: '#/components/schemas/transportEvent'
-          - $ref: '#/components/schemas/shipmentEvent'
-          - $ref: '#/components/schemas/equipmentEvent'
-        discriminator:
-          propertyName: eventType
-      required:
-        - events
-    eventSubscriptionBody:
-      description: The object used by the POST event-subscriptions endpoint
-      type: object
-      properties:
-        callbackUrl:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/callbackUrl'
-        eventType:
-          $ref: '#/components/schemas/eventTypeList'
-        carrierBookingReference:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/carrierBookingReference'
-        transportDocumentID:
-          $ref: '#/components/schemas/transportDocumentID'
-        transportDocumentTypeCode:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/transportDocumentTypeCode'  
-        equipmentReference:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/equipmentReference'
-        scheduleID:  
-          $ref: '#/components/schemas/scheduleID'
-        transportCallID:  
-          $ref: '#/components/schemas/transportCallID'
-      required:
-        - callbackUrl
-    eventSubscription:
-      allOf:
-        - $ref: '#/components/schemas/subscriptionID'
-        - $ref: '#/components/schemas/eventSubscriptionBody'
-    
-####String variables below
+          - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/shipmentEvent'
+          - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/transportEvent'
+          - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/equipmentEvent'
 
-    transportDocumentID:
-      type: string
-      example: ABCD421911263977
-      maxLength: 20
-      description: The Transport Document ID number is an identifier that links to a shipment, i.e. a Bill of Lading or a Sea Waybill. A bill of lading is the document of title to the goods issued to the customer which confirms the carrier's receipt of the cargo from the customer, acknowledging goods being shipped and specifying the terms of delivery. 
-        The Sea Waybill is a simpler document, the main difference being that it is non-negotiable. 
-    emptyIndicatorCode:
-      type: string
-      example: EMPTY
-      enum:
-        - EMPTY
-        - LADEN
-      nullable: false
-      description: Code to denote whether the equipment is empty or laden.
-    shipmentInformationTypeCode:
-      type: string
-      example: SRM
-      enum:
-        - BOK
-        - SHI
-        - VGM
-        - SRM
-        - TRD
-        - ARN
-      maxLength: 3
-      description: | 
-        The code to identify the type of information that is related to the shipment. This code can have the values:
-        - BOK (Booking)
-        - SHI (Shipping Instruction)
-        - VGM (Verified Gross Mass)
-        - SRM (Shipment Release Message)
-        - TRD (Transport Document)
-        - ARN (Arrival Notice)
-      nullable: false
-    eventDateTime:
-      type: string
-      format: date-time
-      example: '2019-11-12T07:41:00+08:30'
-      description: The local date and time, where the event took place, in ISO 8601 format.
-    eventID:
-      type: string
-      format: uuid
-      example: "84db923d-2a19-4eb0-beb5-446c1ec57d34"
-      description: The unique identifier for the Equipment Event ID/Transport Event ID/Shipment Event ID.
-      nullable: false
-    eventClassifierCode:
-      type: string
-      enum:
-        - PLN
-        - ACT
-        - EST
-      example: ACT
-      maxLength: 3
-      nullable: false
-      description: Code for the event classifier, either PLN (Planned), ACT (Actual) or EST (Estimated).
-    eventTypeCode:
-      type: string
-      example: ARRI
-      maxLength: 4
-      description: Unique identifier for Event Type Code. This code has different ENUM values depending on the type of event
-    subscriptionID:
-      type: object
-      properties:
-        subscriptionID:
-          type: string
-          format: uuid
-          example: 123e4567-e89b-12d3-a456-426614174000
-      description: The carrier issues a unique ID to the shipper or consignee for that subscription
-    eventType:
-      description: The Event Type of the object.
-      nullable: false
-      type: string
-      enum:
-        - EQUIPMENT
-        - SHIPMENT
-        - TRANSPORT
-    eventTypeList:
-      description: A list of event types. Default is all events
-      example: [EQUIPMENT,SHIPMENT,TRANSPORT]
+    eventTypes:
+      description: 'A list of event types. Default is all events.'
+      example: [EQUIPMENT,TRANSPORT]
       default: [EQUIPMENT,SHIPMENT,TRANSPORT]
       type: array
       items:
-        $ref: '#/components/schemas/eventType'
-    delayReasonCode:
-      description: Reason code for the delay. The SMDG-Delay-Reason-Codes are used for this attribute. The code list can be found at http://www.smdg.org/smdg-code-lists/
-      type: string
-      maxLength: 3
-      example: WEA
-    vesselScheduleChangeRemark:
-      description: Free text information provided by the vessel operator regarding the reasons for the change in schedule and/or plans to mitigate schedule slippage.
-      type: string
-      example: Bad weather
-      maxLength: 250
-    shipmentID:
-      description: ID uniquely identifying a shipment
-      type: string
-      format: uuid
-      example: 123e4567-e89b-12d3-a456-426614174000
-      nullable: false
-    scheduleID:
-      description: ID uniquely identifying a schedule
-      type: string
-      format: uuid
-      example: 123e4567-e89b-12d3-a456-426614174000
-      nullable: false
-    transportCallID:
-      description: The unique identifier for a transport call
-      type: string
-      format: uuid
-      example: 123e4567-e89b-12d3-a456-426614174000
-      nullable: false
-  headers:
-    signatureHeader:
-      schema:
-        type: object
-        properties:
-          keyId:
-            type: string
-            format: uuid
-            example: 123e4567-e89b-12d3-a456-426614174000
-          created:
-            type: integer
-            example: 1591960384 
-          headers:
-            type: string
-            example: "(request-target) (created) date host"
-          signature:
-            type: string
-            example: aGkgZnJvbSBkZW5tYXJr
-  parameters:    
-    limitParam:
-      name: limit
-      in: query
-      description: Maximum number of items to return.
-      required: false
-      schema:
-        type: integer
-        format: int32
-        minimum: 1
-      #  maximum: 100
-        default: 100 
-      example: 100
-    cursorParam:
-      name: cursor
-      in: query
-      description: A server generated value to specify a specific point in a collection result, used for pagination.
-      required: false
-      schema:
         type: string
-      example: abc123 
-    subscriptionIDPathParam:
-      name: subscriptionID
-      in: path
-      description: The universal unique ID of the subscription to receive.
-      required: true
-      schema:
-        type: string
-        format: uuid
-      example: 123e4567-e89b-12d3-a456-426614174000
+        enum:
+          - EQUIPMENT
+          - SHIPMENT
+          - TRANSPORT
+        # $ref: '#/components/schemas/eventType'
+
+    subscriptionBody:
+      type: object
+      allOf:
+        - type: object
+          properties:
+            callbackUrl:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/callbackUrl'
+        - type: object
+          properties:
+            eventType:
+              $ref: '#/components/schemas/eventTypes'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/shipmentSubscriptionBody'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/transportSubscriptionBody'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/equipmentSubscriptionBody'
+      required:
+        - callbackUrl
+
+    subscription:
+      type: object
+      allOf:
+        - type: object
+          properties:
+            subscriptionID:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/subscriptionID'
+        - $ref: '#/components/schemas/subscriptionBody'
