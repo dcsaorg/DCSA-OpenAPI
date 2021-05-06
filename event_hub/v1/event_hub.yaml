@@ -1,18 +1,20 @@
 openapi: 3.0.3
 info:
-  version: 2.1.0
-  title: 'DCSA OpenAPI specification for Track & Trace'
+  version: 1.0.0
+  title: DCSA Event Hub
   description: |
-    Managing and sending Shipment-, Transport- and Equipment-events and subscriptions for Track &amp; Trace (T&amp;T).
+    Managing and sending all DCSA defined events and subscriptions.
     
-#    This API is a subset of <a href='https://app.swaggerhub.com/apis/dcsaorg/EVENT_HUB'>DCSA Event Hub</a> which can send and manage all DCSA defined Events.
-  license:
-    name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
-  contact:
-    name: Digital Container Shipping Association (DCSA)
-    url: https://dcsa.org
-    email: info@dcsa.org
+    This API implements the following Event types:
+    - Shipment Events (used by <a href='https://app.swaggerhub.com/apis/dcsaorg/DCSA_EBL'>Electronic Bill of Lading (EBL)</a> and <a href='https://app.swaggerhub.com/apis/dcsaorg/DCSA_TNT'>Track &amp; Trace (TNT)</a>)
+    - Equipment Events (used by <a href='https://app.swaggerhub.com/apis/dcsaorg/DCSA_TNT'>Track &amp; Trace (TNT)</a>)
+    - Transport Events (used by <a href='https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS'>Operational Vessel Schedules (OVS)</a> and <a href='https://app.swaggerhub.com/apis/dcsaorg/DCSA_TNT'>Track &amp; Trace (TNT)</a>)
+    - Operations Events (used by <a href='https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS'>Operational Vessel Schedules (OVS)</a>)
+    
+    This API is an aggregation of:
+    - <a href='https://app.swaggerhub.com/apis/dcsaorg/DOCUMENTATION_EVENT_HUB'>Documentation Event Hub</a> (event and subscription handling for Shipment events used by Electronic Bill of Lading)
+    - <a href='https://app.swaggerhub.com/apis/dcsaorg/OVS_EVENT_HUB'>OVS Event Hub</a> (event and subscription handling for Transport- and Operation-Events used by Operational Vessel Schedules)
+    - <a href='https://app.swaggerhub.com/apis/dcsaorg/DCSA_TNT'>T&amp;T</a> (event and subscription handling for Shipment-, Transport- and Equipment-Events)
 tags:
   - name: Events
     description: Event operations
@@ -54,10 +56,13 @@ paths:
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/equipmentEventType'
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/equipmentReference'
 
+        # Chunk with Operations related event parameters
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/operationsEventType'
+        
         # Chunk with base event parameters
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/eventCreatedDateTime'
-
-        # Chunk with event parameters needed to be included in all APIs
+        
+        # Chunk with collection parameters needed to be included in all APIs
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/parameters/limit'
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/parameters/cursor'
       responses:
@@ -110,9 +115,11 @@ paths:
                   - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/shipmentEvent'
                   - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/transportEvent'
                   - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/equipmentEvent'
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/operationsEvent'
                 discriminator:
                   propertyName: eventType
-                example: #Couldn't use $ref in this example. Should be updated manually if shipmentEvent changes
+                #Couldn't use $ref in this example. Should be updated manually if shipmentEvent changes
+                example:
                   eventID: '84db923d-2a19-4eb0-beb5-446c1ec57d34'
                   eventType: 'SHIPMENT'
                   eventCreatedDateTime: '2019-11-12T07:41:00+08:30'
@@ -135,6 +142,13 @@ paths:
       tags:
       - Subscriptions
       summary: Receive a list of your active subscriptions
+      parameters:
+        - in: query
+          name: eventType
+          description: 'The type of event(s) to filter by. Default value is all event types if no value(s) is selected. It is possible to select any combination of values by comma separating values'
+          required: false
+          schema:
+            $ref: '#/components/schemas/eventTypes'
       responses:
         '200':
           description: Returns a list of subscriptions
@@ -286,10 +300,14 @@ paths:
                 $ref: '#/components/schemas/subscription'
         default:
           description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/API-Version'
           content:
             application/json:
               schema:
                 $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.0.0#/components/schemas/error'
+
 
 components:
 
@@ -306,18 +324,21 @@ components:
           - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/shipmentEvent'
           - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/transportEvent'
           - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/equipmentEvent'
+          - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/operationsEvent'
 
     eventTypes:
-      description: 'A list of event types. Default is all events.'
-      example: [EQUIPMENT,TRANSPORT]
-      default: [EQUIPMENT,SHIPMENT,TRANSPORT]
+      description: 'A comma separated list of event types. Default is all events.'
+      example: [EQUIPMENT,SHIPMENT,TRANSPORT]
+      default: [EQUIPMENT,SHIPMENT,TRANSPORT,OPERATIONS]
       type: array
       items:
         type: string
+        
         enum:
           - EQUIPMENT
           - SHIPMENT
           - TRANSPORT
+          - OPERATIONS
         # $ref: '#/components/schemas/eventType'
 
     subscriptionBody:
@@ -334,6 +355,7 @@ components:
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/shipmentSubscriptionBody'
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/transportSubscriptionBody'
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/equipmentSubscriptionBody'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/operationsSubscriptionBody'
       required:
         - callbackUrl
 

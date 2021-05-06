@@ -1,0 +1,64 @@
+# OpenAPI version identifier - required for OpenAPI 3.0 domains
+openapi: 3.0.3
+
+#######################
+# Optional info section
+#######################
+info:
+  title: DCSA Error Domain
+  description: |
+    Common error components for DCSA APIs. Components here are used by all DCSA APIs and Domains.
+  version: '1.0.0'
+
+components:
+  schemas:
+    subErrors:
+      type: array
+      items:
+        type: object
+        properties:
+          reason:
+            description: 'High level error message.'
+            type: string
+            example: 'invalidQuery'
+          message:
+            description: 'Detailed error message.'
+            type: string
+            example: 'The request did not contain one of the three required query parameters.'
+        required:
+         - reason
+         - message
+         
+    error:
+      type: object
+      properties:
+        httpMethod:
+          description: 'The HTTP request method type'
+          type: string
+          example: POST
+        requestUri:
+          description: 'The request URI.'
+          type: string
+          example: 'https://dcsa.org/dcsa/tnt/v1/events'
+        errors:
+          $ref: '#/components/schemas/subErrors'
+        statusCode:
+          description: 'The HTTP status code'
+          type: integer
+          example: 400
+        statusCodeText:
+          description: 'The textual representation of the response status.'
+          type: string
+          example: 'Bad Request'
+        errorDateTime:
+          description: 'The date and time (in ISO 8601 format) the error occurred.'
+          type: string
+          format: $date-time
+          example: '2019-11-12T07:41:00+08:30'
+      required:
+        - httpMethod
+        - requestUri
+        - errors
+        - statusCode
+        - statusCodeText
+        - errorDateTime

@@ -1,18 +1,11 @@
 openapi: 3.0.3
 info:
-  version: 2.1.0
-  title: 'DCSA OpenAPI specification for Track & Trace'
+  version: 1.0.0
+  title: DCSA Operational Vessel Schedules (OVS) Event Hub
   description: |
-    Managing and sending Shipment-, Transport- and Equipment-events and subscriptions for Track &amp; Trace (T&amp;T).
+    Managing and sending Transport- and Operations- Events and subscriptions for OVS. It is recomended (but not required) that implementors of the <a href='https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS'>Operational Vessel Schedules (OVS) API</a> also implements this API.
     
 #    This API is a subset of <a href='https://app.swaggerhub.com/apis/dcsaorg/EVENT_HUB'>DCSA Event Hub</a> which can send and manage all DCSA defined Events.
-  license:
-    name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
-  contact:
-    name: Digital Container Shipping Association (DCSA)
-    url: https://dcsa.org
-    email: info@dcsa.org
 tags:
   - name: Events
     description: Event operations
@@ -23,8 +16,8 @@ paths:
     get:
       tags:
         - Events
-      summary: Find events.
-      description: Returns all events filtered by the parameters.
+      summary: Find Transport and Operations events.
+      description: Returns Transport and Operations events filtered by the parameters.
       parameters:
         # OBS: Be aware that changing the parameters requires a manual change in other APIs
 
@@ -36,26 +29,11 @@ paths:
           schema:
             $ref: '#/components/schemas/eventTypes'
 
-        # Chunk with Shipment related event parameters
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/shipmentEventType'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/carrierBookingReference'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/bookingReference'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/transportDocumentID'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/transportDocumentTypeCode'
+        # Chunk with Operations related event parameters
 
         # Chunk with Transport related event parameters
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/transportEventType'
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/scheduleID'
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/transportCallID'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/vesselIMONumber'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/carrierVoyageNumber'
-
-        # Chunk with Equipment related event parameters
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/equipmentEventType'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/equipmentReference'
-
-        # Chunk with base event parameters
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/eventCreatedDateTime'
 
         # Chunk with event parameters needed to be included in all APIs
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/parameters/limit'
@@ -93,8 +71,8 @@ paths:
     get:
       tags:
         - Events
-      summary: Find events by eventID.
-      description: Returns event with the specified eventID.
+      summary: Find Transport and Operations events by eventID.
+      description: Returns Transport and Operations event with the specified eventID.
       parameters:
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/eventID'
       responses:
@@ -107,19 +85,20 @@ paths:
             application/json:
               schema:
                 oneOf:
-                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/shipmentEvent'
                   - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/transportEvent'
-                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/equipmentEvent'
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/operationsEvent'
                 discriminator:
                   propertyName: eventType
-                example: #Couldn't use $ref in this example. Should be updated manually if shipmentEvent changes
+                example: #Couldn't use $ref in this example. Should be updated manually if transportEvent changes
                   eventID: '84db923d-2a19-4eb0-beb5-446c1ec57d34'
-                  eventType: 'SHIPMENT'
-                  eventCreatedDateTime: '2019-11-12T07:41:00+08:30'
-                  eventSubtype: 'ISSU'
-                  documentID: '84db923d-2a19-4eb0-beb5-446c1ec57d34'
-                  shipmentInformationType: "TRD"
-                  reason: 'All good'
+                  eventCreatedDateTime: '2021-01-09T14:12:56+01:00'
+                  eventType: 'TRANSPORT'
+                  eventClassifierCode: 'ACT'
+                  eventDateTime: '2019-11-12T07:41:00+08:30'
+                  transportEventtype: 'ARRI'
+                  delayReasonCode: 'WEA'
+                  vesselScheduleChangeRemark: 'Bad weather'
+                  transportCallID: '123e4567-e89b-12d3-a456-426614174000'
         default:
           description: Unexpected error
           headers:
@@ -286,10 +265,14 @@ paths:
                 $ref: '#/components/schemas/subscription'
         default:
           description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/API-Version'
           content:
             application/json:
               schema:
                 $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.0.0#/components/schemas/error'
+
 
 components:
 
@@ -298,25 +281,22 @@ components:
   ##############################
 
   schemas:
-
     events:
       type: array
       items:
         anyOf:
-          - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/shipmentEvent'
           - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/transportEvent'
-          - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/equipmentEvent'
-
+          - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/operationsEvent'
+    
     eventTypes:
       description: 'A list of event types. Default is all events.'
-      example: [EQUIPMENT,TRANSPORT]
-      default: [EQUIPMENT,SHIPMENT,TRANSPORT]
+      example: [OPERATIONS,TRANSPORT]
+      default: [OPERATIONS,TRANSPORT]
       type: array
       items:
         type: string
         enum:
-          - EQUIPMENT
-          - SHIPMENT
+          - OPERATIONS
           - TRANSPORT
         # $ref: '#/components/schemas/eventType'
 
@@ -331,9 +311,8 @@ components:
           properties:
             eventType:
               $ref: '#/components/schemas/eventTypes'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/shipmentSubscriptionBody'
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/transportSubscriptionBody'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/equipmentSubscriptionBody'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/operationsSubscriptionBody'
       required:
         - callbackUrl
 
