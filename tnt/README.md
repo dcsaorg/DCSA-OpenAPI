@@ -14,6 +14,7 @@ Publication related to this specification:
 ### Upcomming releases (**public but not published**)
 
 #### [v1.2.1](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/1.2.1)
+The primary fovus of this release is fixing the subscription-problems discovered in v1.2.0. The new subscription system (specially the callbacks) used in this API can be read here: {missing link as it has not been approved yet}.
 * Update openAPI version to 3.0.3
 * Bump version to 1.2.1
 * Removed virtual server specification as we do not have a sandbox running this
