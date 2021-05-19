@@ -11,6 +11,29 @@ Publication related to this specification:
 -	[DCSA Interface for Track and Trace 1.2 Reading Guide]( https://dcsa.org/wp-content/uploads/2020/05/DCSA-Interface-Standard-for-Track-and-Trace-Reading-Guide-1.2.pdf)
 -	[Glossary of Terms](https://knowledge.dcsa.org/s/glossary)
 
+### Upcomming releases (**public but not published**)
+
+#### [v1.2.1](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/1.2.1)
+* Update openAPI version to 3.0.3
+* Bump version to 1.2.1
+* Removed virtual server specification as we do not have a sandbox running this
+* changed definition of array-queryParameters (ex: eventType). This is now a comma (,) separated list
+* Added limit and cursor queryParameter to `GET /events` and `GET /event-subscriptions`
+* Added `API-Version` header to **all** endPoint responses
+* Added `Current-Page`, `Next-Page`, `Prev-Page`, `Last-Page` and `First-Page` headers to `GET /events` and `GET /event-subscriptions` responses
+* Added default error handling in `GET /event-subscriptions
+* Callbacks updated:
+  * Deprecated the `Signature` header as the new `Notification-Signature` is to be used instead
+  * Added `Subscription-ID` header to include the subscriptionID causing the Event to be sent
+  * Added `Notification-Signature` header which is the new Signature used to validate the authenticity of the Event
+  * Added `API-Version` header to include the version of API **sending the event**
+* Added `PUT /event-subscriptions/{subscriptionID}/secret` endPoint to update the shared secret used to create the `Notification-Signature`
+* Split subscription body in 2:
+  * One used for `POST /event-subscriptions` calls which includes the secret
+  * One without the secret used for `GET /event-subscriptions/{subscriptionID}` and `PUT /event-subscriptions/{subscriptionID}`
+  * 
+* Internal cleanup
+
 ### Releasenotes
 
 ### [v2.0.1](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/2.0.1)
