@@ -22,7 +22,7 @@ The primary fovus of this release is fixing the subscription-problems discovered
 * Added limit and cursor queryParameter to `GET /events` and `GET /event-subscriptions`
 * Added `API-Version` header to **all** endPoint responses
 * Added `Current-Page`, `Next-Page`, `Prev-Page`, `Last-Page` and `First-Page` headers to `GET /events` and `GET /event-subscriptions` responses
-* Added default error handling in `GET /event-subscriptions
+* Added default error handling in `GET /event-subscriptions`
 * Callbacks updated:
   * Deprecated the `Signature` header as the new `Notification-Signature` is to be used instead
   * Added `Subscription-ID` header to include the subscriptionID causing the Event to be sent
