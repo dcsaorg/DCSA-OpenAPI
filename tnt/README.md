@@ -17,7 +17,6 @@ Publication related to this specification:
 The primary fovus of this release is fixing the subscription-problems discovered in v1.2.0. The new subscription system (specially the callbacks) used in this API can be read here: {missing link as it has not been approved yet}.
 * Update openAPI version to 3.0.3
 * Bump version to 1.2.1
-* Removed virtual server specification as we do not have a sandbox running this
 * changed definition of array-queryParameters (ex: eventType). This is now a comma (,) separated list
 * Added limit and cursor queryParameter to `GET /events` and `GET /event-subscriptions`
 * Added `API-Version` header to **all** endPoint responses
