@@ -1,0 +1,351 @@
+openapi: 3.0.3
+info:
+  version: 2.0.0
+  title: 'DCSA OpenAPI specification for Operational Vessel Schedules'
+  description: 'API specification issued by DCSA.org'
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  contact:
+    name: Digital Container Shipping Association (DCSA)
+    url: https://dcsa.org
+    email: info@dcsa.org
+tags:
+  - name: Operational Vessel Schedules
+    description: Operational Vessel Schedules operations
+  - name: Events
+paths:
+  /transport-calls:
+    get:
+      tags:
+        - Operational Vessel Schedules
+      summary: Find transport calls
+      description: Returns all Transport Calls filtered by the parameters.
+      parameters:
+        - $ref: '#/components/parameters/carrierServiceCode'
+        - $ref: '#/components/parameters/vesselIMONumber'
+        - $ref: '#/components/parameters/carrierVoyageNumber'
+        - $ref: '#/components/parameters/UNLocationCode'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/parameters/limit'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/parameters/cursor'
+      responses:
+        '200':
+          description: Successful operation
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/API-Version'
+            Current-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/Current-Page'
+            Next-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/Next-Page'
+            Prev-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/Prev-Page'
+            Last-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/Last-Page'
+            First-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/First-Page'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/OVS_DOMAIN/1.0.0#/components/schemas/transportCall'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.0.0#/components/schemas/error'
+    post:
+      tags:
+        - Operational Vessel Schedules
+      summary: Post a new transport-call
+      requestBody:
+        description: The new TransportCall 
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/OVS_DOMAIN/1.0.0#/components/schemas/transportCallBody'
+      responses:
+        '201':
+          description: Transport-call successfully posted
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/OVS_DOMAIN/1.0.0#/components/schemas/transportCall'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.0.0#/components/schemas/error'
+   
+
+  /transport-calls/{transportCallID}:
+    get:
+      parameters:
+        - $ref: '#/components/parameters/transportCallID'
+      tags:
+        - Operational Vessel Schedules
+      summary: Find transport call by transportCallID.
+      description: Returns transport calls with the specified transportCallID.
+      responses:
+        '200':
+          description: Successful operation
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/OVS_DOMAIN/1.0.0#/components/schemas/transportCall'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.0.0#/components/schemas/error'
+    put:
+      tags:
+      - Operational Vessel Schedules
+      summary: Alter a TransportCall
+      parameters:
+        - $ref: '#/components/parameters/transportCallID' 
+      requestBody:
+        description: Parameters used to configure the subscription
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/OVS_DOMAIN/1.0.0#/components/schemas/transportCall'
+      responses:
+        '200':
+          description: Transportcall updated
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+               $ref: 'https://api.swaggerhub.com/domains/dcsaorg/OVS_DOMAIN/1.0.0#/components/schemas/transportCall'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.0.0#/components/schemas/error'
+    delete:
+      tags:
+        - Operational Vessel Schedules
+      summary: Delete a transport-call by its transportCallId
+      parameters:
+        - $ref: '#/components/parameters/transportCallID'
+      responses:
+        '204':
+          description: Subscription stopped
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/API-Version'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.0.0#/components/schemas/error'
+
+  /events:
+    get:
+      tags:
+        - Events
+      summary: Get Operations and Transport events
+      description: |
+        Retrieves Operations and Transport events. The default sort order is by eventCreatedDateTime in descending order (DESC)
+      parameters:
+        # Chunk with Transport related event parameters
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/transportEventTypeCode'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/scheduleID'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/transportCallID'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/vesselIMONumber'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/carrierVoyageNumber'
+
+        # Chunk with Transport related event parameters
+
+
+        # Chunk with Global related event parameters
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/parameters/limit'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/parameters/cursor'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/parameters/Api-Version-Major'
+      responses:
+        '200':
+          description: Successful operation
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/API-Version'
+            Current-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/Current-Page'
+            Next-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/Next-Page'
+            Prev-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/Prev-Page'
+            Last-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/Last-Page'
+            First-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/First-Page'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  anyOf:
+                    - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/operationsEvent'
+                    - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/transportEvent'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.0.0#/components/schemas/error'
+
+  /transport-calls/operations-events:
+    post:
+      tags:
+        - Operational Vessel Schedules
+      summary: Post a new operations event
+      requestBody:
+        description: The new TransportCall 
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/operationsEventBody'
+      responses:
+        '201':
+          description: Transport-call successfully posted
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/operationsEvent'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.0.0#/components/schemas/error'
+  /transport-calls/transport-events:
+    post:
+      tags:
+        - Operational Vessel Schedules
+      summary: Post a new transport event
+      requestBody:
+        description: The new TransportCall 
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/transportEventBody'
+      responses:
+        '201':
+          description: Transport-call successfully posted
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/transportEvent'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.0.0#/components/schemas/error'
+components:
+  parameters: 
+                  
+    ##############
+    # Query params
+    ##############
+    carrierServiceCode:
+      in: query
+      name: carrierServiceCode
+      description: The code of the service for which information should be sent. This is the code used by the vessel operator for that service and should be part of a VSA agreement between the subscribing vessel operator and the vessel operator
+      required: false
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/carrierServiceCode'
+    vesselIMONumber:
+      in: query
+      name: vesselIMONumber
+      description: The identifier of the vessel for which schedule information is sent. If not provided, the schedule is sent for all vessels.
+      required: false
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/vesselIMONumber'
+    carrierVoyageNumber:  
+      in: query
+      name: carrierVoyageNumber
+      description: The vessel operator assigned voyage number for the respective voyage.
+      required: false
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/carrierVoyageNumber'
+    UNLocationCode:  
+      in: query
+      name: UNLocationCode
+      description: The UN location code identifies a location in the sense of a city/a town/a village, being the smaller administrative area existing as defined by the competent national authority in each country.
+      required: false
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/UNLocationCode'
+    startDate:  
+      in: query
+      name: startDate
+      description: The start date of the period for which schedule information is requested. The value is populated in ISO 8601 Date format. If not provided, the current date is used by default.
+      required: false
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/startDate'
+    dateRange:  
+      in: query
+      name: dateRange
+      description: The time period for which schedule information is sent. The duration is populated in ISO 8601 Duration format.
+      required: false
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/dateRange'
+    transportCallID:  
+      in: path
+      name: transportCallID
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/schemas/transportCallID'
+      required: true
+      description: The ID of the Transport Call to filter by.
