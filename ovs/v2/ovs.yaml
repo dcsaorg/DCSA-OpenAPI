@@ -2,7 +2,10 @@ openapi: 3.0.3
 info:
   version: 2.0.0
   title: 'DCSA OpenAPI specification for Operational Vessel Schedules'
-  description: 'API specification issued by DCSA.org'
+  description: |
+    This API also supports JIT (Just in Time Portcalls). JIT is used for negotiating timestamps between vessel and port/terminal.
+    
+    API specification issued by DCSA.org
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -15,19 +18,20 @@ tags:
     description: Operational Vessel Schedules operations
   - name: Events
 paths:
-  /transport-calls:
+  /v2/transport-calls:
     get:
       tags:
         - Operational Vessel Schedules
       summary: Find transport calls
       description: Returns all Transport Calls filtered by the parameters.
       parameters:
-        - $ref: '#/components/parameters/carrierServiceCode'
         - $ref: '#/components/parameters/vesselIMONumber'
+        - $ref: '#/components/parameters/carrierServiceCode'
         - $ref: '#/components/parameters/carrierVoyageNumber'
         - $ref: '#/components/parameters/UNLocationCode'
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/parameters/limit'
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/parameters/cursor'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/parameters/Api-Version-Major'
       responses:
         '200':
           description: Successful operation
@@ -59,42 +63,13 @@ paths:
             application/json:
               schema:
                 $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.0.0#/components/schemas/error'
-    post:
-      tags:
-        - Operational Vessel Schedules
-      summary: Post a new transport-call
-      requestBody:
-        description: The new TransportCall 
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/OVS_DOMAIN/1.0.0#/components/schemas/transportCallBody'
-      responses:
-        '201':
-          description: Transport-call successfully posted
-          headers:
-            API-Version:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/API-Version'
-          content:
-            application/json:
-              schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/OVS_DOMAIN/1.0.0#/components/schemas/transportCall'
-        default:
-          description: Unexpected error
-          headers:
-            API-Version:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/API-Version'
-          content:
-            application/json:
-              schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.0.0#/components/schemas/error'
-   
 
-  /transport-calls/{transportCallID}:
+
+  /v2/transport-calls/{transportCallID}:
     get:
       parameters:
         - $ref: '#/components/parameters/transportCallID'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/parameters/Api-Version-Major'
       tags:
         - Operational Vessel Schedules
       summary: Find transport call by transportCallID.
@@ -118,47 +93,25 @@ paths:
             application/json:
               schema:
                 $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.0.0#/components/schemas/error'
-    put:
-      tags:
-      - Operational Vessel Schedules
-      summary: Alter a TransportCall
+
+
+  /v2/timestamps:
+    post:
       parameters:
-        - $ref: '#/components/parameters/transportCallID' 
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/parameters/Api-Version-Major'
+      tags:
+        - Operational Vessel Schedules
+      summary: Post a new timestamp
       requestBody:
-        description: Parameters used to configure the subscription
+        description: The new Timestamp
         required: true
         content:
           application/json:
             schema:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/OVS_DOMAIN/1.0.0#/components/schemas/transportCall'
-      responses:
-        '200':
-          description: Transportcall updated
-          headers:
-            API-Version:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/API-Version'
-          content:
-            application/json:
-              schema:
-               $ref: 'https://api.swaggerhub.com/domains/dcsaorg/OVS_DOMAIN/1.0.0#/components/schemas/transportCall'
-        default:
-          description: Unexpected error
-          headers:
-            API-Version:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/API-Version'
-          content:
-            application/json:
-              schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.0.0#/components/schemas/error'
-    delete:
-      tags:
-        - Operational Vessel Schedules
-      summary: Delete a transport-call by its transportCallId
-      parameters:
-        - $ref: '#/components/parameters/transportCallID'
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/OVS_DOMAIN/1.0.0#/components/schemas/timestamp'
       responses:
         '204':
-          description: Subscription stopped
+          description: Timestamp successfully posted
           headers:
             API-Version:
               $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/API-Version'
@@ -172,7 +125,8 @@ paths:
               schema:
                 $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.0.0#/components/schemas/error'
 
-  /events:
+
+  /v2/events:
     get:
       tags:
         - Events
@@ -185,9 +139,13 @@ paths:
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/transportCallID'
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/vesselIMONumber'
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/carrierVoyageNumber'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/carrierServiceCode'
 
         # Chunk with Operations related event parameters
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/operationsEventTypeCode'
+
+        # Chunk with base event parameters
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/parameters/eventCreatedDateTime'
 
         # Chunk with Global related event parameters
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/parameters/limit'
@@ -227,72 +185,7 @@ paths:
               schema:
                 $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.0.0#/components/schemas/error'
 
-  /transport-calls/operations-events:
-    post:
-      tags:
-        - Operational Vessel Schedules
-      summary: Post a new operations event
-      requestBody:
-        description: The new TransportCall 
-        required: true
-        content:
-          application/json:
-            schema:
-              allOf:
-                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/operationsEventBody'
-      responses:
-        '201':
-          description: Transport-call successfully posted
-          headers:
-            API-Version:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/API-Version'
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/operationsEvent'
-        default:
-          description: Unexpected error
-          headers:
-            API-Version:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/API-Version'
-          content:
-            application/json:
-              schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.0.0#/components/schemas/error'
-  /transport-calls/transport-events:
-    post:
-      tags:
-        - Operational Vessel Schedules
-      summary: Post a new transport event
-      requestBody:
-        description: The new TransportCall 
-        required: true
-        content:
-          application/json:
-            schema:
-              allOf:
-                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/transportEventBody'
-      responses:
-        '201':
-          description: Transport-call successfully posted
-          headers:
-            API-Version:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/API-Version'
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.0.0#/components/schemas/transportEvent'
-        default:
-          description: Unexpected error
-          headers:
-            API-Version:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/1.0.0#/components/headers/API-Version'
-          content:
-            application/json:
-              schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.0.0#/components/schemas/error'
+
 components:
   parameters: 
                   
