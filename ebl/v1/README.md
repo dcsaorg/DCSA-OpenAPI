@@ -10,6 +10,6 @@ Publications related to this specification:
 
 ### Releasenotes
 
-### [v1.0.0](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/1.0.0)
+### [v1.0.0](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/1.0.0) (30 June 2021)
 
 Initial release of the DCSA OpenAPI definitions for electronic Bill of Lading
