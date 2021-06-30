@@ -1,7 +1,7 @@
-Release v1.x
-------------
+Upcomming release
+-----------------
 
 
 Release v1.0.0 (30 June 2021)
 -----------------------------
-- Domain created
+- Domain created and released
