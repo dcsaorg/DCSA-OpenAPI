@@ -1,5 +1,5 @@
-Upcomming release
------------------
+Changes in upcomming release
+----------------------------
 
 
 Release v1.0.0 (30 June 2021)
