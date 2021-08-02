@@ -1,5 +1,7 @@
-Next release to contain
------------------------
+Release v1.0.1 (02 August 2021)
+-------------------------------
+- Update latitude and logitue examples to comply with maxLength
+- Update VesselIMONumber to a valid value
 
 Release v1.0.0 (30 June 2021)
 -----------------------------
