@@ -1,3 +1,12 @@
+Release v1.0.2 (25 August 2021)
+-------------------------------
+- Bump [DCSA_Domain to version 1.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/dcsa/dcsa_domain_v1.0.2.yaml)
+- Bump [Documentation_Domain to version 1.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/documentation/documentation_domain_v1.0.2.yaml)
+- Bump [Location_Domain to version 1.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/location/dcsa_location_v1.0.2.yaml)
+- Update UUID examples
+- delayReasonCode in Transport- and Operations-Event now points to DCSA_Domain instead of a local definition (which is removed)
+- equipmentEventTypeCodes, operationsEventTypeCodes, shipmentEventTypeCodes and transportEventTypeCodes in Subscriptions were wrongly defined as a comma separated string - now they are a list
+
 Release v1.0.1 (02 August 2021)
 -------------------------------
 - Bump [DCSA_Domain to version 1.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/dcsa/dcsa_domain_v1.0.1.yaml)
