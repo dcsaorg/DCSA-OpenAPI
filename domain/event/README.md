@@ -6,6 +6,11 @@ Release v1.0.2 (25 August 2021)
 - Update UUID examples
 - `delayReasonCode` in Transport- and Operations-Event now points to DCSA_Domain instead of a local definition (which is removed)
 - `equipmentEventTypeCodes`, `operationsEventTypeCodes`, `shipmentEventTypeCodes` and `transportEventTypeCodes` in Subscriptions were wrongly defined as a comma separated string - now they are a list
+- removed all the Event-objects with no ID
+- removed `documentReferences` and `references` from the `TransportEvent` base object and made 2 versions of it - one for OVS and one for T&T (also including `documentReferences` and `references`
+- made a PublisherRole object to be used instead of an extended version of partyFunction codes
+- added `transportCallSequenceNumber` to the `transportCall` object
+- removed the Vessel object since it is already defined in the `Documentation Domain`
 
 Release v1.0.1 (02 August 2021)
 -------------------------------
