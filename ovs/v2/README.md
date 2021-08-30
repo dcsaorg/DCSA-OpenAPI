@@ -1,23 +1,28 @@
 ### Operational Vessecl Schedules (OVS)
 
 The DCSA Interface Standard for Operational Vessel Schedules is documented on the [**DCSA OVS SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS).
-Publications related to this specification:
--	[DCSA Information Model 2.0](https://dcsa.org/wp-content/uploads/2020/07/DCSA-Information-model-2.0-vF.pdf)
--	[DCSA Information Model Reading Guide]( https://dcsa.org/wp-content/uploads/2020/07/DCSA-Information-Model-2.0-Reading-Guide-vF.pdf)
--	[DCSA Interface for Operational Vessel Schedules 1.0]( https://dcsa.org/wp-content/uploads/2020/07/DCSA-Interface-Standard-for-Operational-Vessel-Schedules-1.0-vF.pdf)
--	[DCSA Interface for Operational Vessel Schedules Reading Guide]( https://dcsa.org/wp-content/uploads/2020/07/DCSA-Interface-Standard-for-Operational-Vessel-Schedules-1.0-Reading-Guide-vF.pdf)
--	[Operational Vessel Schedule Definitions 1.0]( https://dcsa.org/wp-content/uploads/2020/07/Operational-Vessel-Schedule-definitions-1.0-vF.pdf)
--	[Glossary of Terms](https://knowledge.dcsa.org/s/glossary)
+Please check out the official webpage for publications related to this specification:
+[JIT Port Call Data Definitions](https://dcsa.org/standards/jit-port-call-data-definitions)
 
-### [v2.0.2](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_OVS/2.0.2)
+### [Release v2.0.2 (30 August 2021)](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS/2.0.2)
 
-### [v2.0.1](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_OVS/2.0.1)
+- Bump [DCSA_Domain to version 1.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/dcsa/dcsa_domain_v1.0.2.yaml)
+- Bump [OVS_Domain to version 1.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/ovs/ovs_domain_v1.0.1.yaml)
+- Bump [Event_Domain to version 1.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/event/event_domain_v1.0.2.yaml)
+- description added for /v2/timestamps endPoint
+- updated the response for the /v2/events endPoint. It now returns a correctly defined `TransportEvent` - an `OVS-Transport-Event` (previously the `TransportEvent` also contained `documentReferences` and `references`)
+- `carrierServiceCode` and `carrierVoyageNumber` have been added as mandatory fields to the timestamp
+- updated example to only include a list with a single (OVS defined) `TransportEvent`
 
-* vesselIMONumber changed from string -> number
-* scheduleID changed from string -> UUID
-* transportCallID changed from number -> UUID
+### [v2.0.1](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS/2.0.1)
 
-### [v2.0.0](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_OVS/2.0.0)
-This release
+- `eventType` example and default values fixed (caused download errors in v2.0.0)
 
-Initial release of the DCSA OpenAPI definitions for Operational Vessel Schedules v2
+### [v2.0.0](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS/2.0.0)
+The purpose of this release is to include JIT (Just in Time) portcalls into OVS. The release also includes a lot of cleanup and reuse of common definitions
+
+- delete all /`schedules` endPoints (schedules are now derived from the /`events` endPoint)
+- delete all /`transport-calls` endPoints (these are no longer needed since `Transport`- and `Operations`-event are now defined as "deep" events and contain transportCall infomration as part of the event)
+- delete all /`schedule-subscriptions` endPoints (subscriptions for OVS are handled in [OVS_EVENT_HUB](https://app.swaggerhub.com/apis/dcsaorg/OVS_EVENT_HUB))
+- delete all /`transport-call-subscriptions` endPoints (subscriptions for OVS are handled in [OVS_EVENT_HUB](https://app.swaggerhub.com/apis/dcsaorg/OVS_EVENT_HUB))
+- Domains have been introduced. Referring to objects defined in Domains  instead of defining them locally
