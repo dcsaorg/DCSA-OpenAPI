@@ -30,5 +30,5 @@ The purpose of this release is to include JIT (Just in Time) portcalls into OVS.
   - [OVS_Domain v1.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/ovs/ovs_domain_v1.0.0.yaml)
   - [Event_Domain v1.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/event/event_domain_v1.0.1.yaml)
   - [Error_Domain v1.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/error/error_domain_v1.0.0.yaml)
-- `GET` /v2/events endPoint added to be used for polling events (can be used to poll `Transport`- and `Operations`-events
+- `GET` /v2/events endPoint added to be used for polling events (can be used to poll `Transport`- and `Operations`-events)
 - `POST` /v2/timestamp endPoint added for JIT
