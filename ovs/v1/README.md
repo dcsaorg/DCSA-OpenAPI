@@ -14,7 +14,8 @@ Publications related to this specification:
 ### [v1.0.1](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_OVS/1.0.1)
 
 * vesselIMONumber changed from string -> number
-* scheduleID changed from string -> UUID
+* scheduleID changed from number -> UUID
+* set min and max length on vesselPartnerCarrierCode
 * transportCallID changed from number -> UUID
 
 ### [v1.0.0](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_OVS/1.0.0)
