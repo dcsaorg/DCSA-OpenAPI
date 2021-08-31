@@ -7,8 +7,8 @@ Please check out the official webpage for publications related to this specifica
 ### [Release v2.0.2 (30 August 2021)](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS/2.0.2)
 
 - Bump [DCSA_Domain to version 1.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/dcsa/dcsa_domain_v1.0.2.yaml)
-- Bump [OVS_Domain to version 1.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/ovs/ovs_domain_v1.0.1.yaml)
-- Bump [Event_Domain to version 1.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/event/event_domain_v1.0.2.yaml)
+- Bump [OVS_Domain to version 1.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/ovs/ovs_domain_v1.0.2.yaml)
+- Bump [Event_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/event/event_domain_v1.0.3.yaml)
 - description added for /v2/timestamps endPoint
 - updated the response for the /v2/events endPoint. It now returns a correctly defined `TransportEvent` (previously the `TransportEvent` also contained `documentReferences` and `references` which are only to be included in T&T)
 - `carrierServiceCode` and `carrierVoyageNumber` have been added as mandatory fields to the timestamp
