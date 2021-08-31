@@ -13,6 +13,7 @@ Please check out the official webpage for publications related to this specifica
 - updated the response for the /v2/events endPoint. It now returns a correctly defined `TransportEvent` (previously the `TransportEvent` also contained `documentReferences` and `references` which are only to be included in T&T)
 - `carrierServiceCode` and `carrierVoyageNumber` have been added as mandatory fields to the timestamp
 - updated example to only include a list with a single (OVS defined) `TransportEvent`
+- Party object has been updated
 
 ### [v2.0.1](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS/2.0.1)
 
