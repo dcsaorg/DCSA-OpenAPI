@@ -20,7 +20,7 @@ Please check out the official webpage for publications related to this specifica
 - `eventType` example and default values fixed (caused download errors in v2.0.0)
 
 ### [v2.0.0](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS/2.0.0)
-The purpose of this release is to include JIT (Just in Time) portcalls into OVS. The release also includes a lot of cleanup and reuse of common definitions
+The purpose of this release is to include JIT v1.0 (Just in Time) portcalls into OVS. The release also includes a lot of cleanup and reuse of common definitions
 
 - delete all /`schedules` endPoints (schedules are now derived from the /`events` endPoint)
 - delete all /`transport-calls` endPoints (these are no longer needed since `Transport`- and `Operations`-event are now defined as "deep" events and contain transportCall infomration as part of the event)
