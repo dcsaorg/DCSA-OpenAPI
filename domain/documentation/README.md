@@ -1,5 +1,7 @@
 Release v1.0.3 (31 August 2021)
 -----------------------------
+Party object has been updated
+
 - Deprecated NMFTA field in Party object
 - Added `identifyingCodes` which is an array of objects to Party object. Each object consists of:
   - `codeListResponsibleAgencyCode`
