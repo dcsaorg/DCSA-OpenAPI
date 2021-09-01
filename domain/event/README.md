@@ -2,6 +2,7 @@ Release v1.1.0 (1 September 2021)
 -------------------------------
 - remove deprecated `scheduleID` from `TransportSubscriptionBody`
 - An alternative `TransportSubscriptionBodyWithScheduleID` has been created to support backward compatability in T&T
+- `eventClassifierCode` added as a simple object
 
 Release v1.0.3 (31 August 2021)
 -------------------------------
