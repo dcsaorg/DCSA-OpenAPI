@@ -4,7 +4,7 @@ The DCSA Interface Standard for Operational Vessel Schedules is documented on th
 Please check out the official webpage for publications related to this specification:
 [JIT Port Call Data Definitions](https://dcsa.org/standards/jit-port-call-data-definitions)
 
-### [Release v2.0.2 (30 August 2021)](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS/2.0.2)
+### [Release v2.0.2 (1 September 2021)](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS/2.0.2)
 
 - Bump [DCSA_Domain to version 1.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/dcsa/dcsa_domain_v1.0.2.yaml)
 - Bump [OVS_Domain to version 1.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/ovs/ovs_domain_v1.0.2.yaml)
