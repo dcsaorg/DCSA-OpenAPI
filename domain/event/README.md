@@ -1,3 +1,8 @@
+Release v1.1.0 (1 September 2021)
+-------------------------------
+- remove deprecated `scheduleID` from `TransportSubscriptionBody`
+- An alternative `TransportSubscriptionBodyWithScheduleID` has been created to support backward compatability in T&T
+
 Release v1.0.3 (31 August 2021)
 -------------------------------
 - Bump [Documentation_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/documentation/documentation_domain_v1.0.3.yaml)
@@ -26,7 +31,7 @@ Release v1.0.1 (02 August 2021)
 - TransportCall location field description updated
 - location no longer a mandatory field of TransportCall
 - remark added as simple type
-- secret exmaple updated
+- secret example updated
 
 Release v1.0.0 (30 June 2021)
 -----------------------------
