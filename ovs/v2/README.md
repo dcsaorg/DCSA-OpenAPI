@@ -10,10 +10,12 @@ Please check out the official webpage for publications related to this specifica
 - Bump [OVS_Domain to version 1.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/ovs/ovs_domain_v1.0.2.yaml)
 - Bump [Event_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/event/event_domain_v1.0.3.yaml)
 - description added for /v2/timestamps endPoint
+- added `eventClassifierCode` as a query parameter on `GET` /v2/events endPoint
 - updated the response for the /v2/events endPoint. It now returns a correctly defined `TransportEvent` (previously the `TransportEvent` also contained `documentReferences` and `references` which are only to be included in T&T)
 - `carrierServiceCode` and `carrierVoyageNumber` have been added as mandatory fields to the timestamp
 - updated example to only include a list with a single (OVS defined) `TransportEvent`
 - Party object has been updated
+- Removed unused query parameter definitions
 
 ### [v2.0.1](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS/2.0.1)
 
