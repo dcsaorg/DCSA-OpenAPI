@@ -16,6 +16,7 @@ Please check out the official webpage for publications related to this specifica
 - updated example to only include a list with a single (OVS defined) `TransportEvent`
 - Party object has been updated
 - Removed unused query parameter definitions
+- Removed deprecated values in the `TransportEvent`
 
 ### [v2.0.1](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS/2.0.1)
 
