@@ -1,3 +1,7 @@
+Release v1.1.0 (...)
+-----------------------------
+This version is primaily connected to Booking
+
 Release v1.0.3 (31 August 2021)
 -----------------------------
 Party object has been updated
