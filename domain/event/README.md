@@ -3,10 +3,13 @@ Release v1.1.1 (1 September 2021)
 - updated `portCallServiceTypeCode` with the following values:
   - FAST (AT All Fast)
   - GWAY (AT Gangway down and secure)
+  - LASH (Lashing)
+  - SAFE (Safety)
 - updated `publisherRole` with the following values:
   - TWG (Experimental: Towage serice provider)
   - LSH (Experimental: Lashing serice provider)
   - BUK (Experimental: Bunker serice provider)
+- BAI (Booking Acknowledgement ID) added to `documentTypeCodes` used in the `ShipmentEvent`
 
 Release v1.1.0 (1 September 2021)
 -------------------------------
