@@ -22,7 +22,7 @@ Parameters and headers used in all APIs is defined here for example: limit and c
 https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa
 
 ### Documentation
-This domain is used for the electronic documentation APIs (ex: [Electronic Bill of Lading](https://app.swaggerhub.com/apis/dcsaorg/DCSA_EBL), Booking). The domain is a collection of objects consisting of components defined in the DCSA Domain.
+This domain is used for the electronic documentation APIs (ex: [Electronic Bill of Lading](https://app.swaggerhub.com/apis/dcsaorg/DCSA_EBL) and [Booking](https://app.swaggerhub.com/apis/dcsaorg/DCSA_BKG)). The domain is a collection of objects consisting of components defined in the DCSA Domain.
 
 https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation
 
@@ -32,7 +32,7 @@ The error object used in all APIs is defined here. This allows for a consistent 
 https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/error
 
 ### Event
-The Events Domain contains all definitions and components used for Events. Events are primarily used in Event Hubs ([Track & Trace](https://app.swaggerhub.com/apis/dcsaorg/DCSA_TNT) (>= v2.1.0), [Documentation Hub](https://app.swaggerhub.com/apis/dcsaorg/DOCUMENTATION_EVENT_HUB) and [Operational Vessel Schedule Hub](https://app.swaggerhub.com/apis/dcsaorg/OVS_EVENT_HUB)). Events are also used in all polling endPoints in APIs where subscriptions are involved ([Electronic Bill of Lading](https://app.swaggerhub.com/apis/dcsaorg/DCSA_EBL), [Operational Vessel Schedules](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS) (>= v1.1.1))
+The Events Domain contains all definitions and components used for Events. Events are primarily used in Event Hubs ([Track & Trace](https://app.swaggerhub.com/apis/dcsaorg/DCSA_TNT) (>= v2.1.0), [Documentation Hub](https://app.swaggerhub.com/apis/dcsaorg/DOCUMENTATION_EVENT_HUB) and [Operational Vessel Schedule Hub](https://app.swaggerhub.com/apis/dcsaorg/OVS_EVENT_HUB)). Events are also used in all polling endPoints in APIs where subscriptions are involved ([Electronic Bill of Lading](https://app.swaggerhub.com/apis/dcsaorg/DCSA_EBL), [Operational Vessel Schedules](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS) (>= v1.1.1) and [Booking](https://app.swaggerhub.com/apis/dcsaorg/DCSA_BKG))
 
 https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event
 
