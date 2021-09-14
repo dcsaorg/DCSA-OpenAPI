@@ -10,12 +10,12 @@ Data and Interface Standard project workstream is to strengthen the container sh
 ### OpenAPI definition
 
 #### APIs
-- The DCSA Interface Standard for Track and Trace is documented on the [**DCSA TNT SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_TNT).
-- The DCSA Interface Standard for Operational Vessel Schedules is documented on the [**DCSA OVS SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS).
-- The DCSA Interface Standard for electronic Bill of Lading is documented on the [**DCSA EBL SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_EBL).
-- The DCSA Interface Standard for Booking is documented on the [**DCSA BKG SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_BKG).
+- The DCSA Interface Standard for `Track and Trace is documented` on the [**DCSA TNT SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_TNT).
+- The DCSA Interface Standard for `Operational Vessel Schedules` is documented on the [**DCSA OVS SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS).
+- The DCSA Interface Standard for `electronic Bill of Lading` is documented on the [**DCSA EBL SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_EBL).
+- The DCSA Interface Standard for `Booking` is documented on the [**DCSA BKG SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_BKG).
 
 #### Event Hubs (optional to implement but recommended)
-- Operational Vessel Schedules Event Hub (recomended to push events from OVS) is documented on the [**OVS_EVENT_HUB SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/OVS_EVENT_HUB).
-- Documentation Event Hub (recomended to push events from EBL) is documented on the [**DOCUMENTATION_EVENT_HUB SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DOCUMENTATION_EVENT_HUB).
-- Track & Trace is also an Event Hub - it is documented on the [**TNT SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_TNT).
+- `Operational Vessel Schedules Event Hub` (recomended to push events from OVS) is documented on the [**OVS_EVENT_HUB SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/OVS_EVENT_HUB).
+- `Documentation Event Hub` (recomended to push events from EBL) is documented on the [**DOCUMENTATION_EVENT_HUB SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DOCUMENTATION_EVENT_HUB).
+- `Track & Trace` is also an Event Hub - it is documented on the [**TNT SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_TNT).
