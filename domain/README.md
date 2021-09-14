@@ -36,6 +36,11 @@ The Events Domain contains all definitions and components used for Events. Event
 
 https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event
 
+### Location
+This domain contains all definitions for Locations. The domain is a collection of Location related objects consisting of components defined in the DCSA Domain.
+
+https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location
+
 ### OVS
 This domain is used for the [Operational Schedule Vessel](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS) API (>= v1.1.1). The domain is a collection of objects consisting of components defined in the DCSA Domain.
 
