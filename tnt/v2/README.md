@@ -13,7 +13,7 @@ Publication related to this specification:
 
 ### Releasenotes
 
-### [v2.2.0](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/2.2.0)
+### [v2.2.0 (...)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/2.2.0)
 Purpose of this release is to add the new subscription model to T&T
 - Bump [DCSA_Domain to version 1.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/dcsa/dcsa_domain_v1.0.2.yaml)
 - Bump [Event_Domain to version 1.1.1](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/event/event_domain_v1.1.1.yaml)
