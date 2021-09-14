@@ -15,10 +15,18 @@ The DCSA Interface Standard for Track and Trace 1.0 is documented on [**DCSA Swa
 
 
 ### Releasenotes
-#### 1.0
- * Initial release of the DSCA OpenAPI definitions for Track & Trace
 
-####  1.1
+#### [v1.2.0](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/1.2.0)
+* Added event-subscription endpoints
+  * Endpoint for creating subscription
+  * Endpoint for deleting subscription
+  * Endpoint for updating subscription
+  * Endpoint for receiving list of subscriptions
+  * Endpoint for reading a single subscription
+* Added eventType discriminator
+* Added endpoint for reading a single event by eventID
+
+#### [v1.1.0](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/1.1.0)
 * Improved error handling
 * Added "modeOfTransportCode" to Transport events, and Transport Equipment events
   * Since we removed Transport and Equipment objects to keep the API focused on just Track & Trace, the Mode of Transport was missing, so it has been added
@@ -29,3 +37,5 @@ The DCSA Interface Standard for Track and Trace 1.0 is documented on [**DCSA Swa
 * Made equipmentReference optional in Transport Equipment events and Equipment events
   * The interface document specified that this should be optional
 
+#### [v1.0.0](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/1.0.0)
+ * Initial release of the DSCA OpenAPI definitions for Track & Trace
