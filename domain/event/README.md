@@ -1,4 +1,4 @@
-Release v1.1.1 (1 September 2021)
+Release v1.1.1 (...)
 -------------------------------
 - updated `portCallServiceTypeCode` with the following values:
   - FAST (AT All Fast)
