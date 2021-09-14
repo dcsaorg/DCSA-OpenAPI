@@ -6,10 +6,6 @@ The purpose of an Event Hub is to send events and manage subscriptions. In case 
 
 ### Releasenotes
 
-### [v2.0.0 - 1 September 2021](https://app.swaggerhub.com/apis-docs/dcsaorg/OVS_EVENT_HUB/2.0.0)
-Initial release of the DCSA OpenAPI definitions for Operational Vessel Schedules Event Hub
-This version is aligned with OVS 2.0.2
-
 ### [v1.0.0](https://app.swaggerhub.com/apis-docs/dcsaorg/OVS_EVENT_HUB/1.0.0)
 
 This release will be skipped in order to align the ../events endPoint with OVS.
