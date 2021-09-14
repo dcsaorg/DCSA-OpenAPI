@@ -1,4 +1,4 @@
-Release v1.0.3 (1 September 2021)
+Release v1.0.3 (...)
 -------------------------------
 - Bump [Event_Domain to version 1.1.1](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/event/dcsa_event_v1.1.1.yaml)
 - Bump [Documentation_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/documentation/documentation_domain_v1.0.3.yaml)
