@@ -1,3 +1,7 @@
+Release v1.1.0 (...)
+-------------------------------
+- `800SeriesCarrierCode` type changed from integer `->` string
+
 Release v1.0.2 (25 August 2021)
 -------------------------------
 - Update UUID example values
