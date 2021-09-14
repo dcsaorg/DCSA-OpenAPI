@@ -1,5 +1,7 @@
 Release v1.1.0 (...)
 -------------------------------
+This version is primarily connected to Booking API
+
 - `800SeriesCarrierCode` type changed from integer `->` string
 - `amsFilingDueDate`, `bookingAcknowledgementID`, `confirmationDateTime`, `confirmedEquipmentUnits`, `cutOffDateTime`, `cutOffDateTimeCode`, `eventLocationDateTime`, `submissionDateTime`, `transportPlanStage` and `transportPlanStageSequenceNumber` added as simple types
 - reordered the location of: `commodityType`, `issueDate`
