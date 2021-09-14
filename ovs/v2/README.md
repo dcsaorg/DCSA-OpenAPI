@@ -4,14 +4,18 @@ The DCSA Interface Standard for Operational Vessel Schedules is documented on th
 Please check out the official webpage for publications related to this specification:
 [JIT Port Call Data Definitions](https://dcsa.org/standards/jit-port-call-data-definitions)
 
+### [Release v2.1.0 (...)](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS/2.1.0)
+This release is to make OVS JIT v1.1 compatible
+
+- Bump [Event_Domain to version 1.1.1](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/event/event_domain_v1.1.1.yaml)
+
 ### [Release v2.0.2 (1 September 2021)](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS/2.0.2)
 
 - Bump [DCSA_Domain to version 1.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/dcsa/dcsa_domain_v1.0.2.yaml)
 - Bump [OVS_Domain to version 1.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/ovs/ovs_domain_v1.0.2.yaml)
-- Bump [Event_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/event/event_domain_v1.0.3.yaml)
+- Bump [Event_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/event/event_domain_v1.1.0.yaml)
 - description added for /v2/timestamps endPoint
 - updated the response for the /v2/events endPoint. It now returns a correctly defined `TransportEvent` (previously the `TransportEvent` also contained `documentReferences` and `references` which are only to be included in T&T)
-- `carrierServiceCode` and `carrierVoyageNumber` have been added as mandatory fields to the timestamp
 - updated example to only include a list with a single (OVS defined) `TransportEvent`
 - Party object has been updated
 - Removed unused query parameter definitions
