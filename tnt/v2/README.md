@@ -13,7 +13,21 @@ Publication related to this specification:
 
 ### Releasenotes
 
+### [v2.2.0](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/2.2.0)
+Purpose of this release is to add the new subscription model to T&T
 * Added `PUT /event-subscriptions/{subscriptionID}/secret` endPoint to update the shared secret used to create the `Notification-Signature`
+
+### [v2.1.1](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/2.1.1)
+* v2.1.0 included an error and was not downloadable - this has been fixed in this version
+
+### [v2.1.0](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/2.1.0)
+* API Description updated
+* changed definition of array-queryParameters (ex: eventType). This is now a comma (,) separated list
+* Added limit and cursor queryParameter to `GET /events` and `GET /event-subscriptions`
+* Added `API-Version` header to **all** endPoint responses
+* Added `Current-Page`, `Next-Page`, `Prev-Page`, `Last-Page` and `First-Page` headers to `GET /events` and `GET /event-subscriptions` responses
+* Added default error handling in `GET /event-subscriptions`
+* Deprecated the `events/{eventID}` endPoint
 * Split subscription body in 2:
   * One used for `POST /event-subscriptions` calls which includes the secret
   * One without the secret used for `GET /event-subscriptions/{subscriptionID}` and `PUT /event-subscriptions/{subscriptionID}`
@@ -22,12 +36,6 @@ Publication related to this specification:
   * Added `Subscription-ID` header to include the subscriptionID causing the Event to be sent
   * Added `Notification-Signature` header which is the new Signature used to validate the authenticity of the Event
   * Added `API-Version` header to include the version of API **sending the event**
-* changed definition of array-queryParameters (ex: eventType). This is now a comma (,) separated list
-* Added limit and cursor queryParameter to `GET /events` and `GET /event-subscriptions`
-* Added `API-Version` header to **all** endPoint responses
-* Added `Current-Page`, `Next-Page`, `Prev-Page`, `Last-Page` and `First-Page` headers to `GET /events` and `GET /event-subscriptions` responses
-* Added default error handling in `GET /event-subscriptions`
-
 
 ### [v2.0.1](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/2.0.1)
 This is supposed to be a Major update correcting errors - but at the time this API was released no one had started implementing v2.0.0 so it was decided "just" to make this a patch release
