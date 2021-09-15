@@ -1,5 +1,5 @@
-Release v1.1.0 (...)
------------------------------
+<a name="v110"></a>Release v1.1.0 (...)
+---
 This version is primaily connected to the new Booking API
 
 - Bump [DCSA_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/dcsa/dcsa_domain_v1.1.0.yaml)
@@ -30,8 +30,8 @@ This version is primaily connected to the new Booking API
 - `transportPlanStage`, `transportPlanStageSequenceNumber` and `vesselName` added to the `transport` object
 - `transportPlanStage`, `transportPlanSequenceNumber`, `loadLocation`, `dischargeLocation`, `plannedDepartureDate`, `plannedArrivalDate`, `vesselName`, `vesselIMONumber`, `carrierVoyageNumber` are now all required fields on `transport`
 
-Release v1.0.3 (31 August 2021)
------------------------------
+<a name="v103"></a>Release v1.0.3 (31 August 2021)
+---
 Party object has been updated
 
 - Deprecated NMFTA field in Party object
@@ -39,16 +39,16 @@ Party object has been updated
   - `codeListResponsibleAgencyCode`
   - `partyCode`
 
-Release v1.0.2 (25 August 2021)
------------------------------
+<a name="v102"></a>Release v1.0.2 (25 August 2021)
+---
 - Bump [DCSA_Domain to version 1.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/dcsa/dcsa_domain_v1.0.2.yaml)
 - Bump [Location_Domain to version 1.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/location/dcsa_location_v1.0.2.yaml)
 
-Release v1.0.1 (02 August 2021)
------------------------------
+<a name="v101"></a>Release v1.0.1 (02 August 2021)
+---
 - Bump [DCSA_Domain to version 1.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/dcsa/dcsa_domain_v1.0.1.yaml)
 - Bump [Location_Domain to version 1.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/location/dcsa_location_v1.0.1.yaml)
 
-Release v1.0.0 (30 June 2021)
------------------------------
+<a name="v100"></a>Release v1.0.0 (30 June 2021)
+---
 - Domain created and released
