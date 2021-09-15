@@ -1,5 +1,5 @@
-Release v1.1.0 (...)
--------------------------------
+<a name="v110"></a>Release v1.1.0 (...)
+---
 This version is primarily connected to Booking API
 
 - `800SeriesCarrierCode` type changed from integer `->` string
@@ -15,16 +15,16 @@ This version is primarily connected to Booking API
 - `referenceType` updated with new values: `ECR`, `CSI`, `BPR` and `BID`
 - `valueAddedServiceRequest` renamed to `valueAddedServiceCode` and changed from string `->` enum
 
-Release v1.0.2 (25 August 2021)
--------------------------------
+<a name="v102"></a>Release v1.0.2 (25 August 2021)
+---
 - Update UUID example values
 - Remove incorrect character in ServiceID format definition
 
-Release v1.0.1 (02 August 2021)
--------------------------------
+<a name="v101"></a>Release v1.0.1 (02 August 2021)
+---
 - Update latitude and logitue examples to comply with maxLength
 - Update VesselIMONumber to a valid value
 
-Release v1.0.0 (30 June 2021)
------------------------------
+<a name="v100"></a>Release v1.0.0 (30 June 2021)
+---
 - Domain created and released
