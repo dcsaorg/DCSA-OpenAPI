@@ -1,5 +1,5 @@
 
-## [Release v1.1.1]() (...)
+## [Release v1.1.1](#) (...)
 - Bump [DCSA_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/dcsa/dcsa_domain_v1.1.0.yaml)
 - Bump [Documentation_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/documentation/documentation_domain_v1.1.0.yaml)
 - Bump [Location_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/location/dcsa_location_v1.0.3.yaml)
