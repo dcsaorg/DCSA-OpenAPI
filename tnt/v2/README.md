@@ -23,7 +23,7 @@ Purpose of this release is to add the new subscription model to T&T
 
 <a name="v211"></a>[Release v2.1.1 (18 August 2021)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/2.1.1)
 ---
-- Fixes an error introduced in (#v210) that preventing the API from being downloaded on SwaggerHub
+- Fixes an error introduced in [Release v2.1.0](#v210) that preventing the API from being downloaded on SwaggerHub
 
 <a name="v210"></a>[Release v2.1.0](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/2.1.0)
 ---
