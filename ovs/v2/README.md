@@ -38,7 +38,7 @@ The purpose of this release is to include JIT v1.0 (Just in Time) portcalls into
 - Domains have been introduced. Referring to objects defined in Domains  instead of defining them locally. The following domains are referenced:
   - [DCSA_Domain v1.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#release-v101-02-august-2021)
   - [OVS_Domain v1.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/ovs#initial-release-v100)
-  - [Event_Domain v1.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/event/event_domain_v1.0.1.yaml)
+  - [Event_Domain v1.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#release-v101-02-august-2021)
   - [Error_Domain v1.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/error/error_domain_v1.0.0.yaml)
 - `GET` /v2/events endPoint added to be used for polling events (can be used to poll `Transport`- and `Operations`-events)
 - `POST` /v2/timestamp endPoint added for JIT
