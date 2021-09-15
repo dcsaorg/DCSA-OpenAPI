@@ -13,14 +13,14 @@ Publication related to this specification:
 
 ### Releasenotes
 
-### [v2.2.0 (...)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/2.2.0)
+### [v2.2.0](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/2.2.0) (...)
 Purpose of this release is to add the new subscription model to T&T
 - Bump [DCSA_Domain to version 1.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/dcsa/dcsa_domain_v1.0.2.yaml)
 - Bump [Event_Domain to version 1.1.1](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/event/event_domain_v1.1.1.yaml)
 - Added `PUT /event-subscriptions/{subscriptionID}/secret` endPoint to update the shared secret used to create the `Notification-Signature`
 - Prefixed all endPoints with `/v2` in order to align with Design Guide
 
-### [v2.1.1 (18 August 2021)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/2.1.1)
+### [v2.1.1](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/2.1.1) (18 August 2021)
 - v2.1.0 included an error and was not downloadable - this has been fixed in this version
 
 ### [v2.1.0](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/2.1.0)
