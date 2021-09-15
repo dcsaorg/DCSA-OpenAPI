@@ -21,7 +21,7 @@
 - `eventClassifierCode` added as a simple object
 - removed deprecated `vesselScheduleChangeRemark`, `transportCallID` and `eventTypeCode` from the `OperationsTransportEvent` (they are still included in the `TransportEvent`)
 
-<a name="release-v103"></a>Release v1.0.3 (31 August 2021)
+<a name="v103"></a>Release v1.0.3 (31 August 2021)
 ---
 - Bump [Documentation_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/documentation/documentation_domain_v1.0.3.yaml)
 
