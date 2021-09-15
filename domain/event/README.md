@@ -14,8 +14,7 @@
   - BUK (Experimental: Bunker serice provider)
 - BAI (Booking Acknowledgement ID) added to `documentTypeCodes` used in the `ShipmentEvent`
 
-Release v1.1.0 (1 September 2021)
--------------------------------
+## [Release v1.1.0] (1 September 2021)
 - remove deprecated `scheduleID` from `TransportSubscriptionBody`
 - An alternative `TransportSubscriptionBodyWithScheduleID` has been created to support backward compatability in T&T
 - `eventClassifierCode` added as a simple object
