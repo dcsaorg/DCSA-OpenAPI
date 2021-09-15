@@ -1,4 +1,5 @@
-Release v1.1.1 (...)
+
+### [Release v1.1.1](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/2.2.0) (...)
 -------------------------------
 - Bump [DCSA_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/dcsa/dcsa_domain_v1.1.0.yaml)
 - Bump [Documentation_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/documentation/documentation_domain_v1.1.0.yaml)
