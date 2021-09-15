@@ -1,15 +1,15 @@
-Release v1.0.3 (...)
+<a name="v103"></a>Release v1.0.3 (unreleased)
 -------------------------------
 - Bump [Event_Domain to version 1.1.1](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/event/dcsa_event_v1.1.1.yaml)
 - Bump [Documentation_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/documentation/documentation_domain_v1.0.3.yaml)
   - this will update the `Party` object to include the `codeListName` in the `identifiers` as it is needed in order to distinguish between different SMDG codes
 
-Release v1.0.2 (31 August 2021)
+<a name="v102"></a>Release v1.0.2 (31 August 2021)
 -------------------------------
 - Bump [Event_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/event/dcsa_event_v1.0.3.yaml)
 - Bump [Documentation_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/documentation/documentation_domain_v1.0.3.yaml)
 
-Release v1.0.1 (26 August 2021)
+<a name="v101"></a>Release v1.0.1 (26 August 2021)
 -------------------------------
 - Bump [DCSA_Domain to version 1.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/dcsa/dcsa_domain_v1.0.2.yaml)
 - Bump [Documentation_Domain to version 1.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/documentation/documentation_domain_v1.0.2.yaml)
@@ -25,6 +25,6 @@ Release v1.0.1 (26 August 2021)
   - `delayReasonCode` optional field
 - update description (remove wrong link to T&T)
 
-Initial release v1.0.0
+<a name="v100"></a>Initial release v1.0.0
 ----------------------
 - Domain created
