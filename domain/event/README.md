@@ -1,5 +1,5 @@
 
-Release v1.1.1
+## Release v1.1.1
 (unreleased)
 ------------------------
 - Bump [DCSA_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/dcsa/dcsa_domain_v1.1.0.yaml)
