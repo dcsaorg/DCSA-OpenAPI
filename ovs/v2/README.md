@@ -14,7 +14,7 @@ This release is to make OVS JIT v1.1 compatible
 
 - Bump [DCSA_Domain to version 1.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#release-v102-25-august-2021)
 - Bump [OVS_Domain to version 1.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/ovs#release-v102-31-august-2021)
-- Bump [Event_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/event/event_domain_v1.1.0.yaml)
+- Bump [Event_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#release-v110-1-september-2021)
 - description added for /v2/timestamps endPoint
 - updated the response for the /v2/events endPoint. It now returns a correctly defined `TransportEvent` (previously the `TransportEvent` also contained `documentReferences` and `references` which are only to be included in T&T)
 - updated example to only include a list with a single (OVS defined) `TransportEvent`
