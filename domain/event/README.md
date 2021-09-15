@@ -15,18 +15,13 @@
   - BUK (Experimental: Bunker serice provider)
 - BAI (Booking Acknowledgement ID) added to `documentTypeCodes` used in the `ShipmentEvent`
 
-<h1 id="release-110">
-  Release v1.1.0 (1 September 2021)
-</h1>
-
 ## <a name="release-v110"></a>Release v1.1.0 (1 September 2021)
-## `Release v1.1.0` (1 September 2021)
 - remove deprecated `scheduleID` from `TransportSubscriptionBody`
 - An alternative `TransportSubscriptionBodyWithScheduleID` has been created to support backward compatability in T&T
 - `eventClassifierCode` added as a simple object
 - removed deprecated `vesselScheduleChangeRemark`, `transportCallID` and `eventTypeCode` from the `OperationsTransportEvent` (they are still included in the `TransportEvent`)
 
-Release v1.0.3 (31 August 2021)
+[Release v1.0.3](#release-v103) (31 August 2021)
 -------------------------------
 - Bump [Documentation_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/documentation/documentation_domain_v1.0.3.yaml)
 
