@@ -7,7 +7,7 @@ Please check out the official webpage for publications related to this specifica
 ### [Release v2.1.0 (...)](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS/2.1.0)
 This release is to make OVS JIT v1.1 compatible
 
-- Bump [Event_Domain to version 1.1.1](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/event/event_domain_v1.1.1.yaml)
+- Bump [Event_Domain to version 1.1.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#release-v111-)
 - Bump [OVS_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/ovs/ovs_domain_v1.0.3.yaml)
 
 ### [Release v2.0.2 (1 September 2021)](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS/2.0.2)
