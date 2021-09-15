@@ -1,6 +1,5 @@
-## <a name="tith"></a>This is the Heading
-
-## <a name="release-v111"></a>Release v1.1.1 (unreleased)
+<a name="release-v111"></a></a>Release v1.1.1 (unreleased)
+-------------------------------
 - Bump [DCSA_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/dcsa/dcsa_domain_v1.1.0.yaml)
 - Bump [Documentation_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/documentation/documentation_domain_v1.1.0.yaml)
 - Bump [Location_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/location/dcsa_location_v1.0.3.yaml)
@@ -15,13 +14,14 @@
   - BUK (Experimental: Bunker serice provider)
 - BAI (Booking Acknowledgement ID) added to `documentTypeCodes` used in the `ShipmentEvent`
 
-## <a name="release-v110"></a>Release v1.1.0 (1 September 2021)
+<a name="release-v110"></a>Release v1.1.0 (1 September 2021)
+-------------------------------
 - remove deprecated `scheduleID` from `TransportSubscriptionBody`
 - An alternative `TransportSubscriptionBodyWithScheduleID` has been created to support backward compatability in T&T
 - `eventClassifierCode` added as a simple object
 - removed deprecated `vesselScheduleChangeRemark`, `transportCallID` and `eventTypeCode` from the `OperationsTransportEvent` (they are still included in the `TransportEvent`)
 
-## [Release v1.0.3](#release-v103) (31 August 2021)
+<a name="release-v103"></a>Release v1.0.3 (31 August 2021)
 - Bump [Documentation_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/documentation/documentation_domain_v1.0.3.yaml)
 
 Release v1.0.2 (30 August 2021)
