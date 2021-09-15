@@ -1,4 +1,4 @@
-<a name="release-v111"></a></a>Release v1.1.1 (unreleased)
+<a name="v111"></a></a>Release v1.1.1 (unreleased)
 ---
 - Bump [DCSA_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/dcsa/dcsa_domain_v1.1.0.yaml)
 - Bump [Documentation_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/documentation/documentation_domain_v1.1.0.yaml)
@@ -14,7 +14,7 @@
   - BUK (Experimental: Bunker serice provider)
 - BAI (Booking Acknowledgement ID) added to `documentTypeCodes` used in the `ShipmentEvent`
 
-<a name="release-v110"></a>Release v1.1.0 (1 September 2021)
+<a name="v110"></a>Release v1.1.0 (1 September 2021)
 ---
 - remove deprecated `scheduleID` from `TransportSubscriptionBody`
 - An alternative `TransportSubscriptionBodyWithScheduleID` has been created to support backward compatability in T&T
@@ -25,7 +25,7 @@
 ---
 - Bump [Documentation_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/documentation/documentation_domain_v1.0.3.yaml)
 
-<a name="release-v102"></a>Release v1.0.2 (30 August 2021)
+<a name="v102"></a>Release v1.0.2 (30 August 2021)
 ---
 - Bump [DCSA_Domain to version 1.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/dcsa/dcsa_domain_v1.0.2.yaml)
 - Bump [Documentation_Domain to version 1.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/documentation/documentation_domain_v1.0.2.yaml)
@@ -38,7 +38,7 @@
 - added `transportCallSequenceNumber` to the `transportCall` object
 - removed the Vessel object since it is already defined in the `Documentation Domain`
 
-<a name="release-v101"></a>Release v1.0.1 (02 August 2021)
+<a name="v101"></a>Release v1.0.1 (02 August 2021)
 ---
 - Bump [DCSA_Domain to version 1.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/dcsa/dcsa_domain_v1.0.1.yaml)
 - Bump [Documentation_Domain to version 1.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/documentation/documentation_domain_v1.0.1.yaml)
@@ -51,6 +51,6 @@
 - remark added as simple type
 - secret example updated
 
-<a name="release-v100"></a>Release v1.0.0 (30 June 2021)
+<a name="v100"></a>Release v1.0.0 (30 June 2021)
 ---
 - Domain created and released
