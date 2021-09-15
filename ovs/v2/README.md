@@ -8,7 +8,7 @@ Please check out the official webpage for publications related to this specifica
 This release is to make OVS JIT v1.1 compatible
 
 - Bump [Event_Domain to version 1.1.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#release-v111-)
-  - this includes new timestamps for JIT v1.1
+  - this includes new timestamps for JIT v1.1 (FAST, GWAY, etc)
 - Bump [OVS_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/ovs#release-v103-)
   - this includes updated `Party` obejct
 
