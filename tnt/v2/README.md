@@ -21,10 +21,12 @@ Purpose of this release is to add the new subscription model to T&T
 - Added `PUT /event-subscriptions/{subscriptionID}/secret` endPoint to update the shared secret used to create the `Notification-Signature`
 - Prefixed all endPoints with `/v2` in order to align with Design Guide
 
-### [v2.1.1](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/2.1.1) (18 August 2021)
-- v2.1.0 included an error and was not downloadable - this has been fixed in this version
+<a name="v211"></a>[Release v2.1.1 (18 August 2021)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/2.1.1)
+---
+- Fixes an error introduced in (#v210) that preventing the API from being downloaded on SwaggerHub
 
-### [v2.1.0](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/2.1.0)
+<a name="v210"></a>[Release v2.1.0](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/2.1.0)
+---
 - API Description updated
 - changed definition of array-queryParameters (ex: eventType). This is now a comma (,) separated list
 - Added limit and cursor queryParameter to `GET /events` and `GET /event-subscriptions`
