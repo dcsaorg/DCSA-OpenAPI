@@ -14,8 +14,8 @@
   - BUK (Experimental: Bunker serice provider)
 - BAI (Booking Acknowledgement ID) added to `documentTypeCodes` used in the `ShipmentEvent`
 
-<h1 id="my-custom-anchor-name">
-  My Header Name
+<h1 id="release-110">
+  Release v1.1.0 (1 September 2021)
 </h1>
 
 ## `Release v1.1.0` (1 September 2021)
