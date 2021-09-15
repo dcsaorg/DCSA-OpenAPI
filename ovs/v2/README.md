@@ -12,7 +12,7 @@ This release is to make OVS JIT v1.1 compatible
 
 ### [Release v2.0.2 (1 September 2021)](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS/2.0.2)
 
-- Bump [DCSA_Domain to version 1.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/dcsa/dcsa_domain_v1.0.2.yaml)
+- Bump [DCSA_Domain to version 1.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#release-v102-25-august-2021)
 - Bump [OVS_Domain to version 1.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/ovs#release-v102-31-august-2021)
 - Bump [Event_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/event/event_domain_v1.1.0.yaml)
 - description added for /v2/timestamps endPoint
