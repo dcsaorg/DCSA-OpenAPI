@@ -22,9 +22,10 @@
 - removed deprecated `vesselScheduleChangeRemark`, `transportCallID` and `eventTypeCode` from the `OperationsTransportEvent` (they are still included in the `TransportEvent`)
 
 <a name="release-v103"></a>Release v1.0.3 (31 August 2021)
+---
 - Bump [Documentation_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/documentation/documentation_domain_v1.0.3.yaml)
 
-Release v1.0.2 (30 August 2021)
+<a name="release-v102"></a>Release v1.0.2 (30 August 2021)
 -------------------------------
 - Bump [DCSA_Domain to version 1.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/dcsa/dcsa_domain_v1.0.2.yaml)
 - Bump [Documentation_Domain to version 1.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/documentation/documentation_domain_v1.0.2.yaml)
@@ -37,7 +38,7 @@ Release v1.0.2 (30 August 2021)
 - added `transportCallSequenceNumber` to the `transportCall` object
 - removed the Vessel object since it is already defined in the `Documentation Domain`
 
-Release v1.0.1 (02 August 2021)
+<a name="release-v101"></a>Release v1.0.1 (02 August 2021)
 -------------------------------
 - Bump [DCSA_Domain to version 1.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/dcsa/dcsa_domain_v1.0.1.yaml)
 - Bump [Documentation_Domain to version 1.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/documentation/documentation_domain_v1.0.1.yaml)
@@ -50,6 +51,6 @@ Release v1.0.1 (02 August 2021)
 - remark added as simple type
 - secret example updated
 
-Release v1.0.0 (30 June 2021)
+<a name="release-v100"></a>Release v1.0.0 (30 June 2021)
 -----------------------------
 - Domain created and released
