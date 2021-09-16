@@ -2,7 +2,7 @@
 
 The OVS Domain is documented on [**OVS_DOMAIN**](https://app.swaggerhub.com/domains-docs/dcsaorg/OVS_DOMAIN) SwaggerHub.
 
-The primary purpose of this Domain is to specify components to be used in the OVS API. This Domain defines the Timestamp object used in JIT (Just in Time).
+The primary purpose of this Domain is to specify components to be used in the OVS API. This Domain defines the Timestamp object used in JIT (Just in Time Port Calls).
 
 <a name="v103"></a>[Release v1.0.3 (unreleased)](https://app.swaggerhub.com/domains-docs/dcsaorg/OVS_DOMAIN/1.0.3)
 ---
