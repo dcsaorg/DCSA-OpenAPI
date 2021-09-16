@@ -2,6 +2,8 @@
 
 The Event Domain is documented on [**EVENT_DOMAIN**](https://app.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN) SwaggerHub.
 
+This Domain specifies common components for DCSA Events. This domain is central for all Event Hubs.
+
 <a name="v111"></a>[Release v1.1.1 (unreleased)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.1.1)
 ---
 - Bump [DCSA_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v110)
