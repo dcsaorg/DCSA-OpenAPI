@@ -7,7 +7,7 @@ The purpose of an Event Hub is to send events and manage subscriptions. Track & 
 - `EquipmentEvents` - events regarding Equipment (Loading, Discharging, Gated in, Gate out, Stuffing, Stripping)
 - `ShipmentEvents` - events regarding documentation (Booking, Bill of Lading, Arrival Notice, Shipment Release Message)
 
-It is only possible to receive and subscribe to events mentioned above when implementing Track & Trace.
+It is only possible to **receive** and **subscribe** to events mentioned above when implementing Track & Trace.
 
 Publication related to this specification:
 -	[DCSA Information Model 2.0](https://dcsa.org/wp-content/uploads/2020/07/DCSA-Information-model-2.0-vF.pdf)
