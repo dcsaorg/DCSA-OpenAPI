@@ -1,6 +1,6 @@
 ## Track & Trace (T&T)
 
-The DCSA Interface Standard for Track & Trace is documented on the [**DCSA TNT SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_TNT).
+The DCSA Interface Standard for Track & Trace is documented on [**DCSA TNT SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_TNT).
 
 <a name="v220"></a>[Release v2.2.0 (unreleased)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/2.2.0)
 ---
