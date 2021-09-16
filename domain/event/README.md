@@ -1,4 +1,8 @@
-<a name="v111"></a></a>Release v1.1.1 (unreleased)
+## Event Domain
+
+The Event Domain is documented on [**EVENT_DOMAIN**](https://app.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN) SwaggerHub.
+
+<a name="v111"></a>[Release v1.1.1 (unreleased)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.1.1)
 ---
 - Bump [DCSA_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v110)
 - Bump [Documentation_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v110)
@@ -14,18 +18,18 @@
   - BUK (Experimental: Bunker serice provider)
 - BAI (Booking Acknowledgement ID) added to `documentTypeCodes` used in the `ShipmentEvent`
 
-<a name="v110"></a>Release v1.1.0 (1 September 2021)
+<a name="v110"></a>[Release v1.1.0 (1 September 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.1.0)
 ---
 - remove deprecated `scheduleID` from `TransportSubscriptionBody`
 - An alternative `TransportSubscriptionBodyWithScheduleID` has been created to support backward compatability in T&T
 - `eventClassifierCode` added as a simple object
 - removed deprecated `vesselScheduleChangeRemark`, `transportCallID` and `eventTypeCode` from the `OperationsTransportEvent` (they are still included in the `TransportEvent`)
 
-<a name="v103"></a>Release v1.0.3 (31 August 2021)
+<a name="v103"></a>[Release v1.0.3 (31 August 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.0.3)
 ---
 - Bump [Documentation_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v103)
 
-<a name="v102"></a>Release v1.0.2 (30 August 2021)
+<a name="v102"></a>[Release v1.0.2 (30 August 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.0.2)
 ---
 - Bump [DCSA_Domain to version 1.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v102)
 - Bump [Documentation_Domain to version 1.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v102)
@@ -38,7 +42,7 @@
 - added `transportCallSequenceNumber` to the `transportCall` object
 - removed the Vessel object since it is already defined in the `Documentation Domain`
 
-<a name="v101"></a>Release v1.0.1 (02 August 2021)
+<a name="v101"></a>[Release v1.0.1 (02 August 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.0.1)
 ---
 - Bump [DCSA_Domain to version 1.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v101)
 - Bump [Documentation_Domain to version 1.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v101)
@@ -51,6 +55,6 @@
 - remark added as simple type
 - secret example updated
 
-<a name="v100"></a>Release v1.0.0 (30 June 2021)
+<a name="v100"></a>[Release v1.0.0 (30 June 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.0.0)
 ---
 - Domain created and released
