@@ -7,8 +7,11 @@ The DCSA Interface Standard for Track & Trace is documented on [**DCSA TNT Swagg
 Purpose of this release is to add the new subscription model to T&T
 - Bump [DCSA_Domain to version 1.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v102)
 - Bump [Event_Domain to version 1.1.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#v111)
+  - Keeping `ShipmentEvent`, `TransportEvent` and `EquipmentEvent` on [Event_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#v110) since it was not agreed to update values in these
 - Added `PUT /event-subscriptions/{subscriptionID}/secret` endPoint to update the shared secret used to create the `Notification-Signature`
 - Prefixed all endPoints with `/v2` in order to align with Design Guide
+- added a `UNLocationCode` filter to the `GET /v2/events` endPoint
+- added `transportCallSequenceNumber` to the `TransportCall`
 
 <a name="v211"></a>[Release v2.1.1 (18 August 2021)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/2.1.1)
 ---
