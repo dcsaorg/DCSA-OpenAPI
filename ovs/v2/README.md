@@ -13,6 +13,7 @@ This release is to make OVS JIT v1.1 compatible
   - this includes updated `Party` obejct
 - `UNLocationCode` filter added to `GET /v2/events endPoint`
 - `sort` queryParameter added to `GET /v2/events endPoint`
+- `facilityTypeCode` no longer mandatory in `POST /v2/timestamps`
 
 ### [Release v2.0.2 (1 September 2021)](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS/2.0.2)
 
