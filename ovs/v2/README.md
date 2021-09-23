@@ -11,6 +11,8 @@ This release is to make OVS JIT v1.1 compatible
   - this includes new timestamps for JIT v1.1 (`FAST`, `GWAY`, etc)
 - Bump [OVS_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/ovs#release-v103-)
   - this includes updated `Party` obejct
+- `UNLocationCode` filter added to `GET /v2/events endPoint`
+- `sort` queryParameter added to `GET /v2/events endPoint`
 
 ### [Release v2.0.2 (1 September 2021)](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS/2.0.2)
 
