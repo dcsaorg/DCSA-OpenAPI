@@ -22,11 +22,11 @@ This Domain specifies common components for DCSA Events. This domain is central 
 
 <a name="v110"></a>[Release v1.1.0 (1 September 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.1.0)
 ---
-Cleanup done for OVS major release.
+Cleanup done for OVS major release. Deprecated fields removed from Events
 - remove deprecated `scheduleID` from `TransportSubscriptionBody`
 - An alternative `TransportSubscriptionBodyWithScheduleID` has been created to support backward compatability in T&T
 - `eventClassifierCode` added as a simple object
-- removed deprecated `vesselScheduleChangeRemark`, `transportCallID` and `eventTypeCode` from the `OperationsTransportEvent` (they are still included in the `TransportEvent`)
+- removed deprecated `vesselScheduleChangeRemark`, `transportCallID` and `eventTypeCode` from the `Operations-TransportEvent` (they are still included in the `TransportEvent` used for T&T)
 
 <a name="v103"></a>[Release v1.0.3 (31 August 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.0.3)
 ---
