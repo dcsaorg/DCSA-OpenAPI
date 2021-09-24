@@ -10,6 +10,7 @@ This Domain specifies common components for DCSA Events. This domain is central 
 - Bump [DCSA_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v110)
 - Bump [Documentation_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v110)
 - Bump [Location_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v103)
+- `UNLocationCode` added as a filter
 - updated `portCallServiceTypeCode` with the following values:
   - FAST (AT All Fast)
   - GWAY (AT Gangway down and secure)
