@@ -29,7 +29,7 @@ This Domain specifies common components for DCSA Events. This domain is central 
 
 <a name="v103"></a>[Release v1.0.3 (31 August 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.0.3)
 ---
-Purpose of this release is to update the `Party`-object to be aligned with what is needed for OVS JIT
+Purpose of this release is to update the `Party`-object to include the new `Party Identifiers` (needed for OVS JIT)
 - Bump [Documentation_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v103)
 
 <a name="v102"></a>[Release v1.0.2 (30 August 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.0.2)
