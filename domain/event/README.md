@@ -22,6 +22,7 @@ This Domain specifies common components for DCSA Events. This domain is central 
 
 <a name="v110"></a>[Release v1.1.0 (1 September 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.1.0)
 ---
+Cleanup done for OVS major release.
 - remove deprecated `scheduleID` from `TransportSubscriptionBody`
 - An alternative `TransportSubscriptionBodyWithScheduleID` has been created to support backward compatability in T&T
 - `eventClassifierCode` added as a simple object
