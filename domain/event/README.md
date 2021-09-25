@@ -20,6 +20,7 @@ This Domain specifies common components for DCSA Events. This domain is central 
   - BUK (Experimental: Bunker serice provider)
 - Use globally defined `facilityTypeCode` in `DCSA_Domain` instead of locally defined version
 - Define new `TransportCallOPR` including `transportCallNumberSequence` to be used in `OperationsEvents`
+- `portCallServiceTypeCode` is no longer a mandatory field in `OperationsEvents`
 
 <a name="v110"></a>[Release v1.1.0 (1 September 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.1.0)
 ---
