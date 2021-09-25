@@ -9,6 +9,7 @@ This Domain specifies common components for DCSA Events. This domain is central 
 Upgrade to JIT v1.1
 - Domain Description updated
 - Bump [Documentation_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v103)
+- Bump [Location_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v103)
 - `UNLocationCode` added as a filter on `/v2/events` endPoint and as a `Subscription` field
 - updated `portCallServiceTypeCode` with the following values:
   - FAST (AT All Fast)
