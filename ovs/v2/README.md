@@ -16,6 +16,7 @@ This release is to make OVS JIT v1.1 compatible
 - `sort` queryParameter added to `GET /v2/events endPoint`
 - `facilityTypeCode` no longer mandatory in `POST /v2/timestamps`
 - specialized example removed from `GET /v2/events` endPoint - now Swaggerhub default is used again
+- `identifyingCodes` renamed to `partyIdentifyingCodes`
 - `codeListName` added to `Party`-object
 - `TWG` (Towage), `LSH` (Lashing) and `BUK` (Bunker) added to `publisherRole`
 - `LASH` (Lashing), `SAFE` (Safety), `FAST` (All Fast) and `GWAY` (Gangway down and secure) added to `portCallServiceTypeCode`
