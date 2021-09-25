@@ -21,6 +21,10 @@ This version is primarily connected to Booking API
 - `referenceType` updated with new values: `ECR`, `CSI`, `BPR` and `BID`
 - `valueAddedServiceRequest` renamed to `valueAddedServiceCode` and changed from string `->` enum
 
+<a name="v103"></a>[Release v1.0.3 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/DCSA_DOMAIN/1.0.3)
+---
+- sort queryParameter added
+
 <a name="v102"></a>[Release v1.0.2 (25 August 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/DCSA_DOMAIN/1.0.2)
 ---
 - Update UUID example values
