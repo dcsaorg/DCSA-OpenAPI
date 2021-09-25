@@ -30,7 +30,7 @@ Cleanup done for OVS major release. Deprecated fields removed from Events
 <a name="v103"></a>[Release v1.0.3 (31 August 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.0.3)
 ---
 Purpose of this release is to update the `Party`-object to include the new `Party Identifiers` (needed for OVS JIT)
-- Bump [Documentation_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v103)
+- Bump [Documentation_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v103) only for `Party` object to inlcued the new `Party Identifier Code`
 
 <a name="v102"></a>[Release v1.0.2 (30 August 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.0.2)
 ---
