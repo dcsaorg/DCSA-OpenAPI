@@ -10,6 +10,10 @@ Publications related to this specification:
 
 ### Releasenotes
 
-### [v1.0.0](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL) (...)
-
+### [v1.0.0](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BGK) (...)
 Initial release of the DCSA OpenAPI definitions for Booking
+
+- Initial Documentation Domain set to [Documentation_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v110)
+- Initial DCSA Domain set to [DCSA_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v110)
+- Initial Event Domain set to [Event_Domain to version 1.5.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#v150)
+
