@@ -8,6 +8,8 @@ This Domain specifies common components for DCSA Events. This domain is central 
 ---
 This release is for Booking
 
+- `BAI` (Booking Acknowledgement ID) added as `documentTypeCode`
+
 <a name="v111"></a>[Release v1.1.1 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.1.1)
 ---
 Upgrade to JIT v1.1
