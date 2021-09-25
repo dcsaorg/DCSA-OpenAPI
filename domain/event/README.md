@@ -8,6 +8,9 @@ This Domain specifies common components for DCSA Events. This domain is central 
 ---
 This release is for Booking
 
+- Bump [DCSA_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v110)
+- Bump [Documentation_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v110)
+- Bump [Location_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v110)
 - `BAI` (Booking Acknowledgement ID) added as `documentTypeCode`
 
 <a name="v111"></a>[Release v1.1.1 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.1.1)
