@@ -17,8 +17,8 @@ This release is to make OVS JIT v1.1 compatible
 - `facilityTypeCode` no longer mandatory in `POST /v2/timestamps`
 - specialized example removed from `GET /v2/events` endPoint - now Swaggerhub default is used again
 - `codeListName` added to `Party`-object
-- `TWG` (Towage), `LSH` (Lashing) and `BUK` (Bunker) added as `publisherRole`s
-- `LASH` (Lashing), `SAFE` (Safety), `FAST` (All Fast) and `GWAY` (Gangway down and secure) added as `portCallServiceTypeCode`s
+- `TWG` (Towage), `LSH` (Lashing) and `BUK` (Bunker) added to `publisherRole`
+- `LASH` (Lashing), `SAFE` (Safety), `FAST` (All Fast) and `GWAY` (Gangway down and secure) added to `portCallServiceTypeCode`
 - `portCallServiceTypeCode` now optional in `OperationsEvents`
 - globally defined `facilityTypeCodeOPR` used instead of locatlly defined version
 
