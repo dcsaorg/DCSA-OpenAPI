@@ -32,6 +32,13 @@ Cleanup done for OVS major release. Deprecated fields removed from Events
 - `eventClassifierCode` added as a simple object
 - removed deprecated `vesselScheduleChangeRemark`, `transportCallID` and `eventTypeCode` from the `Operations-TransportEvent` (they are still included in the `TransportEvent` used for T&T)
 
+<a name="v104"></a>[Release v1.0.4 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.0.4)
+---
+This release is to update T&T v2.2 (T&T with new subscription  module)
+- `eventClassifierCode` added as a simple object
+- `UNLocationCode` added as a filter on `/v2/events` endPoint and as a `Subscription` field
+- Use globally defined `facilityTypeCode` in `DCSA_Domain` instead of locally defined version
+
 <a name="v103"></a>[Release v1.0.3 (31 August 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.0.3)
 ---
 Purpose of this release is to update the `Party`-object to include the new `Party Identifiers` (needed for OVS JIT)
