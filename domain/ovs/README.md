@@ -7,7 +7,7 @@ The primary purpose of this Domain is to specify components to be used in the OV
 <a name="v103"></a>[Release v1.0.3 (unreleased)](https://app.swaggerhub.com/domains-docs/dcsaorg/OVS_DOMAIN/1.0.3)
 ---
 - Bump [Event_Domain to version 1.1.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#v111)
-- Bump [Documentation_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v110)
+- Bump [Documentation_Domain to version 1.0.4](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v104)
   - this will update the `Party` object to include the `codeListName` in the `identifiers` as it is needed in order to distinguish between different SMDG codes
 
 <a name="v102"></a>[Release v1.0.2 (31 August 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/OVS_DOMAIN/1.0.2)
