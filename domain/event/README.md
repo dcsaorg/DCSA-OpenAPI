@@ -7,7 +7,6 @@ This Domain specifies common components for DCSA Events. This domain is central 
 <a name="v111"></a>[Release v1.1.1 (unreleased)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.1.1)
 ---
 - Domain Description updated
-- Bump [Location_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v103)
 - `UNLocationCode` added as a filter
 - updated `portCallServiceTypeCode` with the following values:
   - FAST (AT All Fast)
