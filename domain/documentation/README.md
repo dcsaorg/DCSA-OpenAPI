@@ -33,6 +33,7 @@ This version is primaily connected to the new Booking API
 <a name="v104"></a>Release v1.0.4 (...)
 ---
 - Bump [DCSA_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v103)
+- Bump [Location_Domain to version 1.0.4](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v104)
 
 <a name="v103"></a>Release v1.0.3 (31 August 2021)
 ---
