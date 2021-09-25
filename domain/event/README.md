@@ -37,7 +37,7 @@ Cleanup done for OVS major release. Deprecated fields removed from Events
 This release is to update T&T v2.2 (T&T with new subscription  module)
 - `eventClassifierCode` added as a simple object
 - `UNLocationCode` added as a filter on `/v2/events` endPoint and as a `Subscription` field
-- Use globally defined `facilityTypeCode` in `DCSA_Domain` instead of locally defined version
+- Use globally defined `facilityTypeCodeOPR` in `DCSA_Domain` to align with later versions instead of locally defined version
 
 <a name="v103"></a>[Release v1.0.3 (31 August 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.0.3)
 ---
