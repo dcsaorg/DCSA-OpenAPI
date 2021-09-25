@@ -30,6 +30,10 @@ This version is primaily connected to the new Booking API
 - `transportPlanStage`, `transportPlanStageSequenceNumber` and `vesselName` added to the `transport` object
 - `transportPlanStage`, `transportPlanSequenceNumber`, `loadLocation`, `dischargeLocation`, `plannedDepartureDate`, `plannedArrivalDate`, `vesselName`, `vesselIMONumber`, `carrierVoyageNumber` are now all required fields on `transport`
 
+<a name="v104"></a>Release v1.0.4 (...)
+---
+- Bump [DCSA_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v103)
+
 <a name="v103"></a>Release v1.0.3 (31 August 2021)
 ---
 Party object has been updated
