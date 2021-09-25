@@ -8,7 +8,6 @@ This Domain specifies common components for DCSA Events. This domain is central 
 ---
 - Domain Description updated
 - Bump [DCSA_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v110)
-- Bump [Documentation_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v110)
 - Bump [Location_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v103)
 - `UNLocationCode` added as a filter
 - updated `portCallServiceTypeCode` with the following values:
@@ -20,7 +19,6 @@ This Domain specifies common components for DCSA Events. This domain is central 
   - TWG (Experimental: Towage serice provider)
   - LSH (Experimental: Lashing serice provider)
   - BUK (Experimental: Bunker serice provider)
-- BAI (Booking Acknowledgement ID) added to `documentTypeCodes` used in the `ShipmentEvent`
 
 <a name="v110"></a>[Release v1.1.0 (1 September 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.1.0)
 ---
