@@ -18,6 +18,7 @@ This Domain specifies common components for DCSA Events. This domain is central 
   - TWG (Experimental: Towage serice provider)
   - LSH (Experimental: Lashing serice provider)
   - BUK (Experimental: Bunker serice provider)
+- Use globally defined `facilityTypeCode` in `DCSA_Domain` instead of locally defined version
 
 <a name="v110"></a>[Release v1.1.0 (1 September 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.1.0)
 ---
