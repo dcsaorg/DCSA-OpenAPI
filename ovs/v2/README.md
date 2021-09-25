@@ -16,6 +16,7 @@ This release is to make OVS JIT v1.1 compatible
 - `sort` queryParameter added to `GET /v2/events endPoint`
 - `facilityTypeCode` no longer mandatory in `POST /v2/timestamps`
 - specialized example removed from `GET /v2/events` endPoint - now Swaggerhub default is used again
+- `codeListName` added to `Party`-object
 
 ### [Release v2.0.2 (1 September 2021)](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS/2.0.2)
 
