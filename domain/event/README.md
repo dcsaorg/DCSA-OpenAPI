@@ -4,6 +4,10 @@ The Event Domain is documented on [**EVENT_DOMAIN**](https://app.swaggerhub.com/
 
 This Domain specifies common components for DCSA Events. This domain is central for all Event Hubs.
 
+<a name="v150"></a>[Release v1.5.0 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.5.0)
+---
+This release is for Booking
+
 <a name="v111"></a>[Release v1.1.1 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.1.1)
 ---
 Upgrade to JIT v1.1
