@@ -20,6 +20,7 @@ This version is primarily connected to Booking API
 - `paymentTerm` changed from string `->` enum
 - `referenceType` updated with new values: `ECR`, `CSI`, `BPR` and `BID`
 - `valueAddedServiceRequest` renamed to `valueAddedServiceCode` and changed from string `->` enum
+- `RAMP` added as `facilityTypeCode`
 
 <a name="v103"></a>[Release v1.0.3 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/DCSA_DOMAIN/1.0.3)
 ---
