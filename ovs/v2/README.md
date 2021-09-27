@@ -22,7 +22,7 @@ This release is to make OVS JIT v1.1 compatible
 - `LASH` (Lashing), `SAFE` (Safety), `FAST` (All Fast) and `GWAY` (Gangway down and secure) added to `portCallServiceTypeCode`
 - `portCallServiceTypeCode` now optional in `OperationsEvents`
 - globally defined `facilityTypeCodeOPR` used instead of locatlly defined version
-- `transportCallSequenceNumber` removed from `TransportEvent`
+- `PICK`, `DROP`, `INSP`, `RSEA` and `RMVD` added to `EquipmentEventTypeCode` it was forgotten in previous version
 
 ### [Release v2.0.2 (1 September 2021)](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS/2.0.2)
 
