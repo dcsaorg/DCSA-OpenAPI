@@ -13,6 +13,7 @@ This release is for Booking
 - Bump [Location_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v110)
 - `BAI` (Booking Acknowledgement ID) added as `documentTypeCode`
 - `documentTypeCode` added as query filter parameter and as subscription filter (to be used with `ShipmentEvents`)
+- `PICK`, `DROP`, `INSP`, `RSEA` and `RMVD` added to `EquipmentEventTypeCode`
 
 <a name="v111"></a>[Release v1.1.1 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.1.1)
 ---
@@ -35,6 +36,7 @@ Upgrade to JIT v1.1
 - Removed `transportCallNumberSequence` from `TransportCall` object
 - Created a new `TransportCallOPR` where where `transportCallNumberSequence` is included to be used in `OperationsEvents`
 - `portCallServiceTypeCode` is no longer a mandatory field in `OperationsEvents`
+- `PICK`, `DROP`, `INSP`, `RSEA` and `RMVD` added to `EquipmentEventTypeCode`
 
 <a name="v110"></a>[Release v1.1.0 (1 September 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.1.0)
 ---
@@ -53,6 +55,7 @@ This release is to update T&T v2.2 (T&T with new subscription  module)
 - `UNLocationCode` added as a filter on `/v2/events` endPoint and as a `Subscription` field
 - Use globally defined `facilityTypeCodeOPR` in `DCSA_Domain` to align with later versions instead of locally defined version
 - `documentTypeCode` added as query filter parameter and as subscription filter
+- `PICK`, `DROP`, `INSP`, `RSEA` and `RMVD` added to `EquipmentEventTypeCode`
 
 <a name="v103"></a>[Release v1.0.3 (31 August 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.0.3)
 ---
