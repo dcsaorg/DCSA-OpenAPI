@@ -5,6 +5,7 @@
 <a name="v103"></a>[Release v1.0.3 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/LOCATION_DOMAIN/1.0.3)
 ---
 - Bump [DCSA_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v103)
+- `facilityCode` and `facilityCodeListProvider` have been added to the `location` object
 
 <a name="v102"></a>[Release v1.0.2 (25 August 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/LOCATION_DOMAIN/1.0.2)
 ---
