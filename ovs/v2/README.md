@@ -26,7 +26,7 @@ This release is to make OVS JIT v1.1 compatible
 - `facilitySMDGCode` is deprecated - `facilityCode` together with `facilityCodeListProvider` in `eventLocation` should be used instead
 
 ### [Release v2.0.3 (...)](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS/2.0.3)
-A bugrelease to fix the facilitySMDG code problem
+A bugrelease to fix the `facilitySMDGCode` problem
 
 - `facilitySMDGCode` is deprecated - `facilityCode` together with `facilityCodeListProvider` in `eventLocation` should be used instead
 
