@@ -37,6 +37,8 @@ Upgrade to JIT v1.1
 - Created a new `TransportCallOPR` where where `transportCallNumberSequence` is included to be used in `OperationsEvents`
 - `portCallServiceTypeCode` is no longer a mandatory field in `OperationsEvents`
 - `PICK`, `DROP`, `INSP`, `RSEA` and `RMVD` added to `EquipmentEventTypeCode`
+- `publisher` and `publisherRole` are now mandatory fields in `OperationsEvent`
+
 
 <a name="v110"></a>[Release v1.1.0 (1 September 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.1.0)
 ---
