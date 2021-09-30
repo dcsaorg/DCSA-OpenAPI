@@ -32,7 +32,7 @@ A bugrelease to fix the `facilitySMDGCode` problem
 
 - `facilitySMDGCode` is deprecated - `facilityCode` together with `facilityCodeListProvider` in `eventLocation` should be used instead
 - `publisher` and `publisherRole` are now mandatory fields on `OperationsEvent`
-- `partyCode` and `codeListResponsibleAgencyCode` are now mandatory fields in the `Party`-object
+- `partyCode` and `codeListResponsibleAgencyCode` are now mandatory fields in the `IdentifyingCodes` in the `Party`-object
 - `codeListName` added as an optional field to the `IdentifyingCodes` in the `Party`-object
 
 <a name="v202"></a>[Release v2.0.2 (1 September 2021)](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS/2.0.2)
