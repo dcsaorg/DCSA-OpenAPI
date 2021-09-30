@@ -4,7 +4,8 @@ The DCSA Interface Standard for Operational Vessel Schedules is documented on th
 Please check out the official webpage for publications related to this specification:
 [JIT Port Call Data Definitions](https://dcsa.org/standards/jit-port-call-data-definitions)
 
-### [Release v2.1.0 (...)](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS/2.1.0)
+<a name="v210"></a>[Release v2.1.0 (...)](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS/2.1.0)
+---
 This release is to make OVS JIT v1.1 compatible
 
 - Description updated
@@ -25,12 +26,14 @@ This release is to make OVS JIT v1.1 compatible
 - `PICK`, `DROP`, `INSP`, `RSEA` and `RMVD` added to `EquipmentEventTypeCode` it was forgotten in previous version
 - `facilitySMDGCode` is deprecated - `facilityCode` together with `facilityCodeListProvider` in `eventLocation` should be used instead
 
-### [Release v2.0.3 (...)](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS/2.0.3)
+<a name="v203"></a>[Release v2.0.3 (...)](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS/2.0.3)
+---
 A bugrelease to fix the `facilitySMDGCode` problem
 
 - `facilitySMDGCode` is deprecated - `facilityCode` together with `facilityCodeListProvider` in `eventLocation` should be used instead
 
-### [Release v2.0.2 (1 September 2021)](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS/2.0.2)
+<a name="v202"></a>[Release v2.0.2 (1 September 2021)](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS/2.0.2)
+---
 
 - Bump [DCSA_Domain to version 1.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v102)
 - Bump [OVS_Domain to version 1.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/ovs#v102)
@@ -42,11 +45,13 @@ A bugrelease to fix the `facilitySMDGCode` problem
 - Removed unused query parameter definitions
 - Removed deprecated values in the `TransportEvent`
 
-### [v2.0.1](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS/2.0.1)
+<a name="v201"></a>[Release v2.0.1](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS/2.0.1)
+---
 
 - `eventType` example and default values fixed (caused download errors in v2.0.0)
 
-### [v2.0.0](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS/2.0.0)
+<a name="v200"></a>[Release v2.0.0](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS/2.0.0)
+---
 The purpose of this release is to include JIT v1.0 (Just in Time) portcalls into OVS. The release also includes a lot of cleanup and reuse of common definitions
 
 - delete all /`schedules` endPoints (schedules are now derived from the /`events` endPoint)
