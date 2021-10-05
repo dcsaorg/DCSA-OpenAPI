@@ -58,6 +58,9 @@ This release is to update T&T v2.2 (T&T with new subscription  module)
 - Use globally defined `facilityTypeCodeOPR` in `DCSA_Domain` to align with later versions instead of locally defined version
 - `documentTypeCode` added as query filter parameter and as subscription filter
 - `PICK`, `DROP`, `INSP`, `RSEA` and `RMVD` added to `EquipmentEventTypeCode`
+- `carrierVoyageNumber` deprecated and replaced by `exportVoyageNumber` and ìmportVoyageNumber` in `TransportCall`
+- `REQS`, `CMPL`, `HOLD` and `RELS` added as `ShipmentEventTypeCode`
+
 
 <a name="v103"></a>[Release v1.0.3 (31 August 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.0.3)
 ---
