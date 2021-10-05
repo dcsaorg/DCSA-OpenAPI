@@ -14,7 +14,7 @@ Purpose of this release is to add the new subscription model to T&T
 - added `sort` as a queryParameter to both `GET /v2/events` and `GET /v2/event-subscriptions` endPoints in order to sort the end result
 - `PICK`, `DROP`, `INSP`, `RSEA` and `RMVD` added to `EquipmentEventTypeCode` (it was forgotten in previous version)
 
-<a name="v212"></a>[Release v2.1.2 (...)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/2.1.2)
+<a name="v212"></a>[Release v2.1.2 (4 October 2021)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/2.1.2)
 ---
 This is a patch including some forgotten values for v2.1.1
 - `PICK`, `DROP`, `INSP`, `RSEA` and `RMVD` added to `EquipmentEventTypeCode`
