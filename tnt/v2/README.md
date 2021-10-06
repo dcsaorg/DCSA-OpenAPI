@@ -12,6 +12,7 @@ Purpose of this release is to add the new subscription model to T&T
 - added a `UNLocationCode` filter to the `GET /v2/events` endPoint
 - added `transportCallSequenceNumber` to the `TransportCall`
 - added `sort` as a queryParameter to both `GET /v2/events` and `GET /v2/event-subscriptions` endPoints in order to sort the end result
+- `transportDocumentTypeCode` query parameter filter has been removed from the `/v2/events` endPoint and from the Subscription
 
 <a name="v212"></a>[Release v2.1.2 (4 October 2021)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/2.1.2)
 ---
