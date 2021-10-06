@@ -63,6 +63,7 @@ This release is to update T&T v2.2 (T&T with new subscription  module)
 - `VGM`,`CAS`,`CUS`,`DGD` and `OOG` added as `documentTypeCode`
 - `transportCall` is now an optional field on EquipmentEvent
 - `eventLocation` is added as an optional field on EquipmentEvent
+- `transportDocumentTypeCode` query parameter filter has been removed from the `ShipmentSubscriptionBody` object
 
 <a name="v103"></a>[Release v1.0.3 (31 August 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.0.3)
 ---
