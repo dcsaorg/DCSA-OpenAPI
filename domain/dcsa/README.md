@@ -25,6 +25,7 @@ This version is primarily connected to Booking API
 ---
 - sort queryParameter added
 - `RAMP` added as `facilityTypeCode`
+- `EQ` added as `referenceType`
 
 <a name="v102"></a>[Release v1.0.2 (25 August 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/DCSA_DOMAIN/1.0.2)
 ---
