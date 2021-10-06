@@ -36,6 +36,7 @@ This version is primaily connected to the new Booking API
 - Bump [Location_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v103)
 - `codeListResponsibleAgencyCode` and `partyCode` are now mandatory in `IdentifyingParty`
 - `codeListName` has been added as an optional field on `IdentifyingParty`
+- `bookingChannelReferenceNumber` renamed to `bookingChannelReference`
 
 <a name="v103"></a>[Release v1.0.3 (31 August 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN/1.0.3)
 ---
