@@ -53,17 +53,18 @@ Cleanup done for OVS major release. Deprecated fields removed from Events
 This release is to update T&T v2.2 (T&T with new subscription  module)
 - Bump [Location_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v103)
 - Bump [Documentation_Domain to version 1.0.4](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v104)
-- `eventClassifierCode` added as a simple object
-- `UNLocationCode` added as a filter on `/v2/events` endPoint and as a `Subscription` field
-- Use globally defined `facilityTypeCodeOPR` in `DCSA_Domain` to align with later versions instead of locally defined version
+- Bump [DCSA_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v103)
 - `documentTypeCode` added as query filter parameter and as subscription filter
 - `PICK`, `DROP`, `INSP`, `RSEA` and `RMVD` added to `EquipmentEventTypeCode`
-- `carrierVoyageNumber` deprecated and replaced by `exportVoyageNumber` and ìmportVoyageNumber` in `TransportCall`
+- `eventClassifierCode` added as a simple object
 - `REQS`, `CMPL`, `HOLD` and `RELS` added as `ShipmentEventTypeCode`
-- `VGM`,`CAS`,`CUS`,`DGD` and `OOG` added as `documentTypeCode`
-- `transportCall` is now an optional field on EquipmentEvent
+- `transportDocumentTypeCode` query parameter filter has been removed
+- `UNLocationCode` added as a query parameter filter
 - `eventLocation` is added as an optional field on EquipmentEvent
-- `transportDocumentTypeCode` query parameter filter has been removed as well as from the `ShipmentSubscriptionBody` object
+- `transportCall` is now an optional field on EquipmentEvent
+- Use globally defined `facilityTypeCodeOPR` in `DCSA_Domain` to align with later versions instead of locally defined version
+- `carrierVoyageNumber` deprecated and replaced by `exportVoyageNumber` and ìmportVoyageNumber` in `TransportCall`
+- `VGM`,`CAS`,`CUS`,`DGD` and `OOG` added as `documentTypeCode`
 - `transportDocumentTypeCode` attributehas been removed from `ShipmentSubscriptionBody` object
 
 <a name="v103"></a>[Release v1.0.3 (31 August 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.0.3)
