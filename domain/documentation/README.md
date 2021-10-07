@@ -21,11 +21,17 @@ This version is primaily connected to the new Booking API
   - added `vesselName`, `vesselIMONumber` and `carrierVoyageNumber` (they have been moved from `transportDraft` object which is no longer needed)
 - `bookingConfirmation` object added
 - `commodity` object updated with `exportLicenseIssueDate` and `exportLicenseExpiryDate`
-- `transportDraft` object no longer an array and now only contains `vesselName`, `vesselIMONumber` and `carrierVoyageNumber`
-- `voyage` removed
+- `transportDraft` object removed (fields are now in the `bookingRequest` object)
+- `voyage` and `voyages` removed
+- `valueAddedServiceRequest` object created
+- description updated for `requestedEquipment`
+- `requestedEquipmentType` renamed to `requestedEquipmentSizeType`
 - `requestedEquipmentSizeType`, `requestedEquipmentUnits` and `isShipperOwned` are now required fields on `requestedEquipment`
 - `confirmedEquipment` object added
 - `shipmentCutOffTime` object added
+- `location` object in `shippingInstructionHeader` now contains an ID
+- the `party` object in `documentParties` now contains an ID
+- `partyContactDetails` in `party` object is now a list
 - `codeListName` added as a simple object and added in `identifingCodes` object used in `Party`-object
 - add missing `)` in enum value `54` in `codeListResponsibleAgencyCode`
 - add `eventDate` to `ShipmentLocation` object
