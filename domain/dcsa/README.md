@@ -23,12 +23,13 @@ This version is primarily connected to Booking API
 
 <a name="v103"></a>[Release v1.0.3 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/DCSA_DOMAIN/1.0.3)
 ---
-- `sort` added as a queryparameter
+- renamed `bookingChannelReferenceNumber` -> `bookingChannelReference`
+- `exportVoyageNumber` and `importVoyageNumber` added as simpletypes
 - `RAMP` added as `facilityTypeCode`
 - `EQ` added as `referenceType`
-- `exportVoyageNumber` and `importVoyageNumber` added as simpletypes
 - `UnLocationCode` example updated - changed `USNYC` -> `FRPAR`
 - reordered all parameters to be alphabetically
+- `sort` added as a queryparameter
 
 <a name="v102"></a>[Release v1.0.2 (25 August 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/DCSA_DOMAIN/1.0.2)
 ---
