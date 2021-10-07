@@ -22,7 +22,13 @@ Upgrade to JIT v1.1
 - Bump [Documentation_Domain to version 1.0.4](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v104)
 - Bump [Location_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v103)
 - Bump [DCSA_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v103)
-- `UNLocationCode` added as a filter on `/v2/events` endPoint and as a `Subscription` field
+- `PICK`, `DROP`, `INSP`, `RSEA` and `RMVD` added to `EquipmentEventTypeCode` and `EquipmentEventTypeCodes`
+- `UNLocationCode` added as a query parameter filter
+- `UNLocationCode` added as a filter on `Equipment`, `Transport` and `Operations` subscriptions
+- Use globally defined `facilityTypeCode` in `DCSA_Domain` instead of locally defined version
+- `portCallServiceTypeCode` is no longer a mandatory field in `OperationsEvents`
+- `publisher` and `publisherRole` are now mandatory fields in `OperationsEvent`
+- GitHub link added to `documentTypeCode`, `equipmentEventTypeCode`, `operationsEventTypeCode`, `portCallServiceTypeCode`, `publisherRole`, `shipmentEventTypeCode` and `transportEventTypeCode`
 - updated `portCallServiceTypeCode` with the following values:
   - FAST (AT All Fast)
   - GWAY (AT Gangway down and secure)
@@ -32,12 +38,6 @@ Upgrade to JIT v1.1
   - TWG (Experimental: Towage serice provider)
   - LSH (Experimental: Lashing serice provider)
   - BUK (Experimental: Bunker serice provider)
-- Use globally defined `facilityTypeCode` in `DCSA_Domain` instead of locally defined version
-- Removed `transportCallNumberSequence` from `TransportCall` object
-- Created a new `TransportCallOPR` where where `transportCallNumberSequence` is included to be used in `OperationsEvents`
-- `portCallServiceTypeCode` is no longer a mandatory field in `OperationsEvents`
-- `PICK`, `DROP`, `INSP`, `RSEA` and `RMVD` added to `EquipmentEventTypeCode`
-- `publisher` and `publisherRole` are now mandatory fields in `OperationsEvent`
 
 
 <a name="v110"></a>[Release v1.1.0 (1 September 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.1.0)
@@ -69,7 +69,7 @@ This release is to update T&T v2.2 (T&T with new subscription  module)
 - `UNLocationCode` added as filter on `Equipment`, `Transport` and `Operations` subscriptions
 - `carrierVoyageNumber` deprecated and replaced by `exportVoyageNumber` and `importVoyageNumber` in `TransportCall`
 - `VGM`,`CAS`,`CUS`,`DGD` and `OOG` added as `documentTypeCode` and `documentTypeCodes`
-- GitHub link added to `documentTypeCode`, `equipmentEventTypeCode`, `eventTypeCode`, `operationsEventTypeCode`, `portCallServiceTypeCode`, `publisherRole`, `shipmentEventTypeCode` and `transportEventTypeCode`
+- GitHub link added to `documentTypeCode`, `equipmentEventTypeCode`, `operationsEventTypeCode`, `portCallServiceTypeCode`, `publisherRole`, `shipmentEventTypeCode` and `transportEventTypeCode`
 
 <a name="v103"></a>[Release v1.0.3 (31 August 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.0.3)
 ---
