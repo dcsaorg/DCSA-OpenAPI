@@ -18,7 +18,7 @@ This version is primaily connected to the new Booking API
   - `bookingAcknowledgementID` is now the ID of the `bookingRequest`
   - `carrierBookingReference` has been removed from `bookingRequest` (it is not available until `bookingConfirmation`)
   - `transportDraft` object removed
-  - added `vesselName`, `vesselIMONumber` and `carrierVoyageNumber` (they have been moved from `transportDraft` object which is no longer needed))
+  - added `vesselName`, `vesselIMONumber` and `carrierVoyageNumber` (they have been moved from `transportDraft` object which is no longer needed)
 - `bookingConfirmation` object added
 - `commodity` object updated with `exportLicenseIssueDate` and `exportLicenseExpiryDate`
 - `transportDraft` object no longer an array and now only contains `vesselName`, `vesselIMONumber` and `carrierVoyageNumber`
