@@ -14,7 +14,7 @@ This version is primarily connected to Booking API
 - `destinationFilingRequired`, `equipmentSubstitutionAllowed`, `exportDeclarationRequired`, `importLicenseRequired` and `partLoadAllowed` prefixed with `is` since they are Boolean values
 - updated description of `displayedName` and `transportDocumentType`
 - `incoterms` changed from string `->` enum
-- locationType enum updated with new values: `PSR`, `IEL`, `PRP`, `RTP`, `FCD`, `ECP`, `IPA` and `FDE`
+- locationType enum updated with new values: `PSR`, `IEL`, `PTP`, `RTP`, `FCD`, `ECP`, `IPA` and `FDE`
 - `OTICarrierCode` type changed from integer `->` string
 - `partyFunction` updated with new values: `HE`, `SCO` and `BA`
 - `paymentTerm` changed from string `->` enum
