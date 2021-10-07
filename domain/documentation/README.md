@@ -35,16 +35,18 @@ This version is primaily connected to the new Booking API
 - Bump [DCSA_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v103)
 - Bump [Location_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v103)
 - `bookingChannelReferenceNumber` renamed to `bookingChannelReference`
+- `codeListName` has been added as a simpleType
+- `identifyingCode` added as an object
+- `codeListName` added as an optional field on `IdentifyingParty`
 - `partyCode` is now mandatory in `IdentifyingParty`
-- `codeListResponsibleAgencyCode` is kept in this version even though it will be deprecated in next version as it is already in use in Hamburg Cluster
-- `codeListName` has been added as an optional field on `IdentifyingParty`
+- NB: `codeListResponsibleAgencyCode` is kept in this version even though it will be deprecated in next version as it is already in use in Hamburg Cluster
 
 <a name="v103"></a>[Release v1.0.3 (31 August 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN/1.0.3)
 ---
 Party object has been updated
 
-- Deprecated NMFTA field in Party object
-- Added `identifyingCodes` which is an array of objects to Party object. Each object consists of:
+- deprecated NMFTA field in Party object
+- added `identifyingCodes` which is an array of objects to Party object. Each object consists of:
   - `codeListResponsibleAgencyCode`
   - `partyCode`
 
