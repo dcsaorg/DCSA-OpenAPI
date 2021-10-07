@@ -34,10 +34,14 @@ This version is primaily connected to the new Booking API
 - `partyContactDetails` in `party` object is now a list
 - `codeListName` added as a simple object and added in `identifingCodes` object used in `Party`-object
 - add missing `)` in enum value `54` in `codeListResponsibleAgencyCode`
+- added `DCSAResponsibleAgencyCode` simple type (to replace `codeListResponsibleAgencyCode` going forward)
+- `DCSAResponsibleAgencyCode` is now a mandatory field in `identifyingCode` object (it replaces `codeListResponsibleAgencyCode`)
 - add `eventDate` to `ShipmentLocation` object
 - `location` is now a required field in `ShipmentLocation`
+- `clauses` renamed to `carrierClauses`
 - `transportPlanStage`, `transportPlanStageSequenceNumber` and `vesselName` added to the `transport` object
 - `transportPlanStage`, `transportPlanSequenceNumber`, `loadLocation`, `dischargeLocation`, `plannedDepartureDate`, `plannedArrivalDate`, `vesselName`, `vesselIMONumber`, `carrierVoyageNumber` are now all required fields on `transport`
+- ID added to all places where `location` object is used
 
 <a name="v104"></a>[Release v1.0.4 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN/1.0.4)
 ---
