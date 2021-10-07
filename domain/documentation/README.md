@@ -34,7 +34,8 @@ This version is primaily connected to the new Booking API
 ---
 - Bump [DCSA_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v103)
 - Bump [Location_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v103)
-- `codeListResponsibleAgencyCode` and `partyCode` are now mandatory in `IdentifyingParty`
+- `partyCode` is now mandatory in `IdentifyingParty`
+- `codeListResponsibleAgencyCode` is kept in this version even though it will be deprecated in next version as it is already in use in Hamburg Cluster
 - `codeListName` has been added as an optional field on `IdentifyingParty`
 - `bookingChannelReferenceNumber` renamed to `bookingChannelReference`
 
