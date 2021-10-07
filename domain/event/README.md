@@ -18,17 +18,14 @@ This release is for Booking
 <a name="v111"></a>[Release v1.1.1 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.1.1)
 ---
 Upgrade to JIT v1.1
+NB: This version is an agregation of 1.1.0 and 1.0.4 plus:
 - Domain Description updated
 - Bump [Documentation_Domain to version 1.0.4](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v104)
 - Bump [Location_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v103)
 - Bump [DCSA_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v103)
-- `PICK`, `DROP`, `INSP`, `RSEA` and `RMVD` added to `EquipmentEventTypeCode` and `EquipmentEventTypeCodes`
-- `UNLocationCode` added as a query parameter filter
-- `UNLocationCode` added as a filter on `Equipment`, `Transport` and `Operations` subscriptions
-- Use globally defined `facilityTypeCode` in `DCSA_Domain` instead of locally defined version
+
 - `portCallServiceTypeCode` is no longer a mandatory field in `OperationsEvents`
 - `publisher` and `publisherRole` are now mandatory fields in `OperationsEvent`
-- GitHub link added to `documentTypeCode`, `equipmentEventTypeCode`, `operationsEventTypeCode`, `portCallServiceTypeCode`, `publisherRole`, `shipmentEventTypeCode` and `transportEventTypeCode`
 - updated `portCallServiceTypeCode` with the following values:
   - FAST (AT All Fast)
   - GWAY (AT Gangway down and secure)
