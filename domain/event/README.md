@@ -53,6 +53,8 @@ This release is to update T&T v2.2 (T&T with new subscription  module)
 - `CBR` (Carrier Booking Request Reference) added as `documentTypeCode` and `documentTypeCodes` in order to support the Booking when it is released
 - `VGM`,`CAS`,`CUS`,`DGD` and `OOG` added as `documentTypeCode` and `documentTypeCodes`
 - GitHub link added to `documentTypeCode`, `equipmentEventTypeCode`, `operationsEventTypeCode`, `portCallServiceTypeCode`, `publisherRole`, `shipmentEventTypeCode` and `transportEventTypeCode`
+- `carrierVoyageNumber` queryParameter has become deprecated - `exportVoyageNumber` should be used instead
+- `exportVoyageNumber` added as queryParameter and as filter option in `Transport` subscriptions
 
 <a name="v110"></a>[Release v1.1.0 (1 September 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.1.0)
 ---
