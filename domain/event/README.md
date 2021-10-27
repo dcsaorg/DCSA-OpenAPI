@@ -36,16 +36,6 @@ NB: This version is an agregation of 1.1.0 and 1.0.4 plus:
   - LSH (Experimental: Lashing serice provider)
   - BUK (Experimental: Bunker serice provider)
 
-
-<a name="v110"></a>[Release v1.1.0 (1 September 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.1.0)
----
-Cleanup done for OVS major release. Deprecated fields removed from Events.
-**NB:** This version is released before 1.0.4 - so all updates in 1.0.4 is **not** included here
-- remove deprecated `scheduleID` from `TransportSubscriptionBody`
-- An alternative `TransportSubscriptionBodyWithScheduleID` has been created to support backward compatability in T&T
-- `eventClassifierCode` added as a simple object
-- removed deprecated `vesselScheduleChangeRemark`, `transportCallID` and `eventTypeCode` from the `Operations-TransportEvent` (they are still included in the `TransportEvent` used for T&T)
-
 <a name="v104"></a>[Release v1.0.4 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.0.4)
 ---
 This release is to update T&T v2.2 (T&T with new subscription  module)
@@ -65,6 +55,15 @@ This release is to update T&T v2.2 (T&T with new subscription  module)
 - `documentID` example added
 - `VGM`,`CAS`,`CUS`,`DGD` and `OOG` added as `documentTypeCode` and `documentTypeCodes`
 - GitHub link added to `documentTypeCode`, `equipmentEventTypeCode`, `operationsEventTypeCode`, `portCallServiceTypeCode`, `publisherRole`, `shipmentEventTypeCode` and `transportEventTypeCode`
+
+<a name="v110"></a>[Release v1.1.0 (1 September 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.1.0)
+---
+Cleanup done for OVS major release. Deprecated fields removed from Events.
+**NB:** This version is released before 1.0.4 - so all updates in 1.0.4 is **not** included here
+- remove deprecated `scheduleID` from `TransportSubscriptionBody`
+- An alternative `TransportSubscriptionBodyWithScheduleID` has been created to support backward compatability in T&T
+- `eventClassifierCode` added as a simple object
+- removed deprecated `vesselScheduleChangeRemark`, `transportCallID` and `eventTypeCode` from the `Operations-TransportEvent` (they are still included in the `TransportEvent` used for T&T)
 
 <a name="v103"></a>[Release v1.0.3 (31 August 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.0.3)
 ---
