@@ -52,18 +52,15 @@ This release is to update T&T v2.2 (T&T with new subscription  module)
 - Bump [Location_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v103)
 - Bump [Documentation_Domain to version 1.0.4](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v104)
 - Bump [DCSA_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v103)
-- `documentTypeCode` added as query filter parameter and as subscription filter
+- `documentTypeCode` added as query filter parameter and as `Shipment` subscription filter
 - `PICK`, `DROP`, `INSP`, `RSEA` and `RMVD` added to `EquipmentEventTypeCode` and `EquipmentEventTypeCodes`
 - `eventClassifierCode` added as a simple object
 - `REQS`, `CMPL`, `HOLD` and `RELS` added as `shipmentEventTypeCode` and `shipmentEventTypeCodes`
-- `transportDocumentTypeCode` query parameter filter has been removed
-- `UNLocationCode` added as a query parameter filter
+- `transportDocumentTypeCode` query parameter filter has been removed as well as on `Shipment` subscriptions
+- `UNLocationCode` added as a query parameter filter and added as filter on `Equipment`, `Transport` and `Operations` subscriptions
 - `eventLocation` is added as an optional field on EquipmentEvent
 - `transportCall` is now an optional field on EquipmentEvent
 - Use globally defined `facilityTypeCodeOPR` in `DCSA_Domain` to align with later versions instead of locally defined version
-- `documentTypeCode` added as filter on `Shipment` Subscriptions
-- `transportDocumentTypeCode` removed as filter on `Shipment` subscriptions
-- `UNLocationCode` added as filter on `Equipment`, `Transport` and `Operations` subscriptions
 - `carrierVoyageNumber` deprecated and replaced by `exportVoyageNumber` and `importVoyageNumber` in `TransportCall`
 - `VGM`,`CAS`,`CUS`,`DGD` and `OOG` added as `documentTypeCode` and `documentTypeCodes`
 - GitHub link added to `documentTypeCode`, `equipmentEventTypeCode`, `operationsEventTypeCode`, `portCallServiceTypeCode`, `publisherRole`, `shipmentEventTypeCode` and `transportEventTypeCode`
