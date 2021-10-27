@@ -24,6 +24,8 @@ This version is primarily connected to Booking API
 
 <a name="v103"></a>[Release v1.0.3 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/DCSA_DOMAIN/1.0.3)
 ---
+This version is used by T&T v2.2 and OVS + JIT
+
 - renamed `bookingChannelReferenceNumber` -> `bookingChannelReference`
 - `exportVoyageNumber` and `importVoyageNumber` added as simpletypes
 - `RAMP` added as `facilityTypeCode`
