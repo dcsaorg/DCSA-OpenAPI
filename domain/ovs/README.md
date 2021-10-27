@@ -9,7 +9,6 @@ The primary purpose of this Domain is to specify components to be used in the OV
 - Bump [DCSA_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#v103)
 - Bump [Event_Domain to version 1.1.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#v111)
 - Bump [Documentation_Domain to version 1.0.4](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v104)
-  - this will update the `Party` object to include the `codeListName` in the `identifiers` as it is needed in order to distinguish between different SMDG codes
 - `facilityTypeCode` is now optional in a `TimeStamp`
 
 <a name="v102"></a>[Release v1.0.2 (31 August 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/OVS_DOMAIN/1.0.2)
