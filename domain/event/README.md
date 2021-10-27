@@ -11,7 +11,7 @@ This release is for Booking
 - Bump [DCSA_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v110)
 - Bump [Documentation_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v110)
 - Bump [Location_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v110)
-- `BAI` (Booking Acknowledgement ID) added as `documentTypeCode`
+- `CBR` (Carrier Booking Request Reference) added as `documentTypeCode`
 - `documentTypeCode` added as query filter parameter and as subscription filter (to be used with `ShipmentEvents`)
 - `PICK`, `DROP`, `INSP`, `RSEA` and `RMVD` added to `EquipmentEventTypeCode`
 
