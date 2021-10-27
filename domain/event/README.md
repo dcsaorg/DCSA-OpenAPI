@@ -62,6 +62,7 @@ This release is to update T&T v2.2 (T&T with new subscription  module)
 - `transportCall` is now an optional field on EquipmentEvent
 - Use globally defined `facilityTypeCodeOPR` in `DCSA_Domain` to align with later versions instead of locally defined version
 - `carrierVoyageNumber` deprecated and replaced by `exportVoyageNumber` and `importVoyageNumber` in `TransportCall`
+- `documentID` example added
 - `VGM`,`CAS`,`CUS`,`DGD` and `OOG` added as `documentTypeCode` and `documentTypeCodes`
 - GitHub link added to `documentTypeCode`, `equipmentEventTypeCode`, `operationsEventTypeCode`, `portCallServiceTypeCode`, `publisherRole`, `shipmentEventTypeCode` and `transportEventTypeCode`
 
