@@ -11,7 +11,6 @@ This release is for Booking
 - Bump [DCSA_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v110)
 - Bump [Documentation_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v110)
 - Bump [Location_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v110)
-- `CBR` (Carrier Booking Request Reference) added as `documentTypeCode`
 
 <a name="v111"></a>[Release v1.1.1 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.1.1)
 ---
@@ -51,7 +50,7 @@ This release is to update T&T v2.2 (T&T with new subscription  module)
 - Use globally defined `facilityTypeCodeOPR` in `DCSA_Domain` to align with later versions instead of locally defined version
 - `carrierVoyageNumber` deprecated and replaced by `exportVoyageNumber` and `importVoyageNumber` in `TransportCall`
 - `documentID` example added
-- `CBR` added as `documentTypeCode` and `documentTypeCodes` in order to support the Booking when it is released
+- `CBR` (Carrier Booking Request Reference) added as `documentTypeCode` and `documentTypeCodes` in order to support the Booking when it is released
 - `VGM`,`CAS`,`CUS`,`DGD` and `OOG` added as `documentTypeCode` and `documentTypeCodes`
 - GitHub link added to `documentTypeCode`, `equipmentEventTypeCode`, `operationsEventTypeCode`, `portCallServiceTypeCode`, `publisherRole`, `shipmentEventTypeCode` and `transportEventTypeCode`
 
