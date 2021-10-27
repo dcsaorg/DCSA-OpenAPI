@@ -11,6 +11,7 @@ This version is primarily connected to Booking API
 - `800SeriesCarrierCode` type changed from integer `->` string
 - `amsFilingDueDate`, `bookingAcknowledgementID`, `confirmationDateTime`, `confirmedEquipmentUnits`, `cutOffDateTime`, `cutOffDateTimeCode`, `eventLocationDateTime`, `isAMSACIFilingRequired`, `submissionDateTime`, `transportPlanStage` and `transportPlanStageSequenceNumber` added as simple types
 - reordered the location of: `commodityType`, `issueDate`
+- `communicationChannel` changed from String `->` enum
 - `destinationFilingRequired`, `equipmentSubstitutionAllowed`, `exportDeclarationRequired`, `importLicenseRequired` and `partLoadAllowed` prefixed with `is` since they are Boolean values
 - updated description of `displayedName` and `transportDocumentType`
 - `incoterms` changed from string `->` enum
