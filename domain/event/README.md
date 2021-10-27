@@ -59,7 +59,7 @@ This release is to update T&T v2.2 (T&T with new subscription  module)
 <a name="v110"></a>[Release v1.1.0 (1 September 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.1.0)
 ---
 Cleanup done for OVS major release. Deprecated fields removed from Events.
-**NB:** This version is released before 1.0.4 - so all updates in 1.0.4 is **not** included here
+**NB:** This version is released before 1.0.4 - so all updates in 1.0.4 are **not** included here
 - remove deprecated `scheduleID` from `TransportSubscriptionBody`
 - An alternative `TransportSubscriptionBodyWithScheduleID` has been created to support backward compatability in T&T
 - `eventClassifierCode` added as a simple object
