@@ -45,6 +45,8 @@ This version is primaily connected to the new Booking API
 
 <a name="v104"></a>[Release v1.0.4 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN/1.0.4)
 ---
+This relase is used for JIT 1.1
+
 - Bump [DCSA_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v103)
 - Bump [Location_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v103)
 - `bookingChannelReferenceNumber` renamed to `bookingChannelReference`
@@ -52,7 +54,8 @@ This version is primaily connected to the new Booking API
 - `identifyingCode` added as an object
 - `codeListName` added as an optional field on `IdentifyingParty`
 - `partyCode` is now mandatory in `IdentifyingParty`
-- NB: `codeListResponsibleAgencyCode` is kept in this version even though it will be deprecated in next version as it is already in use in Hamburg Cluster
+- `codeListResponsibleAgencyCode` is marked deprecated and made optional
+- `DCSAResponsibleAgencyCode` is added to `identifyingCode` and marked mandatory
 
 <a name="v103"></a>[Release v1.0.3 (31 August 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN/1.0.3)
 ---
