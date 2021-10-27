@@ -46,7 +46,7 @@ This release is to update T&T v2.2 (T&T with new subscription  module)
 - `PICK`, `DROP`, `INSP`, `RSEA` and `RMVD` added to `EquipmentEventTypeCode` and `EquipmentEventTypeCodes`
 - `eventClassifierCode` added as a simple object
 - `REQS`, `CMPL`, `HOLD` and `RELS` added as `shipmentEventTypeCode` and `shipmentEventTypeCodes`
-- `transportDocumentTypeCode` query parameter filter has been removed as well as on `Shipment` subscriptions
+- `transportDocumentTypeCode` query parameter filter has been removed as well as made depracated on `Shipment` subscriptions
 - `UNLocationCode` added as a query parameter filter and added as filter on `Equipment`, `Transport` and `Operations` subscriptions
 - `eventLocation` is added as an optional field on EquipmentEvent
 - `transportCall` is now an optional field on EquipmentEvent
