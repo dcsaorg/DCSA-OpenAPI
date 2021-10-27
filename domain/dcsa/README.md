@@ -26,6 +26,7 @@ This version is primarily connected to Booking API
 - renamed `bookingChannelReferenceNumber` -> `bookingChannelReference`
 - `exportVoyageNumber` and `importVoyageNumber` added as simpletypes
 - `RAMP` added as `facilityTypeCode`
+- `ISOEquipmentCode` example added
 - `EQ` added as `referenceType`
 - `UnLocationCode` example updated - changed `USNYC` -> `FRPAR`
 - reordered all parameters to be alphabetically
