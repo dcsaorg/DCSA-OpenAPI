@@ -3,7 +3,7 @@
 This version is primaily connected to the new Booking API
 
 - Bump [DCSA_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v110)
-- Bump [Location_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v103)
+- Bump [Location_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v110)
 - `bookingRequestHeader` object updated (previosly `bookingHeader` object)
   - `bookingRequestID` removed (it is now a `ReferenceType`)
   - `receiptDeliveryTypeAtOrigin` renamed to `receiptTypeAtOrigin`
@@ -15,13 +15,12 @@ This version is primaily connected to the new Booking API
   - `valueAddedServiceRequest` field removed (it is now a list)
   - `exportLicenseIssueDate` and `exportLicenseExpiryDate` both removed and moved into the `Commodity` object
   - `serviceContractReference` and `isEquipmentSubstitutionAllowed` are now required fields
-  - `bookingAcknowledgementID` is now the ID of the `bookingRequest`
+  - `carrierBookingRequestReference` is now the ID of the `bookingRequest`
   - `carrierBookingReference` has been removed from `bookingRequest` (it is not available until `bookingConfirmation`)
   - `transportDraft` object removed
   - added `vesselName`, `vesselIMONumber` and `carrierVoyageNumber` (they have been moved from `transportDraft` object which is no longer needed)
 - `bookingConfirmation` object added
 - `commodity` object updated with `exportLicenseIssueDate` and `exportLicenseExpiryDate`
-- `transportDraft` object removed (fields are now in the `bookingRequest` object)
 - `voyage` and `voyages` removed
 - `valueAddedServiceRequest` object created
 - description updated for `requestedEquipment`
@@ -32,10 +31,7 @@ This version is primaily connected to the new Booking API
 - `location` object in `shippingInstructionHeader` now contains an ID
 - the `party` object in `documentParties` now contains an ID
 - `partyContactDetails` in `party` object is now a list
-- `codeListName` added as a simple object and added in `identifingCodes` object used in `Party`-object
 - add missing `)` in enum value `54` in `codeListResponsibleAgencyCode`
-- added `DCSAResponsibleAgencyCode` simple type (to replace `codeListResponsibleAgencyCode` going forward)
-- `DCSAResponsibleAgencyCode` is now a mandatory field in `identifyingCode` object (it replaces `codeListResponsibleAgencyCode`)
 - add `eventDate` to `ShipmentLocation` object
 - `location` is now a required field in `ShipmentLocation`
 - `clauses` renamed to `carrierClauses`
