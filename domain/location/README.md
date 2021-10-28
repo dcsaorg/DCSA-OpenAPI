@@ -9,7 +9,7 @@ The primary purpose of this Domain is to specify common components related to a 
 - Bump [DCSA_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v110)
 - Added a `locationWithID` object to include a locationID
 
-<a name="v103"></a>[Release v1.0.3 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/LOCATION_DOMAIN/1.0.3)
+<a name="v103"></a>[Release v1.0.3 (28 October 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/LOCATION_DOMAIN/1.0.3)
 ---
 - Bump [DCSA_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v103)
 - `facilityCode` and `facilityCodeListProvider` have been added to the `location` object
