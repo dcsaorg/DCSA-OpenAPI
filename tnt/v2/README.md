@@ -7,12 +7,12 @@ The DCSA Interface Standard for Track & Trace is documented on [**DCSA TNT**](ht
 Purpose of this release is to add the new subscription model to T&T
 - Bump [DCSA_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v103)
 - Bump [Event_Domain to version 1.0.4](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#v104)
-- Added `PUT /event-subscriptions/{subscriptionID}/secret` endPoint to update the shared secret used to create the `Notification-Signature`
-- Prefixed all endPoints with `/v2` in order to align with Design Guide
-- added a `UNLocationCode` filter to the `GET /v2/events` endPoint
-- added `transportCallSequenceNumber` to the `TransportCall`
+- `documentTypeCode`, `exportVoyageNumber` and `UNLocationCode` added as filter to the `GET /v2/events` endPoint and added as filter in subscriptions
+- `transportDocumentTypeCode` query parameter filter has been removed from the `GET /v2/events` endPoint and from the Subscription
 - added `sort` as a queryParameter to both `GET /v2/events` and `GET /v2/event-subscriptions` endPoints in order to sort the end result
-- `transportDocumentTypeCode` query parameter filter has been removed from the `/v2/events` endPoint and from the Subscription
+- Prefixed all endPoints with `/v2` in order to align with Design Guide
+- Added `PUT /event-subscriptions/{subscriptionID}/secret` endPoint to update the shared secret used to create the `Notification-Signature`
+- added `transportCallSequenceNumber` to the `TransportCall`
 
 <a name="v212"></a>[Release v2.1.2 (4 October 2021)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/2.1.2)
 ---
