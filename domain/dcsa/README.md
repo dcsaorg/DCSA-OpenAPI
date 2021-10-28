@@ -22,7 +22,7 @@ This version is primarily connected to Booking API
 - `referenceType` updated with new values: `ECR`, `CSI`, `BPR` and `BID`
 - `valueAddedServiceRequest` renamed to `valueAddedServiceCode` and changed from string `->` enum
 
-<a name="v103"></a>[Release v1.0.3 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/DCSA_DOMAIN/1.0.3)
+<a name="v103"></a>[Release v1.0.3 (28 October 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/DCSA_DOMAIN/1.0.3)
 ---
 This version is used by T&T v2.2 and OVS + JIT
 
