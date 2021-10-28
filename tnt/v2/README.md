@@ -2,7 +2,7 @@
 
 The DCSA Interface Standard for Track & Trace is documented on [**DCSA TNT**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_TNT) SwaggerHub.
 
-<a name="v220"></a>[Release v2.2.0 (unreleased)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/2.2.0)
+<a name="v220"></a>[Release v2.2.0 (28 October 2021)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/2.2.0)
 ---
 Purpose of this release is to add the new subscription model to T&T
 - Bump [DCSA_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v103) (was previously v1.0.1)
