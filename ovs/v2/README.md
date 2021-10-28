@@ -28,7 +28,7 @@ This release is to make OVS JIT v1.1 compatible
 
 <a name="v203"></a>[Release v2.0.3 (...)](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS/2.0.3)
 ---
-A bugrelease to fix the `facilitySMDGCode` problem
+A bugrelease to fix problems found during Hamburg Cluster
 
 - `facilitySMDGCode` is deprecated - `facilityCode` together with `facilityCodeListProvider` in `eventLocation` should be used instead
 - `publisher` and `publisherRole` are now mandatory fields on `OperationsEvent`
