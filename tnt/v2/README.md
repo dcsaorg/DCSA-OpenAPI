@@ -5,8 +5,8 @@ The DCSA Interface Standard for Track & Trace is documented on [**DCSA TNT**](ht
 <a name="v220"></a>[Release v2.2.0 (unreleased)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/2.2.0)
 ---
 Purpose of this release is to add the new subscription model to T&T
-- Bump [DCSA_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v103)
-- Bump [Event_Domain to version 1.0.4](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#v104)
+- Bump [DCSA_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v103) (was previously v1.0.1)
+- Bump [Event_Domain to version 1.0.4](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#v104) (was previously v1.0.1)
 - `documentTypeCode`, `exportVoyageNumber` and `UNLocationCode` added as filter to the `GET /v2/events` endPoint and added as filter in subscriptions
 - `transportDocumentTypeCode` query parameter filter has been removed from the `GET /v2/events` endPoint and from the Subscription
 - added `sort` as a queryParameter to both `GET /v2/events` and `GET /v2/event-subscriptions` endPoints in order to sort the end result
