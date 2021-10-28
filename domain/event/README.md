@@ -33,7 +33,7 @@ NB: This version is an agregation of 1.1.0 and 1.0.4 plus the following items:
   - LSH (Experimental: Lashing serice provider)
   - BUK (Experimental: Bunker serice provider)
 
-<a name="v104"></a>[Release v1.0.4 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.0.4)
+<a name="v104"></a>[Release v1.0.4 (28 October 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.0.4)
 ---
 This release is to update T&T v2.2 (T&T with new subscription  module)
 - Bump [Location_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v103)
