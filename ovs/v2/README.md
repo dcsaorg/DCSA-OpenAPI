@@ -32,8 +32,11 @@ A bugrelease to fix problems found during Hamburg Cluster
 
 - `facilitySMDGCode` is deprecated - `facilityCode` together with `facilityCodeListProvider` in `eventLocation` should be used instead
 - `publisher` and `publisherRole` are now mandatory fields on `OperationsEvent`
-- `partyCode` and `codeListResponsibleAgencyCode` are now mandatory fields in the `IdentifyingCodes` in the `Party`-object
-- `codeListName` added as an optional field to the `IdentifyingCodes` in the `Party`-object
+- `Party`-object updated
+  - `partyCode` is now a mandatory
+  - `DCSAResponsibleAgencyCode` added as a mandatory field
+  - `codeListResponsibleAgencyCode` is deprecated
+  - `codeListName` and  added as an optional field
 
 <a name="v202"></a>[Release v2.0.2 (1 September 2021)](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS/2.0.2)
 ---
