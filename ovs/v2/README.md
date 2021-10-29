@@ -25,6 +25,7 @@ This release is to make OVS JIT v1.1 compatible
   - `PICK`, `DROP`, `INSP`, `RSEA` and `RMVD` added to `EquipmentEventTypeCode` it was forgotten in previous version
   - `facilitySMDGCode` is deprecated - `facilityCode` together with `facilityCodeListProvider` in `eventLocation` should be used instead
   - `export`- and `importVoyageNumber` added to `transportCall` - `carrierVoyageNumber` is now deprecated
+  - `portCallPhaseTypeCode` added as an optional field to both `Timestamp` and to `OperationsEvent`
 
 <a name="v203"></a>[Release v2.0.3 (...)](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS/2.0.3)
 ---
