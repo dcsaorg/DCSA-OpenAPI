@@ -13,18 +13,18 @@ This release is to make OVS JIT v1.1 compatible
   - this includes new timestamps for JIT v1.1 (`FAST`, `GWAY`, etc)
 - Bump [DCSA_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v103)
 - Bump [OVS_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/ovs#v103)
-  - this includes updated `Party` obejct
-- `UNLocationCode` filter added to `GET /v2/events endPoint`
+- renamed internal representation of the `TransportEvent` used in OVS: `OperationsTransportEvent` -> `TransportEvent`
+- `UNLocationCode` and `exportVoyageNumber` filter added to `GET /v2/events endPoint`
+- `carrierVoyageNumber` is now a deprecated filter
 - `sort` queryParameter added to `GET /v2/events endPoint`
-- `facilityTypeCode` no longer mandatory in `POST /v2/timestamps`
 - specialized example removed from `GET /v2/events` endPoint - now Swaggerhub default is used again
-- `codeListName` added to `Party`-object
-- `TWG` (Towage), `LSH` (Lashing) and `BUK` (Bunker) added to `publisherRole`
-- `LASH` (Lashing), `SAFE` (Safety), `FAST` (All Fast) and `GWAY` (Gangway down and secure) added to `portCallServiceTypeCode`
-- `portCallServiceTypeCode` now optional in `OperationsEvents`
-- globally defined `facilityTypeCodeOPR` used instead of locatlly defined version
-- `PICK`, `DROP`, `INSP`, `RSEA` and `RMVD` added to `EquipmentEventTypeCode` it was forgotten in previous version
-- `facilitySMDGCode` is deprecated - `facilityCode` together with `facilityCodeListProvider` in `eventLocation` should be used instead
+- check domain links above to see what has also changed in this version - some if the items include:
+  - `TWG` (Towage), `LSH` (Lashing) and `BUK` (Bunker) added to `publisherRole`
+  - `LASH` (Lashing), `SAFE` (Safety), `FAST` (All Fast) and `GWAY` (Gangway down and secure) added to `portCallServiceTypeCode`
+  - `portCallServiceTypeCode` now optional in `OperationsEvents`
+  - globally defined `facilityTypeCodeOPR` used instead of locatlly defined version
+  - `PICK`, `DROP`, `INSP`, `RSEA` and `RMVD` added to `EquipmentEventTypeCode` it was forgotten in previous version
+  - `facilitySMDGCode` is deprecated - `facilityCode` together with `facilityCodeListProvider` in `eventLocation` should be used instead
 
 <a name="v203"></a>[Release v2.0.3 (...)](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS/2.0.3)
 ---
