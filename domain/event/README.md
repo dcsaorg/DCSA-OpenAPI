@@ -21,7 +21,7 @@ NB: This version is an agregation of 1.1.0 and 1.0.4 plus the following items:
 - Bump [Location_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v103)
 - Bump [DCSA_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v103)
 
-- `portCallServiceTypeCode` is no longer a mandatory field in `OperationsEvents`
+- `portCallServiceTypeCode` is no longer a mandatory field in `OperationsEvent`
 - `publisher` and `publisherRole` are now mandatory fields in `OperationsEvent`
 - updated `portCallServiceTypeCode` with the following values:
   - FAST (AT All Fast)
@@ -32,6 +32,7 @@ NB: This version is an agregation of 1.1.0 and 1.0.4 plus the following items:
   - TWG (Experimental: Towage serice provider)
   - LSH (Experimental: Lashing serice provider)
   - BUK (Experimental: Bunker serice provider)
+- `portCallPhaseTypeCode` added as an optional field to `OperationsEvent`
 
 <a name="v104"></a>[Release v1.0.4 (28 October 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.0.4)
 ---
