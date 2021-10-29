@@ -10,7 +10,6 @@ This release is to make OVS JIT v1.1 compatible
 
 - Description updated
 - Bump [Event_Domain to version 1.1.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#v111)
-  - this includes new timestamps for JIT v1.1 (`FAST`, `GWAY`, etc)
 - Bump [DCSA_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v103)
 - Bump [OVS_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/ovs#v103)
 - renamed internal representation of the `TransportEvent` used in OVS: `OperationsTransportEvent` -> `TransportEvent`
