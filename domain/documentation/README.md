@@ -1,4 +1,4 @@
-<a name="v110"></a>[Release v1.1.0 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN/1.1.0)
+<a name="v200"></a>[Release v2.0.0 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN/2.0.0)
 ---
 This version is primaily connected to the new Booking API
 
