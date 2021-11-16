@@ -33,6 +33,7 @@ NB: This version is an agregation of 1.1.0 and 1.0.4 plus the following items:
   - LSH (Experimental: Lashing serice provider)
   - BUK (Experimental: Bunker serice provider)
 - `portCallPhaseTypeCode` added as an optional field to `OperationsEvent`
+- updated OperationsSubscriptions to also include `transportCallID`, `vesselIMONumber`, `carrierVoyageNumber`, `exportVoyageNumber`, `carrierServiceCode` and `UNLocationCode` as filter parameters (needed in this release because of JIT Event Hub)
 
 <a name="v104"></a>[Release v1.0.4 (28 October 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.0.4)
 ---
