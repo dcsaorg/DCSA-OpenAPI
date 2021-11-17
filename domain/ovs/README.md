@@ -4,14 +4,15 @@ The OVS Domain is documented on [**OVS_DOMAIN**](https://app.swaggerhub.com/doma
 
 The primary purpose of this Domain is to specify components to be used in the OVS API. This Domain defines the Timestamp object used in JIT (Just in Time Port Calls).
 
-<a name="v103"></a>[Release v1.0.3 (unreleased)](https://app.swaggerhub.com/domains-docs/dcsaorg/OVS_DOMAIN/1.0.3)
+<a name="v103"></a>[Release v1.0.3 (16 November 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/OVS_DOMAIN/1.0.3)
 ---
 - Bump [DCSA_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#v103)
 - Bump [Event_Domain to version 1.1.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#v111)
 - Bump [Documentation_Domain to version 1.0.4](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v104)
+- Bump [Location_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v103)
 - `facilityTypeCode` is now optional in a `TimeStamp`
-- `carrierVoyageNumber` set to deprecated
-- added `exportVoyageNumber` and `importVoyageNumber` to the `TimeStamp` object
+- `facilitySMDGCode` and `carrierVoyageNumber` set to deprecated
+- added `portCallPhaseTypeCode`, `exportVoyageNumber` and `importVoyageNumber` to the `TimeStamp` object
 
 <a name="v102"></a>[Release v1.0.2 (31 August 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/OVS_DOMAIN/1.0.2)
 ---
