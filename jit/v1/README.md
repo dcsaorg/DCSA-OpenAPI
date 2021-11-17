@@ -1,6 +1,6 @@
 ### Just in Time (JIT)
 
-The DCSA Interface Standard for Just in Time Portcalls is documented on the [**DCSA JIT SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_JIT).
+The DCSA Interface Standard for Just in Time Portcalls is documented on the **[DCSA JIT](https://app.swaggerhub.com/apis/dcsaorg/DCSA_JIT) SwaggerHub**.
 
 <a name="v110"></a>[Release v1.1.0 (16 November 2021)](https://app.swaggerhub.com/apis/dcsaorg/DCSA_JIT/1.1.0)
 ---
@@ -25,7 +25,9 @@ The DCSA Interface Standard for Just in Time Portcalls is documented on the [**D
 
 <a name="v100"></a>[Release v1.0.0 (16 November 2021)](https://app.swaggerhub.com/apis/dcsaorg/DCSA_JIT/1.0.0)
 ---
-Initial release after splitting OVS and JIT. The changes listed below are what is new since [OVS 2.0.2](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS/2.0.2)
+Initial release after splitting OVS and JIT.
+
+The changes listed below are what is new since [OVS 2.0.2](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS/2.0.2)
 
 - `facilitySMDGCode` is deprecated - `facilityCode` together with `facilityCodeListProvider` in `eventLocation` should be used instead
 - `publisher` and `publisherRole` are now mandatory fields on `OperationsEvent`
