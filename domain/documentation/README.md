@@ -45,6 +45,53 @@ This version is primaily connected to the new Booking API
 - `transportPlanStage`, `transportPlanSequenceNumber`, `loadLocation`, `dischargeLocation`, `plannedDepartureDate`, `plannedArrivalDate`, `vesselName`, `vesselIMONumber`, `carrierVoyageNumber` are now all required fields on `transport`
 - ID added to all places where `location` object is used
 
+<a name="v110"></a>[Release v1.1.0 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN/1.1.0)
+---
+Initial relese for Booking API
+
+- Bump [DCSA_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v110)
+- Description updated: Booking added
+- `bookingHeaderNoID` object updated
+  - `bookingRequestID` removed (it is now a `ReferenceType`)
+  - `receiptDeliveryTypeAtOrigin` renamed to `receiptTypeAtOrigin`
+  - `receiptDeliveryTypeAtDestination` renamed to `deliveryTypeAtDestination`
+  - `bookingRequestDateTome` removed
+  - `paymentTerm` added
+  - `cargoGrossWeightUnit` removed
+  - all Boolean operators prefixed with `is`
+  - `submissionDateTime` added
+  - `placeOfReceiotPickupDate` and `finalDestinationExpectedArrivalDate` removed (they are now a `ShipmentLocation`)
+  - `isAMSACIFilingRequired` added
+  - `OTICarrierCode` and `800SeriesCarrierCode` removed (they are not part of the `IdentifyingCode` in the `Party` object
+  - `transportDocumentType` renamed to `transportDocumentTypeCode`
+  - `valueAddedServiceRequest` field removed (it is now a list)
+  - `invoicePayableAt` removed
+  - `exportLicenseIssueDate` and `exportLicenseExpiryDate` both removed and moved into the `Commodity` object
+  - `serviceContractReference` and `isEquipmentSubstitutionAllowed` are now required fields
+  - `carrierBookingRequestReference` is now the ID of the `bookingRequest`
+  - `carrierBookingReference` has been removed from `bookingRequest` (it is not available until `bookingConfirmation`)
+  - `transportDraft` object removed
+  - added `vesselName`, `vesselIMONumber` and `carrierVoyageNumber` (they have been moved from `transportDraft` object which is no longer needed)
+- `bookingConfirmation` object added
+- `commodity` object updated with `exportLicenseIssueDate` and `exportLicenseExpiryDate`
+- `voyage` and `voyages` removed
+- `valueAddedServiceRequest` object created
+- description updated for `requestedEquipment`
+- `requestedEquipmentType` renamed to `requestedEquipmentSizeType`
+- `requestedEquipmentSizeType`, `requestedEquipmentUnits` and `isShipperOwned` are now required fields on `requestedEquipment`
+- `confirmedEquipment` object added
+- `shipmentCutOffTime` object added
+- `location` object in `shippingInstructionHeader` now contains an ID
+- the `party` object in `documentParties` now contains an ID
+- `partyContactDetails` in `party` object is now a list
+- add missing `)` in enum value `54` in `codeListResponsibleAgencyCode`
+- add `eventDate` to `ShipmentLocation` object
+- `location` is now a required field in `ShipmentLocation`
+- `clauses` renamed to `carrierClauses`
+- `transportPlanStage`, `transportPlanStageSequenceNumber` and `vesselName` added to the `transport` object
+- `transportPlanStage`, `transportPlanSequenceNumber`, `loadLocation`, `dischargeLocation`, `plannedDepartureDate`, `plannedArrivalDate`, `vesselName`, `vesselIMONumber`, `carrierVoyageNumber` are now all required fields on `transport`
+- ID added to all places where `location` object is used
+
 <a name="v104"></a>[Release v1.0.4 (28 October 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN/1.0.4)
 ---
 This relase is used for JIT 1.1
