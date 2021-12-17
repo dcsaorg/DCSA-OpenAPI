@@ -24,6 +24,17 @@ This version is primarily connected to Booking API
 - `referenceType` updated with new values: `ECR`, `CSI`, `BPR` and `BID`
 - `valueAddedServiceRequest` renamed to `valueAddedServiceCode` and changed from string `->` enum
 
+<a name="v110"></a>[Release v1.1.0 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/DCSA_DOMAIN/1.1.0)
+---
+Initial relase for Booking
+
+- `800SeriesCarrierCode` type changed from integer `->` string
+- `amsFilingDueDate`, `carrierBookingRequestReference`, `confirmationDateTime`, `confirmedEquipmentUnits`, `cutOffDateTime`, `cutOffDateTimeCode` added
+- `bookingRequestDateTime` format fixed and example added
+- `communicationChannel` changed from String -> enum
+- `destinationFilingRequired`, `equipmentSubstitutionAllowed`  ****, `exportDeclarationRequired`, `importLicenseRequired` and `partLoadAllowed` prefixed with `is` since they are Boolean values
+
+
 <a name="v103"></a>[Release v1.0.3 (28 October 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/DCSA_DOMAIN/1.0.3)
 ---
 This version is used by T&T v2.2 and OVS + JIT
