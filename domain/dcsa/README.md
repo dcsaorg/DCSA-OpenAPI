@@ -8,10 +8,21 @@ The primary purpose of this Domain is to specify common components to be reused 
 ---
 This version is primarily connected to Booking API
 
-- `800SeriesCarrierCode` type changed from integer `->` string
-- `amsFilingDueDate`, `carrierBookingRequestReference`, `confirmationDateTime`, `confirmedEquipmentUnits`, `cutOffDateTime`, `cutOffDateTimeCode`, `eventLocationDateTime`, `isAMSACIFilingRequired`, `submissionDateTime`, `transportPlanStage` and `transportPlanStageSequenceNumber` added as simple types
-- `isChargesDisplayed` renamed to `areChargesDispalyed`
-- `bookingReqestDateTime` format and example updated
+- `800SeriesCarrierCode`, `confirmationDateTime`, `isChargesDisplayed`, `numberOfOriginals` removed
+- `areChargesDisplayedOnOriginals`, `areChargesDisplayedOnCopies`, `bookingReqestUpdatedDateTime`, `chargeTypeCode`, `issuedNumberOfOriginals`, `requestedNumberOfOriginals`, `shipmentCreatedDateTime`, `shipmentUpdatedDateTime`, `shippingInstructionCreatedDateTime`, `shippingInstructionUpdatedDateTime`, `transportDocumentCreatedDateTime`, `transportDocumentUpdatedDateTime` added as simple types
+- `bookingReqestDateTime` renamed `bookingReqestCreatedDateTime`
+- `commodityType` changed from length 20 `->` 550
+- documentStatus enum updated with new values:
+  - PENC (Pending Confirmation)
+  - CONF (Confirmed)
+  - CANC (Cancelled)
+- `email` example updated
+- `locationType` renamed to `shipmentLocationType`
+- GitHub link added to: `referenceType`
+- `termsAndConditions` description updated
+- `transportDocumentType` renamed to `transportDocumentTypeCode`
+- `errors` and `error` object removed as they are in the <a href="https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/error">Error Domain</a>
+
 - reordered the location of: `commodityType`, `issueDate`
 - `communicationChannel` changed from String `->` enum
 - `destinationFilingRequired`, `equipmentSubstitutionAllowed`, `exportDeclarationRequired`, `importLicenseRequired` and `partLoadAllowed` prefixed with `is` since they are Boolean values
