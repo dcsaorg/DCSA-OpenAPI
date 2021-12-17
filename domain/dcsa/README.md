@@ -23,18 +23,6 @@ This version is primarily connected to Booking API
 - `transportDocumentType` renamed to `transportDocumentTypeCode`
 - `errors` and `error` object removed as they are in the <a href="https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/error">Error Domain</a>
 
-- reordered the location of: `commodityType`, `issueDate`
-- `communicationChannel` changed from String `->` enum
-- `destinationFilingRequired`, `equipmentSubstitutionAllowed`, `exportDeclarationRequired`, `importLicenseRequired` and `partLoadAllowed` prefixed with `is` since they are Boolean values
-- updated description of `displayedName` and `transportDocumentType`
-- `incoterms` changed from string `->` enum
-- locationType enum updated with new values: `PSR`, `IEL`, `PTP`, `RTP`, `FCD`, `ECP`, `IPA` and `FDE`
-- `OTICarrierCode` type changed from integer `->` string
-- `partyFunction` updated with new values: `HE`, `SCO` and `BA`
-- `paymentTerm` changed from string `->` enum
-- `referenceType` updated with new values: `ECR`, `CSI`, `BPR` and `BID`
-- `valueAddedServiceRequest` renamed to `valueAddedServiceCode` and changed from string `->` enum
-
 <a name="v110"></a>[Release v1.1.0 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/DCSA_DOMAIN/1.1.0)
 ---
 Initial relase for Booking
