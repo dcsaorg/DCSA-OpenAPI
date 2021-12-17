@@ -29,11 +29,35 @@ This version is primarily connected to Booking API
 Initial relase for Booking
 
 - `800SeriesCarrierCode` type changed from integer `->` string
-- `amsFilingDueDate`, `carrierBookingRequestReference`, `confirmationDateTime`, `confirmedEquipmentUnits`, `cutOffDateTime`, `cutOffDateTimeCode` added
+- `amsFilingDueDate`, `carrierBookingRequestReference`, `confirmationDateTime`, `confirmedEquipmentUnits`, `cutOffDateTime`, `cutOffDateTimeCode`, `eventLocationDateTime`, `isAMSACIFilingRequired`, `submissionDateTime`, `transportPlanStage`, `transportPlanStageSequenceNumber` added
 - `bookingRequestDateTime` format fixed and example added
 - `communicationChannel` changed from String -> enum
-- `destinationFilingRequired`, `equipmentSubstitutionAllowed`  ****, `exportDeclarationRequired`, `importLicenseRequired` and `partLoadAllowed` prefixed with `is` since they are Boolean values
-
+- `destinationFilingRequired`, `equipmentSubstitutionAllowed`, `exportDeclarationRequired`, `importLicenseRequired` and `partLoadAllowed` prefixed with `is` since they are Boolean values
+- `exportLicenseIssueDate`, `exportLicenseExpiryDate`, `plannedArrivalDate` and `plannedDepartureDate`, `errorDateTime` format fixed
+- `incoterms` changed from string `->` enum
+- added the following values to `locationType` enum:
+  - `PSR` (Pre-carriage under shipper’s responsibility)
+  - `IEL` (Container intermediate export stop off location)
+  - `PTP` (Prohibited transshipment port)
+  - `RTP` (Requested transshipment port)
+  - `FCD` (Full container drop-off location)
+  - `ECP` (Empty container pick-up date and time)
+  - `IPA` (IPA  Invoice payable at)
+  - `FDE` (Final destination)
+- `OTICarrierCode` type changed from integer `->` string
+- `partyFunction` updated with new values:
+  - `HE` (Carrier booking office (transportation office))
+  - `SCO` (Service contract owner - Defined by DCSA)
+  - `BA` (Booking Agency)
+- `paymentTerm` changed from string `->` enum and renamed to `paymentTermCode`
+- `referenceType` updated with new values:
+  - `ECR` (Empty container release reference)
+  - `CSI` (Customer shipment ID)
+  - `BPR` (Booking party reference number)
+  - `BID` (Booking Request ID)
+- `valueAddedServiceRequest` renamed to `valueAddedServiceCode` and changed from string `->` enum
+- `transportDocumentType` description updated to include enum values
+- `valueAddedServiceRequest` renamed to `valueAddedServiceCode` and change from text(30) `->` enum
 
 <a name="v103"></a>[Release v1.0.3 (28 October 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/DCSA_DOMAIN/1.0.3)
 ---
