@@ -50,6 +50,7 @@ This version is primaily connected to the new Booking API
 Initial relese for Booking API
 
 - Bump [DCSA_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v110)
+- Bump [Location_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v110)
 - Description updated: Booking added
 - `bookingHeaderNoID` object updated
   - `bookingRequestID`, `bookingRequestDateTime`, `cargoGrossWeightUnit` removed
@@ -84,16 +85,17 @@ Initial relese for Booking API
 - `bookingConfirmation`, `bookingConfirmationHeader`, `bookingConfirmation`, `valueAddedServiceRequests` and `valueAddedServiceRequest` object added
 - `commodity` object updated with `cargoGrossWeightUnit`, `exportLicenseIssueDate` and `exportLicenseExpiryDate`
 - `transportDraft`, `vessels`, `voyage` and `voyages` object removed
-
-
 - description updated for `requestedEquipment`
 - `requestedEquipmentType` renamed to `requestedEquipmentSizeType`
 - `requestedEquipmentSizeType`, `requestedEquipmentUnits` and `isShipperOwned` are now required fields on `requestedEquipment`
-- `confirmedEquipment` object added
-- `shipmentCutOffTime` object added
+- `confirmedEquipment` and `confirmedEquipments` object added
+- `shipmentCutOffTime` and `shipmentCutOffTimes` object added
 - `location` object in `shippingInstructionHeader` now contains an ID
 - the `party` object in `documentParties` now contains an ID
 - `partyContactDetails` in `party` object is now a list
+- `partyContactDetail` is now an object
+
+
 - add missing `)` in enum value `54` in `codeListResponsibleAgencyCode`
 - add `eventDate` to `ShipmentLocation` object
 - `location` is now a required field in `ShipmentLocation`
