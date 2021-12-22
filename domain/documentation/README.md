@@ -33,6 +33,10 @@ This version is primaily connected to the new Booking API
 - `equipmentReference` removed from `cargoItem`
 - description of `utilizedTransportEquipment` updated
 - each `utilizedTransportEquipment` now contains a list of `cargoItems`
+- `partyContactDetails` moved from `documentParty` -> `party` and made a mandatory field
+- `name` is now a mandatory field of `partyContactDetails`
+- modified the example of the `location` object in `shipmentLocations`
+- `locationType` renamed to `shipmentLocationTypeCode`
 
 
 - `bookingRequestHeader` object updated (previosly `bookingHeader` object)
