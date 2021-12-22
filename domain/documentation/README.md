@@ -94,11 +94,9 @@ Initial relese for Booking API
 - the `party` object in `documentParties` now contains an ID
 - `partyContactDetails` in `party` object is now a list
 - `partyContactDetail` is now an object
-
-
-- add missing `)` in enum value `54` in `codeListResponsibleAgencyCode`
-- add `eventDate` to `ShipmentLocation` object
+- `nmftaCode` removed
 - `location` is now a required field in `ShipmentLocation`
+- `eventDateTime` added to `ShipmentLocation`
 - `clauses` renamed to `carrierClauses`
 - `transportPlanStage`, `transportPlanStageSequenceNumber` and `vesselName` added to the `transport` object
 - `transportPlanStage`, `transportPlanSequenceNumber`, `loadLocation`, `dischargeLocation`, `plannedDepartureDate`, `plannedArrivalDate`, `vesselName`, `vesselIMONumber`, `carrierVoyageNumber` are now all required fields on `transport`
