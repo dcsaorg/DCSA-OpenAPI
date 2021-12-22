@@ -52,30 +52,40 @@ Initial relese for Booking API
 - Bump [DCSA_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v110)
 - Description updated: Booking added
 - `bookingHeaderNoID` object updated
-  - `bookingRequestID` removed (it is now a `ReferenceType`)
+  - `bookingRequestID`, `bookingRequestDateTime`, `cargoGrossWeightUnit` removed
   - `receiptDeliveryTypeAtOrigin` renamed to `receiptTypeAtOrigin`
   - `receiptDeliveryTypeAtDestination` renamed to `deliveryTypeAtDestination`
-  - `bookingRequestDateTome` removed
-  - `paymentTerm` added
-  - `cargoGrossWeightUnit` removed
+  - `paymentTermCode`, `submissionDateTime`, `isAMSACIFilingRequired` added
   - all Boolean operators prefixed with `is`
-  - `submissionDateTime` added
   - `placeOfReceiotPickupDate` and `finalDestinationExpectedArrivalDate` removed (they are now a `ShipmentLocation`)
-  - `isAMSACIFilingRequired` added
   - `OTICarrierCode` and `800SeriesCarrierCode` removed (they are not part of the `IdentifyingCode` in the `Party` object
   - `transportDocumentType` renamed to `transportDocumentTypeCode`
   - `valueAddedServiceRequest` field removed (it is now a list)
-  - `invoicePayableAt` removed
+  - `invoicePayableAt` updated object reference to include locationID
   - `exportLicenseIssueDate` and `exportLicenseExpiryDate` both removed and moved into the `Commodity` object
-  - `serviceContractReference` and `isEquipmentSubstitutionAllowed` are now required fields
+  - added `vesselName`, `vesselIMONumber` and `carrierVoyageNumber` (they have been moved from `transportDraft` object which is no longer needed)
+  - `serviceContractReference` and `submissionDateTime` are now required fields
+  - `transportDocumentType` is no longer a required field
+- `bookingHeader` object updated
+  - `carrierBookingRequestReference` added and made mandatory
+  - `carrierBookingReference` removed
+- `bookingHeaderResponse` object created
+- `bookingNoID` object updated
+  - `valueAddedServiceRequests` added
+  - `transportDraft` removed
+- `booking` object updated
+  - `valueAddedServiceRequests` added
+  - `transportDraft` removed
+  - `commodities` made mandatory
+- `bookingResponse` object created
   - `carrierBookingRequestReference` is now the ID of the `bookingRequest`
   - `carrierBookingReference` has been removed from `bookingRequest` (it is not available until `bookingConfirmation`)
   - `transportDraft` object removed
-  - added `vesselName`, `vesselIMONumber` and `carrierVoyageNumber` (they have been moved from `transportDraft` object which is no longer needed)
-- `bookingConfirmation` object added
-- `commodity` object updated with `exportLicenseIssueDate` and `exportLicenseExpiryDate`
-- `voyage` and `voyages` removed
-- `valueAddedServiceRequest` object created
+- `bookingConfirmation`, `bookingConfirmationHeader`, `bookingConfirmation`, `valueAddedServiceRequests` and `valueAddedServiceRequest` object added
+- `commodity` object updated with `cargoGrossWeightUnit`, `exportLicenseIssueDate` and `exportLicenseExpiryDate`
+- `transportDraft`, `vessels`, `voyage` and `voyages` object removed
+
+
 - description updated for `requestedEquipment`
 - `requestedEquipmentType` renamed to `requestedEquipmentSizeType`
 - `requestedEquipmentSizeType`, `requestedEquipmentUnits` and `isShipperOwned` are now required fields on `requestedEquipment`
