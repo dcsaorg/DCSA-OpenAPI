@@ -8,8 +8,33 @@ The primary purpose of this Domain is to specify simple objects used in all DCSA
 ---
 This version is primaily connected to the new Booking API
 
-- Bump [DCSA_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v110)
-- Bump [Location_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v110)
+- Bump [DCSA_Domain to version 2.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v200)
+- Bump [Location_Domain to version 2.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v200)
+- Rearranging and renaming objects and content:
+  - `bookingHeaderNoID` renamed to `bookingShallow` with the following changes:
+    - `bookingRequestDateTime` removed
+    - `transportDocumentTypeCode` reffering to `transportDocumentTypeCode` instead of `transportDocumentType`
+    - `invoicePayableAt` removed from `bookingShallow`
+    - `carrierVoyageNumber` replaced by `exportVoyageNumber`
+    - `preCarriageModeOfTransportCode` added
+  - `bookingDeep` object added with all deeply nested objects
+  - `bookingSummary`, `bookingRequest`, `bookings`, `booking` and `bookingRefStatus` object added
+  - `shipmentSummary`, `shipments` and `shipment` object added
+  - `shippingInstructionHeaderNoID` renamed to `shippingInstructionShallow` with the following changes:
+    - `transportDocumentType` renamed to `transportDocumentTypeCode`
+    - `preCarriageUnderShippersResponsibility` and `invoicePayableAt` removed
+    - `isChargesDisplayed` removed and replaced by `areChargesDisplayedOnOriginals` and `areChargesDisplayedOnCopies`
+    - modified description of `carrierBookingReference`
+    - `displayedNameForPlaceOfReceipt`, `displayedNameForPortOfLoad``, `displayedNameForPortOfDischarge` and `displayedNameForPlaceOfDelivery` added
+  - `shippingInstructionDeep` object added with all deeply nested objects
+  - `shippingInstructionSummary`, `shippingInstructionRequest`, `shippingInstruction`, `shippingInstructionResponse` and `shippingInstructionRefStatus` objects added
+- modified description of `carrierBookingReference` in `cargoItem`
+- `references` added to `cargoItem`
+- `equipmentReference` removed from `cargoItem`
+- description of `utilizedTransportEquipment` updated
+- each `utilizedTransportEquipment` now contains a list of `cargoItems`
+
+
 - `bookingRequestHeader` object updated (previosly `bookingHeader` object)
   - `bookingRequestID` removed (it is now a `ReferenceType`)
   - `receiptDeliveryTypeAtOrigin` renamed to `receiptTypeAtOrigin`
