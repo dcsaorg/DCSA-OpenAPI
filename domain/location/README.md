@@ -6,8 +6,15 @@ The primary purpose of this Domain is to specify common components related to a 
 
 <a name="v200"></a>[Release v2.0.0 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/LOCATION_DOMAIN/2.0.0)
 ---
-- Bump [DCSA_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v110)
+- Bump [DCSA_Domain to version 2.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v200)
 - Added a `locationWithID` object to include a locationID
+- Modified description of general purpose `location` object
+- Created interfaces for the location object
+  - `idLocation` ability to identify a location by a unique ID
+  - `addressLocation` express a location only using an `address`
+  - `facilityLocation` express a location only using a `facilityCode`
+  - `geoLocation` express a location using `latitude` and `longitude`
+  - `unLocationLocation` express a location using a `UN Location Code`
 
 <a name="v103"></a>[Release v1.0.3 (28 October 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/LOCATION_DOMAIN/1.0.3)
 ---
