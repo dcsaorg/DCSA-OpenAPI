@@ -13,10 +13,23 @@ This version is primaily connected to the new Booking API
 - Rearranging and renaming objects and content:
   - `bookingHeaderNoID` renamed to `bookingShallow` with the following changes:
     - `bookingRequestDateTime` removed
+    - `receiptDeliveryTypeAtOrigin` renamed to `receiptTypeAtOrigin`
+    - `receiptDeliveryTypeAtDestination` renamed to `deliveryTypeAtDestination`
+    - `paymentTermCode`, `submissionDateTime`, `isAMSACIFilingRequired` added
+    - all Boolean operators prefixed with `is`
     - `transportDocumentTypeCode` reffering to `transportDocumentTypeCode` instead of `transportDocumentType`
     - `invoicePayableAt` removed from `bookingShallow`
     - `carrierVoyageNumber` replaced by `exportVoyageNumber`
     - `preCarriageModeOfTransportCode` added
+    - `placeOfReceiotPickupDate` and `finalDestinationExpectedArrivalDate` removed (they are now a `ShipmentLocation`)
+    - `OTICarrierCode` and `800SeriesCarrierCode` removed (they are not part of the `IdentifyingCode` in the `Party` object
+    - `transportDocumentType` renamed to `transportDocumentTypeCode`
+    - `valueAddedServiceRequest` field removed (it is now a list)
+    - `invoicePayableAt` updated object reference to include locationID
+    - `exportLicenseIssueDate` and `exportLicenseExpiryDate` both removed and moved into the `Commodity` object
+    - added `vesselName`, `vesselIMONumber` and `carrierVoyageNumber` (they have been moved from `transportDraft` object which is no longer needed)
+    - `serviceContractReference` and `submissionDateTime` are now required fields
+    - `transportDocumentType` is no longer a required field
   - `bookingDeep` object added with all deeply nested objects
   - `bookingSummary`, `bookingRequest`, `bookings`, `booking` and `bookingRefStatus` object added
   - `shipmentSummary`, `shipments` and `shipment` object added
@@ -28,6 +41,7 @@ This version is primaily connected to the new Booking API
     - `displayedNameForPlaceOfReceipt`, `displayedNameForPortOfLoad``, `displayedNameForPortOfDischarge` and `displayedNameForPlaceOfDelivery` added
   - `shippingInstructionDeep` object added with all deeply nested objects
   - `shippingInstructionSummary`, `shippingInstructionRequest`, `shippingInstruction`, `shippingInstructionResponse` and `shippingInstructionRefStatus` objects added
+- `commodity` object updated with `cargoGrossWeightUnit`, `exportLicenseIssueDate` and `exportLicenseExpiryDate`
 - modified description of `carrierBookingReference` in `cargoItem`
 - `references` added to `cargoItem`
 - `equipmentReference` removed from `cargoItem`
@@ -46,8 +60,20 @@ This version is primaily connected to the new Booking API
 - `transportDocument` object updated:
   - `placeOfIssue` added
   - `transports` removed
-- ID removed from all places where `location` object is used (again)
+- `partyContactDetails` in `party` object is now a list
+- `partyContactDetail` is now an object
+- `nmftaCode` removed
+- `location` is now a required field in `ShipmentLocation`
+- `eventDateTime` added to `ShipmentLocation`
+- `clauses` renamed to `carrierClauses`
+- `transportPlanStage`, `transportPlanStageSequenceNumber` and `vesselName` added to the `transport` object
+- `transportPlanStage`, `transportPlanSequenceNumber`, `loadLocation`, `dischargeLocation`, `plannedDepartureDate`, `plannedArrivalDate`, `vesselName`, `vesselIMONumber` are now all required fields on `transport`
 - `carierVoyageNumber` replaced by `importVoyageNumber` and `exportVoyageNumber` in `Transports`
+- description updated for `requestedEquipment`
+- `requestedEquipmentType` renamed to `requestedEquipmentSizeType`
+- `requestedEquipmentSizeType`, `requestedEquipmentUnits` and `isShipperOwned` are now required fields on `requestedEquipment`
+- `confirmedEquipment` and `confirmedEquipments` object added
+- `shipmentCutOffTime` and `shipmentCutOffTimes` object added
 - specialized version of documentStatus called `bookingDocumentStatus` created with only booking related values
 - specialized version of documentTypeCode called `bookingDocumentTypeCode` created with only booking related values
 - specialized version of shipmentEventTypeCode called `bookingShipmentEventTypeCode` created with only booking related values
@@ -63,11 +89,11 @@ Initial relese for Booking API
 - Bump [Location_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v110)
 - Description updated: Booking added
 - `bookingHeaderNoID` object updated
-  - `bookingRequestID`, `bookingRequestDateTime`, `cargoGrossWeightUnit` removed
-  - `receiptDeliveryTypeAtOrigin` renamed to `receiptTypeAtOrigin`
-  - `receiptDeliveryTypeAtDestination` renamed to `deliveryTypeAtDestination`
-  - `paymentTermCode`, `submissionDateTime`, `isAMSACIFilingRequired` added
-  - all Boolean operators prefixed with `is`
+<!--   - `bookingRequestID`, `bookingRequestDateTime`, `cargoGrossWeightUnit` removed -->
+<!--   - `receiptDeliveryTypeAtOrigin` renamed to `receiptTypeAtOrigin` -->
+<!--   - `receiptDeliveryTypeAtDestination` renamed to `deliveryTypeAtDestination` -->
+<!--   - `paymentTermCode`, `submissionDateTime`, `isAMSACIFilingRequired` added -->
+<!--   - all Boolean operators prefixed with `is` -->
   - `placeOfReceiotPickupDate` and `finalDestinationExpectedArrivalDate` removed (they are now a `ShipmentLocation`)
   - `OTICarrierCode` and `800SeriesCarrierCode` removed (they are not part of the `IdentifyingCode` in the `Party` object
   - `transportDocumentType` renamed to `transportDocumentTypeCode`
