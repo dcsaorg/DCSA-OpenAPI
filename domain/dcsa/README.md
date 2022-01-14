@@ -9,32 +9,20 @@ The primary purpose of this Domain is to specify common components to be reused 
 This version is primarily connected to Booking API
 
 - `800SeriesCarrierCode`, `confirmationDateTime`, `isChargesDisplayed`, `numberOfOriginals` removed
-- `areChargesDisplayedOnOriginals`, `areChargesDisplayedOnCopies`, `bookingReqestUpdatedDateTime`, `chargeTypeCode`, `issuedNumberOfOriginals`, `requestedNumberOfOriginals`, `shipmentCreatedDateTime`, `shipmentUpdatedDateTime`, `shippingInstructionCreatedDateTime`, `shippingInstructionUpdatedDateTime`, `transportDocumentCreatedDateTime`, `transportDocumentUpdatedDateTime` added as simple types
-- `bookingReqestDateTime` renamed `bookingReqestCreatedDateTime`
+- `amsFilingDueDate`, `areChargesDisplayedOnOriginals`, `areChargesDisplayedOnCopies`, `bookingReqestUpdatedDateTime`, `carrierBookingRequestReference`, `chargeTypeCode`, `commodityType`, `confirmedEquipmentUnits`, `cutOffDateTime`, `cutOffDateTimeCode`, `eventLocationDateTime`, `isAMSACIFilingRequired`, `issueDate`, `issuedNumberOfOriginals`, `requestedNumberOfOriginals`, `shipmentCreatedDateTime`, `shipmentUpdatedDateTime`, `shippingInstructionCreatedDateTime`, `shippingInstructionUpdatedDateTime`, `submissionDateTime`, `transportDocumentCreatedDateTime`, `transportDocumentUpdatedDateTime`, `transportPlanStage`, `transportPlanStageSequenceNumber` added as simple types
+- `destinationFilingRequired`, `equipmentSubstitutionAllowed`, `exportDeclarationRequired`, `importLicenseRequired` and `partLoadAllowed` prefixed with `is` since they are Boolean values
+- `bookingReqestDateTime` renamed `bookingReqestCreatedDateTime` and format + description fixed
 - `commodityType` changed from length 20 `->` 550
+- `communicationChannel` changed from String -> enum
 - documentStatus enum updated with new values:
   - PENC (Pending Confirmation)
   - CONF (Confirmed)
   - CANC (Cancelled)
+  - COMP (Completed)
 - `email` example updated
-- `locationType` renamed to `shipmentLocationType`
-- GitHub link added to: `referenceType`
-- `termsAndConditions` description updated
-- `transportDocumentType` renamed to `transportDocumentTypeCode`
-- `errors` and `error` object removed as they are in the <a href="https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/error">Error Domain</a>
-
-<a name="v110"></a>[Release v1.1.0 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/DCSA_DOMAIN/1.1.0)
----
-Initial relase for Booking
-
-- `800SeriesCarrierCode` type changed from integer `->` string
-- `amsFilingDueDate`, `carrierBookingRequestReference`, `confirmationDateTime`, `confirmedEquipmentUnits`, `cutOffDateTime`, `cutOffDateTimeCode`, `eventLocationDateTime`, `isAMSACIFilingRequired`, `submissionDateTime`, `transportPlanStage`, `transportPlanStageSequenceNumber` added
-- `bookingRequestDateTime` format fixed and example added
-- `communicationChannel` changed from String -> enum
-- `destinationFilingRequired`, `equipmentSubstitutionAllowed`, `exportDeclarationRequired`, `importLicenseRequired` and `partLoadAllowed` prefixed with `is` since they are Boolean values
 - `exportLicenseIssueDate`, `exportLicenseExpiryDate`, `plannedArrivalDate` and `plannedDepartureDate`, `errorDateTime` format fixed
 - `incoterms` changed from string `->` enum
-- added the following values to `locationType` enum:
+- `locationType` renamed to `shipmentLocationType` and added the following enum values:
   - `PSR` (Pre-carriage under shipper’s responsibility)
   - `IEL` (Container intermediate export stop off location)
   - `PTP` (Prohibited transshipment port)
@@ -43,20 +31,23 @@ Initial relase for Booking
   - `ECP` (Empty container pick-up date and time)
   - `IPA` (IPA  Invoice payable at)
   - `FDE` (Final destination)
+- GitHub link added to: `referenceType`
 - `OTICarrierCode` type changed from integer `->` string
 - `partyFunction` updated with new values:
   - `HE` (Carrier booking office (transportation office))
   - `SCO` (Service contract owner - Defined by DCSA)
   - `BA` (Booking Agency)
+  - `CA` (Carrier)
 - `paymentTerm` changed from string `->` enum and renamed to `paymentTermCode`
 - `referenceType` updated with new values:
   - `ECR` (Empty container release reference)
   - `CSI` (Customer shipment ID)
   - `BPR` (Booking party reference number)
   - `BID` (Booking Request ID)
-- `valueAddedServiceRequest` renamed to `valueAddedServiceCode` and changed from string `->` enum
-- `transportDocumentType` description updated to include enum values
-- `valueAddedServiceRequest` renamed to `valueAddedServiceCode` and change from text(30) `->` enum
+- `termsAndConditions` description updated
+- `transportDocumentType` description updated to include enum values and renamed to `transportDocumentTypeCode`
+- `valueAddedServiceRequest` renamed to `valueAddedServiceCode` and change from string `->` enum
+- `errors` and `error` object removed as they are in the <a href="https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/error">Error Domain</a>
 
 <a name="v103"></a>[Release v1.0.3 (28 October 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/DCSA_DOMAIN/1.0.3)
 ---
