@@ -13,6 +13,8 @@ Purpose of this release is to fix Stuffing and Stripping, support Booking v1 and
   - COMP (Completed)
 - added link to GitHub for `documentTypeCode`
 - fixed bug in `GET /v2/events` endPoint response: changed `anyOf` -> `oneOf`
+- `facilityTypeCode` in `TransportEvents` and `EquipmentEvents` moved from within `TransportCall` -> root level
+- 
 
 
 <a name="v220"></a>[Release v2.2.0 (28 October 2021)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/2.2.0)
