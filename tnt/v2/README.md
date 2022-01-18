@@ -19,7 +19,7 @@ Purpose of this release is to fix Stuffing and Stripping, support Booking v1 and
   - `facilityCode` this is covered by the `facilityCode` in the `location` object
   - `facilityCodeListProvider` this is covered by the `facilityCodeListProvider` in the `location` object
   - `otherFacility` this is covered by the `address` object in the `location` object
-  - `facilityTypeCode` this has been moved to Event root-level
+  - `facilityTypeCode` this has been moved to `TransportEvent` and `EquipmentEvent` root-level
 
 
 <a name="v220"></a>[Release v2.2.0 (28 October 2021)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/2.2.0)
