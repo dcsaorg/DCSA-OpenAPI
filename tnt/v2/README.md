@@ -8,9 +8,9 @@ Purpose of this release is to fix Stuffing and Stripping, support Booking v1 and
 - Bump [DCSA_Domain to version 2.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v103) (was previously v1.0.3)
 - Bump [Event_Domain to version 2.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#v104) (was previously v1.0.4)
 - added new enum values to `shipmentEventTypeCode`
-  - PENC (Pending Confirmation)
-  - CANC (Cancelled)
-  - COMP (Completed)
+  - `PENC` (Pending Confirmation)
+  - `CANC` (Cancelled)
+  - `COMP` (Completed)
 - added link to GitHub for `documentTypeCode`
 - fixed bug in `GET /v2/events` endPoint response: changed `anyOf` -> `oneOf`
 - `facilityTypeCode` added to `TransportEvents` and `EquipmentEvents`
@@ -20,6 +20,23 @@ Purpose of this release is to fix Stuffing and Stripping, support Booking v1 and
   - `facilityCodeListProvider` this is covered by the `facilityCodeListProvider` in the `location` object
   - `otherFacility` this is covered by the `address` object in the `location` object
   - `facilityTypeCode` this has been moved to `TransportEvent` and `EquipmentEvent` root-level
+- added new enum values to `referenceType`
+  - `ECR` (Empty container release reference)
+  - `CSI` (Customer shipment ID)
+  - `BPR` (Booking party reference number)
+  - `BID` (Booking Request ID)
+- added link to GitHub for `referenceType`
+- `documentReferences` added to the `ShipmentEvent`
+- added new enum values to `shipmentEventTypeCode`
+  - `PENC` (Pending Confirmation)
+  - `CANC` (Cancelled)
+  - `COMP` (Completed)
+- `reason` field size limited to 250 in `ShipmentEvent`
+- modified the description of the deprecated `transportDocumentTypeCode` subscription filter for the `ShipmentEvents`
+- added new enum values to `documentReferenceType`
+  - CBR (Carrier Booking Request Reference)
+  - SHI (Shipping Instruction ID)
+- fixed enum values for `documentReferenceType` as they wrongly contained the description as part of the enum value
 
 
 <a name="v220"></a>[Release v2.2.0 (28 October 2021)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/2.2.0)
