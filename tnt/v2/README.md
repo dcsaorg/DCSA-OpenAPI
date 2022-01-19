@@ -10,7 +10,6 @@ Purpose of this release is to fix Stuffing and Stripping, support Booking v1 and
 - added new enum values to `shipmentEventTypeCode`
   - `PENC` (Pending Confirmation)
   - `CANC` (Cancelled)
-  - `COMP` (Completed)
 - added link to GitHub for `documentTypeCode`
 - fixed bug in `GET /v2/events` endPoint response: changed `anyOf` -> `oneOf`
 - `facilityTypeCode` added to `TransportEvents` and `EquipmentEvents`
