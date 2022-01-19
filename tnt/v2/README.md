@@ -5,8 +5,8 @@ The DCSA Interface Standard for Track & Trace is documented on [**DCSA TNT**](ht
 <a name="v230"></a>[Release v2.3.0 (...)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/2.3.0)
 ---
 Purpose of this release is to fix Stuffing and Stripping, support Booking v1 and Electronic Bill of Lading v2
-- Bump [DCSA_Domain to version 2.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v103) (was previously v1.0.3)
-- Bump [Event_Domain to version 2.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#v104) (was previously v1.0.4)
+- Bump [DCSA_Domain to version 2.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v200) (was previously v1.0.3)
+- Bump [Event_Domain to version 2.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#v200) (was previously v1.0.4)
 - added new enum values to `shipmentEventTypeCode`
   - `PENC` (Pending Confirmation)
   - `CANC` (Cancelled)
