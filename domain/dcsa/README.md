@@ -9,16 +9,16 @@ The primary purpose of this Domain is to specify common components to be reused 
 This version is primarily connected to Booking API
 
 - `800SeriesCarrierCode`, `confirmationDateTime`, `isChargesDisplayed`, `numberOfOriginals` removed
-- `amsFilingDueDate`, `areChargesDisplayedOnOriginals`, `areChargesDisplayedOnCopies`, `bookingReqestUpdatedDateTime`, `carrierBookingRequestReference`, `chargeTypeCode`, `commodityType`, `confirmedEquipmentUnits`, `cutOffDateTime`, `cutOffDateTimeCode`, `eventLocationDateTime`, `isAMSACIFilingRequired`, `issueDate`, `issuedNumberOfOriginals`, `requestedNumberOfOriginals`, `shipmentCreatedDateTime`, `shipmentUpdatedDateTime`, `shippingInstructionCreatedDateTime`, `shippingInstructionUpdatedDateTime`, `submissionDateTime`, `transportDocumentCreatedDateTime`, `transportDocumentUpdatedDateTime`, `transportPlanStage`, `transportPlanStageSequenceNumber` added as simple types
+- `amsFilingDueDate`, `areChargesDisplayedOnOriginals`, `areChargesDisplayedOnCopies`, `bookingReqestUpdatedDateTime`, `carrierBookingRequestReference`, `chargeTypeCode`, `commodityType`, `confirmedEquipmentUnits`, `cutOffDateTime`, `cutOffDateTimeCode`, `eventLocationDateTime`, `expectedArrivalDateStart`, `expectedArrivalDateEnd`, `isAMSACIFilingRequired`, `issuedNumberOfOriginals`, `requestedNumberOfOriginals`, `shipmentCreatedDateTime`, `shipmentUpdatedDateTime`, `shippingInstructionCreatedDateTime`, `shippingInstructionUpdatedDateTime`, `submissionDateTime`, `transportDocumentCreatedDateTime`, `transportDocumentUpdatedDateTime`, `transportPlanStage`, `transportPlanStageSequenceNumber` added as simple types
 - `destinationFilingRequired`, `equipmentSubstitutionAllowed`, `exportDeclarationRequired`, `importLicenseRequired` and `partLoadAllowed` prefixed with `is` since they are Boolean values
 - `bookingReqestDateTime` renamed `bookingReqestCreatedDateTime` and format + description fixed
 - `commodityType` changed from length 20 `->` 550
-- `communicationChannel` changed from String -> enum
+- `communicationChannel` renamed to `communicationChannelCode` and changed from String -> enum
 - documentStatus enum updated with new values:
   - PENC (Pending Confirmation)
   - CONF (Confirmed)
   - CANC (Cancelled)
-  - COMP (Completed)
+  - CMPL (Completed)
 - `email` example updated
 - `exportLicenseIssueDate`, `exportLicenseExpiryDate`, `plannedArrivalDate` and `plannedDepartureDate`, `errorDateTime` format fixed
 - `incoterms` changed from string `->` enum
@@ -31,7 +31,6 @@ This version is primarily connected to Booking API
   - `ECP` (Empty container pick-up date and time)
   - `IPA` (IPA  Invoice payable at)
   - `FDE` (Final destination)
-- GitHub link added to: `referenceType`
 - `OTICarrierCode` type changed from integer `->` string
 - `partyFunction` updated with new values:
   - `HE` (Carrier booking office (transportation office))
@@ -44,6 +43,7 @@ This version is primarily connected to Booking API
   - `CSI` (Customer shipment ID)
   - `BPR` (Booking party reference number)
   - `BID` (Booking Request ID)
+- GitHub link added to: `referenceType`
 - `termsAndConditions` description updated
 - `transportDocumentType` description updated to include enum values and renamed to `transportDocumentTypeCode`
 - `valueAddedServiceRequest` renamed to `valueAddedServiceCode` and change from string `->` enum
