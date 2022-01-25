@@ -1,0 +1,166 @@
+# OpenAPI version identifier - required for OpenAPI 3.0 domains
+openapi: 3.0.3
+
+#######################
+# Optional info section
+#######################
+info:
+  title: DCSA - Location Components
+  description: |
+    Common components for DCSA Locations. Locations defined in DCSA APIs and Domains should refer to this Domain. 
+    
+    There are multiple ways to define a location.
+    
+    - the "General" purpose location object can be used as a Polymorphic object defining a Location in multiple ways. All "ways" of defining a location should point to the same location. An example of this: location object containing values in the `UN Location Code` field as well as in the `Address` object would require that these two fields point to the same location
+    - it is also possible to define locations using the `interfaces`. An `interface` is a specific way of defining a location. This Domain defines 4 official ways to define a location: via **UN Location Code**, via **facilityCode**, via a **geoLocation** or via an **Address**. It is possible to "combine" interfaces. This should be done using the `anyOf` qualifier. When doing this the same rule as in the "General" purpose location applies: all interfaces of the same location object must point to the same location
+    
+    For a histroy of changes in this domain - please check [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location)
+  version: 2.0.0
+
+components:
+
+  ####################
+  # Common data models
+  ####################
+  schemas:
+    location:
+      type: object
+      description: |
+        General purpose object to capture location-related data, the location can be specified in **any** of the following ways: `geoLocation` (lat+long), `UN Location Code`, a `Facility` or an `Address`.
+        
+        If multiple ways are used - then they all have to point to the same location!
+      allOf:
+        - type: object
+          properties:
+            locationName:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/locationName'
+        - type: object
+          properties:
+            latitude:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/latitude'
+        - type: object
+          properties:
+            longitude:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/longitude'
+        - type: object
+          properties:
+            UNLocationCode:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/UNLocationCode'
+        - type: object
+          properties:
+            facilityCode:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/facilityCode'
+        - type: object
+          properties:
+            facilityCodeListProvider:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/facilityCodeListProvider'
+        - type: object
+          properties:
+            address:
+              description: 'Address related information'
+              allOf:
+                - $ref: '#/components/schemas/address'
+    idLocation:
+      type: object
+      description: |
+        An interfrace used to express a location using an id (`locationID`)
+      allOf:
+        - type: object
+          properties:
+            locationID:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/locationID'
+      required:
+        - locationID
+    addressLocation:
+      type: object
+      description: |
+        An interfrace used to express a location using an `Address` object
+      allOf:
+        - type: object
+          properties:
+            address:
+              description: 'Address related information'
+              allOf:
+                - $ref: '#/components/schemas/address'
+      required:
+        - address
+    facilityLocation:
+      type: object
+      description: |
+        An interfrace used to express a location using a `Facility`. The facility can either be expressed using a `BIC` code or a `SMDG` code
+      allOf:
+        - type: object
+          properties:
+            facilityCode:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/facilityCode'
+        - type: object
+          properties:
+            facilityCodeListProvider:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/facilityCodeListProvider'
+      required:
+        - facilityCode
+        - facilityCodeListProvider
+    geoLocation:
+      type: object
+      description: |
+        An interfrace used to express a location using `latitude` and `longitude`
+      allOf:
+        - type: object
+          properties:
+            latitude:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/latitude'
+        - type: object
+          properties:
+            longitude:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/longitude'
+      required:
+        - latitude
+        - longitude
+    unLocationLocation:
+      type: object
+      description: |
+        An interfrace used to express a location using a `Un Location Code`
+      allOf:
+        - type: object
+          properties:
+            UNLocationCode:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/UNLocationCode'
+      required:
+        - UNLocationCode
+    address:
+      type: object
+      description: |
+        An object for storing address related information
+      allOf:
+        - type: object
+          properties:
+            name:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/addressName'
+        - type: object
+          properties:
+            street:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/streetName'
+        - type: object
+          properties:
+            streetNumber:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/streetNumber'
+        - type: object
+          properties:
+            floor:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/floor'
+        - type: object
+          properties:
+            postCode:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/postCode'
+        - type: object
+          properties:
+            city:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/cityName'
+        - type: object
+          properties:
+            stateRegion:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/stateRegion'
+        - type: object
+          properties:
+            country:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/country'
