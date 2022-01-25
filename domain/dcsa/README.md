@@ -14,6 +14,7 @@ This version is primarily connected to Booking API
 - `bookingReqestDateTime` renamed `bookingReqestCreatedDateTime` and format + description fixed
 - `commodityType` changed from length 20 `->` 550
 - `communicationChannel` renamed to `communicationChannelCode` and changed from String -> enum
+- `delayReasonCode`description updated to reflect that Category 5 SMDG codes are not supported
 - documentStatus enum updated with new values:
   - PENC (Pending Confirmation)
   - CONF (Confirmed)
