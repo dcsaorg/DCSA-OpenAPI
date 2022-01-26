@@ -17,7 +17,7 @@ This release is for T&T v2.3, Booking and eBL
   - PENC (Pending Confirmation)
   - CANC (Cancelled)
 - `documentReferences` added to `ShipmentEvent`
-- `facilityTypeCode` added to `TrasnportEvent` and `EquipmentEvent`
+- `facilityTypeCode` added to `TransportEvent` and `EquipmentEvent`
 - `references` no longer reffers to DocumentationDomain as the references differ (no refernceType `EQ` in DocumentationDomain)
 - `transportDocumentTypeCode` description updated in the `shipmentSubscriptionBody` object
 - added extra enum values to `documentReferenceType`
