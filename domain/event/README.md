@@ -8,9 +8,27 @@ This Domain specifies common components for DCSA Events. This domain is central 
 ---
 This release is for Booking
 
-- Bump [DCSA_Domain to version 2.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v200)
-- Bump [Documentation_Domain to version 2.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v200)
-- Bump [Location_Domain to version 2.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v200)
+- Bump [DCSA_Domain to version 2.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v200) (was previously 1.0.3)
+- Bump [Documentation_Domain to version 2.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v200) (was previously v1.0.4)
+- Bump [Location_Domain to version 2.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v200) (was previously 1.0.3)
+- Added `carrierBookingRequestReference` as a query parameter
+- `documentType` query parameter description updated and GitHub link added
+- `shipmentEventTypeCode` (both query Parameter and Simple type) updated with new enum values and GitHub link added
+  - PENC (Pending Confirmation)
+  - CANC (Cancelled)
+- `documentReferences` added to `ShipmentEvent`
+- `facilityTypeCode` added to `TrasnportEvent` and `EquipmentEvent`
+- `references` no longer reffers to DocumentationDomain as the references differ (no refernceType `EQ` in DocumentationDomain)
+- `transportDocumentTypeCode` description updated in the `shipmentSubscriptionBody` object
+- added extra enum values to `documentReferenceType`
+  - CBR (Carrier Booking Request Reference)
+  - SHI (Shipping Instruction ID)
+  - in `TransportCall` the following fields have been deprecated (use the same fields in the location object instead): `UN Location Code`, `facilityCode`, `facilityCodeListProvider`, and `otherFacility`
+  - in `TransportCall` - `facilityTypeCode` has been deprecated (it has been moved to event root level)
+  - `location` object of `TransportCall` has been modified to utilize the new "interfaces" that are defined in the Location Domain
+  - `references`, `referenceType` and `referenceValue` have been declared locally in this Domain instead of using the ones defined in Documentation Domain - reason for this is they differ
+  - `reason` field in the `ShipmentEvent` now has a limit of 250 characters
+  - `transportDocumentTypeCodes` example and link updated
 
 <a name="v111"></a>[Release v1.1.1 (16 November 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.1.1)
 ---
