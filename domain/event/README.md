@@ -28,7 +28,7 @@ This release is for T&T v2.3, Booking and eBL
   - `facilityCode` (use `facilityCode` in the `location` object instead)
   - `facilityCodeListProvider` (use `facilityCodeListProvider` in the `location` object instead)
   - `otherFacility` (use `address` object in the `location` object instead)
-- in `TransportCall` - `facilityTypeCode` has been deprecated (it has been moved to event root level)
+  - `facilityTypeCode` (has been moved to event root level)
 - `location` object of `TransportCall` has been modified to utilize the new "interfaces" that are defined in the Location Domain
 - `references`, `referenceType` and `referenceValue` have been declared locally in this Domain instead of using the ones defined in Documentation Domain - reason for this is they differ
 - `reason` field in the `ShipmentEvent` now has a limit of 250 characters
