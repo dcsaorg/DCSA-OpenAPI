@@ -23,12 +23,12 @@ This release is for T&T v2.3, Booking and eBL
 - added extra enum values to `documentReferenceType`
   - CBR (Carrier Booking Request Reference)
   - SHI (Shipping Instruction ID)
-  - in `TransportCall` the following fields have been deprecated (use the same fields in the location object instead): `UN Location Code`, `facilityCode`, `facilityCodeListProvider`, and `otherFacility`
-  - in `TransportCall` - `facilityTypeCode` has been deprecated (it has been moved to event root level)
-  - `location` object of `TransportCall` has been modified to utilize the new "interfaces" that are defined in the Location Domain
-  - `references`, `referenceType` and `referenceValue` have been declared locally in this Domain instead of using the ones defined in Documentation Domain - reason for this is they differ
-  - `reason` field in the `ShipmentEvent` now has a limit of 250 characters
-  - `transportDocumentTypeCodes` example and link updated
+- in `TransportCall` the following fields have been deprecated (use the same fields in the location object instead): `UN Location Code`, `facilityCode`, `facilityCodeListProvider`, and `otherFacility`
+- in `TransportCall` - `facilityTypeCode` has been deprecated (it has been moved to event root level)
+- `location` object of `TransportCall` has been modified to utilize the new "interfaces" that are defined in the Location Domain
+- `references`, `referenceType` and `referenceValue` have been declared locally in this Domain instead of using the ones defined in Documentation Domain - reason for this is they differ
+- `reason` field in the `ShipmentEvent` now has a limit of 250 characters
+- `transportDocumentTypeCodes` example and link updated
 
 <a name="v111"></a>[Release v1.1.1 (16 November 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/1.1.1)
 ---
