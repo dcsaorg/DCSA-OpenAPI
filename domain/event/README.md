@@ -23,7 +23,11 @@ This release is for T&T v2.3, Booking and eBL
 - added extra enum values to `documentReferenceType`
   - CBR (Carrier Booking Request Reference)
   - SHI (Shipping Instruction ID)
-- in `TransportCall` the following fields have been deprecated (use the same fields in the location object instead): `UN Location Code`, `facilityCode`, `facilityCodeListProvider`, and `otherFacility`
+- in `TransportCall` the following fields have been deprecated:
+  - `UN Location Code` (use `UN Location Code` in the `location` object instead)
+  - `facilityCode` (use `facilityCode` in the `location` object instead)
+  - `facilityCodeListProvider` (use `facilityCodeListProvider` in the `location` object instead)
+  - `otherFacility` (use `address` object in the `location` object instead)
 - in `TransportCall` - `facilityTypeCode` has been deprecated (it has been moved to event root level)
 - `location` object of `TransportCall` has been modified to utilize the new "interfaces" that are defined in the Location Domain
 - `references`, `referenceType` and `referenceValue` have been declared locally in this Domain instead of using the ones defined in Documentation Domain - reason for this is they differ
