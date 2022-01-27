@@ -9,7 +9,7 @@ The purpose of this Domain is to specify reusable objects for primarily Booking 
 This version is primaily connected to the new Booking API
 
 - Bump [DCSA_Domain to version 2.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v200) (was previously v1.0.3)
-- Bump [Location_Domain to version 2.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v200)
+- Bump [Location_Domain to version 2.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v200) (was previously v1.0.3)
 - Rearranging and renaming objects and content:
   - `bookingHeaderNoID` renamed to `bookingShallow` with the following changes:
     - `bookingRequestDateTime` removed
