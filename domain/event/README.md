@@ -12,7 +12,7 @@ This release is for T&T v2.3, Booking and eBL
 - Bump [Documentation_Domain to version 2.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v200) (was previously v1.0.4)
 - Bump [Location_Domain to version 2.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v200) (was previously 1.0.3)
 - Added `carrierBookingRequestReference` as a query parameter
-- `documentType` query parameter description updated and GitHub link added
+- `documentTypeCode` query parameter description updated and GitHub link added
 - `shipmentEventTypeCode` (both query Parameter and Simple type) updated with new enum values and GitHub link added
   - PENC (Pending Confirmation)
   - CANC (Cancelled)
