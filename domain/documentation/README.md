@@ -1,8 +1,8 @@
 ## DCSA Domain
 
-The DCSA Domain is documented on [**DCSA_DOMAIN**](https://app.swaggerhub.com/domains-docs/dcsaorg/DCSA_DOMAIN) SwaggerHub.
+The Documentation Domain is documented on [**Documentation Domain**](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN) SwaggerHub.
 
-The primary purpose of this Domain is to specify simple objects used in all DCSA Domains and APIs.
+The purpose of this Domain is to specify reusable objects for primarily Booking and electronic Bill of Lading.
 
 <a name="v200"></a>[Release v2.0.0 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN/2.0.0)
 ---
