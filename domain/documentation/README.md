@@ -12,16 +12,19 @@ This version is primaily connected to the new Booking API
 - Bump [Location_Domain to version 2.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v200) (was previously v1.0.3)
 - Rearranging and renaming objects and content:
   - `bookingHeaderNoID` renamed to `bookingShallow` with the following changes:
-    - `bookingRequestDateTime` removed
+    - `bookingRequestID`, `bookingRequestDateTime`, `cargoGrossWeightUnit` removed
     - `receiptDeliveryTypeAtOrigin` renamed to `receiptTypeAtOrigin`
     - `receiptDeliveryTypeAtDestination` renamed to `deliveryTypeAtDestination`
+    - `paymentTermCode` added
+    - `partialLoadAllowed`, `exportDeclarationRequired`, `importLicenseRequired` prefixed with `is`
+    - `placeOfReceiotPickupDate` and `finalDestinationExpectedArrivalDate` removed (they are now a `ShipmentLocation`)
+
     - `paymentTermCode`, `submissionDateTime`, `isAMSACIFilingRequired` added
     - all Boolean operators prefixed with `is`
     - `transportDocumentTypeCode` reffering to `transportDocumentTypeCode` instead of `transportDocumentType`
     - `invoicePayableAt` removed from `bookingShallow`
     - `carrierVoyageNumber` replaced by `exportVoyageNumber`
     - `preCarriageModeOfTransportCode` added
-    - `placeOfReceiotPickupDate` and `finalDestinationExpectedArrivalDate` removed (they are now a `ShipmentLocation`)
     - `OTICarrierCode` and `800SeriesCarrierCode` removed (they are not part of the `IdentifyingCode` in the `Party` object
     - `transportDocumentType` renamed to `transportDocumentTypeCode`
     - `valueAddedServiceRequest` field removed (it is now a list)
