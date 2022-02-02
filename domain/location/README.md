@@ -12,6 +12,7 @@ The primary purpose of this Domain is to specify common components related to a 
   - `idLocation` ability to identify a location by a unique ID
   - `addressLocation` express a location only using an `address` object
   - `facilityLocation` express a location only using a `facilityCode` and a `facilityCodeListProvider` (an optional `UN Location Code` can be provided)
+  - `facilitySMDGLocation` express a location only using a `facilityCode` using the `SMDG` code (an optional `UN Location Code` can be provided)
   - `geoLocation` express a location using `latitude` and `longitude`
   - `unLocationLocation` express a location using a `UN Location Code`
 
