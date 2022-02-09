@@ -12,6 +12,7 @@ Data and Interface Standard project workstream is to strengthen the container sh
 #### APIs
 - The DCSA Interface Standard for `Track & Trace` is documented on the [**DCSA TNT**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_TNT) SwaggerHub.
 - The DCSA Interface Standard for `Operational Vessel Schedules` is documented on the [**DCSA OVS**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS) SwaggerHub.
+- The DCSA Interface Standard for `Just in Time PortCalls` is documented on the [**DCSA JIT**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_JIT) SwaggerHub.
 - The DCSA Interface Standard for `electronic Bill of Lading` is documented on the [**DCSA EBL**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_EBL) SwaggerHub.
 - The DCSA Interface Standard for `Booking` is documented on the [**DCSA BKG**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_BKG) SwaggerHub.
 
