@@ -29,7 +29,6 @@ Purpose of this release is to fix Stuffing and Stripping, support Booking v1 and
 - added new enum values to `shipmentEventTypeCode`
   - `PENC` (Pending Confirmation)
   - `CANC` (Cancelled)
-  - `COMP` (Completed)
 - `reason` field size limited to 250 in `ShipmentEvent`
 - modified the description of the deprecated `transportDocumentTypeCode` subscription filter for the `ShipmentEvents`
 - added new enum values to `documentReferenceType`
