@@ -33,6 +33,7 @@ This version is primarily connected to Booking API
   - `IPA` (IPA  Invoice payable at)
   - `FDE` (Final destination)
 - `OTICarrierCode` type changed from integer `->` string
+- `packageCode` example corrected 5H `->` 5H4
 - `partyFunction` updated with new values:
   - `HE` (Carrier booking office (transportation office))
   - `SCO` (Service contract owner - Defined by DCSA)
