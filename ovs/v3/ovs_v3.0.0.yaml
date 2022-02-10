@@ -1,0 +1,642 @@
+openapi: 3.0.3
+info:
+  version: 3.0.0
+  title: 'DCSA OpenAPI specification for Operational Vessel Schedules'
+  description: |
+    API specification issued by DCSA.org
+    
+    This API supports <b>OVS</b> (Operational Vessel Schedules)
+    
+    OVS is used for sharing Vessel schedules. The Interface Standards for OVS can be read [here](https://dcsa.org/wp-content/uploads/2020/07/DCSA-Interface-Standard-for-Operational-Vessel-Schedules-1.0-vF.pdf).
+
+    For explanation to specific values or objects please refer to the [Information Model v3.5](https://dcsa.org/wp-content/uploads/2020/12/20201208-DCSA-P1-DCSA-Information-Model-v3.5-FINAL.pdf)
+
+    For a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/ovs/v3#v300). Please also [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments. 
+
+  #    It is possible to use this API as a standalone API. In order to do so it is necessary to use the poll-endPoint
+#    - /v3/events
+
+#    in order to poll event information.
+
+#    It is recomended to implement the <a href='https://app.swaggerhub.com/apis/dcsaorg/OVS_EVENT_HUB'>DCSA Operational Vessel Schedules (OVS) Event Hub</a> in order to use the push model. Here events are pushed as they occur.
+    
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  contact:
+    name: Digital Container Shipping Association (DCSA)
+    url: https://dcsa.org
+    email: info@dcsa.org
+tags:
+  - name: Operational Vessel Schedules
+    description: Operational Vessel Schedules operations
+  - name: Events
+paths:
+  /v3/service-schedules:
+    get:
+      parameters:
+        - in: query
+          name: carrierServiceCode
+          description: |
+            The carrier service code to filter by. The result will only return schedules including the service code
+          schema:
+            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/carrierServiceCode'
+        - in: query
+          name: vesselIMONumber
+          description: |
+            The identifier of a vessel. The result will only return schedules including the vessel
+          schema:
+            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/vesselIMONumber'
+        - in: query
+          name: voyageNumber
+          description: |
+            The identifier of a voyage - can be both import and export Voyage. The result will only return schedules including the voyageNumber (either as importVoyageNumber or exportVoyageNumber)
+          schema:
+            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/carrierVoyageNumber'
+        - in: query
+          name: vesselOperatorCarrierSMDGCode
+          description: |
+            The identifier of a vessel operator using the SMDG code. The result will only return schedules operated by the SMDG Code.
+          schema:
+            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/vesselOperatorCarrierSMDGCode'
+        # - in: query
+        #   name: vesselOperatorCarrierCode
+        #   description: |
+        #     The identifier of a vessel operator. The result will only return schedules operated by the CarrierCode. The type of the code can be specified in the `vesselOperatorCarrierCodeListProvider` queryParameter
+        #   schema:
+        #     $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/vesselOperatorCarrierCode'
+        # - in: query
+        #   name: vesselOperatorCarrierCodeListProvider
+        #   description: |
+        #     The identifier of a vessel operator list provider. The result will only return schedules including the vesselOperators specified by the list provider
+        #   schema:
+        #     $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/vesselOperatorCarrierCodeListProvider'
+        # - $ref: '#/components/parameters/dateInterval'
+        - in: query
+          name: UNLocationCode
+          description: |
+            The UN Location code specifying where the port is located.
+            
+            Specifying this filter will only return schedules related to this particular UN Location code.
+          example: NLRTM
+          schema:
+            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/UNLocationCode'
+        - $ref: '#/components/parameters/startDate'
+        - $ref: '#/components/parameters/endDate'
+
+        # Chunk with pagination parameters needed to be included in all APIs
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/parameters/limit'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/parameters/cursor'
+        # - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/parameters/sort'
+        - $ref: '#/components/parameters/Api-Version-Major'
+      tags:
+        - Operational Vessel Schedules
+      summary: Get a list of Schedules
+      description: |
+        Get a list of schedules. The number of schedules in the list can be narrowed down by providing filter parameters. Whenever a schedule is matched because of a filter parameter - **the entire service is included inside the schedule**.
+      responses:
+        '200':
+          description: Schedule successfully posted
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  allOf:
+                    - $ref: '#/components/schemas/serviceSchedule'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.0.0#/components/schemas/error'
+  /v3/port-schedules:
+    get:
+      parameters:
+        - in: query
+          name: UNLocationCode
+          description: |
+            The UN Location code specifying where the port is located.
+            
+            Specifying this filter will only return port schedules related to this particular UN Location code.
+          example: NLRTM
+          schema:
+            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/UNLocationCode'
+        - in: query
+          name: facilitySMDGCode
+          description: |
+            The SMDG facility code (without the UN Location Code) to further filter by.
+          example: RWG
+          schema:
+            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/facilityCode'
+        # - in: query
+        #   name: facilityBICCode
+        #   description: |
+        #     The BIC facility code (without the UN Location Code) to further filter by.
+        #   example: DIVO
+        #   schema:
+        #     $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/facilityCode'
+        - in: query
+          name: voyageNumber
+          description: |
+            The identifier of a voyage - can be both import and export Voyage. The result will only return schedules including the voyageNumber (either as importVoyageNumber or exportVoyageNumber)
+          schema:
+            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/carrierVoyageNumber'
+        # - $ref: '#/components/parameters/dateInterval'
+        - $ref: '#/components/parameters/startDate'
+        - $ref: '#/components/parameters/endDate'
+        # Chunk with pagination parameters needed to be included in all APIs
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/parameters/limit'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/parameters/cursor'
+        # - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/parameters/sort'
+        - $ref: '#/components/parameters/Api-Version-Major'
+      tags:
+        - Operational Vessel Schedules
+      summary: Get a list of Ports Schedules
+      description: |
+        a schedule object
+      responses:
+        '200':
+          description: Schedule successfully posted
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  allOf:
+                    - $ref: '#/components/schemas/portSchedule'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.0.0#/components/schemas/error'
+
+  /v3/events:
+    get:
+      tags:
+        - Events
+      summary: Get Transport events
+      description: |
+        Retrieves Transport events. The default sort order is by eventCreatedDateTime in descending order (DESC)
+        
+        <b>NB</b>&#58; It is possible to combine queryParameters. When combining queryParameters be aware that it is also possible to make combinations that are mutual contradicting.
+        
+        Example&#58; <i>operationsEventTypeCode=CMPL and transportEventTypeCode=ARRI</i>
+        
+        Since there is no event that can be an OperationsEvent <u>and</u> a TransportEvent at the same time <b>this will return an empty list<b>!
+      parameters:
+        # Chunk with Transport related event parameters
+        - $ref: '#/components/parameters/transportEventTypeCode'
+        
+        # Chunk for TransportCall (used both in Operation- and Transport-Events)
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.1.1#/components/parameters/transportCallID'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.1.1#/components/parameters/vesselIMONumber'
+        # - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.1.1#/components/parameters/carrierVoyageNumber'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.1.1#/components/parameters/exportVoyageNumber'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.1.1#/components/parameters/carrierServiceCode'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.1.1#/components/parameters/UNLocationCode'
+
+        # Chunk with base event parameters
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/1.1.1#/components/parameters/eventCreatedDateTime'
+
+        # Chunk with Global related event parameters
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/parameters/limit'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/parameters/cursor'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/parameters/sort'
+        - $ref: '#/components/parameters/Api-Version-Major'
+      responses:
+        '200':
+          description: Successful operation
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+            Current-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/Current-Page'
+            Next-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/Next-Page'
+            Prev-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/Prev-Page'
+            Last-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/Last-Page'
+            First-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/First-Page'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/transportEvent'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.0.0#/components/schemas/error'
+
+
+components:
+  headers:
+    API-Version:
+      schema:
+        type: string
+        example: '2.0.0'
+      description: SemVer used to indicate the version of the contract (API version) returned.
+  parameters: 
+
+    ##############
+    # Query params
+    ##############
+
+    Api-Version-Major:
+      in: header
+      name: API-Version
+      required: false
+      schema:
+        type: string
+        example: '3'
+      description: |
+        An API-Version header MAY be added to the request (optional); if added it MUST only contain MAJOR version. API-Version header MUST be aligned with the URI version.
+    # dateInterval:
+    #   in: query
+    #   name: dateInterval
+    #   description: |
+    #     Date interval with end-date included for which the schedules should be retrieved. If any date inside a schedule matches within the dateInterval - the entire service for that schedule will be included in the result.
+        
+    #     Current month if this parameter is not specified. (example: `2022-01-13/2022-01-12`)
+        
+    #     Supported formats:
+
+    #     - `start-date`/`end-date`
+    #     - `start-date`/`duration`
+    #     - `duration`/`end-date`
+        
+    #     The duration is in `Period` format: `ISO-8601`. The date format is also according to `ISO-8601`, i.e. the default Local Date Formatter
+    #   example: 2022-01-13/2022-02-12
+    #   schema:
+    #     type: string
+    endDate:
+      in: query
+      name: endDate
+      description: |
+        The end date of the period for which schedule information is requested. If any date inside a schedule matches a date prior to the `endDate` the schedule will be included in the result. The value is populated in `ISO 8601` Date format.
+      required: false
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/startDate'
+    startDate:
+      in: query
+      name: startDate
+      description: |
+        The start date of the period for which schedule information is requested. If any date inside a schedule matches a date after the `startDate` the schedule will be included in the result. The value is populated in `ISO 8601` Date format.
+      required: false
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/startDate'
+    # dateRange:  
+    #   in: query
+    #   name: dateRange
+    #   description: The time period for which schedule information is sent. The duration is populated in ISO 8601 Duration format.
+    #   required: false
+    #   schema:
+    #     $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/dateRange'
+    transportEventTypeCode:
+      in: query
+      name: transportEventTypeCode
+      explode: false
+      style: form
+      description: |
+        Identifier for type of Transport event to filter by
+        - ARRI (Arrived)
+        - DEPA (Departed)
+        - OMIT (Omit)
+        - BLNK (Blank)
+        - ADHO (Ad Hoc)
+        - PHOT (Phase Out)
+        - PHIN (Phase In)
+        - SLID (Sliding)
+
+        It is possible to select multiple values by comma (,) separating them. For multiple values the OR-operator is used. For example <i>transportEventTypeCode=ARRI,DEPA</i> matches <b>both</b> Arrived (ARRI) and Departed (DEPA) transport events.
+        
+        Default is all transportEventTypeCodes.
+        
+        This filter is only relevant when filtering on TransportEvents
+      example: ARRI,DEPA
+      schema:
+        default: ARRI,DEPA
+        type: array
+        items:
+          $ref: '#/components/schemas/transportEventTypeCode'
+  schemas:
+    transportEvent:
+      type: object
+      allOf:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/2.0.0#/components/schemas/operationsTransportEvent'
+        - type: object
+          properties:
+            transportEventTypeCode:
+              $ref: '#/components/schemas/transportEventTypeCode'
+    serviceSchedule:
+      type: object
+      allOf:
+        - type: object
+          properties:
+            carrierServiceName:
+              $ref: '#/components/schemas/carrierServiceName'
+        - type: object
+          properties:
+            carrierServiceCode:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/carrierServiceCode'
+        - type: object
+          properties:
+            vesselIMONumber:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/vesselIMONumber'
+        - type: object
+          properties:
+            vesselName:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/vesselName'
+        - type: object
+          properties:
+            isDummyVessel:
+              $ref: '#/components/schemas/isDummyVessel'
+        - type: object
+          properties:
+            vesselOperatorCarrierSMDGCode:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/vesselOperatorCarrierSMDGCode'
+        # - type: object
+        #   properties:
+        #     vesselOperatorCarrierCodeListProvider:
+        #       allOf:
+        #         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/vesselOperatorCarrierCodeListProvider'
+        - $ref: '#/components/schemas/portCalls'
+
+    portCalls:
+      type: object
+      properties:
+        portCalls:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/portCall'
+    portCall:
+      type: object
+      description: |
+        A portCall in the schedule. The order of the list is the sequence of the list
+      allOf:
+        - type: object
+          properties:
+            portCallStatusCode:
+              type: string
+              description: |
+                The status of the port call.
+                
+                - OMIT (Omit)
+                - BLNK (Blank)
+                - ADHO (Ad Hoc)
+                - PHOT (Phase Out)
+                - PHIN (Phase In)
+                - SLID (Sliding)
+              enum:
+                - OMIN
+                - PHIN
+                - PHOT
+                - ADHO
+                - BLNK
+                - SLID
+              example: OMIT
+        - type: object
+          properties:
+            transportCallID:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/transportCallID'
+        - type: object
+          properties:
+            importVoyageNumber:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/importVoyageNumber'
+        - type: object
+          properties:
+            exportVoyageNumber:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/exportVoyageNumber'
+        - type: object
+          properties:
+            portTerminalLocation:
+              $ref: '#/components/schemas/location'
+        - type: object
+          properties:
+            delayReasonCode:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/delayReasonCode'
+        - type: object
+          properties:
+            changeRemark:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/2.0.0#/components/schemas/changeRemark'
+        - $ref: '#/components/schemas/timestamps'
+      required:
+        - transportCallID
+    timestamps:
+      type: object
+      properties:
+        timestamps:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/timestamp'
+    timestamp:
+      type: object
+      description: |
+        A timestamp for a port
+      allOf:
+        - type: object
+          properties:
+            eventTypeCode:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/2.0.0#/components/schemas/transportEventTypeCode'
+        - type: object
+          properties:
+            eventClassifierCode:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/2.0.0#/components/schemas/eventClassifierCode'
+                - enum:
+                  - ACT
+                  - EST
+                  - PLN
+        - type: object
+          properties:
+            eventDateTime:
+              type: string
+              format: date-time
+              description: |
+                The actual time in the timstamp
+              example: '2025-01-14T09:21:00+01:00'
+    portSchedule:
+      type: object
+      allOf:
+        - type: object
+          properties:
+            portTerminalLocation:
+              $ref: '#/components/schemas/location'
+        - $ref: '#/components/schemas/vesselPortTerminalCalls'
+
+    vesselPortTerminalCalls:
+      type: object
+      properties:
+        vesselPortTerminalCalls:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/vesselPortTerminalCall'
+    vesselPortTerminalCall:
+      type: object
+      description: |
+        A vessel visiting the port
+      allOf:
+        - type: object
+          properties:
+            transportCallID:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/transportCallID'
+        - type: object
+          properties:
+            vesselIMONumber:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/vesselIMONumber'
+        - type: object
+          properties:
+            vesselName:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/vesselName'
+        - type: object
+          properties:
+            isDummyVessel:
+              $ref: '#/components/schemas/isDummyVessel'
+        - type: object
+          properties:
+            vesselOperatorCarrierSMDGCode:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/vesselOperatorCarrierSMDGCode'
+        # - type: object
+        #   properties:
+        #     vesselOperatorCarrierCode:
+        #       allOf:
+        #         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/vesselOperatorCarrierCode'
+        # - type: object
+        #   properties:
+        #     vesselOperatorCarrierCodeListProvider:
+        #       allOf:
+        #         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/vesselOperatorCarrierCodeListProvider'
+        - type: object
+          properties:
+            carrierServiceCode:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/carrierServiceCode'
+        - type: object
+          properties:
+            carrierServiceName:
+              $ref: '#/components/schemas/carrierServiceName'
+        - type: object
+          properties:
+            importVoyageNumber:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/importVoyageNumber'
+        - type: object
+          properties:
+            exportVoyageNumber:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/exportVoyageNumber'
+        - type: object
+          properties:
+            delayReasonCode:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/delayReasonCode'
+        - type: object
+          properties:
+            changeRemark:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/2.0.0#/components/schemas/changeRemark'
+        - type: object
+          properties:
+            portCallStatusCode:
+              type: string
+              description: |
+                The status of the port call.
+                
+                - OMIT (Omit)
+                - BLNK (Blank)
+                - ADHO (Ad Hoc)
+                - PHOT (Phase Out)
+                - PHIN (Phase In)
+                - SLID (Sliding)
+              enum:
+                - OMIN
+                - PHIN
+                - PHOT
+                - ADHO
+                - BLNK
+                - SLID
+              example: OMIT
+        - type: object
+          properties:
+            previousPortTerminal:
+              allOf:
+                - $ref: '#/components/schemas/location'
+                - example:
+                    UNLocationCode: GBLGP
+                    facilitySMDGCode: DPWLG
+        - type: object
+          properties:
+            nextPortTerminal:
+              allOf:
+                - $ref: '#/components/schemas/location'
+                - example:
+                    UNLocationCode: DEHAM
+                    facilitySMDGCode: RMH
+        - $ref: '#/components/schemas/timestamps'
+
+    location:
+      type: object
+      description: |
+        General purpose object to capture location-related data, the location can be specified in any of the following ways: `UN Location Code`, a `Facility` or an `Address`.
+      anyOf:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/LOCATION_DOMAIN/2.0.0#/components/schemas/unLocationLocation'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/LOCATION_DOMAIN/2.0.0#/components/schemas/facilitySMDGLocation'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/LOCATION_DOMAIN/2.0.0#/components/schemas/addressLocation'
+      example:
+        UNLocationCode: NLRTM
+        facilitySMDGCode: RWG
+    isDummyVessel:
+      type: boolean
+      description: |
+        Is this a dummy vessel. In case no vessel has been asigned yet - this property can be set to `true` indicating that the vesselIMONumber does not exist.
+    carrierServiceName:
+      type: string
+      description: |
+        The name of the service 
+      example: Great Lion Service
+    transportEventTypeCode:
+      type: string
+      description: |
+        Identifier for type of Transport event
+        - ARRI (Arrived)
+        - DEPA (Departed)
+        - OMIT (Omit)
+        - BLNK (Blank)
+        - ADHO (Ad Hoc)
+        - PHOT (Phase Out)
+        - PHIN (Phase In)
+        - SLID (Sliding)
+        
+        More details can be found on <a href="https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/transporteventtypecodes.csv">GitHub</a>
+      enum:
+        - ARRI
+        - DEPA
+        - OMIT
+        - BLNK
+        - ADHO
+        - PHOT
+        - PHIN
+        - SLID
+      example: ARRI
