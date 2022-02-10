@@ -10,7 +10,7 @@ Publications related to this specification:
 
 ### Releasenotes
 
-### [v1.0.0](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/1.0.0) (...)
+<a name="v100"></a>[Release v1.0.0 (...)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/1.0.0)
 Initial release of the DCSA OpenAPI definitions for Booking
 
 - Initial Documentation Domain set to [Documentation_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v110)
