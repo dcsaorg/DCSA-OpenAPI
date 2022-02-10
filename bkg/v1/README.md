@@ -8,8 +8,6 @@ Publications related to this specification:
 - Interface standards for BKG (to be announced)
 -	[Glossary of Terms](https://knowledge.dcsa.org/s/glossary)
 
-### Releasenotes
-
 <a name="v100"></a>[Release v1.0.0 (...)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/1.0.0)
 ---
 Initial release of the DCSA OpenAPI definitions for Booking
