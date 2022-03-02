@@ -47,6 +47,7 @@ This version is primarily connected to Booking API
   - `BID` (Booking Request ID)
 - GitHub link added to: `referenceType`
 - `termsAndConditions` description updated
+- fixed wrongly referenced `transportPlanSequenceNumber` required field should be `transportPlanStageSequenceNumber`
 - `transportDocumentType` description updated to include enum values and renamed to `transportDocumentTypeCode`
 - `valueAddedServiceRequest` renamed to `valueAddedServiceCode` and change from string `->` enum
 - `errors` and `error` object removed as they are in the <a href="https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/error">Error Domain</a>
