@@ -1,0 +1,509 @@
+openapi: 3.0.3
+info:
+  version: 2.0.0-Beta-1
+  title: DCSA OpenAPI specification for Electronic Bill of Lading (Beta 1)
+  description: |
+    API specification issued by DCSA.org.
+    
+    For explanation to specific values or objects please refer to the <a href='https://dcsa.org/wp-content/uploads/2020/12/20201208-DCSA-P1-DCSA-Information-Model-v3.5-FINAL.pdf'>Information Model v3.5</a> This API does not define the business rules regarding what is allowed to update at what time. For this the <a href="https://dcsa.org/wp-content/uploads/2020/10/202106_DCSA_Interface_Standard_Bill_of_Lading_Final_1.0.pdf">eBL IFS (link to be updated once v2.0 is published)</a> should be consulted.
+
+    It is possible to use this API as a standalone API. In order to do so it is necessary to use the poll-endPoint
+    - /v2/events
+
+    in order to poll event information.
+
+    It is recomended to implement the <a href='https://app.swaggerhub.com/apis/dcsaorg/DOCUMENTATION_EVENT_HUB'>DCSA Documentation Event Hub</a> in order to use the push model. Here events are pushed as they occur.
+
+    For a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/ebl/v1#v200). Please also [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments.
+
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  contact:
+    name: Digital Container Shipping Association (DCSA)
+    url: https://dcsa.org
+    email: info@dcsa.org
+tags:
+  - name: Shipping Instructions
+    description: |
+      The initial steps by the Shipper to create a Bill of Lading
+  - name: Transport Documents
+    description: |
+      The Transport Document as agreed by both parties
+  - name: Bill of Lading Events
+    description: |
+      If no subscriptions have been setup, event polling can be done here
+paths:
+  /v2/shipping-instructions-summaries:
+    get:
+      tags:
+       - Shipping Instructions
+      summary: Get shipping instruction
+      description: |
+        Retrieves the shipping instruction _metadata_
+      parameters:
+        - $ref: '#/components/parameters/carrierBookingReferences'
+        # - in: query
+        #   name: carrierBookingReference
+        #   description: |
+        #     A set of unique characters provided by carrier to identify a booking confirmation.
+            
+        #     Specifying this filter will only return Shipping Instructions related to this particular `carrierBookingReference`.
+        #   schema:
+        #     $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/carrierBookingReference'
+        - $ref: '#/components/parameters/documentStatus'
+
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/parameters/limit'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/parameters/cursor'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/parameters/sort'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/parameters/Api-Version-Major'
+      responses:
+        '200':
+          description: Request successful
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/API-Version'
+            Current-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/Current-Page'
+            Next-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/Next-Page'
+            Prev-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/Prev-Page'
+            Last-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/Last-Page'
+            First-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/First-Page'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/2.0.0#/components/schemas/shippingInstructionSummary'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.1.0#/components/schemas/error'
+  /v2/shipping-instructions:
+    post:
+      tags:
+       - Shipping Instructions
+      summary: Post shipping instruction
+      description: |
+        Creates a new Shipping Instruction
+      parameters:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/parameters/Api-Version-Major'
+      requestBody:
+        description: Parameters used to create the shipping instruction
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/2.0.0#/components/schemas/shippingInstructionRequest'
+      responses:
+        '201':
+          description: |
+            Shipping Instruction has been successfully created. Asynchronous processing will now begin. A `ShipmentEvent` will be created with the result of the processing once it is finished.
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/2.0.0#/components/schemas/shippingInstructionRefStatus'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.1.0#/components/schemas/error'
+  /v2/shipping-instructions/{shippingInstructionReference}:
+    get:
+      tags:
+       - Shipping Instructions
+      summary: Get shipping instruction
+      description: |
+        Retrieves the Shipping Instruction with the `shippingInstructionReference` in the path.
+      parameters:
+        - $ref: '#/components/parameters/shippingInstructionReference'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/parameters/Api-Version-Major'
+      responses:
+        '200':
+          description: Request successful
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/2.0.0#/components/schemas/shippingInstructionResponse'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.1.0#/components/schemas/error'
+    put:
+      tags:
+       - Shipping Instructions
+      summary: Put shipping instruction
+      parameters:
+        - $ref: '#/components/parameters/shippingInstructionReference'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/parameters/Api-Version-Major'
+      description: |
+        Updates a Shipping Instruction with the `shippingInstructionReference` in the path
+      requestBody:
+        description: Parameters used to update the shipping instruction
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/2.0.0#/components/schemas/shippingInstruction'
+      responses:
+        '200':
+          description: |
+            Shipping Instruction update has been successfully received. Asynchronous processing will now begin. A `ShipmentEvent` will be created with the result of the processing once it is finished.
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/2.0.0#/components/schemas/shippingInstructionRefStatus'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.1.0#/components/schemas/error'
+  /v2/transport-document-summaries:
+    get:
+      tags:
+       - Transport Documents
+      summary: Get Transport Documents
+      description: |
+        Retrieves Transport Document _metadata_
+      parameters:
+        - $ref: '#/components/parameters/carrierBookingReferences'
+        # - in: query
+        #   name: carrierBookingReference
+        #   description: |
+        #     A set of unique characters provided by carrier to identify a booking confirmation.
+            
+        #     Specifying this filter will only return Transport Documents related to this particular `carrierBookingReference`.
+        #   schema:
+        #     $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/carrierBookingReference'
+        - $ref: '#/components/parameters/documentStatus'
+        # - $ref: '#/components/parameters/equipmentReference'
+        
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/parameters/limit'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/parameters/cursor'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/parameters/sort'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/parameters/Api-Version-Major'
+      responses:
+        '200':
+          description: Request successful        
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/API-Version'
+            Current-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/Current-Page'
+            Next-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/Next-Page'
+            Prev-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/Prev-Page'
+            Last-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/Last-Page'
+            First-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/First-Page'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/2.0.0#/components/schemas/transportDocumentSummary'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.1.0#/components/schemas/error'
+  /v2/transport-documents/{transportDocumentReference}:
+    get:
+      tags:
+       - Transport Documents
+      summary: Get Transport Document
+      description: |
+        Retrieves the Transport Document with the `transportDocumentReference` in the path.
+      parameters:
+        - $ref: '#/components/parameters/transportDocumentReference'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/parameters/Api-Version-Major'
+      responses:
+        '200':
+          description: Request successful
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/API-Version'
+            # Document-Signature:
+            #   schema:
+            #     type: string
+            #   description: The Carrier signature of the Transport Document
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/2.0.0#/components/schemas/transportDocument'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.1.0#/components/schemas/error'
+    patch:
+      tags:
+       - Transport Documents
+      summary: Approve a Transport Document.
+      description: |
+        Approves a Transport Document.
+      parameters:
+        - $ref: '#/components/parameters/transportDocumentReference'
+        # - $ref: '#/components/parameters/documentSignature'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/parameters/Api-Version-Major'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              allOf:
+                - type: object
+                  properties:
+                    documentStatus:
+                      type: string
+                      description: |
+                        This changes the documentStatus to contain the value:
+                        - APPR (Approved)
+                      enum:
+                        - APPR
+                      example:
+                        APPR
+              required:
+                - documentStatus
+      responses:
+        '200':
+          description: The Transport Document
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/2.0.0#/components/schemas/transportDocument'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.1.0#/components/schemas/error'
+  /v2/events/:
+    get:
+      tags:
+       - Bill of Lading Events
+      summary: Get Shipment events
+      description: |
+        Retrieves **Bill of Lading related** Shipment events. The default sort order is by _eventCreatedDateTime_ in descending order (`DESC`)
+      parameters:
+        # Chunk with specialized booking related ShipmentEvent parameters
+        - $ref: '#/components/parameters/shipmentEventTypeCodes'
+        - $ref: '#/components/parameters/documentTypeCodes'
+        # - $ref: '#/components/parameters/documentID'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/2.0.0#/components/parameters/carrierBookingReference'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/2.0.0#/components/parameters/carrierBookingRequestReference'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/2.0.0#/components/parameters/transportDocumentReference'
+        - $ref: '#/components/parameters/equipmentReference'
+
+        # Chunk with base event parameters
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/2.0.0#/components/parameters/eventCreatedDateTime'
+
+        # Chunk with Global related event parameters
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/parameters/limit'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/parameters/cursor'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/parameters/sort'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/parameters/Api-Version-Major'
+      responses:
+        '200':
+          description: Request successful
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/API-Version'
+            Current-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/Current-Page'
+            Next-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/Next-Page'
+            Prev-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/Prev-Page'
+            Last-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/Last-Page'
+            First-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/First-Page'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/2.0.0#/components/schemas/shipmentEvent'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.1.0#/components/schemas/error'
+
+components:
+  parameters:
+  
+    #############
+    # Path params
+    #############
+    
+    shippingInstructionReference:
+      in: path
+      name: shippingInstructionReference
+      description: |
+        The identifier for a shipping instruction provided by the carrier
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/shippingInstructionReference'
+      required: true
+    transportDocumentReference:
+      in: path
+      name: transportDocumentReference
+      description: |
+        The transportDocumentReference of the Transport Document
+      required: true
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/transportDocumentReference'
+
+    ##############
+    # Query params
+    ##############
+    
+    carrierBookingReferences:
+      in: query
+      name: carrierBookingReference
+      explode: false
+      style: form
+      description: |
+        The bookingReference in the Bill of Lading process to filter by.
+
+        It is possible to insert multiple values by comma `,` separating them. For multiple values the OR-operator is used. For example _carrierBookingReference=ABC123123,DEF987987_  Matches **both** documents connected to booking with reference `ABC123123` and booking with reference `DEF987987`.
+      example: [ABC123123,DEF987987]
+      schema:
+        type: array
+        items:
+          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/carrierBookingReference'
+    documentID:
+      in: query
+      name: documentID
+      description: |
+        A set of unique characters to identify a resource. Specifying this filter will only return events related to this particular `documentID`. The `documentID` can point to a Shipping Instruction (`SHI`) or to a Transport Document (`TRD`)
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/2.0.0#/components/schemas/documentID'
+    # documentSignature:
+    #   in: query
+    #   name: documentSignature
+    #   description: The signature of the Transport Document to approve
+    #   schema:
+    #     type: string
+    #   required: true
+    documentStatus:
+      in: query
+      name: documentStatus
+      description: |
+        Filter by the status of the Shipping Instruction in the process. Possible values are:
+        - RECE (Received)
+        - PENU (Pending Update)
+        - DRAFT (Draft)
+        - PENA (Pending Approval)
+        - APPR (Approved)
+        - ISSU (Issued)
+        - SURR (Surrendered)
+        - VOID (Void)
+
+        More details can be found on <a href="https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/shipmenteventtypecodes.csv">GitHub</a>. Be aware that the list linked to is the `ShipmentEventTypeCodes` which is equivalent to `documentStatus`, the list is a subset of the possible values.
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/2.0.0#/components/schemas/eblDocumentStatus'
+    documentTypeCodes:
+      in: query
+      name: documentTypeCode
+      explode: false
+      style: form
+      description: |
+        The `documentTypeCode` to filter by. Possible values are
+        - SHI (Shipping Instruction)
+        - TRD (Transport Document)
+
+        It is possible to select multiple values by comma `,` separating them. For multiple values the OR-operator is used. For example _documentTypeCode=SHI,TRD_ Matches **both** `ShipmentEvents` related to Shipping Instructions (`SHI`) and Transport Documents (`TRD`).
+
+        More details can be found on <a href="https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/documenttypecodes.csv">GitHub</a>. Be aware that the list provided here is a subset of the possible values.        
+      example: SHI
+      schema:
+        default: [SHI,TRD]
+        type: array
+        items:
+          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/2.0.0#/components/schemas/eblDocumentTypeCode'
+    equipmentReference:
+      in: query
+      name: equipmentReference
+      description: |
+        Filter by the unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.
+        According to ISO 6346, a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit). If a container does not comply with ISO 6346, it is suggested to follow Recommendation #2 “Container with non-ISO identification” from SMDG.
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/equipmentReference'
+    shipmentEventTypeCodes:
+      in: query
+      name: shipmentEventTypeCode
+      explode: false
+      style: form
+      description: |
+        The status of the document in the Bill of Lading process to filter by. Possible values are
+        - RECE (Received)
+        - PENU (Pending Update)
+        - DRAFT (Draft)
+        - PENA (Pending Approval)
+        - APPR (Approved)
+        - ISSU (Issued)
+        - SURR (Surrendered)
+        - VOID (Void)
+
+        It is possible to select multiple values by comma `,` separating them. For multiple values the OR-operator is used. For example _shipmentEventTypeCode=RECE,ISSU_  Matches **both** Received (`RECE`) and Issued (`ISSU`) `ShipmentEvents`.
+
+        More details can be found on <a href="https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/shipmenteventtypecodes.csv">GitHub</a>. Be aware that the list provided here is a subset of the possible values.
+      example: [RECE,ISSU]
+      schema:
+        default: [RECE,PENU,DRFT,PENA,APPR,ISSU,SURR,VOID]
+        type: array
+        items:
+          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/2.0.0#/components/schemas/eblShipmentEventTypeCode'
