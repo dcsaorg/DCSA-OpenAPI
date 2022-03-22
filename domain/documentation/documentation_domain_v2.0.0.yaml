@@ -623,10 +623,12 @@ components:
                     UNLocationCode: "FRPAR"
                 - description: |
                     The location where the original transport document (bill of lading) will be issued.
+        - $ref: '#/components/schemas/consignmentItems'
         - $ref: '#/components/schemas/utilizedTransportEquipments'
         - $ref: '#/components/schemas/documentParties'
         - $ref: '#/components/schemas/references'
       required:
+        - consignmentItems
         - utilizedTransportEquipments
 
     shippingInstructionSummary:
@@ -653,9 +655,9 @@ components:
                 - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/carrierBookingReference'
                 # Extend the carrierBookingReference description for SI
                 - description: |
-                     The associated booking number provided by the carrier.
+                     The associated booking number provided by the carrier. To be used if **all** `Cosignment Items` belong to the same Booking.
                     
-                     **Cannot** be used in combination with `Utilized Transport Equipment` carrierBookingReference
+                     **Cannot** be used in combination with `Consignment Item` carrierBookingReference
         - $ref: '#/components/schemas/shippingInstructionDeep'
         
     shippingInstruction:
@@ -720,17 +722,13 @@ components:
 
     cargoItem:
       type: object
-      description: addresses the cargo items to be stuffed into a container for a shipment. A cargo item cannot be split across containers.
+      description: A `cargoItem` is the smallest unit used by stuffing. A `cargoItem` cannot be split across containers.
       allOf:
         - $ref: '#/components/schemas/cargoLineItems'
         - type: object
           properties:
-            descriptionOfGoods:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/descriptionOfGoods'
-        - type: object
-          properties:
-            HSCode:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/HSCode'
+            equipmentReference:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/equipmentReference'
         - type: object
           properties:
             weight:
@@ -755,13 +753,11 @@ components:
           properties:
             packageCode:
               $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/packageCode'
-        - $ref: '#/components/schemas/references'
       required:
-        - descriptionOfGoods
-        - HSCode
-        - numberOfPackages
+        - equipmentReference
         - weight
         - weightUnit
+        - numberOfPackages
         - packageCode
 
     #################################
@@ -792,6 +788,73 @@ components:
         - cargoLineItemID
         - shippingMarks
 
+    ###################
+    # Consignment Items
+    ###################
+
+    consignmentItems:
+      type: object
+      properties:
+        consignmentItems:
+          minItems: 1
+          type: array
+          items:
+            $ref: '#/components/schemas/consignmentItem'
+
+    consignmentItem:
+      type: object
+      description: |
+        Defines a list of `CargoItems` belonging together and the associated `Booking`. A `ConsignmentItem` can be split across multiple containers (`UtilizedTransportEquipment`) by referencing multiple `CargoItems`
+      allOf:
+        - type: object
+          properties:
+            carrierBookingReference:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/carrierBookingReference'
+                # Extend the carrierBookingReference description for CargoItem
+                - description: |
+                    The associated booking number provided by the carrier for this `Consignment Item`.
+                    
+                    **Cannot** be used in combination with Shipping Instruction header level carrierBookingReference
+        - type: object
+          properties:
+            weight:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/weight'
+                - description: |
+                    The total weight of all the `CargoItems` listed in the `ConsignmentItem`. Excludes the tare weight of the container(s).
+        - type: object
+          properties:
+            volume:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/volume'
+                - description: |
+                    The total volume of all the `CargoItems` listed in the `ConsignmentItem`.
+        - type: object
+          properties:
+            weightUnit:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/weightUnit'
+        - type: object
+          properties:
+            volumeUnit:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/volumeUnit'
+        - type: object
+          properties:
+            descriptionOfGoods:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/descriptionOfGoods'
+        - type: object
+          properties:
+            HSCode:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/HSCode'
+        - $ref: '#/components/schemas/cargoItems'
+        - $ref: '#/components/schemas/references'
+      required:
+        - descriptionOfGoods
+        - HSCode
+        - cargoItems
+        - weight
+        - weightUnit
+
     ####################################
     # Shipment Equipment Related objects
     ####################################
@@ -808,18 +871,8 @@ components:
     utilizedTransportEquipment:
       type: object
       description: |
-        Specifies the container assigned to a shipment (`equipment`), all its content (`cargoItems`), the `seals` used and possible `reefer` settings
+        Specifies the container (`equipment`), the total weight, the `seals` used and possible `reefer` settings
       allOf:
-        - type: object
-          properties:
-            carrierBookingReference:
-              allOf:
-                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/carrierBookingReference'
-                # Extend the carrierBookingReference description for CargoItem
-                - description: |
-                    The associated booking number provided by the carrier for this `Utilized Transport Equipment`.
-                    
-                    **Cannot** be used in combination with Shipping Instruction header level carrierBookingReference
         - type: object
           properties:
             equipment:
@@ -836,7 +889,6 @@ components:
           properties:
             isShipperOwned:
               $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/isShipperOwned'
-        - $ref: '#/components/schemas/cargoItems'
         - type: object
           properties:
             activeReeferSettings:
