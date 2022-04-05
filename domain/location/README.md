@@ -4,7 +4,7 @@ The Location Domain is documented on [**Location Domain SwaggerHub**](https://ap
 
 The primary purpose of this Domain is to specify common components related to a location.
 
-<a name="v200"></a>[Release v2.0.0 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/LOCATION_DOMAIN/2.0.0)
+<a name="v200"></a>[Release v2.0.0 (05 April 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/LOCATION_DOMAIN/2.0.0)
 ---
 The APIs for Booking v1.0 Beta 1 and EBL v2.0 Beta 1 both use this version of the Domain
 
