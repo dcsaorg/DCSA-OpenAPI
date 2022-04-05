@@ -6,7 +6,9 @@ The purpose of this Domain is to specify reusable objects for primarily Booking 
 
 <a name="v200"></a>[Release v2.0.0 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN/2.0.0)
 ---
-This version is primaily connected to the new Booking API
+The APIs for Booking v1.0 Beta 1 and EBL v2.0 Beta 1 both use this version of the Domain
+
+**NB**: Not updated yet...
 
 - Bump [DCSA_Domain to version 2.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v200) (was previously v1.0.3)
 - Bump [Location_Domain to version 2.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v200) (was previously v1.0.3)
