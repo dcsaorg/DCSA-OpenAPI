@@ -7,6 +7,7 @@ The primary purpose of this Domain is to specify common components to be reused 
 <a name="v200"></a>[Release v2.0.0 (05 April 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/DCSA_DOMAIN/2.0.0)
 ---
 The APIs for Booking v1.0 Beta 1 and EBL v2.0 Beta 1 both use this version
+
 **NB**: Not updated yet...
 
 - `800SeriesCarrierCode`, `confirmationDateTime`, `isChargesDisplayed`, `numberOfOriginals` removed
