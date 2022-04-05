@@ -4,7 +4,7 @@ The Documentation Domain is documented on [**Documentation Domain**](https://app
 
 The purpose of this Domain is to specify reusable objects for primarily Booking and electronic Bill of Lading.
 
-<a name="v200"></a>[Release v2.0.0 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN/2.0.0)
+<a name="v200"></a>[Release v2.0.0 (05 April 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN/2.0.0)
 ---
 The APIs for Booking v1.0 Beta 1 and EBL v2.0 Beta 1 both use this version of the Domain
 
