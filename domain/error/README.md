@@ -8,6 +8,7 @@ The purpose of this Domain is to specify the error object to return in any API e
 ---
 New and extended error object to be used going forward.
 
+- Metadata for the Domian updated
 - Internal reordering of the objects
 - extra details added to the error(s)
   - `errorCode` a machine readable code specifying what is wrong. The codes have not yet been agreed. Once agreed they will be located in [DCSA Error Codes](https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/errorcodes.csv)
