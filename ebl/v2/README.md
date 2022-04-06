@@ -8,7 +8,7 @@ Publications related to this specification:
 - Interface standards for BKG (to be announced)
 -	[Glossary of Terms](https://knowledge.dcsa.org/s/glossary)
 
-<a name="v200"></a>[Release v2.0.0 (...)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/2.0.0)
+<a name="v200"></a>[Release v2.0.0 Beta 1 (06 April 2022)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/2.0.0)
 ---
 Initial release of the DCSA OpenAPI definitions for Bill of Lading
 
