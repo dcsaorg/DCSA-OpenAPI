@@ -4,8 +4,12 @@ The Error Domain is documented on [**Error Domain SwaggerHub**](https://app.swag
 
 The purpose of this Domain is to specify the error object to return in any API endPoint in case an error occurs.
 
-<a name="v110"></a>[Release v1.1.0 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/ERROR_DOMAIN/1.1.0)
+<a name="v110"></a>[Release v1.1.0 (06 April 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/ERROR_DOMAIN/1.1.0)
 ---
+The APIs for Booking v1.0 Beta 1 and EBL v2.0 Beta 1 both use this version of the Domain
+
+**NB**: Not updated yet...
+
 - Internal reordering of the objects
 - extra details added to the error(s)
   - `errorCode` a machine readable code specifying what is wrong. Please visit [DCSA Error Codes (not created yet)](https://dcsa.org) for an exhaustive list
