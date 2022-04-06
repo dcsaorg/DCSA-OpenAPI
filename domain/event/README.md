@@ -4,9 +4,11 @@ The Event Domain is documented on [**EVENT_DOMAIN**](https://app.swaggerhub.com/
 
 This Domain specifies common components for DCSA Events. This domain is central for all Event Hubs.
 
-<a name="v200"></a>[Release v2.0.0 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/2.0.0)
+<a name="v200"></a>[Release v2.0.0 (06 April 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/2.0.0)
 ---
-This release is for T&T v2.3, Booking and eBL
+The APIs for Booking v1.0 Beta 1 and EBL v2.0 Beta 1 both use this version of the Domain
+
+NB: Not updated yet...
 
 - Bump [DCSA Domain to version 2.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v200) (was previously 1.0.3)
 - Bump [Documentation Domain to version 2.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v200) (was previously v1.0.4)
