@@ -10,7 +10,7 @@ New and extended error object to be used going forward.
 
 - Internal reordering of the objects
 - extra details added to the error(s)
-  - `errorCode` a machine readable code specifying what is wrong. The codes have not yet been agreed. Once agreed they will be located here: [DCSA Error Codes](https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/errorcodes.csv)
+  - `errorCode` a machine readable code specifying what is wrong. The codes have not yet been agreed. Once agreed they will be located in [DCSA Error Codes](https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/errorcodes.csv)
   - `field` the field that caused the error
   - `value` the value causing the error
   - `message` field description updated and better example added
