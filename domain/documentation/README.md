@@ -19,21 +19,20 @@ This version has been released together with the APIs for `Booking v1.0 Beta 1` 
     - `receiptDeliveryTypeAtOrigin` renamed to `receiptTypeAtOrigin`
     - `receiptDeliveryTypeAtDestination` renamed to `deliveryTypeAtDestination`
     - `paymentTermCode` added
-    - `partialLoadAllowed`, `exportDeclarationRequired`, `importLicenseRequired` prefixed with `is`
-    - `placeOfReceiotPickupDate` and `finalDestinationExpectedArrivalDate` removed (they are now a `ShipmentLocation`)
-
+    - `partialLoadAllowed`, `exportDeclarationRequired`, `importLicenseRequired`, `distinationFilingRequired`, `equipmentSubstitutionAllowed` prefixed with `is`
+    - `placeOfReceiptPickupDate` removed (it is now a `ShipmentLocation`)
+    - `finalDestinationExpectedArrivalDate` renamed and changed into a range using: `expectedArrivalAtPlaceOfDeliveryStartDate` and `expectedArrivalAtPlaceOfDeliveryEndDate`
     - `paymentTermCode`, `submissionDateTime`, `isAMSACIFilingRequired` added
+    - `OTICarrierCode` and `800SeriesCarrierCode` removed (they are not part of the `IdentifyingCode` in the `Party` object)
     - all Boolean operators prefixed with `is`
-    - `transportDocumentTypeCode` reffering to `transportDocumentTypeCode` instead of `transportDocumentType`
+    - `transportDocumentType` changed to `transportDocumentTypeCode`
     - `invoicePayableAt` removed from `bookingShallow`
-    - `carrierVoyageNumber` replaced by `exportVoyageNumber`
     - `preCarriageModeOfTransportCode` added
-    - `OTICarrierCode` and `800SeriesCarrierCode` removed (they are not part of the `IdentifyingCode` in the `Party` object
     - `transportDocumentType` renamed to `transportDocumentTypeCode`
     - `valueAddedServiceRequest` field removed (it is now a list)
-    - `invoicePayableAt` updated object reference to include locationID
     - `exportLicenseIssueDate` and `exportLicenseExpiryDate` both removed and moved into the `Commodity` object
-    - added `vesselName`, `vesselIMONumber` and `carrierVoyageNumber` (they have been moved from `transportDraft` object which is no longer needed)
+    - `comminicationChannel` renamed to `comminicationChannelCode`
+    - added `vesselName`, `vesselIMONumber` and `exportVoyageNumber` (they have been moved from `transportDraft` object which is no longer needed)
     - `serviceContractReference` and `submissionDateTime` are now required fields
     - `transportDocumentType` is no longer a required field
   - `bookingDeep` object added with all deeply nested objects
