@@ -106,8 +106,10 @@ This version has been released together with the APIs for `Booking v1.0 Beta 1` 
 - `clauses` renamed to `carrierClauses`
 - `paymentTerm` in `charge` object renamed to `paymentTermCode`
 - `transportPlanStage`, `transportPlanStageSequenceNumber` and `vesselName` added to the `transport` object
-- `transportPlanStage`, `transportPlanSequenceNumber`, `loadLocation`, `dischargeLocation`, `plannedDepartureDate`, `plannedArrivalDate`, `vesselName`, `vesselIMONumber` are now all required fields on `transport`
+- examples updated for `loadLocation` and `dischargeLocation`
+- `transportPlanStage`, `transportPlanSequenceNumber`, `loadLocation`, `dischargeLocation`, `plannedDepartureDate`, `plannedArrivalDate` are now all required fields on `transport`
 - `carierVoyageNumber` replaced by `importVoyageNumber` and `exportVoyageNumber` in `Transports`
+- `isShipperOwned` on `equipment` object removed
 - specialized version of documentStatus called `bookingDocumentStatus` created with only booking related values
 - specialized version of documentTypeCode called `bookingDocumentTypeCode` created with only booking related values
 - specialized version of shipmentEventTypeCode called `bookingShipmentEventTypeCode` created with only booking related values
