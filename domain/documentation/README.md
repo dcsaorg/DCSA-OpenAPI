@@ -21,8 +21,6 @@ This version is for `EBL v2.0 Beta 2`
 ---
 This version has been released together with the APIs for `Booking v1.0 Beta 1` and `EBL v2.0 Beta 1`
 
-**NB**: Not updated yet...
-
 - Bump [DCSA_Domain to version 2.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v200) (was previously v1.0.3)
 - Bump [Location_Domain to version 2.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v200) (was previously v1.0.3)
 - Update the Domain metadata
