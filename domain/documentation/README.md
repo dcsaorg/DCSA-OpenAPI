@@ -15,6 +15,7 @@ This version is for `EBL v2.0 Beta 2`
   - `invoicePayableAt` added as a location object supporting the following Location-Interfaces: `addressLocation`, `unLocationLocation` and `facilityLocation`
   - `transports` (transport plan) has been added
   - `shipmentLocations` have been added
+- `cargoItems` removed as a require field from `utilizedTransportEquipment`
 
 <a name="v200"></a>[Release v2.0.0 (5 April 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN/2.0.0)
 ---
@@ -33,43 +34,65 @@ This version has been released together with the APIs for `Booking v1.0 Beta 1` 
     - `paymentTermCode` added
     - `partialLoadAllowed`, `exportDeclarationRequired`, `importLicenseRequired`, `distinationFilingRequired`, `equipmentSubstitutionAllowed` prefixed with `is`
     - `placeOfReceiptPickupDate` removed (it is now a `ShipmentLocation`)
+    - `submissionDateTime`, `isAMSACIFilingRequired` added
     - `finalDestinationExpectedArrivalDate` renamed and changed into a range using: `expectedArrivalAtPlaceOfDeliveryStartDate` and `expectedArrivalAtPlaceOfDeliveryEndDate`
     - `paymentTermCode`, `submissionDateTime`, `isAMSACIFilingRequired` added
     - `OTICarrierCode` and `800SeriesCarrierCode` removed (they are not part of the `IdentifyingCode` in the `Party` object)
     - all Boolean operators prefixed with `is`
-    - `transportDocumentType` changed to `transportDocumentTypeCode`
-    - `invoicePayableAt` removed from `bookingShallow`
-    - `preCarriageModeOfTransportCode` added
     - `transportDocumentType` renamed to `transportDocumentTypeCode`
     - `valueAddedServiceRequest` field removed (it is now a list)
+    - `invoicePayableAt` removed from `bookingShallow`
     - `exportLicenseIssueDate` and `exportLicenseExpiryDate` both removed and moved into the `Commodity` object
     - `comminicationChannel` renamed to `comminicationChannelCode`
+    - `preCarriageModeOfTransportCode` added
     - added `vesselName`, `vesselIMONumber` and `exportVoyageNumber` (they have been moved from `transportDraft` object which is no longer needed)
     - `serviceContractReference` and `submissionDateTime` are now required fields
-    - `transportDocumentType` is no longer a required field
+    - `transportDocumentType`, `bookingRequestDateTime` and `cargoGrossWeightUnit` are no longer a required fields
   - `bookingDeep` object added with all deeply nested objects
-  - `bookingSummary`, `bookingRequest`, `bookings`, `booking` and `bookingRefStatus` object added
+  - `bookingSummary`, `bookingRequest`, `bookings`, `booking`, `bookingResponse` and `bookingRefStatus` object added
   - `shipmentSummary`, `shipments` and `shipment` object added
   - `shippingInstructionHeaderNoID` renamed to `shippingInstructionShallow` with the following changes:
+    - `amendToTransportDocument` added
     - `transportDocumentType` renamed to `transportDocumentTypeCode`
     - `preCarriageUnderShippersResponsibility` and `invoicePayableAt` removed
+    - `isToOrder` added
+    - `preCarriageUnderShippersResponsibility` and `invoicePayableAt` removed
     - `isChargesDisplayed` removed and replaced by `areChargesDisplayedOnOriginals` and `areChargesDisplayedOnCopies`
-    - modified description of `carrierBookingReference`
     - `displayedNameForPlaceOfReceipt`, `displayedNameForPortOfLoad``, `displayedNameForPortOfDischarge` and `displayedNameForPlaceOfDelivery` added
   - `shippingInstructionDeep` object added with all deeply nested objects
   - `shippingInstructionSummary`, `shippingInstructionRequest`, `shippingInstruction`, `shippingInstructionResponse` and `shippingInstructionRefStatus` objects added
-- `commodity` object updated with `cargoGrossWeightUnit`, `exportLicenseIssueDate` and `exportLicenseExpiryDate`
-- modified description of `carrierBookingReference` in `cargoItem`
-- `references` added to `cargoItem`
-- `equipmentReference` removed from `cargoItem`
-- description of `utilizedTransportEquipment` updated
-- each `utilizedTransportEquipment` now contains a list of `cargoItems`
-- `partyContactDetails` moved from `documentParty` -> `party` and made a mandatory field
+- `commodity` object updated with `cargoGrossWeightUnit`, `cargoGrossVolume`, `cargoGrossVolumeUnit`, `numberOfPackages`, `exportLicenseIssueDate` and `exportLicenseExpiryDate` added `cargoGrossWeightUnit` as a required field
+- `valueAddedServiceRequests` and `valueAddedServiceRequest` added as objects
+- `voyage` and `voyages` removed
+- `requestedEquipmentType` renamed to `requestedEquipmentSizeType`
+- `requestedEquipment` description updated
+- `equipmentReferences` added as a list to `requestedEquipment` object containing references to containers
+- `confirmedEquipments` and `confirmedEquipment` objects added
+- `shipmentCutOffTime` and `shipmentCutOffTimes` object added
+- `cargoItems` now has minItems 1
+- `cargoItem` description updated
+  - `carrierBookingReference` removed
+  - `descriptionOfGoods` and `HSCode` removed
+- `consignmentItems` added with a minItems of 1
+- `consignmentItem` object added with
+  - `carrierBookingReference` to allow multiple bookings
+  - `weight`, `volume`, `weightUnit`, `volumeUnit`,  `descriptionOfGoods`, `HSCode`, a list of `references` and a list of `cargoItems`
+- description of `utilizedTransportEquipment` updated and a minItems of 1 required
+- `isShipperOwned` added to `utilizedTransportEquipment` and set as a required field
+- `documentParty` now links to a `party` object instead of `partyNoID` (because the field has been renamed)
+- `partyContactDetails` moved from `documentParty` -> `party` and made a mandatory field plus added a `url` field
+- `party` is now a required field on `documentParty`
 - `name` is now a mandatory field of `partyContactDetails`
+- `DCSAResponsibleAgencyCode` description now updated and `DCSA` added as enum value
+- `partyContactDetails` is a required field on `party`
+- `nmftaCode` removed from `Party` object
+- `codeListResponsibleAgencyCode` removed from `identifyingCode` object
 - modified the example of the `location` object in `shipmentLocations`
 - `locationType` renamed to `shipmentLocationTypeCode`
+- `eventDateTime` added to `shipmentLocation`
 - `referenceType` added as local object
-- `TransportDocumentHeader` renamed to `TransportDocumentSummaries` with the following changes:
+- `TransportDocumentRefStatus` added as an object with `transportDocumentReference`, `transportDocumentCreatedDateTime`, `transportDocumentUpdatedDateTime` and `documentStatus`
+- `TransportDocumentHeader` renamed to `TransportDocumentRoot` with the following changes:
   - `shippingInstructionID`, `documentStatus`, `transportDocumentCreatedDateTime` and `transportDocumentUpdatedDateTime` added
   - `termsAndConditions`, `cargoMovementTypeAtOrigin`, `cargoMovementTypeAtDestination`, `receiptDeliveryTypeAtOrigin`, `receiptDeliveryTypeAtDestination` and `serviceContractReference` removed
   - `numberOfOriginals` added
@@ -86,11 +109,6 @@ This version has been released together with the APIs for `Booking v1.0 Beta 1` 
 - `transportPlanStage`, `transportPlanStageSequenceNumber` and `vesselName` added to the `transport` object
 - `transportPlanStage`, `transportPlanSequenceNumber`, `loadLocation`, `dischargeLocation`, `plannedDepartureDate`, `plannedArrivalDate`, `vesselName`, `vesselIMONumber` are now all required fields on `transport`
 - `carierVoyageNumber` replaced by `importVoyageNumber` and `exportVoyageNumber` in `Transports`
-- description updated for `requestedEquipment`
-- `requestedEquipmentType` renamed to `requestedEquipmentSizeType`
-- `requestedEquipmentSizeType`, `requestedEquipmentUnits` and `isShipperOwned` are now required fields on `requestedEquipment`
-- `confirmedEquipment` and `confirmedEquipments` object added
-- `shipmentCutOffTime` and `shipmentCutOffTimes` object added
 - specialized version of documentStatus called `bookingDocumentStatus` created with only booking related values
 - specialized version of documentTypeCode called `bookingDocumentTypeCode` created with only booking related values
 - specialized version of shipmentEventTypeCode called `bookingShipmentEventTypeCode` created with only booking related values
