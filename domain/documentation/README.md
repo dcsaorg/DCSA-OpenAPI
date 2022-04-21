@@ -4,6 +4,18 @@ The Documentation Domain is documented on [**Documentation Domain**](https://app
 
 This Domain specifies reusable objects for the eDocumentation: [Booking](https://app.swaggerhub.com/apis/dcsaorg/DCSA_BKG) and [Electronic Bill of Lading](https://app.swaggerhub.com/apis/dcsaorg/DCSA_EBL).
 
+<a name="v201"></a>[Release v2.0.1 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN/2.0.1)
+---
+This version is for `EBL v2.0 Beta 1`
+
+- Bump [DCSA_Domain to version 2.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v201) (was previously v2.0.0)
+- Bump [Location_Domain to version 2.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v201) (was previously v2.0.0)
+- `TransportDocument` object updated:
+  - `receiptTypeAtOrigin`, `deliveryTypeAtDestination`, `cargoMovementTypeAtOrigin`, `cargoMovementTypeAtDestination`, `serviceContractReference`, `termsAndConditions` added as simple fields
+  - `invoicePayableAt` added as a location object supporting the following Location-Interfaces: `addressLocation`, `unLocationLocation` and `facilityLocation`
+  - `transports` (transport plan) has been added
+  - `shipmentLocations` have been added
+
 <a name="v200"></a>[Release v2.0.0 (5 April 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN/2.0.0)
 ---
 This version has been released together with the APIs for `Booking v1.0 Beta 1` and `EBL v2.0 Beta 1`
