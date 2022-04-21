@@ -14,13 +14,11 @@ The API for EBL v2.0 Beta 2 uses this version of the Domain
 ---
 The APIs for Booking v1.0 Beta 1 and EBL v2.0 Beta 1 both use this version of the Domain
 
-**NB**: Not updated yet...
-
 - Domain description updated
 - `800SeriesCarrierCode`, `cargoGrossWeightUnit`, `confirmationDateTime`, `isChargesDisplayed`, `numberOfOriginals` removed
-- `addressLineNumber`, `currencyAmount`, `numberOfCopies`, `numberOfPackages`, `numberOfRiderPages` qualified with format `int32`
-- `amendToTransportDocument`, `amsFilingDueDate`, `areChargesDisplayedOnOriginals`, `areChargesDisplayedOnCopies`, `bookingReqestUpdatedDateTime`, `cargoGrossVolume`, `carrierBookingRequestReference`, `chargeTypeCode`, `confirmedEquipmentUnits`, `cutOffDateTime`, `cutOffDateTimeCode`, `eventLocationDateTime`, `expectedArrivalAtPlaceOfDeliveryStartDate`, `expectedArrivalAtPlaceOfDeliveryEndDate`, `isAMSACIFilingRequired`, `issuedNumberOfOriginals`, `isToOrder`, `shipmentCreatedDateTime`, `shipmentUpdatedDateTime`, `shippingInstructionCreatedDateTime`, `shippingInstructionUpdatedDateTime`, `submissionDateTime`, `transportDocumentCreatedDateTime`, `transportDocumentUpdatedDateTime`, `transportPlanStage`, `transportPlanStageSequenceNumber`, `vesselOperatorCarrierSMDGCode` added as simple types
-- `cargoGrossWeight`, `declaredValue`, `humidityMax`, `humidityMin`, `quantity` qualified with format `float`
+- `addressLineNumber`, `currencyAmount`, `numberOfCopies`, `numberOfPackages`, `numberOfRiderPages`, `transportCallSequenceNumber` qualified with format `int32`
+- `amendToTransportDocument`, `amsFilingDueDate`, `areChargesDisplayedOnOriginals`, `areChargesDisplayedOnCopies`, `bookingReqestUpdatedDateTime`, `cargoGrossVolume`, `carrierBookingRequestReference`, `chargeTypeCode`, `confirmedEquipmentUnits`, `cutOffDateTime`, `cutOffDateTimeCode`, `eventLocationDateTime`, `expectedArrivalAtPlaceOfDeliveryStartDate`, `expectedArrivalAtPlaceOfDeliveryEndDate`, `isAMSACIFilingRequired`, `issuedNumberOfOriginals`, `isToOrder`, `shipmentCreatedDateTime`, `shipmentLocationTypeCode`, `shipmentUpdatedDateTime`, `shippingInstructionCreatedDateTime`, `shippingInstructionUpdatedDateTime`, `submissionDateTime`, `transportDocumentCreatedDateTime`, `transportDocumentUpdatedDateTime`, `transportPlanStage`, `transportPlanStageSequenceNumber`, `url`, `vesselOperatorCarrierSMDGCode` added as simple types
+- `cargoGrossWeight`, `declaredValue`, `humidityMax`, `humidityMin`, `quantity`, `tareWeight`, `temperatureMax`, `temperatureMin`, `unitPrice`, `ventilationMax`, `ventilationMin`, `volume`, `weight` qualified with format `float`
 - `chargeType` description updated
 - `commodityType` changed from length 20 `->` 550
 - `communicationChannel` renamed to `communicationChannelCode` and changed from String -> enum
@@ -61,6 +59,7 @@ The APIs for Booking v1.0 Beta 1 and EBL v2.0 Beta 1 both use this version of th
   - `BPR` (Booking party reference number)
   - `BID` (Booking Request ID)
 - GitHub link added to: `referenceType`
+- `shippingInstructionID` renamed to `shippingInstructionReference` and example updated
 - `termsAndConditions` description updated
 - fixed wrongly referenced `transportPlanSequenceNumber` required field should be `transportPlanStageSequenceNumber`
 - `transportDocumentType` description updated to include enum values and renamed to `transportDocumentTypeCode`
