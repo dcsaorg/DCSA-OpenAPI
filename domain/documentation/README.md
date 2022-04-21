@@ -6,7 +6,7 @@ This Domain specifies reusable objects for the eDocumentation: [Booking](https:/
 
 <a name="v201"></a>[Release v2.0.1 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN/2.0.1)
 ---
-This version is for `EBL v2.0 Beta 1`
+This version is for `EBL v2.0 Beta 2`
 
 - Bump [DCSA_Domain to version 2.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v201) (was previously v2.0.0)
 - Bump [Location_Domain to version 2.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v201) (was previously v2.0.0)
