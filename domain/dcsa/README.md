@@ -16,21 +16,27 @@ The APIs for Booking v1.0 Beta 1 and EBL v2.0 Beta 1 both use this version of th
 
 **NB**: Not updated yet...
 
-- `800SeriesCarrierCode`, `confirmationDateTime`, `isChargesDisplayed`, `numberOfOriginals` removed
-- `amsFilingDueDate`, `areChargesDisplayedOnOriginals`, `areChargesDisplayedOnCopies`, `bookingReqestUpdatedDateTime`, `carrierBookingRequestReference`, `chargeTypeCode`, `commodityType`, `confirmedEquipmentUnits`, `cutOffDateTime`, `cutOffDateTimeCode`, `eventLocationDateTime`, `expectedArrivalDateAtFinalDestinationStart`, `expectedArrivalDateAtFinalDestinationEnd`, `isAMSACIFilingRequired`, `issuedNumberOfOriginals`, `isToOrder`, `requestedNumberOfOriginals`, `shipmentCreatedDateTime`, `shipmentUpdatedDateTime`, `shippingInstructionCreatedDateTime`, `shippingInstructionUpdatedDateTime`, `submissionDateTime`, `transportDocumentCreatedDateTime`, `transportDocumentUpdatedDateTime`, `transportPlanStage`, `transportPlanStageSequenceNumber`, `vesselOperatorCarrierSMDGCode` added as simple types
-- `destinationFilingRequired`, `equipmentSubstitutionAllowed`, `exportDeclarationRequired`, `importLicenseRequired` and `partLoadAllowed` prefixed with `is` since they are Boolean values
-- `bookingReqestDateTime` renamed `bookingReqestCreatedDateTime` and format + description fixed
+- Domain description updated
+- `800SeriesCarrierCode`, `cargoGrossWeightUnit`, `confirmationDateTime`, `isChargesDisplayed`, `numberOfOriginals` removed
+- `addressLineNumber`, `currencyAmount`, `numberOfCopies`, `numberOfPackages`, `numberOfRiderPages` qualified with format `int32`
+- `amendToTransportDocument`, `amsFilingDueDate`, `areChargesDisplayedOnOriginals`, `areChargesDisplayedOnCopies`, `bookingReqestUpdatedDateTime`, `cargoGrossVolume`, `carrierBookingRequestReference`, `chargeTypeCode`, `confirmedEquipmentUnits`, `cutOffDateTime`, `cutOffDateTimeCode`, `eventLocationDateTime`, `expectedArrivalAtPlaceOfDeliveryStartDate`, `expectedArrivalAtPlaceOfDeliveryEndDate`, `isAMSACIFilingRequired`, `issuedNumberOfOriginals`, `isToOrder`, `shipmentCreatedDateTime`, `shipmentUpdatedDateTime`, `shippingInstructionCreatedDateTime`, `shippingInstructionUpdatedDateTime`, `submissionDateTime`, `transportDocumentCreatedDateTime`, `transportDocumentUpdatedDateTime`, `transportPlanStage`, `transportPlanStageSequenceNumber`, `vesselOperatorCarrierSMDGCode` added as simple types
+- `cargoGrossWeight`, `declaredValue`, `humidityMax`, `humidityMin`, `quantity` qualified with format `float`
+- `chargeType` description updated
 - `commodityType` changed from length 20 `->` 550
 - `communicationChannel` renamed to `communicationChannelCode` and changed from String -> enum
+- `issueDate` moved
 - `delayReasonCode`description updated to reflect that Category 5 SMDG codes are not supported
+- `destinationFilingRequired`, `equipmentSubstitutionAllowed`, `exportDeclarationRequired`, `importLicenseRequired` and `partialLoadAllowed` prefixed with `is` since they are Boolean values
+- `bookingReqestDateTime` renamed `bookingReqestCreatedDateTime` and format + description fixed
 - documentStatus enum updated with new values:
-  - PENC (Pending Confirmation)
-  - CONF (Confirmed)
-  - CANC (Cancelled)
-  - CMPL (Completed)
+  - `PENC` (Pending Confirmation)
+  - `CONF` (Confirmed)
+  - `CANC` (Cancelled)
+  - `CMPL` (Completed)
 - `email` example updated
 - `exportLicenseIssueDate`, `exportLicenseExpiryDate`, `plannedArrivalDate` and `plannedDepartureDate`, `errorDateTime` format fixed
 - `incoterms` changed from string `->` enum
+- `isDestinationFilingRequired` and `issuerCode` description updated
 - `locationType` renamed to `shipmentLocationType` and added the following enum values:
   - `PSR` (Pre-carriage under shipper’s responsibility)
   - `IEL` (Container intermediate export stop off location)
@@ -40,15 +46,16 @@ The APIs for Booking v1.0 Beta 1 and EBL v2.0 Beta 1 both use this version of th
   - `ECP` (Empty container pick-up date and time)
   - `IPA` (IPA  Invoice payable at)
   - `FDE` (Final destination)
+- `numberOfOriginals` renamed to `requestedNumberOfOriginals`
 - `OTICarrierCode` type changed from integer `->` string
 - `packageCode` example corrected 5H `->` 5H4
 - `partyFunction` updated with new values:
   - `HE` (Carrier booking office (transportation office))
   - `SCO` (Service contract owner - Defined by DCSA)
   - `BA` (Booking Agency)
-  - `CA` (Carrier)
+  - `EBL` (EBL Solution Provider)
 - `paymentTerm` changed from string `->` enum and renamed to `paymentTermCode`
-- `referenceType` updated with new values:
+- `referenceType` updated description and new values:
   - `ECR` (Empty container release reference)
   - `CSI` (Customer shipment ID)
   - `BPR` (Booking party reference number)
