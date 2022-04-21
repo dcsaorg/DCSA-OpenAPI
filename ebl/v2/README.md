@@ -12,6 +12,9 @@ Publications related to this specification:
 ---
 Beta 2 release of the DCSA OpenAPI definitions for Bill of Lading. This release fixes missing elements from Beta 1
 
+- Documentation Domain bumped to [Documentation_Domain to version 2.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v201) (was previously v2.0.0)
+- Initial DCSA Domain bumped to [DCSA_Domain to version 2.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v201) (was previously v2.0.0)
+- Initial Event Domain bumped to [Event_Domain to version 2.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#v201) (was previously v2.0.0)
 - `receiptTypeAtOrigin`, `deliveryTypeAtDestination`, `cargoMovementTypeAtOrigin`, `cargoMovementTypeAtDestination`, `serviceContractReference`, `termsAndConditions` , `invoicePayableAt`, `transports` (transportPlan) and `shipmentLocations` added to the TransportDocument
 
 <a name="v200B1"></a>[Release v2.0.0 Beta 1 (06 April 2022)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/2.0.0-Beta-1)
