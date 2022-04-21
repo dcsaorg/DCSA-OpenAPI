@@ -81,6 +81,7 @@ This version has been released together with the APIs for `Booking v1.0 Beta 1` 
 - `isShipperOwned` added to `utilizedTransportEquipment` and set as a required field
 - `documentParty` now links to a `party` object instead of `partyNoID` (because the field has been renamed)
 - `partyContactDetails` moved from `documentParty` -> `party` and made a mandatory field plus added a `url` field
+- `partyContactDetails` in `party` object is now a list
 - `party` is now a required field on `documentParty`
 - `name` is now a mandatory field of `partyContactDetails`
 - `DCSAResponsibleAgencyCode` description now updated and `DCSA` added as enum value
@@ -93,19 +94,17 @@ This version has been released together with the APIs for `Booking v1.0 Beta 1` 
 - `referenceType` added as local object
 - `TransportDocumentRefStatus` added as an object with `transportDocumentReference`, `transportDocumentCreatedDateTime`, `transportDocumentUpdatedDateTime` and `documentStatus`
 - `TransportDocumentHeader` renamed to `TransportDocumentRoot` with the following changes:
-  - `shippingInstructionID`, `documentStatus`, `transportDocumentCreatedDateTime` and `transportDocumentUpdatedDateTime` added
+  - `transportDocumentCreatedDateTime` and `transportDocumentUpdatedDateTime` added
+  - `placeOfIssue` removed (is now part of the `TransportDocument` object)
   - `termsAndConditions`, `cargoMovementTypeAtOrigin`, `cargoMovementTypeAtDestination`, `receiptDeliveryTypeAtOrigin`, `receiptDeliveryTypeAtDestination` and `serviceContractReference` removed
   - `numberOfOriginals` added
   - `issueDate` and `issuer` no longer mandatory fields
+- `transportDocumentSummary` object created with `transportDocumentRoot`, `shippingInstructionReference` and `documentStatus`
 - `transportDocument` object updated:
   - `placeOfIssue` added
   - `transports` removed
-- `partyContactDetails` in `party` object is now a list
-- `partyContactDetail` is now an object
-- `nmftaCode` removed
-- `location` is now a required field in `ShipmentLocation`
-- `eventDateTime` added to `ShipmentLocation`
 - `clauses` renamed to `carrierClauses`
+- `paymentTerm` in `charge` object renamed to `paymentTermCode`
 - `transportPlanStage`, `transportPlanStageSequenceNumber` and `vesselName` added to the `transport` object
 - `transportPlanStage`, `transportPlanSequenceNumber`, `loadLocation`, `dischargeLocation`, `plannedDepartureDate`, `plannedArrivalDate`, `vesselName`, `vesselIMONumber` are now all required fields on `transport`
 - `carierVoyageNumber` replaced by `importVoyageNumber` and `exportVoyageNumber` in `Transports`
