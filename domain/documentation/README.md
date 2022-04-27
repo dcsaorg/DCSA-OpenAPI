@@ -16,6 +16,7 @@ This version is for `EBL v2.0 Beta 2`
 - `TransportDocument` object updated:
   - `receiptTypeAtOrigin`, `deliveryTypeAtDestination`, `cargoMovementTypeAtOrigin`, `cargoMovementTypeAtDestination`, `serviceContractReference`, `termsAndConditions` added as simple fields
   - `invoicePayableAt` added as a location object supporting the following Location-Interfaces: `addressLocation`, `unLocationLocation` and `facilityLocation`
+  - `issuerCode` and `issuerCodeListProvider` removed as these fields were redundent (a `Party`object using `MS``PartyFunction` should be used to provide issuer)
   - `transports` (transport plan) has been added
   - `shipmentLocations` have been added
 
