@@ -8,6 +8,7 @@ The primary purpose of this Domain is to specify common components to be reused 
 ---
 The API for EBL v2.0 Beta 2 uses this version of the Domain
 
+- `EGI` (Earliest Possible Gate in) enum value added to `cutOffDateTimeCodes`
 - `dimensionUnit`, `exportUniversalVoyageReference`, `importUniversalVoyageReference`, `locationReference`, `transportCallReference`, `universalServiceReference`, `universalVoyageReference`, `vesselCallSign`, `vesselLength`, `vesselWidth` added as a simple type
 - `facilityCodeListProvider` description updated
 - `isToOrder` removed - use `transportDocumentTypeCode` BTO value instead
