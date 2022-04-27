@@ -1,4 +1,4 @@
-## DCSA Domain
+## Documentation Domain
 
 The Documentation Domain is documented on [**Documentation Domain**](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN) SwaggerHub.
 
