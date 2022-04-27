@@ -11,6 +11,8 @@ This version is for `EBL v2.0 Beta 2`
 - Bump [DCSA_Domain to version 2.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v201) (was previously v2.0.0)
 - Bump [Location_Domain to version 2.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v201) (was previously v2.0.0)
 - `cargoItems` removed as a require field from `utilizedTransportEquipment`
+- `ShippingInstruction` object updated:
+  - `isToOrder` removed - use `transportDocumentTypeCode` `BTO` instead
 - `TransportDocument` object updated:
   - `receiptTypeAtOrigin`, `deliveryTypeAtDestination`, `cargoMovementTypeAtOrigin`, `cargoMovementTypeAtDestination`, `serviceContractReference`, `termsAndConditions` added as simple fields
   - `invoicePayableAt` added as a location object supporting the following Location-Interfaces: `addressLocation`, `unLocationLocation` and `facilityLocation`
