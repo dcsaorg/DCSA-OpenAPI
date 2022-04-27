@@ -8,7 +8,9 @@ The primary purpose of this Domain is to specify common components to be reused 
 ---
 The API for EBL v2.0 Beta 2 uses this version of the Domain
 
-- `universalServiceReference` added as a simple type
+- `dimensionUnit`, `exportUniversalVoyageReference`, `importUniversalVoyageReference`, `locationReference`, `transportCallReference`, `universalServiceReference`, `universalVoyageReference`, `vesselCallSign`, `vesselLength`, `vesselWidth` added as a simple type
+- `facilityCodeListProvider` description updated
+- `volumeUnit` updated, contained wrong enum values - now contains `MTQ`, `FTQ`
 
 <a name="v200"></a>[Release v2.0.0 (05 April 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/DCSA_DOMAIN/2.0.0)
 ---
