@@ -4,8 +4,8 @@ The DCSA Interface Standard for Electronci Bill of Lading is documented on the [
 
 Publications related to this specification:
 - [DCSA Information Model v2022.1](https://dcsa.my.salesforce.com/sfc/p/#2o000000YvHJ/a/7T000000bnvo/id.kB9TVoeYABFV8NwRBQvgVkWXXK7DAuIelpCDw13M)
--	[DCSA Information Model Reading Guide]( https://dcsa.org/wp-content/uploads/2020/07/DCSA-Information-Model-2.0-Reading-Guide-vF.pdf)
-- Interface standards for BKG (to be announced)
+-	[DCSA Information Model Reading Guide](https://dcsa.org/wp-content/uploads/2020/07/DCSA-Information-Model-2.0-Reading-Guide-vF.pdf)
+- [Interface standards for EBL](https://dcsa.my.salesforce.com/sfc/p/2o000000YvHJ/a/7T000000bo71/WrX_2alnNnKI.tCt6vcHilJ2cjk_FDDd7cPRaNrKvwk)
 -	[Glossary of Terms](https://knowledge.dcsa.org/s/glossary)
 
 <a name="v200B2"></a>[Release v2.0.0 Beta 2 (...)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/2.0.0-Beta-2)
