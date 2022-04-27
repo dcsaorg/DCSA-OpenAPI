@@ -1,4 +1,4 @@
-### Electronic Bill of Lading (EBL)
+### Electronic Bill of Lading (EBL) API
 
 The DCSA Interface Standard for Electronci Bill of Lading is documented on the [**DCSA EBL SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_EBL).
 
