@@ -10,6 +10,7 @@ The API for EBL v2.0 Beta 2 uses this version of the Domain
 
 - `dimensionUnit`, `exportUniversalVoyageReference`, `importUniversalVoyageReference`, `locationReference`, `transportCallReference`, `universalServiceReference`, `universalVoyageReference`, `vesselCallSign`, `vesselLength`, `vesselWidth` added as a simple type
 - `facilityCodeListProvider` description updated
+- `isToOrder` removed - use `transportDocumentTypeCode` BTO value instead
 - `shippedOnBoardDate` renamed to `shippedOnboardDate`
 - `transportDocumentTypeCode` updated with value BTO (`Bill of Lading to Order`)
 - `volumeUnit` updated, contained wrong enum values - now contains `MTQ`, `FTQ`
