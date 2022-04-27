@@ -16,6 +16,7 @@ This version is for `EBL v2.0 Beta 2`
   - `transports` (transport plan) has been added
   - `shipmentLocations` have been added
 - `cargoItems` removed as a require field from `utilizedTransportEquipment`
+- `shippedOnBoardDate` renamed to `shippedOnboardDate`
 
 <a name="v200"></a>[Release v2.0.0 (5 April 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN/2.0.0)
 ---
