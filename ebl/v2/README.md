@@ -2,8 +2,9 @@
 
 The DCSA Interface Standard for Electronci Bill of Lading is documented on the [**DCSA EBL SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_EBL).
 
-Publications related to this specification can be found on the DCSA website for [Electronic Bill of Lading](https://knowledge.dcsa.org/s/publication?publicationId=a0r7T000000L8lPQAS)
-[Glossary of Terms](https://knowledge.dcsa.org/s/glossary)
+Publications related to this specification can be found on the DCSA website:
+- [Electronic Bill of Lading](https://knowledge.dcsa.org/s/publication?publicationId=a0r7T000000L8lPQAS)
+- [Glossary of Terms](https://knowledge.dcsa.org/s/glossary)
 
 <a name="v200B2"></a>[Release v2.0.0 Beta 2 (...)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/2.0.0-Beta-2)
 ---
