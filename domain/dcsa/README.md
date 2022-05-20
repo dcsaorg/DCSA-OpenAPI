@@ -8,13 +8,14 @@ The primary purpose of this Domain is to specify common components to be reused 
 ---
 The API for EBL v2.0 Beta 2 uses this version of the Domain
 
-- `EGI` (Earliest Possible Gate in) enum value added to `cutOffDateTimeCodes`
+- description updated for `cargoMovementTypeAtOrigin`, `cargoMovementTypeAtDestination`, `facilityCodeListProvider`, `ventilationMax`, `ventilationMin`
+- `issuerCode` and `issuerCodeListProvider` renamed to `carrierCode` and `carrierCodeListProvider`
+- `delayReasonCode` updated with newest link to `SMDG`
 - `dimensionUnit`, `exportUniversalVoyageReference`, `importUniversalVoyageReference`, `locationReference`, `transportCallReference`, `universalServiceReference`, `universalVoyageReference`, `vesselCallSign`, `vesselLength`, `vesselWidth` added as a simple type
-- `facilityCodeListProvider` description updated
-- `isToOrder` removed - use `transportDocumentTypeCode` BTO value instead
-- `shippedOnBoardDate` renamed to `shippedOnboardDate`
-- `transportDocumentTypeCode` updated with value BTO (`Bill of Lading to Order`)
-[//]: # - `volumeUnit` updated, contained wrong enum values - now contains `MTQ`, `FTQ`
+- `receiptDeliveryTypeAtOrigin` renamed to `receiptTypeAtOrigin`
+- `deliveryTypeAtDestination` renamed to `deliveryTypeAtDestination`
+- `isShippedOnboardType` renamed to `isShippedOnBoardType`
+- `volumeUnit` updated - now aligned with UNECE: `MTQ` and `FTQ`
 
 <a name="v200"></a>[Release v2.0.0 (05 April 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/DCSA_DOMAIN/2.0.0)
 ---
