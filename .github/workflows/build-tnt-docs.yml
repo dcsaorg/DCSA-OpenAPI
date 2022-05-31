@@ -5,6 +5,11 @@ on:
       - master
     paths:
       - tnt/v2/test/*.yaml
+  pull_request:
+    branches:
+      - master
+    paths:
+      - tnt/v2/test/*.yaml
 
 jobs:
   build:
@@ -12,14 +17,15 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Build docs test
-#       run: tnt/v2/test/make.sh
       run: |
         npx redoc-cli build tnt/v2/test/tnt_v2.2.0.yaml
         mv redoc-static.html index.html
+        # Insert the favicon on the index.html page
         sed -i '7 i \ \ <link rel="icon" type="image/png" href="./favicon-32x32.png" sizes="32x32"/>' index.html
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3 # https://github.com/peaceiris/actions-gh-pages
       with:
         personal_token: ${{ secrets.REPO_ACCESS_PAT}}
+#         publish_branch: your-branch
         publish_dir: tnt/v2/test/.
-        force_orphan: true
+        keep_files: true
