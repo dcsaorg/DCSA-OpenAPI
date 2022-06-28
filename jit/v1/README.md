@@ -2,6 +2,10 @@
 
 The DCSA Interface Standard for Just in Time Portcalls is documented on the **[DCSA JIT](https://app.swaggerhub.com/apis/dcsaorg/DCSA_JIT) SwaggerHub**.
 
+<a name="v120B1"></a>[Release v1.2.0 Beta 1 (...)](https://app.swaggerhub.com/apis/dcsaorg/DCSA_JIT/1.2.0-Beta-1)
+---
+- Updates will be listed here...
+
 <a name="v110"></a>[Release v1.1.0 (16 November 2021)](https://app.swaggerhub.com/apis/dcsaorg/DCSA_JIT/1.1.0)
 ---
 - Description updated
