@@ -8,12 +8,19 @@ The primary purpose of this Domain is to specify common components to be reused 
 ---
 The API for EBL v2.0 Beta 2 uses this version of the Domain
 
-- description updated for `cargoMovementTypeAtOrigin`, `cargoMovementTypeAtDestination`, `facilityCodeListProvider`, `ventilationMax`, `ventilationMin`
+- description updated for `cargoMovementTypeAtOrigin`, `cargoMovementTypeAtDestination`, `carrierServiceCode`, `facilityCodeListProvider`, `ventilationMax`, `ventilationMin`
+- `carrierImportVoyageNumber`, `carrierExportVoyageNumber`, `dimensionUnit`, `exportUniversalVoyageReference`, `importUniversalVoyageReference`, `locationReference`, `packageNameOnBL`, `portVisitReference`, `transportCallReference`, `universalServiceReference`, `universalImportVoyageReference`, `universalExportVoyageReference`, `universalVoyageReference`, `vesselCallSign`, `vesselLOA`, `vesselDraft`, `vesselType`, `vesselWidth` added as a simple type
 - `issuerCode` and `issuerCodeListProvider` renamed to `carrierCode` and `carrierCodeListProvider`
 - `delayReasonCode` updated with newest link to `SMDG`
-- `dimensionUnit`, `exportUniversalVoyageReference`, `importUniversalVoyageReference`, `locationReference`, `transportCallReference`, `universalServiceReference`, `universalVoyageReference`, `vesselCallSign`, `vesselLength`, `vesselWidth` added as a simple type
-- `receiptDeliveryTypeAtOrigin` renamed to `receiptTypeAtOrigin`
-- `deliveryTypeAtDestination` renamed to `deliveryTypeAtDestination`
+- `facilityTypeCode` description updated and `ANCH`(Anchorage) added to enum values
+- `locationName` example updated
+- `postCode` maxLength changed to 50
+- `receiptDeliveryTypeAtOrigin` renamed to `receiptTypeAtOrigin` and description updated
+- `receiptDeliveryTypeAtDestination` renamed to `deliveryTypeAtDestination` and description updated
+- `shipmentCreatedDateTime` description updated
+- `IPA` (Invoice Payable At) removed as enum value on `shipmentLocationTypeCode`
+- `ventilationMax` and `ventilationMin` description updated
+- `vesselOperatorCarrierSMDGCode` renamed to `vesselOperatorSMDGLinerCode`
 - `isShippedOnboardType` renamed to `isShippedOnBoardType`
 - `volumeUnit` updated - now aligned with UNECE: `MTQ` and `FTQ`
 
