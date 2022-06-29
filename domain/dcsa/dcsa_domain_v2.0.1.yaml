@@ -101,12 +101,14 @@ components:
       type: number
       format: float
       example: 120.0
-      description: 'The grand total volume of the commodity'
+      description: |
+        The grand total volume of the commodity
     cargoGrossWeight:
       type: number
       format: float
       example: 12000.0
-      description: 'The grand total weight of the cargo and weight per container(s) including packaging items being carried, which can be expressed in imperial or metric terms, as provided by the shipper. Excludes the tare weight of the container(s).'
+      description: |
+        The grand total weight of the cargo and weight per container(s) including packaging items being carried, which can be expressed in imperial or metric terms, as provided by the shipper. Excludes the tare weight of the container(s).'
     cargoItemID:
       type: string
       format: uuid
@@ -141,6 +143,16 @@ components:
         - LCL
         - BB
       example: FCL
+    carrierBookingReference:
+      type: string
+      maxLength: 35
+      example: ABC709951
+      description: 'A set of unique characters provided by carrier to identify a booking.'
+    carrierBookingRequestReference:
+      type: string
+      description: |
+        A reference to the booking during the booking request phase
+      example: 24595eb0-5cfc-4381-9c3a-cedc1975e9aa
     carrierCode:
       type: string
       maxLength: 4
@@ -155,24 +167,26 @@ components:
       enum:
         - SMDG
         - NMFTA
+    carrierExportVoyageNumber:
+      type: string
+      maxLength: 50
+      example: '2103S'
+      description: |
+        The identifier of an export voyage. The vessel operator-specific identifier of the export Voyage.
     carrierID:
       type: string
       format: uuid
       description: 'Unique internal identifier for the carrier.'
       example: fb4089dd-1889-485f-b1cc-e31f75568bb9
-    carrierBookingReference:
+    carrierImportVoyageNumber:
       type: string
-      maxLength: 35
-      example: ABC709951
-      description: 'A set of unique characters provided by carrier to identify a booking.'
-    carrierBookingRequestReference:
-      type: string
+      maxLength: 50
+      example: '2103N'
       description: |
-        A reference to the booking during the booking request phase
-      example: 24595eb0-5cfc-4381-9c3a-cedc1975e9aa
+        The identifier of an import voyage. The vessel operator-specific identifier of the import Voyage.
     carrierServiceCode:
       description: |
-        The code of the service for which the schedule details are published.
+        The Internal Carrier code of the service for which the schedule details are published.
       maxLength: 5
       type: string
       example: FE1
@@ -432,20 +446,12 @@ components:
         
         Mandatory to provide in booking request for specific commodities.
       example: 2021-05-21
-    exportUniversalVoyageReference:
-      type: string
-      pattern: \d{2}[0-9A-Z]{2}[NEWS]
-      example: '2103N'
-      description: |
-        A global unique voyage reference for the export Voyage, as per DCSA standard, agreed by VSA partners for the voyage. The voyage reference must match the regular expression pattern: `\d{2}[0-9A-Z]{2}[NEWS]`
-        - `2 digits` for the year
-        - `2 alphanumeric characters` for the sequence number of the voyage
-        - `1 character` for the direction/haul (`N`orth, `E`ast, `W`est or `S`outh).
     exportVoyageNumber:
       type: string
       maxLength: 50
       example: '2103S'
-      description: 'The vessel operator-specific identifier of the export Voyage.'
+      description: |
+        The identifier of an export voyage. The vessel operator-specific identifier of the export Voyage.
     facilityCode:
       type: string
       example: ADT
@@ -498,9 +504,11 @@ components:
         A specialized version of the facilityCode to be used in Operations events. The code to identify the specific type of facility.
         - PBPL (Pilot boarding place)
         - BRTH (Berth)
+        - ANCH (Anchorage)
       enum:
         - PBPL
         - BRTH
+        - ANCH
     facilityTypeCodeTRN:
       type: string
       example: POTE
@@ -555,20 +563,12 @@ components:
       description: |
         A certificate, issued by countries exercising import controls, that permits importation of the articles stated in the license. Reference number assigned by an issuing authority to an Import License. The import license number must be valid at time of arrival. Required if import license required is ‘True’.
       example: ABC123123
-    importUniversalVoyageReference:
-      type: string
-      pattern: \d{2}[0-9A-Z]{2}[NEWS]
-      example: '2103N'
-      description: |
-        A global unique voyage reference for the import Voyage, as per DCSA standard, agreed by VSA partners for the voyage. The voyage reference must match the regular expression pattern: `\d{2}[0-9A-Z]{2}[NEWS]`
-        - `2 digits` for the year
-        - `2 alphanumeric characters` for the sequence number of the voyage
-        - `1 character` for the direction/haul (`N`orth, `E`ast, `W`est or `S`outh).
     importVoyageNumber:
       type: string
       maxLength: 50
       example: '2103N'
-      description: 'The vessel operator-specific identifier of the import Voyage.'
+      description: |
+        The identifier of an import voyage. The vessel operator-specific identifier of the import Voyage.
     incoTerms:
       type: string
       description: |
@@ -637,20 +637,6 @@ components:
       description: |
         Number of original copies of the negotiable bill of lading that has been issued to the customer.
       example: 4
-    issuerCode:
-      type: string
-      maxLength: 4
-      description: |
-        The code containing the SCAC and/or the SMDG code to specify the issuing carrier.  Details about the issuer can be given in the Document Parties entity using the party function code MS.
-      example: MMCU
-    issuerCodeListProvider:
-      type: string
-      description: |
-        The provider used for identifying the issuer Code
-      example: NMFTA
-      enum:
-        - SMDG
-        - NMFTA
     isToBeNotified:
       type: boolean
       description: 'Used to decide whether the party will be notified of the arrival of the cargo.'
@@ -679,7 +665,7 @@ components:
       type: string
       maxLength: 100
       description: 'The name of the location.'
-      example: 'Eiffel Tower'
+      example: 'Port of Amsterdam'
     locationReference:
       type: string
       maxLength: 100
@@ -745,6 +731,12 @@ components:
       maxLength: 3
       description: 'The unique identifier for the package type'
       example: 5H4
+    packageNameOnBL:
+      type: string
+      maxLength: 50
+      description: |
+        To provide package description displayed on the BL
+      example: 'Bags'
     partialLoadAllowed:
       type: boolean
       description: |
@@ -827,9 +819,15 @@ components:
       format: date
       description: |
         The planned date of departure.
+    portVisitReference:
+      type: string
+      maxLength: 50
+      description: |
+        The unique reference that can be used to link different `transportCallReferences` to the same port visit. 
+      example: 'NLRTM1234589'
     postCode:
       type: string
-      maxLength: 10
+      maxLength: 50
       description: 'The post code of the party’s address.'
       example: '1306'
     preCarriageUnderShippersResponsibility:
@@ -986,7 +984,7 @@ components:
       type: string
       format: date-time
       description: |
-        The date and time when the shipment was created.
+        The date and time when the shipment was created (equivalent to when the Booking was confirmed).
       example: '2021-09-03T09:03:00+02:00'
     shipmentEquipmentID:
       type: string
@@ -1016,7 +1014,6 @@ components:
         - RTP (Requested transshipment port)
         - FCD (Full container drop-off location)
         - ECP (Empty container pick-up date and time)
-        - IPA (Invoice payable at)
       enum:
         - PRE
         - POL
@@ -1032,7 +1029,6 @@ components:
         - RTP
         - FCD
         - ECP
-        - IPA
       example: PRE
     shipmentUpdatedDateTime:
       type: string
@@ -1062,7 +1058,7 @@ components:
       type: string
       description: 'The identifying details of a package or the actual markings that appear on the package(s). This information is provided by the shipper.'
     startDate:
-      description: 'The start date of the period for which schedule information is sent. The value is populated in ISO 8601 Date format.'
+      description: 'The start date of the period for which schedule information is sent. The value is populated in `ISO 8601` Date format.'
       type: string
       format: date
       example: '2020-04-06'
@@ -1121,12 +1117,12 @@ components:
       example: CEL
     transportCallReference:
       description: |
-        The unique identifier for a transport call.
+        A carrier definied reference to a TransportCall.
         
         In the case the Means of Transport is a `Vessel` and the facility is a `Port`/`Terminal` - this reference should be considered a **Terminal Call Reference**
       type: string
       maxLength: 100
-      example: 987e4567-e89b-12d3-a456-4266141741234
+      example: '987e4567'
     termsAndConditions:
       type: string
       description: |
@@ -1214,6 +1210,24 @@ components:
       description: |
         A global unique service reference, as per DCSA standard, agreed by VSA partners for the service. The service reference must match the regular expression pattern: `SR\d{5}[A-Z]`. The letters `SR` followed by `5 digits`, followed by a checksum-character as a capital letter from `A to Z`.
       example: SR12345A
+    universalExportVoyageReference:
+      type: string
+      pattern: \d{2}[0-9A-Z]{2}[NEWS]
+      example: '2103N'
+      description: |
+        A global unique voyage reference for the export Voyage, as per DCSA standard, agreed by VSA partners for the voyage. The voyage reference must match the regular expression pattern: `\d{2}[0-9A-Z]{2}[NEWS]`
+        - `2 digits` for the year
+        - `2 alphanumeric characters` for the sequence number of the voyage
+        - `1 character` for the direction/haul (`N`orth, `E`ast, `W`est or `S`outh).
+    universalImportVoyageReference:
+      type: string
+      pattern: \d{2}[0-9A-Z]{2}[NEWS]
+      example: '2103N'
+      description: |
+        A global unique voyage reference for the import Voyage, as per DCSA standard, agreed by VSA partners for the voyage. The voyage reference must match the regular expression pattern: `\d{2}[0-9A-Z]{2}[NEWS]`
+        - `2 digits` for the year
+        - `2 alphanumeric characters` for the sequence number of the voyage
+        - `1 character` for the direction/haul (`N`orth, `E`ast, `W`est or `S`outh).
     universalVoyageReference:
       type: string
       pattern: \d{2}[0-9A-Z]{2}[NEWS]
@@ -1283,18 +1297,28 @@ components:
       type: string
       maxLength: 10
       example: NCVV
+    vesselDraft:
+      type: number
+      format: float
+      description: |
+        The actual draft of the vessel.
+        
+        If the length is specified in feet (`FOT`) then the decimal part should be concidered as a fraction of a foot and **not** as a number of inches. E.g. 120.5 feet means 120 and a half foot (which would be 120'6")
+      example: 245.45
     vesselIMONumber:
       description: |
         The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd&apos;s register code, which does not change during the lifetime of the vessel
       type: string
       maxLength: 7
       example: 9321483
-    vesselLength:
+    vesselLOA:
       type: number
       format: float
       description: |
-        The length of the Vessel.
-      example: 245
+        The maximum length of a ship's hull measured parallel to the waterline (Length OverAll).
+        
+        If the length is specified in feet (`FOT`) then the decimal part should be concidered as a fraction of a foot and **not** as a number of inches. E.g. 120.5 feet means 120 and a half foot (which would be 120'6")
+      example: 245.45
     vesselName:
       type: string
       maxLength: 35
@@ -1316,7 +1340,7 @@ components:
         - NMFTA
       example: NMFTA
       nullable: false
-    vesselOperatorCarrierSMDGCode:
+    vesselOperatorSMDGLinerCode:
       description: |
         The carrier who is in charge of the vessel operation based on the SMDG code
       type: string
@@ -1334,12 +1358,42 @@ components:
       type: string
       enum: [SMDG, NMFTA]
       example: NMFTA
+    vesselType:
+      type: string
+      description: |
+        Categorization of ocean-going vessels distinguished by the main cargo the vessel carries. Possible values:
+        - GCGO (General cargo)
+        - CONT (Container)
+        - RORO (RoRo)
+        - CARC (Car carrier)
+        - PASS (Passenger)
+        - FERY (Ferry)
+        - BULK (Bulk)
+        - TANK (Tanker)
+        - LGTK (Liquified gaz tanker)
+        - ASSI (Assistance)
+        - PILO (Pilot boat)
+      enum:
+        - GCGO - General cargo
+        - CONT - Container
+        - RORO - RoRo
+        - CARC - Car carrier
+        - PASS - Passenger
+        - FERY - Ferry
+        - BULK - Bulk
+        - TANK - Tanker
+        - LGTK - Liquified gaz tanker
+        - ASSI - Assistance
+        - PILO - Pilot boat.
+      example: CONT
     vesselWidth:
       type: number
       format: float
       description: |
-        The width of the Vessel.
-      example: 37
+        Overall width of the ship measured at the widest point of the nominal waterline.
+        
+        If the width is specified in feet (`FOT`) then the decimal part should be concidered as a fraction of a foot and **not** as a number of inches. E.g. 120.5 feet means 120 and a half foot (which would be 120'6")
+      example: 37.33
     volume:
       type: number
       format: float
