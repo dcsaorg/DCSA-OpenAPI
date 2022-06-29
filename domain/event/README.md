@@ -11,6 +11,17 @@ The APIs for Booking v1.0 Beta 2 and EBL v2.0 Beta 2 both use this version of th
 - Bump [DCSA Domain to version 2.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v201) (was previously 2.0.0)
 - Bump [Documentation Domain to version 2.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v201) (was previously v2.0.0)
 - Bump [Location Domain to version 2.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v201) (was previously 2.0.0)
+- `operationsEventTypeCode` updated with `OMIN` (Omitted) and `CANC` (Cancelled)
+- `eventDateTime` description in the `ShipmentEvent` updated
+- `transportCall` has been made mandatory in the `OperationsEvent`
+- `portCallServiceTypeCode` have removed WSDP (Waste dispoal) and added the following values:
+  - ANCO (Anchorage)
+  - SLUG (SLudge)
+  - SHPW (Shore Power)
+  - LCRO (Loading cargo operations)
+  - DCRO (Discharge cargo operations)
+  - VRDY (Vessel ready)
+- `publisherRole` description updated (upgraded all values to non-'experimental') added MOR (Mooring service provider), SLU (Sludge service provider) and SVP (Any other service Provider)
 
 <a name="v200"></a>[Release v2.0.0 (06 April 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/2.0.0)
 ---
