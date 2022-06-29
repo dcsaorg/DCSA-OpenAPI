@@ -7,8 +7,14 @@ The primary purpose of this API is to specify endPoints for schedules shared bet
 - Location Domain
 - DCSA Domain
 
-<a name="v300"></a>[Release v3.0.0 (...)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_OVS/3.0.0)
+<a name="v300B1"></a>[Release v3.0.0 Beta 1 (...)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_OVS/3.0.0-Beta-1)
 ---
-This version focuses on making schedule endPoints
+This version focuses on making a schedule endPoint and detaching [JIT 1.x (Just in Time)](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/jit/v1) into a separate API
 
-- ...
+- Description updated
+- `/events` endPoint removed
+- Bump [Event_Domain to version 2.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#v201)
+- Bump [DCSA_Domain to version 2.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v201)
+- Bump [Error_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/ovs#v110)
+- renamed internal representation of the `TransportEvent` used in OVS: `OperationsTransportEvent` -> `TransportEvent`
+- /v3/service-schedules endPoint added. Can be used for `GET`ing (polling) schedules
