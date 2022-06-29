@@ -1,0 +1,1705 @@
+# OpenAPI version identifier - required for OpenAPI 3.0 domains
+openapi: 3.0.3
+
+#######################
+# Optional info section
+#######################
+info:
+  title: DCSA - Event Components
+  description: |
+    Common components for Events. This domain is central for all Event Hubs and `/v?/events` endPoints (used for polling) in APIs. It is used by
+    - [T&T (Track & Trace)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT). Event hub for the following Event types:
+      - TransportEvent
+      - EquipmentEvent
+      - ShipmentEvent
+    - Documentation Hub used by [EBL (Electronic Bill of Lading)](https://app.swaggerhub.com/apis/dcsaorg/DCSA_EBL) and [BKG (Booking)](https://app.swaggerhub.com/apis/dcsaorg/DCSA_BKG). Event hub for the following Event types:
+      - ShipmentEvent
+    - OVS Hub used by [OVS (Operational Vessel Schedules)](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS). Event hub for the following Event types:
+      - TransportEvent
+    - JIT Hub used by [JIT (Just in Time Portcalls)](https://app.swaggerhub.com/apis/dcsaorg/DCSA_JIT). Event hub for the following Event types:
+      - OperationsEvent
+
+    For a history of changes in this domain - please check [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event). Please also [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  contact:
+    name: Digital Container Shipping Association (DCSA)
+    url: https://dcsa.org
+    email: info@dcsa.org
+  version: 2.0.1
+
+components:
+  parameters:
+
+    ####################
+    ## Header parameters
+    ####################
+
+    apiVersion:
+      in: header
+      name: API-Version
+      required: true
+      schema:
+        type: string
+        example: 1.0.0
+      description: |
+        SemVer used to indicate the version of the contract (API version) returned.
+    notificationSignature:
+      in: header
+      name: Notification-Signature
+      required: true
+      description: |
+        the Notification-Signature is used to sign the notification. The header has the following format: 
+
+        <i>Notification-Signature&#58; &lt;signature-type&gt;=&lt;signature&gt;</i>
+
+        The <i>&lt;signature-type&gt;</i> part is a keyword that determines which algorithm was used to compute the signature.
+
+        The signature <b>MUST</b> cover the entire request body of the request including whitespace and newlines. The content <b>MUST</b> decoded into bytes using the UTF-8 encoding before computing the signature. None of the HTTP headers nor the request URL is covered by the signature.
+        
+        Supported signature typies are&#58;
+        - sha256
+        
+        Example&#58; sha256=ae688919f5e31f4c210ca6af362ce4d9ed87acfb51c1721a8507ee395de5e2de
+      schema:
+        type: string
+        pattern: '\s*([a-zA-Z0-9-_+]+=[0-9a-fA-F]+)\s*'
+        example: 'sha256=ae688919f5e31f4c210ca6af362ce4d9ed87acfb51c1721a8507ee395de5e2de'
+    signatureHeader:
+      in: header
+      name: Signature
+      required: true
+      description: |
+        The signature certifying the request originates from the carrier.
+      deprecated: true
+      schema:
+        properties:
+          keyId:
+            type: string
+            format: uuid
+            example: 4fb682bc-3cd1-43a9-a23a-618a61bd87ca
+          created:
+            type: integer
+            example: 1591960384 
+          headers:
+            type: string
+            example: '(request-target) (created) date host'
+          signature:
+            type: string
+            example: aGkgZnJvbSBkZW5tYXJr
+    subscriptionIDHeader:
+      in: header
+      name: Subscription-ID
+      required: true
+      description: 'The ID of the subscription triggering the event being sent.'
+      schema:
+        type: string
+        format: uuid
+        example: b80d923d-e8ac-4c34-9506-55d3de347034
+
+    #################
+    # Path parameters
+    #################
+
+    eventID:
+      in: path
+      name: eventID
+      schema:
+        $ref: '#/components/schemas/eventID'
+      required: true
+      deprecated: true
+      description: 'The ID of the event to receive'
+      example: 123e4567-e89b-12d3-a456-426614174000
+    subscriptionID:
+      in: path
+      name: subscriptionID
+      schema:
+        $ref: '#/components/schemas/subscriptionID'
+      required: true
+      description: 'The universal unique ID of the subscription.'
+      example: 123e4567-e89b-12d3-a456-426614174000
+
+    ##################
+    # Query parameters
+    ##################
+    
+    bookingReference:
+      in: query
+      name: bookingReference
+      deprecated: true
+      description: Deprecated - use carrierBookingReference instead.
+      required: false
+      schema:
+        type: string
+    carrierBookingReference:
+      in: query
+      name: carrierBookingReference
+      description: |
+        A set of unique characters provided by carrier to identify a booking.
+        
+        Specifying this filter will only return events related to this particular carrierBookingReference.
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/carrierBookingReference'
+    carrierBookingRequestReference:
+      in: query
+      name: carrierBookingRequestReference
+      description: |
+        A set of unique characters provided by carrier to identify a booking during the booking request phase.
+        
+        Specifying this filter will only return events related to this particular carrierBookingRequestReference.
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/carrierBookingRequestReference'
+    carrierVoyageNumber:
+      in: query
+      name: carrierVoyageNumber
+      description: |
+        Filter on the vessel operator-specific identifier of the Voyage.
+        
+        Specifying this filter will only return events related to this particular carrierVoyageNumber.
+        
+        <b>Deprecated:</b> Use exportVoyageNumber instead
+      required: false
+      deprecated: true
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/carrierVoyageNumber'
+    exportVoyageNumber:
+      in: query
+      name: exportVoyageNumber
+      description: |
+        Filter on the vessel operator-specific identifier of the export Voyage.
+        
+        Specifying this filter will only return events related to this particular exportVoyageNumber.
+      required: false
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/exportVoyageNumber'
+    carrierServiceCode:
+      in: query
+      name: carrierServiceCode
+      description: |
+        Filter on the carrier specific identifier of the service.
+        
+        Specifying this filter will only return events related to this particular carrierServiceCode.
+      required: false
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/carrierServiceCode'
+    documentTypeCode:
+      in: query
+      name: documentTypeCode
+      explode: false
+      style: form
+      description: |
+        The documentTypeCode to filter by. Possible values are
+        - CBR (Carrier Booking Request Reference)
+        - BKG (Booking)
+        - SHI (Shipping Instruction)
+        - SRM (Shipment Release Message)
+        - TRD (Transport Document)
+        - ARN (Arrival Notice)
+        - VGM (Verified Gross Mass)
+        - CAS (Cargo Survey)
+        - CUS (Customs Inspection)
+        - DGD (Dangerous Goods Declaration)
+        - OOG (Out of Gauge)
+
+        It is possible to select multiple values by comma (,) separating them. For multiple values the OR-operator is used. For example <i>documentTypeCode=SHI,TRD</i> Matches <b>both</b> ShippingInstruction (SHI) and TransportDocument (TRD) shipment events.
+
+        More details can be found on <a href="https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/documenttypecodes.csv">GitHub</a>.
+        
+        This filter is only relevant when filtering on ShipmentEvents
+      example: SHI,TRD
+      schema:
+        default: CBR,BKG,SHI,SRM,TRD,ARN,VGM,CAS,CUS,DGD,OOG
+
+        type: array
+        items:
+          $ref: '#/components/schemas/documentTypeCode'
+    equipmentEventTypeCode:
+      in: query
+      name: equipmentEventTypeCode
+      explode: false
+      style: form
+      description: |
+        Unique identifier for equipmentEventTypeCode.
+        - LOAD (Loaded)
+        - DISC (Discharged)
+        - GTIN (Gated in)
+        - GTOT (Gated out)
+        - STUF (Stuffed)
+        - STRP (Stripped)
+        - PICK (Pick-up)
+        - DROP (Drop-off)
+        - INSP (Inspected)
+        - RSEA (Resealed)
+        - RMVD (Removed)
+
+        It is possible to select multiple values by comma (,) separating them. For multiple values the OR-operator is used. For example <i>equipmentEventTypeCode=GTIN,GTOT</i> matches <b>both</b> Gated in (GTIN) and Gated out (GTOT) equipment events.
+        
+        Default is all equipmentEventTypeCodes.
+        
+        This filter is only relevant when filtering on EquipmentEvents
+      example: GTIN,GTOT
+      schema:
+        default: LOAD,DISC,GTIN,GTOT,STUF,STRP,PICK,DROP,INSP,RSEA,RMVD
+        type: array
+        items:
+          $ref: '#/components/schemas/equipmentEventTypeCode'
+    equipmentReference:
+      in: query
+      name: equipmentReference
+      description: |
+        Will filter by the unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.
+        
+        Specifying this filter will only return events related to this particular equipmentReference
+      required: false
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/equipmentReference'
+    eventClassifierCode:
+      in: query
+      name: eventClassifierCode
+      description: |
+        Unique identifier for eventClassifierCode.
+      #   - ACT (Actual)
+      #   - PLN (Planned)
+      #   - EST (Estimated)
+      #   - REQ (Requested)
+
+      #   It is possible to select multiple values by comma (,) separating them. For multiple values the OR-operator is used. For example <i>eventClassifierCode=EST,ACT</i> matches <b>both</b> Estimated (EST) and Actual (ACT) events.
+        
+      #   Default is all eventClassifierCodes.
+        
+      #   Be aware that not all events support REQ (Requested).
+      # example: EST,ACT
+      schema:
+      #   default: ACT,PLN,EST,REQ
+      #   type: array
+        items:
+          $ref: '#/components/schemas/eventClassifierCode'
+    eventCreatedDateTime:
+      in: query
+      name: eventCreatedDateTime
+      description: |
+        Limit the result based on the creating date of the event. It is possible to use operators on this query parameter. This is done by adding a colon followed by an operator at the end of the queryParameterName (before the =)
+        
+        <i>eventCreatedDateTime<b>&#58;gte</b>=2021-04-01T14&#58;12&#58;56+01&#58;00</i>
+        
+        would result in all events created &#8805; 2021-04-01T14&#58;12&#58;56+01&#58;00
+        
+        The following operators are supported
+        - &#58;gte (&#8805; Greater than or equal)
+        - &#58;gt (&#62; Greater than)
+        - &#58;lte (&#8804; Less than or equal)
+        - &#58;lt (&#60; Less than)
+        - &#58;eq (&#61; Equal to)
+        
+        If no operator is provided, a <b>strictly equal</b> is used (this is equivalent to <b>&#58;eq</b> operator).
+      required: false
+      example: 2021-04-01T14:12:56+01:00
+      schema:
+        $ref: '#/components/schemas/eventCreatedDateTime'
+    operationsEventTypeCode:
+      in: query
+      name: operationsEventTypeCode
+      description: |
+        The code to identify the type of event that is related to the operation
+        - STRT (Started)
+        - CMPL (Completed)
+        - ARRI (Arrived)
+        - DEPA (Departed)
+        - OMIT (Omitted)
+        - CANC (Cancelled)
+
+        It is possible to select multiple values by comma (,) separating them. For multiple values the OR-operator is used. For example <i>operationsEventTypeCode=ARRI,CMPL</i> matches <b>both</b> Arrived (ARRI) and Completed (CMPL) operations events.
+        
+        Default is all operationsEventTypeCodes.
+      example: ARRI,CMPL
+      schema:
+        default: STRT,CMPL,ARRI,DEPA,OMIT,CANC
+        type: array
+        items:
+          $ref: '#/components/schemas/operationsEventTypeCode'
+    scheduleID:
+      in: query
+      name: scheduleID
+      description: |
+        ID uniquely identifying a schedule, to filter events by.
+        
+        This filter was added by mistake and is thus deprecated.
+      required: false
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/scheduleID'
+      deprecated: true
+    shipmentEventTypeCode:
+      in: query
+      name: shipmentEventTypeCode
+      explode: false
+      style: form
+      description: |
+        The status of the document in the process to filter by. Possible values are
+        - RECE (Received)
+        - DRFT (Drafted)
+        - PENA (Pending Approval)
+        - PENU (Pending Update)
+        - PENC (Pending Confirmation)
+        - CONF (Confirmed)
+        - REJE (Rejected)
+        - APPR (Approved)
+        - ISSU (Issued)
+        - SURR (Surrendered)
+        - SUBM (Submitted)
+        - VOID (Void)
+        - REQS (Requested)
+        - CMPL (Completed)
+        - HOLD (On Hold)
+        - RELS (Released)
+        - CANC (Cancelled)
+
+        It is possible to select multiple values by comma (,) separating them. For multiple values the OR-operator is used. For example <i>shipmentEventTypeCode=RECE,DRFT</i>  Matches <b>both</b> Received (RECE) and Drafted (DRFT) shipment events.
+
+        More details can be found on <a href="https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/shipmenteventtypecodes.csv">GitHub</a>.
+        
+        This filter is only relevant when filtering on ShipmentEvents
+      example: RECE,DRFT
+      schema:
+        default: RECE,DRFT,PENA,PENU,PENC,CONF,REJE,APPR,ISSU,SURR,SUBM,VOID,REQS,CMPL,HOLD,RELS,CANC
+        type: array
+        items:
+          $ref: '#/components/schemas/shipmentEventTypeCode'
+    shippingInstructionID:
+      in: query
+      name: shippingInstructionID
+      description: |
+        The Shipping Instruction ID identifier is an identifier that links to a shipping instruction
+      required: false
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/shippingInstructionID'
+    transportCallID:
+      in: query
+      name: transportCallID
+      description: |
+        ID uniquely identifying a transport call, to filter events by.
+        
+        Specifying this filter will only return events related to this particular transportCallID
+      required: false
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/transportCallID'
+    transportDocumentID:
+      in: query
+      name: transportDocumentID
+      description: |
+        A unique id to identify a transport document.
+        
+        Deprecated - use transportDocumentReference instead transportDocumentReference
+      deprecated: true
+      schema:
+        type: string
+        format: uuid
+    transportDocumentReference:
+      in: query
+      name: transportDocumentReference
+      description: |
+        A unique number reference allocated by the shipping line to the transport document and the main number used for the tracking of the status of the shipment.
+        
+        Specifying this filter will only return events related to this particular transportDocumentReference
+      required: false
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/transportDocumentReference'
+    transportEventTypeCode:
+      in: query
+      name: transportEventTypeCode
+      explode: false
+      style: form
+      description: |
+        Identifier for type of Transport event to filter by
+        - ARRI (Arrived)
+        - DEPA (Departed)
+
+        It is possible to select multiple values by comma (,) separating them. For multiple values the OR-operator is used. For example <i>transportEventTypeCode=ARRI,DEPA</i> matches <b>both</b> Arrived (ARRI) and Departed (DEPA) transport events.
+        
+        Default is all transportEventTypeCodes.
+        
+        This filter is only relevant when filtering on TransportEvents
+      example: ARRI,DEPA
+      schema:
+        default: ARRI,DEPA
+        type: array
+        items:
+          $ref: '#/components/schemas/transportEventTypeCode'
+    UNLocationCode:
+      in: query
+      name: UNLocationCode
+      description: |
+        The UN Location code specifying where the place is located.
+        
+        Specifying this filter will only return events related to this particular UN Location code.
+      required: false
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/UNLocationCode'
+    vesselIMONumber:
+      in: query
+      name: vesselIMONumber
+      description: |
+        The identifier of vessel for which schedule details are published. Depending on schedule type, this may not be available yet.
+        
+        Specifying this filter will only return events related to this particular vesselIMONumber.
+      required: false
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/vesselIMONumber'
+
+  ####################
+  # Common data models
+  ####################
+  
+  schemas:
+  
+    ###################
+    # Base Event object
+    ###################
+
+    baseEventBody:
+      type: object
+      description: |
+        The Event entity is described as a generalization of all the specific event categories. An event always takes place in relation to a shipment and can additionally be linked to a transport or an equipment
+      allOf:
+        - type: object
+          properties:
+            eventType:
+              $ref: '#/components/schemas/eventType'
+        - type: object
+          properties:
+            eventClassifierCode:
+              $ref: '#/components/schemas/eventClassifierCode'
+        - type: object
+          properties:
+            eventDateTime:
+              $ref: '#/components/schemas/eventDateTime'
+      required:
+        - eventType
+        - eventClassifierCode
+        - eventDateTime
+    
+    baseEvent:
+      type: object
+      allOf:
+        - type: object
+          properties:
+            eventID:
+              $ref: '#/components/schemas/eventID'
+        - type: object
+          properties:
+            eventCreatedDateTime:
+              $ref: '#/components/schemas/eventCreatedDateTime'
+        - $ref: '#/components/schemas/baseEventBody'
+      required:
+        - eventCreatedDateTime
+
+
+    ##########################
+    # Shipment Event object
+    ##########################
+
+
+    baseShipmentEvent:
+      type: object
+      description: |
+        The shipment event entity is a specialization of the event entity to support specification of data that only applies to a shipment event.
+      allOf:
+        #Overriding this property to have correct payload response examples
+        - type: object
+          properties:
+            eventType:
+              example: SHIPMENT
+              enum:
+                - SHIPMENT
+        #Overriding this property to have correct payload response examples
+        - type: object
+          properties:
+            eventDateTime:
+              description: |
+                Value for eventDateTime is when the event happened. Often this is the same as eventCreatedDateTime (which is when the event is created)
+        #Overriding this property to have correct payload response examples
+        - type: object
+          properties:
+            eventClassifierCode:
+              description: |
+                For `ShipmentEvents` the `eventClassifierCode` must be `ACT`
+              enum:
+                - ACT
+              example: ACT
+        - type: object
+          properties:
+            shipmentEventTypeCode:
+              $ref: '#/components/schemas/shipmentEventTypeCode'
+        - type: object
+          properties:
+            documentID:
+              $ref: '#/components/schemas/documentID'
+        - type: object
+          properties:
+            documentTypeCode:
+              $ref: '#/components/schemas/documentTypeCode'
+        # - type: object
+        #   properties:
+        #     shipmentInformationTypeCode:
+        #       $ref: '#/components/schemas/shipmentInformationType'
+        - type: object
+          properties:
+            reason:
+              $ref: '#/components/schemas/reason'
+        
+        #####################################
+        # Deprecated ShipmentEvent attributes
+        #####################################
+        
+        # - type: object
+        #   properties:
+        #     eventTypeCode:
+        #       $ref: '#/components/schemas/eventTypeCode'
+        # - type: object
+        #   properties:
+        #     eventTypeCode:
+        #       description: |
+        #         Unique identifier for Event Type Code. For shipment events this can be
+        #         - RECE (Received)
+        #         - CONF (Confirmed)
+        #         - ISSU (Issued)
+        #         - APPR (Approved)
+        #         - SUBM (Submitted)
+        #         - SURR (Surrendered)
+        #         - REJE (Rejected)
+        #         - PENA (Pending approval)
+                
+        #         Deprecated - use shipmentEventTypeCode instead
+        #       deprecated: true
+        #       example: RECE
+        #       enum:
+        #         - RECE
+        #         - CONF
+        #         - ISSU
+        #         - APPR
+        #         - SUBM
+        #         - SURR
+        #         - REJE
+        #         - PENA
+        # - type: object
+        #   properties:
+        #     shipmentID:
+        #       $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/shipmentID'
+        # - type: object
+        #   properties:
+        #     shipmentID:
+        #       description: |
+        #         ID uniquely identifying a shipment.
+                
+        #         Deprecated - this is replaced by documentID which can contain different values depending on the value of the documentTypeCode field
+        #       deprecated: true
+        - type: object
+          properties:
+            documentReferences:
+              $ref: '#/components/schemas/documentReferences'
+        - $ref: '#/components/schemas/references'
+      required:
+        - documentID
+        - shipmentEventTypeCode
+        - documentTypeCode
+
+    shipmentEvent:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/baseEvent'
+        - $ref: '#/components/schemas/baseShipmentEvent'
+
+
+    ###############################
+    # Transport Event object
+    ###############################
+
+
+    baseTransportEvent:
+      type: object
+      description: |
+        The transport event entity is a specialization of the event entity to support specification of data that only applies to a transport event.
+      allOf:
+        #Overriding this property to have correct payload response examples
+        - type: object
+          properties:
+            eventType:
+              example: TRANSPORT
+              enum:
+                - TRANSPORT
+        #Overriding this property to have correct payload response examples
+        - type: object
+          properties:
+            eventClassifierCode:
+              description: |
+                Code for the event classifier can be
+                - ACT (Actual)
+                - PLN (Planned)
+                - EST (Estimated)
+              enum:
+                - ACT
+                - PLN
+                - EST
+              example: ACT
+        - type: object
+          properties:
+            transportEventTypeCode:
+              $ref: '#/components/schemas/transportEventTypeCode'
+        - type: object
+          properties:
+            delayReasonCode:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/delayReasonCode'
+        - type: object
+          properties:
+            changeRemark:
+              $ref: '#/components/schemas/changeRemark'
+        - type: object
+          properties:
+            facilityTypeCode:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/facilityTypeCodeTRN'
+        - type: object
+          properties:
+            transportCall:
+              $ref: '#/components/schemas/transportCall'
+
+      required:
+        - transportCall
+        - transportEventTypeCode
+
+    operationsTransportEvent:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/baseEvent'
+        - $ref: '#/components/schemas/baseTransportEvent'
+
+    transportEvent:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/operationsTransportEvent'
+        - type: object
+          properties:
+            vesselScheduleChangeRemark:
+              $ref: '#/components/schemas/vesselScheduleChangeRemark'
+        - type: object
+          properties:
+            transportCallID:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/transportCallID'
+                - deprecated: true
+                - description: |
+                    The unique identifier for a transport call
+                    
+                    **Deprecated** - not needed as the TransportCall object is included
+        - type: object
+          properties:
+            eventTypeCode:
+              $ref: '#/components/schemas/eventTypeCode'
+        - type: object
+          properties:
+            eventTypeCode:
+              description: |
+                Unique identifier for Event Type Code, for transport events this is either
+                - ARRI (Arrival)
+                - DEPA (Departure)
+                
+                Deprecated - use transportEventTypeCode instead
+              deprecated: true
+              enum:
+                - ARRI
+                - DEPA
+        - type: object
+          properties:
+            documentReferences:
+              $ref: '#/components/schemas/documentReferences'
+        - $ref: '#/components/schemas/references'
+
+
+    ########################
+    # Equipment Event object
+    ########################
+
+
+    baseEquipmentEvent:
+      type: object
+      description: |
+        The equipment event entity is a specialization of the event entity to support specification of data that only applies to an equipment event.
+      allOf:
+        #Overriding this property to have correct payload response examples
+        - type: object
+          properties:
+            eventType:
+              example: EQUIPMENT
+              enum:
+                - EQUIPMENT
+        #Overriding this property to have correct payload response examples
+        - type: object
+          properties:
+            eventClassifierCode:
+              description: |
+                Code for the event classifier can be
+                - PLN (Planned)
+                - ACT (Actual)
+                - EST (Estimated)
+              enum:
+                - PLN
+                - ACT
+                - EST
+              example: EST
+        - type: object
+          properties:
+            equipmentEventTypeCode:
+              $ref: '#/components/schemas/equipmentEventTypeCode'
+        - type: object
+          properties:
+            equipmentReference:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/equipmentReference'
+        - type: object
+          properties:
+            ISOEquipmentCode:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/ISOEquipmentCode'
+        - type: object
+          properties:
+            emptyIndicatorCode:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/emptyIndicatorCode'
+        - type: object
+          properties:
+            eventLocation:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/LOCATION_DOMAIN/2.0.1#/components/schemas/location'
+        - type: object
+          properties:
+            facilityTypeCode:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/facilityTypeCodeTRN'
+        - type: object
+          properties:
+            transportCallID:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/transportCallID'
+                - deprecated: true
+                - description: 'The unique identifier for a transport call<br><br>Deprecated - not needed as the TransportCall object is included'
+        - type: object
+          properties:
+            transportCall:
+              $ref: '#/components/schemas/transportCall'
+        - type: object
+          properties:
+            documentReferences:
+              $ref: '#/components/schemas/documentReferences'
+        - $ref: '#/components/schemas/references'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/2.0.1#/components/schemas/seals'
+
+        ######################################
+        # Deprecated EquipmentEvent attributes
+        ######################################
+
+        - type: object
+          properties:
+            eventTypeCode:
+              $ref: '#/components/schemas/eventTypeCode'
+        - type: object
+          properties:
+            eventTypeCode:
+              description: |
+                Unique identifier for Event Type Code, for transport events this is either
+                - LOAD (Loaded)
+                - DISC (Discharged)
+                - GTIN (Gated in)
+                - GTOT (Gated out)
+                - STUF (Stuffed)
+                - STRP (Stripped)
+                
+                Deprecated - use equipmentEventTypeCode instead
+              deprecated: true
+              enum: 
+                - LOAD
+                - DISC
+                - GTIN
+                - GTOT
+                - STUF
+                - STRP
+      required:
+        - emptyIndicatorCode
+        - equipmentEventTypeCode
+
+    equipmentEvent:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/baseEvent'
+        - $ref: '#/components/schemas/baseEquipmentEvent'
+
+
+    #########################
+    # Operations Event object
+    #########################
+
+
+    baseOperationsEvent:
+      type: object
+      description: |
+        The operations event entity is a specialization of the event entity to support specification of data that only applies to an operations event.
+      allOf:
+        #Overriding this property to have correct payload response examples
+        - type: object
+          properties:
+            eventType:
+              example: OPERATIONS
+              enum:
+                - OPERATIONS
+        #Overriding this property to have correct payload response examples
+        - type: object
+          properties:
+            eventClassifierCode:
+              description: |
+                Code for the event classifier can be
+                - ACT (Actual)
+                - PLN (Planned)
+                - EST (Estimated)
+                - REQ (Requested)
+              enum:
+                - ACT
+                - PLN
+                - EST
+                - REQ
+              example: ACT
+        - type: object
+          properties:
+            operationsEventTypeCode:
+              $ref: '#/components/schemas/operationsEventTypeCode'
+        - type: object
+          properties:
+            publisher:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/1.0.4#/components/schemas/partyNoID'
+        - type: object
+          properties:
+            publisherRole:
+              $ref: '#/components/schemas/publisherRole'
+        - type: object
+          properties:
+            eventLocation:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/LOCATION_DOMAIN/2.0.1#/components/schemas/location'
+                - description: The location where the event takes place.
+        - type: object
+          properties:
+            portCallServiceTypeCode:
+              $ref: '#/components/schemas/portCallServiceTypeCode'
+        - type: object
+          properties:
+            portCallPhaseTypeCode:
+              $ref: '#/components/schemas/portCallPhaseTypeCode'
+        - type: object
+          properties:
+            facilityTypeCode:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/facilityTypeCodeOPR'
+        - type: object
+          properties:
+            delayReasonCode:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/delayReasonCode'
+        - type: object
+          properties:
+            remark:
+              $ref: '#/components/schemas/remark'
+        - type: object
+          properties:
+            transportCall:
+              $ref: '#/components/schemas/transportCall'
+        - type: object
+          properties:
+            vesselPosition:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/LOCATION_DOMAIN/2.0.1#/components/schemas/geoLocation'
+                - description: The position of the vessel at the time when the message was sent
+      required:
+        - operationsEventTypeCode
+        - publisher
+        - publisherRole
+        - transportCall
+
+    operationsEvent:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/baseEvent'
+        - $ref: '#/components/schemas/baseOperationsEvent'
+
+
+    ##############################
+    # Shipment Subscription object
+    ##############################
+
+
+    shipmentSubscriptionBody:
+      type: object
+      allOf:
+        - type: object
+          properties:
+            shipmentEventTypeCode:
+              $ref: '#/components/schemas/shipmentEventTypeCodes'
+        - type: object
+          properties:
+            documentTypeCode:
+              $ref: '#/components/schemas/documentTypeCodes'
+        - type: object
+          properties:
+            carrierBookingRequestReference:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/carrierBookingRequestReference'
+        - type: object
+          properties:
+            carrierBookingReference:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/carrierBookingReference'
+        - type: object
+          properties:
+            transportDocumentReference:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/transportDocumentReference'
+        - type: object
+          properties:
+            equipmentReference:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/equipmentReference'
+
+
+    ###############################
+    # Equipment Subscription object
+    ###############################
+
+
+    equipmentSubscriptionBody:
+      type: object
+      allOf:
+        - type: object
+          properties:
+            equipmentEventTypeCode:
+              $ref: '#/components/schemas/equipmentEventTypeCodes'
+        - type: object
+          properties:
+            equipmentReference:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/equipmentReference'
+        - type: object
+          properties:
+            UNLocationCode:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/UNLocationCode'
+
+
+    ###############################
+    # Transport Subscription object
+    ###############################
+
+
+    transportSubscriptionBody:
+      type: object
+      allOf:
+        - type: object
+          properties:
+            transportEventTypeCode:
+              $ref: '#/components/schemas/transportEventTypeCodes'
+        - type: object
+          properties:
+            scheduleID:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/scheduleID'
+                - deprecated: true
+                - description: 'ID uniquely identifying a schedul.<br>Deprecated as this was added by mistake'
+        - type: object
+          properties:
+            transportCallID:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/transportCallID'
+        - type: object
+          properties:
+            vesselIMONumber:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/vesselIMONumber'
+        - type: object
+          properties:
+            carrierVoyageNumber:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/carrierVoyageNumber'
+                - deprecated: true
+        - type: object
+          properties:
+            exportVoyageNumber:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/exportVoyageNumber'
+        - type: object
+          properties:
+            carrierServiceCode:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/carrierServiceCode'
+        - type: object
+          properties:
+            UNLocationCode:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/UNLocationCode'
+
+
+    transportSubscriptionBodyWithScheduleID:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/transportSubscriptionBody'
+        - type: object
+          properties:
+            scheduleID:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/scheduleID'
+                - deprecated: true
+                - description: |
+                    ID uniquely identifying a schedul.
+                    
+                    **Deprecated** as this was added by mistake
+
+
+    ################################
+    # Operations Subscription object
+    ################################
+
+
+    operationsSubscriptionBody:
+      type: object
+      allOf:
+        - type: object
+          properties:
+            transportCallID:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/transportCallID'
+        - type: object
+          properties:
+            vesselIMONumber:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/vesselIMONumber'
+        - type: object
+          properties:
+            carrierVoyageNumber:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/carrierVoyageNumber'
+                - deprecated: true
+        - type: object
+          properties:
+            exportVoyageNumber:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/exportVoyageNumber'
+        - type: object
+          properties:
+            carrierServiceCode:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/carrierServiceCode'
+        - type: object
+          properties:
+            operationsEventTypeCode:
+              $ref: '#/components/schemas/operationsEventTypeCodes'
+        - type: object
+          properties:
+            UNLocationCode:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/UNLocationCode'
+
+    documentReferences:
+      type: array
+      description: |
+        An optional list of key-value (`documentReferenceType`-`documentReferenceValue`) pairs representing links to objects relevant to the event. The `documentReferenceType`-field is used to describe where the `documentReferenceValue`-field is pointing to.
+      example:
+        - documentReferenceType: BKG
+          documentReferenceValue: ABC123123123
+        - documentReferenceType: TRD
+          documentReferenceValue: 85943567-eedb-98d3-f4ed-aed697474ed4
+      items:
+        type: object
+        properties:
+          documentReferenceType:
+            type: string
+            description: |
+              Describes where the documentReferenceValue is pointing to:
+              - CBR (Carrier Booking Request Reference)
+              - BKG (Carrier Booking Reference)
+              - SHI (Shipping Instruction Reference)
+              - TRD (Transport Document Reference)
+            example: BKG
+            enum:
+              - CBR
+              - BKG
+              - SHI
+              - TRD
+          documentReferenceValue:
+            type: string
+            description:
+              The value of the identifier the documentReferenceType is describing
+            example: 123e4567-e89b-12d3-a456-426614174000
+
+    transportCall:
+      type: object
+      allOf:
+        - type: object
+          properties:
+            transportCallID:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/transportCallID'
+        - type: object
+          properties:
+            carrierServiceCode:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/carrierServiceCode'
+        - type: object
+          properties:
+            carrierVoyageNumber:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/carrierVoyageNumber'
+                # Extending carrierVoyageNumber attributes
+                - description: |
+                    The vessel operator-specific identifier of the Voyage.
+
+                    In case there are multiple voyages the export voyage is chosen.
+                - deprecated: true
+        - type: object
+          properties:
+            exportVoyageNumber:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/exportVoyageNumber'
+        - type: object
+          properties:
+            importVoyageNumber:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/importVoyageNumber'
+        - type: object
+          properties:
+            transportCallSequenceNumber:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/transportCallSequenceNumber'
+        - type: object
+          properties:
+            UNLocationCode:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/UNLocationCode'
+                # Extending UNLocationCode attributes
+                - deprecated: true
+                - description: |
+                    The UN Location code specifying where the place is located.
+                    
+                    **Deprecated**: Use UN Location Code defined in the location object instead
+        - type: object
+          properties:
+            facilityCode:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/facilityCode'
+                # Extending facilityCode attributes
+                - deprecated: true
+                - description: |
+                    The code used for identifying the specific facility. This code does not include the UN Location Code.
+
+                    **Deprecated**: Use facilityCode defined in the location object instead
+        - type: object
+          properties:
+            facilityCodeListProvider:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/facilityCodeListProvider'
+                # Extending facilityCodeListProvider attributes
+                - deprecated: true
+                - description: |
+                    The provider used for identifying the facility Code
+
+                    **Deprecated**: Use facilityCodeListProvider defined in the location object instead
+        - type: object
+          properties:
+            facilityTypeCode:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/facilityTypeCodeTRN'
+                # Extending facilityCodeListProvider attributes
+                - deprecated: true
+                - description: |
+                    A specialized version of the facilityCode to be used in TransportCalls. The code to identify the specific type of facility.
+
+                    - BOCR (Border crossing)
+                    - CLOC (Customer location)
+                    - COFS (Container freight station)
+                    - COYA (Deprecated - use OFFD intead)
+                    - OFFD (Off dock storage)
+                    - DEPO (Depot)
+                    - INTE (Inland terminal)
+                    - POTE (Port terminal)
+                    - RAMP (Ramp)
+
+                    **Deprecated**: Use facilityTypeCode defined on Event root level instead
+        - type: object
+          properties:
+            otherFacility:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/otherFacility'
+                # Extending the otherFacility attributes
+                - deprecated: true
+                - description: |
+                    An alternative way to capture the facility when no standardized DCSA facility code can be found.
+
+                    **Deprecated**: Use address object defined in the location object instead
+        - type: object
+          properties:
+            modeOfTransport:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/modeOfTransport'
+        - type: object
+          properties:
+            location:
+              anyOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/LOCATION_DOMAIN/2.0.1#/components/schemas/geoLocation'
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/LOCATION_DOMAIN/2.0.1#/components/schemas/facilityLocation'
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/LOCATION_DOMAIN/2.0.1#/components/schemas/unLocationLocation'
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/LOCATION_DOMAIN/2.0.1#/components/schemas/addressLocation'
+        - type: object
+          properties:
+            vessel:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/2.0.1#/components/schemas/vessel'
+      required:
+        - transportCallID
+        - modeOfTransport
+
+    references:
+      type: object
+      properties:
+        references:
+          type: array
+          items:
+            $ref: '#/components/schemas/reference'
+    reference:
+      type: object
+      description: |
+        References provided by the shipper or freight forwarder at the time of booking or at the time of providing shipping instruction. Carriers share it back when providing track and trace event updates, some are also printed on the B/L. Customers can use these references to track shipments in their internal systems.
+        
+        In addition to the References provided by the shipper or freight forwarder - the carrier can provide an extra `referenceType` called `EQ` which is a reference to an Equipment.
+      allOf:
+        - type: object
+          properties:
+            referenceType:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/referenceType'
+        # Extension of the referenceType to also include EQ
+        - type: object
+          properties:
+            referenceType:
+              description: |
+                The reference type codes defined by DCSA.
+                - FF (Freight Forwarder’s Reference)
+                - SI (Shipper’s Reference)
+                - PO (Purchase Order Reference)
+                - CR (Customer’s Reference)
+                - AAO (Consignee’s Reference)
+                - ECR (Empty container release reference)
+                - CSI (Customer shipment ID)
+                - BPR (Booking party reference number)
+                - BID (Booking Request ID)
+                - EQ (Equipment Reference)
+
+                More details can be found on <a href="https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/referencetypes.csv">GitHub</a>.
+              enum:
+                - FF
+                - SI
+                - PO
+                - CR
+                - AAO
+                - ECR
+                - CSI
+                - BPR
+                - BID
+                - EQ
+        - type: object
+          properties:
+            referenceValue:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/referenceValue'
+      required:
+        - referenceType
+        - referenceValue
+        
+
+    ##########################
+    # Simple types
+    ##########################
+
+
+    callbackUrl:
+      type: string
+      format: uri
+      description: |
+        The endPoint where a Carrier whould send back events to the Shipper. The callback can contain query parameters uniquely identifying the originator of the events.
+      example: https://myserver.com/send/callback/here?shipperRef=<shipper defined unique id>
+    changeRemark:
+      description: 'Free text information provided by the vessel operator regarding the reasons for the change in schedule and/or plans to mitigate schedule slippage.'
+      type: string
+      example: Bad weather
+      maxLength: 250
+    documentID:
+      type: string
+      description: |
+        The id of the object defined by the documentTypeCode.
+      example: the-id-of-the-documentTypeCode
+    documentTypeCode:
+      type: string
+      maxLength: 3
+      description: |
+        The code to identify the type of information documentID points to. Can be one of the following values
+        - CBR (Carrier Booking Request Reference)
+        - BKG (Booking)
+        - SHI (Shipping Instruction)
+        - SRM (Shipment Release Message)
+        - TRD (Transport Document)
+        - ARN (Arrival Notice)
+        - VGM (Verified Gross Mass)
+        - CAS (Cargo Survey)
+        - CUS (Customs Inspection)
+        - DGD (Dangerous Goods Declaration)
+        - OOG (Out of Gauge)
+        
+        More details can be found on <a href="https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/documenttypecodes.csv">GitHub</a>
+      example: SHI
+      enum:
+        - CBR
+        - BKG
+        - SHI
+        - SRM
+        - TRD
+        - ARN
+        - VGM
+        - CAS
+        - CUS
+        - DGD
+        - OOG
+    documentTypeCodes:
+      type: array
+      description: |
+        List of documentTypeCode to filter by. If multiple values are selected - the OR-operator will be used.
+
+        Default is none as it will not filter on documentTypeCode if not specified.
+      example: [SHI,TRD]
+      items:
+        $ref: '#/components/schemas/documentTypeCode'
+    equipmentEventTypeCode:
+      type: string
+      description: |
+        Unique identifier for equipmentEventTypeCode.
+        - LOAD (Loaded)
+        - DISC (Discharged)
+        - GTIN (Gated in)
+        - GTOT (Gated out)
+        - STUF (Stuffed)
+        - STRP (Stripped)
+        - PICK (Pick-up)
+        - DROP (Drop-off)
+        - INSP (Inspected)
+        - RSEA (Resealed)
+        - RMVD (Removed)
+        
+        More details can be found on <a href="https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/equipmenteventtypecodes.csv">GitHub</a>
+      enum: 
+        - LOAD
+        - DISC
+        - GTIN
+        - GTOT
+        - STUF
+        - STRP
+        - PICK
+        - DROP
+        - INSP
+        - RSEA
+        - RMVD
+      example: LOAD
+    equipmentEventTypeCodes:
+      type: array
+      description: |
+        List of equipmentEventTypeCode to filter by. If multiple values are selected - the OR-operator will be used.
+
+        Default is none as it will not filter on equipmentEventTypeCode if not specified.
+      example: [GTIN,GTOT]
+      items:
+        $ref: '#/components/schemas/equipmentEventTypeCode'
+    eventClassifierCode:
+      type: string
+      description: |
+        Code for the event classifier. Values can vary depending on eventType
+      #   - PLN (Planned)
+      #   - ACT (Actual)
+      #   - REQ (Requested)
+      #   - EST (Estimated)
+      # enum:
+      #   - PLN
+      #   - ACT
+      #   - REQ
+      #   - EST
+      # example: ACT
+    eventID:
+      type: string
+      format: uuid
+      description: |
+        The unique identifier for the event (the message - not the source).
+        
+        <b>NB</b>&#58; This field should be considered Metadata
+      example: 3cecb101-7a1a-43a4-9d62-e88a131651e2
+    eventCreatedDateTime:
+      type: string
+      format: date-time
+      description: |
+        The timestamp of when the event was created.
+        
+        <b>NB</b>&#58; This field should be considered Metadata
+      example: '2021-01-09T14:12:56+01:00'
+    eventDateTime:
+      type: string
+      format: date-time
+      example: '2019-11-12T07:41:00+08:30'
+      description: The local date and time, where the event took place or when the event will take place, in ISO 8601 format.
+    eventType:
+      type: string
+      description: |
+        The Event Type of the object - to be used as a discriminator.
+
+        <b>NB</b>&#58; This field should be considered Metadata
+      # enum:
+      #   - EQUIPMENT
+      #   - SHIPMENT
+      #   - TRANSPORT
+      #   - OPERATIONS
+    eventTypeCode:
+      type: string
+      example: ARRI
+      maxLength: 4
+      description: |
+        Deprecated - Unique identifier for Event Type Code. This has been replaced by Specialized eventTypeCodes: shipmentEventTypeCode, transportEventTypeCode, equipmentEventTypeCode and opertaionsEventType
+      deprecated: true
+    operationsEventTypeCode:
+      type: string
+      description: |
+        The code to identify the type of event that is related to the operation
+        - STRT (Started)
+        - CMPL (Completed)
+        - ARRI (Arrived)
+        - DEPA (Departed)
+        - OMIT (Omitted)
+        - CANC (Cancelled)
+        
+        More details can be found on <a href="https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/operationseventtypecodes.csv">GitHub</a>
+      enum:
+        - STRT
+        - CMPL
+        - ARRI
+        - DEPA
+        - OMIT
+        - CANC
+      example: STRT
+    operationsEventTypeCodes:
+      type: array
+      description: |
+        List of operationsEventTypeCode to filter by. If multiple values are selected - the OR-operator will be used.
+
+        Default is none as it will not filter on operationsEventTypeCode if not specified.
+      example: [ARRI,CMPL]
+      items:
+        $ref: '#/components/schemas/operationsEventTypeCode'
+    portCallPhaseTypeCode:
+      type: string
+      description: |
+        The general direction of the vessel for which information applies
+        - INBD (Inbound)
+        - ALGS (Alongside)
+        - SHIF (Shifting)
+        - OUTB (Outbound)
+
+        More details can be found on <a href="https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/portcallphasetypecodes.csv">GitHub</a>
+      enum:
+        - INBD
+        - ALGS
+        - SHIF
+        - OUTB
+      example: ALGS
+    portCallServiceTypeCode:
+      type: string
+      description: |
+        The type of the service provided in the port call
+        - PILO (Pilotage)
+        - MOOR (Mooring)
+        - CRGO (Cargo operations)
+        - TOWG (Towage)
+        - BUNK (Bunkering)
+        - LASH (Lashing)
+        - SAFE (Safety)
+        - FAST (All Fast)
+        - GWAY (Gangway down and secure)
+        - ANCO (Anchorage operations)
+        - SLUG (Sludge)
+        - SHPW (Shore Power)
+        - LCRO (Loading cargo operations)
+        - DCRO (Discharge cargo operations)
+        - VRDY (Vessel ready)
+        
+        More details can be found on <a href="https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/portcallservicetypecodes.csv">GitHub</a>
+      enum:
+        - PILO
+        - MOOR
+        - CRGO
+        - TOWG
+        - BUNK
+        - LASH
+        - SAFE
+        - FAST
+        - GWAY
+        - ANCO
+        - SLUG
+        - SHPW
+        - LCRO 
+        - DCRO
+        - VRDY
+      example: BUNK
+    publisherRole:
+      type: string
+      description: |
+        The party function code of the publisher. The values are divided into 4 categories:
+        
+        #### Carrier
+        - CA (Carrier)
+        - AG (Carrier local agent)
+        - VSL (Vessel)
+        
+        #### Port
+        - ATH (Port Authorities)
+        - PLT (Port Pilot)
+        - TWG (Towage service provider)
+        - MOR (Moording service provider)
+        
+        #### Terminal
+        - TR (Terminal)
+        
+        #### Service Provider
+        - LSH (Lashing service provider)
+        - BUK (Bunker service provider)
+        - SLU (Sludge service provider)
+        - SVP (Any other service provider)
+        
+        More details can be found on <a href="https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/publisherrole.csv">GitHub</a>
+      enum:
+        - CA
+        - AG
+        - VSL
+        - ATH
+        - PLT
+        - TWG
+        - MOR
+        - TR
+        - LSH
+        - BUK
+        - SLU
+        - SVP
+      example: TR
+    reason:
+      type: string
+      maxLength: 250
+      description: 'Reason field in a Shipment event. This field can be used to explain why a specific event has been sent.'
+      example: 'The following attributes are missing...'
+    remark:
+      description: |
+        Free text to provide additional information on the context.
+      type: string
+      example: Port closed due to strike
+      maxLength: 500
+    secret:
+      type: string
+      format: byte
+      description: |
+        A Base64 encoded secret shared between the Publisher and the Subscriber.
+        It is used to compute the contents of the Notification-Signature header.
+      example: 'MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDM2NTc4NjIzODk3NDY5MDgyNzM0OTg3MTIzNzg2NA=='
+    shipmentEventTypeCode:
+      type: string
+      description: |
+        The status of the document in the process. Possible values are
+        - RECE (Received)
+        - DRFT (Drafted)
+        - PENA (Pending Approval)
+        - PENU (Pending Update)
+        - PENC (Pending Confirmation)
+        - CONF (Confirmed)
+        - REJE (Rejected)
+        - APPR (Approved)
+        - ISSU (Issued)
+        - SURR (Surrendered)
+        - SUBM (Submitted)
+        - VOID (Void)
+        - REQS (Requested)
+        - CMPL (Completed)
+        - HOLD (On Hold)
+        - RELS (Released)
+        - CANC (Cancelled)
+
+        More details can be found on <a href="https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/shipmenteventtypecodes.csv">GitHub</a>
+      enum:
+        - RECE
+        - DRFT
+        - PENA
+        - PENU
+        - PENC
+        - CONF
+        - REJE
+        - APPR
+        - ISSU
+        - SURR
+        - SUBM
+        - VOID
+        - REQS
+        - CMPL
+        - HOLD
+        - RELS
+        - CANC
+      example: DRFT
+    shipmentEventTypeCodes:
+      type: array
+      description: |
+        List of shipmentEventTypeCode to filter by. If multiple values are selected - the OR-operator will be used.
+
+        Default is none as it will not filter on shipmentEventTypeCode if not specified.
+      example: [RECE,DRFT]
+      items:
+        $ref: '#/components/schemas/shipmentEventTypeCode'
+    # shipmentInformationType:
+    #   type: string
+    #   maxLength: 3
+    #   deprecated: true
+    #   description: |
+    #     The code to identify the type of information documentID points to. Can be one of the following values
+    #     - BOK (Booking - deprecated use BKG instead)
+    #     - BKG (Booking)
+    #     - SHI (Shipping Instruction)
+    #     - VGM (Verified Gross Mass)
+    #     - SRM (Shipment Release Message)
+    #     - TRD (Transport Document)
+    #     - ARN (Arrival Notice)
+        
+    #     <b>Deprecated</b> - use documentTypeCode instead
+    #   example: SHI
+    #   enum:
+    #     - BOK
+    #     - BKG
+    #     - SHI
+    #     - VGM
+    #     - SRM
+    #     - TRD
+    #     - ARN
+    subscriptionID:
+      type: string
+      format: uuid
+      example: 8fbdc2d8-57c8-48b9-a04b-18fd8ec1d809
+      description: 'The carrier issues a unique ID to the shipper or consignee for that subscription'
+    transportDocumentTypeCodes:
+      type: array
+      description: |
+        List of transportDocumentType to filter by. If multiple values are selected - the OR-operator will be used.
+        
+        Default is none as it will not filter on transportDocumentType if not specified.
+      example: [BOL,SWB]
+      items:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/transportDocumentTypeCode'
+    transportEventTypeCode:
+      type: string
+      description: |
+        Identifier for type of Transport event
+        - ARRI (Arrived)
+        - DEPA (Departed)
+        
+        More details can be found on <a href="https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/transporteventtypecodes.csv">GitHub</a>
+      enum:
+        - ARRI
+        - DEPA
+        # - OMIT
+      example: ARRI
+    transportEventTypeCodes:
+      type: array
+      description: |
+        List of transportEventTypeCode to filter by. If multiple values are selected - the OR-operator will be used.
+
+        Default is none as it will not filter on transportEventTypeCode if not specified.
+      example: [ARRI,DEPA]
+      items:
+        $ref: '#/components/schemas/transportEventTypeCode'
+    vesselScheduleChangeRemark:
+      description: |
+        Free text information provided by the vessel operator regarding the reasons for the change in schedule and/or plans to mitigate schedule slippage.
+        
+        Deprecated - use changeRemark instead
+      type: string
+      example: Bad weather
+      maxLength: 250
+      deprecated: true
