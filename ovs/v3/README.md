@@ -3,9 +3,10 @@
 The DCSA OVS API is documented on [**OVS SwaggerHub**](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_OVS).
 
 The primary purpose of this API is to specify endPoints for schedules shared between Vessel Partners. This API primarily defines endPoints and otherwise uses the following Domains:
-- OVS Domain
+- Event Domain
 - Location Domain
 - DCSA Domain
+- Error Domain
 
 <a name="v300B1"></a>[Release v3.0.0 Beta 1 (...)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_OVS/3.0.0-Beta-1)
 ---
