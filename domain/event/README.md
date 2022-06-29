@@ -14,7 +14,7 @@ The APIs for Booking v1.0 Beta 2 and EBL v2.0 Beta 2 both use this version of th
 - `operationsEventTypeCode` updated with `OMIN` (Omitted) and `CANC` (Cancelled)
 - `eventDateTime` description in the `ShipmentEvent` updated
 - `transportCall` has been made mandatory in the `OperationsEvent`
-- `portCallServiceTypeCode` have removed WSDP (Waste dispoal) and added the following values:
+- `portCallServiceTypeCode` have removed `WSDP` (Waste dispoal) and added the following values:
   - ANCO (Anchorage)
   - SLUG (SLudge)
   - SHPW (Shore Power)
