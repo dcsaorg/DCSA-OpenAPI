@@ -4,7 +4,7 @@ The Documentation Domain is documented on [**Documentation Domain**](https://app
 
 This Domain specifies reusable objects for the eDocumentation: [Booking](https://app.swaggerhub.com/apis/dcsaorg/DCSA_BKG) and [Electronic Bill of Lading](https://app.swaggerhub.com/apis/dcsaorg/DCSA_EBL).
 
-<a name="v201"></a>[Release v2.0.1 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN/2.0.1)
+<a name="v201"></a>[Release v2.0.1 (30 June 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN/2.0.1)
 ---
 This version is for `EBL v2.0 Beta 2`
 
