@@ -6,7 +6,7 @@ This Domain specifies common components for DCSA Events. This domain is central 
 
 <a name="v201"></a>[Release v2.0.1 (30 June 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/2.0.1)
 ---
-The APIs for Booking v1.0 Beta 2 and EBL v2.0 Beta 2 both use this version of the Domain
+The APIs for Booking v1.0 Beta 2, EBL v2.0 Beta 2, JIT v1.2 and OVS v3.0 all use this version of the Domain
 
 - Bump [DCSA Domain to version 2.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v201) (was previously 2.0.0)
 - Bump [Documentation Domain to version 2.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v201) (was previously v2.0.0)
@@ -21,7 +21,10 @@ The APIs for Booking v1.0 Beta 2 and EBL v2.0 Beta 2 both use this version of th
   - LCRO (Loading cargo operations)
   - DCRO (Discharge cargo operations)
   - VRDY (Vessel ready)
-- `publisherRole` description updated (upgraded all values to non-'experimental') added MOR (Mooring service provider), SLU (Sludge service provider) and SVP (Any other service Provider)
+- `publisherRole` description updated (upgraded all values to non-'experimental') and added:
+  - `MOR` (Mooring service provider)
+  - `SLU` (Sludge service provider)
+  - `SVP` (Any other service Provider)
 
 <a name="v200"></a>[Release v2.0.0 (06 April 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/2.0.0)
 ---
