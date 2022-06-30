@@ -18,3 +18,4 @@ This version focuses on making a schedule endPoint and detaching [JIT 1.0 and JI
 - Bump [DCSA_Domain to version 2.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v201) (was previously v1.0.3)
 - Bump [Error_Domain to version 1.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/error#v110) (was previously v1.0.0)
 - `/v3/service-schedules` endPoint added. Can be used for `GET`ing (polling) schedules
+- please follow domain links above to get full list of changes
