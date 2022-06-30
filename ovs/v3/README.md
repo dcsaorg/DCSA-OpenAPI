@@ -8,7 +8,7 @@ The primary purpose of this API is to specify endPoints for schedules shared bet
 - DCSA Domain
 - Error Domain
 
-<a name="v300B1"></a>[Release v3.0.0 Beta 1 (20 June 2022)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_OVS/3.0.0-Beta-1)
+<a name="v300B1"></a>[Release v3.0.0 Beta 1 (30 June 2022)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_OVS/3.0.0-Beta-1)
 ---
 This version focuses on making a schedule endPoint and detaching [JIT 1.0 and JIT 1.1 (Just in Time)](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/jit/v1) into a separate API
 
