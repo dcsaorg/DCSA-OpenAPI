@@ -10,16 +10,45 @@ This version is for `EBL v2.0 Beta 2`
 
 - Bump [DCSA_Domain to version 2.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v201) (was previously v2.0.0)
 - Bump [Location_Domain to version 2.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v201) (was previously v2.0.0)
-- `cargoItems` removed as a require field from `utilizedTransportEquipment`
-- `ShippingInstruction` object updated:
-  - `isToOrder` removed - use `transportDocumentTypeCode` `BTO` instead
-- `TransportDocument` object updated:
-  - `receiptTypeAtOrigin`, `deliveryTypeAtDestination`, `cargoMovementTypeAtOrigin`, `cargoMovementTypeAtDestination`, `serviceContractReference`, `termsAndConditions` added as simple fields
-  - `invoicePayableAt` added as a location object supporting the following Location-Interfaces: `addressLocation`, `unLocationLocation` and `facilityLocation`
-  - `issuerCode` and `issuerCodeListProvider` removed as these fields were redundent (a `Party`object using `MS` `PartyFunction` should be used to provide issuer)
-  - `transports` (transport plan) has been added
-  - `shipmentLocations` have been added
-
+- split `bookingShallow`, `booking` and `shipmentSummary` into two so the **core** part can be used in `TransportDocument`
+- `BookingShallow` updated:
+  - `receiptTypeAtOrigin` and `deliveryTypeAtDestination` now linking to update field in DCSA_Domain
+  - `exportVoyageNumber` renamed to `carrierExportVoyageNumber`
+  - `universalExportVoyageNumber` added
+  - `declaredValue` and `declaredValueCurrency` added
+  - `submissionDateTime` removed as field since this is not a shipper controlled value but a carrier controlled one
+  - extends the description of `transportDocumentReference`
+  - `communicationChannelCode` is now a required field
+- `invoicePayableAt` no longer supports `facilityLocation` as a location interface
+- `placeOfBLIssue` in `Booking` and `placeOfIssue` in `ShippingInstruction` now only supports `addressLocation` and `UNLocation` location interfaces and example updated
+- `packageNameOnBL` added to `CargoItem`
+- `carrierBookingReference` description updated on `CargoItem` to better explain requirements when linking to multiple Shipments
+- `weight` and `weightUnit` are now required fields on `CargoItem`
+- `UtilizedTransportEquipment` updated:
+  - `cargoGrossVolume` and `cargoGrossVolumeUnit` added
+  - `numberOfPackages` added
+  - `cargoItems` removed as a require field
+- `DID` (Decentralized Identifier) and `LEI` (Legal Entity Identifier) added to `DCSAResponsibleAgencyCode` (Party identifiers)
+- `shipmentLocation` now only supports `addressLocation`, `facilityLocation` and `UNLocation` location interfaces and example is updated
+- `referenceType` updated with the following values:
+  - `RUC` (Registro Único del Contribuyente), 
+  - `DUE` (Declaração Única de Exportação)
+  - `CER` (Canadian Export Reporting System)
+  - `AES` (Automated Export System)
+- `issuerCode` and `issuerCodeListProvider` renamed to `carrierCode` and `carrierCodeListProvider` and set to required
+- `issuingParty` added to `TransportDocument` and set to required
+- `TransportDocument` updated:
+  - `termsAndConditions` added
+  - includes `BookingCore` fields (example: `recieptType`, `cargoMovement`, `serviceContractReference`, `declaredValue`, etc...)
+  - `transports` (TransportPlan) including `ShipmentLocations`
+  - `invoicePayableAt` added as a location object supporting the following Location-Interfaces: `addressLocation` and `unLocationLocation`
+- `transports` (TransportPlan) updated:
+  - `loadLocation` now supports `addressLocation`, `unLocationLocation` and `facilityLocation` location interfaces and example updated
+  - `dischargeLocation` now supports `addressLocation`, `unLocationLocation` and `facilityLocation` location interfaces and example updated
+  - `importVoyageNumber` renamed to `carrierImportVoyageNumber`
+  - `exportVoyageNumber` renamed to `carrierExportVoyageNumber`
+  - `universalImportVoyageReference` and `universalExportVoyageReference` added
+  
 <a name="v200"></a>[Release v2.0.0 (5 April 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN/2.0.0)
 ---
 This version has been released together with the APIs for `Booking v1.0 Beta 1` and `EBL v2.0 Beta 1`
