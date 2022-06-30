@@ -6,15 +6,15 @@ Publications related to this specification can be found on the DCSA website:
 - [Booking 1.0 Beta](https://knowledge.dcsa.org/s/publication?publicationId=a0r7T000000L8mmQAC)
 - [Glossary of Terms](https://knowledge.dcsa.org/s/glossary)
 
-<a name="v100B2"></a>[Release v1.0.0 Beta 2 (...)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/1.0.0-Beta-2)
+<a name="v100B2"></a>[Release v1.0.0 Beta 2 (1 July 2022)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/1.0.0-Beta-2)
 ---
 Beta 2 release of the DCSA OpenAPI definitions for Booking 1.0.0. This release fixes missing elements from Beta 1
 
 - Bump [Documentation_Domain to version 2.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v201) (was previously v2.0.0)
 - Bump [DCSA_Domain to version 2.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v201) (was previously v2.0.0)
 - Bump [Event_Domain to version 2.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#v201) (was previously v2.0.0)
-- Referenced domains above should be consulted to see exact updates. A list of major changes for the API are listed below
-  - `EGI` (Earliest Possible Gate In) added as Enum type on ShipmentCutOffTimes
+- API description updated
+- Referenced domains above should be consulted to see exact updates.
 
 <a name="v100B1"></a>[Release v1.0.0 Beta 1 (06 April 2022)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/1.0.0-Beta-1)
 ---
