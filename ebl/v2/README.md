@@ -6,7 +6,7 @@ Publications related to this specification can be found on the DCSA website:
 - [Electronic Bill of Lading 2.0 Beta](https://knowledge.dcsa.org/s/publication?publicationId=a0r7T000000L8lPQAS)
 - [Glossary of Terms](https://knowledge.dcsa.org/s/glossary)
 
-<a name="v200B2"></a>[Release v2.0.0 Beta 2 (...)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/2.0.0-Beta-2)
+<a name="v200B2"></a>[Release v2.0.0 Beta 2 (1 July 2022)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/2.0.0-Beta-2)
 ---
 Beta 2 release of the DCSA OpenAPI definitions for Bill of Lading 2.0.0. This release fixes missing elements from Beta 1
 
