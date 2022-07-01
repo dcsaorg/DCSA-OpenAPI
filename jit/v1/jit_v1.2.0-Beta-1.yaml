@@ -1,0 +1,154 @@
+openapi: 3.0.3
+info:
+  version: 1.2.0-Beta-1
+  title: |
+    DCSA OpenAPI specification for Just in Time Portcalls
+  description: |
+    API specification issued by DCSA.org
+    
+    This API supports <b>JIT</b> v1.2 (Just in Time Portcalls). JIT is used for negotiating timestamps between vessel and port/terminal. To create a new timestamp the `POST /v1/timestamps` endPoint is to be used.
+
+    For explanation to specific values or objects please refer to the [Information Model 2022.2 - **to be updated in July**]
+
+    It is possible to use this API as a standalone API. In order to do so it is necessary to use the poll-endPoint `GET /v1/events` in order to poll event information.
+
+    It is recomended to implement the <a href='https://app.swaggerhub.com/apis/dcsaorg/JIT_EVENT_HUB/1.1.0'>DCSA Just in Time Portcalls (JIT) Event Hub v1.1.x</a> in order to use the push model. Here events are pushed as they occur.
+    
+    For a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/jit/v1#v120B1). Please also [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  contact:
+    name: Digital Container Shipping Association (DCSA)
+    url: https://dcsa.org
+    email: info@dcsa.org
+tags:
+  - name: Just in Time Portcall
+    description: Just in Time Portcall operations
+  - name: Events
+paths:
+  /v1/timestamps:
+    post:
+      parameters:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/parameters/Api-Version-Major'
+      tags:
+        - Just in Time Portcall
+      summary: Post a new timestamp
+      description: |
+        a timestamp object provides the date-time when a specific event is expected, requested or planned to occur or has occured
+      requestBody:
+        description: The new Timestamp
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/OVS_DOMAIN/1.2.0#/components/schemas/timestamp'
+      responses:
+        '204':
+          description: Timestamp successfully posted
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/headers/API-Version'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.0.0#/components/schemas/error'
+
+
+  /v1/events:
+    get:
+      tags:
+        - Events
+      summary: Get Operations events
+      description: |
+        Retrieves Operations events. The default sort order is by eventCreatedDateTime in descending order (`DESC`)
+        
+        It is possible to combine queryParameters. When combing queryParameters the logical <b>AND</b> is used between them. The response list must fulfill <b>all</b> queryParameters. An example of this is when the following queryParameters are used&#58;
+        
+        `eventCreatedDateTime:gte=2021-04-01T14:12:56+01:00` and `vesselIMONumber=9321484`
+        
+        then all events in the response list returned must be connected to vesselIMONumber `9321484` <b>AND</b> have an eventCreatedDateTime &#8805; `2021-04-01T14:12:56+01:00`
+        
+        <b>NB</b>&#58; When combining queryParameters be aware that it is also possible to make combinations that are mutual contradicting! An example of this could be when the following queryParameters are used:
+        
+        `vesselIMONumber=9321484` and `carrierServiceCode=FE1`
+        
+        if there are no Vessels with IMO number `9321484` on Carrier Service Code `FE1`. If this is the case then this response <b>will return an empty list<b>!
+      parameters:
+        # Chunk for TransportCall (used in Operation Events)
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/2.0.1#/components/parameters/transportCallID'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/2.0.1#/components/parameters/vesselIMONumber'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/2.0.1#/components/parameters/carrierVoyageNumber'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/2.0.1#/components/parameters/exportVoyageNumber'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/2.0.1#/components/parameters/carrierServiceCode'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/2.0.1#/components/parameters/UNLocationCode'
+
+        # Chunk with Operations related event parameters
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/2.0.1#/components/parameters/operationsEventTypeCode'
+
+        # Chunk with base event parameters
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/2.0.1#/components/parameters/eventCreatedDateTime'
+        # Chunk with Global related event parameters
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/parameters/limit'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/parameters/cursor'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/parameters/sort'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/parameters/Api-Version-Major'
+      responses:
+        '200':
+          description: Successful operation
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/headers/API-Version'
+            Current-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/headers/Current-Page'
+            Next-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/headers/Next-Page'
+            Prev-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/headers/Prev-Page'
+            Last-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/headers/Last-Page'
+            First-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/headers/First-Page'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/2.0.1#/components/schemas/operationsEvent'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.0.0#/components/schemas/error'
+
+
+components:
+  parameters: 
+                  
+    ##############
+    # Query params
+    ##############
+
+    startDate:  
+      in: query
+      name: startDate
+      description: The start date of the period for which schedule information is requested. The value is populated in ISO 8601 Date format. If not provided, the current date is used by default.
+      required: false
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/startDate'
+    dateRange:  
+      in: query
+      name: dateRange
+      description: The time period for which schedule information is sent. The duration is populated in ISO 8601 Duration format.
+      required: false
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/dateRange'
