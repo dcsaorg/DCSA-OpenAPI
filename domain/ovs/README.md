@@ -6,10 +6,10 @@ The primary purpose of this Domain is to specify components to be used in the OV
 
 <a name="v120"></a>[Release v1.2.0 (5 July 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/OVS_DOMAIN/1.2.0)
 ---
-- Bump [DCSA_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#v103)
-- Bump [Event_Domain to version 1.1.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#v111)
-- Bump [Documentation_Domain to version 1.0.4](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v104)
-- Bump [Location_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v103)
+- Bump [DCSA_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#v103) (was previously v1.0.3)
+- Bump [Event_Domain to version 1.1.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#v111) (was previously v1.1.1)
+- Bump [Documentation_Domain to version 1.0.4](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v104) (was previously v1.0.4)
+- Bump [Location_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v103) (was previously v1.0.3)
 
 <a name="v103"></a>[Release v1.0.3 (16 November 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/OVS_DOMAIN/1.0.3)
 ---
