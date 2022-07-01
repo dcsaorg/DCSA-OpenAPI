@@ -8,7 +8,7 @@ This is a minor release adding a lot of extra timestamps
 ---
 - Bump [Event_Domain to version 2.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#v201) (was previously v1.1.1)
 - Bump [DCSA_Domain to version 2.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v103) (was previously v1.0.3)
-- Bump [OVS_Domain to version 1.2.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/ovs#v103) (was previously v1.0.3)
+- Bump [OVS_Domain to version 1.2.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/ovs#v120) (was previously v1.0.3)
 - API description updated
 - check domain links above to see what has also changed in this version - some if the items include:
   - `OMIT` and `CANC` added to `OperationsEventTypeCode`
