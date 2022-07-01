@@ -4,6 +4,13 @@ The OVS Domain is documented on [**OVS_DOMAIN**](https://app.swaggerhub.com/doma
 
 The primary purpose of this Domain is to specify components to be used in the OVS (Operational Vessel Schedules) and JIT (Just in Time Port Calls) APIs.
 
+<a name="v120"></a>[Release v1.2.0 (5 July 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/OVS_DOMAIN/1.2.0)
+---
+- Bump [DCSA_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#v103)
+- Bump [Event_Domain to version 1.1.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#v111)
+- Bump [Documentation_Domain to version 1.0.4](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v104)
+- Bump [Location_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v103)
+
 <a name="v103"></a>[Release v1.0.3 (16 November 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/OVS_DOMAIN/1.0.3)
 ---
 - Bump [DCSA_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#v103)
