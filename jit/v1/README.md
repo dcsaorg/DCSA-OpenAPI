@@ -2,7 +2,7 @@
 
 The DCSA Interface Standard for Just in Time Portcalls is documented on the **[DCSA JIT](https://app.swaggerhub.com/apis/dcsaorg/DCSA_JIT) SwaggerHub**.
 
-<a name="v120B1"></a>[Release v1.2.0 Beta 1 (5 July 2022)](https://app.swaggerhub.com/apis/dcsaorg/DCSA_JIT/1.2.0-Beta-1)
+<a name="v120B1"></a>[Release v1.2.0 Beta 1 (5 July 2022)]https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_JIT/1.2.0-Beta-1)
 ---
 This is a minor release adding a lot of extra timestamps
 
@@ -23,7 +23,7 @@ This is a minor release adding a lot of extra timestamps
   - `ANCH` added to `facilityTypeCode`
   - `transportCall` now required in the `OperationsEvent`
   
-<a name="v110"></a>[Release v1.1.0 (16 November 2021)](https://app.swaggerhub.com/apis/dcsaorg/DCSA_JIT/1.1.0)
+<a name="v110"></a>[Release v1.1.0 (16 November 2021)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_JIT/1.1.0)
 ---
 - Description updated
 - Bump [Event_Domain to version 1.1.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#v111)
@@ -44,7 +44,7 @@ This is a minor release adding a lot of extra timestamps
   - `export`- and `importVoyageNumber` added to `transportCall` - `carrierVoyageNumber` is now deprecated
   - `portCallPhaseTypeCode` added as an optional field to both `Timestamp` and to `OperationsEvent`
 
-<a name="v100"></a>[Release v1.0.0 (16 November 2021)](https://app.swaggerhub.com/apis/dcsaorg/DCSA_JIT/1.0.0)
+<a name="v100"></a>[Release v1.0.0 (16 November 2021)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_JIT/1.0.0)
 ---
 Initial release after splitting OVS and JIT.
 
