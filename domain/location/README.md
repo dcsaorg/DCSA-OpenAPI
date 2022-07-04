@@ -4,7 +4,7 @@ The Location Domain is documented on [**Location Domain SwaggerHub**](https://ap
 
 The primary purpose of this Domain is to specify common components related to a location.
 
-<a name="v202"></a>[Release v2.0.1 (30 June 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/LOCATION_DOMAIN/2.0.2)
+<a name="v202"></a>[Release v2.0.1 (5 July 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/LOCATION_DOMAIN/2.0.2)
 ---
 Bump DCSA_Domain reference
 
