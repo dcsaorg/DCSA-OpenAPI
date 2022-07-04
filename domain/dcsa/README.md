@@ -8,7 +8,7 @@ The primary purpose of this Domain is to specify common components to be reused 
 ---
 Minor fix
 
-- `VesselDraft` example updated to be more realistic
+- `VesselDraft` description and example updated to be more realistic
 
 <a name="v201"></a>[Release v2.0.1 (30 June 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/DCSA_DOMAIN/2.0.1)
 ---
