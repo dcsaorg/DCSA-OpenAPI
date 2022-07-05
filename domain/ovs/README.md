@@ -6,10 +6,37 @@ The primary purpose of this Domain is to specify components to be used in the OV
 
 <a name="v120"></a>[Release v1.2.0 (5 July 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/OVS_DOMAIN/1.2.0)
 ---
-- Bump [DCSA_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#v103) (was previously v1.0.3)
-- Bump [Event_Domain to version 1.1.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#v111) (was previously v1.1.1)
-- Bump [Documentation_Domain to version 1.0.4](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v104) (was previously v1.0.4)
-- Bump [Location_Domain to version 1.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v103) (was previously v1.0.3)
+Because of historical reasons this Domain is still called OVS - even though it is currently only linked to JIT
+
+- Bump [DCSA_Domain to version 2.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#v202) (was previously v1.0.3)
+- Bump [Event_Domain to version 2.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#v202) (was previously v1.1.1)
+- Bump [ to version 1.0.4](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v104) (was previously v1.0.4)
+- Bump [Location_Domain to version 2.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v202) (was previously v1.0.3)
+- Documentation_Domain not bumped as the `Party` object needs to be the same
+- `publisherRole` example updated to use `CA` (Carrier)
+- `vesselIMONumber` has been deprecated on the timestamp - `vesselIMONumber` in the `vessel` object should be used instead
+- a `vessel` object has been added to the timestamp with the following fields:
+  - `vesselIMONumber` as a mandatory field
+  - `name`
+  - `lengthOverall`
+  - `width`
+  - `callSign`
+  - `type` being one of the following values (`GCGO`, `CONT`, `RORO`, `CARC`, `PASS`, `FERY`, `BULK`, `TANK`, `LGTK`, `ASSI` or `PILO`)
+  - `draft`
+  - `dimensionUnit`
+- `importVoyageNumber` and `exportVoyageNumber` have both been deprecated, `carrierImportVoyageNumber` and `carrierExportVoyageNumber` should be used instead
+- `portVisitReference` added
+- `vesselPosition` now uses the geo-location-interface and example updated
+- `UNLocationCode` description and exampe updated
+- `facilityCodeType` description updated
+- `eventLocation` now used the location-interfaces (all of them in order to be backward compatible) and the example is updated
+- `milesToDestinationPort` added and example set to **0** miles in order to make sense in the timestamp example presented
+- `eventClassifierCode` description updated
+- `operationsEventTypeCode` updated with `OMIT` (Omitted) and `CANC` (Cancelled) and the description has been updated
+- `modeOfTransport` is now deprecated
+- `portCallPhaseTypeCode` description updated
+- `portCallServiceTypeCode` description updated
+- `delayReasonCode` example updated to fit `reason`-example
 
 <a name="v103"></a>[Release v1.0.3 (16 November 2021)](https://app.swaggerhub.com/domains-docs/dcsaorg/OVS_DOMAIN/1.0.3)
 ---
