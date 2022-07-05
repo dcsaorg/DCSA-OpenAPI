@@ -4,6 +4,16 @@ The Event Domain is documented on [**EVENT_DOMAIN**](https://app.swaggerhub.com/
 
 This Domain specifies common components for DCSA Events. This domain is central for all Event Hubs.
 
+<a name="v202"></a>[Release v2.0.2 (5 July 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/2.0.2)
+---
+Bump domains and add `MilesToDestinationPort` and `vesselDraft` to the `OperationsEvent`
+
+- Bump [DCSA Domain to version 2.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v202) (was previously 2.0.1)
+- Bump [Documentation Domain to version 2.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v202) (was previously v2.0.1)
+- Bump [Location Domain to version 2.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v202) (was previously 2.0.1)
+- Add `milesToDestinationPort` to `operationsEvent`
+- Add `vesselDraft` to `operationsEvent`
+
 <a name="v201"></a>[Release v2.0.1 (30 June 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/2.0.1)
 ---
 The APIs for Booking v1.0 Beta 2, EBL v2.0 Beta 2, JIT v1.2 and OVS v3.0 all use this version of the Domain
