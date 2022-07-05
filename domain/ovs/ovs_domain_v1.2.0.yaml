@@ -1,0 +1,345 @@
+# OpenAPI version identifier - required for OpenAPI 3.0 domains
+openapi: 3.0.3
+
+#######################
+# Optional info section
+#######################
+info:
+  title: DCSA - Operational Vessel Schedules (OVS) Components
+  description: |
+    Common components for DCSA APIs. This domain is used by
+    - Just in Time Portcalls API ([JIT](https://app.swaggerhub.com/apis/dcsaorg/DCSA_JIT))
+
+    For a history of changes in this domain - please check [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/ovs#v120). Please also [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments.
+  version: 1.2.0
+
+components:
+  schemas:
+    timestamp:
+      description: |
+        A digital record of the time of occurrence of an Operations event
+      type: object
+      allOf:
+        - type: object
+          properties:
+            publisher:
+              # Refer to new Party object where CodeListName is included
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/1.0.4#/components/schemas/partyNoID'
+        - type: object
+          properties:
+            publisherRole:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/2.0.2#/components/schemas/publisherRole'
+                - example: CA
+        - type: object
+          properties:
+            vesselIMONumber:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.2#/components/schemas/vesselIMONumber'
+                # extended to deprecate the field and modify the description
+                - description: |
+                    The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd's register code, which does not change during the lifetime of the vessel
+                    
+                    <b>NB:</b> vesselIMONumber is deprecated at the top level - vesselIMONumber needs to also be provided inside the vessel object.
+                - deprecated: true
+        - type: object
+          properties:
+            vessel:
+              allOf:
+                - $ref: '#/components/schemas/vessel'
+        - type: object
+          properties:
+            carrierServiceCode:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.2#/components/schemas/carrierServiceCode'
+        - type: object
+          properties:
+            importVoyageNumber:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.2#/components/schemas/importVoyageNumber'
+                # extends to deprecate the field and modify the description
+                - description: |
+                    The identifier of an import voyage. The vessel operator-specific identifier of the import Voyage.
+                    
+                    **NB:** the importVoyageNumber is deprecated. Use `carrierImportVoyageNumber`.
+                - deprecated: true
+        - type: object
+          properties:
+            exportVoyageNumber:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.2#/components/schemas/exportVoyageNumber'
+                # extends to deprecate the field and modify the description
+                - description: |
+                    The identifier of an export voyage. The vessel operator-specific identifier of the export Voyage.
+                  
+                    **NB:** the exportVoyageNumber is deprecated use `carrierExportVoyageNumber`.
+                - deprecated: true
+        - type: object
+          properties:
+            carrierImportVoyageNumber:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.2#/components/schemas/carrierImportVoyageNumber'
+        - type: object
+          properties:
+            carrierExportVoyageNumber:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.2#/components/schemas/carrierExportVoyageNumber'
+        - type: object
+          properties:
+            portVisitReference:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.2#/components/schemas/portVisitReference'
+        - type: object
+          properties:
+            transportCallSequenceNumber:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.2#/components/schemas/transportCallSequenceNumber'
+        - type: object
+          properties:
+            vesselPosition:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/LOCATION_DOMAIN/2.0.2#/components/schemas/geoLocation'
+                - example:
+                    locationName: 'Port of Amsterdam'
+                    latitude: '52.4120'
+                    longitude: '4.8079'                
+        - type: object
+          properties:
+            UNLocationCode:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.2#/components/schemas/UNLocationCode'
+                # extends to modify the description
+                - description: |
+                    The **UN Location Code** specifying where the Facility is located.
+                - example: NLAMS
+        - type: object
+          properties:
+            facilitySMDGCode:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.2#/components/schemas/facilityCode'
+        # facilitySMDGCode repeated in order to "modify" the description of facilitySMDGCode to also include the word "SMDG"...
+        - type: object
+          properties:
+            facilitySMDGCode:
+              allOf:
+                - description: |
+                    The SMDG code used for identifying the specific facility. This code does not include the UN Location Code.
+                    
+                    <b>NB:</b> facilitySMDGCode is deprecated - facilityCode together with facilityCodeListProvider in the eventLocation object should be used instead.
+                - deprecated: true
+        - type: object
+          properties:
+            facilityTypeCode:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.2#/components/schemas/facilityTypeCodeOPR'
+                - description: |
+                    A specialized version of the facilityCode to be used in Operations events. The code to identify the specific type of facility.
+
+                    - PBPL (Pilot boarding place)
+                    - BRTH (Berth)
+                    - ANCH (Anchorage)
+                    
+                    More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/facilitytypes.csv).
+                    
+                    **NB:** This is a conditional field and is connected to `portCallServiceTypeCode`. Please check the IFS for allowed combinations.
+        - type: object
+          properties:
+            eventLocation:
+              anyOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/LOCATION_DOMAIN/2.0.2#/components/schemas/unLocationLocation'
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/LOCATION_DOMAIN/2.0.2#/components/schemas/facilitySMDGLocation'
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/LOCATION_DOMAIN/2.0.2#/components/schemas/geoLocation'
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/LOCATION_DOMAIN/2.0.2#/components/schemas/addressLocation'
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/LOCATION_DOMAIN/2.0.2#/components/schemas/facilityLocation'
+        # Extended version of location in order to modify description and example
+        - type: object
+          properties:
+            eventLocation:
+              description: |
+                General purpose object to capture the location in the `timestamp`. The location can be specified in **any** of the following ways: `UN Location Code`, `FacilitySMDG` or `Geo Location`. In addition to the above `Address` and `Facility` should only be used when the terminal/location cannot be expressed using a **SMDG** code but needs an **Address** or **BIC** code
+              example:
+                locationName: "Amsterdam Container Terminal"
+                UNLocationCode: "NLAMS"
+                facilityCode: "ACT"
+                facilityCodeListProvider: "SMDG"
+        - type: object
+          properties:
+            milesToDestinationPort:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/2.0.2#/components/schemas/milesToDestinationPort'
+                - example: 0
+        - type: object
+          properties:
+            eventClassifierCode:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/2.0.2#/components/schemas/eventClassifierCode'
+                - description: |
+                    Code for the event classifier.
+
+                    - PLN (Planned)
+                    - ACT (Actual)
+                    - REQ (Requested)
+                    - EST (Estimated)
+                    
+                    More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/eventclassifiercodes.csv).
+                    
+                    **NB:** This is a conditional field and must match timestamps defined in the IFS
+                - enum:
+                  - PLN
+                  - ACT
+                  - REQ
+                  - EST
+                - example: ACT
+        - type: object
+          properties:
+            operationsEventTypeCode:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/2.0.2#/components/schemas/operationsEventTypeCode'
+                - description: |
+                    The code to identify the type of event that is related to the operation
+                    - STRT (Started)
+                    - CMPL (Completed)
+                    - ARRI (Arrived)
+                    - DEPA (Departed)
+                    - OMIT (Omitted)
+                    - CANC (Cancelled)
+                    
+                    More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/operationseventtypecodes.csv).
+                    
+                    **NB:** This is a conditional field and has to be aligned with other fields such as `portCallServiceTypeCode`. One such example is if `portCallServiceTypeCode` is **not** null then `operationsEventTypeCode` **should** be either: STRT (Started), COMP (Completed) or CANC (Cancelled). If `portCallServiceTypeCode` **is** null then `operationsEventTypeCode` is one of: ARRI (Arrived), DEPA (Departed) or OMIT (Omitted). Please check the IFS for allowed combinations.
+        - type: object
+          properties:
+            modeOfTransport:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.2#/components/schemas/modeOfTransport'
+                - description: |
+                    **NB:** this field is marked deprecated since the standard is only defined for `VESSEL` and therefore redundant.
+                    
+                    JIT 1.0 and JIT 1.1 timestamps have used this field to differentiate timestamps. Since JIT 1.2 this is no longer needed except for 1 pair of JIT 1.1 timestamps that JIT 1.2 still needs for the sake of backward compatability. These timestamps have the portCallServiceTypeCode set to SAFE.
+                - deprecated: true
+        - type: object
+          properties:
+            portCallPhaseTypeCode:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/2.0.2#/components/schemas/portCallPhaseTypeCode'
+                - description: |
+                    The general direction of the vessel for which information applies
+                    - INBD (Inbound)
+                    - ALGS (Alongside)
+                    - SHIF (Shifting)
+                    - OUTB (Outbound)
+            
+                    More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/portcallphasetypecodes.csv).
+                    
+                    **NB:** This is a conditional field and must match timestamps according to the IFS. Please be aware that JIT 1.0 does not know about this field. Server implementations are expected to map this to a valid timestamp. If `portCallServiceTypeCode` is `PILO` (Pilotage) and `portCallPhaseTypeCode` is Null then `portCallPhaseTypeCode` can be set to `INBD` (Inbound).
+        - type: object
+          properties:
+            portCallServiceTypeCode:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/2.0.2#/components/schemas/portCallServiceTypeCode'
+                - description: |
+                    The type of the service provided in the port call
+                    - PILO (Pilotage)
+                    - MOOR (Mooring)
+                    - CRGO (Cargo operations)
+                    - TOWG (Towage)
+                    - BUNK (Bunkering)
+                    - LASH (Lashing)
+                    - SAFE (Safety)
+                    - FAST (All Fast)
+                    - GWAY (Gangway down and secure)
+                    - ANCO (Anchorage operations)
+                    - SLUG (Sludge)
+                    - SHPW (Shore Power)
+                    - LCRO (Loading cargo operations)
+                    - DCRO (Discharge cargo operations)
+                    - VRDY (Vessel ready)
+                    
+                    More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/portcallservicetypecodes.csv).
+
+                    **NB:** This is a conditional field and must match timestamps defined in the IFS
+        - type: object
+          properties:
+            eventDateTime:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/2.0.2#/components/schemas/eventDateTime'
+        - type: object
+          properties:
+            carrierVoyageNumber:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.2#/components/schemas/carrierVoyageNumber'
+                - deprecated: true
+                - description: |
+                    The vessel operator-specific identifier of the Voyage.
+                    
+                    **Deprecated:** Use `carrierExportVoyageNumber` and/or `carrierImportVoyageNumber` instead
+        - type: object
+          properties:
+            delayReasonCode:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.2#/components/schemas/delayReasonCode'
+                - example: 'STR'
+        - type: object
+          properties:
+            remark:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/2.0.2#/components/schemas/remark'
+      required:
+        - publisher
+        - publisherRole
+        - vesselIMONumber
+        - UNLocationCode
+        - eventClassifierCode
+        - operationsEventTypeCode
+        - eventDateTime
+        - carrierVoyageNumber
+        - carrierServiceCode
+
+    vessel:
+      description: |
+        A floating, sea going structure (mother vessels and feeder vessels) with either an internal or external mode of propulsion designed for the transport of cargo and/or passengers. Ocean vessels are uniquely identified by an IMO number consisting of 7 digits.
+      type: object
+      allOf:
+        - type: object
+          properties:
+            vesselIMONumber:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.2#/components/schemas/vesselIMONumber'
+        - type: object
+          properties:
+            name:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.2#/components/schemas/vesselName'
+        - type: object
+          properties:
+            lengthOverall:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.2#/components/schemas/vesselLOA'
+        - type: object
+          properties:
+            width:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.2#/components/schemas/vesselWidth'
+        - type: object
+          properties:
+            callSign:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.2#/components/schemas/vesselCallSign'
+        - type: object
+          properties:
+            type:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.2#/components/schemas/vesselType'
+        - type: object
+          properties:
+            draft:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.2#/components/schemas/vesselDraft'
+        - type: object
+          properties:
+            dimensionUnit:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.2#/components/schemas/dimensionUnit'
+      required:
+        - vesselIMONumber
