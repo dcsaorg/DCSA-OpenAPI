@@ -12,7 +12,13 @@ Bump domains and add `MilesToDestinationPort` and `vesselDraft` to the `Operatio
 - Bump [Documentation Domain to version 2.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v202) (was previously v2.0.1)
 - Bump [Location Domain to version 2.0.2](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v202) (was previously 2.0.1)
 - Add `milesToDestinationPort` to `operationsEvent`
-- Add `vesselDraft` to `operationsEvent`
+- Add `vesselDraft` and `vesselDraftUnit` to `operationsEvent`
+- `TransportCall` object has the following changes:
+  - `transportCallID` marked as deprecated - use `transportCallReference` instead
+  - `portVisitReference` added
+  - `importVoyageNumber` and `exportVoyageNumber` both deprecated and `carrierImportVoyageNumber` and `carrierExportVoyageNumber` added
+  - `universalImportVoyageReference` and `universalExportVoyageReference` added
+  - Type fixed: Moording --> Mooring
 
 <a name="v201"></a>[Release v2.0.1 (30 June 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/2.0.1)
 ---
