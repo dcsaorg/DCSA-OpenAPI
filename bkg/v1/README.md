@@ -14,7 +14,16 @@ Beta 2 release of the DCSA OpenAPI definitions for Booking 1.0.0. This release f
 - Bump [DCSA_Domain to version 2.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v201) (was previously v2.0.0)
 - Bump [Event_Domain to version 2.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#v201) (was previously v2.0.0)
 - API description updated
-- Referenced domains above should be consulted to see exact updates.
+- Referenced domains above should be consulted to see exact updates - some if the items include
+  - `carrierExportVoyageNumber` replaced `exportVoyageNumber`
+  - `universalExportVoyageReference` added
+  - rearranged internal objects in order to be reused as part of EBL process
+  - `declaredValue` and `declaredValueCurrency` added
+  - all locations modified to use location-interfaces
+  - `volumeUnits` changed from using internal `CBM` and `CFT` to use UNECE `FTQ` and `MTQ`
+  - extra `referenceTypes` added: `RUC`, `DUE`, `CER` and `AES`
+  - `DID` and `LEI` added as ìdentifyingCodes` in the `Party` object
+  - TransportPlan updated with `carrierImportVoyageNumber`, `carrierExportVoyageNumber`, `universalImportVoyageNumber` and `universalExportVoyageNumber`
 
 <a name="v100B1"></a>[Release v1.0.0 Beta 1 (06 April 2022)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/1.0.0-Beta-1)
 ---
