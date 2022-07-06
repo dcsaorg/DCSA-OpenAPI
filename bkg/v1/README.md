@@ -22,7 +22,7 @@ Beta 2 release of the DCSA OpenAPI definitions for Booking 1.0.0. This release f
   - all locations modified to use location-interfaces
   - `volumeUnits` changed from using internal `CBM` and `CFT` to use UNECE `FTQ` and `MTQ`
   - extra `referenceTypes` added: `RUC`, `DUE`, `CER` and `AES`
-  - `DID` and `LEI` added as ìdentifyingCodes` in the `Party` object
+  - `DID` and `LEI` added as `identifyingCodes` in the `Party` object
   - TransportPlan updated with `carrierImportVoyageNumber`, `carrierExportVoyageNumber`, `universalImportVoyageNumber` and `universalExportVoyageNumber`
 
 <a name="v100B1"></a>[Release v1.0.0 Beta 1 (06 April 2022)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/1.0.0-Beta-1)
