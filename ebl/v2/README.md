@@ -24,19 +24,8 @@ Beta 2 release of the DCSA OpenAPI definitions for Bill of Lading 2.0.0. This re
   - `DID` and `LEI` added as `identifyingCodes` in the `Party` object
   - `issuerCode` and `issierCodeListProvider` changed to `carrierCode` and `carrierCodeListProvider`
   - `issuingParty` added to `transportDocument`
-  - `declaredValue` and `declaredValueCurrency` removed from `transportDocument`
   - TransportPlan updated with `carrierImportVoyageNumber`, `carrierExportVoyageNumber`, `universalImportVoyageNumber` and `universalExportVoyageNumber`
-  - `transportDocument` updated with `booking` values
-    - `termsAndConditions`
-    - `recieptTypeAtOrigin`
-    - `deliveryTypeAtDestination`
-    - `cargoMovementTypeAtOrigin`
-    - `cargoMovementTypeAtDestination`
-    - `serviceContractReference`
-    - `carrierExportVoyageNumber`
-    - `universalExportVoyageReference`
-    - `vesselName`
-    - `declaredValue` and `declaredValueCurrency`
+  - `transportDocument` updated with `booking` values: `termsAndConditions`, `recieptTypeAtOrigin`, `deliveryTypeAtDestination`, `cargoMovementTypeAtOrigin`, `cargoMovementTypeAtDestination`, `serviceContractReference`, `carrierExportVoyageNumber`, `universalExportVoyageReference`, `vesselName`, `declaredValue` and `declaredValueCurrency`
   - `transports` (TransportPlan) added to the `transportDocument`
   - `shipmentLocations` added to the `transportDocument`
 
