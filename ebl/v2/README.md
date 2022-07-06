@@ -14,7 +14,31 @@ Beta 2 release of the DCSA OpenAPI definitions for Bill of Lading 2.0.0. This re
 - Bump [DCSA_Domain to version 2.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v201) (was previously v2.0.0)
 - Bump [Event_Domain to version 2.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#v201) (was previously v2.0.0)
 - API description updated
-- Referenced domains above should be consulted to see exact updates.
+- Referenced domains above should be consulted to see exact updates - some if the items include
+  - locations are now represented using location-interfaces
+  - `consignmentItem` now has `weight` and `weightUnit` as required fields
+  - `volumeUnits` changed from using internal `CBM` and `CFT` to use UNECE `FTQ` and `MTQ`
+  - `packageNameOnBL` added to `cargoItem`
+  - extra `referenceTypes` added: `RUC`, `DUE`, `CER` and `AES`
+  - `cargoGrossVolume`, `cargoGrossVolumeUnit` and `numberOfPackages` added to `utilizedTransportEquipment`
+  - `DID` and `LEI` added as `identifyingCodes` in the `Party` object
+  - `issuerCode` and `issierCodeListProvider` changed to `carrierCode` and `carrierCodeListProvider`
+  - `issuingParty` added to `transportDocument`
+  - `declaredValue` and `declaredValueCurrency` removed from `transportDocument`
+  - TransportPlan updated with `carrierImportVoyageNumber`, `carrierExportVoyageNumber`, `universalImportVoyageNumber` and `universalExportVoyageNumber`
+  - `transportDocument` updated with `booking` values
+    - `termsAndConditions`
+    - `recieptTypeAtOrigin`
+    - `deliveryTypeAtDestination`
+    - `cargoMovementTypeAtOrigin`
+    - `cargoMovementTypeAtDestination`
+    - `serviceContractReference`
+    - `carrierExportVoyageNumber`
+    - `universalExportVoyageReference`
+    - `vesselName`
+    - `declaredValue` and `declaredValueCurrency`
+  - `transports` (TransportPlan) added to the `transportDocument`
+  - `shipmentLocations` added to the `transportDocument`
 
 <a name="v200B1"></a>[Release v2.0.0 Beta 1 (06 April 2022)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/2.0.0-Beta-1)
 ---
