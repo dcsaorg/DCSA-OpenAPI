@@ -20,5 +20,5 @@ This version focuses on making a schedule endPoint and detaching [JIT 1.0 and JI
 - please follow domain links above to get full list of changes:
 - Total rewrite of OVS
   - `/v3/service-schedules` endPoint added. Can be used for `GET`ing (polling) schedules
-  - `/vX/events` endPoint removed
-  - `/vX/timestamp` endPoint removed as JIT and OVS separated into 2 APIs
+  - `/v3/events` endPoint removed
+  - `/v3/timestamp` endPoint removed as JIT and OVS separated into 2 APIs
