@@ -52,6 +52,7 @@ paths:
         # Chunk with Metadata Event related parameters
 
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/eventCreatedDateTime'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/eventDateTime'
         # The eventType parameter is needed when more than one Event type can be returned
         - name: eventType
           in: query
@@ -66,13 +67,14 @@ paths:
             
                 eventType=SHIPMENT,EQUIPMENT
             
-            matches both `ShipmentEvents` and `EquipmentEvents`.
+            matches **both** `ShipmentEvents` and `EquipmentEvents`.
             
-            Default value is all event types.
+            Default value is all `eventTypes`.
           required: false
           style: form
           explode: false
           schema:
+            default: SHIPMENT,TRANSPORT,EQUIPMENT
             type: array
             items:
               type: string
@@ -133,9 +135,9 @@ paths:
                 type: array
                 items:
                   oneOf:
-                    - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/schemas/transportEvent'
                     - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/schemas/shipmentEvent'
                     - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/schemas/equipmentEvent'
+                    - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/schemas/transportEvent'
         default:
           description: Unexpected error
           headers:
@@ -173,18 +175,37 @@ paths:
               schema:
                 oneOf:
                   - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/schemas/shipmentEvent'
-                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/schemas/transportEvent'
                   - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/schemas/equipmentEvent'
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/schemas/transportEvent'
                 discriminator:
                   propertyName: eventType
-                example: #Couldn't use $ref in this example. Should be updated manually if shipmentEvent changes
-                  eventID: '84db923d-2a19-4eb0-beb5-446c1ec57d34'
-                  eventType: 'SHIPMENT'
-                  eventCreatedDateTime: '2019-11-12T07:41:00+08:30'
-                  eventSubtype: 'ISSU'
-                  documentID: '84db923d-2a19-4eb0-beb5-446c1ec57d34'
-                  documentTypeCode: 'TRD'
-                  reason: 'All good'
+              examples:
+                Shipment Event:
+                  value:
+                    metadata:
+                      eventID: '84db923d-2a19-4eb0-beb5-446c1ec57d34'
+                      eventCreatedDateTime: '2022-09-19T06:31:00+02:00'
+                      eventType: 'SHIPMENT'
+                    payload:
+                      eventClassifierCode: 'ACT'
+                      eventDateTime: '2022-09-19T06:31:00+02:00'
+                      shipmentEventTypeCode: 'ISSU'
+                      documentTypeCode: 'TRD'
+                      documentReference: '84db923d-2a19-4eb0-beb5-446c1ec57d34'
+                      reason: 'All good'
+                      relatedDocumentReferences:
+                        - relatedDocumentReferenceType: 'BKG'
+                          relatedDocumentReferenceValue: 'ABC123059'
+                      references:
+                        - referenceType: 'EQ'
+                          referenceValue: 'APZU4812090'
+                Retracted Transport Event:
+                  value:
+                    metadata:
+                      eventID: '2239d040-78c9-4172-8863-89428af41a0e'
+                      eventCreatedDateTime: '2022-09-20T07:41:00+08:30'
+                      eventType: 'TRANSPORT'
+                      retractedEventID: '957e4966-dad0-4111-9f8f-fb7216c43907'
         default:
           description: Unexpected error
           headers:
@@ -333,9 +354,9 @@ paths:
                       type: array
                       items:
                         oneOf:
-                          - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/schemas/transportEvent'
                           - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/schemas/shipmentEvent'
                           - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/schemas/equipmentEvent'
+                          - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/schemas/transportEvent'
               responses:   # Expected responses to the callback message
                 '204':
                   description: 'Your server returns this code if it accepts the callback'
@@ -343,7 +364,7 @@ paths:
     get:
       tags:
       - Subscriptions
-      summary: Find a subscription by `subscriptionID`
+      summary: Find a subscription by subscription ID
       parameters:
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/subscriptionID'
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/parameters/Api-Version-Major'
@@ -378,7 +399,7 @@ paths:
     delete:
       tags:
       - Subscriptions
-      summary: Stop a subscription, using the `subscriptionID`
+      summary: Stop a subscription, using the subscription ID
       parameters:
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/subscriptionID'
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/parameters/Api-Version-Major'
@@ -452,7 +473,7 @@ paths:
     put:
       tags:
       - Secret
-      summary: Resets the Secret on an existing subscription identified by `subscriptionID`.
+      summary: Resets the Secret on an existing subscription identified by subscription ID.
       parameters:
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/subscriptionID'
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/parameters/Api-Version-Major'
@@ -561,4 +582,4 @@ components:
         - $ref: '#/components/schemas/subscriptionBody'
 # servers:
 #   - description: SwaggerHub API Auto Mocking
-#     url: https://virtserver.swaggerhub.com/dcsaorg/DCSA_TNT/3.0.0
+#     url: https://virtserver.swaggerhub.com/dcsaorg/DCSA_TNT/2.1.1
