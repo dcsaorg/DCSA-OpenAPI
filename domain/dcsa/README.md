@@ -6,7 +6,7 @@ The primary purpose of this Domain is to specify common components to be reused 
 
 <a name="v203"></a>[Release v2.0.3 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/DCSA_DOMAIN/2.0.3)
 ---
-To be updated
+Updated as part of new Track & Trace release
 
 - `dateRange` and `startDate` descriptions updated to include link to Wikipedia
 - `facilityTypeCodeTRN` (...TNT = Track & Trace version) description updated
