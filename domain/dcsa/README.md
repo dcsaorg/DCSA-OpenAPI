@@ -8,6 +8,13 @@ The primary purpose of this Domain is to specify common components to be reused 
 ---
 To be updated
 
+- `dateRange` and `startDate` descriptions updated to include link to Wikipedia
+- `facilityTypeCodeTRN` (the Track&Trace version) description updated
+- `latitude` and `longitude` now indluce a regEx for validation
+- `RUC`, `DUE`, `CER` and `AES` added to the `ReferenceType` enum
+- marked patterns as strings
+- improved the description for `weightUnit`
+
 <a name="v202"></a>[Release v2.0.2 (5 July 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/DCSA_DOMAIN/2.0.2)
 ---
 Minor fix
