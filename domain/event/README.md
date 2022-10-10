@@ -13,7 +13,7 @@ New major release of T&T
 - Bump [Location Domain to version 2.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v203) (was previously 2.0.2)
 - update description of `Signature` header to be more markdown compliant
 - removed the 'Deprecation' marker on `eventID`
-- `bookingReference`, `carrierVoyageNumber`, `exportVoyageNumber` deleted as a query parameter as it is no longer in use
+- `bookingReference`, `carrierVoyageNumber`, `exportVoyageNumber`, `scheduleID`, `transportDocumentID` deleted as a query parameter as it is no longer in use
 - `documentReference` added as a query parameter
 - `documentTypeCode` updated:
   - `SRM` replaced with `DEI`, `DEO`, `TRO` and `CRO`
@@ -26,7 +26,32 @@ New major release of T&T
 - description improved
 - `eventCreatedDateTime` description improved
 - `eventDateTime` added as query parameter
-- 
+- `operationsEventTypeCode` description improved
+- `shipmentEventTypeCode` description improved
+- `transportEventTypeCode` description improved
+- `universalExportVoyageReference` and `universalServiceReference` added as query parameters
+- `event` payload changed - it now consists of two parts:
+  - `metadata` - this part consists of all metadata for the event: `eventID`, `eventCreatedDateTime`, `eventType` and `retractedEventID`. `metadata` is a required field
+  - `payload` - is the business part of the event. `payload` is an optional part of the event. If the event is retracting a previously emitted event then the `payload` is empty otherwise the `payload` is mandatory. The `paylaod` changes from event type to event type, 3 types of `payload` are supported:
+    - `shipmentPayload` <-- payload for a ShipmentEvent
+    - `equipmentPayload` <-- payload for an EquipmentEvent
+    - `transportPayload` <-- payload for a TransportEvent
+- the following has changed in a `ShipmentEvent`
+  - `documentID` has been renamed to `documentReference`
+  - deprecated fields removed
+  - `documentReferences` has been renamed to `relatedDocumentReferences`
+-  the following has changed in a `TransportEvent`
+  - deprecated fields removed
+  - `documentReferences` has been renamed to `relatedDocumentReferences`
+  - `transportCall` object has been modified - see further down
+-  the following has changed in a `EquipmentEvent`
+  - deprecated fields removed
+  - `documentReferences` has been renamed to `relatedDocumentReferences`
+  - `transportCall` object has been modified - see further down
+  - `isTransshipmentMove` added as a boolean field
+  - `facilityTypeCode` added (it was forgotten in the T&T 2.0 release)
+- the following has changed in a `ShipmentSubscription`
+  - `documentReference` added as a field and has substituted `carrierBookingRequestReference`, `carrierBookingReference` and `transportDocumentReference`
 
 <a name="v202"></a>[Release v2.0.2 (5 July 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/2.0.2)
 ---
