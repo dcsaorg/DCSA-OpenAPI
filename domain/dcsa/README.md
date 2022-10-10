@@ -13,7 +13,8 @@ Updated as part of new Track & Trace release
 - `latitude` and `longitude` now indluce a regEx for validation
 - `RUC`, `DUE`, `CER` and `AES` added to the `ReferenceType` enum
 - marked patterns as strings
-- improved the description for `weightUnit` and `sort`query parameter
+- improved the description for `weightUnit` and `sort` query parameter
+- pagination-header descriptions updated (`Current-Page`, `Next-Page`, `Prev-Page`, `Last-Page` and `First-Page`)
 
 <a name="v202"></a>[Release v2.0.2 (5 July 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/DCSA_DOMAIN/2.0.2)
 ---
