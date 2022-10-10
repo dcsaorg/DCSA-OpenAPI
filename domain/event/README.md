@@ -8,6 +8,26 @@ This Domain specifies common components for DCSA Events. This domain is central 
 ---
 New major release of T&T
 
+- Bump [DCSA Domain to version 2.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v203) (was previously 2.0.2)
+- Bump [Documentation Domain to version 2.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v210) (was previously v2.0.2)
+- Bump [Location Domain to version 2.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v203) (was previously 2.0.2)
+- update description of `Signature` header to be more markdown compliant
+- removed the 'Deprecation' marker on `eventID`
+- `bookingReference`, `carrierVoyageNumber`, `exportVoyageNumber` deleted as a query parameter as it is no longer in use
+- `documentReference` added as a query parameter
+- `documentTypeCode` updated:
+  - `SRM` replaced with `DEI`, `DEO`, `TRO` and `CRO`
+  - `CUS` (Customs Inspection) renamed to `CUC` (Customs Clearance)
+  - `CQU` (Contract Quotation) and `INV` (Invoice) added
+- description improved
+- `equipmentEventTypeCode` updated:
+  - `AVPU` (Available for Pick-up), `AVDO` (Available for Drop-off) added
+  - `CUSS` (Customs Selected for Scan), `CUSI` (Customs Selected for Inspection) and `CUSR` (Customs Released) added
+- description improved
+- `eventCreatedDateTime` description improved
+- `eventDateTime` added as query parameter
+- 
+
 <a name="v202"></a>[Release v2.0.2 (5 July 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/2.0.2)
 ---
 Bump domains and add `MilesToDestinationPort` and `vesselDraft` to the `OperationsEvent`
