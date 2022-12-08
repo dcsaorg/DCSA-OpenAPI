@@ -6,6 +6,24 @@ Publications related to this specification can be found on the DCSA website:
 - [Booking 1.0 Beta](https://knowledge.dcsa.org/s/publication?publicationId=a0r7T000000L8mmQAC)
 - [Glossary of Terms](https://knowledge.dcsa.org/s/glossary)
 
+<a name="v100B3"></a>[Release v1.0.0 Beta 3 (TBD)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/1.0.0-Beta-3)
+---
+Beta 3 release of the DCSA OpenAPI definitions for Booking 1.0.0. This release fixes missing elements from Beta 2 and it adds `Active Reefer Settings`
+
+- Bump [Documentation_Domain to version 2.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v210) (was previously v2.0.1)
+- Bump [DCSA_Domain to version 2.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v203) (was previously v2.0.1)
+- Bump [Event_Domain to version 3.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#v300) (was previously v2.0.1)
+- Bump [Error_Domain to version 1.1.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/error#v111) (was previously v1.1.0)
+- `cursor` parameter has been removed from all endPoints
+- on the `\v1\events` endPoint the following query parameters have changed
+  - `carrierBookingReference` query parameter removed
+  - `carrierBookingRequestReference` query parameter removed
+  - `documentReference` added as new query parameter
+  - `equipmentReference` added as new query parameter
+  - `eventDateTime` added as new query parameter
+- Referenced domains above should be consulted to see exact updates - some if the items include
+  - `Active Reefer Settings` added
+
 <a name="v100B2"></a>[Release v1.0.0 Beta 2 (1 July 2022)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/1.0.0-Beta-2)
 ---
 Beta 2 release of the DCSA OpenAPI definitions for Booking 1.0.0. This release fixes missing elements from Beta 1
