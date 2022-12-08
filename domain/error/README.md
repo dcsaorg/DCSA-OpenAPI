@@ -4,6 +4,14 @@ The Error Domain is documented on [**Error Domain SwaggerHub**](https://app.swag
 
 The purpose of this Domain is to specify the error object to return in any API endPoint in case an error occurs.
 
+<a name="v200"></a>[Release v2.0.0 (TBD)](https://app.swaggerhub.com/domains-docs/dcsaorg/ERROR_DOMAIN/2.0.0)
+---
+Breaking changes fixed
+
+- maximum value for `errorCode` changed from 7999->9999
+- `field` description updated to allow the field to be express as a JSONpath
+- `requestUri` format `uri` removed from the type so now it is just a string
+
 <a name="v110"></a>[Release v1.1.0 (6 April 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/ERROR_DOMAIN/1.1.0)
 ---
 New and extended error object to be used going forward.
