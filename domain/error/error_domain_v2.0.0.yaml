@@ -1,0 +1,127 @@
+# OpenAPI version identifier - required for OpenAPI 3.0 domains
+openapi: 3.0.3
+
+#######################
+# Optional info section
+#######################
+info:
+  title: DCSA Error Domain
+  description: |
+    Common error components for DCSA APIs. Components here are used by all DCSA APIs and Domains.
+
+    For a history of changes in this domain - please check [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/error). Please also [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  contact:
+    name: Digital Container Shipping Association (DCSA)
+    url: https://dcsa.org
+    email: info@dcsa.org
+  version: 2.0.0
+
+components:
+  schemas:
+    detailedError:
+      type: object
+      properties:
+        errorCode:
+          type: integer
+          format: int32
+          description: |
+            Standard error code see http://dcsa.org/error-codes (to be created). Examples: 7003 – out or range value, 7004 -  invalid type
+          minimum: 7000
+          maximum: 9999
+          example: 7003
+        field:
+          type: string
+          maxLength: 50
+          description: |
+            The field that caused the error, e.g. a failed validation. The field can be expressed as a [JSONpath](https://github.com/json-path/JsonPath)
+          example: location.facilityCode
+        value:
+          type: string
+          maxLength: 500
+          description: |
+            The value that of the field that caused the error
+          example: SG SIN WHS
+        reason:
+          description: |
+            High level error message
+          type: string
+          maxLength: 100
+          example: 'invalidQuery'
+        message:
+          type: string
+          maxLength: 200
+          description: |
+            Additional information as to why the error occured
+          example: 'Spaces not allowed in facility code'
+      required:
+        - reason
+        - message
+    error:
+      type: object
+      properties:
+        httpMethod:
+          description: |
+            The http request method type e.g. GET, POST
+          type: string
+          example: 'POST'
+          enum:
+            - GET
+            - HEAD
+            - POST
+            - PUT
+            - DELETE
+            - OPTION
+            - PATCH
+        requestUri:
+          description: |
+            The request URI as it was sent
+          type: string
+          example: '/v1/events'
+        statusCode:
+          description: |
+            The HTTP status code
+          type: integer
+          format: int32
+          example: 400
+        statusCodeText:
+          description: |
+            The textual representation of the status code
+          type: string
+          maxLength: 50
+          example: 'Bad Request'
+        errorMessage:
+          description: |
+            Other error information
+          type: string
+          maxLength: 200
+          example: 'The supplied data could not be accepted'
+        providerCorrelationID:
+          description: |
+            A unique identifier for the transaction, e.g. a UUID
+          type: string
+          maxLength: 100
+          example: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+        errorDateTime:
+          description: |
+            The date and time (in ISO 8601 format) the error occurred.
+          type: string
+          format: date-time
+          example: '2019-11-12T07:41:00+08:30'
+        errors:
+          type: array
+          description: |
+            List of detailed errors, e.g. fields that could not pass validation
+          minItems: 1
+          items:
+            allOf:
+              - $ref: '#/components/schemas/detailedError'
+      required:
+        - httpMethod
+        - requestUri
+        - statusCode
+        - statusCodeText
+        - errorDateTime
+        - errors
