@@ -15,20 +15,25 @@ New major release of T&T
 - removed the 'Deprecation' marker on `eventID`
 - `bookingReference`, `carrierVoyageNumber`, `exportVoyageNumber`, `scheduleID`, `transportDocumentID` deleted as a query parameter as it is no longer in use
 - `documentReference` added as a query parameter
-- `documentTypeCode` updated:
+- `documentTypeCode` renamed to `documentTypeCodes` and updated:
   - `SRM` replaced with `DEI`, `DEO`, `TRO` and `CRO`
   - `CUS` (Customs Inspection) renamed to `CUC` (Customs Clearance)
   - `CQU` (Contract Quotation) and `INV` (Invoice) added
-- description improved
-- `equipmentEventTypeCode` updated:
+  - `INV` (Invoice) added
+  - `ACE` (Authority Certificate) added
+  - description improved
+- `equipmentEventTypeCode` renamed to `equipmentEventTypeCodes` and updated:
   - `AVPU` (Available for Pick-up), `AVDO` (Available for Drop-off) added
   - `CUSS` (Customs Selected for Scan), `CUSI` (Customs Selected for Inspection) and `CUSR` (Customs Released) added
-- description improved
+  - `WAYP` (Way Point Crossed) added
+  - description improved
 - `eventCreatedDateTime` description improved
 - `eventDateTime` added as query parameter
-- `operationsEventTypeCode` description improved
-- `shipmentEventTypeCode` description improved
-- `transportEventTypeCode` description improved
+- `operationsEventTypeCode` renamed to `operationsEventTypeCodes` and description improved
+- `shipmentEventTypeCode` renamed to `shipmentEventTypeCodes` and description improved
+- `shippingInstructionID` renamed to `shippingInstructionReference` and description improved
+- `transportCallID` renamed to `transportCallReference` and description improved
+- `transportEventTypeCode` renamed to `transportEventTypeCodes` and description improved
 - `universalExportVoyageReference` and `universalServiceReference` added as query parameters
 - `event` payload changed - it now consists of two parts:
   - `metadata` - this part consists of all metadata for the event: `eventID`, `eventCreatedDateTime`, `eventType` and `retractedEventID`. `metadata` is a required field
@@ -49,10 +54,57 @@ New major release of T&T
   - `documentReferences` has been renamed to `relatedDocumentReferences`
   - `transportCall` object has been modified - see further down
   - `isTransshipmentMove` added as a boolean field
+  - `eventLocation` now uses the following location-interfaces: **facilityLocation**, **unLocationLocation** and **addressLocation** instead of the "general" location object
   - `facilityTypeCode` added (it was forgotten in the T&T 2.0 release)
 - the following has changed in a `ShipmentSubscription`
+  - `shipmentEventTypeCode` renamed to `shipmentEventTypeCodes`
+  - `documentTypeCode` renamed to `documentTypeCodes`
   - `documentReference` added as a field and has substituted `carrierBookingRequestReference`, `carrierBookingReference` and `transportDocumentReference`
-
+- the following has changed in a `EquipmentSubscription`
+  - `equipmentEventTypeCode` renamed to `equipmentEventTypeCodes`
+  - all fields belonging to `transportCallSubscriptionBody` added
+- the following has changed in a `TransportSubscription`
+  - `transportEventTypeCode` renamed to `transportEventTypeCodes`
+  - all fields belonging to `transportCallSubscriptionBody` added
+- `transportCallSubscriptionBody` created including:
+  - all deprecations removed
+  - `transportCallReference` renamed from `transportCallID`
+  - `vesselIMONumber`
+  - `carrierExportVoyageNumber` renamed from `carrierVoyageNumber`
+  - `universalExportVoyageReference`
+  - `carrierServiceCode`
+  - `universalServiceReference`
+  - `UNLocationCode`
+- `documentReferences` renamed to `relatedDocumentReferences` with the following updates:
+  - `documentReferenceType` renamed to `type`
+  - `documentReferenceValue` renamed to `value` and maxLength set to 100
+- `transportCall` object updated:
+  - remomved `transportCallID` and `carrierVoyageNumber`
+  - `exportVoyageNumber` renamed to `carrierExportVoyageNumber`
+  - `universalServiceReference`, `universalExportVoyageReference` and `universalImportVoyageReference` added
+  - `importVoyageNumber` renamed to `carrierImportVoyageNumber`
+  - removed `geoLocation` interface from `location`
+  - `facilityTypeCode` updated: `COYA` removed and `RLSP` (Rail Spot) and `RDSP` (Road Spot) added
+  - `facilityCode`, `facilityCodeListProvider`, `otherFacility` and `UNLocationCode` removed from `transportCall` - the fields in the location object should be used
+  - `vessel` object updated. All prefixed `vessel` in field names removed except in `vesselIMONumber`
+ - `reference` object updated. `referenceType` and `referenceValue` renamed to `type` and `value`
+- `changeRemark` description updated
+- `documentID` renamed to `documentReference` and limited to maxLength 100
+- `documentTypeCode` updated:
+  - `SRM` replaced with `DEI`, `DEO`, `TRO` and `CRO`
+  - `CUS` (Customs Inspection) renamed to `CUC` (Customs Clearance)
+  - `CQU` (Contract Quotation) and `INV` (Invoice) added
+  - `INV` (Invoice) added
+  - `ACE` (Authority Certificate) added
+  - description improved
+- `documentTypeCodes` description updated
+- `equipmentEventTypeCode` updated:
+  - `AVPU` (Available for Pick-up), `AVDO` (Available for Drop-off) added
+  - `CUSS` (Customs Selected for Scan), `CUSI` (Customs Selected for Inspection) and `CUSR` (Customs Released) added
+  - `WAYP` (Way Point Crossed) added
+  - description improved
+ - `equipmentEventTypeCodes` description updated
+ 
 <a name="v202"></a>[Release v2.0.2 (5 July 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/2.0.2)
 ---
 Bump domains and add `MilesToDestinationPort` and `vesselDraft` to the `OperationsEvent`
@@ -67,6 +119,10 @@ Bump domains and add `MilesToDestinationPort` and `vesselDraft` to the `Operatio
   - `portVisitReference` added
   - `importVoyageNumber` and `exportVoyageNumber` both deprecated and `carrierImportVoyageNumber` and `carrierExportVoyageNumber` added
   - Type fixed: Moording --> Mooring
+- `eventType` description updated and enum values supplied
+- `eventTypeCode` removed
+- `retractedEventID` added
+- `subscriptionCreatedDateTime` and `subscriptionUpdatedDateTime` added
 
 <a name="v201"></a>[Release v2.0.1 (30 June 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/2.0.1)
 ---
