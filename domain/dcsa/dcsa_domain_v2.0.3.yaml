@@ -33,8 +33,9 @@ components:
   
     addressLine:
       type: string
-      maxLength: 250
-      description: 'A single address line.'
+      maxLength: 35
+      description: |
+        A single address line to be used when a B/L needs to be printed.
       example: 'Kronprincessegade 54'
     addressLineNumber:
       type: integer
@@ -46,6 +47,23 @@ components:
       maxLength: 100
       description: 'Name of the address'
       example: 'Henrik'
+    airExchangeSetpoint:
+      type: number
+      format: float
+      description: |
+        Target value for the air exchange rate which is the rate at which outdoor air replaces indoor air within a Reefer container
+      example: 15.4
+    airExchangeUnit:
+      type: string
+      description: |
+        The unit for `airExchangeSetpoin` in metrics- or imperial units- per hour
+        
+        - MQH (Cubic metre per hour)
+        - FQH (Cubic foot per hour)
+      enum:
+        - MQH
+        - FQH
+      example: MQH
     amendToTransportDocument:
       type: string
       maxLength: 20
@@ -230,6 +248,18 @@ components:
     clauseContent:
       type: string
       description: 'The content of the clause.'
+    co2Setpoint:
+      type: number
+      format: float
+      description: |
+        The percentage of the controlled atmosphere CO<sub>2</sub> target value
+      example: 25
+    commodityRequestedEquipmentLink:
+      type: string
+      maxLength: 100
+      description: |
+        Link used to connect `commodity` to a `requestedEquipment`.
+      example: '001'
     commodityType:
       type: string
       example: 'Mobile phones'
@@ -323,6 +353,19 @@ components:
       type: string
       maxLength: 3
       example: WEA
+    deliveryTypeAtDestination:
+      type: string
+      maxLength: 3
+      description: |
+        Indicates the type of service offered at Destination. Options are defined in the Receipt/Delivery entity.
+        - CY (Container yard (incl. rail ramp))
+        - SD (Store Door)
+        - CFS (Container Freight Station)
+      enum:
+        - CY
+        - SD
+        - CFS
+      example: CY
     descriptionOfGoods:
       type: string
       description: 'The cargo description are details which accurately and properly describe the cargo being shipped in the container(s) as provided by the shipper.'
@@ -338,8 +381,9 @@ components:
         - FOT
     displayedName:
       type: string
-      maxLength: 250
-      description: 'The address of the Party to be displayed on the transport document.'
+      maxLength: 35
+      description: |
+        A line of the address to be displayed on the transport document.
     documentReferenceNumber:
       type: string
       maxLength: 20
@@ -548,16 +592,22 @@ components:
       type: string
       maxLength: 10
       description: 'Used by customs to classify the product being shipped.'
-    humidityMax:
+    # humidityMax:
+    #   type: number
+    #   format: float
+    #   description: 'Indicates the maximum humidity setting on the container in percent.'
+    #   example: 100.0
+    # humidityMin:
+    #   type: number
+    #   format: float
+    #   description: 'Indicates the minimum humidity setting on the container in percent.'
+    #   example: 80.0
+    humiditySetpoint:
       type: number
       format: float
-      description: 'Indicates the maximum humidity setting on the container in percent.'
-      example: 100.0
-    humidityMin:
-      type: number
-      format: float
-      description: 'Indicates the minimum humidity setting on the container in percent.'
-      example: 80.0
+      description: |
+        The percentage of the controlled atmosphere humidity target value
+      example: 95.6
     importLicenseReference:
       type: string
       maxLength: 35
@@ -585,6 +635,42 @@ components:
       description: |
         Customs filing for US (AMS) or Canadian (ACI) customs
       example: true
+    isBulbMode:
+      type: boolean
+      description: |
+        Is special container setting for handling flower bulbs active
+      example: false
+      default: false
+    isCargoProbe1Required:
+      type: boolean
+      description: |
+        Is `Cargo Probe 1 Required` enabled allowing the container to emit temperatures.
+      example: true
+      default: false
+    isCargoProbe2Required:
+      type: boolean
+      description: |
+        Is `Cargo Probe 2 Required` enabled allowing the container to emit temperatures.
+      example: true
+      default: false
+    isCargoProbe3Required:
+      type: boolean
+      description: |
+        Is `Cargo Probe 3 Required` enabled allowing the container to emit temperatures.
+      example: true
+      default: false
+    isCargoProbe4Required:
+      type: boolean
+      description: |
+        Is `Cargo Probe 4 Required` enabled allowing the container to emit temperatures.
+      example: true
+      default: false
+    isColdTreatmentRequired:
+      type: boolean
+      description: |
+        Indicator whether cargo requires cold treatment prior to loading at origin or during transit, but prior arrival at POD
+      example: false
+      default: false
     isDestinationFilingRequired:
       type: boolean
       description: |
@@ -604,6 +690,18 @@ components:
       description: |
         Information provided by the shipper whether an export declaration is required for this particular shipment/commodity/destination.
       example: true
+    isGeneratorSetRequired:
+      type: boolean
+      description: |
+        Indicator whether reefer container should have a generator set attached at time of release from depot
+      example: true
+      default: false
+    isHighValueCargo:
+      type: boolean
+      description: |
+        Cargo value exceeds USD XXX K (carrier specific)
+      example: true
+      default: false
     isImportLicenseRequired:
       type: boolean
       description: |
@@ -619,6 +717,12 @@ components:
       description: |
         Indication whether the shipper agrees to load part of the shipment in case where not all of the cargo is delivered within cut-off.
       example: true
+    isPreCoolingRequired:
+      type: boolean
+      description: |
+        Indicator whether reefer container should be pre-cooled to the temperature setting required at time of release from depot
+      example: true
+      default: false
     isShippedOnBoardType:
       type: boolean
       description: 'Specifies whether the Transport document is a received for shipment, or shipped on board.'
@@ -638,6 +742,18 @@ components:
       description: |
         Number of original copies of the negotiable bill of lading that has been issued to the customer.
       example: 4
+    issuedNumberOfOriginalsWithCharges:
+      type: integer
+      format: int32
+      description: |
+        Number of original copies of the negotiable bill of lading that has been issued to the customer with Charges.
+      example: 1
+    issuedNumberOfOriginalsWithoutCharges:
+      type: integer
+      format: int32
+      description: |
+        Number of original copies of the negotiable bill of lading that has been issued to the customer without Charges.
+      example: 1
     isToBeNotified:
       type: boolean
       description: 'Used to decide whether the party will be notified of the arrival of the cargo.'
@@ -652,6 +768,12 @@ components:
       description: |
         Indicator whether mode of transportation for pre-carriage (e.g. truck, barge, rail) is under shipper's responsibility
       example: false
+    isVentilationOpen:
+      type: boolean
+      description: |
+        If `true` the ventilation orifice is `Open` - if `false` the ventilation orifice is `closed`
+      example: true
+      default: false
     latitude:
       type: string
       pattern: '^[\+-][0-9]{1,2}\.[0-9]{1,6}$'
@@ -705,6 +827,28 @@ components:
       format: int32
       description: 'The requested number of copies of the Transport document to be issued by the carrier. Only applicable for physical documents'
       example: 2
+    numberOfCopiesWithCharges:
+      type: integer
+      format: int32
+      description: 'The requested number of copies of the Transport document to be issued by the carrier including charges. Only applicable for physical documents'
+      example: 2
+    numberOfCopiesWithoutCharges:
+      type: integer
+      format: int32
+      description: 'The requested number of copies of the Transport document to be issued by the carrier **NOT** including charges. Only applicable for physical documents'
+      example: 2
+    numberOfOriginalsWithCharges:
+      type: integer
+      format: int32
+      description: |
+        Number of original copies of the negotiable bill of lading that has been requested by the customer with Charges.
+      example: 1
+    numberOfOriginalsWithoutCharges:
+      type: integer
+      format: int32
+      description: |
+        Number of original copies of the negotiable bill of lading that has been requested by the customer without Charges.
+      example: 1
     numberOfPackages:
       type: integer
       format: int32
@@ -715,11 +859,12 @@ components:
       format: int32
       description: 'The number of additional pages required to contain the goods description on a transport document. Only applicable for physical transport documents.'
       example: 2
-    shippedOnBoardDate:
-      type: string
-      format: date
-      description: 'Date when the last container that is linked to the transport document is physically loaded onboard the vessel indicated on the transport document.'
-      example: '2020-12-12'
+    o2Setpoint:
+      type: number
+      format: float
+      description: |
+        The percentage of the controlled atmosphere O<sub>2</sub> target value
+      example: 75.3
     otherFacility:
       type: string
       example: Depot location or address
@@ -765,6 +910,7 @@ components:
         - SCO (Service contract owner - Defined by DCSA)
         - BA (Booking Agency)
         - EBL (EBL Solution Provider)
+        - ENR (Envelope Receiver)
       # NB: This is excluding partyFunctions defined in the publisherRole
       enum:
         - OS
@@ -781,6 +927,7 @@ components:
         - SCO
         - BA
         - EBL
+        - ENR
         # NB: This is excluding partyFunctions defined in the publisherRole
       example: DDS
     partyID:
@@ -866,24 +1013,18 @@ components:
         - SD
         - CFS
       example: CY
-    deliveryTypeAtDestination:
-      type: string
-      maxLength: 3
-      description: |
-        Indicates the type of service offered at Destination. Options are defined in the Receipt/Delivery entity.
-        - CY (Container yard (incl. rail ramp))
-        - SD (Store Door)
-        - CFS (Container Freight Station)
-      enum:
-        - CY
-        - SD
-        - CFS
-      example: CY
     receivedForShipmentDate:
       type: string
       format: date
       description: 'Date when the last container linked to the transport document is physically in the terminal (customers cleared against the intended vessel).'
       example: '2020-12-12'
+    reeferProductName:
+      type: string
+      maxLength: 500
+      description: |
+        Carrier specific commercial name indicating the technology service offered.
+      example: 'FROZEN'
+      readOnly: true
     referenceID:
       type: string
       format: uuid
@@ -1049,6 +1190,11 @@ components:
       description: |
         Last date and time when the Shipment was updated.
       example: '2021-09-03T09:03:00+02:00'
+    shippedOnBoardDate:
+      type: string
+      format: date
+      description: 'Date when the last container that is linked to the transport document is physically loaded onboard the vessel indicated on the transport document.'
+      example: '2020-12-12'
     shippingInstructionCreatedDateTime:
       type: string
       format: date-time
@@ -1084,7 +1230,7 @@ components:
       type: string
       maxLength: 100
       description: 'The name of the street of the party’s address.'
-      example: Kronprincessegade
+      example: Kronprinsessegade
     streetNumber:
       type: string
       maxLength: 50
@@ -1099,7 +1245,7 @@ components:
     tareWeight:
       type: number
       format: float
-      example: 12000.0
+      example: 4800.0
       description: 'The weight of an empty container (gross container weight).'
     taxReference1:
       type: string
@@ -1111,16 +1257,21 @@ components:
       maxLength: 20
       description: 'Optional second identifying number of the consignee or shipper (Individual or entity) used for tax purposes.'
       example: 'CVR-25645774'
-    temperatureMax:
+    # temperatureMax:
+    #   type: number
+    #   format: float
+    #   description: 'Indicates the maximum temperature setting on the container.'
+    #   example: 64.3
+    # temperatureMin:
+    #   type: number
+    #   format: float
+    #   description: 'Indicates the minimum temperature setting on the container.'
+    #   example: -18.1
+    temperatureSetpoint:
       type: number
-      format: float
-      description: 'Indicates the maximum temperature setting on the container.'
-      example: 64.3
-    temperatureMin:
-      type: number
-      format: float
-      description: 'Indicates the minimum temperature setting on the container.'
-      example: -18.1
+      description: |
+        Target value of the temperature for the Reefer based on the cargo requirement.
+      example: -15
     temperatureUnit:
       type: string
       description: Celsius (CEL) or Fahrenheit (FAH).
@@ -1460,37 +1611,53 @@ components:
     Current-Page:
       schema:
         type: string
-        example: 'fE9mZnNldHw9MCZsaW1pdD01'
+        example: |
+          https://api.dcsa.org/vX/endPoint?pageNumber=fE9mZnNldHw9NSZsaW1pdD01
       description: |
-        A link to the current page.
-      required: true
+        The `Current-Page` header is optional to implement. If provided it **MUST** link to the current page. The queryParameter(s) used (can be `offset` or `keyset` based) to specify the current page **MUST** be accepted when used.
+
+        The example represents a link to a `cursor` based pagination
+      required: false
     Next-Page:
       schema:
         type: string
-        example: 'fE9mZnNldHw9NSZsaW1pdD01'
+        example: |
+          https://api.dcsa.org/vX/endPoint?cursor=fE9mZnNldHw9NSZsaW1pdD01
       description: |
-        A link to the next page. `Next-Page` header link **MAY** be omitted if the current page is the last page.
+        The `Next-Page` header is mandatory to implement but **MAY** be omitted in case there are not any more items in the collection for a next page. If provided it **MUST** link to the next page. The queryParameter(s) used (can be `offset` or `keyset` based) to specify the next page **MUST** be accepted when used.
+
+        The example represents a `cursor` based pagination
       required: false
     Prev-Page:
       schema:
         type: string
-        example: 'fE9mZnNldHw9MCZsaW1pdD01'
+        example: |
+          https://api.dcsa.org/vX/endPoint?cursor=fE9mZnNldHw9NSZsaW1pdD01
       description: |
-        A link to the previous page. `Prev-Page` header link **MAY** be omitted if the current page is the first page.
+        The `Prev-Page` header is optional to implement. If provided it **MUST** link to the previous page. The queryParameter(s) used (can be `offset` or `keyset` based) to specify the previous page **MUST** be accepted when used.
+
+        The example represents a `cursor` based pagination
       required: false
     Last-Page:
       schema:
         type: string
-        example: 'fE9mZnNldHw9NTkmbGltaXQ9NQ=='
+        example:  |
+          https://api.dcsa.org/vX/endPoint?cursor=fE9mZnNldHw9NTkmbGltaXQ9NQ==
       description: |
-        A link to the last page. `Last-Page` header link **MAY** be omitted if the current page is the last page.
+        The `Last-Page` header is optional to implement. If provided it **MUST** link to the last page. The queryParameter(s) used (can be `offset` or `keyset` based) to specify the last page **MUST** be accepted when used.
+        
+
+        The example represents a `cursor` based pagination
       required: false
     First-Page:
       schema:
         type: string
-        example: 'fE9mZnNldHw9NjAmbGltaXQ9NQ=='
+        example: |
+          https://api.dcsa.org/vX/endPoint?cursor=fE9mZnNldHw9NTkmbGltaXQ9NQ==
       description: |
-        A link to thefirst page. `First-Page` header link **MAY** be omitted if current page is the first page.
+        The `First-Page` header is optional to implement. If provided it **MUST** link to the first page. The queryParameter(s) used (can be `offset` or `keyset` based) to specify the first page **MUST** be accepted when used.
+
+        The example represents a `cursor` based pagination
       required: false
     API-Version:
       schema:
@@ -1517,11 +1684,14 @@ components:
       name: cursor
       in: query
       description: |
-        A server generated value to specify a specific point in a collection result, used for pagination.
+        A server generated value to specify a specific point in a collection result, used for `cursor`/`keyset`/`seek` based pagination.
+        
+        **NB**: Cannot be used in combination with the `offset` parameter
       required: false
       schema:
         type: string
-      example: 'fE9mZnNldHw9MTAmbGltaXQ9MTA='
+      example: |
+        fE9mZnNldHw9MTAmbGltaXQ9MTA=
     limit:
       name: limit
       in: query
@@ -1534,6 +1704,17 @@ components:
         minimum: 1
         default: 100 
       example: 100
+    offset:
+      name: offset
+      in: query
+      description: |
+        A value indicating the number of records that should be skipped when getting a result. To be used with `offset` based pagination.
+        
+        **NB**: Cannot be used in combination with the `cursor` parameter
+      required: false
+      schema:
+        type: number
+      example: 20
     sort:
       name: sort
       in: query
