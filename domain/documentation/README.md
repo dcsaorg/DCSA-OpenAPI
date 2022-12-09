@@ -4,6 +4,46 @@ The Documentation Domain is documented on [**Documentation Domain**](https://app
 
 This Domain specifies reusable objects for the eDocumentation: [Booking](https://app.swaggerhub.com/apis/dcsaorg/DCSA_BKG) and [Electronic Bill of Lading](https://app.swaggerhub.com/apis/dcsaorg/DCSA_EBL).
 
+<a name="v210"></a>[Release v2.1.0 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN/2.1.0)
+---
+Add Active Reefer Settings
+
+- Bump [DCSA_Domain to version 2.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v203) (was previously v2.0.2)
+- Bump [Location_Domain to version 2.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v203) (was previously v2.0.2)
+- ??? add `carrierServiceCode` and `universalServiceReference` to the booking
+- ??? `isAMSACIFilingRequired` changed to include entire object?!?
+- `valueAddedServiceRequests` renamed to `valueAddedServices`
+- `commodityRequestedEquipmentLink` added to the `commodity` in order to link commodity and requestedEquipment
+- description for `requestedEquipment` updated to clearly specify how `Active Reefer Settings` work
+- `requestedEquipmentSizeType` renamed to `ISOEquipmentCode`
+- `tareWeight` and `tareWeightUnit` added to `requestedEquipment` in case of SOC
+- `requestedEquipmentUnits` renamed to `units`
+- description updated for `equipmentReferences`
+- `commodityRequestedEquipmentLink` added to the `requestedEquipment` in order to link commodity and requestedEquipment
+- `activeReeferSettings` added
+- `confirmedEquipmentSizeType` renamed to `ISOEquipmentCode`
+- `confirmedEquipmentUnits` renamed to `units`
+- `numberOfCopies` renamed to `numberOfCopiesWithCharges`
+- `numberOfCopiesWithoutCharges` added
+- `numberOfOriginals` renamed to `numberOfOriginalsWithCharges`
+- `numberOfOriginalsWithoutCharges` added
+- `areChargesDisplayedOnOriginals` and `areChargesDisplayedOnCopies` removed
+- `displayedNameForPlaceOfReceipt`, `displayedNameForPortOfLoad`, `displayedNameForPortOfDischarge` and `displayedNameForPlaceOfDelivery` changed from string with maxlength of 250 to an array of 5 lines each containing 35 characters (string with maxLength 35)
+- `utilizedTransportEquipment` description updated
+- `activeReeferSettings` updated on the `utilizedTransportEquipment`
+- `seal` object updated
+  - `sealNumber` renamed to `number`
+  - `sealSource` renamed to `source`
+  - `sealType` renamed to `type`
+  - only `number` remains a required field
+- `displayedAddress` in the `Party` object now only allows 5 lines each with a max of 35 characters (string with maxLength 35)
+- `DCSA` removed as a `partyFunctionCode`
+- `EPI` (EBL Platform Identifier) added as a `partyFunctionCode`
+- `partyName` is now a mandaotry field
+- `referenceType` renamed to `type` and `referenceValue` renamed to `value` in `reference` object
+- `numberOfOriginals` renamed to `numberOfOriginalsWithCharges` and `numberOfOriginalsWithoutCharges` added to `transportDocument`
+- 
+
 <a name="v202"></a>[Release v2.0.2 (5 July 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN/2.0.2)
 ---
 Bumps DCSA_Domain and Location_Domain
