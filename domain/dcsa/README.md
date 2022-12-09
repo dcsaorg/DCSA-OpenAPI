@@ -9,6 +9,8 @@ The primary purpose of this Domain is to specify common components to be reused 
 Updated as part of new Track & Trace release
 
 - `addressLine` and `displayedName` lengths changed from 250 -> 35 since it needs to comply with printed B/L text field lengths
+- `airExchangeSetpoint`, `airExchangeUnit`, `co2Setpoint`, `commodityRequestedEquipmentLink`, `isBulbMode`, `isCargoProbe1Required`, `isCargoProbe2Required`, `isCargoProbe3Required`, `isCargoProbe4Required`, `isColdTreatmentRequired`, `isGeneratorSetRequired`, `isHighValueCargo`, `isPreCoolingRequired`, `isVentilationOpen`, `humiditySetpoint`, `o2Setpoint` and `reeferProductName` added
+- `humidityMin`, `humidityMax`, `temperatureMin` and `temperatureMax` removed
 - `dateRange` and `startDate` descriptions updated to include link to Wikipedia
 - `facilityTypeCodeTRN` (...TNT = Track & Trace version) description updated
 - `issedNumberOfOriginalsWithCharges` and `issedNumberOfOriginalsWithoutCharges` added
