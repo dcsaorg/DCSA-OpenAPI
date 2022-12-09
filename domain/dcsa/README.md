@@ -8,9 +8,13 @@ The primary purpose of this Domain is to specify common components to be reused 
 ---
 Updated as part of new Track & Trace release
 
+- `addressLine` and `displayedName` lengths changed from 250 -> 35 since it needs to comply with printed B/L text field lengths
 - `dateRange` and `startDate` descriptions updated to include link to Wikipedia
 - `facilityTypeCodeTRN` (...TNT = Track & Trace version) description updated
+- `issedNumberOfOriginalsWithCharges` and `issedNumberOfOriginalsWithoutCharges` added
 - `latitude` and `longitude` now indluce a regEx for validation
+- `numberOfCopiesWithCharges`, `numberOfCopiesWithoutCharges`, `numberOfOriginalsWithCharges` and `numberOfOriginalsWithoutCharges` added
+- `ENR` (Envelope Receiver) added as new partyFunctionCode 
 - `RUC`, `DUE`, `CER` and `AES` added to the `ReferenceType` enum
 - marked patterns as strings
 - improved the description for `weightUnit` and `sort` query parameter
