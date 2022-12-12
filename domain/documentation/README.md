@@ -6,7 +6,7 @@ This Domain specifies reusable objects for the eDocumentation: [Booking](https:/
 
 <a name="v210"></a>[Release v2.1.0 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN/2.1.0)
 ---
-Active Reefer Settings has been added
+Active Reefer Settings has been added, possibility to link between Commodity and RequestedEquipment, improved support for paper-version of EBL
 
 - Bump [DCSA_Domain to version 2.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v203) (was previously v2.0.2)
 - Bump [Location_Domain to version 2.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v203) (was previously v2.0.2)
