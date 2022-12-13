@@ -28,7 +28,11 @@ Release of the DCSA OpenAPI definitions for Booking 1.0.0. This release fixes mi
   - `equipmentReference` added as new query parameter
   - `eventDateTime` added as new query parameter
 - Referenced domains above should be consulted to see exact updates - some if the items include
-  - `Active Reefer Settings` added
+  - linkage between `Commodity` and `RequestedEquipment`
+  - better support for paper-version of B/L (displayedAddress, displaedName...)
+  - `references` and `seals` objects updated
+  - minor updates to the `Party` object (`PartyName` is now mandatory, new `parrtyFunctionCodes`
+  - confirmed and requested Equipment groups updated
 
 <a name="v100B2"></a>[Release v1.0.0 Beta 2 (1 July 2022)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/1.0.0-Beta-2)
 ---
