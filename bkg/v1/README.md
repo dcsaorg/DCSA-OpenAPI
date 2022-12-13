@@ -6,12 +6,6 @@ Publications related to this specification can be found on the DCSA website:
 - [Booking 1.0 Beta](https://knowledge.dcsa.org/s/publication?publicationId=a0r7T000000L8mmQAC)
 - [Glossary of Terms](https://knowledge.dcsa.org/s/glossary)
 
-<a name="v200B1"></a>[Release v2.0.0 Beta 1 (...)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0-Beta-1)
----
-Beta 1 release of the DCSA OpenAPI definitions for Booking 2.0.0. This release adds `Active Reefer Settings`
-
-  - `Active Reefer Settings` added
-
 <a name="v100"></a>[Release v1.0.0 (...)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/1.0.0)
 ---
 Release of the DCSA OpenAPI definitions for Booking 1.0.0. This release fixes minor issues found in Beta 2. This release does **not** include `Active Reefer Settings`, `Dangerious Goods`, `Special Cargo` or `Out of Gauge`
