@@ -4,9 +4,16 @@ The Documentation Domain is documented on [**Documentation Domain**](https://app
 
 This Domain specifies reusable objects for the eDocumentation: [Booking](https://app.swaggerhub.com/apis/dcsaorg/DCSA_BKG) and [Electronic Bill of Lading](https://app.swaggerhub.com/apis/dcsaorg/DCSA_EBL).
 
+<a name="v300"></a>[Release v3.0.0 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN/3.0.0)
+---
+Active Reefer Settings has been added
+
+- `activeReeferSettings` added to `requestedEquipment`
+- `activeReeferSettings` updated on the `utilizedTransportEquipment`
+
 <a name="v210"></a>[Release v2.1.0 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN/2.1.0)
 ---
-Active Reefer Settings has been added, possibility to link between Commodity and RequestedEquipment, improved support for paper-version of EBL
+Possibility to link between Commodity and RequestedEquipment, improved support for paper-version of EBL
 
 - Bump [DCSA_Domain to version 2.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v203) (was previously v2.0.2)
 - Bump [Location_Domain to version 2.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v203) (was previously v2.0.2)
@@ -20,7 +27,6 @@ Active Reefer Settings has been added, possibility to link between Commodity and
 - `requestedEquipmentUnits` renamed to `units`
 - description updated for `equipmentReferences`
 - `commodityRequestedEquipmentLink` added to the `requestedEquipment` in order to link commodity and requestedEquipment
-- `activeReeferSettings` added
 - `confirmedEquipmentSizeType` renamed to `ISOEquipmentCode`
 - `confirmedEquipmentUnits` renamed to `units`
 - `numberOfCopies` renamed to `numberOfCopiesWithCharges`
@@ -30,7 +36,6 @@ Active Reefer Settings has been added, possibility to link between Commodity and
 - `areChargesDisplayedOnOriginals` and `areChargesDisplayedOnCopies` removed
 - `displayedNameForPlaceOfReceipt`, `displayedNameForPortOfLoad`, `displayedNameForPortOfDischarge` and `displayedNameForPlaceOfDelivery` changed from string with maxlength of 250 to an array of 5 lines each containing 35 characters (string with maxLength 35)
 - `utilizedTransportEquipment` description updated
-- `activeReeferSettings` updated on the `utilizedTransportEquipment`
 - `seal` object updated
   - `sealNumber` renamed to `number`
   - `sealSource` renamed to `source`
