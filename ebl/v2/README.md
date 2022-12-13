@@ -12,7 +12,7 @@ Beta 1 release of the DCSA OpenAPI definitions for Bill of Lading 3.0.0. This re
 
 - `Active Reefer Settings` added
 
-<a name="v200"></a>[Release v2.0.0 (...)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/2.0.0-Beta-2)
+<a name="v200"></a>[Release v2.0.0 (...)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/2.0.0)
 ---
 Release of the DCSA OpenAPI definitions for Bill of Lading 2.0.0. This release fixes minor issues found in Beta 2
 
