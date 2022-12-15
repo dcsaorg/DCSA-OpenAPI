@@ -46,7 +46,7 @@ Possibility to link between Commodity and RequestedEquipment, improved support f
 - `EPI` (EBL Platform Identifier) added as a `partyFunctionCode`
 - `partyName` is now a mandaotry field
 - `referenceType` renamed to `type` and `referenceValue` renamed to `value` in `reference` object
-- `numberOfOriginals` renamed to `numberOfOriginalsWithCharges` and `numberOfOriginalsWithoutCharges` added to `transportDocument`
+- `numberOfOriginals` removed from `transportDocument`
 
 <a name="v202"></a>[Release v2.0.2 (5 July 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN/2.0.2)
 ---
