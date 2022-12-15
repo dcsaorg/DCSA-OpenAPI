@@ -22,6 +22,7 @@ Updated as part of new Track & Trace release
 - marked patterns as strings
 - improved the description for `weightUnit` and `sort` query parameter
 - pagination-header descriptions updated (`Current-Page`, `Next-Page`, `Prev-Page`, `Last-Page` and `First-Page`)
+- `EBL` removed as a `PartyFunction` as this is not needed
 
 <a name="v202"></a>[Release v2.0.2 (5 July 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/DCSA_DOMAIN/2.0.2)
 ---
