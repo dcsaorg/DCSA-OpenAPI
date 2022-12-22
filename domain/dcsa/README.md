@@ -10,7 +10,7 @@ Updated as part of new Track & Trace release
 
 - `addressLine` and `displayedName` lengths changed from 250 -> 35 since it needs to comply with printed B/L text field lengths
 - `areChargesDisplayedOnOriginals` and `areChargesDisplayedOnCopies` removed
-- `airExchangeSetpoint`, `airExchangeUnit`, `co2Setpoint`, `commodityRequestedEquipmentLink`, `isBulbMode`, `isCargoProbe1Required`, `isCargoProbe2Required`, `isCargoProbe3Required`, `isCargoProbe4Required`, `isColdTreatmentRequired`, `isGeneratorSetRequired`, `isHighValueCargo`, `isPreCoolingRequired`, `isVentilationOpen`, `humiditySetpoint`, `nitrogenSetpoint`, `o2Setpoint`, `reeferExtraMaterial` and `reeferProductName` added
+- `airExchangeSetpoint`, `airExchangeUnit`, `carrierServiceName`, `co2Setpoint`, `commodityRequestedEquipmentLink`, `isBulbMode`, `isCargoProbe1Required`, `isCargoProbe2Required`, `isCargoProbe3Required`, `isCargoProbe4Required`, `isColdTreatmentRequired`, `isGeneratorSetRequired`, `isHighValueCargo`, `isPreCoolingRequired`, `isVentilationOpen`, `humiditySetpoint`, `nitrogenSetpoint`, `o2Setpoint`, `reeferExtraMaterial` and `reeferProductName` added
 - `humidityMin`, `humidityMax`, `temperatureMin` and `temperatureMax` removed
 - `dateRange` and `startDate` descriptions updated to include link to Wikipedia
 - `facilityTypeCodeTRN` (...TNT = Track & Trace version) description updated
