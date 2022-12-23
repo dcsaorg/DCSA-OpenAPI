@@ -4,7 +4,7 @@ The Event Domain is documented on [**EVENT_DOMAIN**](https://app.swaggerhub.com/
 
 This Domain specifies common components for DCSA Events. This domain is central for all Event Hubs.
 
-<a name="v300"></a>[Release v3.0.0 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/3.0.0)
+<a name="v300"></a>[Release v3.0.0 (23 December 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/3.0.0)
 ---
 New major release of T&T
 
@@ -20,12 +20,18 @@ New major release of T&T
   - `CUS` (Customs Inspection) renamed to `CUC` (Customs Clearance)
   - `CQU` (Contract Quotation) and `INV` (Invoice) added
   - `INV` (Invoice) added
-  - `ACE` (Authority Certificate) added
+  - `HCE` (Health Certificate) added
+  - `PCE` (Phytosanitary Certificate) added
+  - `VCE` (Veterinary Certificate) added
+  - `FCE` (Fumigation Certificate) added
+  - `ICE` (Inspection Certificate) added
+  - `CEA` (Certificate of Analysis) added
+  - `CEO` (Certificate of Origin) added
   - description improved
 - `equipmentEventTypeCode` renamed to `equipmentEventTypeCodes` and updated:
   - `AVPU` (Available for Pick-up), `AVDO` (Available for Drop-off) added
   - `CUSS` (Customs Selected for Scan), `CUSI` (Customs Selected for Inspection) and `CUSR` (Customs Released) added
-  - `WAYP` (Way Point Crossed) added
+  - `CROS` (Crossed) added
   - description improved
 - `eventCreatedDateTime` description improved
 - `eventDateTime` added as query parameter
@@ -84,7 +90,7 @@ New major release of T&T
   - `universalServiceReference`, `universalExportVoyageReference` and `universalImportVoyageReference` added
   - `importVoyageNumber` renamed to `carrierImportVoyageNumber`
   - removed `geoLocation` interface from `location`
-  - `facilityTypeCode` updated: `COYA` removed and `RLSP` (Rail Spot) and `RDSP` (Road Spot) added
+  - `facilityTypeCode` updated: `COYA` removed, `BOCR` (Border crossing) renamed to `BORD` (Border) and `WAYP` (Waypoint) added
   - `facilityCode`, `facilityCodeListProvider`, `otherFacility` and `UNLocationCode` removed from `transportCall` - the fields in the location object should be used
   - `vessel` object updated. All prefixed `vessel` in field names removed except in `vesselIMONumber`
  - `reference` object updated. `referenceType` and `referenceValue` renamed to `type` and `value`
@@ -95,15 +101,22 @@ New major release of T&T
   - `CUS` (Customs Inspection) renamed to `CUC` (Customs Clearance)
   - `CQU` (Contract Quotation) and `INV` (Invoice) added
   - `INV` (Invoice) added
-  - `ACE` (Authority Certificate) added
+  - `HCE` (Health Certificate) added
+  - `PCE` (Phytosanitary Certificate) added
+  - `VCE` (Veterinary Certificate) added
+  - `FCE` (Fumigation Certificate) added
+  - `ICE` (Inspection Certificate) added
+  - `CEA` (Certificate of Analysis) added
+  - `CEO` (Certificate of Origin) added
   - description improved
 - `documentTypeCodes` description updated
 - `equipmentEventTypeCode` updated:
   - `AVPU` (Available for Pick-up), `AVDO` (Available for Drop-off) added
   - `CUSS` (Customs Selected for Scan), `CUSI` (Customs Selected for Inspection) and `CUSR` (Customs Released) added
-  - `WAYP` (Way Point Crossed) added
+  - `CROS` (Crossed) added
   - description improved
  - `equipmentEventTypeCodes` description updated
+ - `subscriptionCreatedDateTime` and `subscriptionUpdatedDateTime` added
  
 <a name="v202"></a>[Release v2.0.2 (5 July 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/2.0.2)
 ---
