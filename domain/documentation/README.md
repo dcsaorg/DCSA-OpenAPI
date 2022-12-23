@@ -11,17 +11,18 @@ Active Reefer Settings has been added
 - `activeReeferSettings` added to `requestedEquipment`
 - `activeReeferSettings` updated on the `utilizedTransportEquipment`
 
-<a name="v210"></a>[Release v2.1.0 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN/2.1.0)
+<a name="v210"></a>[Release v2.1.0 (23 December 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN/2.1.0)
 ---
 Possibility to link between Commodity and RequestedEquipment, improved support for paper-version of EBL
 
 - Bump [DCSA_Domain to version 2.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v203) (was previously v2.0.2)
 - Bump [Location_Domain to version 2.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v203) (was previously v2.0.2)
-- ??? add `carrierServiceCode` and `universalServiceReference` to the booking
-- ??? `isAMSACIFilingRequired` changed to include entire object?!?
+- `carrierServiceName`, `carrierServiceCode` and `universalServiceReference` added to booking request
+- `isAMSACIFilingRequired` moved from booking request to shipment
+- `isDestinationFilingRequired` renamed to `isCustomsFilingSubmissionByShipper`
+- `customsFilingSystem` added as object but not used
 - `valueAddedServiceRequests` renamed to `valueAddedServices`
 - `commodityRequestedEquipmentLink` added to the `commodity` in order to link commodity and requestedEquipment
-- description for `requestedEquipment` updated to clearly specify how `Active Reefer Settings` work
 - `requestedEquipmentSizeType` renamed to `ISOEquipmentCode`
 - `tareWeight` and `tareWeightUnit` added to `requestedEquipment` in case of SOC
 - `requestedEquipmentUnits` renamed to `units`
@@ -36,15 +37,18 @@ Possibility to link between Commodity and RequestedEquipment, improved support f
 - `areChargesDisplayedOnOriginals` and `areChargesDisplayedOnCopies` removed
 - `displayedNameForPlaceOfReceipt`, `displayedNameForPortOfLoad`, `displayedNameForPortOfDischarge` and `displayedNameForPlaceOfDelivery` changed from string with maxlength of 250 to an array of 5 lines each containing 35 characters (string with maxLength 35)
 - `utilizedTransportEquipment` description updated
+- `ActiveReeferSettings` removed
 - `seal` object updated
   - `sealNumber` renamed to `number`
   - `sealSource` renamed to `source`
   - `sealType` renamed to `type`
   - only `number` remains a required field
 - `displayedAddress` in the `Party` object now only allows 5 lines each with a max of 35 characters (string with maxLength 35)
+- deprecated `codeListResponsibleAgencyCode` removed
 - `DCSA` removed as a `partyFunctionCode`
 - `EPI` (EBL Platform Identifier) added as a `partyFunctionCode`
 - `partyName` is now a mandaotry field
+- `displayedName` removed from `shipmentLocations` (`displayedNameFor...` fields should be used instead)
 - `referenceType` renamed to `type` and `referenceValue` renamed to `value` in `reference` object
 - `numberOfOriginals` removed from `transportDocument`
 
