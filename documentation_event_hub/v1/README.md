@@ -6,8 +6,6 @@ The purpose of an Event Hub is to send events and manage subscriptions. In case 
 
 ### Releasenotes
 
-### [v1.0.0](https://app.swaggerhub.com/apis-docs/dcsaorg/DOCUMENTATION_EVENT_HUB/1.0.0)
-
+<a name="v100"></a>[Release v1.0.0 (23 December 2022)](https://app.swaggerhub.com/apis-docs/dcsaorg/DOCUMENTATION_EVENT_HUB/1.0.0)
+---
 Initial release of the DCSA OpenAPI definitions for eDocumentation Hub
-
-**NB**: Not updated yet...
