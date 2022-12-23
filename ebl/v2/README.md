@@ -20,7 +20,10 @@ Release of the DCSA OpenAPI definitions for Bill of Lading 2.0.0. This release f
   - `carrierBookingRequestReference` removed as parameter and substituted by `documentTypeCode` and `documentReference`
   - `eventDateTime` added as parameter
 - Please consult the Domains updated above to see changes - some of the major are listed here:
-  - 
+  - `NumberOfOriginals` and `NumberOf Copies` can now be with and without Charges
+  - it is possible to link a `Commodity` to a `requestedEquipment`
+  - `DisplayedNameForPlaceOfReceipt`, `DisplayedNameForPortOfLoad`, `DisplayedNameForPortOfDischarge` and `DisplayedNameForPlaceOfDelivery` are now limited to 5 lines of 35 characters (same applies to the address of all the `DocumentParties`)
+  - No `ActiveReeferSettings` in this release
 
 <a name="v200B2"></a>[Release v2.0.0 Beta 2 (1 July 2022)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/2.0.0-Beta-2)
 ---
