@@ -19,6 +19,8 @@ Release of the DCSA OpenAPI definitions for Bill of Lading 2.0.0. This release f
 - following modifications has been done to the ´GET /events` endPoint
   - `carrierBookingRequestReference` removed as parameter and substituted by `documentTypeCode` and `documentReference`
   - `eventDateTime` added as parameter
+- Please consult the Domains updated above to see changes - some of the major are listed here:
+  - 
 
 <a name="v200B2"></a>[Release v2.0.0 Beta 2 (1 July 2022)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/2.0.0-Beta-2)
 ---
