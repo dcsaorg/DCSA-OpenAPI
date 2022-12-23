@@ -1,0 +1,541 @@
+openapi: 3.0.3
+info:
+  version: 1.0.0-Beta-2
+  title: DCSA OpenAPI specification for Booking - Beta 2
+  description: |
+    API specification issued by DCSA.org.
+    
+    For explanation to specific values or objects please refer to the *** [Information Model v2022.1]() *** Will be updated soon ***. This API does not define the business rules regarding what is allowed to update at what time. For this the [BKG IFS]() *** Will be updated soon *** should be consulted.
+
+    All other documents related to the Booking publication can be found [here](https://knowledge.dcsa.org/s/publication?publicationId=a0r7T000000L8mmQAC)
+    
+    It is possible to use this API as a standalone API. In order to do so it is necessary to use the poll-endPoint
+    - /v1/events
+    
+    in order to poll event information.
+
+    It is recomended to implement the [DCSA Documentation Event Hub](https://app.swaggerhub.com/apis/dcsaorg/DOCUMENTATION_EVENT_HUB) in order to use the push model. Here events are pushed as they occur.
+
+    For a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/bkg/v1#v100B2). Please also [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments.
+
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  contact:
+    name: Digital Container Shipping Association (DCSA)
+    url: https://dcsa.org
+    email: info@dcsa.org
+tags:
+  - name: Booking Request
+    description: |
+      The initial steps by the Shipper to create a Booking
+  - name: Shipment
+    description: |
+      The shipment as agreed by both parties
+  - name: Cancellation
+    description: |
+      Shipper initiated cancellation of a booking
+  - name: Booking Events
+    description: |
+      If no subscriptions have been setup, event polling can be done here
+paths:
+  /v1/booking-summaries:
+    get:
+      tags:
+       - Booking Request
+      summary: Get booking requests
+      description: |
+        Retrieves the booking request _metadata_
+      parameters:
+        - $ref: '#/components/parameters/documentStatus'
+
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/parameters/limit'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/parameters/cursor'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/parameters/sort'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/parameters/Api-Version-Major'
+      responses:
+        '200':
+          description: Request successful
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/headers/API-Version'
+            Current-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/headers/Current-Page'
+            Next-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/headers/Next-Page'
+            Prev-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/headers/Prev-Page'
+            Last-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/headers/Last-Page'
+            First-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/headers/First-Page'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/2.0.1#/components/schemas/bookingSummary'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.1.0#/components/schemas/error'
+  /v1/bookings:
+    post:
+      tags:
+       - Booking Request
+      summary: Post a booking request
+      parameters:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/parameters/Api-Version-Major'
+      description: |
+        Creates a new booking request
+      requestBody:
+        description: Parameters used to create a booking request
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/2.0.1#/components/schemas/bookingRequest'
+      responses:
+        '201':
+          description: |
+            Booking request has been successfully created. Asynchronous processing will now begin. A `ShipmentEvent` will be created with the result of the processing once it is finished.
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/2.0.1#/components/schemas/bookingRefStatus'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.1.0#/components/schemas/error'
+  /v1/bookings/{carrierBookingRequestReference}:
+    get:
+      tags:
+       - Booking Request
+      summary: Get booking requests
+      description: |
+        Retrieves the booking request with the `carrierBookingRequestReference` in the path.
+      parameters:
+        - $ref: '#/components/parameters/carrierBookingRequestReferencePathParam'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/parameters/Api-Version-Major'
+      responses:
+        '200':
+          description: Request successful
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/2.0.1#/components/schemas/bookingResponse'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.1.0#/components/schemas/error'
+    put:
+      tags:
+       - Booking Request
+      summary: Put booking requests
+      parameters:
+        - $ref: '#/components/parameters/carrierBookingRequestReferencePathParam'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/parameters/Api-Version-Major'
+      description: |
+        Updates the booking request with the `carrierBookingRequestReference` in the path.
+      requestBody:
+        description: Parameters used to update the booking request
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/2.0.1#/components/schemas/booking'
+      responses:
+        '200':
+          description: |
+            Booking request update has been successfully received. Asynchronous processing will now begin. A `ShipmentEvent` will be created with the result of the processing once it is finished.
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/2.0.1#/components/schemas/bookingRefStatus'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.1.0#/components/schemas/error'
+    patch:
+      tags:
+       - Cancellation
+      summary: Cancel a booking
+      description: |
+        A shipper initiated cancellation of the Booking.
+      parameters:
+        - $ref: '#/components/parameters/carrierBookingRequestReferencePathParam'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/parameters/Api-Version-Major'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              allOf:
+                - type: object
+                  properties:
+                    documentStatus:
+                      $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/documentStatus'
+                # Extension of the documentStatus field to limit it only to the value CANC
+                - type: object
+                  properties:
+                    documentStatus:
+                      description: |
+                        This changes the documentStatus to contain the value:
+                        - CANC (Cancelled)
+                      enum:
+                        - CANC
+                      example:
+                        CANC
+                - type: object
+                  properties:
+                    reason:
+                      $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/2.0.1#/components/schemas/reason'
+                # Extension of the reason field to describe the reason for cancellation
+                - type: object
+                  properties:
+                    reason:
+                      description: |
+                        An optional field where a reason for cancelling the booking can be given.
+                      example:
+                        Booking cancelled due to internal problems
+              required:
+                - documentStatus
+              # description: |
+              #   This changes the documentStatus to contain the value:
+              #   - CANC (Cancelled)
+              # type: string
+              # enum: 
+              #   - CANC
+      responses:
+        '200':
+          description: |
+            Booking has been cancellated
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/2.0.1#/components/schemas/bookingRefStatus'
+                  # Extending the documentStatus example to return CANC (as this is a cancellation endPoint)
+                  - type: object
+                    properties:
+                      documentStatus:
+                        example: CANC
+
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.1.0#/components/schemas/error'
+  
+  /v1/shipment-summaries:
+    get:
+      tags:
+       - Shipment
+      summary: Get shipments
+      description: |
+        Retrieves the shipment _metadata_.
+      parameters:
+        - $ref: '#/components/parameters/documentStatus'
+
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/parameters/limit'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/parameters/cursor'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/parameters/sort'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/parameters/Api-Version-Major'
+      responses:
+        '200':
+          description: Request successful
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/headers/API-Version'
+            Current-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/headers/Current-Page'
+            Next-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/headers/Next-Page'
+            Prev-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/headers/Prev-Page'
+            Last-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/headers/Last-Page'
+            First-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/headers/First-Page'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/2.0.1#/components/schemas/shipmentSummary'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.1.0#/components/schemas/error'
+  /v1/shipments/{carrierBookingReference}:
+    get:
+      tags:
+       - Shipment
+      summary: Get shipment
+      description: |
+        Retrieves the shipment with the `carrierBookingReference` in the path.
+      parameters:
+        - $ref: '#/components/parameters/carrierBookingReferencePathParam'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/parameters/Api-Version-Major'
+      responses:
+        '200':
+          description: Request successful
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/2.0.1#/components/schemas/shipment'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.1.0#/components/schemas/error'
+
+  /v1/events/:
+    get:
+      tags:
+       - Booking Events
+      summary: Get Shipment events
+      description: |
+        Retrieves **booking related** Shipment events. The default sort order is by `eventCreatedDateTime` in descending order (`DESC`)
+      parameters:
+        # Chunk with specialized booking related ShipmentEvent parameters
+        - $ref: '#/components/parameters/shipmentEventTypeCodes'
+        - $ref: '#/components/parameters/documentTypeCodes'
+        # - $ref: '#/components/parameters/documentID'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/2.0.1#/components/parameters/carrierBookingReference'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/2.0.1#/components/parameters/carrierBookingRequestReference'
+
+        # Chunk with base event parameters
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/2.0.1#/components/parameters/eventCreatedDateTime'
+
+        # Chunk with Global related event parameters
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/parameters/limit'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/parameters/cursor'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/parameters/sort'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/parameters/Api-Version-Major'
+      responses:
+        '200':
+          description: Request successful
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/headers/API-Version'
+            Current-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/headers/Current-Page'
+            Next-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/headers/Next-Page'
+            Prev-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/headers/Prev-Page'
+            Last-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/headers/Last-Page'
+            First-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/headers/First-Page'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/2.0.1#/components/schemas/shipmentEvent'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.1.0#/components/schemas/error'
+
+components:
+  # schemas:
+    # documentTypeCode:
+    #   type: string
+    #   maxLength: 3
+    #   description: |
+    #     The code to identify the type of information `documentID` points to. Can be one of the following values
+    #     - CBR (Carrier Booking Request Reference)
+    #     - BKG (Booking)
+
+    #     More details can be found on <a href="https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/documenttypecodes.csv">GitHub</a>. Be aware that the list provided here is a subset of the possible values.
+    #   example: CBR
+    #   enum:
+    #     - CBR
+    #     - BKG
+    # shipmentEventTypeCode:
+    #   type: string
+    #   description: |
+    #     The status of the booking in the process. Possible values are
+    #     - RECE (Received)
+    #     - PENU (Pending Update)
+    #     - PENC (Pending Confirmation)
+    #     - CONF (Confirmed)
+    #     - REJE (Rejected)
+    #     - CANC (Cancelled)
+
+    #     More details can be found on <a href="https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/shipmenteventtypecodes.csv">GitHub</a>. Be aware that the list provided here is a subset of the possible values.
+    #   enum:
+    #     - RECE
+    #     - PENU
+    #     - PENC
+    #     - CONF
+    #     - REJE
+    #     - CANC
+    #   example: CONF
+    
+  parameters:
+  
+    #############
+    # Path params
+    #############
+    
+    carrierBookingRequestReferencePathParam:
+      in: path
+      name: carrierBookingRequestReference
+      description: |
+        The `carrierBookingRequestReference` of the booking request to match
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/carrierBookingRequestReference'
+      required: true
+    carrierBookingReferencePathParam:
+      in: path
+      name: carrierBookingReference
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/carrierBookingReference'
+      required: true
+
+    ##############
+    # Query params
+    ##############
+    
+    documentID:
+      in: query
+      name: documentID
+      description: |
+        A set of unique characters to identify a resource. Specifying this filter will only return events related to this particular `documentID`. The `documentID` can point to a bookingRequest (`CBR`) or to a confirmed booking (`BKG`)
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/2.0.1#/components/schemas/documentID'
+    documentStatus:
+      in: query
+      name: documentStatus
+      description: |
+        Filter by the status of the booking. Possible values are:
+        - RECE (Received)
+        - PENU (Pending Update)
+        - PENC (Pending Confirmation)
+        - CONF (Confirmed)
+        - REJE (Rejected)
+        - CANC (Cancelled)
+        - CMPL (Completed)
+
+        More details can be found on <a href="https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/shipmenteventtypecodes.csv">GitHub</a>. Be aware that the list linked to is the `ShipmentEventTypeCodes` which is equivalent to `documentStatus`, the list is a subset of the possible values.
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/2.0.1#/components/schemas/bookingDocumentStatus'
+    documentTypeCodes:
+      in: query
+      name: documentTypeCode
+      explode: false
+      style: form
+      description: |
+        The `documentTypeCode` to filter by. Possible values are
+        - CBR (Carrier Booking Request Reference)
+        - BKG (Booking)
+
+        It is possible to select multiple values by comma `,` separating them. For multiple values the OR-operator is used. For example _documentTypeCode=CBR,BKG_ Matches **both** `ShipmentEvents` related to Booking Requests (`CBR`) and Confirmed Bookings (`BKG`).
+
+        More details can be found on <a href="https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/documenttypecodes.csv">GitHub</a>. Be aware that the list provided here is a subset of the possible values.        
+      example: CBR
+      schema:
+        default: [CBR,BKG]
+        type: array
+        items:
+          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/2.0.1#/components/schemas/bookingDocumentTypeCode'
+    carrierBookingRequestReferenceQueryParam:
+      in: query
+      name: carrierBookingRequestReference
+      description: |
+        A temporary ID provided by carrier to identify a booking request.
+        
+        Specifying this filter will only return booking requests related to this particular `carrierBookingRequestReference`.
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/carrierBookingRequestReference'
+    carrierBookingReferenceQueryParam:
+      in: query
+      name: carrierBookingReference
+      description: |
+        A set of unique characters provided by carrier to identify a confirmed booking.
+        
+        Specifying this filter will only return confirmed bookings related to this particular `carrierBookingReference`.
+      schema:
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.1#/components/schemas/carrierBookingReference'
+    shipmentEventTypeCodes:
+      in: query
+      name: shipmentEventTypeCode
+      explode: false
+      style: form
+      description: |
+        The status of the document in the booking process to filter by. Possible values are
+        - RECE (Received)
+        - PENU (Pending Update)
+        - PENC (Pending Confirmation)
+        - CONF (Confirmed)
+        - REJE (Rejected)
+        - CANC (Cancelled)
+        - CMPL (Completed)
+
+        It is possible to select multiple values by comma `,` separating them. For multiple values the OR-operator is used. For example _shipmentEventTypeCode=RECE,CONF_  Matches **both** Received (`RECE`) and Confirmed (`CONF`) `ShipmentEvents`.
+
+        More details can be found on <a href="https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/shipmenteventtypecodes.csv">GitHub</a>. Be aware that the list provided here is a subset of the possible values.
+      example: [RECE,CONF]
+      schema:
+        default: [RECE,PENU,PENC,CONF,REJE,CANC,CMPL]
+        type: array
+        items:
+          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/2.0.1#/components/schemas/bookingShipmentEventTypeCode'
