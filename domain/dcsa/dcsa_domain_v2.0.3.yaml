@@ -77,16 +77,6 @@ components:
       description: |
         Date when AMS filing should latest be done in the last port of call before visiting the first US port.
       example: 2021-09-03
-    areChargesDisplayedOnOriginals:
-      type: boolean
-      description: |
-        An indicator of whether the charges are displayed on the original documents.
-      example: true
-    areChargesDisplayedOnCopies:
-      type: boolean
-      description: |
-        An indicator of whether the charges are displayed on the copies of the documents.
-      example: true
     bookingChannelReference:
       type: string
       maxLength: 20
@@ -208,6 +198,12 @@ components:
       maxLength: 5
       type: string
       example: FE1
+    carrierServiceName:
+      type: string
+      maxLength: 50
+      description: |
+        The name of a service as specified by the carrier
+      example: Great Lion Service
     carrierVoyageNumber:
       type: string
       maxLength: 50
@@ -519,7 +515,7 @@ components:
       example: POTE
       description: |
         The code to identify the specific type of facility.
-        - BOCR (Border crossing)
+        - BORD (Border)
         - CLOC (Customer location)
         - COFS (Container freight station)
         - COYA (Deprecated - use OFFD intead)
@@ -530,8 +526,9 @@ components:
         - PBPL (Pilot boarding place)
         - BRTH (Berth)
         - RAMP (Ramp)
+        - WAYP (Waypoint)
       enum:
-        - BOCR
+        - BORD
         - CLOC
         - COFS
         - COYA
@@ -542,6 +539,7 @@ components:
         - PBPL
         - BRTH
         - RAMP
+        - WAYP
     facilityTypeCodeOPR:
       type: string
       example: BRTH
@@ -559,7 +557,7 @@ components:
       example: POTE
       description: |
         The code to identify the specific type of facility. The code indicates which role the facility plays during the `transportCall` or during *stuffing*/*stipping*.
-        - BOCR (Border crossing)
+        - BORD (Border)
         - CLOC (Customer location)
         - COFS (Container freight station)
         - COYA (Deprecated - use OFFD intead)
@@ -568,8 +566,9 @@ components:
         - INTE (Inland terminal)
         - POTE (Port terminal)
         - RAMP (Ramp)
+        - WAYP (Waypoint)
       enum:
-        - BOCR
+        - BORD
         - CLOC
         - COFS
         - COYA
@@ -578,6 +577,7 @@ components:
         - INTE
         - POTE
         - RAMP
+        - WAYP
     finalDestinationExpectedArrivalDate:
       type: string
       format: date
@@ -671,10 +671,10 @@ components:
         Indicator whether cargo requires cold treatment prior to loading at origin or during transit, but prior arrival at POD
       example: false
       default: false
-    isDestinationFilingRequired:
+    isCustomsFilingSubmissionByShipper:
       type: boolean
       description: |
-        Indicates whether the shipper will perform the AMS/ACI filing directly or not. Mandatory if AMS/ACI filing is required
+        Indicates whether the shipper will submit the destination customs filing directly. If `false` the shipper requests the carrier to submit the customs filing on their behalf. Mandatory if AMS/ACI filing is required
       example: true
     isElectronic:
       type: boolean
@@ -736,24 +736,24 @@ components:
       format: date
       description: 'Local date when the transport document has been issued'
       example: '2020-12-12'
-    issuedNumberOfOriginals:
-      type: integer
-      format: int32
-      description: |
-        Number of original copies of the negotiable bill of lading that has been issued to the customer.
-      example: 4
-    issuedNumberOfOriginalsWithCharges:
-      type: integer
-      format: int32
-      description: |
-        Number of original copies of the negotiable bill of lading that has been issued to the customer with Charges.
-      example: 1
-    issuedNumberOfOriginalsWithoutCharges:
-      type: integer
-      format: int32
-      description: |
-        Number of original copies of the negotiable bill of lading that has been issued to the customer without Charges.
-      example: 1
+    # issuedNumberOfOriginals:
+    #   type: integer
+    #   format: int32
+    #   description: |
+    #     Number of original copies of the negotiable bill of lading that has been issued to the customer.
+    #   example: 4
+    # issuedNumberOfOriginalsWithCharges:
+    #   type: integer
+    #   format: int32
+    #   description: |
+    #     Number of original copies of the negotiable bill of lading that has been issued to the customer with Charges.
+    #   example: 1
+    # issuedNumberOfOriginalsWithoutCharges:
+    #   type: integer
+    #   format: int32
+    #   description: |
+    #     Number of original copies of the negotiable bill of lading that has been issued to the customer without Charges.
+    #   example: 1
     isToBeNotified:
       type: boolean
       description: 'Used to decide whether the party will be notified of the arrival of the cargo.'
@@ -817,6 +817,12 @@ components:
       maxLength: 100
       description: 'Name of the contact'
       example: 'Henrik'
+    nitrogenSetpoint:
+      type: number
+      format: float
+      description: |
+        The percentage of the controlled atmosphere nitrogen target value
+      example: 25
     nmftaCode:
       type: string
       maxLength: 4
@@ -909,7 +915,6 @@ components:
         - HE (Carrier booking office (transportation office))
         - SCO (Service contract owner - Defined by DCSA)
         - BA (Booking Agency)
-        - EBL (EBL Solution Provider)
         - ENR (Envelope Receiver)
       # NB: This is excluding partyFunctions defined in the publisherRole
       enum:
@@ -926,7 +931,6 @@ components:
         - HE
         - SCO
         - BA
-        - EBL
         - ENR
         # NB: This is excluding partyFunctions defined in the publisherRole
       example: DDS
@@ -1018,6 +1022,12 @@ components:
       format: date
       description: 'Date when the last container linked to the transport document is physically in the terminal (customers cleared against the intended vessel).'
       example: '2020-12-12'
+    reeferExtraMaterial:
+      type: string
+      maxLength: 500
+      description: |
+        spacers, filler, board or dunnage material used to stabilize cargo and ensure optimal airflow inside the Reefer container.
+      example: 'spacers'
     reeferProductName:
       type: string
       maxLength: 500
