@@ -10,20 +10,24 @@ Updated as part of new Track & Trace release
 
 - `addressLine` and `displayedName` lengths changed from 250 -> 35 since it needs to comply with printed B/L text field lengths
 - `areChargesDisplayedOnOriginals` and `areChargesDisplayedOnCopies` removed
-- `airExchangeSetpoint`, `airExchangeUnit`, `carrierServiceName`, `co2Setpoint`, `commodityRequestedEquipmentLink`, `isBulbMode`, `isCargoProbe1Required`, `isCargoProbe2Required`, `isCargoProbe3Required`, `isCargoProbe4Required`, `isColdTreatmentRequired`, `isGeneratorSetRequired`, `isHighValueCargo`, `isPreCoolingRequired`, `isVentilationOpen`, `humiditySetpoint`, `nitrogenSetpoint`, `o2Setpoint`, `reeferExtraMaterial` and `reeferProductName` added
+- `airExchangeSetpoint`, `airExchangeUnit`, `carrierServiceName`, `co2Setpoint`, `commodityRequestedEquipmentLink`, `isBulbMode`, `isCargoProbe1Required`, `isCargoProbe2Required`, `isCargoProbe3Required`, `isCargoProbe4Required`, `isColdTreatmentRequired`, `isGeneratorSetRequired`, `isHighValueCargo`, `isPreCoolingRequired`, `isVentilationOpen`, `humiditySetpoint`, `nitrogenSetpoint`, `o2Setpoint`, `reeferExtraMaterial`, `reeferProductName` and `temperatureSetpoint` added
 - `CUS` (Customs Filing Due Date) added to `cutOffDateTimeCodes`
 - `humidityMin`, `humidityMax`, `temperatureMin` and `temperatureMax` removed
 - `dateRange` and `startDate` descriptions updated to include link to Wikipedia
-- `facilityTypeCodeTRN` (...TNT = Track & Trace version) description updated
+- `facilityTypeCode` updated `BOCR` (Border crossing) --> `BORD` (Border) and added `WAYP` (Waypoint)
+- `facilityTypeCodeTRN` (...TNT = Track & Trace version) description updated and aligned with `facilityTypeCode`
+- `isDestinationFilingRequired` renamed to `isCustomsFilingSubmissionByShipper`
+- `issedNumberOfOriginals` removed
 - `issedNumberOfOriginalsWithCharges` and `issedNumberOfOriginalsWithoutCharges` added
 - `latitude` and `longitude` now indluce a regEx for validation
 - `numberOfCopiesWithCharges`, `numberOfCopiesWithoutCharges`, `numberOfOriginalsWithCharges` and `numberOfOriginalsWithoutCharges` added
-- `ENR` (Envelope Receiver) added as new partyFunctionCode 
+- `ENR` (Envelope Receiver) added as new partyFunctionCode `EBL` (EBL Solution Provider) removed
 - `RUC`, `DUE`, `CER` and `AES` added to the `ReferenceType` enum
+- `shippedOnBoardDate` added
 - marked patterns as strings
 - improved the description for `weightUnit` and `sort` query parameter
 - pagination-header descriptions updated (`Current-Page`, `Next-Page`, `Prev-Page`, `Last-Page` and `First-Page`)
-- `EBL` removed as a `PartyFunction` as this is not needed
+- `offset` added as query parameter
 
 <a name="v202"></a>[Release v2.0.2 (5 July 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/DCSA_DOMAIN/2.0.2)
 ---
