@@ -6,14 +6,19 @@ Publications related to this specification can be found on the DCSA website:
 - [Electronic Bill of Lading 2.0 Beta](https://knowledge.dcsa.org/s/publication?publicationId=a0r7T000000L8lPQAS)
 - [Glossary of Terms](https://knowledge.dcsa.org/s/glossary)
 
-<a name="v200"></a>[Release v2.0.0 (...)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/2.0.0)
+<a name="v200"></a>[Release v2.0.0 (23 December 2022)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/2.0.0)
 ---
 Release of the DCSA OpenAPI definitions for Bill of Lading 2.0.0. This release fixes minor issues found in Beta 2
 
-- Bump [Documentation_Domain to version 2.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v201) (was previously v2.0.0)
-- Bump [DCSA_Domain to version 2.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v201) (was previously v2.0.0)
-- Bump [Event_Domain to version 2.0.1](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#v201) (was previously v2.0.0)
+- Bump [Documentation_Domain to version 2.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v210) (was previously v2.0.1)
+- Bump [DCSA_Domain to version 2.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v203) (was previously v2.0.1)
+- Bump [Event_Domain to version 3.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#v203) (was previously v2.0.1)
+- Bump [Error_Domain to version 2.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/error#v200) (was previously v1.1.1)
 - API description updated
+- `cursor` parameter removed from all endPoints
+- following modifications has been done to the ´GET /events` endPoint
+  - `carrierBookingRequestReference` removed as parameter and substituted by `documentTypeCode` and `documentReference`
+  - `eventDateTime` added as parameter
 
 <a name="v200B2"></a>[Release v2.0.0 Beta 2 (1 July 2022)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/2.0.0-Beta-2)
 ---
