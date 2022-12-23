@@ -1,0 +1,514 @@
+openapi: 3.0.3
+info:
+  version: 1.0.0
+  title: DCSA Documentation Event Hub
+  description: |
+    Managing and sending ShipmentEvents and subscriptions for <a href='https://app.swaggerhub.com/apis/dcsaorg/DCSA_EBL'>DCSA OpenAPI specification for Electronic Bill of Lading (EBL)</a> and <a href='https://app.swaggerhub.com/apis/dcsaorg/DCSA_BKG'>DCSA OpenAPI specification for Booking (BKG)</a>. It is recomended (but not required) that implementors of the EBL and BKG APIs also implements this API in order to push events as they occur to consumers.
+
+    For a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/documentation_event_hub/v1#v100). Please also [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments.
+
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  contact:
+    name: Digital Container Shipping Association (DCSA)
+    url: https://dcsa.org
+    email: info@dcsa.org
+tags:
+  - name: Events
+    description: Event operations
+  - name: Subscriptions
+    description: Subscription operations
+  - name: Secret
+    description: Update secret
+paths:
+  /v1/events:
+    get:
+      tags:
+        - Events
+      summary: Find Shipment events.
+      description: |
+        Returns Shipment events filtered by the queryParameters.
+        
+        **NB**: It is possible to combine queryParameters. When combining queryParameters be aware that it is also possible to make combinations that are mutual contradicting. Example:
+        
+            shipmentEventTypeCodes=DRFT & equipmentEventTypeCodes=GTIN
+        
+        Since there is no event that can be a ShipmentEvent **and** an EquipmentEvent at the same time **this will return an empty list**!
+        
+        If not specified - this list will be sorted by the time the event was created (`eventCreatedDateTime`) in ascending (`ASC`) order.
+      parameters:
+        # OBS: Be aware that changing the parameters requires a manual change in other APIs
+
+        # Chunk with Metadata Event related parameters
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/eventCreatedDateTime'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/eventDateTime'
+
+        # Chunk with Shipment related event parameters
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/shipmentEventTypeCodes'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/documentTypeCodes'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/documentReference'
+
+        # Chunk with event parameters needed to be included in all APIs
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/parameters/limit'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/parameters/sort'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/parameters/Api-Version-Major'
+      responses:
+        '200':
+          description: Successful operation
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/API-Version'
+            Current-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/Current-Page'
+            Next-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/Next-Page'
+            Prev-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/Prev-Page'
+            Last-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/Last-Page'
+            First-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/First-Page'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/schemas/shipmentEvent'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.0#/components/schemas/error'
+                  - type: object
+                    properties:
+                      httpMethod:
+                        example: GET
+                  - type: object
+                    properties:
+                      requestUri:
+                        example: 'https://dcsa.org/dcsa/documentation-hub/v1/events'
+  /v1/events/{eventID}:
+    get:
+      tags:
+        - Events
+      summary: Find ShipmentEvent by eventID.
+      description: Returns the Shipment event with the specified `eventID`.
+      parameters:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/eventID'
+      responses:
+        '200':
+          description: Successful operation
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/schemas/shipmentEvent'
+              examples:
+                Shipment Event:
+                  value:
+                    metadata:
+                      eventID: '84db923d-2a19-4eb0-beb5-446c1ec57d34'
+                      eventCreatedDateTime: '2022-09-19T06:31:00+02:00'
+                      eventType: 'SHIPMENT'
+                    payload:
+                      eventClassifierCode: 'ACT'
+                      eventDateTime: '2022-09-19T06:31:00+02:00'
+                      shipmentEventTypeCode: 'ISSU'
+                      documentTypeCode: 'TRD'
+                      documentReference: '84db923d-2a19-4eb0-beb5-446c1ec57d34'
+                      reason: 'All good'
+                      relatedDocumentReferences:
+                        - type: 'BKG'
+                          value: 'ABC123059'
+                      references:
+                        - type: 'EQ'
+                          value: 'APZU4812090'
+                Retracted Shiopment Event:
+                  value:
+                    metadata:
+                      eventID: '2239d040-78c9-4172-8863-89428af41a0e'
+                      eventCreatedDateTime: '2022-09-20T07:41:00+08:30'
+                      eventType: 'SHIPMENT'
+                      retractedEventID: '957e4966-dad0-4111-9f8f-fb7216c43907'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.0#/components/schemas/error'
+                  - type: object
+                    properties:
+                      httpMethod:
+                        example: GET
+                  - type: object
+                    properties:
+                      requestUri:
+                        example: 'https://dcsa.org/dcsa/documentation-hub/v1/events/123e4567-e89b-12d3-a456-426614174000'
+
+  /v1/event-subscriptions:
+    get:
+      tags:
+      - Subscriptions
+      summary: Receive a list of your active subscriptions
+      description: |
+        Lists all subscriptions belonging to you. If not specified the list will be sorted on the creation date of the subscription (`subscriptionCreatedDateTime`) in ascending (`ASC`) order.
+      parameters:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/parameters/limit'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/parameters/sort'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/parameters/Api-Version-Major'
+      responses:
+        '200':
+          description: Returns a list of subscriptions
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/API-Version'
+            Current-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/Current-Page'
+            Next-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/Next-Page'
+            Prev-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/Prev-Page'
+            Last-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/Last-Page'
+            First-Page:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/First-Page'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/subscription'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.0#/components/schemas/error'
+                  - type: object
+                    properties:
+                      httpMethod:
+                        example: GET
+                  - type: object
+                    properties:
+                      requestUri:
+                        example: 'https://dcsa.org/dcsa/documentation-hub/v1/event-subscriptions'
+    post:
+      tags:
+      - Subscriptions
+      summary: Create a subscription
+      description: |
+        Creates a new subscription and allows events matching the subscription to be pushed to the `callBackUrl`
+      parameters:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/parameters/Api-Version-Major'
+      requestBody:
+        description: |
+          Parameters used to configure the subscription. It is possible to only receive cirtain types of events by adding filter values to the subscription.
+
+          All values in the subscription body except: `callback`, `secret` and `subscriptionID` will be used as filters. All filters specified **must** be filfilled in order to match an Event.
+          
+          A logical **AND* is used between filters. So
+          
+              shipmentEventTypeCode=DRFT&carrierBookingReference=ABC123123
+          
+          means that the events matched ***must*** both be Draft (`shipmentEventTypeCodes=DRFT`) **and** be connected to carrierBookingReference ABC123123 (`carrierBookingReference=ABC123123`)
+          
+          Filters that are specified as `,` (comma) separated lists use logical **OR** between list values. So
+          
+              shipmentEventTypeCode=DRFT,PENU
+          
+          means that **both* Draft- **and** Pending Update Shipmentevents will be matched by this subscription.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/subscriptionBodyWithSecret'
+      responses:
+        '201':
+          description: Subscription created
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/subscription'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.0#/components/schemas/error'
+                  - type: object
+                    properties:
+                      httpMethod:
+                        example: POST
+                  - type: object
+                    properties:
+                      requestUri:
+                        example: 'https://dcsa.org/dcsa/documentation-hub/v1/event-subscriptions'
+      callbacks:
+        event:
+          '{$request.body.callbackUrl}':
+            post:   # Method
+              parameters:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/signatureHeader'
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/subscriptionIDHeader'
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/notificationSignature'
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/apiVersion'
+              description: |
+                Whenever an event occurs that matches a subscription a `POST` call will be made to the `callbackUrl`. The request will be a list of events and contain the `subscriptionID` in the header originating the request.
+                
+                It is up to the receiver of the request to validate the content and make sure it is not sent from a malicious sender. This process is documented in the [DCSA Subscription Callback API 1.0](https://dcsa.org/wp-content/uploads/2021/10/202109_DCSA-Subscription-Callback-API_1.0_Final.pdf).
+                
+                When the `POST` request is accepted by the receiver a `204` (No Content) **MUST** be returned.
+              requestBody: # Contents of the callback message
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      type: array
+                      items:
+                        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/schemas/shipmentEvent'
+              responses:   # Expected responses to the callback message
+                '204':
+                  description: 'Your server returns this code if it accepts the callback'
+  /v1/event-subscriptions/{subscriptionID}:
+    get:
+      tags:
+      - Subscriptions
+      summary: Find a subscription by subscription ID
+      description: |
+        Gets a subscription matching the `subscriptionID`
+        
+        **NB: All subscription based endPoints are **optional** to implement**. If not implemented a `501 Not Implemented` must be returned.
+      parameters:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/subscriptionID'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/parameters/Api-Version-Major'
+      responses:
+        '200':
+          description: Subscription returned
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/subscription'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.0#/components/schemas/error'
+                  - type: object
+                    properties:
+                      httpMethod:
+                        example: GET
+                  - type: object
+                    properties:
+                      requestUri:
+                        example: 'https://dcsa.org/dcsa/documentation-hub/v1/event-subscriptions/8fbdc2d8-57c8-48b9-a04b-18fd8ec1d809'
+    delete:
+      tags:
+      - Subscriptions
+      summary: Stop a subscription, using the subscription ID
+      description: |
+        Deletes a subscription matching `subscriptionID`
+        
+        **NB: All subscription based endPoints are **optional** to implement**. If not implemented a `501 Not Implemented` must be returned.
+      parameters:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/subscriptionID'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/parameters/Api-Version-Major'
+      responses:
+        '204':
+          description: Subscription stopped
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/API-Version'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.0#/components/schemas/error'
+                  - type: object
+                    properties:
+                      httpMethod:
+                        example: DELETE
+                  - type: object
+                    properties:
+                      requestUri:
+                        example: 'https://dcsa.org/dcsa/documentation-hub/v1/event-subscriptions/8fbdc2d8-57c8-48b9-a04b-18fd8ec1d809'
+    put:
+      tags:
+      - Subscriptions
+      summary: Alter a subscription
+      description: |
+        Updates a subscription matching `subscriptionID`
+        
+        **NB: All subscription based endPoints are **optional** to implement**. If not implemented a `501 Not Implemented` must be returned.
+      parameters:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/subscriptionID'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/parameters/Api-Version-Major'
+      requestBody:
+        description: Parameters used to configure the subscription
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/subscription'
+      responses:
+        '200':
+          description: Subscription updated
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/subscription'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.0#/components/schemas/error'
+                  - type: object
+                    properties:
+                      httpMethod:
+                        example: PUT
+                  - type: object
+                    properties:
+                      requestUri:
+                        example: 'https://dcsa.org/dcsa/documentation-hub/v1/event-subscriptions/8fbdc2d8-57c8-48b9-a04b-18fd8ec1d809'
+  /v2/event-subscriptions/{subscriptionID}/secret:
+    put:
+      tags:
+      - Secret
+      summary: Resets the Secret on an existing subscription identified by subscription ID.
+      description: |
+        This endPoint is used to update the secret of the subscription matiching `subscriptionID`
+        
+        **NB: All subscription based endPoints are **optional** to implement**. If not implemented a `501 Not Implemented` must be returned.
+      parameters:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/subscriptionID'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/parameters/Api-Version-Major'
+      requestBody:
+        description: Parameters used to configure the subscription
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - type: object
+                  properties:
+                    secret:
+                      $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/schemas/secret'
+      responses:
+        '204':
+          description: Secret updated
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/API-Version'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.0#/components/schemas/error'
+                  - type: object
+                    properties:
+                      httpMethod:
+                        example: PUT
+                  - type: object
+                    properties:
+                      requestUri:
+                        example: 'https://dcsa.org/dcsa/tnt/v3/event-subscriptions/8fbdc2d8-57c8-48b9-a04b-18fd8ec1d809/secret'
+
+components:
+
+  #######################################
+  # EBL Specific events and subscriptions
+  #######################################
+  
+  schemas:
+    subscriptionBody:
+      type: object
+      allOf:
+        - type: object
+          properties:
+            callbackUrl:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/schemas/callbackUrl'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/schemas/shipmentSubscriptionBody'
+      required:
+        - callbackUrl
+        
+    subscriptionBodyWithSecret:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/subscriptionBody'
+        - type: object
+          properties:
+            secret:
+              allOf:
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/schemas/secret'
+                - description: |
+                    A shared secret shared between the Publisher and the Subscriber. It is used to compute the contents of the `Notification-Signature` header.
+                    
+                    _**Only** valid in `POST` calls - anywhere else must be omitted!_
+      required:
+        - secret
+
+    subscription:
+      type: object
+      allOf:
+        - type: object
+          properties:
+            subscriptionID:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/schemas/subscriptionID'
+        - type: object
+          properties:
+            subscriptionCreatedDateTime:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/schemas/subscriptionCreatedDateTime'
+        - type: object
+          readOnly: true
+          properties:
+            subscriptionUpdatedDateTime:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/schemas/subscriptionUpdatedDateTime'
+        - $ref: '#/components/schemas/subscriptionBody'
