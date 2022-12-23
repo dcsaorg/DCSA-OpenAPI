@@ -6,14 +6,15 @@ Publications related to this specification can be found on the DCSA website:
 - [Booking 1.0 Beta](https://knowledge.dcsa.org/s/publication?publicationId=a0r7T000000L8mmQAC)
 - [Glossary of Terms](https://knowledge.dcsa.org/s/glossary)
 
-<a name="v100"></a>[Release v1.0.0 (...)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/1.0.0)
+<a name="v100"></a>[Release v1.0.0 (23 December 2022)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/1.0.0)
 ---
-Release of the DCSA OpenAPI definitions for Booking 1.0.0. This release fixes minor issues found in Beta 2. This release does **not** include `Active Reefer Settings`, `Dangerious Goods`, `Special Cargo` or `Out of Gauge`
+Release of the DCSA OpenAPI definitions for Booking 1.0.0. This release fixes minor issues found in Beta 2. This release does **not** include `Active Reefer Settings`
 
 - Bump [Documentation_Domain to version 2.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/documentation#v210) (was previously v2.0.1)
 - Bump [DCSA_Domain to version 2.0.3](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v203) (was previously v2.0.1)
 - Bump [Event_Domain to version 3.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/event#v300) (was previously v2.0.1)
 - Bump [Error_Domain to version 2.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/error#v200) (was previously v1.1.0)
+- API description updated
 - `cursor` parameter has been removed from all endPoints
 - on the `\v1\events` endPoint the following query parameters have changed
   - `carrierBookingReference` query parameter removed
@@ -21,12 +22,13 @@ Release of the DCSA OpenAPI definitions for Booking 1.0.0. This release fixes mi
   - `documentReference` added as new query parameter
   - `equipmentReference` added as new query parameter
   - `eventDateTime` added as new query parameter
-- Referenced domains above should be consulted to see exact updates - some if the items include
+- Referenced domains above should be consulted to see exact updates - some if the major items include
   - linkage between `Commodity` and `RequestedEquipment`
   - better support for paper-version of B/L (displayedAddress, displaedName...)
   - `references` and `seals` objects updated
-  - minor updates to the `Party` object (`PartyName` is now mandatory, new `parrtyFunctionCodes`
+  - minor updates to the `Party` object (`PartyName` is now mandatory, new `parrtyFunctionCodes`)
   - confirmed and requested Equipment groups updated
+  - `ActiveReeferSettings` removed
 
 <a name="v100B2"></a>[Release v1.0.0 Beta 2 (1 July 2022)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/1.0.0-Beta-2)
 ---
