@@ -5,17 +5,23 @@ info:
   description: |
     Managing and sending `ShipmentEvents`, `TransportEvents` and `EquipmentEvents` and subscriptions for **Track &amp; Trace** (T&amp;T). API specification issued by DCSA.org.
     
-    For explanation to specific values or objects please refer to the [Information Model 2022.{to be updated}](https://dcsa.my.salesforce.com/sfc/p/#2o000000YvHJ/a/7T0000005DYt/jyzttKZQS1vxdd6dAFkWYi4F5RMiz38EsGwCBGhp1ic)
+    For explanation to specific values or objects please refer to the [Information Model 2022.Q4](https://dcsa.org/wp-content/uploads/2022/12/DCSA_Information-Model-2022.Q4-final.pdf)
     
-    Polling can be done on the
+    There are two ways to get events. Either they can be **polled by you** or they can be **pushed to an endPoint** by the implementor.
+    
+    ## Poll model
+    Polling data can be done using
     
         GET /v3/events
     
-    endPoint. It is also possible to setup a subscription on the
+    Calling this endPoint will return a list of events that fulfill the query parameters specified. The list returned is sorted in ascending (`ASC`) order based on the creation date-time of the event (`eventCreatedDateTime`). **This endPoint is mandatory to implement.**
+
+    ## Push model
+    Having events pushed to you is possible via setting up a subscription on the
     
         /v3/event-subscriptions
 
-    endPoints in order to use the push model. Here events are pushed as they occur.
+    endPoints. Using the subscriptions, events are pushed as they occur. **The push model is optional** to implement and will clearly be stated on the implementing side. It is therefore possible to get a `501 Not Implemented` error message if subscription endPoints are called in case the implementor has chosen **not** to implement the push model.
 
     For a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/tnt/v3#v300). Please also [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments.
   license:
@@ -29,9 +35,9 @@ tags:
   - name: Events
     description: Event operations
   - name: Subscriptions
-    description: Subscription operations
+    description: Subscription operations (**Optional to implement**)
   - name: Secret
-    description: Update secret
+    description: Update secret (**Optional to implement**)
 paths:
   /v3/events:
     get:
@@ -43,18 +49,22 @@ paths:
         
         **NB**: It is possible to combine queryParameters. When combining queryParameters be aware that it is also possible to make combinations that are mutual contradicting. Example:
         
-            shipmentEventTypeCode=DRFT & equipmentEventTypeCode=GTIN
+            shipmentEventTypeCodes=DRFT & equipmentEventTypeCodes=GTIN
         
         Since there is no event that can be a ShipmentEvent **and** an EquipmentEvent at the same time **this will return an empty list**!
+        
+        If not specified - this list will be sorted by the time the event was created (`eventCreatedDateTime`) in ascending (`ASC`) order.
+        
+        **NB: This endPoint is **mandatory** to implement!**
       parameters:
         # OBS: Be aware that changing the parameters requires a manual change in other APIs
 
         # Chunk with Metadata Event related parameters
 
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/eventCreatedDateTime'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/eventDateTime'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/eventCreatedDateTime'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/eventDateTime'
         # The eventType parameter is needed when more than one Event type can be returned
-        - name: eventType
+        - name: eventTypes
           in: query
           description: |
             The type of event(s) to filter by. Possible values are
@@ -65,7 +75,7 @@ paths:
             
             It is possible to select multiple values by comma `,` separating them. For multiple values the **OR**-operator is used. For example
             
-                eventType=SHIPMENT,EQUIPMENT
+                eventTypes=SHIPMENT,EQUIPMENT
             
             matches **both** `ShipmentEvents` and `EquipmentEvents`.
             
@@ -74,7 +84,7 @@ paths:
           style: form
           explode: false
           schema:
-            default: SHIPMENT,TRANSPORT,EQUIPMENT
+            default: [SHIPMENT,TRANSPORT,EQUIPMENT]
             type: array
             items:
               type: string
@@ -84,70 +94,304 @@ paths:
                 - EQUIPMENT
 
         # Chunk with Shipment related event parameters
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/shipmentEventTypeCode'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/documentTypeCode'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/documentReference'
-        # - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/equipmentReference'
-        # - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/carrierBookingReference'
-        # - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/transportDocumentReference'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/shipmentEventTypeCodes'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/documentTypeCodes'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/documentReference'
+        # - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/equipmentReference'
+        # - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/carrierBookingReference'
+        # - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/transportDocumentReference'
 
         # Chunk with Transport related event parameters
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/transportEventTypeCode'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/transportEventTypeCodes'
 
         # Chunk with Equipment related event parameters
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/equipmentEventTypeCode'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/equipmentReference'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/equipmentEventTypeCodes'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/equipmentReference'
 
         # Chunk with TransportCall related event parameters (used both in Equipment- and Transport-Events)
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/transportCallReference'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/vesselIMONumber'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/carrierExportVoyageNumber'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/universalExportVoyageReference'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/carrierServiceCode'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/universalServiceReference'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/UNLocationCode'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/transportCallReference'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/vesselIMONumber'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/carrierExportVoyageNumber'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/universalExportVoyageReference'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/carrierServiceCode'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/universalServiceReference'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/UNLocationCode'
 
 
         # Chunk with event parameters needed to be included in all APIs
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/parameters/limit'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/parameters/cursor'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/parameters/sort'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/parameters/Api-Version-Major'
+        # - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/parameters/cursor'
+        # - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/parameters/offset'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/parameters/limit'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/parameters/sort'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/parameters/Api-Version-Major'
       responses:
         '200':
           description: Successful operation
           headers:
             API-Version:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/API-Version'
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
             Current-Page:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/Current-Page'
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/Current-Page'
             Next-Page:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/Next-Page'
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/Next-Page'
             Prev-Page:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/Prev-Page'
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/Prev-Page'
             Last-Page:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/Last-Page'
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/Last-Page'
             First-Page:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/First-Page'
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/First-Page'
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  oneOf:
-                    - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/schemas/shipmentEvent'
-                    - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/schemas/equipmentEvent'
-                    - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/schemas/transportEvent'
+                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/schemas/event'
+                  # oneOf:
+                  #   - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/schemas/shipmentEvent'
+                  #   - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/schemas/equipmentEvent'
+                  #   - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/schemas/transportEvent'
+              examples:
+                "Events related to Booking: 'ABC123059'":
+                  description: |
+                    In order to retreive a list of Events that are relating to Booking `ABC123059` the following request could be made:
+                    
+                        GET /events?documentTypeCodes=BKG&documentReference=ABC123059
+                        
+                    An example of a response could be:
+                    
+                    - a `ShipmentEvent` that was sent when the TransportDocument: `84db923d-2a19-4eb0-beb5-446c1ec57d34` was `ISSU` (Issued)
+                    - an `EquipmentEvent` linked to Booking `ABC123059` that is `EST` (Estimated) to be `LOAD` (Loaded) onto the vessel `King of the Seas` in `NLRAM` (Port of Amsterdam) on `2019-11-12T07:41:00+08:30`
+                  value:
+                    - metadata:
+                        eventID: '84db923d-2a19-4eb0-beb5-446c1ec57d34'
+                        eventCreatedDateTime: '2022-09-19T06:31:00+02:00'
+                        eventType: 'SHIPMENT'
+                        publisher:
+                          partyName: 'Mediterranean Shipping Company'
+                          carrierCode: 'MSC'
+                          carrierCodeListProvider: 'SMDG'
+                        publisherRole: 'CA'
+                      payload:
+                        eventClassifierCode: 'ACT'
+                        eventDateTime: '2022-09-19T06:31:00+02:00'
+                        shipmentEventTypeCode: 'ISSU'
+                        documentTypeCode: 'TRD'
+                        documentReference: '84db923d-2a19-4eb0-beb5-446c1ec57d34'
+                        reason: 'All good'
+                        relatedDocumentReferences:
+                          - type: 'BKG'
+                            value: 'ABC123059'
+                        references:
+                          - type: 'EQ'
+                            value: 'APZU4812090'
+                    - metadata:
+                        eventID: '004a3525-23ae-4cf1-b442-68e6b2e591d8'
+                        eventCreatedDateTime: '2022-10-05T13:19:00+02:00'
+                        eventType: 'EQUIPMENT'
+                        publisher:
+                          partyName: 'CMA CGM'
+                          carrierCode: 'CMA'
+                          carrierCodeListProvider: 'SMDG'
+                        publisherRole: 'CA'
+                      payload:
+                        eventClassifierCode: 'EST'
+                        eventDateTime: '2019-11-12T07:41:00+08:30'
+                        equipmentEventTypeCode: 'LOAD'
+                        equipmentReference: 'APZU4812090'
+                        ISOEquipmentCode: '22GP'
+                        emptyIndicatorCode: 'LADEN'
+                        isTransshipmentMove: true
+                        transportCall:
+                          transportCallReference: '987e4567'
+                          modeOfTransport: 'VESSEL'
+                          location:
+                            locationName: 'Port of Amsterdam'
+                            UNLocationCode: 'NLRAM'
+                          portVisitReference: 'NLRTM1234589'
+                          carrierServiceCode: 'FE1'
+                          universalServiceReference: 'SR12345A'
+                          carrierExportVoyageNumber: '2103S'
+                          universalExportVoyageReference: '2103N'
+                          carrierImportVoyageNumber: '2103N'
+                          universalImportVoyageReference: '2103N'
+                          transportCallSequenceNumber: 2
+                          facilityTypeCode: 'POTE'
+                          vessel:
+                            vesselIMONumber: '9321483'
+                            name: 'King of the Seas'
+                            flag: 'NL'
+                            callSign: 'NCVV'
+                            operatorCarrierCode: 'MAEU'
+                            operatorCarrierCodeListProvider: 'NMFTA'
+                        relatedDocumentReferences:
+                          - type: 'BKG'
+                            value: 'ABC123059'
+                          - type: 'TRD'
+                            value: '85943567'
+                        references:
+                          - type: 'EQ'
+                            value: 'APZU4812090'
+                        seals:
+                          - number: 133534
+                            source: 'CUS'
+                            type: 'WIR'
+                Equipment Events that are DROP (Drop-off) or PICK (Pick-up):
+                  description: |
+                    In order to retreive a list of Events that are either `DROP` (Drop-off) **or** `PICK` (Pick-up) the following request could be made:
+                    
+                        GET /events?equipmentEventTypeCodes=DROP,PICK
+                        
+                    This request would **only** result in `EquipmentEvents` (as only `EquipmentEvents` contain the `equipmentEventTypeCode` field) - an example of a response could be:
+                    
+                    - an `EquipmentEvent` relating to equipmentReference: `APZU4812090` that is part of a Transshipment Move (_isTransshipmentMove=true_) which has been `DROP` (Droped-off) `ACT` (Actual) at `NLRAM` (Port of Amsterdam) on `2019-11-12T07:41:00+08:30`
+                    - an `EquipmentEvent` relating to equipmentReference: `APNR7744962` that is `EMPTY` and being PICK (Picked-up) at `NLRAM` (Port of Amsterdam) on `2018-03-18T17:36:00+01:00`.
+                  value:
+                    - metadata:
+                        eventID: '3ac63340-3f64-434b-8410-67942a2cef21'
+                        eventCreatedDateTime: '2021-09-30T09:25:00+02:00'
+                        eventType: 'EQUIPMENT'
+                        publisher:
+                          partyName: 'Evergreen Marine Corporation'
+                          carrierCode: 'EMC'
+                          carrierCodeListProvider: 'SMDG'
+                        publisherRole: 'CA'
+                      payload:
+                        eventClassifierCode: 'ACT'
+                        eventDateTime: '2019-11-12T07:41:00+08:30'
+                        equipmentEventTypeCode: 'DROP'
+                        equipmentReference: 'APZU4812090'
+                        ISOEquipmentCode: '22GP'
+                        emptyIndicatorCode: 'LADEN'
+                        isTransshipmentMove: true
+                        transportCall:
+                          transportCallReference: '987e4567'
+                          modeOfTransport: 'VESSEL'
+                          location:
+                            locationName: 'Port of Amsterdam'
+                            UNLocationCode: 'NLRAM'
+                          portVisitReference: 'NLRTM1234589'
+                          carrierServiceCode: 'FE1'
+                          universalServiceReference: 'SR12345A'
+                          carrierExportVoyageNumber: '2103S'
+                          universalExportVoyageReference: '2103N'
+                          carrierImportVoyageNumber: '2103N'
+                          universalImportVoyageReference: '2103N'
+                          transportCallSequenceNumber: 2
+                          facilityTypeCode: 'POTE'
+                          vessel:
+                            vesselIMONumber: '9321483'
+                            name: 'King of the Seas'
+                            flag: 'NL'
+                            callSign: 'NCVV'
+                            operatorCarrierCode: 'MAEU'
+                            operatorCarrierCodeListProvider: 'NMFTA'
+                        relatedDocumentReferences:
+                          - type: 'BKG'
+                            value: 'ABC123059'
+                          - type: 'TRD'
+                            value: '85943567'
+                        references:
+                          - type: 'EQ'
+                            value: 'APZU4812090'
+                        seals:
+                          - number: 133534
+                            source: 'CUS'
+                            type: 'WIR'
+                    - metadata:
+                        eventID: '3ac63340-3f64-434b-8410-67942a2cef21'
+                        eventCreatedDateTime: '2021-09-30T09:25:00+02:00'
+                        eventType: 'EQUIPMENT'
+                        publisher:
+                          partyName: 'Zim Israel Navigation Company'
+                          carrierCode: 'ZIM'
+                          carrierCodeListProvider: 'SMDG'
+                        publisherRole: 'CA'
+                      payload:
+                        eventClassifierCode: 'ACT'
+                        eventDateTime: '2018-03-18T17:36:00+01:00'
+                        equipmentEventTypeCode: 'PICK'
+                        equipmentReference: 'APNR7744962'
+                        ISOEquipmentCode: '22GP'
+                        emptyIndicatorCode: 'EMPTY'
+                        isTransshipmentMove: false
+                        location:
+                          locationName: 'Port of Amsterdam'
+                          UNLocationCode: 'NLRAM'
+                        facilityTypeCode: 'POTE'
+                List of Transport Events:
+                  description: |
+                    In order to retreive a list of only `TRANSPORT` (Transport Events)  the following request could be made:
+                    
+                        GET /events?eventTypes=TRANSPORT
+                        
+                    This request would **only** result in `TransportEvents` - an example of a response could be:
+                    
+                    - a `TransportEvent` retracting eventID=`957e4966-dad0-4111-9f8f-fb7216c43907`
+                    - a `TransportEvent` `EST` (Estimated) to `ARRI` (Arrive) at `NLRAM` (Port of Amsterdam) on `2022-11-12T07:41:00+08:30`
+                  value:
+                    - metadata:
+                        eventID: '2239d040-78c9-4172-8863-89428af41a0e'
+                        eventCreatedDateTime: '2022-09-20T07:41:00+08:30'
+                        eventType: 'TRANSPORT'
+                        retractedEventID: '957e4966-dad0-4111-9f8f-fb7216c43907'
+                        publisher:
+                          partyName: 'Hapag-Lloyd'
+                          carrierCode: 'HLC'
+                          carrierCodeListProvider: 'SMDG'
+                        publisherRole: 'CA'
+                    - metadata:
+                        eventID: 'c0ea5971-bd21-4749-a7ce-8f8d1dc562e2'
+                        eventCreatedDateTime: '2022-10-03T02:55:00+03:00'
+                        eventType: 'TRANSPORT'
+                        publisher:
+                          partyName: 'Maersk'
+                          carrierCode: 'MSK'
+                          carrierCodeListProvider: 'SMDG'
+                        publisherRole: 'CA'
+                      payload:
+                        eventClassifierCode: 'EST'
+                        eventDateTime: '2022-11-12T07:41:00+08:30'
+                        transportEventTypeCode: 'ARRI'
+                        transportCall:
+                          transportCallReference: '6E3BA447'
+                          transportCallSequenceNumber: 2
+                          modeOfTransport: 'VESSEL'
+                          location:
+                            locationName: 'Port of Amsterdam'
+                            UNLocationCode: 'NLRAM'
+                          portVisitReference: 'NLRTM7474338'
+                          carrierServiceCode: 'FE1'
+                          universalServiceReference: 'SR12345A'
+                          carrierExportVoyageNumber: '2103S'
+                          universalExportVoyageReference: '2103N'
+                          carrierImportVoyageNumber: '2103N'
+                          universalImportVoyageReference: '2103N'
+                          facilityTypeCode: 'POTE'
+                          vessel:
+                            vesselIMONumber: '9321483'
+                            name: 'King of the Seas'
+                            flag: 'NL'
+                            callSign: 'NCVV'
+                            operatorCarrierCode: 'MAEU'
+                            operatorCarrierCodeListProvider: 'NMFTA'
+                        relatedDocumentReferences:
+                          - type: 'BKG'
+                            value: 'ABC123059'
+                          - type: 'TRD'
+                            value: '85943567'
+                        references:
+                          - type: 'EQ'
+                            value: 'APZU4812090'
         default:
           description: Unexpected error
           headers:
             API-Version:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/API-Version'
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.1.0#/components/schemas/error'
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.0#/components/schemas/error'
                   - type: object
                     properties:
                       httpMethod:
@@ -163,22 +407,21 @@ paths:
       summary: Find event by eventID.
       description: Returns the event with the specified `eventID`.
       parameters:
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/eventID'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/eventID'
       responses:
         '200':
           description: Successful operation
           headers:
             API-Version:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/API-Version'
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
           content:
             application/json:
               schema:
-                oneOf:
-                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/schemas/shipmentEvent'
-                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/schemas/equipmentEvent'
-                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/schemas/transportEvent'
-                discriminator:
-                  propertyName: eventType
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/schemas/event'
+                # oneOf:
+                #   - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/schemas/shipmentEvent'
+                #   - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/schemas/equipmentEvent'
+                #   - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/schemas/transportEvent'
               examples:
                 Shipment Event:
                   value:
@@ -186,6 +429,11 @@ paths:
                       eventID: '84db923d-2a19-4eb0-beb5-446c1ec57d34'
                       eventCreatedDateTime: '2022-09-19T06:31:00+02:00'
                       eventType: 'SHIPMENT'
+                      publisher:
+                        partyName: 'Maersk'
+                        carrierCode: 'MSK'
+                        carrierCodeListProvider: 'SMDG'
+                      publisherRole: 'CA'
                     payload:
                       eventClassifierCode: 'ACT'
                       eventDateTime: '2022-09-19T06:31:00+02:00'
@@ -194,11 +442,127 @@ paths:
                       documentReference: '84db923d-2a19-4eb0-beb5-446c1ec57d34'
                       reason: 'All good'
                       relatedDocumentReferences:
-                        - relatedDocumentReferenceType: 'BKG'
-                          relatedDocumentReferenceValue: 'ABC123059'
+                        - type: 'BKG'
+                          value: 'ABC123059'
                       references:
-                        - referenceType: 'EQ'
-                          referenceValue: 'APZU4812090'
+                        - type: 'EQ'
+                          value: 'APZU4812090'
+                Equipment Event as part of a transshipment:
+                  value:
+                    metadata:
+                      eventID: '53670102-09f1-4882-8a7f-0d90b2eac529'
+                      eventCreatedDateTime: '2022-09-30T09:25:00+02:00'
+                      eventType: 'EQUIPMENT'
+                      publisher:
+                        partyName: 'Hapag-Lloyd'
+                        carrierCode: 'HLC'
+                        carrierCodeListProvider: 'SMDG'
+                      publisherRole: 'CA'
+                    payload:
+                      eventClassifierCode: 'EST'
+                      eventDateTime: '2019-11-12T07:41:00+08:30'
+                      equipmentEventTypeCode: 'LOAD'
+                      equipmentReference: 'APZU4812090'
+                      ISOEquipmentCode: '22GP'
+                      emptyIndicatorCode: 'LADEN'
+                      isTransshipmentMove: true
+                      transportCall:
+                        transportCallReference: '987e4567'
+                        modeOfTransport: 'VESSEL'
+                        location:
+                          locationName: 'Port of Amsterdam'
+                          UNLocationCode: 'NLRAM'
+                        portVisitReference: 'NLRTM1234589'
+                        carrierServiceCode: 'FE1'
+                        universalServiceReference: 'SR12345A'
+                        carrierExportVoyageNumber: '2103S'
+                        universalExportVoyageReference: '2103N'
+                        carrierImportVoyageNumber: '2103N'
+                        universalImportVoyageReference: '2103N'
+                        transportCallSequenceNumber: 2
+                        facilityTypeCode: 'POTE'
+                        vessel:
+                          vesselIMONumber: '9321483'
+                          name: 'King of the Seas'
+                          flag: 'NL'
+                          callSign: 'NCVV'
+                          operatorCarrierCode: 'MAEU'
+                          operatorCarrierCodeListProvider: 'NMFTA'
+                      relatedDocumentReferences:
+                        - type: 'BKG'
+                          value: 'ABC123059'
+                        - type: 'TRD'
+                          value: '85943567'
+                      references:
+                        - type: 'EQ'
+                          value: 'APZU4812090'
+                      seals:
+                        - number: 133534
+                          source: 'CUS'
+                          type: 'WIR'
+                Transport Event Rail Transport:
+                  value:
+                    metadata:
+                        eventID: 'c0ea5971-bd21-4749-a7ce-8f8d1dc562e2'
+                        eventCreatedDateTime: '2022-10-03T02:55:00+03:00'
+                        eventType: 'TRANSPORT'
+                        publisher:
+                          partyName: 'Mediterranean Shipping Company'
+                          carrierCode: 'MSC'
+                          carrierCodeListProvider: 'SMDG'
+                        publisherRole: 'CA'
+                    payload:
+                      eventClassifierCode: 'EST'
+                      eventDateTime: '2022-11-12T07:41:00+08:30'
+                      transportEventTypeCode: 'ARRI'
+                      transportCall:
+                        transportCallReference: '6E3BA447'
+                        transportCallSequenceNumber: 2
+                        modeOfTransport: 'RAIL'
+                        location:
+                          locationName: 'Railstation of Amsterdam'
+                          UNLocationCode: 'NLRAM'
+                        railCar: 'railcar1'
+                        railService: 'goods transport'
+                        departureID: '391adc3e-227e-42a7-a240-23191eb41358'
+                      relatedDocumentReferences:
+                        - type: 'BKG'
+                          value: 'ABC123059'
+                        - type: 'TRD'
+                          value: '85943567'
+                      references:
+                        - type: 'EQ'
+                          value: 'APZU4812090'
+                Transport Event Truck Transport:
+                  value:
+                    metadata:
+                        eventID: '6ae78068-e658-4755-800a-67503fa1fb64'
+                        eventCreatedDateTime: '2022-10-03T02:55:00+03:00'
+                        eventType: 'TRANSPORT'
+                        publisher:
+                          partyName: 'Mediterranean Shipping Company'
+                          carrierCode: 'MSC'
+                          carrierCodeListProvider: 'SMDG'
+                        publisherRole: 'CA'
+                    payload:
+                      eventClassifierCode: 'EST'
+                      eventDateTime: '2022-11-12T07:41:00+08:30'
+                      transportEventTypeCode: 'ARRI'
+                      transportCall:
+                        transportCallReference: '6E3BA448'
+                        transportCallSequenceNumber: 1
+                        modeOfTransport: 'TRUCK'
+                        lisencePlate: '1234nf932'
+                        chassisLisencePlate: '0mkdsf34dfg'
+                        departureID: 'b9da1ff6-58b7-4e6f-a597-385e1d7c73e9'
+                      relatedDocumentReferences:
+                        - type: 'BKG'
+                          value: 'ABC123059'
+                        - type: 'TRD'
+                          value: '85943567'
+                      references:
+                        - type: 'EQ'
+                          value: 'APZU4812090'
                 Retracted Transport Event:
                   value:
                     metadata:
@@ -206,16 +570,21 @@ paths:
                       eventCreatedDateTime: '2022-09-20T07:41:00+08:30'
                       eventType: 'TRANSPORT'
                       retractedEventID: '957e4966-dad0-4111-9f8f-fb7216c43907'
+                      publisher:
+                        partyName: 'CMA CGM'
+                        carrierCode: 'CMA'
+                        carrierCodeListProvider: 'SMDG'
+                      publisherRole: 'CA'
         default:
           description: Unexpected error
           headers:
             API-Version:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/API-Version'
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.1.0#/components/schemas/error'
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.0#/components/schemas/error'
                   - type: object
                     properties:
                       httpMethod:
@@ -230,43 +599,69 @@ paths:
       tags:
       - Subscriptions
       summary: Receive a list of your active subscriptions
+      description: |
+        Lists all subscriptions belonging to you. If not specified the list will be sorted on the creation date of the subscription (`subscriptionCreatedDateTime`) in ascending (`ASC`) order.
+        
+        **NB: All subscription based endPoints are **optional** to implement**. If not implemented a `501 Not Implemented` must be returned.
       parameters:
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/parameters/limit'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/parameters/cursor'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/parameters/sort'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/parameters/Api-Version-Major'
+        # - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/parameters/cursor'
+        # - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/parameters/offset'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/parameters/limit'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/parameters/sort'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/parameters/Api-Version-Major'
       responses:
         '200':
           description: Returns a list of subscriptions
           headers:
             API-Version:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/API-Version'
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
             Current-Page:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/Current-Page'
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/Current-Page'
             Next-Page:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/Next-Page'
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/Next-Page'
             Prev-Page:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/Prev-Page'
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/Prev-Page'
             Last-Page:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/Last-Page'
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/Last-Page'
             First-Page:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/First-Page'
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/First-Page'
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/subscription'
-        default:
-          description: Unexpected error
+        '501':
+          description: |
+            If this endPoint is not implemented (optional to implement) a `501` Not implemented code will be returned.
+            
+            **NB:** The subscription model is optional to implement
           headers:
             API-Version:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/API-Version'
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.1.0#/components/schemas/error'
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/schemas/notImplemented'
+                  - type: object
+                    properties:
+                      httpMethod:
+                        example: GET
+                  - type: object
+                    properties:
+                      requestUri:
+                        example: 'https://dcsa.org/dcsa/tnt/v3/event-subscriptions'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.0#/components/schemas/error'
                   - type: object
                     properties:
                       httpMethod:
@@ -279,8 +674,12 @@ paths:
       tags:
       - Subscriptions
       summary: Create a subscription
+      description: |
+        Creates a new subscription and allows events matching the subscription to be pushed to the `callBackUrl`
+        
+        **NB: All subscription based endPoints are **optional** to implement**. If not implemented a `501 Not Implemented` must be returned.
       parameters:
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/parameters/Api-Version-Major'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/parameters/Api-Version-Major'
       requestBody:
         description: |
           Parameters used to configure the subscription. It is possible to only receive cirtain types of events by adding filter values to the subscription.
@@ -289,13 +688,13 @@ paths:
           
           A logical **AND** is used between filters. So
           
-              shipmentEventTypeCode=DRFT&carrierBookingReference=ABC123123
+              shipmentEventTypeCodes=DRFT&carrierBookingReference=ABC123123
           
-          means that the events matched ***must*** both be in draft status (`shipmentEventTypeCode=DRFT`) **and** be connected to carrierBookingReference ABC123123 (`carrierBookingReference=ABC123123`)
+          means that the events matched ***must*** both be in draft status (`shipmentEventTypeCodes=DRFT`) **and** be connected to carrierBookingReference ABC123123 (`carrierBookingReference=ABC123123`)
           
           Filters that are specified as `,` (comma) separated lists use logical **OR** between list values. So
           
-              eventType=SHIPMENT,TRANSPORT
+              eventTypes=SHIPMENT,TRANSPORT
           
           means that **both** `ShipmentEvents` **and** `TransportEvents` will be matched by this subscription.
         required: true
@@ -308,21 +707,42 @@ paths:
           description: Subscription created
           headers:
             API-Version:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/API-Version'
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/subscription'
-        default:
-          description: Unexpected error
+        '501':
+          description: |
+            If this endPoint is not implemented (optional to implement) a `501` Not implemented code will be returned.
+            
+            **NB:** The subscription model is optional to implement
           headers:
             API-Version:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/API-Version'
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.1.0#/components/schemas/error'
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/schemas/notImplemented'
+                  - type: object
+                    properties:
+                      httpMethod:
+                        example: POST
+                  - type: object
+                    properties:
+                      requestUri:
+                        example: 'https://dcsa.org/dcsa/tnt/v3/event-subscriptions'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.0#/components/schemas/error'
                   - type: object
                     properties:
                       httpMethod:
@@ -336,14 +756,14 @@ paths:
           '{$request.body.callbackUrl}':
             post:   # Method
               parameters:
-                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/signatureHeader'
-                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/subscriptionIDHeader'
-                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/notificationSignature'
-                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/apiVersion'
+                # - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/signatureHeader'
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/subscriptionIDHeader'
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/notificationSignature'
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/apiVersion'
               description: |
                 Whenever an event occurs that matches a subscription a `POST` call will be made to the `callbackUrl`. The request will be a list of events and contain the `subscriptionID` in the header originating the request.
                 
-                It is up to the receiver of the request to validate the content and make sure it is not sent from a malicious sender. This process is documented in the [DCSA Subscription Callback API 1.0](file:///C:/Users/Henrik/Downloads/202109_DCSA-Subscription-Callback-API_1.0_Final.pdf).
+                It is up to the receiver of the request to validate the content and make sure it is not sent from a malicious sender. This process is documented in the [DCSA Subscription Callback API 1.0](https://dcsa.org/wp-content/uploads/2021/10/202109_DCSA-Subscription-Callback-API_1.0_Final.pdf).
                 
                 When the `POST` request is accepted by the receiver a `204` (No Content) **MUST** be returned.
               requestBody: # Contents of the callback message
@@ -353,10 +773,11 @@ paths:
                     schema:
                       type: array
                       items:
-                        oneOf:
-                          - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/schemas/shipmentEvent'
-                          - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/schemas/equipmentEvent'
-                          - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/schemas/transportEvent'
+                        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/schemas/event'
+                        # oneOf:
+                        #   - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/schemas/shipmentEvent'
+                        #   - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/schemas/equipmentEvent'
+                        #   - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/schemas/transportEvent'
               responses:   # Expected responses to the callback message
                 '204':
                   description: 'Your server returns this code if it accepts the callback'
@@ -365,29 +786,54 @@ paths:
       tags:
       - Subscriptions
       summary: Find a subscription by subscription ID
+      description: |
+        Gets a subscription matching the `subscriptionID`
+        
+        **NB: All subscription based endPoints are **optional** to implement**. If not implemented a `501 Not Implemented` must be returned.
       parameters:
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/subscriptionID'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/parameters/Api-Version-Major'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/subscriptionID'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/parameters/Api-Version-Major'
       responses:
         '200':
           description: Subscription returned
           headers:
             API-Version:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/API-Version'
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/subscription'
-        default:
-          description: Unexpected error
+        '501':
+          description: |
+            If this endPoint is not implemented (optional to implement) a `501` Not implemented code will be returned.
+            
+            **NB:** The subscription model is optional to implement
           headers:
             API-Version:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/API-Version'
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.1.0#/components/schemas/error'
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/schemas/notImplemented'
+                  - type: object
+                    properties:
+                      httpMethod:
+                        example: GET
+                  - type: object
+                    properties:
+                      requestUri:
+                        example: 'https://dcsa.org/dcsa/tnt/v3/event-subscriptions/c4436afa-a8f0-4c23-b924-ab9a988557ab'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.0#/components/schemas/error'
                   - type: object
                     properties:
                       httpMethod:
@@ -400,25 +846,50 @@ paths:
       tags:
       - Subscriptions
       summary: Stop a subscription, using the subscription ID
+      description: |
+        Deletes a subscription matching `subscriptionID`
+        
+        **NB: All subscription based endPoints are **optional** to implement**. If not implemented a `501 Not Implemented` must be returned.
       parameters:
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/subscriptionID'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/parameters/Api-Version-Major'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/subscriptionID'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/parameters/Api-Version-Major'
       responses:
         '204':
           description: Subscription stopped
           headers:
             API-Version:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/API-Version'
-        default:
-          description: Unexpected error
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
+        '501':
+          description: |
+            If this endPoint is not implemented (optional to implement) a `501` Not implemented code will be returned.
+            
+            **NB:** The subscription model is optional to implement
           headers:
             API-Version:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/API-Version'
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.1.0#/components/schemas/error'
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/schemas/notImplemented'
+                  - type: object
+                    properties:
+                      httpMethod:
+                        example: DELETE
+                  - type: object
+                    properties:
+                      requestUri:
+                        example: 'https://dcsa.org/dcsa/tnt/v3/event-subscriptions/c4436afa-a8f0-4c23-b924-ab9a988557ab'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.0#/components/schemas/error'
                   - type: object
                     properties:
                       httpMethod:
@@ -430,10 +901,14 @@ paths:
     put:
       tags:
       - Subscriptions
-      summary: Alter a subscription using the `subscriptionID`
+      summary: Alter a subscription using the subscriptionID`
+      description: |
+        Updates a subscription matching `subscriptionID`
+        
+        **NB: All subscription based endPoints are **optional** to implement**. If not implemented a `501 Not Implemented` must be returned.
       parameters:
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/subscriptionID'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/parameters/Api-Version-Major'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/subscriptionID'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/parameters/Api-Version-Major'
       requestBody:
         description: Parameters used to configure the subscription
         required: true
@@ -446,21 +921,42 @@ paths:
           description: Subscription updated
           headers:
             API-Version:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/API-Version'
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/subscription'
-        default:
-          description: Unexpected error
+        '501':
+          description: |
+            If this endPoint is not implemented (optional to implement) a `501` Not implemented code will be returned.
+            
+            **NB:** The subscription model is optional to implement
           headers:
             API-Version:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/API-Version'
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.1.0#/components/schemas/error'
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/schemas/notImplemented'
+                  - type: object
+                    properties:
+                      httpMethod:
+                        example: PUT
+                  - type: object
+                    properties:
+                      requestUri:
+                        example: 'https://dcsa.org/dcsa/tnt/v3/event-subscriptions/c4436afa-a8f0-4c23-b924-ab9a988557ab'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.0#/components/schemas/error'
                   - type: object
                     properties:
                       httpMethod:
@@ -474,9 +970,13 @@ paths:
       tags:
       - Secret
       summary: Resets the Secret on an existing subscription identified by subscription ID.
+      description: |
+        This endPoint is used to update the secret of the subscription matching `subscriptionID`
+        
+        **NB: All subscription based endPoints are **optional** to implement**. If not implemented a `501 Not Implemented` must be returned.
       parameters:
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/parameters/subscriptionID'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/parameters/Api-Version-Major'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/subscriptionID'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/parameters/Api-Version-Major'
       requestBody:
         description: Parameters used to configure the subscription
         required: true
@@ -487,23 +987,44 @@ paths:
                 - type: object
                   properties:
                     secret:
-                      $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/schemas/secret'
+                      $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/schemas/secret'
       responses:
         '204':
           description: Secret updated
           headers:
             API-Version:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/API-Version'
-        default:
-          description: Unexpected error
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
+        '501':
+          description: |
+            If this endPoint is not implemented (optional to implement) a `501` Not implemented code will be returned.
+            
+            **NB:** The subscription model is optional to implement
           headers:
             API-Version:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/API-Version'
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/1.1.0#/components/schemas/error'
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/schemas/notImplemented'
+                  - type: object
+                    properties:
+                      httpMethod:
+                        example: PUT
+                  - type: object
+                    properties:
+                      requestUri:
+                        example: 'https://dcsa.org/dcsa/tnt/v3/event-subscriptions/c4436afa-a8f0-4c23-b924-ab9a988557ab/secret'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.0#/components/schemas/error'
                   - type: object
                     properties:
                       httpMethod:
@@ -544,15 +1065,15 @@ components:
         - type: object
           properties:
             callbackUrl:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/schemas/callbackUrl'
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/schemas/callbackUrl'
         - type: object
           properties:
-            eventType:
+            eventTypes:
               allOf:
                 - $ref: '#/components/schemas/eventTypes'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/schemas/shipmentSubscriptionBody'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/schemas/transportSubscriptionBody'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/schemas/equipmentSubscriptionBody'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/schemas/shipmentSubscriptionBody'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/schemas/transportSubscriptionBody'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/schemas/equipmentSubscriptionBody'
       required:
         - callbackUrl
         
@@ -564,22 +1085,31 @@ components:
           properties:
             secret:
               allOf:
-                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/schemas/secret'
+                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/schemas/secret'
                 - description: |
                     A shared secret shared between the Publisher and the Subscriber. It is used to compute the contents of the `Notification-Signature` header.
                     
                     _**Only** valid in `POST` calls - anywhere else must be omitted!_
       required:
         - secret
-
+ 
     subscription:
       type: object
       allOf:
         - type: object
           properties:
             subscriptionID:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.0.0#/components/schemas/subscriptionID'
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/schemas/subscriptionID'
+        - type: object
+          properties:
+            subscriptionCreatedDateTime:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/schemas/subscriptionCreatedDateTime'
+        - type: object
+          readOnly: true
+          properties:
+            subscriptionUpdatedDateTime:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/schemas/subscriptionUpdatedDateTime'
         - $ref: '#/components/schemas/subscriptionBody'
 # servers:
 #   - description: SwaggerHub API Auto Mocking
-#     url: https://virtserver.swaggerhub.com/dcsaorg/DCSA_TNT/2.1.1
+#     url: https://virtserver.swaggerhub.com/dcsaorg/DCSA_TNT/3.0.0-Beta-1
