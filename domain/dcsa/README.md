@@ -4,9 +4,35 @@ The DCSA Domain is documented on [**DCSA Domain SwaggerHub**](https://app.swagge
 
 The primary purpose of this Domain is to specify common components to be reused across DCSA APIs and Domains. This Domain does not define any "complex" objects. Common QueryParameters (limit, cursor) and Headers (Current-Page, Next-Page, ...) are also defined here.
 
+<a name="v300"></a>[Release v3.0.0 (31 March 2023)](https://app.swaggerhub.com/domains-docs/dcsaorg/DCSA_DOMAIN/3.0.0)
+---
+Released as part of Track & Trace 3.0.0 Beta 1 release. Contains Booking and eBL upodates as well. A lot of validation rules have been added
+
+- validation rules have been added to many attributes:
+  - `addressLineNumber` must be >=1
+  - `addressName`, `amendToTransportDocument`, `bookingChannelReference`, `calculationBasis`, `cargoLineItemID`, `carrierBookingReference`, `carrierBookingRequestReference`, `carrierCode`, `carrierExportVoyageNumber`, `carrierImportVoyageNumber`, `carrierServiceCode`, `carrierServiceName`, `carrierVoyageNumber`, `chargeType`, `cityName`, `clauseContent`, `commodityType`, `contractQuotationReference`, `country`, `delayReasonCode`, `descriptionOfGoods`, `documentReferenceNumber`, `equipmentReference`, `eventComment`, `exportDeclarationReference`, `exportVoyageNumber`, `facilityCode`, ``, ``, ``, ``, ``, ``, ``, ``, ``, ``, `` cannot start or end with a ` ` (space)
+  - `airExchangeSetpoint` must be >=0
+  - `amendToTransportDocument` example added
+  - `cargoGrossVolume`, `cargoGrossWeight`, `curencyAmount`, `declaredValue` must be >0
+  - `co2Setpoint` must be a value >=0 and <=100
+  - `confirmedEquipmentUnits` must be >= 1
+  - `currencyCode` and `declaredValueCurrency` must match 3 letters ([A-Z])
+  - `email` must contain `@`
+- `arrivalNoticeReference`, `bargeCallSignNumber`, `bargeFlag`, `bargeName`, `bargeOperatorCarrierCode` and `bargeOperatorCarrierCodeListProvider`, `carrierInformationToConsignee`, `contactName`, `contactPhone`, `containerDepositAmount`, `countryCode`, `customsImportDeclarationProcedure`, `demurrageAmount`, `demurrageFreetime`, `detentionAmount`, `detentionFreetime`, `equipmentSetpointAmbientTemperature`, `equipmentSetpointTemperature`, `equipmentSetpointO2`, `equipmentSetpointCo2`, `equipmentSetpointHumidity`, `equipmentSetpointAirExchange`, `etaAtPlaceOfDeliveryDateTime`, `etaAtPortOfDischargeDateTime`, `etaAtPortOfDischargeDateTime`, ``, `` added
+- `areChargesDisplayedOnOriginals` and `areChargesDisplayedOnCopies` removed
+- `bookingRequestID`, `cargoItemID`, `carrierID`, `chargeID`, `clauseID` removed
+- `cargoLineItemID`, `clauseContent`, `commodityType`, `contractQuotationReference`, `cutOffDateTimeCode`, `documentReferenceNumber` example added
+- `carrierCodeListProvider` description updated
+- `carrierImportVoyageNumber`, `carrierImportVoyageNumber` and `carrierVoyageNumber` description changed to be **carrier-specific** instead of **operator-specific**
+- `chargeTypeCode` maxLength changed from 3 --> 4
+- `customsFilingSystem` added (will be changed to advanceManifestFiling in future)
+- `AFD` (AMS Filing Due date) removed from cutOffDateTimeCode
+- `equipmentReference` maxLength changed from 15 --> 11 and description updated
+- `COYA` no longer part of `facilityTypeCode`
+
 <a name="v203"></a>[Release v2.0.3 (23 December 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/DCSA_DOMAIN/2.0.3)
 ---
-Updated as part of new Track & Trace release
+Updated as part of new Track & Trace release 
 
 - `addressLine` and `displayedName` lengths changed from 250 -> 35 since it needs to comply with printed B/L text field lengths
 - `areChargesDisplayedOnOriginals` and `areChargesDisplayedOnCopies` removed
