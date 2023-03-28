@@ -10,9 +10,15 @@ Add location descriminator
 
 - API description updates
 - Bump [DCSA_Domain to version 3.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v203) (was previously v2.0.3)
-- added `locationType` to all interfaces to be used as the discriminator
-- tried to rewrite the spec to avoid the use of `allOf`
+- added `locationType` to all interfaces to be used as the discriminator. Following values are supported:
+  - `UNLO` (unLocationLocation)
+  - `FACI` (facilityLocation)
+  - `FACS` (facilitySMDGLocation)
+  - `ADDR` (addressLocation)
+  - `GEOL` (geoLocation)
+- specs rewritten to avoid the use of `allOf` where possible
 - `locationReference` renamed to `carrierLocationReference` (not yet used in any APIs)
+- `name` and `country` are now mandatory fields in the `Address` location interface
 
 <a name="v203"></a>[Release v2.0.3 (23 December 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/LOCATION_DOMAIN/2.0.3)
 ---
