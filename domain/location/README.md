@@ -9,7 +9,7 @@ The primary purpose of this Domain is to specify common components related to a 
 Add location descriminator
 
 - API description updates
-- Bump [DCSA_Domain to version 3.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v203) (was previously v2.0.3)
+- Bump [DCSA_Domain to version 3.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v300) (was previously v2.0.3)
 - added `locationType` to all interfaces to be used as the discriminator. Following values are supported:
   - `UNLO` (unLocationLocation)
   - `FACI` (facilityLocation)
