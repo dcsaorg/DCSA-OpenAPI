@@ -4,6 +4,13 @@ The Location Domain is documented on [**Location Domain SwaggerHub**](https://ap
 
 The primary purpose of this Domain is to specify common components related to a location.
 
+<a name="v300"></a>[Release v3.0.0 (31 March 2023)](https://app.swaggerhub.com/domains-docs/dcsaorg/LOCATION_DOMAIN/3.0.0)
+---
+Add location descriminator
+
+- Bump [DCSA_Domain to version 3.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v203) (was previously v2.0.3)
+- add `locationType` to be used as the discriminator
+
 <a name="v203"></a>[Release v2.0.3 (23 December 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/LOCATION_DOMAIN/2.0.3)
 ---
 Bump DCSA_Domain reference
