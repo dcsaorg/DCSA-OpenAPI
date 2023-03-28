@@ -10,25 +10,39 @@ Released as part of Track & Trace 3.0.0 Beta 1 release. Contains Booking and eBL
 
 - validation rules have been added to many attributes:
   - `addressLineNumber` must be >=1
-  - `addressName`, `amendToTransportDocument`, `bookingChannelReference`, `calculationBasis`, `cargoLineItemID`, `carrierBookingReference`, `carrierBookingRequestReference`, `carrierCode`, `carrierExportVoyageNumber`, `carrierImportVoyageNumber`, `carrierServiceCode`, `carrierServiceName`, `carrierVoyageNumber`, `chargeType`, `cityName`, `clauseContent`, `commodityType`, `contractQuotationReference`, `country`, `delayReasonCode`, `descriptionOfGoods`, `documentReferenceNumber`, `equipmentReference`, `eventComment`, `exportDeclarationReference`, `exportVoyageNumber`, `facilityCode`, ``, ``, ``, ``, ``, ``, ``, ``, ``, ``, `` cannot start or end with a ` ` (space)
-  - `airExchangeSetpoint` must be >=0
+  - `addressName`, `amendToTransportDocument`, `bookingChannelReference`, `calculationBasis`, `cargoLineItemID`, `carrierBookingReference`, `carrierBookingRequestReference`, `carrierCode`, `carrierExportVoyageNumber`, `carrierImportVoyageNumber`, `carrierServiceCode`, `carrierServiceName`, `carrierVoyageNumber`, `chargeType`, `cityName`, `clauseContent`, `commodityType`, `contractQuotationReference`, `country`, `delayReasonCode`, `descriptionOfGoods`, `documentReferenceNumber`, `equipmentReference`, `eventComment`, `exportDeclarationReference`, `exportVoyageNumber`, `facilityCode`, `floot`, `importLicenseReference`, `importVoyageNumber`, `ISOEquipmentCode`, `locationName`, `locationReference`, `nmftaCode`, `packageCode`, `packageCodeOnBL`, `partyName`, `portVisitReference`, `shippingInstructionReference`, `transportCallReference`, `transportDocumentReference`, `UNLocationName`, `url`, `vesselCallSign`, `vesselCallSignNumber`, `vesselName`, `vesselOperatorCarrierCode`, `vesselOperatorSMDGLinerCode` cannot start or end with a ` ` (space)
+  - `airExchangeSetpoint`, `numberOfCopies`, `numberOfCopiesWithCharges`, `numberOfCopiesWithoutCharges`, `numberOfOriginalsWithCharges`, `numberOfOriginalsWithoutCharges`, `numberOfRiderPages`, `quantity`, `unitPrice`, `weight` must be >=0
   - `amendToTransportDocument` example added
-  - `cargoGrossVolume`, `cargoGrossWeight`, `curencyAmount`, `declaredValue` must be >0
-  - `co2Setpoint` must be a value >=0 and <=100
-  - `confirmedEquipmentUnits` must be >= 1
+  - `cargoGrossVolume`, `cargoGrossWeight`, `curencyAmount`, `declaredValue`, `tareWeight`, `vesselLOA`, `vesselWidth`, `volume` must be >0
+  - `co2Setpoint`, `humiditySetpoint`, `o2Setpoint` must be a value >=0 and <=100
+  - `confirmedEquipmentUnits`, `numberOfPackages`, `requestedNumberOfOriginals` must be >= 1
   - `currencyCode` and `declaredValueCurrency` must match 3 letters ([A-Z])
   - `email` must contain `@`
-- `arrivalNoticeReference`, `bargeCallSignNumber`, `bargeFlag`, `bargeName`, `bargeOperatorCarrierCode` and `bargeOperatorCarrierCodeListProvider`, `carrierInformationToConsignee`, `contactName`, `contactPhone`, `containerDepositAmount`, `countryCode`, `customsImportDeclarationProcedure`, `demurrageAmount`, `demurrageFreetime`, `detentionAmount`, `detentionFreetime`, `equipmentSetpointAmbientTemperature`, `equipmentSetpointTemperature`, `equipmentSetpointO2`, `equipmentSetpointCo2`, `equipmentSetpointHumidity`, `equipmentSetpointAirExchange`, `etaAtPlaceOfDeliveryDateTime`, `etaAtPortOfDischargeDateTime`, `etaAtPortOfDischargeDateTime`, ``, `` added
-- `areChargesDisplayedOnOriginals` and `areChargesDisplayedOnCopies` removed
-- `bookingRequestID`, `cargoItemID`, `carrierID`, `chargeID`, `clauseID` removed
-- `cargoLineItemID`, `clauseContent`, `commodityType`, `contractQuotationReference`, `cutOffDateTimeCode`, `documentReferenceNumber` example added
+  - `HSCode` must be a string with 6-10 digits
+  - `vesselFlag` must match 2 letters ([A-Z])
+  - `vesselIMONumber` must be 7 digits
+- `arrivalNoticeReference`, `bargeCallSignNumber`, `bargeFlag`, `bargeName`, `bargeOperatorCarrierCode` and `bargeOperatorCarrierCodeListProvider`, `carrierInformationToConsignee`, `contactName`, `contactPhone`, `containerDepositAmount`, `countryCode`, `customsImportDeclarationProcedure`, `demurrageAmount`, `demurrageFreetime`, `detentionAmount`, `detentionFreetime`, `equipmentSetpointAmbientTemperature`, `equipmentSetpointTemperature`, `equipmentSetpointO2`, `equipmentSetpointCo2`, `equipmentSetpointHumidity`, `equipmentSetpointAirExchange`, `etaAtPlaceOfDeliveryDateTime`, `etaAtPortOfDischargeDateTime`, `etaAtPortOfDischargeDateTime`, `firmsCode`, `isDrainholesOpen`, `itNumber`, `measuredAmbientTemperature`, `measuredTemperature`, `measuredO2`, `measuredCo2`, `measuredHumidity`, `measuredAirExchange`, `returnDescription`, `storageAmount` added
+- `areChargesDisplayedOnOriginals`, `areChargesDisplayedOnCopies`, `bookingRequestID`, `cargoItemID`, `carrierID`, `chargeID`, `clauseID`, `humidityMax`, `humidityMin`, `issuedNumberOfOriginals`, `issuedNumberOfOriginalsWithCharges`, `issuedNumberOfOriginalsWithoutCharges`, `nitrogenSetpoint`, `otherFacility`, `OTICarrierCode`, `partyID`, `referenceID`, `scheduleID`, `sealID`, `serviceID`, `shipmentEquipmentID`, `shipmentID`, `temperatureMax`, `temperatureMin`, `transportCallID`, `transportID`, `ventilationMax`, `ventilationMin`, `voyageID` removed
+- `cargoLineItemID`, `clauseContent`, `commodityType`, `contractQuotationReference`, `cutOffDateTimeCode`, `documentReferenceNumber`, `referenceValue`, `serviceContractReference`, `stateRegion`, `storageAmount`, `transportDocumentReference` example added
 - `carrierCodeListProvider` description updated
 - `carrierImportVoyageNumber`, `carrierImportVoyageNumber` and `carrierVoyageNumber` description changed to be **carrier-specific** instead of **operator-specific**
 - `chargeTypeCode` maxLength changed from 3 --> 4
 - `customsFilingSystem` added (will be changed to advanceManifestFiling in future)
 - `AFD` (AMS Filing Due date) removed from cutOffDateTimeCode
 - `equipmentReference` maxLength changed from 15 --> 11 and description updated
-- `COYA` no longer part of `facilityTypeCode`
+- `COYA` no longer part of `facilityTypeCode` nor `facilityTypeCodeTRN`
+- `isBulbMode`, `isColdTreatment`, `isElectronic` example updated and default value removed
+- `isCustomsFilingSubmissionByShipper` updated (will be changed in future)
+- `isGeneratorSetRequired`, `isHighValueCargo`, `isPreCoolingRequired` default value removed
+- `name` renamed to `contactName`
+- `phone` renamed to `contactPhone`
+- `requestedEquipmentUnits` type changed from Integer --> Number (float), example and description updated to allow partial containers as part of the requestedEquipment
+- `temperatureSetpoint` specified as float
+- `temperatureUnit` description updated
+- `universalServiceReference`, `universalExportVoyageReference`, `universalVoyageReference` regular expression pattern updated
+- `valueAddedServiceCode` removed
+- `LTR` (Litre) has been added to `volumeUnit`
+- `cursor` and `offset` header parameter removed
 
 <a name="v203"></a>[Release v2.0.3 (23 December 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/DCSA_DOMAIN/2.0.3)
 ---
@@ -54,6 +68,7 @@ Updated as part of new Track & Trace release
 - improved the description for `weightUnit` and `sort` query parameter
 - pagination-header descriptions updated (`Current-Page`, `Next-Page`, `Prev-Page`, `Last-Page` and `First-Page`)
 - `offset` added as query parameter
+- `UNLocationCode` minLength of 5 added, description updated
 
 <a name="v202"></a>[Release v2.0.2 (5 July 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/DCSA_DOMAIN/2.0.2)
 ---
