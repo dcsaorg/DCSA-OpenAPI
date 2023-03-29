@@ -6,7 +6,7 @@ This Domain specifies common components for DCSA Events. This domain is central 
 
 <a name="v310"></a>[Release v3.1.0 (31 March 2023)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/3.1.0)
 ---
-Release for T&T 3.0 + ReeferEvents and IoTEvents
+Release for T&T 3.0 + Reefer 1.0 and IoT 1.0
 
 - Bump [DCSA Domain to version 3.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v300) (was previously 2.0.3)
 - Bump [Location Domain to version 3.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v300) (was previously 2.0.3)
