@@ -4,6 +4,28 @@ The Event Domain is documented on [**EVENT_DOMAIN**](https://app.swaggerhub.com/
 
 This Domain specifies common components for DCSA Events. This domain is central for all Event Hubs.
 
+<a name="v310"></a>[Release v3.1.0 (31 March 2023)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/3.1.0)
+---
+Release for T&T 3.0 + ReeferEvents and IoTEvents
+
+- Bump [DCSA Domain to version 3.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v300) (was previously 2.0.3)
+- Bump [Location Domain to version 3.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v300) (was previously 2.0.3)
+- `carrierExportVoyageNumber` query parameter description changed and now correctly refers to a carrier-specific Voyage number instead of an operator-specific Voyage number
+- `carrierImportVoyageNumber`, `iotEventTypeCodes`, `reeferEventTypeCodes` and `universalImportVoyageReference` added as a query parameter
+- `eventCreatedDateTime` and `eventDateTime` query parameters description updated to support ranges
+- `publisher` and `publisherRole` added as part of the `metadata` object and made mandatory to provide
+- `eventType` removed from the "general" `metadata` object
+- added a `title` attribute to all payloads. This can be used in combination with the `oneOf`
+- added `reeferPayload` and `iotPayload` objects
+- `eventType` added to the event-object used in T&T
+- `eventType` also added to each of the "specialized" events: `ShipmentEvent`, `TransportEvent`, `EquipmentEvent`, `ReeferEvent` and `IoTEvent`
+- `anyOf` in the location objects have been changed to a `oneOf` and a discriminator has been added: `locationType`
+- `metadata` is now a required attribute of the `EquipmentEvent`
+- `ReeferEvent` and `IotEvent` added
+- `publisher` object added
+- added `reefer-` and `iot-` subscription objects
+- `relatedDocumentReferences` have been extended to support all `documentTypeCodes` (from the `ShipmentEvent`)
+
 <a name="v300"></a>[Release v3.0.0 (23 December 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/3.0.0)
 ---
 New major release of T&T
