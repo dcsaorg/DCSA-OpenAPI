@@ -19,12 +19,16 @@ Release for T&T 3.0 + Reefer 1.0 and IoT 1.0 (all Beta 1)
 - added `reeferPayload` and `iotPayload` objects
 - `eventType` added to the event-object used in T&T
 - `eventType` also added to each of the "specialized" events: `ShipmentEvent`, `TransportEvent`, `EquipmentEvent`, `ReeferEvent` and `IoTEvent`
-- `anyOf` in the location objects have been changed to a `oneOf` and a discriminator has been added: `locationType`
+- `anyOf` in all the location objects have been changed to a `oneOf` and a discriminator has been added: `locationType`
 - `metadata` is now a required attribute of the `EquipmentEvent`
 - `ReeferEvent` and `IotEvent` added
 - `publisher` object added
 - added `reefer-` and `iot-` subscription objects
 - `relatedDocumentReferences` have been extended to support all `documentTypeCodes` (from the `ShipmentEvent`)
+- `transportCall` has been split into 4 different types depending on `modeOfTransport` (`VESSEL`, `BARGE`, `RAIL` or `TRUCK`)
+- `railTransportCall`, `truckTransportCall`, `bargeTransportCall` and `vesselTransportCall` added
+- `vessel` object remodelled in order to avoid the use of `anyOf`
+- `notImplemented` object created to specialize the `501` (Not Implemented) error response needed in case some of the "optional" endPoints are not implemented
 
 <a name="v300"></a>[Release v3.0.0 (23 December 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/3.0.0)
 ---
