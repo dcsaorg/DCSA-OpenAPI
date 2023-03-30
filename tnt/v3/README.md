@@ -2,7 +2,7 @@
 
 The DCSA Interface Standard for Track & Trace is documented on [**DCSA TNT**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_TNT) SwaggerHub.
 
-<a name="v300"></a>[Release v3.0.0-Beta-1 (...)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/3.0.0-Beta-1)
+<a name="v300"></a>[Release v3.0.0-Beta-1 (31 March 2023)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_TNT/3.0.0-Beta-1)
 ---
 Major changes are the following:
 - Restructured the `Event` in a `metadata` section and a `payload` section
