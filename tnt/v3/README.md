@@ -23,10 +23,13 @@ A detailed list of changes (please visit the updated domains for further changes
   - `eventType` filter renamed to `eventTypes`, description updated and default value added including all values (`SHIPMENT`, `TRANSPORT` and `EQUIPMENT`)
   - `documentTypeCode` filter renamed to `documentTypeCodes`
   - `shipmentEventTypeCode` filter renamed to `shipmentEventTypeCodes`
-  - `documentReference` filter added as a ghereic way to filter on references to different documentTypes
+  - `documentReference` filter added as a generic way to filter on references to different documentTypes
   - `carrierBookingReference` and `transportDocumentReference` removed as they have been replaced with the more generic `documentReference`
   - deprecated filters removed (`bookingReference`, `transportDocumentID`, `transportCallID` and `scheduleID`)
   - `transportEventTypeCode` filter renamed to `transportEventTypeCodes`
+  - `equipmentEventTypeCode` filter renamed to `equipmentEventTypeCodes`
+  - `universalServiceReference`, `carrierImportVoyageNumber`, `universalImportVoyageReference`, `carrierExportVoyageNumber` and `universalExportVoyageReference` filters added
+  - `
   
   
   - `eventDateTime` filter parameter added
