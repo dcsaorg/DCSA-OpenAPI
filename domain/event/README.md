@@ -29,6 +29,10 @@ Release for T&T 3.0 + Reefer 1.0 and IoT 1.0 (all Beta 1)
 - `railTransportCall`, `truckTransportCall`, `bargeTransportCall` and `vesselTransportCall` added
 - `vessel` object remodelled in order to avoid the use of `anyOf`
 - `notImplemented` object created to specialize the `501` (Not Implemented) error response needed in case some of the "optional" endPoints are not implemented
+- `ambientTemperatureSetpoint`, `iotEventTypeCode`, `iotEventCode`, `iotEventTypeCodes`, `reeferEventTypeCode`, `reeferEventTypeCodes`, ``, ``, ``, ``, `` added
+- `eventID` type changed from `UUID` to "normal" `string` with a maxLength of 100
+- `retractedEventID` type changed from `UUID` to "normal" `string` with a maxLength of 100
+- `tntPublisherRole` added
 
 <a name="v300"></a>[Release v3.0.0 (23 December 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/EVENT_DOMAIN/3.0.0)
 ---
