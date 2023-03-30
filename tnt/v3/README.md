@@ -20,24 +20,20 @@ A detailed list of changes (please visit the updated domains for further changes
 - 'event-structure' has changed. Instead of being flat it now consists of a 'common' `metadata` part and a 'specialized' `payload` part
 - `/v3/events` endPoint updated:
   - description updated to be more markdown compliant. The endPoint is mandatory to implement
+  - `eventDateTime` filter parameter added
   - `eventType` filter renamed to `eventTypes`, description updated and default value added including all values (`SHIPMENT`, `TRANSPORT` and `EQUIPMENT`)
   - `documentTypeCode` filter renamed to `documentTypeCodes`
   - `shipmentEventTypeCode` filter renamed to `shipmentEventTypeCodes`
-  - `documentReference` filter added as a generic way to filter on references to different documentTypes
+  - `documentReference` filter added as a generic way to filter on references to different documentTypes (`shipmentEventTypeCodes`)
   - `carrierBookingReference` and `transportDocumentReference` removed as they have been replaced with the more generic `documentReference`
-  - deprecated filters removed (`bookingReference`, `transportDocumentID`, `transportCallID` and `scheduleID`)
+  - deprecated filters removed (`bookingReference`, `transportDocumentID` and `scheduleID`)
   - `transportEventTypeCode` filter renamed to `transportEventTypeCodes`
   - `equipmentEventTypeCode` filter renamed to `equipmentEventTypeCodes`
   - `universalServiceReference`, `carrierImportVoyageNumber`, `universalImportVoyageReference`, `carrierExportVoyageNumber` and `universalExportVoyageReference` filters added
-  - `
-  
-  
-  - `eventDateTime` filter parameter added
-  - `documentReference` added to support filtering for all references belonging to `shipmentEventTypeCodes`
-  - `transportCallID` replaced with `transportCallReference`
   - `exportVoyageNumber` replaced with `carrierExportVoyageNumber` and `universalVoyageReference`
-  - `universalServiceReferemnce` added
-  - `cursor` queryParameter removed as pagination is implementation specific
+  - `carrierVoyageNumber` removed
+  - `transportCallID` replaced with `transportCallReference`
+  - `cursor` and `offset` queryParameters removed as pagination is implementation specific
   - response payload change to be a list of events rather than an `anyOf` events
   - added 3 examples:
     - Events related to Booking: 'ABC123059'
@@ -50,9 +46,28 @@ A detailed list of changes (please visit the updated domains for further changes
   - added 3 examples:
     - Shipment Event
     - Equipment Event as part of a transshipment
+    - Rail-TransportCall Transport event
+    - Truck-TransportCall Transport event
     - Retracted Transport Event
-- removed the `cursor` queryParameter from the `/v3/event-subscriptions` endPoint
-- description updated to be more markdown compliant
-- callBack description updated and the response payload is now a list of events and not a `oneOf`
+- `/v3/event-subscriptions` endPoint updated:
+  - GET description updated. This endPoint is optional to implement
+    - removed the `cursor` and `offset` queryParameter
+    - added a `501` (Not Implemented) error response
+  - POST description updated. This endPoint is optional to implement
+    - added a `501` (Not Implemented) error response
+- `callbackUrl` endPoint updated:
+  - description updated
+  - payload has been changed to be an event rather than an `oneOf`
+- `/v3/event-subscriptions/{subscriptionID}`
+  - GET description updated. This endPoint is optional to implement
+    - added a `501` (Not Implemented) error response
+  - DELETE description updated. This endPoint is optional to implement
+    - added a `501` (Not Implemented) error response
+  - PUT description updated. This endPoint is optional to implement
+    - added a `501` (Not Implemented) error response
+- `/v3/event-subscriptions/{subscriptionID}/secret:`
+  - PUT description updated. This endPoint is optional to implement
+    - added a `501` (Not Implemented) error response
 - `eventTypes` description updated
 - emphasized that the `secret` field is only valid in `POST` subscription calls
+- `subscriptionCreatedDateTime` and `subscriptionUpdatedDateTime` added to the subscription response payload
