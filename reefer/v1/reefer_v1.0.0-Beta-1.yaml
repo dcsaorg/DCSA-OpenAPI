@@ -5,9 +5,9 @@ info:
   description: |
     Managing and sending `ReeferEvents` and subscriptions for **Reefer (extension to Track &amp; Trace)**. API specification issued by DCSA.org.
     
-    For explanation to specific values or objects please refer to the [Information Model 2022.Q4](https://dcsa.org/wp-content/uploads/2022/12/DCSA_Information-Model-2022.Q4-final.pdf) - to be updated.
+    For explanation to specific values or objects please refer to the [Information Model 2023.Q1](https://dcsa.org/wp-content/uploads/2022/02/DCSA-Information-Model-2023.Q1.pdf).
     
-    There are two ways to get events. Either they can be **pulled by you** or they can be **pushed to an endPoint** by the implementor.
+    There are two ways to get events. Either they can be **polled by you** or they can be **pushed to an endPoint** by the implementor.
     
     ## Poll model
     Polling data can be done using
@@ -23,7 +23,7 @@ info:
 
     endPoints. Using the subscriptions, events are pushed as they occur. **The push model is optional to implement** and will clearly be stated on the implementing side. It is therefore possible to get a `501 Not Implemented` error message if subscription endPoints are called in case the implementor has chosen **not** to implement the push model.
 
-    For a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/tnt-reefer/v1#v100Beta1). Please also [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments.
+    For a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/reefer/v1#v100Beta1). Please also [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments.
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -95,19 +95,44 @@ paths:
                     
                         GET /events?carrierBookingReference=ABC123059
                         
-                    An example of a response could be xxx:
-                    
-                    - a `ReeferEvent` that was sent when the TransportDocument: `84db923d-2a19-4eb0-beb5-446c1ec57d34` was `ISSU` (Issued)
-                    - an `EquipmentEvent` linked to Booking `ABC123059` that is `EST` (Estimated) to be `LOAD` (Loaded) onto the vessel `King of the Seas` in `NLRAM` (Port of Amsterdam) on `2019-11-12T07:41:00+08:30`
+                    An example of a response could be:
+                    - a `ReeferEvent` with frozen cargo for `equipmentReference`=MSKU9070323
+                    - a `ReeferEvent` with Controlled Atmosphere for `equipmentReference`=APZU4812090
                   value:
                     - metadata:
                         eventID: '84db923d-2a19-4eb0-beb5-446c1ec57d34'
                         eventCreatedDateTime: '2022-09-19T06:31:00+02:00'
                         eventType: 'REEFER'
+                        publisher:
+                          partyName: 'Maersk'
+                          carrierCode: 'MSK'
+                          carrierCodeListProvider: 'SMDG'
+                        publisherRole: 'CA'
                       payload:
                         eventClassifierCode: 'ACT'
                         eventDateTime: '2022-09-19T06:31:00+02:00'
-                        reeferEventTypeCode: 'ISSU'
+                        reeferEventTypeCode: 'MEAS'
+                        measurements:
+                          ambientTemperature: 22
+                          temperature: -17.9
+                          temperatureUnit: 'CEL'
+                          o2: 10.5
+                          co2: 15.2
+                          humidity: 88
+                          airExchange: 0
+                          airExchangeUnit: 'MQH'
+                        setpoints:
+                          temperature: -18
+                          temperatureUnit: 'CEL'
+                          o2: 10.0
+                          co2: 15.0
+                          humidity: 88
+                          airExchange: 0
+                          airExchangeUnit: 'MQH'
+                        geoLocation:
+                          latitude: 48.8585500
+                          longitude: 2.294492036
+                        equipmentReference: 'MSKU9070323'
                         relatedDocumentReferences:
                           - type: 'BKG'
                             value: 'ABC123059'
@@ -115,10 +140,35 @@ paths:
                         eventID: '004a3525-23ae-4cf1-b442-68e6b2e591d8'
                         eventCreatedDateTime: '2022-10-05T13:19:00+02:00'
                         eventType: 'REEFER'
+                        publisher:
+                          partyName: 'Hapag-Lloyd'
+                          carrierCode: 'HLC'
+                          carrierCodeListProvider: 'SMDG'
+                        publisherRole: 'CA'
                       payload:
-                        eventClassifierCode: 'EST'
+                        eventClassifierCode: 'ACT'
                         eventDateTime: '2019-11-12T07:41:00+08:30'
-                        reeferEventTypeCode: 'LOAD'
+                        reeferEventTypeCode: 'MEAS'
+                        measurements:
+                          ambientTemperature: 12
+                          temperature: 5
+                          temperatureUnit: 'CEL'
+                          o2: 20
+                          co2: 25
+                          humidity: 98
+                          airExchange: 0
+                          airExchangeUnit: 'MQH'
+                        setpoints:
+                          temperature: -15
+                          temperatureUnit: 'CEL'
+                          o2: 20
+                          co2: 25
+                          humidity: 96
+                          airExchange: 0
+                          airExchangeUnit: 'MQH'
+                        geoLocation:
+                          latitude: 48.8585500
+                          longitude: 2.294492036
                         equipmentReference: 'APZU4812090'
                         relatedDocumentReferences:
                           - type: 'BKG'
@@ -127,21 +177,45 @@ paths:
                   description: |
                     In order to retreive a list of Events that are linked to a specific `equipmentReference` the following request could be made:
                     
-                        GET /events?equipmentEventTypeCodes=DROP,PICK
+                        GET /events?equipmentReference=APZU4812090
                         
                     An example of a response could be:
-                    
-                    - an `EquipmentEvent` relating to equipmentReference: `APZU4812090` that is part of a Transshipment Move (_isTransshipmentMove=true_) which has been `DROP` (Droped-off) `ACT` (Actual) at `NLRAM` (Port of Amsterdam) on `2019-11-12T07:41:00+08:30`
-                    - an `EquipmentEvent` relating to equipmentReference: `APNR7744962` that is `EMPTY` and being PICK (Picked-up) at `NLRAM` (Port of Amsterdam) on `2018-03-18T17:36:00+01:00`.
+                    - a `ReeferEvent` for `equipmentReference`=APZU4812090 with Controlled Atmosphere related to `carrierBookingReference`=ABC123059
+                    - a `ReeferEvent` for `equipmentReference`=APZU4812090 with frozen cargo related to `carrierBookingReference`=XYZ98765
                   value:
                     - metadata:
                         eventID: '3ac63340-3f64-434b-8410-67942a2cef21'
                         eventCreatedDateTime: '2021-09-30T09:25:00+02:00'
                         eventType: 'REEFER'
+                        publisher:
+                          partyName: 'Mediterranean Shipping Company'
+                          carrierCode: 'MSC'
+                          carrierCodeListProvider: 'SMDG'
+                        publisherRole: 'CA'
                       payload:
                         eventClassifierCode: 'ACT'
                         eventDateTime: '2019-11-12T07:41:00+08:30'
-                        reeferEventTypeCode: 'DROP'
+                        reeferEventTypeCode: 'MEAS'
+                        measurements:
+                          ambientTemperature: 12
+                          temperature: 5
+                          temperatureUnit: 'CEL'
+                          o2: 20
+                          co2: 25
+                          humidity: 98
+                          airExchange: 0
+                          airExchangeUnit: 'MQH'
+                        setpoints:
+                          temperature: -15
+                          temperatureUnit: 'CEL'
+                          o2: 20
+                          co2: 25
+                          humidity: 96
+                          airExchange: 0
+                          airExchangeUnit: 'MQH'
+                        geoLocation:
+                          latitude: 48.8585500
+                          longitude: 2.294492036
                         equipmentReference: 'APZU4812090'
                         relatedDocumentReferences:
                           - type: 'BKG'
@@ -150,14 +224,39 @@ paths:
                         eventID: '3ac63340-3f64-434b-8410-67942a2cef21'
                         eventCreatedDateTime: '2021-09-30T09:25:00+02:00'
                         eventType: 'REEFER'
+                        publisher:
+                          partyName: 'CMA CGM'
+                          carrierCode: 'CMA'
+                          carrierCodeListProvider: 'SMDG'
+                        publisherRole: 'CA'
                       payload:
                         eventClassifierCode: 'ACT'
                         eventDateTime: '2018-03-18T17:36:00+01:00'
-                        reeferEventTypeCode: 'PICK'
+                        reeferEventTypeCode: 'MEAS'
+                        measurements:
+                          ambientTemperature: 22
+                          temperature: -17.9
+                          temperatureUnit: 'CEL'
+                          o2: 10.5
+                          co2: 15.2
+                          humidity: 88
+                          airExchange: 0
+                          airExchangeUnit: 'MQH'
+                        setpoints:
+                          temperature: -18
+                          temperatureUnit: 'CEL'
+                          o2: 10.0
+                          co2: 15.0
+                          humidity: 88
+                          airExchange: 0
+                          airExchangeUnit: 'MQH'
+                        geoLocation:
+                          latitude: 48.8585500
+                          longitude: 2.294492036
                         equipmentReference: 'APZU4812090'
                         relatedDocumentReferences:
                           - type: 'BKG'
-                            value: 'ABC123059'
+                            value: 'XYZ98765'
         default:
           description: Unexpected error
           headers:
@@ -201,10 +300,36 @@ paths:
                       eventID: '123e4567-e89b-12d3-a456-426614174000'
                       eventCreatedDateTime: '2022-09-19T06:31:00+02:00'
                       eventType: 'REEFER'
+                      publisher:
+                        partyName: 'CMA CGM'
+                        carrierCode: 'CMA'
+                        carrierCodeListProvider: 'SMDG'
+                      publisherRole: 'CA'
                     payload:
                       eventClassifierCode: 'ACT'
                       eventDateTime: '2022-09-19T06:31:00+02:00'
-                      reeferEventTypeCode: 'ISSU'
+                      reeferEventTypeCode: 'MEAS'
+                      measurements:
+                        ambientTemperature: 22
+                        temperature: -17.9
+                        temperatureUnit: 'CEL'
+                        o2: 10.5
+                        co2: 15.2
+                        humidity: 88
+                        airExchange: 0
+                        airExchangeUnit: 'MQH'
+                      setpoints:
+                        temperature: -18
+                        temperatureUnit: 'CEL'
+                        o2: 10.0
+                        co2: 15.0
+                        humidity: 88
+                        airExchange: 0
+                        airExchangeUnit: 'MQH'
+                      geoLocation:
+                        latitude: 48.8585500
+                        longitude: 2.294492036
+                      equipmentReference: 'APZU4812090'
                       relatedDocumentReferences:
                         - type: 'BKG'
                           value: 'ABC123059'
@@ -215,6 +340,11 @@ paths:
                       eventCreatedDateTime: '2022-09-20T07:41:00+08:30'
                       eventType: 'REEFER'
                       retractedEventID: '957e4966-dad0-4111-9f8f-fb7216c43907'
+                      publisher:
+                        partyName: 'Mediterranean Shipping Company'
+                        carrierCode: 'MSC'
+                        carrierCodeListProvider: 'SMDG'
+                      publisherRole: 'CA'
         default:
           description: Unexpected error
           headers:
@@ -249,7 +379,8 @@ paths:
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/parameters/Api-Version-Major'
       responses:
         '200':
-          description: Returns a list of subscriptions
+          description: |
+            Returns a list of subscriptions
           headers:
             API-Version:
               $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
@@ -269,6 +400,27 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/subscription'
+        '501':
+          description: |
+            If this endPoint is not implemented (optional to implement) a `501` Not implemented code will be returned.
+            
+            **NB:** The subscription model is optional to implement
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/schemas/notImplemented'
+                  - type: object
+                    properties:
+                      httpMethod:
+                        example: GET
+                  - type: object
+                    properties:
+                      requestUri:
+                        example: 'https://dcsa.org/dcsa/tnt/v1/event-subscriptions'
         default:
           description: Unexpected error
           headers:
@@ -305,15 +457,9 @@ paths:
           
           A logical **AND** is used between filters. So
           
-              reeferEventTypeCodes=DRFT&carrierBookingReference=ABC123123
+              reeferEventTypeCodes=MEAS&carrierBookingReference=ABC123123
           
-          means that the events matched ***must*** both be in draft status (`reeferEventTypeCodes=DRFT`) **and** be connected to carrierBookingReference ABC123123 (`carrierBookingReference=ABC123123`)
-          
-          XXX Filters that are specified as `,` (comma) separated lists use logical **OR** between list values. So
-          
-              XXX eventTypes=SHIPMENT,TRANSPORT
-          
-          XXX means that **both** `ShipmentEvents` **and** `TransportEvents` will be matched by this subscription.
+          means that the events matched ***must*** both a measured reefer (`reeferEventTypeCodes=MEAS`) **and** be connected to carrierBookingReference ABC123123 (`carrierBookingReference=ABC123123`)
         required: true
         content:
           application/json:
@@ -329,6 +475,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/subscription'
+        '501':
+          description: |
+            If this endPoint is not implemented (optional to implement) a `501` Not implemented code will be returned.
+            
+            **NB:** The subscription model is optional to implement
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/schemas/notImplemented'
+                  - type: object
+                    properties:
+                      httpMethod:
+                        example: POST
+                  - type: object
+                    properties:
+                      requestUri:
+                        example: 'https://dcsa.org/dcsa/tnt/v1/event-subscriptions'
         default:
           description: Unexpected error
           headers:
@@ -395,6 +562,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/subscription'
+        '501':
+          description: |
+            If this endPoint is not implemented (optional to implement) a `501` Not implemented code will be returned.
+            
+            **NB:** The subscription model is optional to implement
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/schemas/notImplemented'
+                  - type: object
+                    properties:
+                      httpMethod:
+                        example: GET
+                  - type: object
+                    properties:
+                      requestUri:
+                        example: 'https://dcsa.org/dcsa/tnt/v1/event-subscriptions/c4436afa-a8f0-4c23-b924-ab9a988557ab'
         default:
           description: Unexpected error
           headers:
@@ -430,6 +618,27 @@ paths:
           headers:
             API-Version:
               $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
+        '501':
+          description: |
+            If this endPoint is not implemented (optional to implement) a `501` Not implemented code will be returned.
+            
+            **NB:** The subscription model is optional to implement
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/schemas/notImplemented'
+                  - type: object
+                    properties:
+                      httpMethod:
+                        example: DELETE
+                  - type: object
+                    properties:
+                      requestUri:
+                        example: 'https://dcsa.org/dcsa/tnt/v1/event-subscriptions/c4436afa-a8f0-4c23-b924-ab9a988557ab'
         default:
           description: Unexpected error
           headers:
@@ -476,6 +685,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/subscription'
+        '501':
+          description: |
+            If this endPoint is not implemented (optional to implement) a `501` Not implemented code will be returned.
+            
+            **NB:** The subscription model is optional to implement
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/schemas/notImplemented'
+                  - type: object
+                    properties:
+                      httpMethod:
+                        example: PUT
+                  - type: object
+                    properties:
+                      requestUri:
+                        example: 'https://dcsa.org/dcsa/tnt/v1/event-subscriptions/c4436afa-a8f0-4c23-b924-ab9a988557ab'
         default:
           description: Unexpected error
           headers:
@@ -523,6 +753,27 @@ paths:
           headers:
             API-Version:
               $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
+        '501':
+          description: |
+            If this endPoint is not implemented (optional to implement) a `501` Not implemented code will be returned.
+            
+            **NB:** The subscription model is optional to implement
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/schemas/notImplemented'
+                  - type: object
+                    properties:
+                      httpMethod:
+                        example: PUT
+                  - type: object
+                    properties:
+                      requestUri:
+                        example: 'https://dcsa.org/dcsa/tnt/v1/event-subscriptions/c4436afa-a8f0-4c23-b924-ab9a988557ab/secret'
         default:
           description: Unexpected error
           headers:
