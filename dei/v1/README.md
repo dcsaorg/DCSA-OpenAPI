@@ -1,4 +1,4 @@
-### Delivery Instruction (DEO) API
+### Delivery Instruction (DEI) API
 
 The DCSA Interface Standard for Delivery Instruction is documented on the [**DCSA DEI SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_DEI).
 
