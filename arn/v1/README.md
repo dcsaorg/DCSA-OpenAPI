@@ -1,4 +1,4 @@
-### Booking (BKG) API
+### Arrival Notice (ARN) API
 
 The DCSA Interface Standard for Arrival Notice is documented on the [**DCSA ARN SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_ARN).
 
