@@ -4,6 +4,12 @@ The Error Domain is documented on [**Error Domain SwaggerHub**](https://app.swag
 
 The purpose of this Domain is to specify the error object to return in any API endPoint in case an error occurs.
 
+<a name="v201"></a>[Release v2.0.1 (TBD)](https://app.swaggerhub.com/domains-docs/dcsaorg/ERROR_DOMAIN/2.0.1)
+---
+Type fixed
+
+- typo fixed
+
 <a name="v200"></a>[Release v2.0.0 (23 December 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/ERROR_DOMAIN/2.0.0)
 ---
 Breaking changes fixed
