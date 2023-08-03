@@ -1,11 +1,11 @@
 openapi: 3.0.3
 info:
   version: 2.0.0-Beta-1
-  title: DCSA OpenAPI specification for Booking v2 - Beta 1
+  title: DCSA OpenAPI specification for Booking
   description: |
     API specification issued by DCSA.org.
     
-    For explanation to specific values or objects please refer to the [Information Model 2023.Q1](https://dcsa.org/wp-content/uploads/2022/02/DCSA-Information-Model-2023.Q1.pdf) *** _Will be updated_ ***. This API does not define the business rules regarding what is allowed to update at what time. For this the [BKG IFS]() *** _Will be updated_ *** should be consulted.
+    For explanation to specific values or objects please refer to the [Information Model 2023.Q3](https://dcsa.org/wp-content/uploads/2022/02/DCSA-Information-Model-2023.Q1.pdf) *** _Will be updated_ ***. This API does not define the business rules regarding what is allowed to update at what time. For this the [Booking IFS]() *** _Will be updated_ *** should be consulted.
 
     All other documents related to the Booking publication can be found [here](https://knowledge.dcsa.org/s/publication?publicationId=a0r7T000000L8mmQAC)
     
@@ -49,9 +49,9 @@ paths:
       description: |
         Retrieves the booking request _metadata_
 
-        If not specified - this list will be sorted by the time the `Booking Request` was created (bookingRequestCreatedDateTime) in ascending (ASC) order.
+        If not specified - this list will be sorted by the time the `Booking Request` was created (bookingRequestDateTime) in ascending (ASC) order.
       parameters:
-        - $ref: '#/components/parameters/documentStatus'
+        - $ref: '#/components/parameters/bookingStatus'
 
         # - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/parameters/cursor'
         # - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/parameters/offset'
@@ -88,7 +88,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.0#/components/schemas/error'
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.1#/components/schemas/error'
   /v2/bookings:
     post:
       tags:
@@ -101,19 +101,19 @@ paths:
         Creates a new booking request. This endPoint corresponds with [**UseCase 1 - Submit booking request**](https://dcsa.sparxcloud.us/L3KJa4) in the Booking Interface Standards (IFS) document.
         
         ## Precondition
-        The consumer has information for a booking
+        The consumer has information for a `Booking Request`
         
         ## Postcondition
-        The provider has received the Booking request. 
+        The provider has received the `Booking Request`. 
         
         The consumer will receive a `201` (Created) if the payload schema-validates or a `400` (Bad Request) if it does not.
         
-        If a `201` (Created) is returned - a `ShipmentEvent` with the status `RECE` (Received) is also created. The provider can optionally do a full validation in which case a second `ShipmentEvent` is created.
+        If a `201` (Created) is returned - a `ShipmentEvent` with the status `RECE` (Received) is also created. The provider can **optionally** do a full validation in which case a second `ShipmentEvent` is created. The full validation can also be done asynchroniously in which case the second `ShipmentEvent` will be created later.
         
         ## Process
         The following occurs when a provider recieves a booking request:
-        1. The payload (booking request) is schema-validated. In case the payload **is invalid** a `400` (Bad Request) is returned
-        2. A `carrierBookingRequestReference` (as a reference to the booking request) is created and stored along with the payload in the provider database.
+        1. The payload (`Booking Request`) is schema-validated. In case the payload **is invalid** a `400` (Bad Request) is returned
+        2. A `carrierBookingRequestReference` (as a reference to the `Booking Request`) is created and stored along with the payload in the provider system.
           
             **For the rest of this description and in all examples the value `cbr-123` will be used as `carrierBookingRequestReference`**
         3. A `ShipmentEvent` is created:
@@ -132,24 +132,25 @@ paths:
             }
             ```
         
-        The provider can now choose to either do **no validation** or make a **full validation**
+        The provider can now choose to either do **No Validation** or make a **Full Validation**
 
         ### No validation
+        
         4. A `201` (Created) response is returned with the following payload
             ```
             {
               carrierBookingRequestReference: 'cbr-123',
-              documentStatus: 'RECE',
-              bookingRequestCreatedDateTime: '2021-11-03T09:41:00-08:30',
-              bookingRequestUpdatedDateTime: '2021-11-03T09:41:00-08:30'
+              bookingStatus: 'RECE',
+              bookingRequestDateTime: '2021-11-03T09:41:00-08:30',
+              bookingUpdatedDateTime: '2021-11-03T09:41:00-08:30'
             }
             ```
-        For `POST` Booking request the process ends here in case no further validation is done at this point. The Booking request
+        For `POST` `Booking Request` the process ends here in case no further validation is done at this point. The `Booking Request`
         
           - is now stored in the provider system
           - has status `RECE` (Received)
           - awaits further processing by the provider
-          - a `201` (Created) response is sent to the consumer with a payload containing `documentStatus=RECE`
+          - a `201` (Created) response is sent to the consumer with a payload containing `bookingStatus='RECE'`
         
         Any further communication from provider to consumer will be done via `ShipmentEvents` and can be monitored by the consumer on the
         
@@ -160,15 +161,16 @@ paths:
         ### Full validation
         4. Do full validation of the payload. Some examples could be:
             - check all conditional fields
-            - create a `transportPlan` based in booking request input
+            - create a `transportPlan` based on booking request input
             - check equipment and space availability
+            - check that `HS Codes` match the `Commodity` descriptions
             - etc
             
             Making a full validation requires the provider to check against all business rules (_the list above is just examples_)
-        5. Create a `ShipmentEvent` (in addition to the `ShipmentEvent` created in step 3) with the new status based on the validation result in step 4:
+        5. Create a `ShipmentEvent` (in addition to the `ShipmentEvent` created in step 3) with the new status based on the validation result in step 4. The status can be one of the following:
             - **Update required**
                
-              If an update to the Booking request is required (equivalent to [**UseCase 2 - Request missing information to booking request**]() in the Booking Interface Standard (IFS) document) a `ShipmentEvent` is created with the status `PENU` (Pending Update) :
+              If an update to the `Booking Request` is required (equivalent to [**UseCase 2 - Request missing information to booking request**]() in the Booking Interface Standard (IFS) document) a `ShipmentEvent` is created with the status `PENU` (Pending Update) :
               ```
               {
                 metadata: {
@@ -186,7 +188,7 @@ paths:
               ```
             - **Confirm Booking request**
             
-              If the booking request can be confirmed (equivalent to [**UseCase 5 - Confirm booking request**]() in the Booking Interface Standard (IFS) document) a `ShipmentEvent` is created with the status `CONF` (Confirmed):
+              If the `Booking Request` can be confirmed (equivalent to [**UseCase 5 - Confirm booking request**]() in the Booking Interface Standard (IFS) document) a `ShipmentEvent` is created with the status `CONF` (Confirmed):
               ```
               {
                 metadata: {
@@ -201,9 +203,9 @@ paths:
                 }
               }
               ```
-            - **Reject booking request**
+            - **Reject Booking Request**
             
-              If the booking request needs to be rejected (equivalent to [**UseCase 4 - Reject booking request**]() in the Booking Interface Standard (IFS) document) a `ShipmentEvent` is created with the status `REJE` (Rejected):
+              If the `Booking Request` needs to be rejected (equivalent to [**UseCase 4 - Reject booking request**]() in the Booking Interface Standard (IFS) document) a `ShipmentEvent` is created with the status `REJE` (Rejected):
               ```
               {
                 metadata: {
@@ -219,26 +221,26 @@ paths:
                 }
               }
               ```
-        6. A `201` (Created) response is returned with the following payload (`documentStatus` can also be `CONF` or `REJE` - `PENU` used in the example)
+        6. A `201` (Created) response is returned with the following payload (`bookingStatus` can also be `CONF` or `REJE` - `PENU` used in the example)
             ```
             {
               carrierBookingRequestReference: 'cbr-123',
-              documentStatus: 'PENU',
-              bookingRequestCreatedDateTime: '2021-11-03T09:41:00-08:30',
-              bookingRequestUpdatedDateTime: '2021-11-03T09:41:00-08:30'
+              bookingStatus: 'PENU',
+              bookingRequestDateTime: '2021-11-03T09:41:00-08:30',
+              bookingUpdatedDateTime: '2021-11-03T09:41:00-08:30'
             }
             ```
         
-        For a full validation the `POST` Booking request ends here. The Booking request
+        For a full validation the `POST` `Booking Request` ends here. The `Booking Request`
             
         - is now stored in the provider system
         - a `ShipmentEvent` with status `RECE` (Received) has been created
         - a full validation has been done
-        - a second `ShipmentEvent` is created with one of the following statuses:
+        - a second `ShipmentEvent` is created with one of the following statuses (depending on the result of the full validation):
           - `PENU` (Pending Update) in case provider awaits further input from consumer
-          - `CONF` (Confirmed) in case provider has confirmed the Booking request and the Booking request is ready to be used in a `Shipping Instruction`
-          - `REJE` (Rejected) in case the provider has rejected the Booking request.
-        - a `201` (Created) response is sent to the consumer with a payload containing the `documentStatus` of the second `ShipmentEvent`
+          - `CONF` (Confirmed) in case provider has confirmed the `Booking Request` and the `Booking Request` is ready to be used in a `Shipping Instruction`
+          - `REJE` (Rejected) in case the provider has rejected the `Booking Request`.
+        - a `201` (Created) response is sent to the consumer with a payload containing the `bookingStatus` of the second `ShipmentEvent`
           
         Any further communication from provider to consumer will be done via `ShipmentEvents` and can be monitored by the consumer on the
 
@@ -255,13 +257,13 @@ paths:
       responses:
         '201':
           description: |
-            Booking request has been successfully created in the provider system. Depending on the level of validation done by the provider - the status of the Booking request will be one of the following:
-            - `RECE` (Received) in case asynchronous processing of the Booking request begins. The Booking request is now awaiting the provider to finish the validation
-            - `PENU` (Pending Update) in case provider needs the Booking request to be updated and awaits further input from consumer
-            - `CONF` (Confirmed) in case provider has confirmed the Booking request and the Booking request is ready to be used in a `Shipping Instruction`
-            - `REJE` (Rejected) in case the provider has rejected the Booking request. The Booking request can no longer be updated
+            `Booking Request` has been successfully created in the provider system. Depending on the level of validation done by the provider - the status of the `Booking Request` will be one of the following:
+            - `RECE` (Received) in case asynchronous processing of the `Booking Request` begins. The `Booking Request` is now awaiting the provider to finish the validation
+            - `PENU` (Pending Update) in case provider needs the `Booking Request` to be updated and awaits further input from consumer
+            - `CONF` (Confirmed) in case provider has confirmed the `Booking Request` and the `Booking Request` is ready to be used in a `Shipping Instruction`
+            - `REJE` (Rejected) in case the provider has rejected the `Booking Request`. The `Booking Request`can no longer be updated
             
-            The status of the Booking request is communicated via `ShipmentEvent(s)` and can be monitored by the consumer on the
+            The status of the `Booking Request` is communicated via `ShipmentEvent(s)` and can be monitored by the consumer on the
               
                 GET /v2/events
               
@@ -278,60 +280,60 @@ paths:
                   summary: |
                     Booking request received
                   description: |
-                    A Booking request received (`RECE`) and stored in provider system but not yet fully validated (only schema validated)
+                    A `Booking Request` has been received (`RECE`) and stored in provider system but not yet fully validated (only schema validated)
                   value:
                     carrierBookingRequestReference: 24595eb0-5cfc-4381-9c3a-cedc1975e9aa
-                    documentStatus: RECE
-                    bookingRequestCreatedDateTime: '2023-04-13T09:41:00-08:30'
-                    bookingRequestUpdatedDateTime: '2023-04-13T09:41:00-08:30'
+                    bookingStatus: RECE
+                    bookingRequestDateTime: '2021-11-03T09:41:00-08:30'
+                    bookingUpdatedDateTime: '2021-11-03T09:41:00-08:30'
                 penuExample:
                   summary: |
                     Booking request pending update
                   description: |
-                    A Booking request received and stored in provider system and fully validated. The result of the full validation has resulted in the provider requiring the consumer to make some updates (`PENU`)
+                    A `Booking Request` received and stored in provider system and fully validated. The result of the full validation has resulted in the provider requiring the consumer to make some updates (`PENU`)
                   value:
                     carrierBookingRequestReference: 24595eb0-5cfc-4381-9c3a-cedc1975e9aa
-                    documentStatus: PENU
-                    bookingRequestCreatedDateTime: '2023-04-13T09:41:00-08:30'
-                    bookingRequestUpdatedDateTime: '2023-04-13T09:41:00-08:30'
+                    bookingStatus: PENU
+                    bookingRequestDateTime: '2021-11-03T09:41:00-08:30'
+                    bookingUpdatedDateTime: '2021-11-03T09:41:00-08:30'
                 confExample:
                   summary: |
                     Confirmed Booking request
                   description: |
-                    A Booking request received and stored in provider system, fully validated and Confirmed (`CONF`).
+                    A `Booking Request` received and stored in provider system, fully validated and Confirmed (`CONF`).
                   value:
                     carrierBookingRequestReference: 24595eb0-5cfc-4381-9c3a-cedc1975e9aa
-                    documentStatus: CONF
-                    bookingRequestCreatedDateTime: '2023-04-13T09:41:00-08:30'
-                    bookingRequestUpdatedDateTime: '2023-04-13T09:41:00-08:30'
+                    bookingStatus: CONF
+                    bookingRequestDateTime: '2021-11-03T09:41:00-08:30'
+                    bookingUpdatedDateTime: '2021-11-03T09:41:00-08:30'
                 rejeExample:
                   summary: |
                     Rejected Booking request
                   description: |
-                    A Booking request received and stored in provider system, fully validated but has been rejected (`REJE`).
+                    A `Booking Request` received and stored in provider system but has been rejected (`REJE`).
                   value:
                     carrierBookingRequestReference: 24595eb0-5cfc-4381-9c3a-cedc1975e9aa
-                    documentStatus: REJE
-                    bookingRequestCreatedDateTime: '2023-04-13T09:41:00-08:30'
-                    bookingRequestUpdatedDateTime: '2023-04-13T09:41:00-08:30'
+                    bookingStatus: REJE
+                    bookingRequestDateTime: '2021-11-03T09:41:00-08:30'
+                    bookingUpdatedDateTime: '2021-11-03T09:41:00-08:30'
         '401':
           description: |
-            In case the Booking request does not schema validate a `401` (Bad Request) is returned
+            In case the `Booking Request` does not schema validate a `401` (Bad Request) is returned
           headers:
             API-Version:
               $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.0#/components/schemas/error'
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.1#/components/schemas/error'
               examples:
                 badRequestExample:
                   summary: |
                     Booking missing `receiptTypeAtOrigin`
                   description: |
-                    `receiptTypeAtOrigin` is a mandoatry field in the Booking request. This is an example of how the error object would look in case this field is missing
+                    `receiptTypeAtOrigin` is a mandoatry field in the `Booking Request`. This is an example of how the error object would look in case this field is missing
                     
-                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
                     httpMethod: POST
                     requestUri: /v2/bookings
@@ -354,15 +356,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.0#/components/schemas/error'
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.1#/components/schemas/error'
               examples:
                 internalServerErrorExample:
                   summary: |
-                    Internal Server Error while processing Booking request
+                    Internal Server Error while processing Booking Request
                   description: |
                     An Internal Server Error has occurred - the consumer should contact {provider-support} and provide the `providerCorrelationID` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
                     
-                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
                     httpMethod: POST
                     requestUri: /v2/bookings
@@ -384,15 +386,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.0#/components/schemas/error'
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.1#/components/schemas/error'
               examples:
                 tooManyRequestsExample:
                   summary: |
-                    Making too many Bookings requests
+                    Making too many Bookings Requests
                   description: |
-                    Calling the endPoint POST /v2/bookings too many times within a timeperiod.
+                    Calling the endPoint
                     
-                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example
+                        POST /v2/bookings
+                        
+                    too many times within a timeperiod.
+                    
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
                     httpMethod: POST
                     requestUri: /v2/bookings
@@ -412,7 +418,7 @@ paths:
       summary: Get booking requests
       operationId: 'getBooking'
       description: |
-        Retrieves the booking request with the `carrierBookingRequestReference` in the path.
+        Retrieves the `Booking Request` with the `carrierBookingRequestReference` in the path. It is recommended to use this endPoint to `GET` data before an update is made to make sure latest version is being updated.
       parameters:
         - $ref: '#/components/parameters/carrierBookingRequestReferencePathParam'
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/parameters/Api-Version-Major'
@@ -434,7 +440,31 @@ paths:
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.0#/components/schemas/error'
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.1#/components/schemas/error'
+              examples:
+                getError:
+                  summary: |
+                    GET non-existing Booking Request
+                  description: |
+                    Calling
+                    
+                        GET /v2/bookings/123
+                        
+                    results in an error as booking 123 does not exist.
+                    
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
+                  value:
+                    httpMethod: GET
+                    requestUri: /v2/bookings
+                    statusCode: 429
+                    statusCodeText: Too Many Requests
+                    errorMessage: Too many request to create a booking has been requested. Please try again in 1 hour
+                    providerCorrelationID: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2023-04-13T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7003
+                        reason: Max Booking requests reached 
+                        message: A maximum of 10 Bookings can be created per hour
     put:
       tags:
        - Booking Request
@@ -444,19 +474,26 @@ paths:
         - $ref: '#/components/parameters/carrierBookingRequestReferencePathParam'
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/parameters/Api-Version-Major'
       description: |
-        Updates the booking request with the `carrierBookingRequestReference` in the path. This endPoint corresponds with either
-        - [UseCase 3 - Submit updated booking request]()
-        - [UseCase 7 - Request amendments to booking request()]
+        Updates the `Booking Request` with the `carrierBookingRequestReference` in the path. This endPoint corresponds with either
         
-        from the Booking Interface Standards (IFS) Document
+        - [UseCase 3 - Submit updated booking request]()
+        - [UseCase 7 - Request amendments to booking request]()
+        
+        from the Booking Interface Standards (IFS) Document. This endPoint is to be used in response to
+        
+        - [UseCase 2 - Request missing information to booking request]()
+        - [UseCase 6 - Request to update booking request]()
         
         ### Precondition
-        In order to update a booking, the status of the booking needs to be either `RECE` (Received) or `PENU` (Pending Update)
+        In order to update a booking, the status of the booking needs to be either
+        
+        - `RECE` (Received) or `PENU` (Pending Update) in case this endPoint is being used for [UseCase 3 - Submit updated booking request]()
+        - `CONF` (Confirmed) or `PENU` (Pending Update) in case this endPoint is being used for [UseCase 7 - Request amendments to booking request]()
         
         ## Postcondition
-        The provider has received an update to the booking.
+        The provider has received an update or amendment to the booking.
 
-        The consumer will receive a 200 (Ok) if the payload schema-validates or a 400 (Bad Request) if it does not.
+        The consumer will receive a `200` (Ok) if the payload schema-validates or a 400 (Bad Request) if it does not.
         
         If a 200 (Ok) is returned - a `ShipmentEvent` with the status `RECE` (Received) is also created. The provider can optionally do a full validation in which case a second `ShipmentEvent` is created.
         
@@ -489,9 +526,9 @@ paths:
             ```
             {
               carrierBookingRequestReference: 'cbr-123',
-              documentStatus: 'RECE',
-              bookingRequestCreatedDateTime: '2021-11-03T09:41:00-08:30',
-              bookingRequestUpdatedDateTime: '2021-11-03T09:41:00-08:30'
+              bookingStatus: 'RECE',
+              bookingRequestDateTime: '2021-11-03T09:41:00-08:30',
+              bookingUpdatedDateTime: '2021-11-03T09:41:00-08:30'
             }
             ```
         For `PUT` Booking request the process ends here in case no further validation is done at this point. The **updated** Booking request
@@ -499,7 +536,7 @@ paths:
           - is now stored in the provider system
           - has status `RECE` (Received)
           - awaits further processing by the provider
-          - a `200` (Ok) response is sent to the consumer with a payload containing `documentStatus=RECE`
+          - a `200` (Ok) response is sent to the consumer with a payload containing `bookingStatus=RECE`
         
         Any further communication from provider to consumer will be done via `ShipmentEvents` and can be monitored by the consumer on the
         
@@ -569,13 +606,13 @@ paths:
                 }
               }
               ```
-        6. A `200` (Ok) response is returned with the following payload (`documentStatus` can also be `CONF` or `REJE` - `PENU` used in the example)
+        6. A `200` (Ok) response is returned with the following payload (`bookingStatus` can also be `CONF` or `REJE` - `PENU` used in the example)
             ```
             {
               carrierBookingRequestReference: 'cbr-123',
-              documentStatus: 'PENU',
-              bookingRequestCreatedDateTime: '2021-11-03T09:41:00-08:30',
-              bookingRequestUpdatedDateTime: '2021-11-03T09:41:00-08:30'
+              bookingStatus: 'PENU',
+              bookingRequestDateTime: '2021-11-03T09:41:00-08:30',
+              bookingUpdatedDateTime: '2021-11-03T09:41:00-08:30'
             }
             ```
         
@@ -588,7 +625,7 @@ paths:
           - `PENU` (Pending Update) in case provider awaits further input from consumer
           - `CONF` (Confirmed) in case provider has confirmed the Booking request and the Booking request is ready to be used in a `Shipping Instruction`
           - `REJE` (Rejected) in case the provider has rejected the Booking request.
-        - a `200` (Ok) response is sent to the consumer with a payload containing the `documentStatus` of the second `ShipmentEvent`
+        - a `200` (Ok) response is sent to the consumer with a payload containing the `bookingStatus` of the second `ShipmentEvent`
           
         Any further communication from provider to consumer will be done via `ShipmentEvents` and can be monitored by the consumer on the
 
@@ -630,9 +667,9 @@ paths:
                     An updated Booking request received (`RECE`) and stored in provider system but not yet fully validated (only schema validated)
                   value:
                     carrierBookingRequestReference: 24595eb0-5cfc-4381-9c3a-cedc1975e9aa
-                    documentStatus: RECE
-                    bookingRequestCreatedDateTime: '2023-04-13T09:41:00-08:30'
-                    bookingRequestUpdatedDateTime: '2023-04-13T09:41:00-08:30'
+                    bookingStatus: RECE
+                    bookingRequestDateTime: '2023-04-13T09:41:00-08:30'
+                    bookingUpdatedDateTime: '2023-04-13T09:41:00-08:30'
                 penuExample:
                   summary: |
                     Booking request pending update
@@ -640,9 +677,9 @@ paths:
                     An updated Booking request received and stored in provider system and fully validated. The result of the full validation has resulted in the provider requiring the consumer to make some updates (`PENU`)
                   value:
                     carrierBookingRequestReference: 24595eb0-5cfc-4381-9c3a-cedc1975e9aa
-                    documentStatus: PENU
-                    bookingRequestCreatedDateTime: '2023-04-13T09:41:00-08:30'
-                    bookingRequestUpdatedDateTime: '2023-04-13T09:41:00-08:30'
+                    bookingStatus: PENU
+                    bookingRequestDateTime: '2023-04-13T09:41:00-08:30'
+                    bookingUpdatedDateTime: '2023-04-13T09:41:00-08:30'
                 confExample:
                   summary: |
                     Confirmed Booking request
@@ -650,9 +687,9 @@ paths:
                     An updated Booking request received and stored in provider system, fully validated and Confirmed (`CONF`).
                   value:
                     carrierBookingRequestReference: 24595eb0-5cfc-4381-9c3a-cedc1975e9aa
-                    documentStatus: CONF
-                    bookingRequestCreatedDateTime: '2023-04-13T09:41:00-08:30'
-                    bookingRequestUpdatedDateTime: '2023-04-13T09:41:00-08:30'
+                    bookingStatus: CONF
+                    bookingRequestDateTime: '2023-04-13T09:41:00-08:30'
+                    bookingUpdatedDateTime: '2023-04-13T09:41:00-08:30'
                 rejeExample:
                   summary: |
                     Rejected Booking request
@@ -660,9 +697,9 @@ paths:
                     An updated Booking request received and stored in provider system, fully validated but has been rejected (`REJE`).
                   value:
                     carrierBookingRequestReference: 24595eb0-5cfc-4381-9c3a-cedc1975e9aa
-                    documentStatus: REJE
-                    bookingRequestCreatedDateTime: '2023-04-13T09:41:00-08:30'
-                    bookingRequestUpdatedDateTime: '2023-04-13T09:41:00-08:30'
+                    bookingStatus: REJE
+                    bookingRequestDateTime: '2023-04-13T09:41:00-08:30'
+                    bookingUpdatedDateTime: '2023-04-13T09:41:00-08:30'
         '401':
           description: |
             In case the updated Booking request does not schema validate a `401` (Bad Request) is returned
@@ -672,7 +709,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.0#/components/schemas/error'
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.1#/components/schemas/error'
               examples:
                 badRequestExample:
                   summary: |
@@ -680,7 +717,7 @@ paths:
                   description: |
                     `receiptTypeAtOrigin` is a mandoatry field in the Booking request. This is an example of how the error object would look in case this field is missing
                     
-                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
                     httpMethod: PUT
                     requestUri: /v2/bookings
@@ -703,7 +740,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.0#/components/schemas/error'
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.1#/components/schemas/error'
               examples:
                 internalServerErrorExample:
                   summary: |
@@ -711,7 +748,7 @@ paths:
                   description: |
                     An Internal Server Error has occurred - the consumer should contact {provider-support} and provide the `providerCorrelationID` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
                     
-                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
                     httpMethod: PUT
                     requestUri: /v2/bookings
@@ -733,7 +770,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.0#/components/schemas/error'
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.1#/components/schemas/error'
               examples:
                 tooManyRequestsExample:
                   summary: |
@@ -741,7 +778,7 @@ paths:
                   description: |
                     Calling the endPoint PUT /v2/bookings too many times within a timeperiod.
                     
-                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
                     httpMethod: PUT
                     requestUri: /v2/bookings
@@ -817,14 +854,14 @@ paths:
               allOf:
                 - type: object
                   properties:
-                    documentStatus:
+                    bookingStatus:
                       allOf:
-                        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/3.0.0#/components/schemas/bookingDocumentStatusCancelled'
+                        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/3.0.0#/components/schemas/bookingStatusCancelled'
                 - type: object
                   properties:
                     reason:
                       allOf:
-                        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/schemas/reason'
+                        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.2.0#/components/schemas/reason'
                 # Extension of the reason field to describe the reason for cancellation
                 - type: object
                   properties:
@@ -834,7 +871,7 @@ paths:
                       example:
                         Booking cancelled due to internal problems
               required:
-                - documentStatus
+                - bookingStatus
       responses:
         '200':
           description: |
@@ -856,7 +893,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.0#/components/schemas/error'
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.1#/components/schemas/error'
   
   /v2/shipment-summaries:
     get:
@@ -869,7 +906,7 @@ paths:
         
         If not specified - this list will be sorted by the time the `Shipment` was created (shipmentCreatedDateTime) in ascending (ASC) order.
       parameters:
-        - $ref: '#/components/parameters/documentStatus'
+        - $ref: '#/components/parameters/bookingStatus'
 
         # - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/parameters/cursor'
         # - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/parameters/offset'
@@ -906,7 +943,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.0#/components/schemas/error'
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.1#/components/schemas/error'
   /v2/shipments/{carrierBookingReference}:
     get:
       tags:
@@ -936,8 +973,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.0#/components/schemas/error'
-
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.1#/components/schemas/error'
   /v2/events:
     get:
       tags:
@@ -1003,16 +1039,16 @@ paths:
         # Chunk with specialized booking related ShipmentEvent parameters
         - $ref: '#/components/parameters/shipmentEventTypeCodes'
         - $ref: '#/components/parameters/documentTypeCodes'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/documentReference'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.2.0#/components/parameters/documentReference'
         
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/equipmentReference'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.2.0#/components/parameters/equipmentReference'
 
-        # - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/carrierBookingReference'
-        # - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/carrierBookingRequestReference'
+        # - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.2.0#/components/parameters/carrierBookingReference'
+        # - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.2.0#/components/parameters/carrierBookingRequestReference'
 
         # Chunk with base event parameters
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/eventCreatedDateTime'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/eventDateTime'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.2.0#/components/parameters/eventCreatedDateTime'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.2.0#/components/parameters/eventDateTime'
 
         # Chunk with Global related event parameters
         # - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/parameters/cursor'
@@ -1044,7 +1080,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/schemas/shipmentEvent'
+                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.2.0#/components/schemas/shipmentEvent'
         default:
           description: |
             For errors the error object should be populated with relevant information
@@ -1054,7 +1090,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.0#/components/schemas/error'
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.1#/components/schemas/error'
               examples:
                 tooManyRequestsExample:
                   summary: |
@@ -1062,7 +1098,7 @@ paths:
                   description: |
                     Calling the endPoint GET /v2/events too many times within a timeperiod.
                     
-                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
                     httpMethod: POST
                     requestUri: /v2/events
@@ -1137,9 +1173,9 @@ components:
     # Query params
     ##############
     
-    documentStatus:
+    bookingStatus:
       in: query
-      name: documentStatus
+      name: bookingStatus
       description: |
         Filter by the status of the booking. Possible values are:
         - RECE (Received)
@@ -1150,9 +1186,9 @@ components:
         - CANC (Cancelled)
         - CMPL (Completed)
 
-        More details can be found on <a href="https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/shipmenteventtypecodes.csv">GitHub</a>. Be aware that the list linked to is the `ShipmentEventTypeCodes` which is equivalent to `documentStatus`, the list is a subset of the possible values.
+        More details can be found on <a href="https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/shipmenteventtypecodes.csv">GitHub</a>. Be aware that the list linked to is the `ShipmentEventTypeCodes` which is equivalent to `bookingStatus`, the list is a subset of the possible values.
       schema:
-        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/3.0.0#/components/schemas/bookingDocumentStatus'
+        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/3.0.0#/components/schemas/bookingStatus'
     documentTypeCodes:
       in: query
       name: documentTypeCode
