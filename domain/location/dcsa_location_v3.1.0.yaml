@@ -1,0 +1,224 @@
+# OpenAPI version identifier - required for OpenAPI 3.0 domains
+openapi: 3.0.3
+
+#######################
+# Optional info section
+#######################
+info:
+  title: DCSA - Location Components
+  description: |
+    Common components for Locations. Locations defined in DCSA APIs and Domains should refer to this Domain.
+    
+    There are multiple ways to specify a location. This is done via the location `interfaces`. An `interface` is a specific way of specify a location. This Domain defines 5 official ways to specify a location: 
+
+      - via **UN Location Code** (only defines a location using `UN Location Code`)
+      - via **facilityCode** (defines a location by either a `SMDG` or `BIC` facility code)
+      - via **facilitySMDGCode** (defines a location by a `SMDG` facility code)
+      - via a **geoLocation** (defines a location by `latitude` and `longitude`)
+      - via an **Address** (defines a location by an `Address`)
+
+    If a location matches multiple interfaces - the most precise one should be used. Hence - when offering multiple ways of supplying a location - the `oneOf` should be used.
+    
+    For a history of changes in this domain - please check [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v300). Please also [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  contact:
+    name: Digital Container Shipping Association (DCSA)
+    url: https://dcsa.org
+    email: info@dcsa.org
+  version: 3.1.0
+
+components:
+
+  ####################
+  # Common data models
+  ####################
+  schemas:
+    referenceLocation:
+      type: object
+      description: |
+        An interface used to express a location using a reference (`locationReference`)
+        
+        **NB**: This interface has not been agreed
+      properties:
+        locationName:
+          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/locationName'
+        locationType:
+          type: string
+          description: |
+            Discriminator used to identify this as a `Reference Location` interface
+          enum:
+          - REFR
+          example: 'REFR'
+        carrierLocationReference:
+          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/carrierLocationReference'
+      required:
+      - locationType
+      - carrierLocationReference
+    addressLocation:
+      type: object
+      description: |
+        An interface used to express a location using an `Address` object
+      properties:
+        locationName:
+          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/locationName'
+        locationType:
+          type: string
+          description: |
+            Discriminator used to identify this as a `Address Location` interface
+          enum:
+          - ADDR
+          example: 'ADDR'
+        address:
+          $ref: '#/components/schemas/address'
+      required:
+      - locationType
+      - address
+    facilityLocation:
+      type: object
+      description: |
+        An interface used to express a location using a `Facility`. The facility can either be expressed using a `BIC` code or a `SMDG` code. The `facilityCode` does not contain the `UNLocationCode` - this should be provided in the `UnLocationCode` attribute.
+      properties:
+        locationName:
+          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/locationName'
+        locationType:
+          type: string
+          description: |
+            Discriminator used to identify this as a `Facility Location` interface
+          enum:
+          - FACI
+          example: 'FACI'
+        UNLocationCode:
+          allOf:
+            - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/UNLocationCode'
+            - description: |
+                The UN Location code specifying where the place is located.
+                
+                This field is **conditionally mandatory** depending on the value of the `facilityCodeListProvider` field.
+        facilityCode:
+          allOf:
+            - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/facilityCode'
+            - description: |
+                The code used for identifying the specific facility. This code does not include the UN Location Code.
+                
+                The definition of the code depends on the `facilityCodeListProvider`. As code list providers maintain multiple codeLists the following codeList is used:
+                
+                - for `SMDG` - the codeList used is the [SMDG Terminal Code List](https://smdg.org/wp-content/uploads/Codelists/Terminals/SMDG-Terminal-Code-List-v20210401.xlsx) 
+                - for `BIC` - the codeList used is the [BIC Facility Codes](https://www.bic-code.org/facility-codes/)
+        facilityCodeListProvider:
+          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/facilityCodeListProvider'
+      required:
+      - locationType
+      - facilityCode
+      - facilityCodeListProvider
+    facilitySMDGLocation:
+      type: object
+      description: |
+        An interface used to express a location using a `Facility` by the `SMDG` code list. The `facilitySMDGCode` does not contain the `UNLocationCode` - this should be provided in the `UnLocationCode` attribute.
+      properties:
+        locationName:
+          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/locationName'
+        locationType:
+          type: string
+          description: |
+            Discriminator used to identify this as a `Facility Location` interface only using `SMDG` code list
+          enum:
+          - FACS
+          example: 'FACS'
+        UNLocationCode:
+          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/UNLocationCode'
+        facilitySMDGCode:
+          allOf:
+            - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/facilityCode'
+            - description: |
+                The code used for identifying the specific facility. This code does not include the UN Location Code.
+                
+                The codeList used by `SMDG` is the [SMDG Terminal Code List](https://smdg.org/wp-content/uploads/Codelists/Terminals/SMDG-Terminal-Code-List-v20210401.xlsx)
+      required:
+      - locationType
+      - facilitySMDGCode
+      - UNLocationCode
+    geoLocation:
+      type: object
+      description: |
+        An interface used to express a location using `latitude` and `longitude`
+      properties:
+        locationName:
+          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/locationName'
+        locationType:
+          type: string
+          description: |
+            Discriminator used to identify this as a `Geolocation` interface
+          enum:
+          - GEOL
+          example: 'GEOL'
+        latitude:
+          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/latitude'
+        longitude:
+          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/longitude'
+      required:
+      - locationType
+      - latitude
+      - longitude
+    unLocationLocation:
+      type: object
+      description: |
+        An interface used to express a location using a `Un Location Code`
+      properties:
+        locationName:
+          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/locationName'
+        locationType:
+          type: string
+          description: |
+            Discriminator used to identify this as a `UNLocation` location interface
+          enum:
+          - UNLO
+          example: 'UNLO'
+        UNLocationCode:
+          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/UNLocationCode'
+      required:
+      - locationType
+      - UNLocationCode
+    address:
+      type: object
+      description: |
+        An object for storing address related information
+      properties:
+        name:
+          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/addressName'
+        street:
+          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/streetName'
+        streetNumber:
+          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/streetNumber'
+        floor:
+          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/floor'
+        postCode:
+          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/postCode'
+        city:
+          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/cityName'
+        stateRegion:
+          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/stateRegion'
+        country:
+          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/country'
+      required:
+      - name
+      - country
+    locationType:
+      type: string
+      description: |
+        Discriminator used to identify a Location Interface. Can be oneOf:
+        - UNLO (`unLocationLocation`)
+        - FACI (`facilityLocation`)
+        - FACS (`facilitySMDGLocation`)
+        - ADDR (`addressLocation`)
+        - GEOL (`geoLocation`)
+        
+      enum:
+      # - REFE
+      - UNLO
+      - FACI
+      - FACS
+      - ADDR
+      - GEOL
+      example: 'ADDR'
