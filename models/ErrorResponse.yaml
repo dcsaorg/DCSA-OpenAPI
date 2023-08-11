@@ -1,0 +1,89 @@
+title: Error Response
+x-stoplight:
+  id: 8au4gtxv8nxpl
+type: object
+description: Unexpected error
+properties:
+  httpMethod:
+    type: string
+    description: 'The http request method type e.g. GET, POST'
+    enum:
+      - GET
+      - HEAD
+      - POST
+      - PUT
+      - DELETE
+      - OPTION
+      - PATCH
+    example: GET
+  requestUri:
+    type: string
+    description: The request URI as it was sent
+    example: 'https://dcsa.org/dcsa/dcsa-standard/v1/path'
+  statusCode:
+    type: integer
+    description: The HTTP status code
+    example: 400
+    format: int32
+  statusCodeText:
+    type: string
+    description: The textual representation of the status code
+    example: Bad Request
+    maxLength: 50
+  errorMessage:
+    type: string
+    description: Other error information
+    example: The supplied data could not be accepted
+    maxLength: 200
+  providerCorrelationID:
+    type: string
+    example: 4426d965-0dd8-4005-8c63-dc68b01c4962
+    maxLength: 100
+    description: 'A unique identifier for the transaction, e.g. a UUID'
+  errorDateTime:
+    type: string
+    format: date-time
+    example: '2019-11-12T07:41:00+08:30'
+    description: The date and time (in ISO 8601 format) the error occurred.
+  errors:
+    type: array
+    description: 'List of detailed errors, e.g. fields that could not pass validation'
+    items:
+      type: object
+      properties:
+        errorCode:
+          type: integer
+          format: int32
+          description: 'Standard error code see http://dcsa.org/error-codes (to be created). Examples: 7003 – out or range value, 7004 - invalid type'
+          minimum: 7000
+          maximum: 9999
+          example: 7003
+        field:
+          type: string
+          description: 'The field that caused the error, e.g. a failed validation. The field can be expressed as a JSONpath'
+          example: location.facilityCode
+          maxLength: 50
+        value:
+          type: string
+          maxLength: 500
+          example: SG SIN WHS
+          description: The value of the field that caused the error
+        reason:
+          type: string
+          example: invalidQuery
+          maxLength: 100
+          description: High level error message
+        message:
+          type: string
+          maxLength: 200
+          example: Spaces not allowed in facility code
+          description: Additional information as to why the error occured
+      required:
+        - reason
+        - message
+required:
+  - httpMethod
+  - requestUri
+  - statusCode
+  - statusCodeText
+  - errorDateTime
