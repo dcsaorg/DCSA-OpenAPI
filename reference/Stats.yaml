@@ -1,0 +1,181 @@
+openapi: 3.1.0
+x-stoplight:
+  id: rgho0z92i5v42
+info:
+  title: Stats API
+  version: '1.0'
+  license:
+    name: Apache 2.0
+    url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
+  contact:
+    name: Digital Container Shipping Association (DCSA)
+    email: info@dcsa.org
+    url: 'https://dcsa.org/'
+  description: 'The Stats API, version 1.0.0, is a service provided by the Digital Container Shipping Association (DCSA). It serves as an optional, anonymous tool for reporting the statistics of a reference API''s usage between peers. The aim of the Stats API is to help the DCSA gauge the level of adoption of the reference API, providing vital information that influences future investment and development decisions.'
+servers:
+  - url: 'http://api.dcsa.org'
+paths:
+  /v1/stats:
+    post:
+      summary: Publish Stats
+      operationId: post-stats
+      responses:
+        '201':
+          description: Accepted
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      description: 'This endpoint allows you to report the usage statistics of a reference API call. '
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: api-key
+          required: true
+          description: An API key for authorizing requests.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                domain:
+                  type: string
+                  enum:
+                    - TNT
+                    - OVS
+                    - EBL
+                    - BKG
+                    - CBF
+                  example: TNT
+                  description: The standard being referred.
+                method:
+                  type: string
+                  enum:
+                    - POST
+                    - GET
+                    - PUT
+                    - DELETE
+                  example: GET
+                  description: The HTTP Method used in the reference API call.
+                path:
+                  type: string
+                  example: /v1/events
+                  description: 'The context path of the reference API call. This can include the request parameters if present, but the values must be masked.'
+                statusCode:
+                  type: integer
+                  example: 200
+                  description: The response status code of the reference API call.
+              required:
+                - domain
+                - method
+                - path
+                - statusCode
+        description: ''
+      tags:
+        - PublishStats
+    parameters: []
+components:
+  schemas:
+    ErrorResponse:
+      title: Error Response
+      type: object
+      description: Unexpected error
+      properties:
+        httpMethod:
+          type: string
+          description: 'The http request method type e.g. GET, POST'
+          enum:
+            - GET
+            - HEAD
+            - POST
+            - PUT
+            - DELETE
+            - OPTION
+            - PATCH
+          example: GET
+        requestUri:
+          type: string
+          description: The request URI as it was sent
+          example: 'https://dcsa.org/dcsa/dcsa-standard/v1/path'
+        statusCode:
+          type: integer
+          description: The HTTP status code
+          example: 400
+          format: int32
+        statusCodeText:
+          type: string
+          description: The textual representation of the status code
+          example: Bad Request
+          maxLength: 50
+        errorMessage:
+          type: string
+          description: Other error information
+          example: The supplied data could not be accepted
+          maxLength: 200
+        providerCorrelationID:
+          type: string
+          example: 4426d965-0dd8-4005-8c63-dc68b01c4962
+          maxLength: 100
+          description: 'A unique identifier for the transaction, e.g. a UUID'
+        errorDateTime:
+          type: string
+          format: date-time
+          example: '2019-11-12T07:41:00+08:30'
+          description: The date and time (in ISO 8601 format) the error occurred.
+        errors:
+          type: array
+          description: 'List of detailed errors, e.g. fields that could not pass validation'
+          items:
+            type: object
+            properties:
+              errorCode:
+                type: integer
+                format: int32
+                description: 'Standard error code see http://dcsa.org/error-codes (to be created). Examples: 7003 – out or range value, 7004 - invalid type'
+                minimum: 7000
+                maximum: 9999
+                example: 7003
+              field:
+                type: string
+                description: 'The field that caused the error, e.g. a failed validation. The field can be expressed as a JSONpath'
+                example: location.facilityCode
+                maxLength: 50
+              value:
+                type: string
+                maxLength: 500
+                example: SG SIN WHS
+                description: The value of the field that caused the error
+              reason:
+                type: string
+                example: invalidQuery
+                maxLength: 100
+                description: High level error message
+              message:
+                type: string
+                maxLength: 200
+                example: Spaces not allowed in facility code
+                description: Additional information as to why the error occured
+            required:
+              - reason
+              - message
+      required:
+        - httpMethod
+        - requestUri
+        - statusCode
+        - statusCodeText
+        - errorDateTime
+tags:
+  - name: PublishStats
+    description: ' '
+  - name: StatsAPI
+    description: The stats API
