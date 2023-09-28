@@ -17,8 +17,10 @@ info:
 servers:
   - url: 'https://dcsa.org/cbf'
 tags:
-  - name: VSA Partner
   - name: Vessel Operator
+    description: ' '
+  - name: VSA Partner
+    description: ' '
 paths:
   /v1/booking-forecasts:
     parameters: []
@@ -62,6 +64,12 @@ paths:
             application/json:
               schema:
                 $ref: ../../models/ErrorResponse.yaml
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: ../../models/ErrorResponse.yaml
       operationId: get-booking-forecast-by-reference
       description: |-
         Fetch the booking forecast by either the `carrierServiceCode` or the `universalServiceReference`.\
@@ -85,16 +93,17 @@ paths:
           in: query
           name: vesselIMONumber
           description: 'The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd''s register code, which does not change during the lifetime of the vessel'
+          required: true
         - schema:
             type: string
           in: query
-          name: carrierImportVoyageNumber
-          description: The carrier-specific identifier of the import Voyage.
+          name: carrierExportVoyageNumber
+          description: The carrier-specific identifier of the export voyage.
         - schema:
             type: string
           in: query
-          name: universalImportVoyageReference
-          description: Universal voyage reference for the import Voyage
+          name: universalExportVoyageReference
+          description: Universal voyage reference for the export voyage
   /v1/booking-forecast:
     post:
       summary: Submit A Booking Forecast
@@ -125,6 +134,12 @@ paths:
                         value: SG SIN WHS
                         reason: invalidQuery
                         message: Spaces not allowed in facility code
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: ../../models/ErrorResponse.yaml
       operationId: create-v1-booking-forecast
       description: Submits a Booking forecast.
       parameters:
@@ -142,35 +157,6 @@ components:
       x-stoplight:
         id: keuoy8j4qkve1
       type: object
-      properties:
-        partnerIdentity:
-          $ref: '#/components/schemas/PartnerIdentity'
-        carrierServiceName:
-          type: string
-          pattern: ^\S+(\s+\S+)*$
-          maxLength: 50
-          example: Great Lion Service
-          description: The name of a service as specified by the carrier
-        carrierServiceCode:
-          type: string
-          pattern: ^\S+(\s+\S+)*$
-          maxLength: 11
-          example: FE1
-          description: The carrier-specific code of the service for which the schedule details are published.
-        universalServiceReference:
-          type: string
-          description: 'A global unique service reference, as per DCSA standard, agreed by VSA partners for the service. The service reference must match the regular expression pattern: SR\d{5}[A-Z]. The letters SR followed by 5 digits, followed by a checksum-character as a capital letter from A to Z.'
-          example: SR12345A
-          maxLength: 8
-          pattern: '^SR\d{5}[A-Z]$'
-        vessels:
-          type: array
-          items:
-            $ref: '#/components/schemas/Vessel'
-      required:
-        - partnerIdentity
-        - carrierServiceName
-        - vessels
       examples:
         - partnerIdentity:
             code: MMCU
@@ -260,6 +246,36 @@ components:
                           locationType: FACS
                           UNLocationCode: FRPAR
                           facilitySMDGCode: ADT
+      properties:
+        partnerIdentity:
+          $ref: '#/components/schemas/PartnerIdentity'
+        carrierServiceName:
+          type: string
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 50
+          example: Great Lion Service
+          description: The name of a service as specified by the carrier
+        carrierServiceCode:
+          type: string
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 11
+          example: FE1
+          description: The carrier-specific code of the service for which the schedule details are published.
+        universalServiceReference:
+          type: string
+          description: 'A global unique service reference, as per DCSA standard, agreed by VSA partners for the service. The service reference must match the regular expression pattern: SR\d{5}[A-Z]. The letters SR followed by 5 digits, followed by a checksum-character as a capital letter from A to Z.'
+          example: SR12345A
+          maxLength: 8
+          pattern: '^SR\d{5}[A-Z]$'
+        vessels:
+          type: array
+          items:
+            $ref: '#/components/schemas/Vessel'
+      required:
+        - partnerIdentity
+        - carrierServiceName
+        - carrierServiceCode
+        - vessels
     PartnerIdentity:
       title: PartnerIdentity
       x-stoplight:
@@ -453,15 +469,39 @@ components:
             - $ref: ../../models/UnLocationLocation.yaml
             - $ref: ../../models/FacilitySMDGLocation.yaml
         loadLadenContainers:
-          $ref: '#/components/schemas/LadenContainer'
           description: Lists all the `LADEN` containers being loaded.
+          type: array
+          uniqueItems: true
+          minItems: 0
+          items:
+            $ref: '#/components/schemas/LadenContainer'
+            x-stoplight:
+              id: xwd9wgupwk8m7
         loadEmptyContainers:
-          $ref: '#/components/schemas/EmptyContainer'
           description: Lists all the `EMPTY` containers being loaded
+          type: array
+          minItems: 0
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/EmptyContainer'
+            x-stoplight:
+              id: chwpisamzgh4b
         loadBreakBulk:
-          $ref: '#/components/schemas/NonContainer'
+          type: array
+          minItems: 0
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/NonContainer'
+            x-stoplight:
+              id: frcnb8jwobq7a
         loadOutOfGauge:
-          $ref: '#/components/schemas/NonContainer'
+          type: array
+          minItems: 0
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/NonContainer'
+            x-stoplight:
+              id: 02vefvs2x9qbz
       required:
         - location
     LadenContainer:
@@ -481,9 +521,12 @@ components:
             - 40HC
             - 45HC
           example: '20'
-        averageGrossWeight:
+        averageTotalContainerWeight:
           type: number
           format: float
+          x-stoplight:
+            id: hubebhsjsro4k
+          description: Cargo Gross Weight plus Container Tare Weight.
         unitsNonDG:
           type: object
           properties:
@@ -583,9 +626,12 @@ components:
             - 40HC
             - 45HC
           example: '20'
-        averageGrossWeight:
+        averageTotalContainerWeight:
           type: number
           format: float
+          description: Cargo Gross Weight plus Container Tare Weight.
+          x-stoplight:
+            id: 9x4mxy8qv6kvi
         units:
           type: integer
           description: Total units non DG
@@ -596,7 +642,7 @@ components:
             $ref: '#/components/schemas/DischargeEmptyContainer'
       required:
         - equipmentSizeCode
-        - averageGrossWeight
+        - averageTotalContainerWeight
         - units
         - discharge
     DischargeEmptyContainer:
@@ -623,15 +669,18 @@ components:
         units:
           type: integer
           description: Total units non DG
-        averageGrossWeight:
+        averageTotalContainerWeight:
           type: number
           format: float
+          x-stoplight:
+            id: w007kd6wx48n4
+          description: Cargo Gross Weight plus Container Tare Weight.
         location:
           $ref: ../../models/FacilitySMDGLocation.yaml
       required:
         - equipmentSizeCode
         - units
-        - averageGrossWeight
+        - averageTotalContainerWeight
         - location
     NonContainer:
       title: NonContainer
@@ -648,6 +697,8 @@ components:
           format: float
         discharge:
           type: array
+          minItems: 0
+          uniqueItems: true
           items:
             $ref: '#/components/schemas/DischargeNonContainer'
       required:
