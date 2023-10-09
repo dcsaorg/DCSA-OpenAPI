@@ -39,7 +39,7 @@ paths:
                 $ref: '#/components/schemas/BookingForecast'
           headers:
             API-Version:
-              $ref: ../../models/Headers.yaml#/components/headers/API-Version
+              $ref: ../../models/CommonComponents.yaml#/components/headers/API-Version
         '400':
           description: Invalid request for booking forecast.
           content:
@@ -50,7 +50,7 @@ paths:
                 Invalid GET Request:
                   value:
                     httpMethod: GET
-                    requestUri: 'https://dcsa.org/dcsa/cbf/v1/booking-forcast'
+                    requestUri: 'https://dcsa.org/dcsa/cbf/v1/booking-forcasts'
                     statusCode: 400
                     statusCodeText: Bad Request
                     errorMessage: Either carrierServiceCode or universalServiceReference must be provided.
@@ -74,7 +74,11 @@ paths:
         Fetch the booking forecast by either the `carrierServiceCode` or the `universalServiceReference`.\
         Either one is **REQUIRED** but not both when fetching the booking forcast.
       parameters:
-        - schema: {}
+        - schema:
+            type: string
+            pattern: ^\S+(\s+\S+)*$
+            example: FE1
+            maxLength: 11
           in: query
           name: carrierServiceCode
           description: |-
@@ -82,6 +86,9 @@ paths:
             **REQUIRED** if `universalServiceReference` is not provided.
         - schema:
             type: string
+            pattern: '^SR\d{5}[A-Z]$'
+            maxLength: 8
+            example: SR12345A
           in: query
           name: universalServiceReference
           description: |-
@@ -95,15 +102,20 @@ paths:
           required: true
         - schema:
             type: string
+            pattern: ^\S+(\s+\S+)*$
+            example: 2201N
+            maxLength: 50
           in: query
           name: carrierExportVoyageNumber
           description: The carrier-specific identifier of the export voyage.
         - schema:
             type: string
+            pattern: '^\d{2}[0-9A-Z]{2}[NEWS]$'
+            example: 2103S
+            maxLength: 50
           in: query
           name: universalExportVoyageReference
           description: Universal voyage reference for the export voyage
-  /v1/booking-forecast:
     post:
       summary: Submit A Booking Forecast
       tags:
@@ -142,7 +154,7 @@ paths:
       operationId: create-v1-booking-forecast
       description: Submits a Booking forecast.
       parameters:
-        - $ref: ../../models/Headers.yaml#/components/parameters/APIVersionHeader
+        - $ref: ../../models/CommonComponents.yaml#/components/parameters/APIVersionHeader
       requestBody:
         content:
           application/json:
@@ -177,15 +189,15 @@ components:
           example: SR12345A
           maxLength: 8
           pattern: '^SR\d{5}[A-Z]$'
-        vessels:
+        vesselsBookings:
           type: array
           items:
-            $ref: '#/components/schemas/Vessel'
+            $ref: '#/components/schemas/VesselBooking'
       required:
         - partnerIdentity
         - carrierServiceName
         - carrierServiceCode
-        - vessels
+        - vesselsBookings
     PartnerIdentity:
       title: PartnerIdentity
       x-stoplight:
@@ -194,7 +206,6 @@ components:
       properties:
         code:
           type: string
-          format: regex
           pattern: ^\S+(\s+\S+)*$
           example: MMCU
           maxLength: 4
@@ -221,8 +232,8 @@ components:
         - code
         - codeListProvider
         - agreementTypeCode
-    Vessel:
-      title: Vessel
+    VesselBooking:
+      title: VesselBooking
       x-stoplight:
         id: 262a2bff1896c
       type: object
@@ -387,8 +398,16 @@ components:
       properties:
         portVisitReference:
           type: string
+          description: The unique reference that can be used to link different transportCallReferences to the same port visit. The reference is provided by the port to uniquely identify a port call.
+          example: NLRTM1234589
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 50
         transportCallReference:
           type: string
+          description: "A carrier definied reference to a TransportCall.\r\n\r\nIn the case the Means of Transport is a Vessel and the facility is a Port/Terminal - this reference should be considered a Terminal Call Reference\r\n"
+          example: N987G4567
+          maxLength: 100
+          pattern: ^\S+(\s+\S+)*$
         location:
           $ref: ../../models/FacilitySMDGLocation.yaml
         equipmentSizeCode:
@@ -479,8 +498,16 @@ components:
       properties:
         portVisitReference:
           type: string
+          maxLength: 50
+          pattern: ^\S+(\s+\S+)*$
+          example: NLRTM1234589
+          description: The unique reference that can be used to link different transportCallReferences to the same port visit. The reference is provided by the port to uniquely identify a port call.
         transportCallReference:
           type: string
+          description: "A carrier definied reference to a TransportCall.\r\n\r\nIn the case the Means of Transport is a Vessel and the facility is a Port/Terminal - this reference should be considered a Terminal Call Reference\r\n"
+          example: N987G4567
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 100
         equipmentSizeCode:
           type: string
           enum:
@@ -540,8 +567,16 @@ components:
       properties:
         portVisitReference:
           type: string
+          description: The unique reference that can be used to link different transportCallReferences to the same port visit. The reference is provided by the port to uniquely identify a port call.
+          maxLength: 50
+          pattern: ^\S+(\s+\S+)*$
+          example: NLRTM1234589
         transportCallReference:
           type: string
+          description: "A carrier definied reference to a TransportCall.\r\n\r\nIn the case the Means of Transport is a Vessel and the facility is a Port/Terminal - this reference should be considered a Terminal Call Reference"
+          maxLength: 100
+          pattern: ^\S+(\s+\S+)*$
+          example: N987G4567
         totalGrossWeight:
           type: number
           format: float
