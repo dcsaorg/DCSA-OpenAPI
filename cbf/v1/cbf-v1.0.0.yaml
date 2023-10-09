@@ -96,6 +96,9 @@ paths:
             **REQUIRED** if `carrierServiceCode` is not provided.
         - schema:
             type: string
+            maxLength: 7
+            pattern: '^\d{7}$'
+            example: '9321483'
           in: query
           name: vesselIMONumber
           description: 'The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd''s register code, which does not change during the lifetime of the vessel'
@@ -104,15 +107,15 @@ paths:
             type: string
             pattern: ^\S+(\s+\S+)*$
             example: 2201N
-            maxLength: 50
+            maxLength: 5
           in: query
           name: carrierExportVoyageNumber
           description: The carrier-specific identifier of the export voyage.
         - schema:
             type: string
-            pattern: '^\d{2}[0-9A-Z]{2}[NEWS]$'
+            pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
             example: 2103S
-            maxLength: 50
+            maxLength: 5
           in: query
           name: universalExportVoyageReference
           description: Universal voyage reference for the export voyage
@@ -282,28 +285,33 @@ components:
             A carrier definied reference to a TransportCall.
 
             In the case the Means of Transport is a Vessel and the facility is a Port/Terminal - this reference should be considered a Terminal Call Reference
-          example: da97d1e3-e546-4647-891b-3f57e04b886b
+          example: N987G4567
+          maxLength: 100
+          pattern: ^\S+(\s+\S+)*$
         carrierImportVoyageNumber:
           type: string
           example: 2103N
           description: The identifier of an import voyage. The carrier-specific identifier of the import Voyage.
-          maxLength: 50
+          maxLength: 5
+          pattern: ^\S+(\s+\S+)*$
         carrierExportVoyageNumber:
           type: string
           description: The identifier of an export voyage. The carrier-specific identifier of the export Voyage.
           example: 2103S
-          maxLength: 50
+          maxLength: 5
           pattern: ^\S+(\s+\S+)*$
         universalImportVoyageReference:
           type: string
           description: 'A global unique voyage reference for the import Voyage, as per DCSA standard, agreed by VSA partners for the voyage.'
-          pattern: '^\d{2}[0-9A-Z]{2}[NEWS]$'
+          pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
           example: 2103N
+          maxLength: 5
         universalExportVoyageReference:
           type: string
           description: 'A global unique voyage reference for the export Voyage, as per DCSA standard, agreed by VSA partners for the voyage.'
-          pattern: '^\d{2}[0-9A-Z]{2}[NEWS]$'
+          pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
           example: 2103N
+          maxLength: 5
         location:
           oneOf:
             - $ref: ../../models/UnLocationLocation.yaml
@@ -315,8 +323,6 @@ components:
           minItems: 0
           items:
             $ref: '#/components/schemas/LadenContainer'
-            x-stoplight:
-              id: xwd9wgupwk8m7
         loadEmptyContainers:
           description: Lists all the `EMPTY` containers being loaded
           type: array
@@ -324,24 +330,18 @@ components:
           uniqueItems: true
           items:
             $ref: '#/components/schemas/EmptyContainer'
-            x-stoplight:
-              id: chwpisamzgh4b
         loadBreakBulk:
           type: array
           minItems: 0
           uniqueItems: true
           items:
             $ref: '#/components/schemas/NonContainer'
-            x-stoplight:
-              id: frcnb8jwobq7a
         loadOutOfGauge:
           type: array
           minItems: 0
           uniqueItems: true
           items:
             $ref: '#/components/schemas/NonContainer'
-            x-stoplight:
-              id: 02vefvs2x9qbz
       required:
         - location
     LadenContainer:
@@ -361,6 +361,14 @@ components:
           x-stoplight:
             id: hubebhsjsro4k
           description: Cargo Gross Weight plus Container Tare Weight.
+        averageTotalContainerWeightUnit:
+          type: string
+          x-stoplight:
+            id: p2b5myu3gaxqv
+          description: "The unit of measure which can be expressed in imperial or metric terms.\r\n\r\nOnly possible value here is `KGM`."
+          default: KGM
+          enum:
+            - KGM
         unitsNonDG:
           type: object
           properties:
@@ -390,6 +398,10 @@ components:
           description: Lists all the `LADEN` containers being discharged.
           items:
             $ref: '#/components/schemas/DischargeLadenContainer'
+      required:
+        - equipmentSizeCode
+        - averageTotalContainerWeight
+        - averageTotalContainerWeightUnit
     DischargeLadenContainer:
       title: Discharge Laden Container
       type: object
@@ -424,6 +436,14 @@ components:
         averageGrossWeight:
           type: number
           format: float
+        averageGrossWeightUnit:
+          type: string
+          x-stoplight:
+            id: nl6klgkrwiqej
+          default: KGM
+          description: "The unit of measure which can be expressed in imperial or metric terms.\r\n\r\nOnly possible value here is `KGM`."
+          enum:
+            - KGM
         unitsNonDG:
           type: object
           properties:
@@ -452,6 +472,7 @@ components:
         - location
         - equipmentSizeCode
         - averageGrossWeight
+        - averageGrossWeightUnit
     EmptyContainer:
       title: EmptyContainer
       x-stoplight:
@@ -476,9 +497,16 @@ components:
           description: Cargo Gross Weight plus Container Tare Weight.
           x-stoplight:
             id: 9x4mxy8qv6kvi
+        averageTotalContainerWeightUnit:
+          x-stoplight:
+            id: 1c9ho5inkwgfi
+          type: string
+          enum:
+            - KGM
+          description: "The unit of measure which can be expressed in imperial or metric terms.\r\n\r\nOnly possible value here is `KGM`."
         units:
           type: integer
-          description: Total units non DG
+          description: Total units non DG.
         discharge:
           type: array
           description: Lists all the `EMPTY` containers being discharged.
@@ -487,6 +515,7 @@ components:
       required:
         - equipmentSizeCode
         - averageTotalContainerWeight
+        - averageTotalContainerWeightUnit
         - units
         - discharge
     DischargeEmptyContainer:
@@ -528,12 +557,20 @@ components:
           x-stoplight:
             id: w007kd6wx48n4
           description: Cargo Gross Weight plus Container Tare Weight.
+        averageTotalContainerWeightUnit:
+          x-stoplight:
+            id: m9m7w7fh98be7
+          type: string
+          description: "The unit of measure which can be expressed in imperial or metric terms.\r\n\r\nOnly possible value here is `KGM`."
+          enum:
+            - KGM
         location:
           $ref: ../../models/FacilitySMDGLocation.yaml
       required:
         - equipmentSizeCode
         - units
         - averageTotalContainerWeight
+        - averageTotalContainerWeightUnit
         - location
     NonContainer:
       title: NonContainer
@@ -545,6 +582,13 @@ components:
         totalGrossWeight:
           type: number
           format: float
+        totalGrossWeightUnit:
+          x-stoplight:
+            id: aoyia2pjesxd3
+          type: string
+          enum:
+            - KGM
+          description: "The unit of measure which can be expressed in imperial or metric terms.\r\n\r\nOnly possible value here is `KGM`."
         quantityTEU:
           type: number
           format: float
@@ -556,6 +600,7 @@ components:
             $ref: '#/components/schemas/DischargeNonContainer'
       required:
         - totalGrossWeight
+        - totalGrossWeightUnit
         - quantityTEU
         - discharge
     DischargeNonContainer:
@@ -580,6 +625,13 @@ components:
         totalGrossWeight:
           type: number
           format: float
+        totalGrossWeightUnit:
+          x-stoplight:
+            id: nkv7a8skkw11r
+          type: string
+          description: "The unit of measure which can be expressed in imperial or metric terms.\r\n\r\nOnly possible value here is `KGM`."
+          enum:
+            - KGM
         quantityTEU:
           type: number
           format: float
@@ -587,5 +639,6 @@ components:
           $ref: ../../models/FacilitySMDGLocation.yaml
       required:
         - totalGrossWeight
+        - totalGrossWeightUnit
         - quantityTEU
         - location
