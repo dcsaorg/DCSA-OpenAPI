@@ -1,0 +1,651 @@
+openapi: 3.0.3
+x-stoplight:
+  id: rpkqjj7g6hmz6
+info:
+  title: DCSA OpenAPI specification for Consolidated Booking Forecast
+  version: 1.0.0-Beta-1
+  description: |
+    The [“consolidated booking forecast”](https://dcsa.org/wp-content/uploads/2020/09/20200928-DCSA-Loadlists-and-Bayplans.pdf) contains all the forecasted loadings and dischargings per port (full/empty and specials) for the entire region and is submitted from the partner to the vessel operator to allow port planning and capacity management of the vessel while in the specific region. The CBF should remain within the partner’s agreed slot/weight allocation.
+  license:
+    url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
+    name: Apache 2.0
+  contact:
+    name: Digital Container Shipping Association (DCSA)
+    url: 'https://dcsa.org/'
+    email: info@dcsa.org
+servers:
+  - url: 'https://dcsa.org/cbf'
+tags:
+  - name: Vessel Operator
+    description: ' '
+  - name: VSA Partner
+    description: ' '
+paths:
+  /v1/booking-forecasts:
+    parameters: []
+    get:
+      summary: Fetch Booking Forecast
+      tags:
+        - VSA Partner
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingForecast'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/BookingForecast'
+          headers:
+            API-Version:
+              $ref: ../../models/CommonComponents.yaml#/components/headers/API-Version
+        '400':
+          description: Invalid request for booking forecast.
+          content:
+            application/json:
+              schema:
+                $ref: ../../models/ErrorResponse.yaml
+              examples:
+                Invalid GET Request:
+                  value:
+                    httpMethod: GET
+                    requestUri: 'https://dcsa.org/dcsa/cbf/v1/booking-forcasts'
+                    statusCode: 400
+                    statusCodeText: Bad Request
+                    errorMessage: Either carrierServiceCode or universalServiceReference must be provided.
+                    providerCorrelationID: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2019-11-12T07:41:00+08:30'
+                    errors: []
+        '404':
+          description: Booking forecast not foound.
+          content:
+            application/json:
+              schema:
+                $ref: ../../models/ErrorResponse.yaml
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: ../../models/ErrorResponse.yaml
+      operationId: get-booking-forecast-by-reference
+      description: |-
+        Fetch the booking forecast by either the `carrierServiceCode` or the `universalServiceReference`.\
+        Either one is **REQUIRED** but not both when fetching the booking forcast.
+      parameters:
+        - schema:
+            type: string
+            pattern: ^\S+(\s+\S+)*$
+            example: FE1
+            maxLength: 11
+          in: query
+          name: carrierServiceCode
+          description: |-
+            The carrier-specific code of the service for which the schedule details are published.\
+            **REQUIRED** if `universalServiceReference` is not provided.
+        - schema:
+            type: string
+            pattern: '^SR\d{5}[A-Z]$'
+            maxLength: 8
+            example: SR12345A
+          in: query
+          name: universalServiceReference
+          description: |-
+            A global unique service reference, as per DCSA standard, agreed by VSA partners for the service. \
+            **REQUIRED** if `carrierServiceCode` is not provided.
+        - schema:
+            type: string
+            maxLength: 7
+            pattern: '^\d{7}$'
+            example: '9321483'
+          in: query
+          name: vesselIMONumber
+          description: 'The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd''s register code, which does not change during the lifetime of the vessel'
+          required: true
+        - schema:
+            type: string
+            pattern: ^\S+(\s+\S+)*$
+            example: 2201N
+            maxLength: 50
+          in: query
+          name: carrierExportVoyageNumber
+          description: The carrier-specific identifier of the export voyage.
+        - schema:
+            type: string
+            pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
+            example: 2103S
+            maxLength: 5
+          in: query
+          name: universalExportVoyageReference
+          description: Universal voyage reference for the export voyage
+    post:
+      summary: Submit A Booking Forecast
+      tags:
+        - Vessel Operator
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad booking forecast request.
+          content:
+            application/json:
+              schema:
+                $ref: ../../models/ErrorResponse.yaml
+              examples:
+                Example 1:
+                  value:
+                    httpMethod: GET
+                    requestUri: 'https://dcsa.org/dcsa/dcsa-standard/v1/booking-forecast'
+                    statusCode: 400
+                    statusCodeText: Bad Request
+                    errorMessage: The supplied data could not be accepted
+                    providerCorrelationID: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2019-11-12T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7003
+                        field: location.facilityCode
+                        value: SG SIN WHS
+                        reason: invalidQuery
+                        message: Spaces not allowed in facility code
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: ../../models/ErrorResponse.yaml
+      operationId: create-v1-booking-forecast
+      description: Submits a Booking forecast.
+      parameters:
+        - $ref: ../../models/CommonComponents.yaml#/components/parameters/APIVersionHeader
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingForecast'
+        description: ''
+components:
+  schemas:
+    BookingForecast:
+      title: BookingForecast
+      x-stoplight:
+        id: keuoy8j4qkve1
+      type: object
+      properties:
+        partnerIdentity:
+          $ref: '#/components/schemas/PartnerIdentity'
+        carrierServiceName:
+          type: string
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 50
+          example: Great Lion Service
+          description: The name of a service as specified by the carrier
+        carrierServiceCode:
+          type: string
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 11
+          example: FE1
+          description: The carrier-specific code of the service for which the schedule details are published.
+        universalServiceReference:
+          type: string
+          description: 'A global unique service reference, as per DCSA standard, agreed by VSA partners for the service. The service reference must match the regular expression pattern: SR\d{5}[A-Z]. The letters SR followed by 5 digits, followed by a checksum-character as a capital letter from A to Z.'
+          example: SR12345A
+          maxLength: 8
+          pattern: '^SR\d{5}[A-Z]$'
+        vesselsBookings:
+          type: array
+          items:
+            $ref: '#/components/schemas/VesselBooking'
+      required:
+        - partnerIdentity
+        - carrierServiceName
+        - carrierServiceCode
+        - vesselsBookings
+    PartnerIdentity:
+      title: PartnerIdentity
+      x-stoplight:
+        id: mnr99wlnor6is
+      type: object
+      properties:
+        code:
+          type: string
+          pattern: ^\S+(\s+\S+)*$
+          example: MMCU
+          maxLength: 4
+          description: SCAC code or SMDG Liner Code of the carrier.
+        codeListProvider:
+          type: string
+          example: NMFTA
+          description: The provider used for identifying the partner code
+          enum:
+            - SMDG
+            - NMFTA
+        agreementTypeCode:
+          type: string
+          example: VSA
+          enum:
+            - VSA
+            - SCA
+          description: |-
+            Possible values are:
+
+            - VSA (Vessel Sharing Agreement)
+            - SCA (Slot Charter Agreement)
+      required:
+        - code
+        - codeListProvider
+        - agreementTypeCode
+    VesselBooking:
+      title: VesselBooking
+      x-stoplight:
+        id: 262a2bff1896c
+      type: object
+      properties:
+        vesselOperatorSMDGLinerCode:
+          type: string
+          description: The carrier who is in charge of the vessel operation based on the SMDG code
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 10
+          example: HLC
+        vesselIMONumber:
+          type: string
+          pattern: '^\d{7}$'
+          maxLength: 7
+          example: '9321483'
+          description: 'The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd''s register code, which does not change during the lifetime of the vessel'
+        vesselName:
+          type: string
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 35
+          example: King of the Seas
+          description: The name of the Vessel given by the Vessel Operator and registered with IMO.
+        forecasts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Forecast'
+      required:
+        - vesselOperatorSMDGLinerCode
+        - vesselIMONumber
+        - forecasts
+    Forecast:
+      title: Forecast
+      x-stoplight:
+        id: 299e1a5e0f756
+      type: object
+      properties:
+        portVisitReference:
+          type: string
+          description: The unique reference that can be used to link different transportCallReferences to the same port visit. The reference is provided by the port to uniquely identify a port call.
+          pattern: ^\S+(\s+\S+)*$
+          example: NLRTM1234589
+          maxLength: 50
+        transportCallReference:
+          type: string
+          description: |-
+            A carrier definied reference to a TransportCall.
+
+            In the case the Means of Transport is a Vessel and the facility is a Port/Terminal - this reference should be considered a Terminal Call Reference
+          example: N987G4567
+          maxLength: 100
+          pattern: ^\S+(\s+\S+)*$
+        carrierImportVoyageNumber:
+          type: string
+          example: 2103N
+          description: The identifier of an import voyage. The carrier-specific identifier of the import Voyage.
+          maxLength: 50
+          pattern: ^\S+(\s+\S+)*$
+        carrierExportVoyageNumber:
+          type: string
+          description: The identifier of an export voyage. The carrier-specific identifier of the export Voyage.
+          example: 2103S
+          maxLength: 50
+          pattern: ^\S+(\s+\S+)*$
+        universalImportVoyageReference:
+          type: string
+          description: 'A global unique voyage reference for the import Voyage, as per DCSA standard, agreed by VSA partners for the voyage.'
+          pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
+          example: 2103N
+          maxLength: 5
+        universalExportVoyageReference:
+          type: string
+          description: 'A global unique voyage reference for the export Voyage, as per DCSA standard, agreed by VSA partners for the voyage.'
+          pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
+          example: 2103N
+          maxLength: 5
+        location:
+          oneOf:
+            - $ref: ../../models/UnLocationLocation.yaml
+            - $ref: ../../models/FacilitySMDGLocation.yaml
+        loadLadenContainers:
+          description: Lists all the `LADEN` containers being loaded.
+          type: array
+          uniqueItems: true
+          minItems: 0
+          items:
+            $ref: '#/components/schemas/LadenContainer'
+        loadEmptyContainers:
+          description: Lists all the `EMPTY` containers being loaded
+          type: array
+          minItems: 0
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/EmptyContainer'
+        loadBreakBulk:
+          type: array
+          minItems: 0
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/NonContainer'
+        loadOutOfGauge:
+          type: array
+          minItems: 0
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/NonContainer'
+      required:
+        - location
+    LadenContainer:
+      title: LadenContainer
+      x-stoplight:
+        id: kdfqf0ojv0wqd
+      type: object
+      description: A CBF specification for a particular container type.
+      properties:
+        equipmentSizeCode:
+          type: string
+          description: 'A CBF specification for a particular equipment size and type.'
+          enum:
+            - '20'
+            - '40'
+            - '45'
+            - 20HC
+            - 40HC
+            - 45HC
+          example: '20'
+        averageTotalContainerWeight:
+          type: number
+          format: float
+          x-stoplight:
+            id: hubebhsjsro4k
+          description: Cargo Gross Weight plus Container Tare Weight.
+        averageTotalContainerWeightUnit:
+          type: string
+          x-stoplight:
+            id: p2b5myu3gaxqv
+          description: "The unit of measure which can be expressed in imperial or metric terms.\r\n\r\nOnly possible value here is `KGM`."
+          default: KGM
+          enum:
+            - KGM
+        unitsNonDG:
+          type: object
+          properties:
+            total:
+              type: integer
+              description: Total units non DG
+            totalPlugs:
+              type: integer
+              description: Subtotal units non DG with plugs (reefer)
+          required:
+            - total
+            - totalPlugs
+        unitsDG:
+          type: object
+          properties:
+            total:
+              type: integer
+              description: Total units DG
+            totalPlugs:
+              type: integer
+              description: Subtotal units DG with plugs (reefer)
+          required:
+            - total
+            - totalPlugs
+        discharge:
+          type: array
+          description: Lists all the `LADEN` containers being discharged.
+          items:
+            $ref: '#/components/schemas/DischargeLadenContainer'
+      required:
+        - equipmentSizeCode
+        - averageTotalContainerWeight
+        - averageTotalContainerWeightUnit
+    DischargeLadenContainer:
+      title: Discharge Laden Container
+      type: object
+      x-stoplight:
+        id: eba602e7e427f
+      properties:
+        portVisitReference:
+          type: string
+          description: The unique reference that can be used to link different transportCallReferences to the same port visit. The reference is provided by the port to uniquely identify a port call.
+          example: NLRTM1234589
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 50
+        transportCallReference:
+          type: string
+          description: "A carrier definied reference to a TransportCall.\r\n\r\nIn the case the Means of Transport is a Vessel and the facility is a Port/Terminal - this reference should be considered a Terminal Call Reference\r\n"
+          example: N987G4567
+          maxLength: 100
+          pattern: ^\S+(\s+\S+)*$
+        location:
+          $ref: ../../models/FacilitySMDGLocation.yaml
+        equipmentSizeCode:
+          type: string
+          enum:
+            - '20'
+            - '40'
+            - '45'
+            - 20HC
+            - 40HC
+            - 45HC
+          example: '20'
+          description: A CBF specification for a particular equipment size and type.
+        averageGrossWeight:
+          type: number
+          format: float
+        averageGrossWeightUnit:
+          type: string
+          x-stoplight:
+            id: nl6klgkrwiqej
+          default: KGM
+          description: "The unit of measure which can be expressed in imperial or metric terms.\r\n\r\nOnly possible value here is `KGM`."
+          enum:
+            - KGM
+        unitsNonDG:
+          type: object
+          properties:
+            total:
+              type: integer
+              description: Total units non DG
+            totalPlugs:
+              type: integer
+              description: Subtotal units non DG with plugs (reefer)
+          required:
+            - total
+            - totalPlugs
+        unitsDG:
+          type: object
+          properties:
+            total:
+              type: integer
+              description: Total units DG
+            totalPlugs:
+              type: integer
+              description: Subtotal units DG with plugs (reefer)
+          required:
+            - total
+            - totalPlugs
+      required:
+        - location
+        - equipmentSizeCode
+        - averageGrossWeight
+        - averageGrossWeightUnit
+    EmptyContainer:
+      title: EmptyContainer
+      x-stoplight:
+        id: 2xjaqamt03lnq
+      type: object
+      description: A CBF specification for a particular container type.
+      properties:
+        equipmentSizeCode:
+          type: string
+          enum:
+            - '20'
+            - '40'
+            - '45'
+            - 20HC
+            - 40HC
+            - 45HC
+          example: '20'
+          description: A CBF specification for a particular equipment size and type.
+        averageTotalContainerWeight:
+          type: number
+          format: float
+          description: Cargo Gross Weight plus Container Tare Weight.
+          x-stoplight:
+            id: 9x4mxy8qv6kvi
+        averageTotalContainerWeightUnit:
+          x-stoplight:
+            id: 1c9ho5inkwgfi
+          type: string
+          enum:
+            - KGM
+          description: "The unit of measure which can be expressed in imperial or metric terms.\r\n\r\nOnly possible value here is `KGM`."
+        units:
+          type: integer
+          description: Total units non DG.
+        discharge:
+          type: array
+          description: Lists all the `EMPTY` containers being discharged.
+          items:
+            $ref: '#/components/schemas/DischargeEmptyContainer'
+      required:
+        - equipmentSizeCode
+        - averageTotalContainerWeight
+        - averageTotalContainerWeightUnit
+        - units
+        - discharge
+    DischargeEmptyContainer:
+      title: Discharge Empty Container
+      type: object
+      description: A CBF specification for a particular container type.
+      x-stoplight:
+        id: 3870fdc4937be
+      properties:
+        portVisitReference:
+          type: string
+          maxLength: 50
+          pattern: ^\S+(\s+\S+)*$
+          example: NLRTM1234589
+          description: The unique reference that can be used to link different transportCallReferences to the same port visit. The reference is provided by the port to uniquely identify a port call.
+        transportCallReference:
+          type: string
+          description: "A carrier definied reference to a TransportCall.\r\n\r\nIn the case the Means of Transport is a Vessel and the facility is a Port/Terminal - this reference should be considered a Terminal Call Reference\r\n"
+          example: N987G4567
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 100
+        equipmentSizeCode:
+          type: string
+          enum:
+            - '20'
+            - '40'
+            - '45'
+            - 20HC
+            - 40HC
+            - 45HC
+          example: '20'
+          description: A CBF specification for a particular equipment size and type.
+        units:
+          type: integer
+          description: Total units non DG
+        averageTotalContainerWeight:
+          type: number
+          format: float
+          x-stoplight:
+            id: w007kd6wx48n4
+          description: Cargo Gross Weight plus Container Tare Weight.
+        averageTotalContainerWeightUnit:
+          x-stoplight:
+            id: m9m7w7fh98be7
+          type: string
+          description: "The unit of measure which can be expressed in imperial or metric terms.\r\n\r\nOnly possible value here is `KGM`."
+          enum:
+            - KGM
+        location:
+          $ref: ../../models/FacilitySMDGLocation.yaml
+      required:
+        - equipmentSizeCode
+        - units
+        - averageTotalContainerWeight
+        - averageTotalContainerWeightUnit
+        - location
+    NonContainer:
+      title: NonContainer
+      x-stoplight:
+        id: xyt1uk315okek
+      type: object
+      description: A CBF specification for a particular container type.
+      properties:
+        totalGrossWeight:
+          type: number
+          format: float
+        totalGrossWeightUnit:
+          x-stoplight:
+            id: aoyia2pjesxd3
+          type: string
+          enum:
+            - KGM
+          description: "The unit of measure which can be expressed in imperial or metric terms.\r\n\r\nOnly possible value here is `KGM`."
+        quantityTEU:
+          type: number
+          format: float
+        discharge:
+          type: array
+          minItems: 0
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/DischargeNonContainer'
+      required:
+        - totalGrossWeight
+        - totalGrossWeightUnit
+        - quantityTEU
+        - discharge
+    DischargeNonContainer:
+      title: Discharge Non Container
+      type: object
+      description: A CBF specification for a particular container type.
+      x-stoplight:
+        id: b6466f6755447
+      properties:
+        portVisitReference:
+          type: string
+          description: The unique reference that can be used to link different transportCallReferences to the same port visit. The reference is provided by the port to uniquely identify a port call.
+          maxLength: 50
+          pattern: ^\S+(\s+\S+)*$
+          example: NLRTM1234589
+        transportCallReference:
+          type: string
+          description: "A carrier definied reference to a TransportCall.\r\n\r\nIn the case the Means of Transport is a Vessel and the facility is a Port/Terminal - this reference should be considered a Terminal Call Reference"
+          maxLength: 100
+          pattern: ^\S+(\s+\S+)*$
+          example: N987G4567
+        totalGrossWeight:
+          type: number
+          format: float
+        totalGrossWeightUnit:
+          x-stoplight:
+            id: nkv7a8skkw11r
+          type: string
+          description: "The unit of measure which can be expressed in imperial or metric terms.\r\n\r\nOnly possible value here is `KGM`."
+          enum:
+            - KGM
+        quantityTEU:
+          type: number
+          format: float
+        location:
+          $ref: ../../models/FacilitySMDGLocation.yaml
+      required:
+        - totalGrossWeight
+        - totalGrossWeightUnit
+        - quantityTEU
+        - location
