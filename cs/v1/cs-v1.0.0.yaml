@@ -1,0 +1,251 @@
+openapi: 3.0.3
+x-stoplight:
+  id: 3674xgyacnizs
+info:
+  title: DCSA OpenAPI specification for Commercial Schedules
+  version: 1.0.0
+  description: |-
+    API specification issued by DCSA.org.
+
+    For a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/cs/v1#v100). Please also [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments.
+  license:
+    url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
+    name: Apache 2.0
+  contact:
+    name: Digital Container Shipping Association (DCSA)
+    url: 'https://dcsa.org/'
+    email: info@dcsa.org
+servers:
+  - url: 'http://localhost:3000'
+paths:
+  /v1/point-to-point-routes:
+    get:
+      summary: Point to Point Routing
+      tags:
+        - Point To Point
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PointToPoint'
+          headers:
+            API-Version:
+              $ref: ../../models/CommonComponents.yaml#/components/headers/API-Version
+      operationId: get-v1-point-to-point
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: placeOfReceipt
+          description: The UN Location code specifying where the place is located. Cannot be used in combination with Port of Load.
+          required: true
+        - schema:
+            type: string
+          in: query
+          name: placeOfDelivery
+          description: The UN Location code specifying where the place is located. Cannot be used in combination with Port of Discharge.
+          required: true
+        - schema:
+            type: string
+            format: date-time
+          in: query
+          name: departureDateTime
+          description: '`:gte` (≥ Greater than or equal) OR `:lte` (≤ Less than or equal)'
+        - schema:
+            type: string
+            format: date-time
+          in: query
+          name: arrivalDateTime
+          description: '`:gte` (≥ Greater than or equal) OR `:lte` (≤ Less than or equal)'
+        - schema:
+            type: boolean
+          in: query
+          name: isTranshipment
+          description: 'Specifies wheter the proposed routing can have a transhipmentin or not. By default is TRUE and responses can have either direct routings or routings with transhipment. If FALSE, only direct routings can be proposed in the response. Transhipment: A terminal operation whereby containers or cargo are transferred from one vessel to another to reach their final destination, compared to a direct service from the load port of origin to the discharge port of destination.'
+        - $ref: ../../models/CommonComponents.yaml#/components/parameters/Limit
+components:
+  schemas:
+    Place:
+      title: Place
+      type: object
+      properties:
+        facilityTypeCode:
+          type: string
+        location:
+          oneOf:
+            - $ref: ../../models/UnLocationLocation.yaml
+            - $ref: ../../models/FacilitySMDGLocation.yaml
+            - $ref: ../../models/AddressLocation.yaml
+        datatime:
+          type: string
+          format: date-time
+    PointToPoint:
+      title: PointToPoint
+      x-stoplight:
+        id: f0nefg6xj9093
+      type: object
+      description: Leg of the Point-to-Point routing. The object "Legs" can be conformed by as many legs as needed and this legs must be identified with a sequence number.
+      properties:
+        placeOfReceipt:
+          $ref: '#/components/schemas/Place'
+        placeOfDelivery:
+          $ref: '#/components/schemas/Place'
+        transitTime:
+          type: string
+          x-stoplight:
+            id: n94kpnvpk6zsn
+          description: The estimated total time in days that it takes a shipment to move from place of receipt to place of delivery. Transit time includes stop-over time during transshipments and waiting time at connection points.
+        cutOff:
+          type: array
+          x-stoplight:
+            id: htdwqv6o6e9js
+          items:
+            $ref: '#/components/schemas/CutOff'
+        legs:
+          x-stoplight:
+            id: w4k1wtp4z5j6i
+          type: array
+          items:
+            x-stoplight:
+              id: qv568k3ep7gvd
+            anyOf:
+              - $ref: '#/components/schemas/Ocean'
+              - $ref: '#/components/schemas/Hinterland'
+      required:
+        - placeOfReceipt
+        - placeOfDelivery
+        - legs
+    CutOff:
+      title: CutOff
+      x-stoplight:
+        id: x028nov3x6li9
+      type: object
+      properties:
+        location:
+          x-stoplight:
+            id: nwwolkkgfbbw2
+          oneOf:
+            - $ref: ../../models/UnLocationLocation.yaml
+            - $ref: ../../models/FacilitySMDGLocation.yaml
+            - $ref: ../../models/AddressLocation.yaml
+        typeCode:
+          x-stoplight:
+            id: uhq420gns96bq
+          type: string
+          enum:
+            - DCO
+            - VCO
+            - FCO
+            - LCO
+            - EFC
+        dataTime:
+          type: string
+          x-stoplight:
+            id: jdz9ry8qnguxs
+          format: date-time
+    Ocean:
+      title: Ocean
+      x-stoplight:
+        id: r70pyme3qud40
+      type: object
+      properties:
+        sequenceNumber:
+          type: integer
+          x-stoplight:
+            id: 4z9lhffp3cyjs
+          format: int64
+        modeOfTransport:
+          x-stoplight:
+            id: 9atywo7bqza4b
+          type: string
+          enum:
+            - VESSEL
+            - BARGE
+        vesselIMONumber:
+          type: string
+          x-stoplight:
+            id: o2ovfknig1oap
+        vesselName:
+          type: string
+          x-stoplight:
+            id: xfeizdvobewab
+        vesselBuildYear:
+          type: string
+          x-stoplight:
+            id: ii5w50fjhtz6w
+        vesselCallSign:
+          type: string
+          x-stoplight:
+            id: rhvp6vwcc5elg
+        vesselFlag:
+          type: string
+          x-stoplight:
+            id: rm5libnl8kal6
+        carrierServiceName:
+          type: string
+          x-stoplight:
+            id: 4f73nmpx0tgcd
+        universalServiceReference:
+          type: string
+          x-stoplight:
+            id: v00rf5pn6sfs3
+        carrierServiceCode:
+          type: string
+          x-stoplight:
+            id: 6ejiom7wmncco
+        universalImportVoyageReference:
+          type: string
+          x-stoplight:
+            id: 6dyfm23y5ct2x
+        universalExportVoyageReference:
+          type: string
+          x-stoplight:
+            id: ns0d83qpotc73
+        carrierImportVoyageNumber:
+          type: string
+          x-stoplight:
+            id: e9np9hrh7c934
+        carrierExportVoyageNumber:
+          type: string
+          x-stoplight:
+            id: 5u650xz8q6zfm
+        departure:
+          $ref: '#/components/schemas/Place'
+        arrival:
+          $ref: '#/components/schemas/Place'
+      required:
+        - departure
+        - arrival
+    Hinterland:
+      title: Hinterland
+      x-stoplight:
+        id: jqzpnmixsji3k
+      type: object
+      properties:
+        sequenceNumber:
+          type: integer
+          format: int64
+        modeOfTransport:
+          enum:
+            - BARGE
+            - RAIL
+            - TRUCK
+          type: string
+        departure:
+          $ref: '#/components/schemas/Place'
+        arrival:
+          $ref: '#/components/schemas/Place'
+      required:
+        - departure
+        - arrival
+tags:
+  - name: Point To Point
+    description: ' '
+  - name: Port Schedule
+    description: ' '
+  - name: Vessel Schedule
+    description: ' '
