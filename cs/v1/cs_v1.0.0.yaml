@@ -1,439 +1,588 @@
 openapi: 3.0.3
 info:
   version: 1.0.0
-  title: DCSA OpenAPI specification for Commercial Schedules - Alpha 1
-  description: |
+  title: DCSA OpenAPI specification for Commercial Schedules
+  description: |-
     API specification issued by DCSA.org.
-    
-    For a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/cs/v1#v100). Please also [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments.
 
-  license:
-    name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
+    For a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/cs/v1#v100). Please also [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments.
   contact:
     name: Digital Container Shipping Association (DCSA)
-    url: https://dcsa.org
+    url: 'https://dcsa.org/'
     email: info@dcsa.org
+  license:
+    url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
+    name: Apache 2.0
+servers:
+  - url: 'http://localhost:3000'
 paths:
   /v1/point-to-point-routes:
     get:
-      summary: Get Point-Point routes
-      description: |
-        Retrieves the Point-Point routes
+      tags:
+        - Point To Point
+      summary: Point to Point Routing
+      operationId: get-v1-point-to-point
       parameters:
-        - $ref: '#/components/parameters/placeOfReceiptQueryParam'
-#        - $ref: '#/components/parameters/portOfLoadQueryParam'
-        - $ref: '#/components/parameters/placeOfDeliveryQueryParam'
-#        - $ref: '#/components/parameters/portOfDischargeQueryParam'
-        - $ref: '#/components/parameters/earliestDepartureDateTimeQueryParam'
-        - $ref: '#/components/parameters/latestDepartureDateTimeQueryParam'
-        - $ref: '#/components/parameters/earliestArrivalDateTimeQueryParam'
-        - $ref: '#/components/parameters/latestArrivalDateTimeQueryParam'
-        - $ref: '#/components/parameters/routingTypeCodeQueryParam'
-#        - $ref: '#/components/parameters/specialCargoTypeCodeQueryParam'
-#        - $ref: '#/components/parameters/vesselFlagQueryParam'
-
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/parameters/limit'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/parameters/cursor'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/parameters/sort'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/parameters/Api-Version-Major'
+        - name: placeOfReceipt
+          in: query
+          description: The UN Location code specifying where the place is located.
+          required: true
+          schema:
+            type: string
+            pattern: '^[A-Z]{2}[A-Z2-9]{3}$'
+            minLength: 5
+            maxLength: 5
+        - name: placeOfDelivery
+          in: query
+          description: The UN Location code specifying where the place is located.
+          required: true
+          schema:
+            type: string
+            pattern: '^[A-Z]{2}[A-Z2-9]{3}$'
+            minLength: 5
+            maxLength: 5
+        - name: departureDateTime
+          in: query
+          description: |
+            `:gte` (≥ Greater than or equal) OR `:lte` (≤ Less than or equal)\
+            `departureDateTime:gte=2021-04-01T14:12:56-01:00`
+          schema:
+            type: string
+            format: date-time
+            example: '2021-04-01T14:12:56-01:00'
+        - name: arrivalDateTime
+          in: query
+          description: |
+            `:gte` (≥ Greater than or equal) OR `:lte` (≤ Less than or equal) \
+            `arrivalDateTime:gte=2021-04-01T14:12:56-01:00`
+          schema:
+            type: string
+            format: date-time
+            example: '2021-04-01T14:12:56-01:00'
+        - name: isTranshipment
+          in: query
+          description: 'Specifies wheter the proposed routing can have a transhipmentin or not. By default is TRUE and responses can have either direct routings or routings with transhipment. If FALSE, only direct routings can be proposed in the response. Transhipment: A terminal operation whereby containers or cargo are transferred from one vessel to another to reach their final destination, compared to a direct service from the load port of origin to the discharge port of destination.'
+          schema:
+            type: boolean
+            example: false
+        - $ref: '#/components/parameters/Limit'
       responses:
         '200':
-          description: Request successful
-          headers:
-            API-Version:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/API-Version'
-            Current-Page:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/Current-Page'
-            Next-Page:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/Next-Page'
-            Prev-Page:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/Prev-Page'
-            Last-Page:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/Last-Page'
-            First-Page:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/First-Page'
+          description: OK
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/pointToPoint'
-        default:
-          description: Unexpected error
+                  $ref: '#/components/schemas/PointToPoint'
           headers:
             API-Version:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/headers/API-Version'
+              $ref: '#/components/headers/API-Version'
+      servers:
+        - url: 'http://localhost:3000'
+  /v1/port-schedule:
+    get:
+      tags:
+        - Port Schedule
+      summary: Port Schedule
+      description: 'Provides, for a required specific port and starting date, the set of all vessels arriving and departing from the port with the corresponding estimated timestamps.'
+      operationId: get-v1-port-schedules
+      parameters:
+        - name: port
+          in: query
+          description: The UN Location code specifying where the place is located.
+          required: true
+          schema:
+            type: string
+            pattern: '^[A-Z]{2}[A-Z2-9]{3}$'
+            minLength: 5
+            maxLength: 5
+            example: NLRTM
+        - name: date
+          in: query
+          description: The date since when the estimated arrival and departures of vessels in a given port is required
+          required: true
+          schema:
+            type: string
+            format: date
+            pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'
+            example: '2023-07-01'
+      responses:
+        '200':
+          description: OK
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.1#/components/schemas/error'
+                $ref: '#/components/schemas/PortSchedule'
+      servers:
+        - url: 'http://localhost:3000'
+tags:
+  - name: Point To Point
+    description: ' '
+  - name: Port Schedule
+    description: ' '
+  - name: Vessel Schedule
+    description: ' '
 components:
-  schemas:
-    dateTime:
-      type: string
-      format: date-time
-      example: '2021-01-09T14:12:56-01:00'      
-    pointToPoint:
-      type: object
-      description: |
-        Point to point routing metadata
-      allOf:
-        - type: object
-          properties:
-            placeOfReceipt:
-              allOf:
-                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/UNLocationCode'
-                - description: |
-                    The UN Location code of the `Place of Receipt` of the 1<sup>st</sup> leg. This field is only provided if the queryParameter `placeOfReceipt` has been used.
-        - type: object
-          properties:
-            placeOfReceiptDateTime:
-              type: string
-              format: date-time
-              description: |
-                The date and time when the goods will depart the `Place of Reciept`. This field is only provided if the queryParameter `placeOfReceipt` has been used.
-        - type: object
-          properties:
-            placeOfDelivery:
-              allOf:
-                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/UNLocationCode'
-                - description: |
-                    The UN Location code of the `Place of Delivery` of the last leg. This field is only provided if the queryParameter `placeOfDelivery` has been used.
-        - type: object
-          properties:
-            placeOfDeliveryDateTime:
-              type: string
-              format: date-time
-              description: |
-                The date and time when the goods will arrive at the `Place of Delivery`. This field is only provided if the queryParameter `placeOfDelivery` has been used.
-        - type: object
-          properties:
-            portOfLoad:
-              allOf:
-                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/UNLocationCode'
-                - description: |
-                    The UN Location code of the `Port of Load` if the 1<sup>st</sup> leg is a port. This field is only provided if the queryParameter `portOfLoad` has been used.
-        - type: object
-          properties:
-            portOfLoadDateTime:
-              type: string
-              format: date-time
-              description: |
-                The date and time when the goods will depart from the `Port of Load`. This field is only provided if the queryParameter `portOfLoad` has been used.
-        - type: object
-          properties:
-            portOfDischarge:
-              allOf:
-                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/UNLocationCode'
-                - description: |
-                    The UN Location code of the `Port of Discharge` if the last leg is a port. This field is only provided if the queryParameter `portOfDischarge` has been used.
-        - type: object
-          properties:
-            portOfDischargeDateTime:
-              type: string
-              format: date-time
-              description: |
-                The date and time when the goods will arrive at the `Port of Discharge`. This field is only provided if the queryParameter `portOfDischarge` has been used.
-        - type: object
-          properties:
-            transitTime:
-              type: integer
-              description: |
-                The estimated total time in days that it takes a shipment to move from place of receipt to place of delivery. Transit time includes stop-over time during transshipments and waiting time at connection points
-        - type: object
-          properties:
-            gateOpeningDateTime:
-              type: string
-              format: date-time
-              description: |
-                Earliest date and time for possible Gate in
-        - type: object
-          properties:
-           gateInCutOffDateTimes:
-              type: array
-              items:
-                $ref: '#/components/schemas/gateInCutOffTime'
-        - type: object
-          properties:
-            legs:
-              type: array
-              description: |
-                Leg of the Point-to-Point routing. Can be either an `intermodal` leg or an `ocean` leg
-              items:
-                oneOf:
-                  - $ref: '#/components/schemas/intermodal'
-                  - $ref: '#/components/schemas/ocean'
-
-    gateInCutOffTime:
-      type: object
-      description: |
-        Cut off times
-      allOf:
-        - type: object
-          properties:
-            cutOffDateTimeCode:
-              type: string
-              description: |
-                Code for the cut-off time
-                - DGD (Dangerous Goods cut-off)
-                - REF (Reefer cut-off)
-                - VCO (VGM cut-off)
-                - FCO (FCL delivery cut-off)
-                - LCO (LCL delivery cut-off)
-                - OOG (Out of Gauge - BB cut-off)
-                - SHI (Shipping Instruction cut-off)
-              enum:
-                - DGD
-                - REF
-                - VCO
-                - FCO
-                - LCO
-                - OOG
-                - SHI
-        - type: object
-          properties:
-            cutOffDateTime:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/cutOffDateTime'
-      required:
-        - cutOffDateTimeCode
-        - cutOffDateTime
-
-    intermodal:
-      type: object
-      description: |
-         intermodal
-      allOf:
-        - type: object
-          properties:
-            modeOfTransport:
-              allOf:
-                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/modeOfTransport'
-                - example:
-                    TRAIN
-        - type: object
-          properties:
-            departureLocation:
-              anyOf:
-                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/LOCATION_DOMAIN/2.0.0#/components/schemas/addressLocation'
-                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/LOCATION_DOMAIN/2.0.0#/components/schemas/unLocationLocation'
-                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/LOCATION_DOMAIN/2.0.0#/components/schemas/facilityLocation'
-        - type: object
-          properties:
-            departurDateTime:
-              type: string
-              format: date-time
-              description: |
-                xxx
-        - type: object
-          properties:
-            arrivalLocation:
-              anyOf:
-                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/LOCATION_DOMAIN/2.0.0#/components/schemas/addressLocation'
-                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/LOCATION_DOMAIN/2.0.0#/components/schemas/unLocationLocation'
-                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/LOCATION_DOMAIN/2.0.0#/components/schemas/facilityLocation'
-        - type: object
-          properties:
-            arrivalDateTime:
-              type: string
-              format: date-time
-              description: |
-                yyy
-    ocean:
-      type: object
-      description: |
-        ocean
-      allOf:
-        - $ref: '#/components/schemas/intermodal'
-        - type: object
-          properties:
-            vesselName:
-              allOf:
-                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/vesselName'
-        - type: object
-          properties:
-            vesselYearBuilt:
-              description: |
-                Year the Vessel is built
-              type: integer
-              example: 1925
-        - type: object
-          properties:
-            vesselCallSign:
-              description: |
-                Call sign of the Vesel
-              type: string
-              example: Alpha 1
-        - type: object
-          properties:
-            vesselFlag:
-              allOf:
-                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/vesselFlag'
-        - type: object
-          properties:
-            vesselIMONumber:
-              allOf:
-                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/vesselIMONumber'
-        - type: object
-          properties:
-            serviceName:
-              allOf:
-                - $ref: '#/components/schemas/carrierServiceName'
-        - type: object
-          properties:
-            importVoyageNumber:
-              allOf:
-                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/importVoyageNumber'
-        - type: object
-          properties:
-            exportVoyageNumber:
-              allOf:
-                - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/exportVoyageNumber'
-        - example:
-            modeOfTransport: VESSEL
-            vesselName: 'King of the Seas'
-            vesselIMONumber: 9321483
-            serviceName: 'Great Lion Service'
-            importVoyageNumber: '111'
-            exortVoyageNumber: '222'
-            departureLocation: FRPAR
-            departureDateTime: '2022-04-01T14:12:56-01:00'
-            arrivalLocation: DEHAM
-            arrivalDateTime: '2022-03-29T14:12:56-01:00'
-    specialCargoTypeCode:
-      type: string
-      enum:
-        - DGD
-        - REF
-        - OOG
-    carrierServiceName:
-      type: string
-      description: |
-        The name of the service 
-      example: Great Lion Service
-
-  parameters:
-  
-    ##############
-    # Query params
-    ##############
-    
-    placeOfReceiptQueryParam:
-      in: query
-      name: placeOfReceipt
-      description: |
-        `Place Of Receipt` defined as a UnLocationCode. Cannot be used in combination with `portOfLoad`
-      schema:
-        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/UNLocationCode'
-      required: false
-    portOfLoadQueryParam:
-      in: query
-      name: portOfLoad
-      description: |
-        `Port Of Load` defined as a UnLocationCode. Cannot be used in combination with `placeOfReceipt`
-      schema:
-        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/UNLocationCode'
-      required: false
-    placeOfDeliveryQueryParam:
-      in: query
-      name: placeOffDelivery
-      description: |
-        `Place Of fDelivery` defined as a UnLocationCode. Cannot be used in combination with `portOfDischarge`
-      schema:
-        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/UNLocationCode'
-      required: false
-    portOfDischargeQueryParam:
-      in: query
-      name: portOfDischarge
-      description: |
-        `Port Of Discharge` defined as a UnLocationCode. Cannot be used in combination with `placeOffDelivery`
-      schema:
-        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/UNLocationCode'
-      required: false
-    earliestDepartureDateTimeQueryParam:
-      in: query
-      name: earliestDepartureDateTime
-      description: |
-        Limit the result based on the departure start DateTime (earliest departure dateTme). This is a **conditional** field and `required` if `arrivalEndDateTime` is not specified.
-        
-        It is possible to use this query parameter in combination with the optional `departureEndDateTime`-queryParam. The maximum duration of the period allowed is 12 weeks (=3 months) which is also the default period used if `departureEndDateTime` is **not** defined.
-        
-        **NB:** A BadRequest is returned if the period exceeds 12 weeks or if this queryParameter is used in combination with either `arrivalStartDateTime` or `arrivalEndDateTime`
-      required: false
-      example: '2021-04-01T14:12:56-01:00'
-      schema:
-        $ref: '#/components/schemas/dateTime'
-    latestDepartureDateTimeQueryParam:
-      in: query
-      name: latestDepartureDateTime
-      description: |
-        Limit the result based on the departure end DateTime. It is not possible to combine this queryParameter with the `arrival`-queryParameters. It can **only** be used in combination with `departureStartDateTime` in which case it defines a period. If omitted the default value of this parameter in combination with `departureStartDateTime` is 12 weeks (=3 months)
-
-        **NB:** A BadRequest is returned if the period exceeds 12 weeks or if this queryParameter is used in combination with either `arrivalStartDateTime` or `arrivalEndDateTime`
-      required: false
-      example: '2021-04-01T14:12:56-01:00'
-      schema:
-        $ref: '#/components/schemas/dateTime'
-    earliestArrivalDateTimeQueryParam:
-      in: query
-      name: earliestArrivalDateTime
-      description: |
-        Limit the result based on the arrival start DateTime. It is not possible to combine this queryParameter with the `departure`-queryParameters. It can **only** be used in combination with `arrivalEndDateTime` in which case it defines a period. If omitted the default value of this parameter in combination with `arrivalEndDateTime` is 12 weeks (=3 months)
-
-        **NB:** A BadRequest is returned if the period exceeds 12 weeks or if this queryParameter is used in combination with either `departureStartDateTime` or `departureEndDateTime`
-      required: false
-      example: '2021-04-01T14:12:56-01:00'
-      schema:
-        $ref: '#/components/schemas/dateTime'
-    latestArrivalDateTimeQueryParam:
-      in: query
-      name: arrivalEndDateTime
-      description: |
-        Limit the result based on the arrival end DateTime (latest arrival dateTme). This is a **conditional** field and `required` if `departureStartDateTime` is not specified.
-        
-        It is possible to use this query parameter in combination with the optional `arrivalStartDateTime`-queryParam. The maximum duration of the period allowed is 12 weeks (=3 months) which is also the default period used if `arrivalStartDateTime` is **not** defined.
-        
-        **NB:** A BadRequest is returned if the period exceeds 12 weeks or if this queryParameter is used in combination with either `departureStartDateTime` or `departureEndDateTime`
-      required: false
-      example: '2021-04-01T14:12:56-01:00'
-      schema:
-        $ref: '#/components/schemas/dateTime'
-    vesselFlagQueryParam:
-      in: query
-      name: vesselFlag
-      description: |
-        The flag of the vessel. All Vessels in the results will belong to the specified flag
-      schema:
-        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.0#/components/schemas/vesselFlag'
-      required: false
-    routingTypeCodeQueryParam:
-      in: query
-      name: routingTypeCode
-      description: |
-        Whether to use Direct-routing (`direct`) or Indirect-routing (`indirect`)
+  headers:
+    API-Version:
       schema:
         type: string
-        enum:
-          - direct
-          - indirect
-      required: false
-    specialCargoTypeCodeQueryParam:
-      in: query
-      name: speciaCargoTypeCode
-      explode: false
-      style: form
-      required: false
+        example: 1.0.0
       description: |
-        Specify special cargo requirements:
-        
-        - DGD (Dangerious Goods)
-        - REF (Reefer)
-        - OOG (Out of Gauge)
-        
-        It is possible to select multiple values by comma `,` separating them. For multiple values the AND-operator is used. For example _speciaCargoTypeCode=DGD,REF_ Matches schedules where **both** Dangerous Goods (`DGD`) and Reefers (`REF`) can be provided in the same routing.
-      example: [DGD,REF]
+        SemVer used to indicate the version of the contract (API version) returned.
+  parameters:
+    Limit:
+      name: limit
+      in: query
+      description: Maximum number of items to return.
       schema:
-        default: [DGD,REF,OOG]
-        type: array
-        items:
-          $ref: '#/components/schemas/specialCargoTypeCode'
+        type: number
+        minimum: 0
+        default: 100
+  schemas:
+    PointToPoint:
+      type: object
+      title: PointToPoint
+      description: Leg of the Point-to-Point routing. The object "Legs" can be conformed by as many legs as needed and this legs must be identified with a sequence number.
+      properties:
+        placeOfReceipt:
+          $ref: '#/components/schemas/Place'
+        placeOfDelivery:
+          $ref: '#/components/schemas/Place'
+        transitTime:
+          type: integer
+          description: The estimated total time in **days** that it takes a shipment to move from place of receipt to place of delivery. Transit time includes stop-over time during transshipments and waiting time at connection points.
+          format: int64
+          example: 10
+        cutOffs:
+          type: array
+          items:
+            $ref: '#/components/schemas/CutOff'
+        legs:
+          type: array
+          items:
+            anyOf:
+              - $ref: '#/components/schemas/Ocean'
+              - $ref: '#/components/schemas/Hinterland'
+      required:
+        - placeOfReceipt
+        - placeOfDelivery
+        - legs
+    Place:
+      type: object
+      title: Place
+      description: The Location specifying where the place is located.
+      properties:
+        facilityTypeCode:
+          enum:
+            - BORD
+            - CLOC
+            - COFS
+            - OFFD
+            - DEPO
+            - INTE
+            - POTE
+            - RAMP
+            - WAYP
+          description: The code to identify the specific type of facility. The code indicates which role the facility plays during the transportCall.
+          example: POTE
+        location:
+          oneOf:
+            - $ref: '#/components/schemas/UnLocationLocation'
+            - $ref: '#/components/schemas/FacilitySMDGLocation'
+            - $ref: '#/components/schemas/AddressLocation'
+        datatime:
+          type: string
+          format: date-time
+          example: '2019-08-24T14:15:22Z'
+      required:
+        - facilityTypeCode
+        - location
+        - datatime
+    UnLocationLocation:
+      type: object
+      title: UnLocationLocation
+      description: An interface used to express a location using a `UnLocationCode`.
+      properties:
+        locationName:
+          type: string
+          description: The name of the location.
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 100
+          example: Port of Amsterdam
+        locationType:
+          enum:
+            - UNLO
+          description: Discriminator used to identify this as a `UNLocation` location interface
+          example: UNLO
+        UNLocationCode:
+          type: string
+          description: |-
+            The UN Location code specifying where the place is located. The pattern used must be
+
+             - 2 characters for the country code using [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)
+             - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used
+
+            More info can be found here: [UN/LOCODE](https://en.wikipedia.org/wiki/UN/LOCODE)
+          pattern: '^[A-Z]{2}[A-Z2-9]{3}$'
+          minLength: 5
+          maxLength: 5
+          example: FRPAR
+      required:
+        - locationType
+        - UNLocationCode
+    FacilitySMDGLocation:
+      type: object
+      title: FacilitySMDGLocation
+      description: An interface used to express a location using a `SMDG Facility Code`.
+      properties:
+        locationName:
+          type: string
+          description: The name of the location.
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 100
+          example: Port of Amsterdam
+        locationType:
+          enum:
+            - FACS
+          description: Discriminator used to identify this as a `SMDG Facility` location interface
+          example: FACS
+        UNLocationCode:
+          type: string
+          description: |-
+            The UN Location code specifying where the place is located. The pattern used must be
+
+             - 2 characters for the country code using [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)
+             - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used
+
+            More info can be found here: [UN/LOCODE](https://en.wikipedia.org/wiki/UN/LOCODE)
+          pattern: '^[A-Z]{2}[A-Z2-9]{3}$'
+          minLength: 5
+          maxLength: 5
+          example: FRPAR
+        facilitySMDGCode:
+          type: string
+          description: |-
+            The code used for identifying the specific facility. This code does not include the UN Location Code.
+
+            The codeList used by SMDG is the [SMDG Terminal Code List](https://smdg.org/wp-content/uploads/Codelists/Terminals/SMDG-Terminal-Code-List-v20210401.xlsx)
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 6
+          example: ADT
+      required:
+        - locationType
+        - UNLocationCode
+        - facilitySMDGCode
+    AddressLocation:
+      type: object
+      title: AddressLocation
+      description: An interface used to express a location using an `Address`.
+      properties:
+        locationName:
+          type: string
+          description: The name of the location.
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 100
+          example: Port of Amsterdam
+        locationType:
+          enum:
+            - ADDR
+          description: Discriminator used to identify this as an `Address` location interface
+          example: ADDR
+        address:
+          type: object
+          description: An object for storing address related information.
+          properties:
+            name:
+              type: string
+              description: Name of the address.
+              pattern: ^\S+(\s+\S+)*$
+              maxLength: 100
+              example: John
+            street:
+              type: string
+              description: The name of the street of the party’s address.
+              maxLength: 100
+              example: Kronprinsessegade
+            streetNumber:
+              type: string
+              description: The number of the street of the party’s address.
+              maxLength: 50
+              example: '54'
+            floor:
+              type: string
+              description: The floor of the party’s street number.
+              pattern: ^\S+(\s+\S+)*$
+              maxLength: 50
+              example: 5. sal
+            postCode:
+              type: string
+              description: The post code of the party’s address.
+              maxLength: 50
+              example: '1306'
+            city:
+              type: string
+              description: The city name of the party’s address.
+              pattern: ^\S+(\s+\S+)*$
+              maxLength: 65
+              example: København
+            stateRegion:
+              type: string
+              description: The state/region of the party’s address.
+              maxLength: 65
+              example: Copenhagen
+            country:
+              type: string
+              description: The country of the party’s address.
+              pattern: ^\S+(\s+\S+)*$
+              maxLength: 75
+              example: Denmark
+          required:
+            - name
+      required:
+        - locationType
+        - address
+    CutOff:
+      type: object
+      title: CutOff
+      properties:
+        cuttOffTypeCode:
+          enum:
+            - DCO
+            - VCO
+            - FCO
+            - LCO
+            - EFC
+        cutOffDateTime:
+          type: string
+          format: date-time
+          pattern: '2019-11-12T07:41:00-08:30'
+      required:
+        - cuttOffTypeCode
+        - cutOffDateTime
+    Ocean:
+      type: object
+      title: Ocean
+      properties:
+        sequenceNumber:
+          type: integer
+          format: int64
+        modeOfTransport:
+          enum:
+            - VESSEL
+            - BARGE
+          description: The mode of transport as defined by DCSA.
+        VesselOperatorSMDGLinerCode:
+          type: string
+          description: The carrier who is in charge of the vessel operation based on the SMDG code.
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 10
+          example: HLC
+        vesselIMONumber:
+          type: string
+          description: "The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd's register code, which does not change during the lifetime of the vessel\r\n\r\nCondition: If the vessel is not dummy, there needs to be an IMO. If the vessel is dummy, the IMO is optional."
+          pattern: '^\d{7}$'
+          maxLength: 7
+          example: '9321483'
+        vesselName:
+          type: string
+          description: The name of the Vessel given by the Vessel Operator and registered with IMO.
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 35
+          example: King of the Seas
+        vesselBuildYear:
+          type: string
+        vesselCallSign:
+          type: string
+          description: 'A unique alphanumeric identity that belongs to the vessel and is assigned by the International Telecommunication Union (ITU). It consists of a threeletter alphanumeric prefix that indicates nationality, followed by one to four characters to identify the individual vessel. For instance, vessels registered under Denmark are assigned the prefix ranges 5PA-5QZ, OUAOZZ, and XPA-XPZ. The Call Sign changes whenever a vessel changes its flag.'
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 10
+          example: NCVV
+        vesselFlag:
+          type: string
+        carrierServiceName:
+          type: string
+          description: The name of the service.
+          maxLength: 50
+          example: Great Lion Service
+        universalServiceReference:
+          type: string
+          description: 'A global unique service reference, as per DCSA standard, agreed by VSA partners for the service. The service reference must match the regular expression pattern: SR\d{5}[A-Z]. The letters SR followed by 5 digits, followed by a checksum-character as a capital letter from A to Z.'
+          pattern: '^SR\d{5}[A-Z]$'
+          maxLength: 8
+          example: SR12345A
+        carrierServiceCode:
+          type: string
+          description: The carrier-specific code of the service for which the schedule details are published.
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 11
+          example: FE1
+        universalImportVoyageReference:
+          type: string
+          description: 'A global unique voyage reference for the import Voyage, as per DCSA standard, agreed by VSA partners for the voyage.'
+          pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
+          example: 2103N
+        universalExportVoyageReference:
+          type: string
+          description: 'A global unique voyage reference for the export Voyage, as per DCSA standard, agreed by VSA partners for the voyage.'
+          pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
+          example: 2103N
+        carrierImportVoyageNumber:
+          type: string
+          description: The identifier of an import voyage. The carrier-specific identifier of the import Voyage.
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 50
+          example: 2103S
+        carrierExportVoyageNumber:
+          type: string
+          description: The identifier of an export voyage. The carrier-specific identifier of the export Voyage.
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 50
+          example: 2103N
+        departure:
+          $ref: '#/components/schemas/Place'
+        arrival:
+          $ref: '#/components/schemas/Place'
+      required:
+        - sequenceNumber
+        - modeOfTransport
+        - vesselIMONumber
+        - vesselName
+        - carrierServiceName
+        - carrierServiceCode
+        - carrierImportVoyageNumber
+        - carrierExportVoyageNumber
+        - departure
+        - arrival
+    Hinterland:
+      type: object
+      title: Hinterland
+      properties:
+        sequenceNumber:
+          type: integer
+          format: int64
+        modeOfTransport:
+          enum:
+            - BARGE
+            - RAIL
+            - TRUCK
+          description: The mode of transport as defined by DCSA.
+        departure:
+          $ref: '#/components/schemas/Place'
+        arrival:
+          $ref: '#/components/schemas/Place'
+      required:
+        - sequenceNumber
+        - departure
+        - arrival
+    PortSchedule:
+      type: object
+      title: PortSchedule
+      properties:
+        location:
+          oneOf:
+            - $ref: '#/components/schemas/UnLocationLocation'
+            - $ref: '#/components/schemas/FacilitySMDGLocation'
+        vesselSchedules:
+          type: array
+          items:
+            $ref: '#/components/schemas/Schedule'
+      required:
+        - location
+    Schedule:
+      type: object
+      title: Schedule
+      properties:
+        carrierServiceName:
+          type: string
+          description: The name of the service.
+          maxLength: 50
+          example: Great Lion Service
+        carrierServiceCode:
+          type: string
+          description: The carrier-specific code of the service for which the schedule details are published.
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 11
+          example: FE1
+        universalServiceReference:
+          type: string
+          description: 'A global unique service reference, as per DCSA standard, agreed by VSA partners for the service. The service reference must match the regular expression pattern: SR\d{5}[A-Z]. The letters SR followed by 5 digits, followed by a checksum-character as a capital letter from A to Z.'
+          pattern: '^SR\d{5}[A-Z]$'
+          maxLength: 8
+          example: SR12345A
+        vesselIMONumber:
+          type: string
+          description: "The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd's register code, which does not change during the lifetime of the vessel\r\n\r\nCondition: If the vessel is not dummy, there needs to be an IMO. If the vessel is dummy, the IMO is optional."
+          pattern: '^\d{7}$'
+          maxLength: 7
+          example: '9321483'
+        vesselName:
+          type: string
+          description: The name of the Vessel given by the Vessel Operator and registered with IMO.
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 35
+          example: King of the Seas
+        vesselFlag:
+          type: string
+        vesselYearBuilt:
+          type: string
+        carrierImportVoyageNumber:
+          type: string
+          description: The identifier of an import voyage. The carrier-specific identifier of the import Voyage.
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 50
+          example: 2103S
+        carrierExportVoyageNumber:
+          type: string
+          description: The identifier of an export voyage. The carrier-specific identifier of the export Voyage.
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 50
+          example: 2103N
+        universalImportVoyageReference:
+          type: string
+          description: 'A global unique voyage reference for the import Voyage, as per DCSA standard, agreed by VSA partners for the voyage.'
+          pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
+          example: 2103N
+        universalExportVoyageReference:
+          type: string
+          description: 'A global unique voyage reference for the export Voyage, as per DCSA standard, agreed by VSA partners for the voyage.'
+          pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
+          example: 2103N
+        timestamp:
+          $ref: '#/components/schemas/Timestamp'
+        cutOffTimes:
+          type: array
+          items:
+            $ref: '#/components/schemas/CutOff'
+      required:
+        - carrierServiceName
+        - carrierServiceCode
+        - vesselIMONumber
+        - carrierImportVoyageNumber
+        - carrierExportVoyageNumber
+        - timestamp
+    Timestamp:
+      type: object
+      title: Timestamp
+      description: Always the latest timestamp available.
+      properties:
+        eventTypeCode:
+          enum:
+            - ARRI
+            - DEPA
+          description: Identifier for type of Transport event.
+        eventClassifierCode:
+          enum:
+            - PLN
+            - EST
+            - ACT
+          description: Code for the event classifier.
+        eventDatetime:
+          type: string
+          description: The estimated local date time in the timestamp.
+          format: date-time
+      required:
+        - eventTypeCode
+        - eventClassifierCode
+        - eventDatetime
