@@ -98,6 +98,8 @@ paths:
             type: string
             maxLength: 5
             example: NLRTM
+            pattern: '^[A-Z]{2}[A-Z2-9]{3}$'
+            minLength: 5
           in: query
           name: port
           description: The UN Location code specifying where the place is located.
@@ -376,6 +378,8 @@ components:
           minItems: 0
           items:
             $ref: '#/components/schemas/Schedule'
+      required:
+        - location
     Schedule:
       title: Schedule
       x-stoplight:
@@ -386,22 +390,41 @@ components:
           type: string
           x-stoplight:
             id: g8e6j84n6mcw8
+          description: The name of the service.
+          maxLength: 50
+          example: Great Lion Service
         carrierServiceCode:
           type: string
           x-stoplight:
             id: ys8adwf0o370o
+          description: The carrier-specific code of the service for which the schedule details are published.
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 11
+          example: FE1
         universalServiceReference:
           type: string
           x-stoplight:
             id: 18655doinhur2
+          description: 'A global unique service reference, as per DCSA standard, agreed by VSA partners for the service. The service reference must match the regular expression pattern: SR\d{5}[A-Z]. The letters SR followed by 5 digits, followed by a checksum-character as a capital letter from A to Z.'
+          example: SR12345A
+          pattern: '^SR\d{5}[A-Z]$'
+          maxLength: 8
         vesselIMONumber:
           type: string
           x-stoplight:
             id: emnq4ndujb496
+          description: "The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd's register code, which does not change during the lifetime of the vessel\r\n\r\nCondition: If the vessel is not dummy, there needs to be an IMO. If the vessel is dummy, the IMO is optional."
+          example: '9321483'
+          pattern: '^\d{7}$'
+          maxLength: 7
         vesselName:
           type: string
           x-stoplight:
             id: yrtql880q13gj
+          description: The name of the Vessel given by the Vessel Operator and registered with IMO.
+          example: King of the Seas
+          maxLength: 35
+          pattern: ^\S+(\s+\S+)*$
         vesselFlag:
           type: string
           x-stoplight:
@@ -414,18 +437,32 @@ components:
           type: string
           x-stoplight:
             id: g5k2j8ieu07oq
+          maxLength: 50
+          pattern: ^\S+(\s+\S+)*$
+          example: 2103S
+          description: The identifier of an import voyage. The carrier-specific identifier of the import Voyage.
         carrierExportVoyageNumber:
           type: string
           x-stoplight:
             id: dj9o6n46dqdas
+          example: 2103N
+          maxLength: 50
+          pattern: ^\S+(\s+\S+)*$
+          description: The identifier of an export voyage. The carrier-specific identifier of the export Voyage.
         universalImportVoyageReference:
           type: string
           x-stoplight:
             id: 6lhyeoynmhgm7
+          description: 'A global unique voyage reference for the import Voyage, as per DCSA standard, agreed by VSA partners for the voyage.'
+          pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
+          example: 2103N
         universalExportVoyageReference:
           type: string
           x-stoplight:
             id: a41ztcfgnzf22
+          description: 'A global unique voyage reference for the export Voyage, as per DCSA standard, agreed by VSA partners for the voyage.'
+          pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
+          example: 2103N
         timestamp:
           $ref: '#/components/schemas/Timestamp'
         cutOffTimes:
@@ -434,30 +471,11 @@ components:
           type: array
           minItems: 0
           items:
-            x-stoplight:
-              id: 4be026m8kes80
-            type: object
-            properties:
-              cutOffTypeCode:
-                x-stoplight:
-                  id: z98huuwcn57pw
-                type: string
-                enum:
-                  - DCO
-                  - VCO
-                  - FCO
-                  - LCO
-                  - EFC
-              cutOffDatetTime:
-                type: string
-                x-stoplight:
-                  id: axy4h49lpubhg
-            required:
-              - cutOffTypeCode
-              - cutOffDatetTime
+            $ref: '#/components/schemas/CutOff'
       required:
         - carrierServiceName
         - carrierServiceCode
+        - vesselIMONumber
         - carrierImportVoyageNumber
         - carrierExportVoyageNumber
         - timestamp
