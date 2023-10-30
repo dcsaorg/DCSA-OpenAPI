@@ -80,10 +80,12 @@ paths:
           name: isTranshipment
           description: 'Specifies wheter the proposed routing can have a transhipmentin or not. By default is TRUE and responses can have either direct routings or routings with transhipment. If FALSE, only direct routings can be proposed in the response. Transhipment: A terminal operation whereby containers or cargo are transferred from one vessel to another to reach their final destination, compared to a direct service from the load port of origin to the discharge port of destination.'
         - $ref: ../../models/CommonComponents.yaml#/components/parameters/Limit
+      description: Provides the product offering of single or multiple estimated end-to-end route options for a shipment in the pre-booking phase.
   /v1/port-schedule:
     get:
       summary: Port Schedule
-      tags: []
+      tags:
+        - Port Schedule
       responses:
         '200':
           description: OK
@@ -114,6 +116,46 @@ paths:
           description: The date since when the estimated arrival and departures of vessels in a given port is required
           required: true
     parameters: []
+  /v1/vessel-schedule:
+    get:
+      summary: Vessel Schedule
+      tags:
+        - Vessel Schedule
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ServiceSchedule'
+          headers:
+            API-Version:
+              $ref: ../../models/CommonComponents.yaml#/components/headers/API-Version
+      operationId: get-v1-vessel-schedule
+      x-stoplight:
+        id: lj963wbx8i5m9
+      parameters:
+        - schema:
+            type: string
+            maxLength: 7
+          in: query
+          name: vesselIMONumber
+          required: true
+          description: The identifier of a vessel. The result will only return schedules including the vessel with the specified `IMO number`.  It is not a requirement for dummy vessels to have an `IMO Number`.
+        - schema:
+            type: string
+          in: query
+          name: vesselName
+          description: The name of a vessel. The result will only return schedules including the vessel with the specified name.  Be aware that the vesselName is not unique and might match multiple vessels.
+        - schema:
+            type: string
+          in: query
+          name: date
+          required: true
+          description: The date since when the scheduled arrival and departure dates for a vessel are required.
+      description: 'Provides, for a required specific vessel and starting date, the timetable of estimated departure and arrival times for each port call on the rotation of a vessel.'
 components:
   schemas:
     Place:
@@ -229,7 +271,7 @@ components:
             - VESSEL
             - BARGE
           description: The mode of transport as defined by DCSA.
-        VesselOperatorSMDGLinerCode:
+        vesselOperatorSMDGLinerCode:
           type: string
           x-stoplight:
             id: p7rb8ih6ttymi
@@ -511,6 +553,225 @@ components:
         - eventTypeCode
         - eventClassifierCode
         - eventDatetime
+    TransportCall:
+      title: TransportCall
+      x-stoplight:
+        id: z6ma0rjy1bydz
+      type: object
+      x-internal: false
+      properties:
+        portVisitReference:
+          type: string
+          x-stoplight:
+            id: cd5lalxkwxmp2
+          description: The unique reference that can be used to link different `transportCallReferences` to the same port visit. The reference is provided by the port to uniquely identify a port call.
+          maxLength: 50
+          example: NLRTM1234589
+          pattern: ^\S+(\s+\S+)*$
+        transportCallReference:
+          type: string
+          x-stoplight:
+            id: qcmcz7jjht5mh
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 100
+          description: 'The unique reference for a transport call. It’s the vessel operator responsibility to provide the Transport Call Reference, other parties are obliged to pick it up and use it.'
+        carrierImportVoyageNumber:
+          type: string
+          x-stoplight:
+            id: 4x4hvlsau7ue4
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 50
+          example: 2103N
+          description: The identifier of an import voyage. The carrier-specific identifier of the import Voyage.
+        carrierExportVoyageNumber:
+          type: string
+          x-stoplight:
+            id: jvibcpyoy1a3i
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 50
+          example: 2103S
+          description: The identifier of an export voyage. The carrier-specific identifier of the export Voyage.
+        universalImportVoyageReference:
+          type: string
+          x-stoplight:
+            id: gxutqo82oej8i
+          pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
+          example: 2103N
+          description: 'A global unique voyage reference for the import Voyage, as per DCSA standard, agreed by VSA partners for the voyage.'
+          maxLength: 5
+        universalExportVoyageReference:
+          type: string
+          x-stoplight:
+            id: qi9m0kpgyredl
+          pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
+          example: 2103N
+          maxLength: 5
+        location:
+          x-stoplight:
+            id: d7jg2e23zhjnb
+          oneOf:
+            - $ref: ../../models/UnLocationLocation.yaml
+            - $ref: ../../models/FacilitySMDGLocation.yaml
+            - $ref: ../../models/AddressLocation.yaml
+          description: 'General purpose object to capture location-related data, the location can be specified in one of the following ways: `UN Location Code`, a `Facility` or an `Address`.'
+        timestamp:
+          $ref: '#/components/schemas/TimeStamp'
+      required:
+        - transportCallReference
+        - carrierImportVoyageNumber
+        - timestamp
+    TimeStamp:
+      title: TimeStamp
+      x-stoplight:
+        id: 0s7ssgfku9hid
+      type: object
+      properties:
+        eventTypeCode:
+          x-stoplight:
+            id: 1wp4wgtbaiqrs
+          enum:
+            - ARRI
+            - DEPA
+          description: "Identifier for type of transportEvent\r\n\r\n- ARRI (Arrived)\r\n- DEPA (Departed)"
+          readOnly: true
+        eventClassifierCode:
+          x-stoplight:
+            id: 7zogujur5x685
+          enum:
+            - PLN
+            - EST
+            - ACT
+          description: Code for the event classifier. Values can vary depending on eventType
+          readOnly: true
+        eventDateTime:
+          type: string
+          x-stoplight:
+            id: 8o5gse4ovp1ah
+          format: date-time
+          description: Time in the timstamp
+          example: '2025-01-14T09:21:00+01:00'
+        delayReasonCode:
+          type: string
+          x-stoplight:
+            id: w4q7bto11x4xs
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 3
+          example: WEA
+          description: Reason code for the delay. See SMDG Code list DELAY for a list of valid codes to be used for this attribute.
+      required:
+        - eventTypeCode
+        - eventClassifierCode
+        - eventDateTime
+    VesselSchedule:
+      title: VesselSchedule
+      x-stoplight:
+        id: muv0lg6w14ore
+      type: object
+      properties:
+        vesselOperatorSMDGLinerCode:
+          type: string
+          x-stoplight:
+            id: dore13e0yltxc
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 10
+          example: HLC
+          description: The carrier who is in charge of the vessel operation based on the `SMDG code`.
+        vesselIMONumber:
+          type: string
+          x-stoplight:
+            id: tx0a6mhyaohct
+          description: "The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd's register code, which does not change during the lifetime of the vessel\r\n\r\nCondition: If the vessel is not dummy, there needs to be an IMO. If the vessel is dummy, the IMO is optional."
+          pattern: '^\d{7}$'
+          maxLength: 7
+          example: '9321483'
+        vesselName:
+          type: string
+          x-stoplight:
+            id: sjxoamy8akix5
+          description: The name of the Vessel given by the Vessel Operator and registered with IMO.
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 35
+          example: King of the Seas
+        vesselCallSign:
+          type: string
+          x-stoplight:
+            id: 4vw8dszljv2x7
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 10
+          example: NCVV
+          description: 'A unique alphanumeric identity that belongs to the vessel and is assigned by the International Telecommunication Union (ITU). It consists of a threeletter alphanumeric prefix that indicates nationality, followed by one to four characters to identify the individual vessel. For instance, vessels registered under Denmark are assigned the prefix ranges 5PA-5QZ, OUAOZZ, and XPA-XPZ. The Call Sign changes whenever a vessel changes its flag.'
+        isDummyVessel:
+          type: boolean
+          x-stoplight:
+            id: furrqtk4xkza1
+          description: Is this a dummy vessel. In case no vessel has been asigned yet - this property can be set to `true` indicating that the vesselIMONumber does not exist.
+        vesselYearBuilt:
+          type: string
+          x-stoplight:
+            id: 1gchcu011vsm6
+          description: The year in which the vessel was built.
+        vesselFlag:
+          type: string
+          x-stoplight:
+            id: fs8q0c0x443cx
+          description: The flag of the nation whose laws the vessel is registered under. This is the ISO 3166 two-letter country code.
+          maxLength: 2
+        vesselClass:
+          type: string
+          x-stoplight:
+            id: elv5nr917oa61
+          description: 'The group to which the vessel belongs based on size (tonnage), use (cargo), and design.'
+        norminalTEU:
+          type: string
+          x-stoplight:
+            id: eqsec6embi58d
+          description: The nominal capacity of the vessel in TEU (twenty foot equivalent unit).
+        transportCalls:
+          type: array
+          x-stoplight:
+            id: bf4cuvo4d89vq
+          items:
+            $ref: '#/components/schemas/TransportCall'
+      required:
+        - isDummyVessel
+    ServiceSchedule:
+      title: ServiceSchedule
+      x-stoplight:
+        id: ie0jcqodlylah
+      type: object
+      properties:
+        carrierServiceName:
+          type: string
+          x-stoplight:
+            id: 2b1m51pfjlvu6
+          description: The name of the service.
+          maxLength: 50
+          example: Great Lion Service
+        carrierServiceCode:
+          type: string
+          x-stoplight:
+            id: 6iw2bwqz9fi1y
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 11
+          example: FE1
+          description: The carrier-specific code of the service for which the schedule details are published.
+        universalServiceReference:
+          type: string
+          x-stoplight:
+            id: l8yh5dy09liba
+          pattern: '^SR\d{5}[A-Z]$'
+          maxLength: 8
+          example: SR12345A
+          description: 'A global unique service reference, as per DCSA standard, agreed by VSA partners for the service.'
+        vesselSchedules:
+          type: array
+          x-stoplight:
+            id: lrom88da9uo6f
+          items:
+            $ref: '#/components/schemas/VesselSchedule'
+      required:
+        - carrierServiceName
+        - vesselSchedules
 tags:
   - name: Point To Point
     description: ' '
