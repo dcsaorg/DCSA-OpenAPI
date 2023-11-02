@@ -1,0 +1,400 @@
+openapi: 3.0.0
+x-stoplight:
+  id: a6iz4bb3dw0lc
+info:
+  title: reefer_v1.0.0-Beta-1
+  version: 1.0.0-Beta-1
+  contact:
+    name: Digital Container Shipping Association (DCSA)
+    email: info@dcsa.org
+    url: 'https://dcsa.org'
+  license:
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+    name: Apache 2.0
+  description: |-
+    XX
+
+    For explanation to specific values or objects please refer to the [Information Model 2023.Q1](https://dcsa.org/wp-content/uploads/2022/02/DCSA-Information-Model-2023.Q1.pdf).
+
+    There are two ways to get events. Either they can be **polled by you** or they can be **pushed to an endPoint** by the implementor.
+
+    ## Poll model
+    Polling data can be done using
+
+        GET /v1/events
+
+    Calling this endPoint will return a list of events that fulfill the query parameters specified. The list returned is sorted in ascending (`ASC`) order based on the creation date-time of the event (`eventCreatedDateTime`). **This endPoint is mandatory to implement.**
+
+    ## Push model
+    Having events pushed to you is possible via setting up a subscription on the
+
+        /v1/event-subscriptions
+
+    endPoints. Using the subscriptions, events are pushed as they occur. **The push model is optional to implement** and will clearly be stated on the implementing side. It is therefore possible to get a `501 Not Implemented` error message if subscription endPoints are called in case the implementor has chosen **not** to implement the push model.
+
+    XX
+servers: []
+paths:
+  /reefer:
+    get:
+      tags:
+        - reefer
+      summary: Fetch reefer monitoring data for a container
+      operationId: fetchReefer
+      parameters:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/equipmentReference'
+      description: Fetch the details for a specific reefer type container
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReeferControllerResponse'
+              examples:
+                'Reefer data related to equipmentReference: ''APZU4812090''':
+                  description: |
+                    To retrieve the reefer data for a specific `equipmentReference` the following request could be made:
+
+                        GET /reefer?equipmentReference=APZU4812090
+                        
+                  value:
+                    payload:
+                      activeAlarmCount: 0
+                      controller:
+                        dateTime: '2023-10-23T15:40:28Z'
+                        hardwareVersion: 1.1.1
+                        maker: 900
+                        model: N99
+                        operatingState: 1
+                        serialNumber: '123456789'
+                        softwareVersion: 1.1.1
+                      equipmentReference: APZU4812090
+                      equipmentOptions:
+                        - N00
+                        - N05
+                      isConnectedToPowerSource: true
+                      lastDefrost: '2023-10-23T15:40:28Z'
+                      measurements:
+                        ambientTemperature: 12
+                        temperature: 5
+                        temperatureUnit: CEL
+                        o2: 20
+                        co2: 25
+                        relativeHumidity: 98
+                        airExchange: 0
+                        airExchangeUnit: MQH
+                        cargoProbe1Temperature: 6
+                        cargoProbe2Temperature: 6
+                        cargoProbe3Temperature: 6
+                        currentPhaseA: 15
+                        currentPhaseB: 15
+                        currentPhaseC: 15
+                        dischargePressure: 21
+                        dischargeTemperature: 10
+                        evaporatorTemperature: 10
+                        lineFrequency: 60
+                        lineVoltage: 400
+                        returnProbe1Temperature: 10
+                        returnProbe2Temperature: 10
+                        returnTemperature: 10
+                        suctionPressure: 60
+                        suctionTemperature: 10
+                        supplySensor1Temperature: 10
+                        supplySensor2Temperature: 10
+                        supplyTemperature: 10
+                      setpoints:
+                        temperature: -15
+                        temperatureUnit: CEL
+                        o2: 20
+                        co2: 25
+                        humidity: 96
+                      reeferSettings:
+                        controlledAtmosphereMode: 'ON'
+                        defrosting: false
+                        efficiencySetting: '2'
+                      unitModel: N00
+        '405':
+          description: Invalid input
+      x-stoplight:
+        id: k62mkncefaldt
+components:
+  schemas:
+    Measurements:
+      type: object
+      properties:
+        ambientTemperature:
+          allOf:
+            - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/schemas/measuredAmbientTemperature'
+        temperature:
+          allOf:
+            - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/schemas/measuredTemperature'
+        temperatureUnit:
+          allOf:
+            - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/schemas/temperatureUnit'
+        o2:
+          allOf:
+            - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/schemas/measuredO2'
+        co2:
+          allOf:
+            - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/schemas/measuredCo2'
+        relativeHumidity:
+          allOf:
+            - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/schemas/measuredHumidity'
+        airExchange:
+          allOf:
+            - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/schemas/measuredAirExchange'
+        airExchangeUnit:
+          allOf:
+            - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/schemas/airExchangeUnit'
+        cargoProbe1Temperature:
+          type: number
+          format: float
+          example: 6
+        cargoProbe2Temperature:
+          type: number
+          format: float
+          example: 6
+        cargoProbe3Temperature:
+          type: number
+          format: float
+          example: 6
+        cargoProbe4Temperature:
+          type: number
+          x-stoplight:
+            id: 3dkqi3m46ix4l
+          format: float
+        currentPhaseA:
+          $ref: '#/components/schemas/CurrentPhaseA'
+        currentPhaseB:
+          $ref: '#/components/schemas/CurrentPhaseB'
+        currentPhaseC:
+          $ref: '#/components/schemas/CurrentPhaseC'
+        dischargePressure:
+          $ref: '#/components/schemas/DischargePressure'
+        dischargeTemperature:
+          $ref: '#/components/schemas/DischargeTemperature'
+        evaporatorTemperature:
+          $ref: '#/components/schemas/EvaporatorTemperature'
+        lineFrequency:
+          $ref: '#/components/schemas/LineFrequency'
+        lineVoltage:
+          $ref: '#/components/schemas/LineVoltage'
+        returnProbe1Temperature:
+          $ref: '#/components/schemas/ReturnProbe1Temperature'
+        returnProbe2Temperature:
+          $ref: '#/components/schemas/ReturnProbe2Temperature'
+        returnTemperature:
+          $ref: '#/components/schemas/ReturnTemperature'
+        suctionPressure:
+          $ref: '#/components/schemas/SuctionPressure'
+        suctionTemperature:
+          $ref: '#/components/schemas/SuctionTemperature'
+        supplySensor1Temperature:
+          $ref: '#/components/schemas/SupplySensor1Temperature'
+        supplySensor2Temperature:
+          $ref: '#/components/schemas/SupplySensor2Temperature'
+        supplyTemperature:
+          $ref: '#/components/schemas/SupplyTemperature'
+    ReeferControllerResponse:
+      type: object
+      properties:
+        activeAlarmCount:
+          $ref: '#/components/schemas/ActiveAlarmCount'
+        alarms:
+          type: array
+          items:
+            $ref: '#/components/schemas/AlarmNumber'
+        controller:
+          $ref: '#/components/schemas/Controller'
+        equipmentReference:
+          $ref: '#/components/schemas/EquipmentReference'
+        equipmentOptions:
+          $ref: '#/components/schemas/EquipmentOptions'
+        isConnectedToPowerSource:
+          type: boolean
+          description: 'Indicates if the source is connected to power, aligned to COA UDM P2'
+        lastDefrost:
+          $ref: '#/components/schemas/LastDefrost'
+        measurements:
+          $ref: '#/components/schemas/Measurements'
+        setpoints:
+          $ref: '#/components/schemas/Setpoints'
+        reeferSettings:
+          $ref: '#/components/schemas/ReeferSettings'
+        unitModel:
+          $ref: '#/components/schemas/UnitModel'
+    ReeferSettings:
+      type: object
+      properties:
+        controlledAtmosphereMode:
+          $ref: '#/components/schemas/ControlledAtmosphereMode'
+        defrosting:
+          $ref: '#/components/schemas/Defrosting'
+        efficiencySetting:
+          $ref: '#/components/schemas/EfficiencySetting'
+    Setpoints:
+      type: object
+      properties:
+        temperature:
+          allOf:
+            - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/schemas/measuredTemperature'
+        temperatureUnit:
+          allOf:
+            - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/schemas/temperatureUnit'
+        o2:
+          allOf:
+            - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/schemas/measuredO2'
+        co2:
+          allOf:
+            - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/schemas/measuredCo2'
+        humidity:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 100
+          description: |
+            The percentage of the controlled atmosphere humidity target value
+          example: 95.6
+    Controller:
+      type: object
+      properties:
+        dateTime:
+          $ref: '#/components/schemas/ControllerDateTime'
+        hardwareVersion:
+          $ref: '#/components/schemas/ControllerHardwareVersion'
+        maker:
+          $ref: '#/components/schemas/ControllerMaker'
+        model:
+          $ref: '#/components/schemas/ControllerModel'
+        operatingState:
+          $ref: '#/components/schemas/ControllerOperatingState'
+        serialNumber:
+          $ref: '#/components/schemas/ControllerSerialNumber'
+        softwareVersion:
+          $ref: '#/components/schemas/ControllerSoftwareVersion'
+    ControlledAtmosphereMode:
+      type: string
+      description: The controlled atmosphere mode setting
+    EquipmentReference:
+      type: string
+      pattern: ^\S+(\s+\S+)*$
+      maxLength: 11
+      description: |
+        The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.
+        According to ISO 6346, a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit).
+
+        If a container does not comply with ISO 6346, it is suggested to follow [Recommendation #2: Containers with non-ISO identification](https://smdg.org/documents/smdg-recommendations) from SMDG.
+      example: APZU4812090
+    AlarmNumber:
+      type: string
+      description: Harmonised Alarm Code across all Manufacturers
+    ActiveAlarmCount:
+      type: integer
+      description: The number of active alarms from the controller
+    ControllerDateTime:
+      type: string
+      format: date-time
+      description: The datetime from the controller device
+    ControllerHardwareVersion:
+      type: string
+      description: The hardware revision of the controller device
+    ControllerMaker:
+      type: string
+      description: The manufacturers of source equipment such as reefer controllers
+    ControllerModel:
+      type: string
+      description: The model of the controller from the maker
+    ControllerOperatingState:
+      type: string
+      description: 'The controller operating state, specific to the type of controller'
+    ControllerSerialNumber:
+      type: string
+      description: The serial number of the controller device
+    ControllerSoftwareVersion:
+      type: string
+      description: The software version running on the controller device
+    CurrentPhaseA:
+      type: number
+      format: float
+      description: The phase A current or average current in Amps
+    CurrentPhaseB:
+      type: number
+      format: float
+      description: The phase B current in Amps
+    CurrentPhaseC:
+      type: number
+      format: float
+      description: The phase C current in Amps
+    Defrosting:
+      type: boolean
+      description: Indicates if the device is defrosting
+    DischargePressure:
+      type: number
+      format: float
+      description: The discharge pressure in BarRelative units
+    DischargeTemperature:
+      allOf:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/schemas/measuredTemperature'
+      description: The discharge temperature
+    EfficiencySetting:
+      type: number
+      description: The efficiency Setting (controller specific) COA UDM List 5.5.8
+    EvaporatorTemperature:
+      type: number
+      format: float
+      description: The evaporator temperature in CEL
+    EquipmentOptions:
+      type: array
+      description: List of equipment options available on the container
+      items:
+        type: string
+    LastDefrost:
+      type: string
+      format: date-time
+      description: The end time of the past defrost period
+    LineFrequency:
+      type: number
+      format: float
+      description: The mains power frequency in Hz
+      example: 50
+    LineVoltage:
+      type: number
+      format: float
+      description: The mains power voltage in volts
+      example: 400
+    ReturnProbe1Temperature:
+      allOf:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/schemas/measuredTemperature'
+      description: The return temperature of probe 1
+    ReturnProbe2Temperature:
+      allOf:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/schemas/measuredTemperature'
+      description: The return temperature of probe 2
+    ReturnTemperature:
+      allOf:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/schemas/measuredTemperature'
+      description: The return temperature
+    SuctionPressure:
+      type: number
+      format: float
+      description: The suction pressure in BarRelative units
+    SuctionTemperature:
+      allOf:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/schemas/measuredTemperature'
+      description: The suction temperature
+    SupplySensor1Temperature:
+      allOf:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/schemas/measuredTemperature'
+      description: The supply sensor 1 temperature
+    SupplySensor2Temperature:
+      allOf:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/schemas/measuredTemperature'
+      description: The supply sensor 2 temperature
+    SupplyTemperature:
+      allOf:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/schemas/measuredTemperature'
+      description: The supply temperature
+    UnitModel:
+      type: string
+      description: 'The unit model specific to the maker, COA UDM 5.5.3 code list'
