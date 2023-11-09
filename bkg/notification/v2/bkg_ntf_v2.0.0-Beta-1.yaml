@@ -70,7 +70,7 @@ components:
           type: string
           format: date-time
           description: |
-            The timestamp of when the notification was created. 
+            Timestamp of when the occurrence happened. If the time of the occurrence cannot be determined then this attribute MAY be set to some other time (such as the current time) by the CloudEvents producer, however all producers for the same `source` MUST be consistent in this respect. In other words, either they all use the actual time of the occurrence or they all use the same algorithm to determine the value used.
           example: '2018-04-05T17:31:00Z'
         datacontenttype:
           type: string
@@ -104,14 +104,14 @@ components:
                 - COMPLETED
 
                 More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/bookingstatuses.csv).
-              example: 'RECEIVED'
+              example: RECEIVED
             carrierBookingRequestReference:
               type: string
               pattern: '^\S+(\s+\S+)*$'
               maxLength: 100
               description: |
                 A reference to the booking during the booking request phase.
-                
+
                 **Conditional:** `carrierBookingRequestReference` and/or `carrierBookingReference` is required to provide
               example: '24595eb0-5cfc-4381-9c3a-cedc1975e9aa'
             carrierBookingReference:
@@ -120,9 +120,20 @@ components:
               maxLength: 35
               description: |
                 The `carrierBookingReference` if know. Often this will not be known until the booking has been confirmed. Is available during a booking amendment.
-                
+
                 **Conditional:** `carrierBookingRequestReference` and/or `carrierBookingReference` is required to provide
               example: 'ABC709951'
+            origin:
+              type: string
+              maxLength: 50
+              description: |
+                Describes the origin of the Notification. Possible values are:
+                - AMENDMENT
+                - CONFIRMED BOOKING
+                - BOOKING REQUEST
+
+                **Conditional:** Mandatory if `bookingStatus=DECLINED` or `bookingStatus=CONFIRMED`
+              example: AMENDMENT
           required:
             - bookingStatus
       required:
