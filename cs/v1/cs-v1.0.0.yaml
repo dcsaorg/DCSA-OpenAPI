@@ -3,7 +3,7 @@ x-stoplight:
   id: 3674xgyacnizs
 info:
   title: DCSA OpenAPI specification for Commercial Schedules
-  version: 1.0.0
+  version: 1.0.0-Beta-1
   description: |-
     API specification issued by DCSA.org.
 
@@ -80,6 +80,36 @@ paths:
           name: isTranshipment
           description: 'Specifies wheter the proposed routing can have a transhipmentin or not. By default is TRUE and responses can have either direct routings or routings with transhipment. If FALSE, only direct routings can be proposed in the response. Transhipment: A terminal operation whereby containers or cargo are transferred from one vessel to another to reach their final destination, compared to a direct service from the load port of origin to the discharge port of destination.'
         - $ref: ../../models/CommonComponents.yaml#/components/parameters/Limit
+        - schema:
+            type: string
+            enum:
+              - CY
+              - SD
+              - CFS
+            maxLength: 3
+            example: CY
+          in: query
+          name: receiptTypeAtOrigin
+          description: |
+            Indicates the type of service offered at Origin. Options are defined in the Receipt/Delivery entity.
+              - CY(Container yard (incl. rail ramp))
+              - SD (Store Door)
+              - CFS (Container Freight Station)
+        - schema:
+            type: string
+            enum:
+              - CY
+              - SD
+              - CFS
+            maxLength: 3
+            example: CY
+          in: query
+          name: deliveryTypeAtDestination
+          description: |
+            Indicates the type of service offered at Destination. Options are defined in the Receipt/Delivery entity.
+              - CY(Container yard (incl. rail ramp))
+              - SD (Store Door)
+              - CFS (Container Freight Station)
       description: Provides the product offering of single or multiple estimated end-to-end route options for a shipment in the pre-booking phase.
   /v1/port-schedule:
     get:
@@ -140,22 +170,80 @@ paths:
         - schema:
             type: string
             maxLength: 7
+            pattern: '^\d{7}$'
           in: query
           name: vesselIMONumber
-          required: true
           description: The identifier of a vessel. The result will only return schedules including the vessel with the specified `IMO number`.  It is not a requirement for dummy vessels to have an `IMO Number`.
         - schema:
             type: string
+            pattern: ^\S+(\s+\S+)*$
+            maxLength: 35
           in: query
           name: vesselName
           description: The name of a vessel. The result will only return schedules including the vessel with the specified name.  Be aware that the vesselName is not unique and might match multiple vessels.
         - schema:
             type: string
+            pattern: ^\S+(\s+\S+)*$
+            maxLength: 11
           in: query
-          name: date
-          required: true
-          description: The date since when the scheduled arrival and departure dates for a vessel are required.
-      description: 'Provides, for a required specific vessel and starting date, the timetable of estimated departure and arrival times for each port call on the rotation of a vessel.'
+          name: carrierServiceCode
+          description: The carrier specific service code to filter by. The result will only return schedules including the service code.
+        - schema:
+            type: string
+            pattern: '^SR\d{5}[A-Z]$'
+            maxLength: 8
+          in: query
+          name: universalServiceReference
+          description: The Universal Service Reference (USR) as defined by DCSA to filter by.
+        - schema:
+            type: string
+            pattern: ^\S+(\s+\S+)*$
+            maxLength: 50
+          in: query
+          name: carrierVoyageNumber
+          description: The carrier specific identifier of a Voyage - can be both `importVoyageNumber` and `exportVoyageNumber`. The result will only return schedules including the Ports where `carrierVoyageNumber` is either `carrierImportVoyageNumber` or `carrierExportVoyageNumber`.
+        - schema:
+            type: string
+            pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
+            maxLength: 5
+          in: query
+          name: universalVoyageReference
+          description: The Universal Reference of a Voyage - can be both `importUniversalVoyageReference` and `exportUniversalVoyageReference`. The result will only return schedules including the Ports where `universalVoyageReference` is either `importUniversalVoyageReference` or `exportUniversalVoyageReference`.
+        - schema:
+            type: string
+            pattern: '^[A-Z]{2}[A-Z2-9]{3}$'
+            minLength: 5
+            maxLength: 5
+          in: query
+          name: UNLocationCode
+          description: The UN Location Code specifying where a port is located.  Specifying this filter will only return schedules including entire Voyages related to this particular UN Location Code.
+        - schema:
+            type: string
+            pattern: ^\S+(\s+\S+)*$
+            maxLength: 6
+          in: query
+          name: facilitySMDGCode
+          description: The facilitySMDGCode specifying a specific facility (using SMDG Code). Be aware that the `facilitySMDGCode` does not contain a `UNLocationCode` - this must be specified in the `UNLocationCode` filter.  Specifying this filter will only return schedules including entire Voyages related to this particular `facilitySMDGCode`.
+        - schema:
+            type: string
+            format: date
+          in: query
+          name: startDate
+          description: |
+            The start date of the period for which schedule information is requested. If a date of any Timestamp (ATA, ETA or PTA) inside a PortCall matches a date on or after (≥) the `startDate` the entire Voyage (import- and export-Voyage) matching the PortCall will be included in the result. All matching is done towards local Date at the place of the port call.
+            If this filter is not provided the default value is `3 months` prior to request time.  The value is populated in `ISO 8601` date format.
+        - schema:
+            type: string
+            format: date
+          in: query
+          name: endDate
+          description: |
+            The end date of the period for which schedule information is requested. If a date of any Timestamp (ATA, ETA or PTA) inside a PortCall matches a date on or before (≤) the `endDate` the entire Voyage(import- and export-Voyage) matching the PortCall will be included in the result. All matching is done towards local Date at the place of the port call.  
+            If this filter is not provided the default value is `6 months` after request time.  The value is populated in `ISO 8601` date format.
+      description: |-
+        Provides, for a required specific service and/or voyage and/or vessel and/or location, the timetable of estimated departure and arrival times for each port call on the rotation of the vessel(s). 
+
+        The number of schedules in the list can be narrowed down by providing filter parameters. The resulting payload will always include the entire voyage(s) being matched.
 components:
   schemas:
     Place:
@@ -166,6 +254,7 @@ components:
         facilityTypeCode:
           description: The code to identify the specific type of facility. The code indicates which role the facility plays during the transportCall.
           example: POTE
+          type: string
           enum:
             - BORD
             - CLOC
@@ -181,20 +270,22 @@ components:
             - $ref: ../../models/UnLocationLocation.yaml
             - $ref: ../../models/FacilitySMDGLocation.yaml
             - $ref: ../../models/AddressLocation.yaml
-        datatime:
+        dataTime:
           type: string
           format: date-time
           example: '2019-08-24T14:15:22Z'
+          x-stoplight:
+            id: tfufl59x6te0n
       required:
         - facilityTypeCode
         - location
-        - datatime
+        - dataTime
     PointToPoint:
       title: PointToPoint
       x-stoplight:
         id: f0nefg6xj9093
       type: object
-      description: Leg of the Point-to-Point routing. The object "Legs" can be conformed by as many legs as needed and this legs must be identified with a sequence number.
+      description: ''
       properties:
         placeOfReceipt:
           $ref: '#/components/schemas/Place'
@@ -207,53 +298,18 @@ components:
           description: The estimated total time in **days** that it takes a shipment to move from place of receipt to place of delivery. Transit time includes stop-over time during transshipments and waiting time at connection points.
           format: int64
           example: 10
-        cutOffs:
-          type: array
-          x-stoplight:
-            id: htdwqv6o6e9js
-          items:
-            $ref: '#/components/schemas/CutOff'
         legs:
           x-stoplight:
             id: w4k1wtp4z5j6i
           type: array
           items:
-            x-stoplight:
-              id: qv568k3ep7gvd
-            anyOf:
-              - $ref: '#/components/schemas/Ocean'
-              - $ref: '#/components/schemas/Hinterland'
+            $ref: '#/components/schemas/Leg'
       required:
         - placeOfReceipt
         - placeOfDelivery
         - legs
-    CutOff:
-      title: CutOff
-      x-stoplight:
-        id: x028nov3x6li9
-      type: object
-      properties:
-        cuttOffTypeCode:
-          x-stoplight:
-            id: uhq420gns96bq
-          type: string
-          enum:
-            - DCO
-            - VCO
-            - FCO
-            - LCO
-            - EFC
-        cutOffDateTime:
-          type: string
-          x-stoplight:
-            id: jdz9ry8qnguxs
-          format: date-time
-          pattern: '2019-11-12T07:41:00-08:30'
-      required:
-        - cuttOffTypeCode
-        - cutOffDateTime
-    Ocean:
-      title: Ocean
+    Leg:
+      title: Leg
       x-stoplight:
         id: r70pyme3qud40
       type: object
@@ -263,6 +319,7 @@ components:
           x-stoplight:
             id: 4z9lhffp3cyjs
           format: int64
+          description: Sequence number of the leg.
         modeOfTransport:
           x-stoplight:
             id: 9atywo7bqza4b
@@ -270,6 +327,8 @@ components:
           enum:
             - VESSEL
             - BARGE
+            - TRUCK
+            - RAIL
           description: The mode of transport as defined by DCSA.
         vesselOperatorSMDGLinerCode:
           type: string
@@ -295,22 +354,6 @@ components:
           example: King of the Seas
           maxLength: 35
           pattern: ^\S+(\s+\S+)*$
-        vesselBuildYear:
-          type: string
-          x-stoplight:
-            id: ii5w50fjhtz6w
-        vesselCallSign:
-          type: string
-          x-stoplight:
-            id: rhvp6vwcc5elg
-          description: 'A unique alphanumeric identity that belongs to the vessel and is assigned by the International Telecommunication Union (ITU). It consists of a threeletter alphanumeric prefix that indicates nationality, followed by one to four characters to identify the individual vessel. For instance, vessels registered under Denmark are assigned the prefix ranges 5PA-5QZ, OUAOZZ, and XPA-XPZ. The Call Sign changes whenever a vessel changes its flag.'
-          pattern: ^\S+(\s+\S+)*$
-          maxLength: 10
-          example: NCVV
-        vesselFlag:
-          type: string
-          x-stoplight:
-            id: rm5libnl8kal6
         carrierServiceName:
           type: string
           x-stoplight:
@@ -369,40 +412,9 @@ components:
         arrival:
           $ref: '#/components/schemas/Place'
       required:
-        - sequenceNumber
-        - modeOfTransport
-        - vesselIMONumber
-        - vesselName
-        - carrierServiceName
-        - carrierServiceCode
-        - carrierImportVoyageNumber
-        - carrierExportVoyageNumber
         - departure
         - arrival
-    Hinterland:
-      title: Hinterland
-      x-stoplight:
-        id: jqzpnmixsji3k
-      type: object
-      properties:
-        sequenceNumber:
-          type: integer
-          format: int64
-        modeOfTransport:
-          enum:
-            - BARGE
-            - RAIL
-            - TRUCK
-          type: string
-          description: The mode of transport as defined by DCSA.
-        departure:
-          $ref: '#/components/schemas/Place'
-        arrival:
-          $ref: '#/components/schemas/Place'
-      required:
-        - sequenceNumber
-        - departure
-        - arrival
+      description: Leg of the Point-to-Point routing. The object "Legs" can be conformed by as many legs as needed and this legs must be identified with a sequence number.
     PortSchedule:
       title: PortSchedule
       type: object
@@ -467,14 +479,6 @@ components:
           example: King of the Seas
           maxLength: 35
           pattern: ^\S+(\s+\S+)*$
-        vesselFlag:
-          type: string
-          x-stoplight:
-            id: kb0qouqf81aoa
-        vesselYearBuilt:
-          type: string
-          x-stoplight:
-            id: gdhtxd2pqgull
         carrierImportVoyageNumber:
           type: string
           x-stoplight:
@@ -506,14 +510,7 @@ components:
           pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
           example: 2103N
         timestamp:
-          $ref: '#/components/schemas/Timestamp'
-        cutOffTimes:
-          x-stoplight:
-            id: nrm0rslp6zqrr
-          type: array
-          minItems: 0
-          items:
-            $ref: '#/components/schemas/CutOff'
+          $ref: '#/components/schemas/TimeStamp'
       required:
         - carrierServiceName
         - carrierServiceCode
@@ -521,38 +518,6 @@ components:
         - carrierImportVoyageNumber
         - carrierExportVoyageNumber
         - timestamp
-    Timestamp:
-      title: Timestamp
-      x-stoplight:
-        id: ver8ymezdhtxv
-      type: object
-      description: Always the latest timestamp available.
-      properties:
-        eventTypeCode:
-          x-stoplight:
-            id: lg6nct99zkt2v
-          enum:
-            - ARRI
-            - DEPA
-          description: Identifier for type of Transport event.
-        eventClassifierCode:
-          x-stoplight:
-            id: 51t71zwukesws
-          description: Code for the event classifier.
-          enum:
-            - PLN
-            - EST
-            - ACT
-        eventDatetime:
-          type: string
-          x-stoplight:
-            id: q511u7kwj3v69
-          description: The estimated local date time in the timestamp.
-          format: date-time
-      required:
-        - eventTypeCode
-        - eventClassifierCode
-        - eventDatetime
     TransportCall:
       title: TransportCall
       x-stoplight:
@@ -650,14 +615,6 @@ components:
           format: date-time
           description: Time in the timstamp
           example: '2025-01-14T09:21:00+01:00'
-        delayReasonCode:
-          type: string
-          x-stoplight:
-            id: w4q7bto11x4xs
-          pattern: ^\S+(\s+\S+)*$
-          maxLength: 3
-          example: WEA
-          description: Reason code for the delay. See SMDG Code list DELAY for a list of valid codes to be used for this attribute.
       required:
         - eventTypeCode
         - eventClassifierCode
@@ -705,27 +662,6 @@ components:
           x-stoplight:
             id: furrqtk4xkza1
           description: Is this a dummy vessel. In case no vessel has been asigned yet - this property can be set to `true` indicating that the vesselIMONumber does not exist.
-        vesselYearBuilt:
-          type: string
-          x-stoplight:
-            id: 1gchcu011vsm6
-          description: The year in which the vessel was built.
-        vesselFlag:
-          type: string
-          x-stoplight:
-            id: fs8q0c0x443cx
-          description: The flag of the nation whose laws the vessel is registered under. This is the ISO 3166 two-letter country code.
-          maxLength: 2
-        vesselClass:
-          type: string
-          x-stoplight:
-            id: elv5nr917oa61
-          description: 'The group to which the vessel belongs based on size (tonnage), use (cargo), and design.'
-        norminalTEU:
-          type: string
-          x-stoplight:
-            id: eqsec6embi58d
-          description: The nominal capacity of the vessel in TEU (twenty foot equivalent unit).
         transportCalls:
           type: array
           x-stoplight:
