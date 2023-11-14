@@ -7,7 +7,7 @@ info:
   description: |
     API specification issued by DCSA.org.
     
-    Booking Notifications for [DCSA OpenAPI specification for Booking](https://app.swaggerhub.com/apis/dcsaorg/DCSA_BKG/2.0.0-Beta-1) is a lightweight notification based on [CloudEvents](https://cloudevents.io/). The POST endPoint of the consumer is called whenever a Booking that is being subscribed changes state.
+    Booking Notifications for [DCSA OpenAPI specification for Booking](https://app.swaggerhub.com/apis/dcsaorg/DCSA_BKG/2.0.0-Beta-1) is a lightweight notification based on [CloudEvents](https://cloudevents.io/). The POST endPoint of the consumer is called whenever a Booking that is being subscribed to changes state.
     
     Setting up the notification is done outside scope of this API.
     
@@ -109,18 +109,29 @@ components:
               maxLength: 50
               description: |
                 The status of the booking. Possible values are:
-                - RECEIVED
-                - PENDING UPDATE
-                - PENDING UPDATE CONFIRMATION
-                - PENDING AMENDMENT APPROVAL
-                - CONFIRMED
-                - REJECTED
-                - DECLINED
-                - CANCELLED
-                - COMPLETED
+                - `RECEIVED` (Booking request has been received)
+                - `PENDING UPDATE` (An update is required to the booking)
+                - `PENDING UPDATE CONFIRMATION` (An update is waiting to be Confirmed)
+                - `CONFIRMED` (Booking has been Confirmed)
+                - `REJECTED` (Booking discontinued before it has been Confirmed)
+                - `DECLINED` (Booking discontinued after it has been Confirmed)
+                - `CANCELLED` (Booking discontinued by consumer)
+                - `COMPLETED` (Transport Document booking is connected to has been Issued)
 
                 More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/bookingstatuses.csv).
               example: 'RECEIVED'
+            amendedBookingStatus:
+              type: string
+              maxLength: 50
+              description: |
+                The status of latest amendment added to the booking. If no amendment has been requested - then this field is empty. Possible values are:
+                - `PENDING AMENDMENT APPROVAL` (An amendment is waiting to be Approved)
+                - `CONFIRMED` (Amendment is confirmed)
+                - `DECLINED` (Amendment discontinued by provider)
+                - `CANCELLED` (Amendment discontinued by consumer)
+
+                More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/bookingstatuses.csv).
+              example: 'PENDING AMENDMENT APPROVAL'
             carrierBookingRequestReference:
               type: string
               pattern: '^\S+(\s+\S+)*$'
@@ -139,16 +150,6 @@ components:
 
                 **Conditional:** `carrierBookingRequestReference` and/or `carrierBookingReference` is required to provide
               example: 'ABC709951'
-            context:
-              type: string
-              maxLength: 50
-              description: |
-                Describes the context of the Notification. Possible values are:
-                - AMENDMENT
-                - BOOKING
-
-                **Conditional:** Mandatory if `bookingStatus=DECLINED`, `bookingStatus=CANCELLED` or `bookingStatus=CONFIRMED`
-              example: 'AMENDMENT'
             reason:
               type: string
               maxLength: 5000
