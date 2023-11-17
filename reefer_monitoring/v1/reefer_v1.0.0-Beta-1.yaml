@@ -1,16 +1,7 @@
 openapi: 3.0.0
-x-stoplight:
-  id: a6iz4bb3dw0lc
 info:
-  title: DCSA OpenAPI specification for Operational Reefer Monitoring
   version: 1.0.0-Beta-1
-  contact:
-    name: Digital Container Shipping Association (DCSA)
-    email: info@dcsa.org
-    url: 'https://dcsa.org'
-  license:
-    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
-    name: Apache 2.0
+  title: DCSA OpenAPI specification for Operational Reefer Monitoring
   description: |-
     Exchange data uniformly on data collected from live reefers between operational supply chain partners such as carriers, terminals and vessel operators.
 
@@ -24,16 +15,20 @@ info:
     Calling this endPoint will return a list of events that fulfill the query parameters specified. The list returned is sorted in ascending (`ASC`) order based on the creation date-time of the event (`eventCreatedDateTime`). **This endPoint is mandatory to implement.**
 
     For a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/reefer-monitoring/v1). Please also [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments.
-
-tags:
-  - name: Events
-    description: Event operations
+  contact:
+    name: Digital Container Shipping Association (DCSA)
+    email: info@dcsa.org
+    url: 'https://dcsa.org'
+  license:
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+    name: Apache 2.0
 paths:
   /events:
     get:
       tags:
         - Events
       summary: Retrieve Reefer Information
+      description: Fetch the current monitoring data available for reefer container fleet
       operationId: fetchReefer
       parameters:
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/eventDateTime'
@@ -44,7 +39,7 @@ paths:
           in: query
           name: activeControllerAlarms
           description: Will filter by all live reefers with one or more active alarms
-      description: Fetch the current monitoring data available for reefer container fleet
+
       responses:
         '200':
           description: Successful operation
@@ -58,7 +53,7 @@ paths:
                     To retrieve the reefer data for a specific `equipmentReference` the following request could be made:
 
                         GET /events?equipmentReference=APZU4812090
-                        
+
                   value:
                     payload:
                       activeAlarmCount: 0
@@ -117,38 +112,149 @@ paths:
                       unitModel: N00
         default:
           description: Unexpected error
-          headers:
-            API-Version:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
           content:
             application/json:
               schema:
                 $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.0#/components/schemas/error'
-      x-stoplight:
-        id: k62mkncefaldt
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
+tags:
+  - name: Events
+    description: Event operations
 components:
   schemas:
+    reeferResponse:
+      type: object
+      properties:
+        alarms:
+          $ref: '#/components/schemas/alarms'
+        controller:
+          $ref: '#/components/schemas/controller'
+        equipmentReference:
+          $ref: '#/components/schemas/equipmentReference'
+        equipmentOptions:
+          $ref: '#/components/schemas/equipmentOptions'
+        geoLocation:
+          $ref: '#/components/schemas/geoLocation'
+        isConnectedToPowerSource:
+          type: boolean
+          description: 'Indicates if the source is connected to power, aligned to COA UDM P2'
+        lastDefrost:
+          $ref: '#/components/schemas/lastDefrost'
+        measurements:
+          $ref: '#/components/schemas/measurements'
+        setpoints:
+          $ref: '#/components/schemas/setpoints'
+        reeferSettings:
+          $ref: '#/components/schemas/reeferSettings'
+        unitModel:
+          $ref: '#/components/schemas/unitModel'
+    alarms:
+      type: object
+      properties:
+        activeAlarmCount:
+          type: integer
+          description: The number of active alarms from the controller
+        activeAlarms:
+          type: array
+          items:
+            type: object
+            properties:
+              alarmDate:
+                type: string
+                description: The datetime of when the alarm first appeared
+                format: date-time
+              alarmNumber:
+                type: string
+                description: Harmonised Alarm Code across all Manufacturers
+    controller:
+      type: object
+      properties:
+        dateTime:
+          $ref: '#/components/schemas/controllerDateTime'
+        hardwareVersion:
+          $ref: '#/components/schemas/controllerHardwareVersion'
+        maker:
+          $ref: '#/components/schemas/controllerMaker'
+        model:
+          $ref: '#/components/schemas/controllerModel'
+        operatingState:
+          $ref: '#/components/schemas/controllerOperatingState'
+        serialNumber:
+          $ref: '#/components/schemas/controllerSerialNumber'
+        softwareVersion:
+          $ref: '#/components/schemas/controllerSoftwareVersion'
+    controllerDateTime:
+      type: string
+      description: The datetime from the controller device
+      format: date-time
+    controllerHardwareVersion:
+      type: string
+      description: The hardware revision of the controller device
+    controllerMaker:
+      type: string
+      description: The manufacturers of source equipment such as reefer controllers
+    controllerModel:
+      type: string
+      description: The model of the controller from the maker
+    controllerOperatingState:
+      type: string
+      description: 'The controller operating state, specific to the type of controller'
+    controllerSerialNumber:
+      type: string
+      description: The serial number of the controller device
+    controllerSoftwareVersion:
+      type: string
+      description: The software version running on the controller device
+    equipmentReference:
+      type: string
+      description: |
+        The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.
+        According to ISO 6346, a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit).
+
+        If a container does not comply with ISO 6346, it is suggested to follow [Recommendation #2: Containers with non-ISO identification](https://smdg.org/documents/smdg-recommendations) from SMDG.
+      pattern: ^\S+(\s+\S+)*$
+      maxLength: 11
+      example: APZU4812090
+    equipmentOptions:
+      type: array
+      description: List of equipment options available on the container
+      items:
+        type: string
+    geoLocation:
+      type: object
+      properties:
+        latitude:
+          type: number
+          example: 48.85855
+        longitude:
+          type: number
+          example: 2.294492036
+    lastDefrost:
+      type: string
+      description: The end time of the past defrost period
+      format: date-time
     measurements:
       type: object
-      x-stoplight:
-        id: ab808f3b8e601
+      title: Measurements
       properties:
         ambientTemperature:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/schemas/measuredAmbientTemperature'
+          $ref: '#/components/schemas/measuredAmbientTemperature'
         temperature:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/schemas/measuredTemperature'
+          $ref: '#/components/schemas/measuredTemperature'
         temperatureUnit:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/schemas/temperatureUnit'
+          $ref: '#/components/schemas/temperatureUnit'
         o2:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/schemas/measuredO2'
+          $ref: '#/components/schemas/measuredO2'
         co2:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/schemas/measuredCo2'
+          $ref: '#/components/schemas/measuredCo2'
         relativeHumidity:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/schemas/measuredHumidity'
+          $ref: '#/components/schemas/measuredHumidity'
         airExchange:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/schemas/measuredAirExchange'
+          $ref: '#/components/schemas/measuredAirExchange'
         airExchangeUnit:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/schemas/airExchangeUnit'
+          $ref: '#/components/schemas/airExchangeUnit'
         cargoProbe1Temperature:
           type: number
           format: float
@@ -163,8 +269,6 @@ components:
           example: 6
         cargoProbe4Temperature:
           type: number
-          x-stoplight:
-            id: 3dkqi3m46ix4l
           format: float
         currentPhaseA:
           $ref: '#/components/schemas/currentPhaseA'
@@ -198,39 +302,166 @@ components:
           $ref: '#/components/schemas/supplySensor2Temperature'
         supplyTemperature:
           $ref: '#/components/schemas/supplyTemperature'
-      title: Measurements
-    reeferResponse:
+    measuredAmbientTemperature:
+      type: number
+      description: |
+        The measured value of the ambient temperature of the Reefer.
+      format: float
+      example: -15
+    measuredTemperature:
+      type: number
+      description: |
+        The measured value of the temperature of the Reefer
+      format: float
+      example: -15
+    temperatureUnit:
+      enum:
+        - CEL
+        - FAH
+      description: |
+        The unit for temperature in Celsius or Fahrenheit
+
+        - CEL (Celsius)
+        - FAH (Fahrenheit)
+      example: CEL
+    measuredO2:
+      type: number
+      description: |
+        The measured value of the controlled atmosphere `O<sub>2</sub>` value in percent
+      format: float
+      minimum: 0
+      maximum: 100
+      example: 75.3
+    measuredCo2:
+      type: number
+      description: |
+        The measured value of the controlled atmosphere `CO<sub>2</sub>` value in percent
+      format: float
+      minimum: 0
+      maximum: 100
+      example: 75.3
+    measuredHumidity:
+      type: number
+      description: |
+        The measured value of the controlled atmosphere humidity value in percent
+      format: float
+      minimum: 0
+      maximum: 100
+      example: 95.6
+    measuredAirExchange:
+      type: number
+      description: |
+        The measured value for the air exchange rate which is the rate at which outdoor air replaces indoor air within a Reefer container
+      format: float
+      minimum: 0
+      example: 15.4
+    airExchangeUnit:
+      enum:
+        - MQH
+        - FQH
+      description: |
+        The unit for `airExchange` in metrics- or imperial- units per hour
+
+        - MQH (Cubic metre per hour)
+        - FQH (Cubic foot per hour)
+
+        **NB:** This is a conditional field. If `airExchange` is specified then this field is required
+      example: MQH
+    currentPhaseA:
+      type: number
+      description: The phase A current or average current in Amps
+      format: float
+    currentPhaseB:
+      type: number
+      description: The phase B current or average current in Amps
+      format: float
+    currentPhaseC:
+      type: number
+      description: The phase C current or average current in Amps
+      format: float
+    dischargePressure:
+      type: number
+      description: The discharge pressure in BarRelative units
+      format: float
+    dischargeTemperature:
+      type: number
+      description: The discharge temperature
+      format: float
+      example: -15
+    evaporatorTemperature:
+      type: number
+      description: The evaporator temperature in CEL
+      format: float
+    lineFrequency:
+      type: number
+      description: The mains power frequency in Hz
+      format: float
+      example: 50
+    lineVoltage:
+      type: number
+      description: The mains power voltage in volts
+      format: float
+      example: 400
+    returnProbe1Temperature:
+      type: number
+      description: The return temperature of probe 1
+      format: float
+      example: -15
+    returnProbe2Temperature:
+      type: number
+      description: The return temperature of probe 2
+      format: float
+      example: -15
+    returnTemperature:
+      type: number
+      description: The return temperature
+      format: float
+      example: -15
+    suctionPressure:
+      type: number
+      description: The suction pressure in BarRelative units
+      format: float
+    suctionTemperature:
+      type: number
+      description: The suction temperature
+      format: float
+      example: -15
+    supplySensor1Temperature:
+      type: number
+      description: The supply sensor 1 temperature
+      format: float
+      example: -15
+    supplySensor2Temperature:
+      type: number
+      description: The supply sensor 2 temperature
+      format: float
+      example: -15
+    supplyTemperature:
+      type: number
+      description: The supply temperature
+      format: float
+      example: -15
+    setpoints:
       type: object
-      x-stoplight:
-        id: 1101e866d0266
       properties:
-        alarms:
-          $ref: '#/components/schemas/alarms'
-        controller:
-          $ref: '#/components/schemas/controller'
-        equipmentReference:
-          $ref: '#/components/schemas/equipmentReference'
-        equipmentOptions:
-          $ref: '#/components/schemas/equipmentOptions'
-        geoLocation:
-          $ref: '#/components/schemas/geoLocation'
-        isConnectedToPowerSource:
-          type: boolean
-          description: 'Indicates if the source is connected to power, aligned to COA UDM P2'
-        lastDefrost:
-          $ref: '#/components/schemas/lastDefrost'
-        measurements:
-          $ref: '#/components/schemas/measurements'
-        setpoints:
-          $ref: '#/components/schemas/setpoints'
-        reeferSettings:
-          $ref: '#/components/schemas/reeferSettings'
-        unitModel:
-          $ref: '#/components/schemas/unitModel'
+        temperature:
+          $ref: '#/components/schemas/measuredTemperature'
+        temperatureUnit:
+          $ref: '#/components/schemas/temperatureUnit'
+        o2:
+          $ref: '#/components/schemas/measuredO2'
+        co2:
+          $ref: '#/components/schemas/measuredCo2'
+        humidity:
+          type: number
+          description: |
+            The percentage of the controlled atmosphere humidity target value
+          format: float
+          minimum: 0
+          maximum: 100
+          example: 95.6
     reeferSettings:
       type: object
-      x-stoplight:
-        id: 89583c1e5a249
       properties:
         controlledAtmosphereMode:
           $ref: '#/components/schemas/controlledAtmosphereMode'
@@ -238,247 +469,15 @@ components:
           $ref: '#/components/schemas/defrosting'
         efficiencySetting:
           $ref: '#/components/schemas/efficiencySetting'
-    setpoints:
-      type: object
-      x-stoplight:
-        id: 4db10b053cb8e
-      properties:
-        temperature:
-            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/schemas/measuredTemperature'
-        temperatureUnit:
-            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/schemas/temperatureUnit'
-        o2:
-            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/schemas/measuredO2'
-        co2:
-            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/schemas/measuredCo2'
-        humidity:
-          type: number
-          format: float
-          minimum: 0
-          maximum: 100
-          description: |
-            The percentage of the controlled atmosphere humidity target value
-          example: 95.6
-    controller:
-      type: object
-      x-stoplight:
-        id: 425fbc59eb757
-      properties:
-        dateTime:
-          $ref: '#/components/schemas/controllerDateTime'
-        hardwareVersion:
-          $ref: '#/components/schemas/controllerHardwareVersion'
-        maker:
-          $ref: '#/components/schemas/controllerMaker'
-        model:
-          $ref: '#/components/schemas/controllerModel'
-        operatingState:
-          $ref: '#/components/schemas/controllerOperatingState'
-        serialNumber:
-          $ref: '#/components/schemas/controllerSerialNumber'
-        softwareVersion:
-          $ref: '#/components/schemas/controllerSoftwareVersion'
     controlledAtmosphereMode:
       type: string
-      x-stoplight:
-        id: 78e1cd0fd35b0
       description: The controlled atmosphere mode setting
-    equipmentReference:
-      type: string
-      x-stoplight:
-        id: 466cdf45dc3cd
-      pattern: ^\S+(\s+\S+)*$
-      maxLength: 11
-      description: |
-        The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.
-        According to ISO 6346, a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit).
-
-        If a container does not comply with ISO 6346, it is suggested to follow [Recommendation #2: Containers with non-ISO identification](https://smdg.org/documents/smdg-recommendations) from SMDG.
-      example: APZU4812090
-    alarms:
-      type: object
-      x-stoplight:
-        id: ed63afe9afbf6
-      properties:
-        activeAlarmCount:
-          type: integer
-          description: The number of active alarms from the controller
-        activeAlarms:
-          type: array
-          items:
-            type: object
-            properties:
-              alarmDate:
-                type: string
-                format: date-time
-                description: The datetime of when the alarm first appeared
-              alarmNumber:
-                type: string
-                x-stoplight:
-                  id: 961e16039a0db
-                description: Harmonised Alarm Code across all Manufacturers
-    controllerDateTime:
-      type: string
-      x-stoplight:
-        id: bafc1d5c43922
-      format: date-time
-      description: The datetime from the controller device
-    controllerHardwareVersion:
-      type: string
-      x-stoplight:
-        id: ed36279a8a5b7
-      description: The hardware revision of the controller device
-    controllerMaker:
-      type: string
-      x-stoplight:
-        id: c1515e242e9ef
-      description: The manufacturers of source equipment such as reefer controllers
-    controllerModel:
-      type: string
-      x-stoplight:
-        id: 7cc87f90608a2
-      description: The model of the controller from the maker
-    controllerOperatingState:
-      type: string
-      x-stoplight:
-        id: 9c4d3615d5a9e
-      description: 'The controller operating state, specific to the type of controller'
-    controllerSerialNumber:
-      type: string
-      x-stoplight:
-        id: 85198024f8ff2
-      description: The serial number of the controller device
-    controllerSoftwareVersion:
-      type: string
-      x-stoplight:
-        id: 6c473aa909c95
-      description: The software version running on the controller device
-    currentPhaseA:
-      type: number
-      x-stoplight:
-        id: 8a465afd81161
-      format: float
-      description: The phase A current or average current in Amps
-    currentPhaseB:
-      type: number
-      x-stoplight:
-        id: 8a765afd81a78
-      format: float
-      description: The phase B current or average current in Amps
-    currentPhaseC:
-      type: number
-      x-stoplight:
-        id: 8a665afd81d8f
-      format: float
-      description: The phase C current or average current in Amps
     defrosting:
       type: boolean
-      x-stoplight:
-        id: 458de0f8230ef
       description: Indicates if the device is defrosting
-    dischargePressure:
-      type: number
-      x-stoplight:
-        id: 49290aca593bd
-      format: float
-      description: The discharge pressure in BarRelative units
-    dischargeTemperature:
-      type: number
-      format: float
-      example: -15
-      description: The discharge temperature
     efficiencySetting:
       type: number
-      x-stoplight:
-        id: a1beb5769dd83
       description: The efficiency Setting (controller specific) COA UDM List 5.5.8
-    evaporatorTemperature:
-      type: number
-      x-stoplight:
-        id: 6272d1f6f40b4
-      format: float
-      description: The evaporator temperature in CEL
-    equipmentOptions:
-      type: array
-      x-stoplight:
-        id: bf9a1437488d6
-      description: List of equipment options available on the container
-      items:
-        type: string
-    geoLocation:
-      type: object
-      x-stoplight:
-        id: cc01ff8a61d52
-      properties:
-        latitude:
-          type: number
-          example: 48.85855
-        longitude:
-          type: number
-          example: 2.294492036
-    lastDefrost:
-      type: string
-      x-stoplight:
-        id: 2a7068aedfe2d
-      format: date-time
-      description: The end time of the past defrost period
-    lineFrequency:
-      type: number
-      x-stoplight:
-        id: 6e4b52aa20d93
-      format: float
-      description: The mains power frequency in Hz
-      example: 50
-    lineVoltage:
-      type: number
-      x-stoplight:
-        id: 61ca68123fe58
-      format: float
-      description: The mains power voltage in volts
-      example: 400
-    returnProbe1Temperature:
-      type: number
-      format: float
-      example: -15
-      description: The return temperature of probe 1
-    returnProbe2Temperature:
-      type: number
-      format: float
-      example: -15
-      description: The return temperature of probe 2
-    returnTemperature:
-      type: number
-      format: float
-      example: -15
-      description: The return temperature
-    suctionPressure:
-      type: number
-      x-stoplight:
-        id: 3b087c8448ec4
-      format: float
-      description: The suction pressure in BarRelative units
-    suctionTemperature:
-      type: number
-      format: float
-      example: -15
-      description: The suction temperature
-    supplySensor1Temperature:
-      type: number
-      format: float
-      example: -15
-      description: The supply sensor 1 temperature
-    supplySensor2Temperature:
-      type: number
-      format: float
-      example: -15
-      description: The supply sensor 2 temperature
-    supplyTemperature:
-      type: number
-      format: float
-      example: -15
-      description: The supply temperature
     unitModel:
       type: string
-      x-stoplight:
-        id: 81e5c104a750f
       description: 'The unit model specific to the maker, COA UDM 5.5.3 code list'
