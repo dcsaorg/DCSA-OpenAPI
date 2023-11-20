@@ -87,65 +87,27 @@ paths:
                   description: The request parameters being used.
                   minItems: 0
                   uniqueItems: true
+                  example:
+                    - eventTypes
+                    - equipmentReference
                   items:
                     x-stoplight:
                       id: 7nrwgb6yjwv1j
                     type: string
-                  example:
-                    - eventTypes
-                    - equipmentReference
-                statusCode:
-                  type: integer
-                  example: 200
-                  description: The response status code of the reference API call.
+                uniqueAdopterHash:
+                  type: string
+                  description: "SHA-256 of the adopter. \r\n\r\n> *Rules to be defined.*"
+                  x-stoplight:
+                    id: i0r1skfclxygo
               required:
                 - domain
                 - method
                 - relativePath
                 - version
-                - statusCode
         description: ''
       tags:
         - RealTime
     parameters: []
-  /v1/stats-summary:
-    post:
-      summary: Stats Summary
-      operationId: post-v1-stats-summary
-      responses:
-        '204':
-          description: No Content
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-      x-stoplight:
-        id: d9b9jda77q1td
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/StatSummary'
-        description: ''
-      parameters:
-        - $ref: '#/components/parameters/api-key'
-      description: This endpoint allows you to report the daily usage statistics of a all DCSA APIs being used.
-      tags:
-        - Summary
 components:
   schemas:
     ErrorResponse:
@@ -236,125 +198,6 @@ components:
         - statusCode
         - statusCodeText
         - errorDateTime
-    StatSummary:
-      title: StatSummary
-      x-stoplight:
-        id: b7h2xul25sfvm
-      type: object
-      properties:
-        date:
-          type: string
-          x-stoplight:
-            id: o9g44g3h16rgx
-          format: date
-          example: '2023-11-01'
-          description: Statistics created date in `ISO 8601` format.
-        domain:
-          type: string
-          enum:
-            - TNT
-            - OVS
-            - EBL
-            - BKG
-            - CBF
-          example: TNT
-        stats:
-          type: array
-          x-stoplight:
-            id: 0pcp6iul6ahn6
-          items:
-            x-stoplight:
-              id: 3eh19umonq8vk
-            type: object
-            properties:
-              method:
-                type: string
-                enum:
-                  - POST
-                  - GET
-                  - PUT
-                  - DELETE
-                example: GET
-                description: The HTTP Method used in the referenced API call.
-              relativePath:
-                type: string
-                example: /v2/events
-                description: The context path of the referenced API call.
-                x-stoplight:
-                  id: aws3n5h1jisiq
-              version:
-                x-stoplight:
-                  id: ue059emm71xtc
-                type: string
-                example: v2.2
-                description: DCSA version of the API being used.
-              params:
-                type: array
-                x-stoplight:
-                  id: 7uz3bu0dcrhq9
-                minItems: 0
-                description: Unique set of request parameters being used for the referenced API.
-                example:
-                  - eventTypes
-                  - equipmentReference
-                items:
-                  x-stoplight:
-                    id: r1or27u13vy8v
-                  type: string
-              totalApiRequests:
-                type: integer
-                x-stoplight:
-                  id: rxmbwojdhoh0d
-                description: Total request count for the day for the referenced API.
-                example: 1000000
-                format: int64
-              totalSuccessRequests:
-                type: integer
-                x-stoplight:
-                  id: vstjp3joc3r1g
-                format: int64
-                description: "Total success request count for the day for the referenced API.\r\n\r\nResponses considered successful : `200`, `201`, `202`, `204`"
-                example: 900000
-                exclusiveMinimum: 0
-              totalFailureRequests:
-                type: integer
-                x-stoplight:
-                  id: b7vm2cswgi2n5
-                format: int64
-                description: Total failure request count for the day for the referenced API.
-                example: 100000
-                minimum: 0
-              avgResponseTime:
-                type: integer
-                x-stoplight:
-                  id: bj6ewb8irqs9f
-                format: int64
-                description: Average response time for the referenced API in `milliseconds`.
-                example: 437
-                exclusiveMinimum: 0
-              avgApiAvailability:
-                type: number
-                x-stoplight:
-                  id: zghfa54xa2i9d
-                format: float
-                example: 99.9
-              uniqueAdopterCount:
-                type: integer
-                x-stoplight:
-                  id: 9x09udlwlxbyv
-                format: int64
-                example: 20
-                description: Number of unique adopters using the standard.
-            required:
-              - method
-              - relativePath
-              - version
-              - totalApiRequests
-              - uniqueAdopterCount
-      required:
-        - date
-        - domain
-        - stats
   parameters:
     api-key:
       name: DCSA-API-KEY
