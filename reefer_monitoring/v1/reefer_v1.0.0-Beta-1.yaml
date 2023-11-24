@@ -1,488 +1,721 @@
-openapi: 3.0.0
-info:
-  version: 1.0.0-Beta-1
-  title: DCSA OpenAPI specification for Operational Reefer Monitoring
-  description: |-
-    Exchange data uniformly on data collected from live reefers between operational supply chain partners such as carriers, terminals and vessel operators.
-
-    For explanation to specific values or objects please refer to the [Information Model 2023.Q1](https://dcsa.org/wp-content/uploads/2022/02/DCSA-Information-Model-2023.Q1.pdf).
-
-    ## Poll model
-    Polling data can be done using
-
-        GET /v1/events
-
-    Calling this endPoint will return a list of events that fulfill the query parameters specified. The list returned is sorted in ascending (`ASC`) order based on the creation date-time of the event (`eventCreatedDateTime`). **This endPoint is mandatory to implement.**
-
-    For a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/reefer-monitoring/v1). Please also [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments.
-  contact:
-    name: Digital Container Shipping Association (DCSA)
-    email: info@dcsa.org
-    url: 'https://dcsa.org'
-  license:
-    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
-    name: Apache 2.0
-paths:
-  /events:
-    get:
-      tags:
-        - Events
-      summary: Retrieve Reefer Information
-      description: Fetch the current monitoring data available for reefer container fleet
-      operationId: fetchReefer
-      parameters:
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/eventDateTime'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/equipmentReference'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/reeferEventTypeCodes'
-        - schema:
-            type: boolean
-          in: query
-          name: activeControllerAlarms
-          description: Will filter by all live reefers with one or more active alarms
-
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/reeferResponse'
-              examples:
-                'Reefer data related to equipmentReference: ''APZU4812090''':
-                  description: |
-                    To retrieve the reefer data for a specific `equipmentReference` the following request could be made:
-
-                        GET /events?equipmentReference=APZU4812090
-
-                  value:
-                    payload:
-                      alarms:
-                        activeAlarmCount: 0
-                        activeAlarms:
-                          - alarmDate: '2023-10-23T15:40:28Z'
-                            alarmNumber: 'N999'
-                      controller:
-                        dateTime: '2023-10-23T15:40:28Z'
-                        hardwareVersion: '1.1.1'
-                        maker: '900'
-                        model: 'N99'
-                        operatingState: '1'
-                        serialNumber: '123456789'
-                        softwareVersion: '1.1.1'
-                      equipmentReference: 'APZU4812090'
-                      equipmentOptions:
-                        - 'N00'
-                        - 'N05'
-                      geoLocation:
-                        latitude: '53.45823668072835'
-                        longitude: '-3.02590625266987'
-                      isConnectedToPowerSource: true
-                      lastDefrost: '2023-10-23T15:40:28Z'
-                      measurements:
-                        ambientTemperature: 12
-                        temperature: 5
-                        temperatureUnit: 'CEL'
-                        o2: 20
-                        co2: 25
-                        relativeHumidity: 98
-                        airExchange: 0
-                        airExchangeUnit: 'MQH'
-                        cargoProbe1Temperature: 6
-                        cargoProbe2Temperature: 6
-                        cargoProbe3Temperature: 6
-                        currentPhaseA: 15
-                        currentPhaseB: 15
-                        currentPhaseC: 15
-                        dischargePressure: 21
-                        dischargeTemperature: 10
-                        evaporatorTemperature: 10
-                        lineFrequency: 60
-                        lineVoltage: 400
-                        returnProbe1Temperature: 10
-                        returnProbe2Temperature: 10
-                        returnTemperature: 10
-                        suctionPressure: 60
-                        suctionTemperature: 10
-                        supplySensor1Temperature: 10
-                        supplySensor2Temperature: 10
-                        supplyTemperature: 10
-                      setpoints:
-                        temperature: -15
-                        temperatureUnit: 'CEL'
-                        o2: 20
-                        co2: 25
-                        humidity: 96
-                      reeferSettings:
-                        controlledAtmosphereMode: 'ON'
-                        defrosting: false
-                        efficiencySetting: '2'
-                      unitModel: 'N00'
-        default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.0#/components/schemas/error'
-          headers:
-            API-Version:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
-tags:
-  - name: Events
-    description: Event operations
-components:
-  schemas:
-    reeferResponse:
-      type: object
-      properties:
-        alarms:
-          $ref: '#/components/schemas/alarms'
-        controller:
-          $ref: '#/components/schemas/controller'
-        equipmentReference:
-          $ref: '#/components/schemas/equipmentReference'
-        equipmentOptions:
-          $ref: '#/components/schemas/equipmentOptions'
-        geoLocation:
-          $ref: '#/components/schemas/geoLocation'
-        isConnectedToPowerSource:
-          type: boolean
-          description: 'Indicates if the source is connected to power, aligned to COA UDM P2'
-        lastDefrost:
-          $ref: '#/components/schemas/lastDefrost'
-        measurements:
-          $ref: '#/components/schemas/measurements'
-        setpoints:
-          $ref: '#/components/schemas/setpoints'
-        reeferSettings:
-          $ref: '#/components/schemas/reeferSettings'
-        unitModel:
-          $ref: '#/components/schemas/unitModel'
-    alarms:
-      type: object
-      properties:
-        activeAlarmCount:
-          type: integer
-          description: The number of active alarms from the controller
-        activeAlarms:
-          type: array
-          items:
-            type: object
-            properties:
-              alarmDate:
-                type: string
-                description: The datetime of when the alarm first appeared
-                format: date-time
-              alarmNumber:
-                type: string
-                description: Harmonised Alarm Code across all Manufacturers
-    controller:
-      type: object
-      properties:
-        dateTime:
-          $ref: '#/components/schemas/controllerDateTime'
-        hardwareVersion:
-          $ref: '#/components/schemas/controllerHardwareVersion'
-        maker:
-          $ref: '#/components/schemas/controllerMaker'
-        model:
-          $ref: '#/components/schemas/controllerModel'
-        operatingState:
-          $ref: '#/components/schemas/controllerOperatingState'
-        serialNumber:
-          $ref: '#/components/schemas/controllerSerialNumber'
-        softwareVersion:
-          $ref: '#/components/schemas/controllerSoftwareVersion'
-    controllerDateTime:
-      type: string
-      description: The datetime from the controller device
-      format: date-time
-    controllerHardwareVersion:
-      type: string
-      description: The hardware revision of the controller device
-    controllerMaker:
-      type: string
-      description: The manufacturers of source equipment such as reefer controllers
-    controllerModel:
-      type: string
-      description: The model of the controller from the maker
-    controllerOperatingState:
-      type: string
-      description: 'The controller operating state, specific to the type of controller'
-    controllerSerialNumber:
-      type: string
-      description: The serial number of the controller device
-    controllerSoftwareVersion:
-      type: string
-      description: The software version running on the controller device
-    equipmentReference:
-      type: string
-      description: |
-        The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.
-        According to ISO 6346, a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit).
-
-        If a container does not comply with ISO 6346, it is suggested to follow [Recommendation #2: Containers with non-ISO identification](https://smdg.org/documents/smdg-recommendations) from SMDG.
-      pattern: ^\S+(\s+\S+)*$
-      maxLength: 11
-      example: APZU4812090
-    equipmentOptions:
-      type: array
-      description: List of equipment options available on the container
-      items:
-        type: string
-    geoLocation:
-      type: object
-      properties:
-        latitude:
-          $ref: 'https://app.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/latitude'
-        longitude:
-          $ref: 'https://app.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/longitude'
-    lastDefrost:
-      type: string
-      description: The end time of the past defrost period
-      format: date-time
-    measurements:
-      type: object
-      title: Measurements
-      properties:
-        ambientTemperature:
-          $ref: '#/components/schemas/measuredAmbientTemperature'
-        temperature:
-          $ref: '#/components/schemas/measuredTemperature'
-        temperatureUnit:
-          $ref: '#/components/schemas/temperatureUnit'
-        o2:
-          $ref: '#/components/schemas/measuredO2'
-        co2:
-          $ref: '#/components/schemas/measuredCo2'
-        relativeHumidity:
-          $ref: '#/components/schemas/measuredHumidity'
-        airExchange:
-          $ref: '#/components/schemas/measuredAirExchange'
-        airExchangeUnit:
-          $ref: '#/components/schemas/airExchangeUnit'
-        cargoProbe1Temperature:
-          type: number
-          format: float
-          example: 6
-        cargoProbe2Temperature:
-          type: number
-          format: float
-          example: 6
-        cargoProbe3Temperature:
-          type: number
-          format: float
-          example: 6
-        cargoProbe4Temperature:
-          type: number
-          format: float
-        currentPhaseA:
-          $ref: '#/components/schemas/currentPhaseA'
-        currentPhaseB:
-          $ref: '#/components/schemas/currentPhaseB'
-        currentPhaseC:
-          $ref: '#/components/schemas/currentPhaseC'
-        dischargePressure:
-          $ref: '#/components/schemas/dischargePressure'
-        dischargeTemperature:
-          $ref: '#/components/schemas/dischargeTemperature'
-        evaporatorTemperature:
-          $ref: '#/components/schemas/evaporatorTemperature'
-        lineFrequency:
-          $ref: '#/components/schemas/lineFrequency'
-        lineVoltage:
-          $ref: '#/components/schemas/lineVoltage'
-        returnProbe1Temperature:
-          $ref: '#/components/schemas/returnProbe1Temperature'
-        returnProbe2Temperature:
-          $ref: '#/components/schemas/returnProbe2Temperature'
-        returnTemperature:
-          $ref: '#/components/schemas/returnTemperature'
-        suctionPressure:
-          $ref: '#/components/schemas/suctionPressure'
-        suctionTemperature:
-          $ref: '#/components/schemas/suctionTemperature'
-        supplySensor1Temperature:
-          $ref: '#/components/schemas/supplySensor1Temperature'
-        supplySensor2Temperature:
-          $ref: '#/components/schemas/supplySensor2Temperature'
-        supplyTemperature:
-          $ref: '#/components/schemas/supplyTemperature'
-    measuredAmbientTemperature:
-      type: number
-      description: |
-        The measured value of the ambient temperature of the Reefer.
-      format: float
-      example: -15
-    measuredTemperature:
-      type: number
-      description: |
-        The measured value of the temperature of the Reefer
-      format: float
-      example: -15
-    temperatureUnit:
-      enum:
-        - CEL
-        - FAH
-      description: |
-        The unit for temperature in Celsius or Fahrenheit
-
-        - CEL (Celsius)
-        - FAH (Fahrenheit)
-      example: CEL
-    measuredO2:
-      type: number
-      description: |
-        The measured value of the controlled atmosphere `O<sub>2</sub>` value in percent
-      format: float
-      minimum: 0
-      maximum: 100
-      example: 75.3
-    measuredCo2:
-      type: number
-      description: |
-        The measured value of the controlled atmosphere `CO<sub>2</sub>` value in percent
-      format: float
-      minimum: 0
-      maximum: 100
-      example: 75.3
-    measuredHumidity:
-      type: number
-      description: |
-        The measured value of the controlled atmosphere humidity value in percent
-      format: float
-      minimum: 0
-      maximum: 100
-      example: 95.6
-    measuredAirExchange:
-      type: number
-      description: |
-        The measured value for the air exchange rate which is the rate at which outdoor air replaces indoor air within a Reefer container
-      format: float
-      minimum: 0
-      example: 15.4
-    airExchangeUnit:
-      enum:
-        - MQH
-        - FQH
-      description: |
-        The unit for `airExchange` in metrics- or imperial- units per hour
-
-        - MQH (Cubic metre per hour)
-        - FQH (Cubic foot per hour)
-
-        **NB:** This is a conditional field. If `airExchange` is specified then this field is required
-      example: MQH
-    currentPhaseA:
-      type: number
-      description: The phase A current or average current in Amps
-      format: float
-    currentPhaseB:
-      type: number
-      description: The phase B current or average current in Amps
-      format: float
-    currentPhaseC:
-      type: number
-      description: The phase C current or average current in Amps
-      format: float
-    dischargePressure:
-      type: number
-      description: The discharge pressure in BarRelative units
-      format: float
-    dischargeTemperature:
-      type: number
-      description: The discharge temperature
-      format: float
-      example: -15
-    evaporatorTemperature:
-      type: number
-      description: The evaporator temperature in CEL
-      format: float
-    lineFrequency:
-      type: number
-      description: The mains power frequency in Hz
-      format: float
-      example: 50
-    lineVoltage:
-      type: number
-      description: The mains power voltage in volts
-      format: float
-      example: 400
-    returnProbe1Temperature:
-      type: number
-      description: The return temperature of probe 1
-      format: float
-      example: -15
-    returnProbe2Temperature:
-      type: number
-      description: The return temperature of probe 2
-      format: float
-      example: -15
-    returnTemperature:
-      type: number
-      description: The return temperature
-      format: float
-      example: -15
-    suctionPressure:
-      type: number
-      description: The suction pressure in BarRelative units
-      format: float
-    suctionTemperature:
-      type: number
-      description: The suction temperature
-      format: float
-      example: -15
-    supplySensor1Temperature:
-      type: number
-      description: The supply sensor 1 temperature
-      format: float
-      example: -15
-    supplySensor2Temperature:
-      type: number
-      description: The supply sensor 2 temperature
-      format: float
-      example: -15
-    supplyTemperature:
-      type: number
-      description: The supply temperature
-      format: float
-      example: -15
-    setpoints:
-      type: object
-      properties:
-        temperature:
-          $ref: '#/components/schemas/measuredTemperature'
-        temperatureUnit:
-          $ref: '#/components/schemas/temperatureUnit'
-        o2:
-          $ref: '#/components/schemas/measuredO2'
-        co2:
-          $ref: '#/components/schemas/measuredCo2'
-        humidity:
-          type: number
-          description: |
-            The percentage of the controlled atmosphere humidity target value
-          format: float
-          minimum: 0
-          maximum: 100
-          example: 95.6
-    reeferSettings:
-      type: object
-      properties:
-        controlledAtmosphereMode:
-          $ref: '#/components/schemas/controlledAtmosphereMode'
-        defrosting:
-          $ref: '#/components/schemas/defrosting'
-        efficiencySetting:
-          $ref: '#/components/schemas/efficiencySetting'
-    controlledAtmosphereMode:
-      type: string
-      description: The controlled atmosphere mode setting
-    defrosting:
-      type: boolean
-      description: Indicates if the device is defrosting
-    efficiencySetting:
-      type: number
-      description: The efficiency Setting (controller specific) COA UDM List 5.5.8
-    unitModel:
-      type: string
-      description: 'The unit model specific to the maker, COA UDM 5.5.3 code list'
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0-Beta-1",
+    "title": "DCSA OpenAPI specification for Operational Reefer Monitoring",
+    "description": "Exchange data uniformly on data collected from live reefers between operational supply chain partners such as carriers, terminals and vessel operators.\n\nFor explanation to specific values or objects please refer to the [Information Model 2023.Q1](https://dcsa.org/wp-content/uploads/2022/02/DCSA-Information-Model-2023.Q1.pdf).\n\n## Poll model\nPolling data can be done using\n\n    GET /v1/events\n\nCalling this endPoint will return a list of events that fulfill the query parameters specified. The list returned is sorted in ascending (`ASC`) order based on the creation date-time of the event (`eventCreatedDateTime`). **This endPoint is mandatory to implement.**\n\nFor a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/reefer-monitoring/v1). Please also [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments.",
+    "contact": {
+      "name": "Digital Container Shipping Association (DCSA)",
+      "email": "info@dcsa.org",
+      "url": "https://dcsa.org"
+    },
+    "license": {
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html",
+      "name": "Apache 2.0"
+    }
+  },
+  "paths": {
+    "/events": {
+      "get": {
+        "tags": [
+          "Events"
+        ],
+        "summary": "Retrieve Reefer Information",
+        "description": "Fetch the current monitoring data available for reefer container fleet",
+        "operationId": "fetchReefer",
+        "parameters": [
+          {
+            "name": "activeControllerAlarms",
+            "in": "query",
+            "description": "Will filter by all live reefers with one or more active alarms",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/reeferResponse"
+                },
+                "examples": {
+                  "Reefer data related to equipmentReference: 'APZU4812090'": {
+                    "description": "To retrieve the reefer data for a specific `equipmentReference` the following request could be made:\n\n    GET /events?equipmentReference=APZU4812090\n",
+                    "value": {
+                      "payload": {
+                        "alarms": {
+                          "activeAlarmCount": 0,
+                          "activeAlarms": [
+                            {
+                              "alarmDate": "2023-10-23T15:40:28Z",
+                              "alarmNumber": "N999"
+                            }
+                          ]
+                        },
+                        "controller": {
+                          "dateTime": "2023-10-23T15:40:28Z",
+                          "hardwareVersion": "1.1.1",
+                          "maker": "900",
+                          "model": "N99",
+                          "operatingState": "1",
+                          "serialNumber": "123456789",
+                          "softwareVersion": "1.1.1"
+                        },
+                        "equipmentReference": "APZU4812090",
+                        "equipmentOptions": [
+                          "N00",
+                          "N05"
+                        ],
+                        "geoLocation": {
+                          "latitude": "53.45823668072835",
+                          "longitude": "-3.02590625266987"
+                        },
+                        "isConnectedToPowerSource": true,
+                        "lastDefrost": "2023-10-23T15:40:28Z",
+                        "measurements": {
+                          "ambientTemperature": 12,
+                          "temperature": 5,
+                          "temperatureUnit": "CEL",
+                          "o2": 20,
+                          "co2": 25,
+                          "relativeHumidity": 98,
+                          "airExchange": 0,
+                          "airExchangeUnit": "MQH",
+                          "cargoProbe1Temperature": 6,
+                          "cargoProbe2Temperature": 6,
+                          "cargoProbe3Temperature": 6,
+                          "currentPhaseA": 15,
+                          "currentPhaseB": 15,
+                          "currentPhaseC": 15,
+                          "dischargePressure": 21,
+                          "dischargeTemperature": 10,
+                          "evaporatorTemperature": 10,
+                          "lineFrequency": 60,
+                          "lineVoltage": 400,
+                          "returnProbe1Temperature": 10,
+                          "returnProbe2Temperature": 10,
+                          "returnTemperature": 10,
+                          "suctionPressure": 60,
+                          "suctionTemperature": 10,
+                          "supplySensor1Temperature": 10,
+                          "supplySensor2Temperature": 10,
+                          "supplyTemperature": 10
+                        },
+                        "setpoints": {
+                          "temperature": -15,
+                          "temperatureUnit": "CEL",
+                          "o2": 20,
+                          "co2": 25,
+                          "humidity": 96
+                        },
+                        "reeferSettings": {
+                          "controlledAtmosphereMode": "ON",
+                          "defrosting": false,
+                          "efficiencySetting": "2"
+                        },
+                        "unitModel": "N00"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/error"
+                }
+              }
+            },
+            "headers": {
+              "API-Version": {
+                "$ref": "#/components/headers/API-Version"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Events",
+      "description": "Event operations"
+    }
+  ],
+  "components": {
+    "schemas": {
+      "reeferResponse": {
+        "type": "object",
+        "properties": {
+          "alarms": {
+            "$ref": "#/components/schemas/alarms"
+          },
+          "controller": {
+            "$ref": "#/components/schemas/controller"
+          },
+          "equipmentReference": {
+            "$ref": "#/components/schemas/equipmentReference"
+          },
+          "equipmentOptions": {
+            "$ref": "#/components/schemas/equipmentOptions"
+          },
+          "geoLocation": {
+            "$ref": "#/components/schemas/geoLocation"
+          },
+          "isConnectedToPowerSource": {
+            "type": "boolean",
+            "description": "Indicates if the source is connected to power, aligned to COA UDM P2"
+          },
+          "lastDefrost": {
+            "$ref": "#/components/schemas/lastDefrost"
+          },
+          "measurements": {
+            "$ref": "#/components/schemas/measurements"
+          },
+          "setpoints": {
+            "$ref": "#/components/schemas/setpoints"
+          },
+          "reeferSettings": {
+            "$ref": "#/components/schemas/reeferSettings"
+          },
+          "unitModel": {
+            "$ref": "#/components/schemas/unitModel"
+          }
+        }
+      },
+      "alarms": {
+        "type": "object",
+        "properties": {
+          "activeAlarmCount": {
+            "type": "integer",
+            "description": "The number of active alarms from the controller"
+          },
+          "activeAlarms": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "alarmDate": {
+                  "type": "string",
+                  "description": "The datetime of when the alarm first appeared",
+                  "format": "date-time"
+                },
+                "alarmNumber": {
+                  "type": "string",
+                  "description": "Harmonised Alarm Code across all Manufacturers"
+                }
+              }
+            }
+          }
+        }
+      },
+      "controller": {
+        "type": "object",
+        "properties": {
+          "dateTime": {
+            "$ref": "#/components/schemas/controllerDateTime"
+          },
+          "hardwareVersion": {
+            "$ref": "#/components/schemas/controllerHardwareVersion"
+          },
+          "maker": {
+            "$ref": "#/components/schemas/controllerMaker"
+          },
+          "model": {
+            "$ref": "#/components/schemas/controllerModel"
+          },
+          "operatingState": {
+            "$ref": "#/components/schemas/controllerOperatingState"
+          },
+          "serialNumber": {
+            "$ref": "#/components/schemas/controllerSerialNumber"
+          },
+          "softwareVersion": {
+            "$ref": "#/components/schemas/controllerSoftwareVersion"
+          }
+        }
+      },
+      "controllerDateTime": {
+        "type": "string",
+        "description": "The datetime from the controller device",
+        "format": "date-time"
+      },
+      "controllerHardwareVersion": {
+        "type": "string",
+        "description": "The hardware revision of the controller device"
+      },
+      "controllerMaker": {
+        "type": "string",
+        "description": "The manufacturers of source equipment such as reefer controllers"
+      },
+      "controllerModel": {
+        "type": "string",
+        "description": "The model of the controller from the maker"
+      },
+      "controllerOperatingState": {
+        "type": "string",
+        "description": "The controller operating state, specific to the type of controller"
+      },
+      "controllerSerialNumber": {
+        "type": "string",
+        "description": "The serial number of the controller device"
+      },
+      "controllerSoftwareVersion": {
+        "type": "string",
+        "description": "The software version running on the controller device"
+      },
+      "equipmentReference": {
+        "type": "string",
+        "description": "The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.\nAccording to ISO 6346, a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit).\n\nIf a container does not comply with ISO 6346, it is suggested to follow [Recommendation #2: Containers with non-ISO identification](https://smdg.org/documents/smdg-recommendations) from SMDG.\n",
+        "pattern": "^\\S+(\\s+\\S+)*$",
+        "maxLength": 11,
+        "example": "APZU4812090"
+      },
+      "equipmentOptions": {
+        "type": "array",
+        "description": "List of equipment options available on the container",
+        "items": {
+          "type": "string"
+        }
+      },
+      "geoLocation": {
+        "type": "object",
+        "properties": {
+          "latitude": {
+            "$ref": "https://app.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/latitude"
+          },
+          "longitude": {
+            "$ref": "https://app.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/longitude"
+          }
+        }
+      },
+      "lastDefrost": {
+        "type": "string",
+        "description": "The end time of the past defrost period",
+        "format": "date-time"
+      },
+      "measurements": {
+        "type": "object",
+        "title": "Measurements",
+        "properties": {
+          "ambientTemperature": {
+            "$ref": "#/components/schemas/measuredAmbientTemperature"
+          },
+          "temperature": {
+            "$ref": "#/components/schemas/measuredTemperature"
+          },
+          "temperatureUnit": {
+            "$ref": "#/components/schemas/temperatureUnit"
+          },
+          "o2": {
+            "$ref": "#/components/schemas/measuredO2"
+          },
+          "co2": {
+            "$ref": "#/components/schemas/measuredCo2"
+          },
+          "relativeHumidity": {
+            "$ref": "#/components/schemas/measuredHumidity"
+          },
+          "airExchange": {
+            "$ref": "#/components/schemas/measuredAirExchange"
+          },
+          "airExchangeUnit": {
+            "$ref": "#/components/schemas/airExchangeUnit"
+          },
+          "cargoProbe1Temperature": {
+            "type": "number",
+            "format": "float",
+            "example": 6
+          },
+          "cargoProbe2Temperature": {
+            "type": "number",
+            "format": "float",
+            "example": 6
+          },
+          "cargoProbe3Temperature": {
+            "type": "number",
+            "format": "float",
+            "example": 6
+          },
+          "cargoProbe4Temperature": {
+            "type": "number",
+            "format": "float"
+          },
+          "currentPhaseA": {
+            "$ref": "#/components/schemas/currentPhaseA"
+          },
+          "currentPhaseB": {
+            "$ref": "#/components/schemas/currentPhaseB"
+          },
+          "currentPhaseC": {
+            "$ref": "#/components/schemas/currentPhaseC"
+          },
+          "dischargePressure": {
+            "$ref": "#/components/schemas/dischargePressure"
+          },
+          "dischargeTemperature": {
+            "$ref": "#/components/schemas/dischargeTemperature"
+          },
+          "evaporatorTemperature": {
+            "$ref": "#/components/schemas/evaporatorTemperature"
+          },
+          "lineFrequency": {
+            "$ref": "#/components/schemas/lineFrequency"
+          },
+          "lineVoltage": {
+            "$ref": "#/components/schemas/lineVoltage"
+          },
+          "returnProbe1Temperature": {
+            "$ref": "#/components/schemas/returnProbe1Temperature"
+          },
+          "returnProbe2Temperature": {
+            "$ref": "#/components/schemas/returnProbe2Temperature"
+          },
+          "returnTemperature": {
+            "$ref": "#/components/schemas/returnTemperature"
+          },
+          "suctionPressure": {
+            "$ref": "#/components/schemas/suctionPressure"
+          },
+          "suctionTemperature": {
+            "$ref": "#/components/schemas/suctionTemperature"
+          },
+          "supplySensor1Temperature": {
+            "$ref": "#/components/schemas/supplySensor1Temperature"
+          },
+          "supplySensor2Temperature": {
+            "$ref": "#/components/schemas/supplySensor2Temperature"
+          },
+          "supplyTemperature": {
+            "$ref": "#/components/schemas/supplyTemperature"
+          }
+        }
+      },
+      "measuredAmbientTemperature": {
+        "type": "number",
+        "description": "The measured value of the ambient temperature of the Reefer.\n",
+        "format": "float",
+        "example": -15
+      },
+      "measuredTemperature": {
+        "type": "number",
+        "description": "The measured value of the temperature of the Reefer\n",
+        "format": "float",
+        "example": -15
+      },
+      "temperatureUnit": {
+        "enum": [
+          "CEL",
+          "FAH"
+        ],
+        "description": "The unit for temperature in Celsius or Fahrenheit\n\n- CEL (Celsius)\n- FAH (Fahrenheit)\n",
+        "example": "CEL"
+      },
+      "measuredO2": {
+        "type": "number",
+        "description": "The measured value of the controlled atmosphere `O<sub>2</sub>` value in percent\n",
+        "format": "float",
+        "minimum": 0,
+        "maximum": 100,
+        "example": 75.3
+      },
+      "measuredCo2": {
+        "type": "number",
+        "description": "The measured value of the controlled atmosphere `CO<sub>2</sub>` value in percent\n",
+        "format": "float",
+        "minimum": 0,
+        "maximum": 100,
+        "example": 75.3
+      },
+      "measuredHumidity": {
+        "type": "number",
+        "description": "The measured value of the controlled atmosphere humidity value in percent\n",
+        "format": "float",
+        "minimum": 0,
+        "maximum": 100,
+        "example": 95.6
+      },
+      "measuredAirExchange": {
+        "type": "number",
+        "description": "The measured value for the air exchange rate which is the rate at which outdoor air replaces indoor air within a Reefer container\n",
+        "format": "float",
+        "minimum": 0,
+        "example": 15.4
+      },
+      "airExchangeUnit": {
+        "enum": [
+          "MQH",
+          "FQH"
+        ],
+        "description": "The unit for `airExchange` in metrics- or imperial- units per hour\n\n- MQH (Cubic metre per hour)\n- FQH (Cubic foot per hour)\n\n**NB:** This is a conditional field. If `airExchange` is specified then this field is required\n",
+        "example": "MQH"
+      },
+      "currentPhaseA": {
+        "type": "number",
+        "description": "The phase A current or average current in Amps",
+        "format": "float"
+      },
+      "currentPhaseB": {
+        "type": "number",
+        "description": "The phase B current or average current in Amps",
+        "format": "float"
+      },
+      "currentPhaseC": {
+        "type": "number",
+        "description": "The phase C current or average current in Amps",
+        "format": "float"
+      },
+      "dischargePressure": {
+        "type": "number",
+        "description": "The discharge pressure in BarRelative units",
+        "format": "float"
+      },
+      "dischargeTemperature": {
+        "type": "number",
+        "description": "The discharge temperature",
+        "format": "float",
+        "example": -15
+      },
+      "evaporatorTemperature": {
+        "type": "number",
+        "description": "The evaporator temperature in CEL",
+        "format": "float"
+      },
+      "lineFrequency": {
+        "type": "number",
+        "description": "The mains power frequency in Hz",
+        "format": "float",
+        "example": 50
+      },
+      "lineVoltage": {
+        "type": "number",
+        "description": "The mains power voltage in volts",
+        "format": "float",
+        "example": 400
+      },
+      "returnProbe1Temperature": {
+        "type": "number",
+        "description": "The return temperature of probe 1",
+        "format": "float",
+        "example": -15
+      },
+      "returnProbe2Temperature": {
+        "type": "number",
+        "description": "The return temperature of probe 2",
+        "format": "float",
+        "example": -15
+      },
+      "returnTemperature": {
+        "type": "number",
+        "description": "The return temperature",
+        "format": "float",
+        "example": -15
+      },
+      "suctionPressure": {
+        "type": "number",
+        "description": "The suction pressure in BarRelative units",
+        "format": "float"
+      },
+      "suctionTemperature": {
+        "type": "number",
+        "description": "The suction temperature",
+        "format": "float",
+        "example": -15
+      },
+      "supplySensor1Temperature": {
+        "type": "number",
+        "description": "The supply sensor 1 temperature",
+        "format": "float",
+        "example": -15
+      },
+      "supplySensor2Temperature": {
+        "type": "number",
+        "description": "The supply sensor 2 temperature",
+        "format": "float",
+        "example": -15
+      },
+      "supplyTemperature": {
+        "type": "number",
+        "description": "The supply temperature",
+        "format": "float",
+        "example": -15
+      },
+      "setpoints": {
+        "type": "object",
+        "properties": {
+          "temperature": {
+            "$ref": "#/components/schemas/measuredTemperature"
+          },
+          "temperatureUnit": {
+            "$ref": "#/components/schemas/temperatureUnit"
+          },
+          "o2": {
+            "$ref": "#/components/schemas/measuredO2"
+          },
+          "co2": {
+            "$ref": "#/components/schemas/measuredCo2"
+          },
+          "humidity": {
+            "type": "number",
+            "description": "The percentage of the controlled atmosphere humidity target value\n",
+            "format": "float",
+            "minimum": 0,
+            "maximum": 100,
+            "example": 95.6
+          }
+        }
+      },
+      "reeferSettings": {
+        "type": "object",
+        "properties": {
+          "controlledAtmosphereMode": {
+            "$ref": "#/components/schemas/controlledAtmosphereMode"
+          },
+          "defrosting": {
+            "$ref": "#/components/schemas/defrosting"
+          },
+          "efficiencySetting": {
+            "$ref": "#/components/schemas/efficiencySetting"
+          }
+        }
+      },
+      "controlledAtmosphereMode": {
+        "type": "string",
+        "description": "The controlled atmosphere mode setting"
+      },
+      "defrosting": {
+        "type": "boolean",
+        "description": "Indicates if the device is defrosting"
+      },
+      "efficiencySetting": {
+        "type": "number",
+        "description": "The efficiency Setting (controller specific) COA UDM List 5.5.8"
+      },
+      "unitModel": {
+        "type": "string",
+        "description": "The unit model specific to the maker, COA UDM 5.5.3 code list"
+      },
+      "error": {
+        "type": "object",
+        "properties": {
+          "httpMethod": {
+            "enum": [
+              "GET",
+              "HEAD",
+              "POST",
+              "PUT",
+              "DELETE",
+              "OPTION",
+              "PATCH"
+            ],
+            "description": "The http request method type e.g. GET, POST\n",
+            "example": "POST"
+          },
+          "requestUri": {
+            "type": "string",
+            "description": "The request URI as it was sent\n",
+            "example": "/v1/events"
+          },
+          "statusCode": {
+            "type": "integer",
+            "description": "The HTTP status code\n",
+            "format": "int32",
+            "example": 400
+          },
+          "statusCodeText": {
+            "type": "string",
+            "description": "The textual representation of the status code\n",
+            "maxLength": 50,
+            "example": "Bad Request"
+          },
+          "errorMessage": {
+            "type": "string",
+            "description": "Other error information\n",
+            "maxLength": 200,
+            "example": "The supplied data could not be accepted"
+          },
+          "providerCorrelationID": {
+            "type": "string",
+            "description": "A unique identifier for the transaction, e.g. a UUID\n",
+            "maxLength": 100,
+            "example": "4426d965-0dd8-4005-8c63-dc68b01c4962"
+          },
+          "errorDateTime": {
+            "type": "string",
+            "description": "The date and time (in ISO 8601 format) the error occurred.\n",
+            "format": "date-time",
+            "example": "2019-11-12T07:41:00+08:30"
+          },
+          "errors": {
+            "type": "array",
+            "description": "List of detailed errors, e.g. fields that could not pass validation\n",
+            "minItems": 1,
+            "items": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/detailedError"
+                }
+              ]
+            }
+          }
+        },
+        "required": [
+          "httpMethod",
+          "requestUri",
+          "statusCode",
+          "statusCodeText",
+          "errorDateTime",
+          "errors"
+        ]
+      },
+      "detailedError": {
+        "type": "object",
+        "properties": {
+          "errorCode": {
+            "type": "integer",
+            "description": "Standard error code see http://dcsa.org/error-codes (to be created). Examples: 7003 – out or range value, 7004 -  invalid type\n",
+            "format": "int32",
+            "minimum": 7000,
+            "maximum": 9999,
+            "example": 7003
+          },
+          "field": {
+            "type": "string",
+            "description": "The field that caused the error, e.g. a failed validation. The field can be expressed as a [JSONpath](https://github.com/json-path/JsonPath)\n",
+            "maxLength": 50,
+            "example": "location.facilityCode"
+          },
+          "value": {
+            "type": "string",
+            "description": "The value that of the field that caused the error\n",
+            "maxLength": 500,
+            "example": "SG SIN WHS"
+          },
+          "reason": {
+            "type": "string",
+            "description": "High level error message\n",
+            "maxLength": 100,
+            "example": "invalidQuery"
+          },
+          "message": {
+            "type": "string",
+            "description": "Additional information as to why the error occured\n",
+            "maxLength": 200,
+            "example": "Spaces not allowed in facility code"
+          }
+        },
+        "required": [
+          "reason",
+          "message"
+        ]
+      }
+    }
+  }
+}
