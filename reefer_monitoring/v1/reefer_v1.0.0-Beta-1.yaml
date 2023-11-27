@@ -2,19 +2,34 @@ openapi: 3.0.0
 info:
   version: 1.0.0-Beta-1
   title: DCSA OpenAPI specification for Operational Reefer Monitoring
-  description: |-
-    Exchange data uniformly on data collected from live reefers between operational supply chain partners such as carriers, terminals and vessel operators.
+  description: >-
+    Exchange data uniformly on data collected from live reefers between
+    operational supply chain partners such as carriers, terminals and vessel
+    operators.
 
-    For explanation to specific values or objects please refer to the [Information Model 2023.Q1](https://dcsa.org/wp-content/uploads/2022/02/DCSA-Information-Model-2023.Q1.pdf).
+
+    For explanation to specific values or objects please refer to the
+    [Information Model
+    2023.Q1](https://dcsa.org/wp-content/uploads/2022/02/DCSA-Information-Model-2023.Q1.pdf).
+
 
     ## Poll model
+
     Polling data can be done using
 
         GET /v1/events
 
-    Calling this endPoint will return a list of events that fulfill the query parameters specified. The list returned is sorted in ascending (`ASC`) order based on the creation date-time of the event (`eventCreatedDateTime`). **This endPoint is mandatory to implement.**
+    Calling this endPoint will return a list of events that fulfill the query
+    parameters specified. The list returned is sorted in ascending (`ASC`) order
+    based on the creation date-time of the event (`eventCreatedDateTime`).
+    **This endPoint is mandatory to implement.**
 
-    For a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/reefer-monitoring/v1). Please also [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments.
+
+    For a changelog please click
+    [here](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/reefer-monitoring/v1).
+    Please also [create a GitHub
+    issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any
+    questions/comments.
   contact:
     name: Digital Container Shipping Association (DCSA)
     email: info@dcsa.org
@@ -29,16 +44,19 @@ paths:
         - Events
       summary: Retrieve Reefer Information
       description: Fetch the current monitoring data available for reefer container fleet
-      operationId: fetchReefer
+      operationId: fetchEvent
       parameters:
-        - $ref: ../../domain/event/event_domain_v3.1.0.yaml#/components/parameters/eventDateTime
-        - $ref: ../../domain/event/event_domain_v3.1.0.yaml#/components/parameters/equipmentReference
+        - $ref: >-
+            ../../domain/event/event_domain_v3.1.0.yaml#/components/parameters/eventDateTime
+        - $ref: >-
+            ../../domain/event/event_domain_v3.1.0.yaml#/components/parameters/equipmentReference
         - schema:
             type: boolean
           in: query
           name: activeControllerAlarms
           description: Will filter by all live reefers with one or more active alarms
-        - $ref: ../../models/CommonComponents.yaml#/components/parameters/APIVersionHeader
+        - $ref: >-
+            ../../models/CommonComponents.yaml#/components/parameters/APIVersionHeader
       responses:
         '200':
           description: Successful operation
@@ -48,8 +66,9 @@ paths:
                 $ref: '#/components/schemas/reeferResponse'
               examples:
                 'Reefer data related to equipmentReference: ''APZU4812090''':
-                  description: |
-                    To retrieve the reefer data for a specific `equipmentReference` the following request could be made:
+                  description: >
+                    To retrieve the reefer data for a specific
+                    `equipmentReference` the following request could be made:
 
                         GET /events?equipmentReference=APZU4812090
                   value:
@@ -75,7 +94,7 @@ paths:
                         latitude: '53.45823668072835'
                         longitude: '-3.02590625266987'
                       isConnectedToPowerSource: true
-                      lastDefrost: '2023-10-23T15:40:28Z'
+                      lastDefrostDateTime: '2023-10-23T15:40:28Z'
                       measurements:
                         ambientTemperature: 12
                         temperature: 5
@@ -112,7 +131,7 @@ paths:
                         humidity: 96
                       reeferSettings:
                         controlledAtmosphereMode: 'ON'
-                        defrosting: false
+                        isDefrosting: false
                         efficiencySetting: '2'
                       unitModel: N00
         default:
@@ -120,7 +139,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: ../../domain/error/error_domain_v2.0.1.yaml#/components/schemas/error
+                $ref: >-
+                  ../../domain/error/error_domain_v2.0.1.yaml#/components/schemas/error
 tags:
   - name: Events
     description: Event operations
@@ -142,8 +162,8 @@ components:
         isConnectedToPowerSource:
           type: boolean
           description: 'Indicates if the source is connected to power, aligned to COA UDM P2'
-        lastDefrost:
-          $ref: '#/components/schemas/lastDefrost'
+        lastDefrostDateTime:
+          $ref: '#/components/schemas/lastDefrostDateTime'
         measurements:
           $ref: '#/components/schemas/measurements'
         setpoints:
@@ -211,11 +231,19 @@ components:
       description: The software version running on the controller device
     equipmentReference:
       type: string
-      description: |
-        The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.
-        According to ISO 6346, a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit).
+      description: >
+        The unique identifier for the equipment, which should follow the BIC ISO
+        Container Identification Number where possible.
 
-        If a container does not comply with ISO 6346, it is suggested to follow [Recommendation #2: Containers with non-ISO identification](https://smdg.org/documents/smdg-recommendations) from SMDG.
+        According to ISO 6346, a container identification code consists of a
+        4-letter prefix and a 7-digit number (composed of a 3-letter owner code,
+        a category identifier, a serial number, and a check-digit).
+
+
+        If a container does not comply with ISO 6346, it is suggested to follow
+        [Recommendation #2: Containers with non-ISO
+        identification](https://smdg.org/documents/smdg-recommendations) from
+        SMDG.
       pattern: ^\S+(\s+\S+)*$
       maxLength: 11
       example: APZU4812090
@@ -231,23 +259,27 @@ components:
           $ref: '#/components/schemas/latitude'
         longitude:
           $ref: '#/components/schemas/longitude'
-    lastDefrost:
+    lastDefrostDateTime:
       type: string
+      x-stoplight:
+        id: aqapllo5b6nqo
       description: The end time of the past defrost period
       format: date-time
     latitude:
       type: string
       pattern: '^[\+-][0-9]{1,2}\.[0-9]{1,6}$'
       maxLength: 10
-      description: |
-        Geographic coordinate that specifies the north–south position of a point on the Earth&apos;s surface.
+      description: >
+        Geographic coordinate that specifies the north–south position of a point
+        on the Earth&apos;s surface.
       example: '+48.858550'
     longitude:
       type: string
       pattern: '^[\+-][0-9]{1,3}\.[0-9]{1,6}$'
       maxLength: 11
-      description: |
-        Geographic coordinate that specifies the east–west position of a point on the Earth&apos;s surface.
+      description: >
+        Geographic coordinate that specifies the east–west position of a point
+        on the Earth&apos;s surface.
       example: '+2.294492'
     measurements:
       type: object
@@ -340,32 +372,36 @@ components:
       example: CEL
     measuredO2:
       type: number
-      description: |
-        The measured value of the controlled atmosphere `O<sub>2</sub>` value in percent
+      description: >
+        The measured value of the controlled atmosphere `O<sub>2</sub>` value in
+        percent
       format: float
       minimum: 0
       maximum: 100
       example: 75.3
     measuredCo2:
       type: number
-      description: |
-        The measured value of the controlled atmosphere `CO<sub>2</sub>` value in percent
+      description: >
+        The measured value of the controlled atmosphere `CO<sub>2</sub>` value
+        in percent
       format: float
       minimum: 0
       maximum: 100
       example: 75.3
     measuredHumidity:
       type: number
-      description: |
-        The measured value of the controlled atmosphere humidity value in percent
+      description: >
+        The measured value of the controlled atmosphere humidity value in
+        percent
       format: float
       minimum: 0
       maximum: 100
       example: 95.6
     measuredAirExchange:
       type: number
-      description: |
-        The measured value for the air exchange rate which is the rate at which outdoor air replaces indoor air within a Reefer container
+      description: >
+        The measured value for the air exchange rate which is the rate at which
+        outdoor air replaces indoor air within a Reefer container
       format: float
       minimum: 0
       example: 15.4
@@ -373,13 +409,17 @@ components:
       enum:
         - MQH
         - FQH
-      description: |
+      description: >
         The unit for `airExchange` in metrics- or imperial- units per hour
 
+
         - MQH (Cubic metre per hour)
+
         - FQH (Cubic foot per hour)
 
-        **NB:** This is a conditional field. If `airExchange` is specified then this field is required
+
+        **NB:** This is a conditional field. If `airExchange` is specified then
+        this field is required
       example: MQH
     currentPhaseA:
       type: number
@@ -479,15 +519,17 @@ components:
       properties:
         controlledAtmosphereMode:
           $ref: '#/components/schemas/controlledAtmosphereMode'
-        defrosting:
-          $ref: '#/components/schemas/defrosting'
+        isDefrosting:
+          $ref: '#/components/schemas/isDefrosting'
         efficiencySetting:
           $ref: '#/components/schemas/efficiencySetting'
     controlledAtmosphereMode:
       type: string
       description: The controlled atmosphere mode setting
-    defrosting:
+    isDefrosting:
       type: boolean
+      x-stoplight:
+        id: o7ruedp0x4gx1
       description: Indicates if the device is defrosting
     efficiencySetting:
       type: number
