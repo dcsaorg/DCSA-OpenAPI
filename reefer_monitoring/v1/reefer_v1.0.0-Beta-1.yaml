@@ -31,15 +31,14 @@ paths:
       description: Fetch the current monitoring data available for reefer container fleet
       operationId: fetchReefer
       parameters:
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/eventDateTime'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/equipmentReference'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.1.0#/components/parameters/reeferEventTypeCodes'
+        - $ref: ../../domain/event/event_domain_v3.1.0.yaml#/components/parameters/eventDateTime
+        - $ref: ../../domain/event/event_domain_v3.1.0.yaml#/components/parameters/equipmentReference
         - schema:
             type: boolean
           in: query
           name: activeControllerAlarms
           description: Will filter by all live reefers with one or more active alarms
-
+        - $ref: ../../models/CommonComponents.yaml#/components/parameters/APIVersionHeader
       responses:
         '200':
           description: Successful operation
@@ -53,26 +52,25 @@ paths:
                     To retrieve the reefer data for a specific `equipmentReference` the following request could be made:
 
                         GET /events?equipmentReference=APZU4812090
-
                   value:
                     payload:
                       alarms:
                         activeAlarmCount: 0
                         activeAlarms:
                           - alarmDate: '2023-10-23T15:40:28Z'
-                            alarmNumber: 'N999'
+                            alarmNumber: N999
                       controller:
                         dateTime: '2023-10-23T15:40:28Z'
-                        hardwareVersion: '1.1.1'
+                        hardwareVersion: 1.1.1
                         maker: '900'
-                        model: 'N99'
+                        model: N99
                         operatingState: '1'
                         serialNumber: '123456789'
-                        softwareVersion: '1.1.1'
-                      equipmentReference: 'APZU4812090'
+                        softwareVersion: 1.1.1
+                      equipmentReference: APZU4812090
                       equipmentOptions:
-                        - 'N00'
-                        - 'N05'
+                        - N00
+                        - N05
                       geoLocation:
                         latitude: '53.45823668072835'
                         longitude: '-3.02590625266987'
@@ -81,12 +79,12 @@ paths:
                       measurements:
                         ambientTemperature: 12
                         temperature: 5
-                        temperatureUnit: 'CEL'
+                        temperatureUnit: CEL
                         o2: 20
                         co2: 25
                         relativeHumidity: 98
                         airExchange: 0
-                        airExchangeUnit: 'MQH'
+                        airExchangeUnit: MQH
                         cargoProbe1Temperature: 6
                         cargoProbe2Temperature: 6
                         cargoProbe3Temperature: 6
@@ -108,7 +106,7 @@ paths:
                         supplyTemperature: 10
                       setpoints:
                         temperature: -15
-                        temperatureUnit: 'CEL'
+                        temperatureUnit: CEL
                         o2: 20
                         co2: 25
                         humidity: 96
@@ -116,16 +114,13 @@ paths:
                         controlledAtmosphereMode: 'ON'
                         defrosting: false
                         efficiencySetting: '2'
-                      unitModel: 'N00'
+                      unitModel: N00
         default:
           description: Unexpected error
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.0#/components/schemas/error'
-          headers:
-            API-Version:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
+                $ref: ../../domain/error/error_domain_v2.0.1.yaml#/components/schemas/error
 tags:
   - name: Events
     description: Event operations
@@ -233,13 +228,27 @@ components:
       type: object
       properties:
         latitude:
-          $ref: 'https://app.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/latitude'
+          $ref: '#/components/schemas/latitude'
         longitude:
-          $ref: 'https://app.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/longitude'
+          $ref: '#/components/schemas/longitude'
     lastDefrost:
       type: string
       description: The end time of the past defrost period
       format: date-time
+    latitude:
+      type: string
+      pattern: '^[\+-][0-9]{1,2}\.[0-9]{1,6}$'
+      maxLength: 10
+      description: |
+        Geographic coordinate that specifies the north–south position of a point on the Earth&apos;s surface.
+      example: '+48.858550'
+    longitude:
+      type: string
+      pattern: '^[\+-][0-9]{1,3}\.[0-9]{1,6}$'
+      maxLength: 11
+      description: |
+        Geographic coordinate that specifies the east–west position of a point on the Earth&apos;s surface.
+      example: '+2.294492'
     measurements:
       type: object
       title: Measurements
