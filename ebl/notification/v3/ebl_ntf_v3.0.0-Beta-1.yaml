@@ -7,9 +7,9 @@ info:
   description: |
     API specification issued by DCSA.org.
 
-    Electronic Bill of Lading Notifications for [DCSA OpenAPI specification for Electronic Bill of Lading](https://app.swaggerhub.com/apis/dcsaorg/DCSA_EBL/3.0.0-Beta-1) is a lightweight notification based on [CloudEvents](https://cloudevents.io/). The POST endPoint of the consumer is called whenever a `Shipping Instruction` or a `Transport Document` that is being subscribed to changes state.
+    Electronic Bill of Lading Notifications for [DCSA OpenAPI specification for Electronic Bill of Lading](https://app.swaggerhub.com/apis/dcsaorg/DCSA_EBL/3.0.0-Beta-1) is a lightweight notification based on [CloudEvents](https://cloudevents.io/). The `POST` endPoint of the consumer is called whenever a `Shipping Instructions` or a `Transport Document` that is being subscribed to changes state.
 
-    Setting up the notification is done outside scope of this API.
+    Subscribing to notification is done outside scope of this API.
 
     For a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/ebl/notification/v3#v300B1). Please also [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments.
   contact:
@@ -27,38 +27,142 @@ paths:
       tags:
         - Notifications
       summary: Send a new Shipping Instructions Notification
-      operationId: post-si-notifications
+      operationId: shipping-instructions-notifications
       description: |
-        Send a new Electronic Shipping Instructions Notification
+        Creates a new `Shipping Instructions Notification`. This endPoint is called whenever a `Shipping Instructions` that a cosumer has subscribed to changes state or is updated.
+      parameters:
+        - name: API-Version
+          in: header
+          description: |
+            An API-Version header **MUST** be provided to the request (mandatory). The header **MUST** be a [SemVer](https://semver.org/) specifying the provider (the calling party) API version.
+          required: true
+          schema:
+            type: string
+            example: 3.0.0-Beta-1
       requestBody:
+        description: |
+          The payload used to create a `Shipping Instructions Notification`
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/ShippingInstructionsNotification'
+            examples:
+              receivedExample:
+                summary: |
+                  Shipping Instructions request received
+                description: |
+                  A notification explaining that a new `Shipping Instructions` has been received and stored in provider system (`shippingInstructionsStatus='RECEIVED'`).
+                value:
+                  specversion: '1.0'
+                  id: '3cecb101-7a1a-43a4-9d62-e88a131651e2'
+                  source: 'https://member.com/'
+                  type: 'org.dcsa.shipping-instructions-notification.v3'
+                  time: '2018-04-05T17:31:00Z'
+                  datacontenttype: 'application/json'
+                  data:
+                    shippingInstructionsStatus: 'RECEIVED'
+                    shippingInstructionsReference: 'e0559d83-00e2-438e-afd9-fdd610c1a008'
+              declinedExample:
+                summary: |
+                  Shipping Instructions update declined
+                description: |
+                  A notification explaining that an amendment to a `Shipping Instructions`, that was pending an update by the consumer (`shippingInstructionsStatus='PENDING UPDATE'`), has been declined (`updatedShippingInstructionsStatus='UPDATE DECLINED'`)
+                value:
+                  specversion: '1.0'
+                  id: '3cecb101-7a1a-43a4-9d62-e88a131651e2'
+                  source: 'https://member.com/'
+                  type: 'org.dcsa.shipping-instructions-notification.v3'
+                  time: '2018-04-05T17:31:00Z'
+                  datacontenttype: 'application/json'
+                  data:
+                    shippingInstructionsStatus: 'PENDING UPDATE'
+                    updatedShippingInstructionsStatus: 'UPDATE DECLINED'
+                    shippingInstructionsReference: 'e0559d83-00e2-438e-afd9-fdd610c1a008'
       responses:
         '204':
-          description: No Content
+          description: |
+            No Content
+          headers:
+            API-Version:
+              description: |
+                [SemVer](https://semver.org/) used to indicate the version of the consumer (the responding party). This is optional to provide.
+              schema:
+                type: string
+                example: 3.0.0-Beta-1
   /v3/transport-document-notifications:
     post:
       tags:
         - Notifications
       summary: Send a new Transport Document Notification
-      operationId: post-td-notifications
+      operationId: transport-document-notifications
       description: |
-        Send a new Transport Document Notification
+        Creates a new `Transport Document Notification`. This endPoint is called whenever a `Transport Document` that a cosumer has subscribed to changes state or is updated.
+      parameters:
+        - name: API-Version
+          in: header
+          description: |
+            An API-Version header **MUST** be provided to the request (mandatory). The header **MUST** be a [SemVer](https://semver.org/) specifying the provider (the calling party) API version.
+          required: true
+          schema:
+            type: string
+            example: 3.0.0-Beta-1
       requestBody:
+        description: |
+          The payload used to create a `Transport Document Notification`
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/TransportDocumentNotification'
+            examples:
+              draftExample:
+                summary: |
+                  Transport Document Draft created
+                description: |
+                  A notification explaining that a new `Draft Transport Document` has been created and stored in provider system (`transportDocumentStatus='DRAFT'`).
+                value:
+                  specversion: '1.0'
+                  id: '3cecb101-7a1a-43a4-9d62-e88a131651e2'
+                  source: 'https://member.com/'
+                  type: 'org.dcsa.transport-document-notification.v3'
+                  time: '2018-04-05T17:31:00Z'
+                  datacontenttype: 'application/json'
+                  data:
+                    transportDocumentStatus: 'DRAFT'
+                    transportDocumentReference: 'HHL71800000'
+              issuedExample:
+                summary: |
+                  Transport Document has been issued
+                description: |
+                  A notification explaining that a `Transport Document` has been issued (`transportDocumentStatus='ISSUED'`)
+                value:
+                  specversion: '1.0'
+                  id: '3cecb101-7a1a-43a4-9d62-e88a131651e2'
+                  source: 'https://member.com/'
+                  type: 'org.dcsa.transport-document-notification.v3'
+                  time: '2018-04-05T17:31:00Z'
+                  datacontenttype: 'application/json'
+                  data:
+                    transportDocumentStatus: 'ISSUED'
+                    transportDocumentReference: 'HHL71800000'
       responses:
         '204':
-          description: No Content
+          description: |
+            No Content
+          headers:
+            API-Version:
+              description: |
+                [SemVer](https://semver.org/) used to indicate the version of the consumer (the responding party). This is optional to provide.
+              schema:
+                type: string
+                example: 3.0.0-Beta-1
 components:
   schemas:
     ShippingInstructionsNotification:
       type: object
       title: Shipping Instructions Notification
+      description: |
+        `CloudEvent` specific properties for the `Notification`.
+      additionalProperties: false
       properties:
         specversion:
           type: string
@@ -115,27 +219,33 @@ components:
           example: application/json
         data:
           type: object
+          description: |
+            `Shipping Instructions` specific properties for the `Notification`
+          additionalProperties: false
           properties:
             shippingInstructionsStatus:
               type: string
               maxLength: 50
               description: |
-                The status of the `Shipping Instruction` or the `Transport Document`. Possible values are:
-                - `RECEIVED` (Shipping Instruction has been received)
-                - `PENDING UPDATE` (An update is required to the Shipping Instruction)
+                The status of the `Shipping Instructions`. Possible values are:
+                - `RECEIVED` (Shipping Instructions has been received)
+                - `PENDING UPDATE` (An update is required to the Shipping Instructions)
+                - `COMPLETED` (The Shipping Instructions can no longer be modified - the related Transport Document has been surrendered for delivery)
 
                 More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/eblstatuses.csv).
               example: RECEIVED
-            amendedShippingInstructionsStatus:
+            updatedShippingInstructionsStatus:
               type: string
               maxLength: 50
               description: |
-                The status of latest amendment added to the Transport Document. This can either be for the Draft Transport Document or as an amendment to an Issued Transport Document. Possible values are:
-                - `PENDING UPDATE CONFIRMATION` (A change to a Shipping Instruction is waiting to be approved)
-                - `CANCELLED` (An amendment to a Shipping Instruction is discontinued)
+                The status of latest update to the `Shipping Instructions`. If no update has been requested - then this field is empty. Possible values are:
+                - `UPDATE RECEIVED` (An update to a Shipping Instructions has been recieved and is awaiting to be processed)
+                - `UPDATE CONFIRMED` (Update is confirmed)
+                - `UPDATE CANCELLED` (An update to a Shipping Instruction is discontinued by consumer)
+                - `UPDATE DECLINED` (An update to a Shipping Instruction is discontinued by provider)
 
                 More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/eblstatuses.csv).
-              example: AMENDMENT APPROVED
+              example: UPDATE RECEIVED
             shippingInstructionReference:
               type: string
               pattern: ^\S+(\s+\S+)*$
@@ -158,7 +268,7 @@ components:
               type: string
               maxLength: 5000
               description: |
-                This field can be used to explain shippingInstructionStatus.
+                This field can be used to explain `shippingInstructionStatus`.
               example: Selected vessel is overbooked - please update VesselName
           required:
             - shippingInstructionsStatus
@@ -175,6 +285,9 @@ components:
     TransportDocumentNotification:
       type: object
       title: Transport Document Notification
+      description: |
+        `CloudEvent` specific properties for the `Notification`.
+      additionalProperties: false
       properties:
         specversion:
           type: string
@@ -231,6 +344,9 @@ components:
           example: application/json
         data:
           type: object
+          description: |
+            `Transport Document` specific properties for the `Notification`
+          additionalProperties: false
           properties:
             transportDocumentStatus:
               type: string
