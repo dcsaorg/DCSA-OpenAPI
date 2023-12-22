@@ -141,7 +141,10 @@ components:
           $ref: '#/components/schemas/geoLocation'
         isConnectedToPowerSource:
           type: boolean
-          description: 'Indicates if the source is connected to power, aligned to COA UDM P2'
+          description: |-
+            Indicates if the source is connected to power.
+
+            COA UDM Key: P2
         lastDefrostDateTime:
           $ref: '#/components/schemas/lastDefrostDateTime'
         measurements:
@@ -152,6 +155,16 @@ components:
           $ref: '#/components/schemas/reeferSettings'
         unitModel:
           $ref: '#/components/schemas/unitModel'
+        device:
+          $ref: '#/components/schemas/device'
+      required:
+        - controller
+        - equipmentReference
+        - isConnectedToPowerSource
+        - measurements
+        - setpoints
+        - reeferSettings
+        - device
     alarms:
       type: object
       properties:
@@ -172,6 +185,13 @@ components:
                 description: Harmonised Alarm Code across all Manufacturers
     controller:
       type: object
+      description: |-
+        A reefer container electronic component,
+        which acquires information from sensors and operates the
+        refrigerated container through commands. Information on
+        measurements and state in a controller can be extracted
+        electronically via communication channels by an external
+        device.
       properties:
         dateTime:
           $ref: '#/components/schemas/controllerDateTime'
@@ -187,22 +207,42 @@ components:
           $ref: '#/components/schemas/controllerSerialNumber'
         softwareVersion:
           $ref: '#/components/schemas/controllerSoftwareVersion'
+      required:
+        - dateTime
+        - maker
+        - model
+        - operatingState
     controllerDateTime:
       type: string
-      description: The datetime from the controller device
+      description: |-
+        The datetime from the controller device.
+
+        COA UDM Key: P15
       format: date-time
+      example: '2023-12-10T10:34:12Z'
     controllerHardwareVersion:
       type: string
       description: The hardware revision of the controller device
     controllerMaker:
       type: string
-      description: The manufacturers of source equipment such as reefer controllers
+      description: |-
+        The manufacturers of source equipment such as reefer controllers.
+
+        COA UDM Key: P13
+      example: '100'
     controllerModel:
       type: string
-      description: The model of the controller from the maker
+      description: |-
+        The model of the controller from the maker.
+
+        COA UDM Key: P14
     controllerOperatingState:
       type: string
-      description: 'The controller operating state, specific to the type of controller'
+      description: |-
+        The controller operating state, specific to the type of controller.
+
+        COA UDM Key: P12
+      example: '2'
     controllerSerialNumber:
       type: string
       description: The serial number of the controller device
@@ -216,9 +256,11 @@ components:
         According to ISO 6346, a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit).
 
         If a container does not comply with ISO 6346, it is suggested to follow [Recommendation #2: Containers with non-ISO identification](https://smdg.org/documents/smdg-recommendations) from SMDG.
+
+        COA UDM Key: P1
       pattern: ^\S+(\s+\S+)*$
       maxLength: 11
-      example: APZU4812090
+      example: BICU4812097
     equipmentOptions:
       type: array
       description: List of equipment options available on the container
@@ -273,17 +315,31 @@ components:
           type: number
           format: float
           example: 6
+          description: |-
+            The temperature of USDA Probe 1.
+
+            COA UDM Key: P19
         cargoProbe2Temperature:
           type: number
           format: float
           example: 6
+          description: |-
+            The temperature of USDA Probe 2.
+
+            COA UDM Key: P20
         cargoProbe3Temperature:
           type: number
           format: float
           example: 6
+          description: |-
+            The temperature of USDA Probe 3.
+
+            COA UDM Key: P21
         cargoProbe4Temperature:
           type: number
           format: float
+          description: |
+            The temperature of Probe 4.
         currentPhaseA:
           $ref: '#/components/schemas/currentPhaseA'
         currentPhaseB:
@@ -316,16 +372,33 @@ components:
           $ref: '#/components/schemas/supplySensor2Temperature'
         supplyTemperature:
           $ref: '#/components/schemas/supplyTemperature'
+      required:
+        - ambientTemperature
+        - temperature
+        - o2
+        - co2
+        - relativeHumidity
+        - cargoProbe1Temperature
+        - cargoProbe2Temperature
+        - cargoProbe3Temperature
+        - returnTemperature
+        - supplySensor1Temperature
+        - supplySensor2Temperature
+        - supplyTemperature
     measuredAmbientTemperature:
       type: number
       description: |
         The measured value of the ambient temperature of the Reefer.
+
+        COA UDM Key: P6
       format: float
       example: -15
     measuredTemperature:
       type: number
       description: |
-        The measured value of the temperature of the Reefer
+        The measured value of the temperature of the Reefer.
+
+        COA UDM Key: P22
       format: float
       example: -15
     temperatureUnit:
@@ -340,8 +413,10 @@ components:
       example: CEL
     measuredO2:
       type: number
-      description: |
-        The measured value of the controlled atmosphere `O<sub>2</sub>` value in percent
+      description: |-
+        The measured value of the controlled atmosphere value in percent
+
+        COA UDM Key: P10
       format: float
       minimum: 0
       maximum: 100
@@ -349,15 +424,20 @@ components:
     measuredCo2:
       type: number
       description: |
-        The measured value of the controlled atmosphere `CO<sub>2</sub>` value in percent
+        The measured value of the controlled atmosphere value in percent.
+
+        COA UDM Key: P8
       format: float
       minimum: 0
       maximum: 100
       example: 75.3
     measuredHumidity:
       type: number
-      description: |
-        The measured value of the controlled atmosphere humidity value in percent
+      description: |-
+        The measured value of the controlled atmosphere humidity value. in percent
+
+
+        COA UDM Key: P7
       format: float
       minimum: 0
       maximum: 100
@@ -418,17 +498,26 @@ components:
       example: 400
     returnProbe1Temperature:
       type: number
-      description: The return temperature of probe 1
+      description: |-
+        The return temperature of probe 1.
+
+        COA UDM Key: P115
       format: float
       example: -15
     returnProbe2Temperature:
       type: number
-      description: The return temperature of probe 2
+      description: |-
+        The return temperature of probe 2.
+
+        COA UDM Key: P116
       format: float
       example: -15
     returnTemperature:
       type: number
-      description: The return temperature
+      description: |-
+        The return temperature.
+
+        COA UDM Key: P5
       format: float
       example: -15
     suctionPressure:
@@ -442,17 +531,26 @@ components:
       example: -15
     supplySensor1Temperature:
       type: number
-      description: The supply sensor 1 temperature
+      description: |-
+        The supply sensor 1 temperature.
+
+        COA UDM Key: P16
       format: float
       example: -15
     supplySensor2Temperature:
       type: number
-      description: The supply sensor 2 temperature
+      description: |-
+        The supply sensor 2 temperature.
+
+        COA UDM Key: P17
       format: float
       example: -15
     supplyTemperature:
       type: number
-      description: The supply temperature
+      description: |-
+        The supply temperature.
+
+        COA UDM Key: P4
       format: float
       example: -15
     setpoints:
@@ -474,6 +572,10 @@ components:
           minimum: 0
           maximum: 100
           example: 95.6
+      required:
+        - temperature
+        - o2
+        - co2
     reeferSettings:
       type: object
       properties:
@@ -483,9 +585,14 @@ components:
           $ref: '#/components/schemas/isDefrosting'
         efficiencySetting:
           $ref: '#/components/schemas/efficiencySetting'
+      required:
+        - controlledAtmosphereMode
     controlledAtmosphereMode:
       type: string
-      description: The controlled atmosphere mode setting
+      description: |-
+        The controlled atmosphere mode setting.
+
+        COA UDM Key: P18
     isDefrosting:
       type: boolean
       description: Indicates if the device is defrosting
@@ -495,3 +602,77 @@ components:
     unitModel:
       type: string
       description: 'The unit model specific to the maker, COA UDM 5.5.3 code list'
+    device:
+      title: device
+      x-stoplight:
+        id: 1kvbmbk3mgnvb
+      type: object
+      description: |-
+        An IoT device which connects wirelessly to a
+        network and has an ability to transmit data. Types of devices
+        vary based on installation location (external/internal),
+        life cycle (single trip/permanent), etc. In this particular
+        document only, a “device” is part of the equipment of
+        a container. A device part of a refrigerated container is
+        connected to the controller
+      properties:
+        deviceDateTime:
+          type: string
+          x-stoplight:
+            id: 1s1tkfdzwmfwb
+          format: date-time
+          description: UTC time automatically set by a wireless device or similar
+          example: '2023-12-10T10:34:12Z'
+        model:
+          type: string
+          x-stoplight:
+            id: ib8g0rsr609ya
+          description: The model type name of the device
+          example: '100'
+        receivedDateTime:
+          type: string
+          x-stoplight:
+            id: 6s07i7gk87ux5
+          description: The time the recording was received by the Data Holder cloud system
+        isDeviceConnectedToPower:
+          type: string
+          x-stoplight:
+            id: bblp2oalsv19i
+          description: Indicates if the device is connected to power
+        brand:
+          type: string
+          x-stoplight:
+            id: rsu6qmilyac9c
+          description: The brand name of the device
+          example: '2'
+      required:
+        - deviceDateTime
+        - model
+        - receivedDateTime
+        - isDeviceConnectedToPower
+    inspection:
+      title: inspection
+      x-stoplight:
+        id: bzqic9cdj9u5d
+      type: object
+      description: details about the 'Smart PTI' that takes place during a trip
+      properties:
+        inspectionDate:
+          type: string
+          x-stoplight:
+            id: l162gjdnt7i7c
+          format: date-time
+          example: '2023-12-10T10:34:12Z'
+          description: The date of the remote 'smart' inspection
+        expiryDate:
+          type: string
+          x-stoplight:
+            id: yxv7hliq5782r
+          format: date-time
+          example: '2023-12-10T10:34:12Z'
+          description: 'The expiry date of the smart inspection '
+        hasPassed:
+          type: string
+          x-stoplight:
+            id: bzvehua6qi8h9
+          description: indicates if the 'smart pti' passed or failed
