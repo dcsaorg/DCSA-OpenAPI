@@ -4,6 +4,27 @@ The DCSA Domain is documented on [**DCSA Domain SwaggerHub**](https://app.swagge
 
 The primary purpose of this Domain is to specify common components to be reused across DCSA APIs and Domains. This Domain does not define any "complex" objects. Common QueryParameters (limit, cursor) and Headers (Current-Page, Next-Page, ...) are also defined here.
 
+<a name="v310"></a>[Release v3.1.0 (28 December 2023)](https://app.swaggerhub.com/domains-docs/dcsaorg/DCSA_DOMAIN/3.1.0)
+---
+Released as part of Booking v2.0.0 Beta 1 and EBL v3.0.0 Beta 1 release.
+
+- following properties have been added: `additionalContainerCargoHandling`, `codedVariantList`, `competentAuthorityApproval`, `containerInspectionBodyIdentifier`, `containerInspectionCertificateNumber`, `deliveryInstructionReference`, `deliveryOrderReference`, `destinationChargesPaymentTermCode`, `dgGrossWeight`, `dgVolume`, `dgRemarks`, `EMSNumber`, `endOfHoldingTime`, `flashPoint`, `freightPaymentTermCode`, `fumigationDateTime`, `imoClass`, `inhalationZone`, ``
+- following descriptions have been updated: `amendToTransportDocument`, `bargeFlag`, `commodityType`, `countryCode`, `currencyCode`, `declaredValueCurrency`, `equipmentReference`, `etaAtPlaceOfDeliveryDateTime`, `etaAtPortOfDischargeDateTime`, `HSCode`, ``, ``, ``, ``, ``
+- `bookingRequestCreatedDateTime` renamed to `bookingRequestDateTime`
+- `bookingRequestUpdatedDateTime` renamed to `bookingUpdatedDateTime`
+- `cargoLineItemID`, `carrierInformationToConsignee`, `commodityRequestedEquipmentLink`, `customsFilingSystem` deleted
+- following properties are no longer `enum` but now simple strings: `cargoMovementTypeAtOrigin`, `cargoMovementTypeAtDestination`, `communicationChannelCode`, `cutOffDateTimeCode`
+- `carrierCode` regEx pattern corrected
+- `chargeType` rename to `chargeName` and now accepts a maxLength of 50 instead of 20
+- `cityName`, `country` example improved
+- `clauseContent` maxLength set to 20000
+- added a new regEx to `customsImportDeclarationProcedure`
+- `cutOffDateTimeCode` now limited to 3 characters
+- `descriptionOfGoods` now limited to 5000 characters
+- `email` regEx pattern modified
+- `incoTerms` description updated and property limited to 3 characters
+- 
+ 
 <a name="v300"></a>[Release v3.0.0 (31 March 2023)](https://app.swaggerhub.com/domains-docs/dcsaorg/DCSA_DOMAIN/3.0.0)
 ---
 Released as part of Track & Trace 3.0.0 Beta 1 release. Contains Booking and eBL upodates as well. A lot of validation rules have been added
