@@ -6,17 +6,17 @@ The primary purpose of this Domain is to specify common components to be reused 
 
 <a name="v310"></a>[Release v3.1.0 (28 December 2023)](https://app.swaggerhub.com/domains-docs/dcsaorg/DCSA_DOMAIN/3.1.0)
 ---
-Released as part of Booking v2.0.0 Beta 1 and EBL v3.0.0 Beta 1 release.
+Released as part of Booking v2.0.0 Beta 1 and EBL v3.0.0 Beta 1 release. Many new properties for DG (Dangerous Goods) have been added. Many properties previously specified with `enum` values have been changed to only be a string in order to be better backward compatible. External links to other standardbodies have been updated. Many descriptions updated in order to be more clear.
 
-- following properties have been added: `additionalContainerCargoHandling`, `codedVariantList`, `competentAuthorityApproval`, `containerInspectionBodyIdentifier`, `containerInspectionCertificateNumber`, `deliveryInstructionReference`, `deliveryOrderReference`, `destinationChargesPaymentTermCode`, `dgGrossWeight`, `dgVolume`, `dgRemarks`, `EMSNumber`, `endOfHoldingTime`, `flashPoint`, `freightPaymentTermCode`, `fumigationDateTime`, `imoClass`, `inhalationZone`, `isControlledAtmosphereRequired`, `isCompetentAuthorityApprovalProvided`, `isContainerInspectionCertificateProvided`, `isEmptyUncleanedResidue`, `isExceptedQuantity`, `isHot`, `isLimitedQuantity`, `isMarinePollutant`, `isNonOperatingReefer`, `isReportableQuantity`, `isSalvagePackings`, `isWaste`, `naNumber`, `netExplosiveContent`, `netExplosiveContentUnit`, `netWeight`, `netWeightUnit`, `originChargesPaymentTermCode`, `packingGroup`, `properShippingName`, `sadt`, `sapt`, `sendToPlatform`, `shippingMark`, `specialCertificateNumber`, ``, ``
-- following descriptions have been updated: `amendToTransportDocument`, `bargeFlag`, `commodityType`, `countryCode`, `currencyCode`, `declaredValueCurrency`, `equipmentReference`, `etaAtPlaceOfDeliveryDateTime`, `etaAtPortOfDischargeDateTime`, `HSCode`, `ISOEquipmentCode`, `issueDate`, `isToOrder`, `numberOfCopiesWithCharges`, `numberOfCopiesWithoutCharges`, `numberOfOriginalsWithCharges`, `numberOfOriginalsWithoutCharges`, `paymentTermCode`, `receivedForShipmentDate`, `shippedOnBoardDate`, ``, ``, ``
+- following properties have been added: `additionalContainerCargoHandling`, `codedVariantList`, `competentAuthorityApproval`, `containerInspectionBodyIdentifier`, `containerInspectionCertificateNumber`, `deliveryInstructionReference`, `deliveryOrderReference`, `destinationChargesPaymentTermCode`, `dgGrossWeight`, `dgVolume`, `dgRemarks`, `EMSNumber`, `endOfHoldingTime`, `flashPoint`, `freightPaymentTermCode`, `fumigationDateTime`, `imoClass`, `inhalationZone`, `isControlledAtmosphereRequired`, `isCompetentAuthorityApprovalProvided`, `isContainerInspectionCertificateProvided`, `isEmptyUncleanedResidue`, `isExceptedQuantity`, `isHot`, `isLimitedQuantity`, `isMarinePollutant`, `isNonOperatingReefer`, `isReportableQuantity`, `isSalvagePackings`, `isWaste`, `naNumber`, `netExplosiveContent`, `netExplosiveContentUnit`, `netWeight`, `netWeightUnit`, `originChargesPaymentTermCode`, `packingGroup`, `properShippingName`, `sadt`, `sapt`, `sendToPlatform`, `shippingMark`, `specialCertificateNumber`, `subsidiaryRisk`, `technicalName`, `transportControlTemperature`, `transportEmergencyTemperature`, `unNumber`, `volumeUnitDG`
+- following descriptions have been updated: `amendToTransportDocument`, `bargeFlag`, `commodityType`, `countryCode`, `currencyCode`, `declaredValueCurrency`, `equipmentReference`, `etaAtPlaceOfDeliveryDateTime`, `etaAtPortOfDischargeDateTime`, `HSCode`, `ISOEquipmentCode`, `issueDate`, `isToOrder`, `numberOfCopiesWithCharges`, `numberOfCopiesWithoutCharges`, `numberOfOriginalsWithCharges`, `numberOfOriginalsWithoutCharges`, `paymentTermCode`, `receivedForShipmentDate`, `shippedOnBoardDate`, `UNLocationCode`, `vesselFlag`, `Api-Version-Major` (header)
 - `bookingRequestCreatedDateTime` renamed to `bookingRequestDateTime`
 - `bookingRequestUpdatedDateTime` renamed to `bookingUpdatedDateTime`
-- `cargoLineItemID`, `carrierInformationToConsignee`, `commodityRequestedEquipmentLink`, `customsFilingSystem`, `preCarriageUnderShippersResponsibility`, `referenceType` deleted
+- `cargoLineItemID`, `carrierInformationToConsignee`, `commodityRequestedEquipmentLink`, `customsFilingSystem`, `preCarriageUnderShippersResponsibility`, `referenceType`, `transportLocationType` deleted
 - following properties are no longer `enum` but now simple strings: `cargoMovementTypeAtOrigin`, `cargoMovementTypeAtDestination`, `communicationChannelCode`, `cutOffDateTimeCode`
 - `carrierCode` regEx pattern corrected
 - `chargeType` rename to `chargeName` and now accepts a maxLength of 50 instead of 20
-- `cityName`, `country`, `latitude`, `longitude`, `postCode`, `stateRegion` example improved
+- `cityName`, `country`, `latitude`, `longitude`, `postCode`, `stateRegion`, `streetName`, `streetNumber` example improved
 - `clauseContent` maxLength set to 20000
 - added a new regEx to `customsImportDeclarationProcedure`
 - `cutOffDateTimeCode` now limited to 3 characters
@@ -37,7 +37,9 @@ Released as part of Booking v2.0.0 Beta 1 and EBL v3.0.0 Beta 1 release.
 - `shippingInstructionCreatedDateTime` renamed to `shippingInstructionsCreatedDateTime` and description updated
 - `shippingInstructionReference` renamed to `shippingInstructionsReference` and description updated
 - `shippingMarks` maxLength set to 500 and example added
-- 
+- `termsAndConditions` now limited to 50000 characters and description modified
+- `universalVoyageReference`, `universalExportVoyageReference` and `universalImportVoyageReference` regEx modified to also include `R` (Roundtrip)
+- `LTR` (Litre) removed from allowed values in `volumeUnit`
  
 <a name="v300"></a>[Release v3.0.0 (31 March 2023)](https://app.swaggerhub.com/domains-docs/dcsaorg/DCSA_DOMAIN/3.0.0)
 ---
