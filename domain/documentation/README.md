@@ -13,6 +13,7 @@ A major rewrite of the Documnetation Domain. Less reuse of objects since endPoin
 - Bump [DCSA_Domain to version 3.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v310) (was previously v2.0.3)
 - Bump [Location_Domain to version 4.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v400) (was previously v2.0.3)
 - added `requestedChanges` object to keep track of  changes requested by the provider (carrier)
+
 **For Booking**:
 - `CreateBooking` object added in order to create a new Booking. Compared to previous version:
   - `freightPaymentTermCode`, `originChargesPaymentTermCode`, `destinationChargesPaymentTermCode` added
@@ -42,8 +43,10 @@ A major rewrite of the Documnetation Domain. Less reuse of objects since endPoin
   - `AFD` (AMS Filing Due date) added to `cutOffDateTimeCode` in `shipmentCutOffTimes`
 - `BookingRefStatus` object added for the `POST` and `PUT` responses
 - `BookingRefCancelledStatus` object added for the cancellation response
+
 **For Bill of Lading**:
 - 
+
 **Objects modified/added**:
 - `References`: `type` (referenceType) modified:
   - `SPO` (Shippers Purchase Order Reference), `CPO` (Consignees Purchase Order Reference) and `SAC` (Shipper Agency Code) added
