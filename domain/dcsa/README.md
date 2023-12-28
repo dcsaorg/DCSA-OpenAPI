@@ -8,15 +8,15 @@ The primary purpose of this Domain is to specify common components to be reused 
 ---
 Released as part of Booking v2.0.0 Beta 1 and EBL v3.0.0 Beta 1 release.
 
-- following properties have been added: `additionalContainerCargoHandling`, `codedVariantList`, `competentAuthorityApproval`, `containerInspectionBodyIdentifier`, `containerInspectionCertificateNumber`, `deliveryInstructionReference`, `deliveryOrderReference`, `destinationChargesPaymentTermCode`, `dgGrossWeight`, `dgVolume`, `dgRemarks`, `EMSNumber`, `endOfHoldingTime`, `flashPoint`, `freightPaymentTermCode`, `fumigationDateTime`, `imoClass`, `inhalationZone`, `isControlledAtmosphereRequired`, `isCompetentAuthorityApprovalProvided`, `isContainerInspectionCertificateProvided`, `isEmptyUncleanedResidue`, `isExceptedQuantity`, `isHot`, `isLimitedQuantity`, `isMarinePollutant`, `isNonOperatingReefer`, `isReportableQuantity`, `isSalvagePackings`, `isWaste`, `naNumber`, `netExplosiveContent`, `netExplosiveContentUnit`, `netWeight`, `netWeightUnit`, `originChargesPaymentTermCode`, `packingGroup`, `properShippingName`, ``
-- following descriptions have been updated: `amendToTransportDocument`, `bargeFlag`, `commodityType`, `countryCode`, `currencyCode`, `declaredValueCurrency`, `equipmentReference`, `etaAtPlaceOfDeliveryDateTime`, `etaAtPortOfDischargeDateTime`, `HSCode`, `ISOEquipmentCode`, `issueDate`, `isToOrder`, `numberOfCopiesWithCharges`, `numberOfCopiesWithoutCharges`, `numberOfOriginalsWithCharges`, `numberOfOriginalsWithoutCharges`, `paymentTermCode`, `receivedForShipmentDate`, ``, ``, ``, ``
+- following properties have been added: `additionalContainerCargoHandling`, `codedVariantList`, `competentAuthorityApproval`, `containerInspectionBodyIdentifier`, `containerInspectionCertificateNumber`, `deliveryInstructionReference`, `deliveryOrderReference`, `destinationChargesPaymentTermCode`, `dgGrossWeight`, `dgVolume`, `dgRemarks`, `EMSNumber`, `endOfHoldingTime`, `flashPoint`, `freightPaymentTermCode`, `fumigationDateTime`, `imoClass`, `inhalationZone`, `isControlledAtmosphereRequired`, `isCompetentAuthorityApprovalProvided`, `isContainerInspectionCertificateProvided`, `isEmptyUncleanedResidue`, `isExceptedQuantity`, `isHot`, `isLimitedQuantity`, `isMarinePollutant`, `isNonOperatingReefer`, `isReportableQuantity`, `isSalvagePackings`, `isWaste`, `naNumber`, `netExplosiveContent`, `netExplosiveContentUnit`, `netWeight`, `netWeightUnit`, `originChargesPaymentTermCode`, `packingGroup`, `properShippingName`, `sadt`, `sapt`, `sendToPlatform`, `shippingMark`, `specialCertificateNumber`, ``, ``
+- following descriptions have been updated: `amendToTransportDocument`, `bargeFlag`, `commodityType`, `countryCode`, `currencyCode`, `declaredValueCurrency`, `equipmentReference`, `etaAtPlaceOfDeliveryDateTime`, `etaAtPortOfDischargeDateTime`, `HSCode`, `ISOEquipmentCode`, `issueDate`, `isToOrder`, `numberOfCopiesWithCharges`, `numberOfCopiesWithoutCharges`, `numberOfOriginalsWithCharges`, `numberOfOriginalsWithoutCharges`, `paymentTermCode`, `receivedForShipmentDate`, `shippedOnBoardDate`, ``, ``, ``
 - `bookingRequestCreatedDateTime` renamed to `bookingRequestDateTime`
 - `bookingRequestUpdatedDateTime` renamed to `bookingUpdatedDateTime`
 - `cargoLineItemID`, `carrierInformationToConsignee`, `commodityRequestedEquipmentLink`, `customsFilingSystem`, `preCarriageUnderShippersResponsibility`, `referenceType` deleted
 - following properties are no longer `enum` but now simple strings: `cargoMovementTypeAtOrigin`, `cargoMovementTypeAtDestination`, `communicationChannelCode`, `cutOffDateTimeCode`
 - `carrierCode` regEx pattern corrected
 - `chargeType` rename to `chargeName` and now accepts a maxLength of 50 instead of 20
-- `cityName`, `country`, `latitude`, `longitude`, `postCode` example improved
+- `cityName`, `country`, `latitude`, `longitude`, `postCode`, `stateRegion` example improved
 - `clauseContent` maxLength set to 20000
 - added a new regEx to `customsImportDeclarationProcedure`
 - `cutOffDateTimeCode` now limited to 3 characters
@@ -30,7 +30,14 @@ Released as part of Booking v2.0.0 Beta 1 and EBL v3.0.0 Beta 1 release.
   - `ENR` (Envelope Receiver) value removed
   - `END` (Endorsee Party) added
   - maxLength set to 3 characters
-- `requestedEquipmentUnits` 
+- `requestedEquipmentUnits` changed from float to integer and minimum value changed from 0 --> 1. Description also changed
+- `returnDescription` regEx pattern added
+- `sealSource` and `sealType` no longer an enum and now limited to 5 characters
+- `shipmentLocationTypeCode` no longer an enum and now limited to 3 characters
+- `shippingInstructionCreatedDateTime` renamed to `shippingInstructionsCreatedDateTime` and description updated
+- `shippingInstructionReference` renamed to `shippingInstructionsReference` and description updated
+- `shippingMarks` maxLength set to 500 and example added
+- 
  
 <a name="v300"></a>[Release v3.0.0 (31 March 2023)](https://app.swaggerhub.com/domains-docs/dcsaorg/DCSA_DOMAIN/3.0.0)
 ---
