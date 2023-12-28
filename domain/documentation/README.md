@@ -13,6 +13,7 @@ A major rewrite of the Documnetation Domain. Less reuse of objects since endPoin
 - Bump [DCSA_Domain to version 3.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v310) (was previously v2.0.3)
 - Bump [Location_Domain to version 4.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v400) (was previously v2.0.3)
 - added `requestedChanges` object to keep track of  changes requested by the provider (carrier)
+**For Booking**:
 - `CreateBooking` object added in order to create a new Booking. Compared to previous version:
   - `freightPaymentTermCode`, `originChargesPaymentTermCode`, `destinationChargesPaymentTermCode` added
   - `paymentTermCode`, `preCarriageModeOfTransportCode` removed
@@ -41,37 +42,39 @@ A major rewrite of the Documnetation Domain. Less reuse of objects since endPoin
   - `AFD` (AMS Filing Due date) added to `cutOffDateTimeCode` in `shipmentCutOffTimes`
 - `BookingRefStatus` object added for the `POST` and `PUT` responses
 - `BookingRefCancelledStatus` object added for the cancellation response
-- the following objects were modified:
-  - `References`: `type` (referenceType) modified:
-    - `SPO` (Shippers Purchase Order Reference), `CPO` (Consignees Purchase Order Reference) and `SAC` (Shipper Agency Code) added
-    - `PO` (Purchase Order), `RUC` (Registro Único del Contribuyente), `DUE` (Declaração Única de Exportação), `CER` (Canadian Export Reporting System), `AES` (Automated Export System) removed
-    - no longer an `enum` --> has been changed to be a string for backward compatibility
-  - `Party`:
-    - `taxAndLegalReferences` object added to keep track of tax and legal references
-    - `taxReference1` and `taxReference2` removed (use `taxAndLegalReferences` instead)
-    - `publicKey` removed as it was not used
-    - `partyContactDetails` is no longer mandatory
-  - `PartyContactDetails` structure changed to require either `phone` or `email` or both. `url` has been removed
-  - `identifyingCodes`:
-    - `DCSAResponsibleAgencyCode` renamed to `codeListProvider` and updated:
-      - `EXIS` (Exis Technologies Ltd.), `DID` (Decentralized Identifier), `LEI` (Legal Entity Identifier) removed
-      - `NCBH` (NCB Hazcheck), `DCSA` (Digitial Container Shipping Association), `W3C` (World Wide Web Consortium) and `GLEIF` (Global Legal Entity Identifier Foundation) added
-      - changed from `enum` --> string for backwards compatibility
-  - `shipmentLocations`:
-    - `location` structure changed from an `anyOf` --> `oneOf`
-    - `shipmentLocationTypeCode` renamed to `locationTypeCode` with the following modification:
-      - `PSR` (Pre-carriage under shipper’s responsibility) and `ECP` (Empty container pick-up location) removed
-  - `requestedEquipments`:
-    - structure changed so `tareWeight` and `tareWeightUnit` along with `isShipperOwned` are specified via a `oneOf` Shipper Owned or Carrier Owned structure
-    - `isNonOperatingReefer`, `activeReeferSettings`, `commodities` and `references` added
-    - `commodityRequestedEquipmentLink` removed (this is now renamed to `commoditySubReference` and a carrierProvided value in the commodity-object)
-  - `commodity`:
-    - `HSCode` is now a list of `HSCodes` and hence renamed to `HSCodes`
-    - `numberOfPackages` moved into the `outerPackaging` object
-    - `references` added
-    - `commodityRequestedEquipmentLink` removed
-  - `outerPackaging` added as a new object containing the following properties: `packageCode`, `imoPackagingCode`, `numberOfPackages`, `description` and a new `DangerousGoods` object to include a list of DG declarations
-  - `Charge` object has renamed `chargeType` into `chargeName`
+**For Bill of Lading**:
+- 
+**Objects modified/added**:
+- `References`: `type` (referenceType) modified:
+  - `SPO` (Shippers Purchase Order Reference), `CPO` (Consignees Purchase Order Reference) and `SAC` (Shipper Agency Code) added
+  - `PO` (Purchase Order), `RUC` (Registro Único del Contribuyente), `DUE` (Declaração Única de Exportação), `CER` (Canadian Export Reporting System), `AES` (Automated Export System) removed
+  - no longer an `enum` --> has been changed to be a string for backward compatibility
+- `Party`:
+  - `taxAndLegalReferences` object added to keep track of tax and legal references
+  - `taxReference1` and `taxReference2` removed (use `taxAndLegalReferences` instead)
+  - `publicKey` removed as it was not used
+  - `partyContactDetails` is no longer mandatory
+- `PartyContactDetails` structure changed to require either `phone` or `email` or both. `url` has been removed
+- `identifyingCodes`:
+  - `DCSAResponsibleAgencyCode` renamed to `codeListProvider` and updated:
+    - `EXIS` (Exis Technologies Ltd.), `DID` (Decentralized Identifier), `LEI` (Legal Entity Identifier) removed
+    - `NCBH` (NCB Hazcheck), `DCSA` (Digitial Container Shipping Association), `W3C` (World Wide Web Consortium) and `GLEIF` (Global Legal Entity Identifier Foundation) added
+    - changed from `enum` --> string for backwards compatibility
+- `shipmentLocations`:
+  - `location` structure changed from an `anyOf` --> `oneOf`
+  - `shipmentLocationTypeCode` renamed to `locationTypeCode` with the following modification:
+    - `PSR` (Pre-carriage under shipper’s responsibility) and `ECP` (Empty container pick-up location) removed
+- `requestedEquipments`:
+  - structure changed so `tareWeight` and `tareWeightUnit` along with `isShipperOwned` are specified via a `oneOf` Shipper Owned or Carrier Owned structure
+  - `isNonOperatingReefer`, `activeReeferSettings`, `commodities` and `references` added
+  - `commodityRequestedEquipmentLink` removed (this is now renamed to `commoditySubReference` and a carrierProvided value in the commodity-object)
+- `commodity`:
+  - `HSCode` is now a list of `HSCodes` and hence renamed to `HSCodes`
+  - `numberOfPackages` moved into the `outerPackaging` object
+  - `references` added
+  - `commodityRequestedEquipmentLink` removed
+- `outerPackaging` added as a new object containing the following properties: `packageCode`, `imoPackagingCode`, `numberOfPackages`, `description` and a new `DangerousGoods` object to include a list of DG declarations
+- `Charge` object has renamed `chargeType` into `chargeName`
 
 <a name="v210"></a>[Release v2.1.0 (23 December 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN/2.1.0)
 ---
