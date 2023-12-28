@@ -16,7 +16,7 @@ A major rewrite of the Documnetation Domain. Less reuse of objects since endPoin
 - `CreateBooking` object added in order to create a new Booking. Compared to previous version:
   - `freightPaymentTermCode`, `originChargesPaymentTermCode`, `destinationChargesPaymentTermCode` added
   - `paymentTermCode`, `preCarriageModeOfTransportCode` removed
-  - `isCustomsFilingSubmissionByShipper` removed and substituted with the `advanceManifestFilings`
+  - `isCustomsFilingSubmissionByShipper` removed and substituted with the `advanceManifestFilings` in the `Shipping Instructions`
   - `vesselName ` and `vesselIMONumber` moved into `vessel` object
   - `invoicePayableAt` and `placeOfBLIssue` structure changed from an `anyOf` --> `oneOf`
   - `partyContactDetails` added for contact details regarding the booking
@@ -24,7 +24,21 @@ A major rewrite of the Documnetation Domain. Less reuse of objects since endPoin
   - `valueAddedServices` removed
   - `commodities` removed from root level and added below `requestedEquipments`
 - `UpdateBooking` object added in order to update an existing Booking
-- `Booking` object added in order to fetch a Booking
+- `Booking` object added in order to fetch a Booking. Compared to previous version:
+  - the object is now a combination of a `Booking Request` and a `Confirmed Booking`
+  - `bookingRequestCreatedDateTime` and `bookingRequestUpdateddDateTime` removed
+  - `documentStatus` renamed to `bookingStatus` and `amendedBookingStatus` added in order to follow the status for an amendment
+  - `isAMSACIFilingRequired` removed
+  - `commoditySubReference` added to `commodities` inside the `requestedEquipments`
+  - `units` and `ISOEquipmentCode` now mandatory fields inside `confirmedEquipments`
+  - `transports` renamed to `transportPlan` with the following modifications:
+    - all locations are now a `oneOf` instead of an `anyOf`
+    - `carrierServiceCode` and `universalServiceCode` added
+    - `isUnderShippersResponsibility` removed
+    - `advanceManifestFilings` added
+    - `requestedChanges` object added
+    - `reason` field added
+  - `AFD` (AMS Filing Due date) added to `cutOffDateTimeCode` in `shipmentCutOffTimes`
 - `BookingRefStatus` object added for the `POST` and `PUT` responses
 - `BookingRefCancelledStatus` object added for the cancellation response
 - the following objects were modified:
@@ -51,8 +65,13 @@ A major rewrite of the Documnetation Domain. Less reuse of objects since endPoin
     - structure changed so `tareWeight` and `tareWeightUnit` along with `isShipperOwned` are specified via a `oneOf` Shipper Owned or Carrier Owned structure
     - `isNonOperatingReefer`, `activeReeferSettings`, `commodities` and `references` added
     - `commodityRequestedEquipmentLink` removed (this is now renamed to `commoditySubReference` and a carrierProvided value in the commodity-object)
-    - 
-    - 
+  - `commodity`:
+    - `HSCode` is now a list of `HSCodes` and hence renamed to `HSCodes`
+    - `numberOfPackages` moved into the `outerPackaging` object
+    - `references` added
+    - `commodityRequestedEquipmentLink` removed
+  - `outerPackaging` added as a new object containing the following properties: `packageCode`, `imoPackagingCode`, `numberOfPackages`, `description` and a new `DangerousGoods` object to include a list of DG declarations
+  - `Charge` object has renamed `chargeType` into `chargeName`
 
 <a name="v210"></a>[Release v2.1.0 (23 December 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN/2.1.0)
 ---
