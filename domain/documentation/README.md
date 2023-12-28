@@ -4,12 +4,20 @@ The Documentation Domain is documented on [**Documentation Domain**](https://app
 
 This Domain specifies reusable objects for the eDocumentation: [Booking](https://app.swaggerhub.com/apis/dcsaorg/DCSA_BKG) and [Electronic Bill of Lading](https://app.swaggerhub.com/apis/dcsaorg/DCSA_EBL).
 
-<a name="v300"></a>[Release v3.0.0 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN/3.0.0)
+<a name="v300"></a>[Release v3.0.0 (28 December 2023)](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN/3.0.0)
 ---
-Active Reefer Settings has been added
+A major rewrite of the Documnetation Domain. Less reuse of objects since endPoints using the objects are asymetric. This release is for Booking v2.0.0 Beta 1 and EBL v3.0.0 Beta 1.
 
-- `activeReeferSettings` added to `requestedEquipment`
-- `activeReeferSettings` updated on the `utilizedTransportEquipment`
+- object names are now capitalized
+- objects now contain the `title` property for viasual presentation. It maay contain spaces
+- Bump [DCSA_Domain to version 3.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v310) (was previously v2.0.3)
+- Bump [Location_Domain to version 4.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v400) (was previously v2.0.3)
+- added `requestedChanges` object to keep track of  changes requested by the provider (carrier)
+- `CreateBooking` object added in order to create a new Booking
+- `UpdateBooking` object added in order to update an existing Booking
+- `Booking` object added in order to fetch a Booking
+- `BookingRefStatus` object added for the `POST` and `PUT` responses
+- `BookingRefCancelledStatus` object added for the cancellation response
 
 <a name="v210"></a>[Release v2.1.0 (23 December 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN/2.1.0)
 ---
