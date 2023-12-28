@@ -5,19 +5,24 @@ info:
   description: |
     API specification issued by DCSA.org.
     
-    For explanation to specific values or objects please refer to the [Information Model v2023.Q3]() *** _Will be updated_ ***. This API does not define the business rules regarding what is allowed to update at what time. For this the [Electronic Bill of Lading IFS]() *** _Will be updated_ *** should be consulted.
+    For explanation of specific values or objects please refer to the [Information Model v2023.Q4](https://dcsa.org/wp-content/uploads/2024/01/DCSA-Information-Model-2023.Q4.pdf). This API specification does not define the allowable updates and their timing in accordance with the established business rules. Refer to the [DCSA Interface Standard for the Bill of Lading 3.0 Beta 1](https://dcsa.atlassian.net/wiki/external/Y2MwYmRiMmE4MTc2NGJmOGI3ZDczZTQ1ZTM0NzQxYWY) to address this. **All use cases mentioned in this API specification refer to use cases defined in the eBL IFS**.
     
-    All other documents related to the Electronic Bill of Lading publication can be found [here](https://knowledge.dcsa.org/s/publication?publicationId=a0r7T000000L8lPQAS)
+    All other documents related to the Electronic Bill of Lading publication can be found [here](https://dcsa.org)
 
-    It is possible to use this API as a standalone API. In order to do so it is necessary to use the poll-endPoint
-    - /v3/events
+    It is possible to use the eBL API as a standalone API. In that case use one of the poll endPoints:
 
-    in order to poll event information.
+        GET /v3/shipping-instructions/{documentReference}  # For Shipping Instructions status
+        GET /v3/transport-documents/{transportDocumentReference}  # For Transport Document status
+    
+    in order to poll information about status changes.
 
-    It is recomended to implement the [DCSA Documentation Event Hub](https://app.swaggerhub.com/apis/dcsaorg/DOCUMENTATION_EVENT_HUB) in order to use the push model. Here events are pushed as they occur.
+    ### Notifications
+    It is possible to have notifications pushed to you whenever the provider needs input and/or a state change. The format of the notification is defined by the [Electronic Bill of Lading Notification API](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_NTF/3.0.0-Beta-1). Signing up for notifications is defined outside the scope of this API specification.
 
-    For a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/ebl/v3#v300B1). Please also [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments.
-
+    ### Stats API
+    The Stats API offers crucial statistical information for both API providers and consumers to enhance their services and helps DCSA to understand and scale the ecosystem. We expect you to invoke the Stats API for every request made to the Electronic Bill of Lading API. Further details can be found [here](https://developer.dcsa.org/#/http/guides/api-guides/stats-api)
+    
+    For a changelog, please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/ebl/v3#v300B1). Please [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments.
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -28,258 +33,210 @@ info:
 tags:
   - name: Shipping Instructions
     description: |
-      The initial steps by the Shipper to create a Bill of Lading
-  - name: Transport Documents
+      The Shipping Instructions
+  - name: Transport Document
     description: |
-      The Transport Document as agreed by both parties
-  - name: Bill of Lading Events
-    description: |
-      If no subscriptions have been setup, event polling can be done here
+      The Transport Document
 paths:
-  /v3/shipping-instructions-summaries:
-    get:
-      tags:
-       - Shipping Instructions
-      summary: 'Get shipping instructions'
-      operationId: 'getShippingInstructionSummeries'
-      description: |
-        Retrieves the shipping instruction _metadata_
-        
-        If not specified - this list will be sorted by the time the `ShippingInstruction` was created (shippingInstructionCreatedDateTime) in ascending (ASC) order.
-      parameters:
-        - $ref: '#/components/parameters/carrierBookingReferences'
-        # - in: query
-        #   name: carrierBookingReference
-        #   description: |
-        #     A set of unique characters provided by carrier to identify a booking confirmation.
-            
-        #     Specifying this filter will only return Shipping Instructions related to this particular `carrierBookingReference`.
-        #   schema:
-        #     $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/carrierBookingReference'
-        - $ref: '#/components/parameters/documentStatus'
 
-        # - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/parameters/cursor'
-        # - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/parameters/offset'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/parameters/limit'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/parameters/sort'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/parameters/Api-Version-Major'
-      responses:
-        '200':
-          description: Request successful
-          headers:
-            API-Version:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/headers/API-Version'
-            Current-Page:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/headers/Current-Page'
-            Next-Page:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/headers/Next-Page'
-            Prev-Page:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/headers/Prev-Page'
-            Last-Page:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/headers/Last-Page'
-            First-Page:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/headers/First-Page'
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/3.0.0#/components/schemas/shippingInstructionSummary'
-        default:
-          description: Unexpected error
-          headers:
-            API-Version:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/headers/API-Version'
-          content:
-            application/json:
-              schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.1#/components/schemas/error'
+  ##############################
+  # Shipping Instructions Request
+  ##############################
+
   /v3/shipping-instructions:
     post:
       tags:
        - Shipping Instructions
-      summary: Post a shipping instruction
-      operationId: 'postShippingInstruction'
+      summary: |
+        Creates a Shipping Instructions
+      operationId: 'create-shipping-instructions'
       description: |
-        Creates a new Shipping Instruction. This endPoint corresponds with [**UseCase 1 - Submit Shipping Instruction**]() in the Electronic Bill of Lading Interface Standards (IFS) document.
+        Creates a new `Shipping Instructions`. This endPoint corresponds with **UseCase 1 - Submit Shipping Instructions**.
         
         ## Precondition
-        The consumer has information for a `Shipping Instruction`.
+        The consumer has information for a `Shipping Instructions`. The empty equipment has been released to the shipper. The `Booking` is in state `CONFIRMED`.
         
         ## Postcondition
-        The provider has received the `Shipping Instruction`.
+        The provider has received the `Shipping Instructions`.
         
-        The consumer will receive a `201` (Created) if the payload schema-validates or a `400` (Bad Request) if it does not.
+        The consumer will receive a `201` (Created) if the payload schema validates or a `400` (Bad Request) if it does not.
         
-        If a `201` (Created) is returned - a `ShipmentEvent` with the status `RECE` (Received) is also created. The provider can **optionally** do a full validation in which case a second `ShipmentEvent` is created. The full validation can also be done asynchroniously in which case the second `ShipmentEvent` will be created later.
+        ## Flow
+        The following occurs when a provider receives a `Shipping Instructions`:
+        1. The payload (`Shipping Instructions`) is schema-validated. In case the payload **is invalid** a `400` (Bad Request) is returned.
         
-        ## Process
-        The following occurs when a provider recieves a booking request:
-        1. The payload (Shipping Instruction) is schema-validated. In case the payload **is invalid** a `400` (Bad Request) is returned
-        2. A `shippingInstructionReference` (as a reference to the Shipping Instruction) is created and stored along with the payload in the provider database.
-          
-            **For the rest of this description and in all examples the value `si-123` will be used as `shippingInstructionReference`**
-        3. A `ShipmentEvent` is created:
-            ```
-            {
-              metadata: {
-                { ---metadata fields omitted for clarity--- }
-              },
-              payload: {
-                eventClassifierCode: 'ACT',
-                eventDateTime: { ---now--- },
-                shipmentEventTypeCode: 'RECE',
-                documentTypeCode: 'SHI'
-                documentReference: 'si-123'    // NB: as specified above
-              }
-            }
-            ```
+           **The process stops here!**
         
-        The provider can now choose to either do **no validation** or make a **full validation**
+        2. The payload is schema-valid which means:
+            - all required properties are provided.
+            - all values provided have correct data type.
 
-        ### No validation
-        4. A `201` (Created) response is returned with the following payload
+           A `shippingInstructionsReference` (as a reference to the `Shipping Instructions`) is created and stored along with the payload in the provider system.
+          
+           **For the rest of this description and in all examples the value `si-123` will be used as `shippingInstructionsReference`**
+
+        3. A `201` (Created) response is returned with the following payload:
             ```
             {
-              shippingInstructionReference: 'si-123',
-              documentStatus: 'RECE'
+              shippingInstructionsReference: 'si-123',
+              shippingInstructionsStatus: 'RECEIVED'
             }
             ```
-        For `POST` Shipping Instruction the process ends here in case no further validation is done at this point. The Shipping Instruction
+        4. All '_relevant_' subscribers will be notified via a [Shipping Instructions Notification](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_NTF/3.0.0-Beta-1#/Notifications/shipping-instructions-notifications).
+
+        For `POST` `Shipping Instructions` the process ends here. The `Shipping Instructions`
         
           - is now stored in the provider system
-          - has status `RECE` (Received)
+          - has status `RECEIVED`
           - awaits further processing by the provider
-          - a `201` (Created) response is sent to the consumer with a payload containing `documentStatus=RECE`
+          - a `201` (Created) response is sent to the consumer with a payload containing `documentStatus=RECEIVED`
+          - '_relevant_' subscribers have been notified.
         
-        Any further communication from provider to consumer will be done via `ShipmentEvents` and can be monitored by the consumer on the
+        The provider wil now start asynchronous processing. Once processed, the new status of the `Shipping Instructions` will be communicated via a `Shipping Instructions Notification`. In case the consumer does not subscribe to notifications it is necessary for the consumer to poll on the
         
-            GET /v3/events
+            GET /v3/shipping-instructions/{documentReference}
             
-          endPoint.
-        
-        ### Full validation
-        4. Do full validation of the payload. Some examples could be:
-            - check all conditional fields
-            - check Equipment References specified
-            - check...
-            - etc
-            
-            Making a full validation requires the provider to check against all business rules (_the list above is just examples_)
-        5. Create a `ShipmentEvent` (in addition to the `ShipmentEvent` created in step 3) with the new status based on the validation result in step 4:
-            - **Update required**
-               
-              If an update to the Shipping Instruction is required (equivalent to [**UseCase 2 - Request update to Shipping instruction**]() in the Electronic Bill of Lading Interface Standard (IFS) document) a `ShipmentEvent` is created with the status `PENU` (Pending Update) :
-              ```
-              {
-                metadata: {
-                   { ---metadata fields omitted for clarity--- }
-                },
-                payload: {
-                  eventClassifierCode: 'ACT',
-                  eventDateTime: { ---now--- },
-                  shipmentEventTypeCode: 'PENU',
-                  documentTypeCode: 'SHI'
-                  documentReference: 'si-123',
-                  reason: 'The Consginee Party specified cannot be uniquely identified - please provide some more information'
-                }
-              }
-              ```
-            - **Draft Transport Document**
-            
-              If the Shipping Instruction is accepted a Draft Transport Document is published (equivalent to [**UseCase 4 - Publish Draft Transport Document**]() in the Electronic Bill of Lading Interface Standard (IFS) document) a `ShipmentEvent` is created with the status `DRFT` (Drafted). The `ShipmentEvent` contains the `transportDocumentReference`. **For the rest of this description and in all examples the value `td-987` will be used as `transportDocumentReference`.**
-                
-                TransportDocument `td-987` will be linked to ShippingInstruction `si-123`. It will now be possible to call:
-                
-                   GET /v3/transport-documents/td-987
-                   
-                In order to get the `Transport Document`. Here is an example of the `ShipmentEvent`:
-
-              ```
-              {
-                metadata: {
-                  { ---metadata fields omitted for clarity--- }
-                },
-                payload: {
-                  eventClassifierCode: 'ACT',
-                  eventDateTime: { ---now--- },
-                  shipmentEventTypeCode: 'DRFT',
-                  documentTypeCode: 'TRD'
-                  documentReference: 'td-987'
-                }
-              }
-              ```
-            - **Reject Shipping Instruction ???**
-            
-              If the Shipping Instruction needs to be rejected (equivalent to [**UseCase ??? - *]() in the Electronic Bill of Lading Interface Standard (IFS) document) a `ShipmentEvent` is created with the status `REJE` (Rejected):
-              ```
-              {
-                metadata: {
-                  { ---metadata fields omitted for clarity--- }
-                },
-                payload: {
-                  eventClassifierCode: 'ACT',
-                  eventDateTime: { ---now--- },
-                  shipmentEventTypeCode: 'REJE',
-                  documentTypeCode: 'CBR'
-                  documentReference: 'cbr-123',
-                  reason: 'The Booking request has been rejeted due to inactivity during the last 30 days'
-                }
-              }
-              ```
-        6. A `201` (Created) response is returned with the following payload (`documentStatus` can also be `DRFT` - `PENU` used in the example)
-            ```
-            {
-              shippingInstructionReference: 'si-123',
-              documentStatus: 'PENU'
-            }
-            ```
-        
-        For a full validation the `POST` Shipping Instruction ends here. The Shipping Instruction
-            
-        - is now stored in the provider system
-        - a `ShipmentEvent` with status `RECE` (Received) has been created
-        - a full validation has been done
-        - a second `ShipmentEvent` is created with one of the following statuses:
-          - `PENU` (Pending Update) in case provider awaits further input from consumer
-          - `DRFT` (Drafted) in case provider has accepted the Shipping Instruction and a Transport Document has been drafted
-          - `REJE ??` (Rejected) in case the provider has rejected the Shipping Instruction.
-        - a `201` (Created) response is sent to the consumer with a payload containing the `documentStatus` of the second `ShipmentEvent`
-          
-        Any further communication from provider to consumer will be done via `ShipmentEvents` and can be monitored by the consumer on the
-
-            GET /v2/events
-        endPoint.
+          endPoint to check if the `shippingInstructionsStatus` of the `Shipping Instructions` has changed.
       parameters:
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/parameters/Api-Version-Major'
       requestBody:
-        description: Parameters used to create the Shipping Instruction
+        description: |
+          Parameters used to create the `Shipping Instructions`
         required: true
         content:
           application/json:
             schema:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/3.0.0#/components/schemas/shippingInstructionRequest'
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/3.0.0#/components/schemas/CreateShippingInstructions'
+            examples:
+              regularSTDExample:
+                summary: |
+                  Create a Shipping Instructions
+                description: |
+                  A new `Shipping Instructions` with standard Dry cargo: `Black shoes`. The shoes are packed in 400 `Fibreboard boxes` and stuffed inside a single container (`NARU3472484`). The shipment has been booked via `carrierBookingReference` = `CBR_123_REGULAR`
+                  
+                  The `Shipping Instructions` now awaits the provider to `DRAFT` a `Transport Document`.
+                value:
+                  transportDocumentTypeCode: 'BOL'
+                  isShippedOnBoardType: true
+                  freightPaymentTermCode: 'PRE'
+                  isElectronic: true
+                  isToOrder: true
+                  invoicePayableAt:
+                    locationType: 'UNCO'
+                    UNLocationCode: 'DKAAR'
+                  partyContactDetails:
+                    - name: 'DCSA test person'
+                      email: 'no-reply@dcsa.example.org'
+                  documentParties:
+                    - party:
+                        partyName: 'DCSA CTK'
+                        partyContactDetails:
+                          - name: 'DCSA test person'
+                            email: 'no-reply@dcsa.example.org'
+                      partyFunction: 'OS'
+                      isToBeNotified: false
+                  consignmentItems:
+                    - carrierBookingReference: 'CBR_123_REGULAR'
+                      weight: 12000
+                      weightUnit: 'KGM'
+                      descriptionOfGoods: 'Shoes - black, 400 boxes'
+                      HSCodes:
+                        - '640510'
+                      commoditySubreference: 'RegSubRef001'
+                      cargoItems:
+                        - equipmentReference: 'NARU3472484'
+                          weight: 12000
+                          weightUnit: 'KGM'
+                          outerPackaging:
+                            numberOfPackages: 400
+                            packageCode: '4G'
+                            description: 'Fibreboard boxes'
+                  utilizedTransportEquipments:
+                    - isShipperOwned: false
+                      seals:
+                        - number: 'DCSA-CTK-1234'
+                      equipmentReference: 'NARU3472484'
       responses:
         '201':
           description: |
-            Shipping Instruction has been successfully created in the provider system. Depending on the level of validation done by the provider - the status of the Shipping Instruction will be one of the following:
-            - `RECE` (Received) in case asynchronous processing of the Shipping Instruction begins. The Shipping Instruction is now awaiting the provider to finish the validation
-            - `PENU` (Pending Update) in case provider needs the Shipping Instruction to be updated and awaits further input from consumer
-            - `DRFT` (Drafted) in case provider has accepted the Shipping Instruction and drafted a Transport Document
-            - `REJE` (Rejected) in case the provider has rejected the Shipping Instruction. The Shipping Instruction can no longer be updated
-            
-            The status of the Shipping Instruction is communicated via `ShipmentEvent(s)` and can be monitored by the consumer on the
-              
-                GET /v2/events
-              
-              endPoint.
+            The `Shipping Instructions` has been successfully created in the provider system. The status of the `Shipping Instructions` is now `RECEIVED`. The consumer is now awaiting provider to process the `Shipping Instructions` asynchronously.
           headers:
             API-Version:
               $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/headers/API-Version'
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/3.0.0#/components/schemas/shippingInstructionRefStatus'
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/3.0.0#/components/schemas/ShippingInstructionsRefStatus'
+              examples:
+                receExample:
+                  summary: |
+                    Shipping Instructions received
+                  description: |
+                    A `Shipping Instructions` has been received (`shippingInstructionsStatus='RECEIVED'`), schema validated and stored in provider system
+                  value:
+                    shippingInstructionsReference: 'si-123'
+                    shippingInstructionsStatus: 'RECEIVED'
+        '400':
+          description: |
+            In case the `Shipping Instructions` does not schema validate a `400` (Bad Request) is returned
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/3.0.0#/components/schemas/Error'
+              examples:
+                badRequestExample:
+                  summary: |
+                    Shipping Instructions missing isElectronic
+                  description: |
+                    `isElectronic` is a mandatory property in the `Shipping Instructions`. In case this property is missing an error objet is created.
+                    
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: 'POST'
+                    requestUri: '/v3/shipping-instructions'
+                    statusCode: 400
+                    statusCodeText: 'Bad Request'
+                    statusCodeMessage: 'isElectronic not found - it is a mandatory property in Shipping Instructions'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    errorDateTime: '2023-10-03T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7003
+                        property: 'isElectronic'
+                        errorCodeText: 'mandatory property missing'
+                        errorCodeMessage: 'isElectronic must be provided as part of a Shipping Instructions'
+        '500':
+          description: |
+            In case a server error occurs in provider system a `500` (Internal Server Error) is returned
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/3.0.0#/components/schemas/Error'
+              examples:
+                internalServerErrorExample:
+                  summary: |
+                    Internal Server Error while processing Shipping Instructions
+                  description: |
+                    An Internal Server Error has occurred - the consumer should contact {provider-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+                    
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: 'POST'
+                    requestUri: '/v3/shipping-instructions'
+                    statusCode: 500
+                    statusCodeText: 'Internal Server Error'
+                    statusCodeMessage: 'Internal Server Error occurred while processing Booking request'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    errorDateTime: '2023-04-13T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: 'Internal Error occurred'
+                        errorCodeMessage: 'Internal Error occurred'
         default:
           description: Unexpected error
           headers:
@@ -288,124 +245,624 @@ paths:
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.1#/components/schemas/error'
-  /v3/shipping-instructions/{shippingInstructionReference}:
-    get:
-      tags:
-       - Shipping Instructions
-      summary: 'Get shipping instruction'
-      operationId: 'getShippingInstructions'
-      description: |
-        Retrieves the Shipping Instruction with the `shippingInstructionReference` in the path.
-      parameters:
-        - $ref: '#/components/parameters/shippingInstructionReference'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/parameters/Api-Version-Major'
-      responses:
-        '200':
-          description: Request successful
-          headers:
-            API-Version:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/headers/API-Version'
-          content:
-            application/json:
-              schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/3.0.0#/components/schemas/shippingInstructionResponse'
-        default:
-          description: Unexpected error
-          headers:
-            API-Version:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/headers/API-Version'
-          content:
-            application/json:
-              schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.1#/components/schemas/error'
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/3.0.0#/components/schemas/Error'
+              examples:
+                tooManyRequestsExample:
+                  summary: |
+                    Making too many Shipping Instructions
+                  description: |
+                    Calling the endPoint
+                    
+                        POST /v3/shipping-instructions
+                        
+                    too many times within a time period results in an error.
+                    
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: 'POST'
+                    requestUri: '/v3/shipping-instructions'
+                    statusCode: 429
+                    statusCodeText: 'Too Many Requests'
+                    statusCodeMessage: 'Too many request to create a Shipping Instructions has been requested. Please try again in 1 hour'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    errorDateTime: '2023-04-13T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: 'Max Shipping Instructions reached'
+                        errorCodeMessage: 'A maximum of 10 Shipping Instructions can be created per hour'
+  /v3/shipping-instructions/{documentReference}:
     put:
       tags:
        - Shipping Instructions
-      summary: 'Put shipping instruction'
-      operationId: 'putShippingInstructions'
+      summary: |
+        Updates the Shipping Instructions
+      operationId: 'update-shipping-instructions'
       parameters:
-        - $ref: '#/components/parameters/shippingInstructionReference'
+        - $ref: '#/components/parameters/documentReference'
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/parameters/Api-Version-Major'
       description: |
-        Updates a Shipping Instruction with the `shippingInstructionReference` in the path
+        Updates the `Shipping Instructions` with the `documentReference`. The path can contain either a `shippingInstructionsReference` or a `transportDocumentReference`. This endPoint corresponds with **UseCase 3 - Submit updated Shipping Instructions**
+
+        ### Precondition
+        In order to update a `Shipping Instructions`, the status of the `Shipping Instructions` needs to be in state:
+        
+        - `RECEIVED` in case the consumer has updated information for the `Shipping Instructions`
+        - `PENDING UPDATE` in case the provider has requested the consumer to update the `Shipping Instructions` (a result of **UseCase 2 - Request to update Shipping Instructions**)
+
+        ## Postcondition
+        The provider has received an update to the `Shipping Instructions` (**UseCase 3 - Submit updated Shipping Instructions**), from now on called the `Updated Shipping Instructions`.
+        
+        The `Updated Shipping Instructions` and the "original" `Shipping Instructions` **co-exist** until a new update is submitted by the consumer (via **UseCase 3: Submit updated Shipping Instructions**) or until the provider requests an update (sets the `shippingInstructionsStatus='PENDING UPDATE'` via **UseCase 2: Request to update Shipping Instructions**). The `Updated Shipping Instructions` always represents the latest version of an update received by the provider.
+
+        The consumer will receive a `200` (OK) if the payload schema-validates or a `400` (Bad Request) if it does not.
+        
+        ## Flow
+        The following occurs when a provider receives an **update** to a `Shipping Instructions`
+        1. The payload (`Updated Shipping Instructions`) is schema-validated. In case the payload **is invalid** a `400` (Bad Request) is returned.
+        
+           **The process stops here!**
+        2. The payload is schema-valid which means:
+            - all required properties are provided
+            - all values provided have correct data type.
+          
+            The `Updated Shipping Instructions` is stored in the provider system alongside the "original" `Shipping Instructions`.
+
+           **For the rest of this description and in all examples the value `si-123` will be used as `shippingInstructionsReference`**
+        
+        3. The response depends on which use case is the reason for calling this endPoint (what the `shippingInstructionsStatus` is):
+        
+            - If `shippingInstructionsStatus` **is** `RECEIVED`, then this endPoint is being used in addition to **UseCase 1 - Submit Shipping Instructions**. In this case the consumer would like to make an update to an already sent `Shipping Instructions`. This is done via **UseCase 3 - Submit updated Shipping Instructions**. The `shippingInstructionsStatus` stays as `RECEIVED`, `updatedShippingInstructionsStatus` is set to `UPDATE RECEIVED`
+            
+              A `200` (OK) response corresponding to the following payload is returned:
+              ```
+              {
+                shippingInstructionsReference: 'si-123',
+                shippingInstructionsStatus: 'RECEIVED',
+                updatedShippingInstructionsStatus: 'UPDATE RECEIVED'
+              }
+              ```
+
+            - If `shippingInstructionsStatus` is `PENDING UPDATE`, then this endPoint is being used as a response to **UseCase 2 - Request to update Shipping Instructions** in this case the provider has requested an update to a `Shipping Instructions`. The `shippingInstructionsStatus` remains `PENDING UPDATE`, `updatedShippingInstructionsStatus` is set to `UPDATE RECEIVED`.
+              
+              A `200` (OK) response corresponding to the following payload is returned:
+              ```
+              {
+                shippingInstructionsReference: 'si-123',
+                shippingInstructionsStatus: 'PENDING UPDATE',
+                updateShippingInstructionsStatus: 'UPDATE RECEIVED'
+              }
+              ```
+        4. All '_relevant_' subscribers will be notified via a [Shipping Instructions Notification](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_NTF/3.0.0-Beta-1#/Notifications/shipping-instructions-notifications).
+
+        For `PUT` `Shipping Instructions` the process ends here. The `Updated Shipping Instructions`
+        
+          - is now stored in the provider system
+          - a `200` (OK) response is sent to the consumer with the status of the `Shipping Instructions` and the `Updated Shipping Instructions` with one of the following combinations (depending on the use case):
+            - `shippingInstructionsStatus='RECEIVED'` and `updateShippingInstructionsStatus='UPDATE RECEIVED'` (if endPoint used to make an update to a Submitted Shipping Instructions - **UseCase 1 - Submit Shipping Instructions**)
+            - `shippingInstructionsStatus='PENDING UPDATE'` and `updatedShippingInstructionsStatus='UPDATE RECEIVED'` (if endPoint used as a response to **UseCase 2 - Request to update Shipping Instructions**)
+          - awaits further processing by the provider
+          - '_relevant_' subscribers have been notified.
+        
+        The provider wil now start asynchronous processing. Once processed, the new status of the `Shipping Instructions` and `Updated Shipping Instructions` will be communicated via a `Shipping Instructions Notification`. In case the consumer does not subscribe to notifications it is necessary for the consumer to poll on the
+        
+            GET /v3/shipping-instructions/{documentReference}
+            
+          endPoint to check if the `shippingInstructionsStatus` and `updatedShippingInstructionsStatus` of the `Shipping Instructions` has changed.
+          
+          If the consumer wants to get the content of the `Update Shipping Instructions` provided via this `PUT` endPoint,  the `GET` endPoint needs to be used in combination with the `?updatedContent=true` queryParameter:
+          
+            GET /v3/shipping-instructions/{documentReference}?updatedContent=true
+            
+          It is possible to `GET` the content of the `Updated Shipping Instructions` via the example above until either:
+          - the provider requests for a new update (**UseCase 2: Request to update Shipping Instructions**) in which case the "old update" is no longer accessible
+          - the consumer submits a new update (**UseCase 3: Submit updated Shipping Instructions**) in which case the "new update" provided **replaces** the "old update".
       requestBody:
-        description: Parameters used to update the shipping instruction
+        description: |
+          Parameters used to update the `Shipping Instructions`
         required: true
         content:
           application/json:
             schema:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/3.0.0#/components/schemas/shippingInstruction'
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/3.0.0#/components/schemas/UpdateShippingInstructions'
+            examples:
+              regularSTDExample:
+                summary: |
+                  Update Shipping Instructions
+                description: |
+                  An update for a `Shipping Instructions` with standard Dry cargo. The `Shipping Instructions` update now wait to be confirmed by the provider.
+                value:
+                  shippingInstructionsReference: 'fc5009a7-25ad-4bb0-9892-4e2dea6bcdd9'
+                  transportDocumentTypeCode: 'BOL'
+                  isShippedOnBoardType: true
+                  freightPaymentTermCode: 'PRE'
+                  isElectronic: true
+                  isToOrder: true
+                  invoicePayableAt:
+                    locationType: 'UNCO'
+                    UNLocationCode: 'DKAAR'
+                  partyContactDetails:
+                    - name: 'DCSA test person'
+                      email: 'no-reply@dcsa.example.org'
+                  documentParties:
+                    - party:
+                        partyName: 'DCSA CTK'
+                        partyContactDetails:
+                          - name: 'DCSA test person'
+                            email: 'no-reply@dcsa.example.org'
+                      partyFunction: 'OS'
+                      isToBeNotified: false
+                  consignmentItems:
+                    - carrierBookingReference: 'CBR_123_REGULAR'
+                      weight: 12000
+                      weightUnit: 'KGM'
+                      descriptionOfGoods: 'Shoes - black, 400 boxes'
+                      HSCodes:
+                        - '640510'
+                      commoditySubreference: 'RegSubRef001'
+                      cargoItems:
+                        - equipmentReference: 'NARU3472484'
+                          weight: 12000
+                          weightUnit: 'KGM'
+                          outerPackaging:
+                            numberOfPackages: 400
+                            packageCode: '4G'
+                            description: 'Fibreboard boxes'
+                  utilizedTransportEquipments:
+                    - isShipperOwned: false
+                      seals:
+                        - number: 'DCSA-CTK-1234'
+                      equipmentReference: 'NARU3472484'
       responses:
         '200':
           description: |
-            Shipping Instruction update has been successfully received. Asynchronous processing will now begin. A `ShipmentEvent` will be created with the result of the processing once it is finished.
+            The `Updated Shipping Instructions` has been successfully stored in the provider system with one of the following combinations (depending on the use case):
+            - `shippingInstructionsStatus='RECEIVED'` and `updateShippingInstructionsStatus='UPDATE RECEIVED'` (if endPoint is used to make an update to a Submitted Shipping Instructions - **UseCase 1 - Submit Shipping Instructions**)
+            - `shippingInstructionsStatus='PENDING UPDATE'` and `updatedShippingInstructionsStatus='UPDATE RECEIVED'` (if endPoint is used as a response to **UseCase 2 - Request to update Shipping Instructions**)
+
+            The status of the `Updated Shipping Instructions` can be monitored on the
+
+                GET /v3/shipping-instructions/{documentReference}
+
+            endPoint where the "original" `Shipping Instructions` is returned by the consumer.
+
+            If the consumer wants to get the content of the `Update Shipping Instructions`  the `GET` endPoint needs to be used in combination with the `?updatedContent=true` queryParameter:
+            
+                GET /v3/shipping-instructions/{documentReference}?updatedContent=true
           headers:
             API-Version:
               $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/headers/API-Version'
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/3.0.0#/components/schemas/shippingInstructionRefStatus'
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/3.0.0#/components/schemas/ShippingInstructionsRefStatus'
+              examples:
+                receivedExample:
+                  summary: |
+                    Shipping Instructions updated by consumer
+                  description: |
+                    An `Updated Shipping Instructions` is received and stored in provider system, the `Updated Shipping Instructions` now awaits provider action.
+                    
+                        shippingInstructionsStatus='RECEIVED'
+                        updatedShippingInstructionsStatus='UPDATE RECEIVED'
+                  value:
+                    shippingInstructionsReference: 'si-123'
+                    shippingInstructionsStatus: 'RECEIVED'
+                    updatedShippingInstructionsStatus: 'UPDATE RECEIVED'
+                pendingUpdateExample:
+                  summary: |
+                    Shipping Instructions updated because of consumer requirement
+                  description: |
+                    An updated `Shipping Instructions` received and stored in provider system as a response to a provider initiated update request (a response to **UseCase 2 - Request to update Shipping Instructions**). The `Updated Shipping Instructions` now awaits provider action
+                    
+                        shippingInstructionsStatus='PENDING UPDATE'
+                        updatedShippingInstructionsStatus='UPDATE RECEIVED'
+                  value:
+                    shippingInstructionsReference: 'si-123'
+                    shippingInstructionsStatus: PENDING UPDATE
+                    updatedShippingInstructionsStatus: UPDATE RECEIVED
+                amendmentExample:
+                  summary: |
+                    Request amendment to Transport Document
+                  description: |
+                    An `Updated Shipping Instructions` received and stored in provider system as an amendment to a `Transport Document` with `transportDocumentReference='td-987'`. The `Updated Shipping Instructions` now awaits provider action
+                    
+                        shippingInstructionsStatus='RECEIVED'
+                        updatedShippingInstructionsStatus='UPDATE RECEIVED'
+                  value:
+                    shippingInstructionsReference: 'si-123'
+                    transportDocumentReference: 'td-987'
+                    shippingInstructionsStatus: RECEIVED
+                    updatedShippingInstructionsStatus: UPDATE RECEIVED
+        '400':
+          description: |
+            In case the updated `Shipping Instructions` does not schema validate a `400` (Bad Request) is returned
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/3.0.0#/components/schemas/Error'
+              examples:
+                badRequestExample:
+                  summary: |
+                    Shipping Instructions missing isElectronic
+                  description: |
+                    `isElectronic` is a mandatory property in the `Shipping Instructions`. In case this property is missing an error object is created.
+                    
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: 'PUT'
+                    requestUri: '/v3/shipping-instructions/si-123'
+                    statusCode: 400
+                    statusCodeText: 'Bad Request'
+                    statusCodeMessage: 'isElectronic not found - it is a mandatory property in Shipping Instructions'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    errorDateTime: '2023-04-13T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7003
+                        property: 'isElectronic'
+                        errorCodeText: 'mandatory property missing'
+                        errorCodeMessage: 'isElectronic must be provided as part of a Shipping Instructions'
+        '409':
+          description: |
+            In case the provider is already processing the `Shipping Instructions` matching `shippingInstructionsReference='si-123'` or for any other reason cannot process the request, it is possible to reject the `PUT` request with a `409` (Conflict) response
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/3.0.0#/components/schemas/Error'
+              examples:
+                conflictExample:
+                  summary: |
+                    Conflicting Shipping Instructions update
+                  description: |
+                    The `Shipping Instructions` referenced in the `PUT` request is being processed by the provider. The provider does not support breaking this processing and must complete the processing of the `Shipping Instructions` prior to receiving a new request to update.
+                    
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: 'PUT'
+                    requestUri: '/v3/shipping-instructions/si-123'
+                    statusCode: 409
+                    statusCodeText: 'Conflict'
+                    statusCodeMessage: 'Is being processed'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    errorDateTime: '2023-04-13T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: 'Shipping Instructions is being processed'
+                        errorCodeMessage: 'The Shipping Instructions cannot be updated while it is being processed. Please try again later'
+        '500':
+          description: |
+            In case a server error occurs in provider system a `500` (Internal Server Error) is returned
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/3.0.0#/components/schemas/Error'
+              examples:
+                internalServerErrorExample:
+                  summary: |
+                    Internal Server Error while processing `Shipping Instructions`
+                  description: |
+                    An Internal Server Error has occurred - the consumer should contact {provider-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+                    
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: 'PUT'
+                    requestUri: '/v3/shipping-instructions/si-123'
+                    statusCode: 500
+                    statusCodeText: 'Internal Server Error'
+                    statusCodeMessage: 'Internal Server Error occurred while processing Shipping Instructions'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    errorDateTime: '2023-04-13T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: 'Internal Error occurred'
+                        errorCodeMessage: 'Internal Error occurred'
         default:
-          description: Unexpected error
+          description: |
+            For other errors the error object should be populated with relevant information
           headers:
             API-Version:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/headers/API-Version'
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.1#/components/schemas/error'
-  /v3/transport-document-summaries:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/3.0.0#/components/schemas/Error'
+              examples:
+                tooManyRequestsExample:
+                  summary: |
+                    Updating too many Shipping Instructions
+                  description: |
+                    Calling the endPoint
+                    
+                        PUT /v3/shipping-instructions/si-123
+                      
+                    too many times within a time period.
+                    
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: 'PUT'
+                    requestUri: '/v3/shipping-instructions/si-123'
+                    statusCode: 429
+                    statusCodeText: 'Too Many Requests'
+                    statusCodeMessage: 'Too many request to update a Shipping Instructions has been requested. Please try again in 1 hour'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    errorDateTime: '2023-04-13T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: 'Max Shipping Instructions requests reached'
+                        errorCodeMessage: 'A maximum of 10 Shipping Instructions can be updated per hour'
     get:
       tags:
-       - Transport Documents
-      summary: 'Get Transport Documents'
-      operationId: 'getTransportDocumentSummaries'
-      description: |
-        Retrieves Transport Document _metadata_
-
-        If not specified - this list will be sorted by the time the `TransportDocument` was created (transportDocumentCreatedDateTime) in ascending (ASC) order.
+       - Shipping Instructions
+      summary: |
+        Gets the Shipping Instructions
+      operationId: 'get-shipping-instructions'
       parameters:
-        - $ref: '#/components/parameters/carrierBookingReferences'
-        # - in: query
-        #   name: carrierBookingReference
-        #   description: |
-        #     A set of unique characters provided by carrier to identify a booking confirmation.
-            
-        #     Specifying this filter will only return Transport Documents related to this particular `carrierBookingReference`.
-        #   schema:
-        #     $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/carrierBookingReference'
-        - $ref: '#/components/parameters/documentStatus'
-        # - $ref: '#/components/parameters/equipmentReference'
-        
-        # - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/parameters/cursor'
-        # - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/parameters/offset'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/parameters/limit'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/parameters/sort'
+        - $ref: '#/components/parameters/documentReference'
+        - $ref: '#/components/parameters/updatedContent'
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/parameters/Api-Version-Major'
+      description: |
+        Retrieves the `Shipping Instructions` with the `documentReference`. The path can contain a `shippingInstructionsReference` or a `transportDocumentReference`. It is recommended to use this endPoint to `GET` data before an update is made to make sure latest version is being updated.
+        
+        The default payload when calling this endPoint is the "original" `Shipping Instructions`. It is also possible to get the latest update to a `Shipping Instructions` called the `Updated Shipping Instructions`. In order to get the `Update Shipping Instructions`, it is necessary to use the query parameter `updatedContent` and set it to `true`.
+        
+            GET /v3/shipping-instructions/{documentReference}?updatedContent=true
+        
+        The `status` of the "original" `Shipping Instructions` is included in both payloads as `shippingInstructionsStatus`. `updatedShippingInstructionsStatus` and related content is only available after a consumer has requested an update via **UseCase 3: Submit updated Shipping Instructions** and until:
+        - the provider requests for a new update (**UseCase 2: Request to update Shipping Instructions**) in which case the "old update" is no longer accessable.
+        - the consumer submits a new update (**UseCase 3: Submit updated Shipping Instructions**) in which case the "new update" provided **replaces** the "old update".
+        
+        If `updatedContent=true` is requested but no update has yet been provided by the consumer **or** the state of the "original" `Shipping Instructions` is `PENDING UPDATE`, then a `404` (Not Found) is returned.
+
+        If the provider is requesting some changes to the `Shipping Instructions` this will also be part of the "original" `Shipping Instructions` payload in the `requestedChanges` property. This property is **conditional** on the `shippingInstructionsStatus='PENDING UPDATE'`.
+
+        In case no subscription (`Notification`) has been set up - it is possible to use this endPoint to poll on in order to detect if `shippingInstructionsStatus` and/or `updatedShippingInstructionsStatus` has changed.
       responses:
         '200':
-          description: Request successful        
+          description: |
+            Fetching the content of either the "original" `Shipping Instructions` or the `Updated Shipping Instructions`
           headers:
             API-Version:
               $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/headers/API-Version'
-            Current-Page:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/headers/Current-Page'
-            Next-Page:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/headers/Next-Page'
-            Prev-Page:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/headers/Prev-Page'
-            Last-Page:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/headers/Last-Page'
-            First-Page:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/headers/First-Page'
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/3.0.0#/components/schemas/transportDocumentSummary'
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/3.0.0#/components/schemas/ShippingInstructions'
+              examples:
+                regularSTDExample:
+                  summary: |
+                    Fetch Shipping Instruction with standard Dry cargo
+                  description: |
+                    A `RECEIVED` `Shipping Instructions` with standard Dry cargo waiting for the provider to `DRAFT` a `Transport Document`.
+                  value:
+                    shippingInstructionsReference: 'fc5009a7-25ad-4bb0-9892-4e2dea6bcdd9'
+                    shippingInstructionsStatus: 'RECEIVED'
+                    transportDocumentTypeCode: 'BOL'
+                    isShippedOnBoardType: true
+                    freightPaymentTermCode: 'PRE'
+                    isElectronic: true
+                    isToOrder: true
+                    invoicePayableAt:
+                      locationType: 'UNCO'
+                      UNLocationCode: 'DKAAR'
+                    partyContactDetails:
+                      - name: 'DCSA test person'
+                        email: 'no-reply@dcsa.example.org'
+                    documentParties:
+                      - party:
+                          partyName: 'DCSA CTK'
+                          partyContactDetails:
+                            - name: 'DCSA test person'
+                              email: 'no-reply@dcsa.example.org'
+                        partyFunction: 'OS'
+                        isToBeNotified: false
+                    consignmentItems:
+                      - carrierBookingReference: 'CBR_123_REGULAR'
+                        weight: 12000
+                        weightUnit: 'KGM'
+                        descriptionOfGoods: 'Shoes - black, 400 boxes'
+                        HSCodes:
+                          - '640510'
+                        commoditySubreference: 'RegSubRef001'
+                        cargoItems:
+                          - equipmentReference: 'NARU3472484'
+                            weight: 12000
+                            weightUnit: 'KGM'
+                            outerPackaging:
+                              numberOfPackages: 400
+                              packageCode: '4G'
+                              description: 'Fibreboard boxes'
+                    utilizedTransportEquipments:
+                      - isShipperOwned: false
+                        seals:
+                          - number: 'DCSA-CTK-1234'
+                        equipmentReference: 'NARU3472484'
+                reeferExample:
+                  summary: |
+                    Shipping Instructions with reefer cargo
+                  description: |
+                    A `Shipping Instructions` with reefer cargo (`Diary products`) with US as destination. The provider requests that the `Advance Manifest Filing` be updated by the consumer.
+                    
+                    **Notice** that there are no Reefer info in the `Shipping Instructions`. If any reefer info need to be modified - then a `Booking` amendment must be applied to booking: `CBR_123_REEFER`.
+                  value:
+                    transportDocumentReference: 'D8931B95625E4B339F2A'
+                    shippingInstructionsReference: '9051da7d-4099-4930-af35-7add4e68c635'
+                    shippingInstructionsStatus: 'PENDING UPDATE'
+                    transportDocumentTypeCode: 'BOL'
+                    isShippedOnBoardType: true
+                    freightPaymentTermCode: 'PRE'
+                    isElectronic: true
+                    isToOrder: true
+                    invoicePayableAt:
+                      locationType: 'UNCO'
+                      UNLocationCode: 'DKAAR'
+                    partyContactDetails:
+                      - name: 'DCSA test person'
+                        email: 'no-reply@dcsa.example.org'
+                    documentParties:
+                      - party:
+                          partyName: 'DCSA CTK'
+                          partyContactDetails:
+                            - name: 'DCSA test person'
+                              email: 'no-reply@dcsa.example.org'
+                        partyFunction: 'OS'
+                        isToBeNotified: false
+                    consignmentItems:
+                      - carrierBookingReference: 'CBR_123_REEFER'
+                        weight: 12000
+                        weightUnit: 'KGM'
+                        descriptionOfGoods: 'Dairy products'
+                        HSCodes:
+                          - '04052090'
+                        commoditySubreference: 'ReeferSubRef002'
+                        cargoItems:
+                          - equipmentReference: 'KKFU6671914'
+                            weight: 12000
+                            weightUnit: 'KGM'
+                            outerPackaging:
+                              numberOfPackages: 400
+                              packageCode: 'BQ'
+                    utilizedTransportEquipments:
+                      - isShipperOwned: false
+                        seals:
+                          - number: 'DCSA-CTK-1234'
+                        equipmentReference: 'KKFU6671914'
+                    advanceManifestFilings:
+                      manifestTypeCode: 'AFR'
+                      countryCode: 'US'
+                      advanceManifestFilingsHouseBLPerformedBy: 'SHIPPER'
+                      selfFilerCode: 'HHL007'
+                    requestedChanges:
+                      - field: '$.advanceManifestFilings[0]'
+                        message: 'Not a legal combination of "manifestTypeCode" (AFR) and "countryCode" (US)'
+                      - field: '$.advanceManifestFilings'
+                        message: 'Missing "ACI" filing required for import to US'
+                dgExample:
+                  summary: |
+                    Updated Shipping Instructions with DG cargo
+                  description: |
+                    A `Shipping Instructions` with `Environmentally hazardous substance, liquid, N.O.S (Propiconazole)` which is transported in steel Jarricans.
+                    
+                    The `Shipping Instructions` has already been applied an update which has been confirmed by the provider (`updatedShippingInstructions='UPDATE CONFIRMED'`). The `Shipping Instructions` is now waiting for the provider to `DRAFT` a `Transport Document`.
+                    
+                    **Notice** that there are no DG (Dangerous Goods) info in the `Shipping Instructions`. If any DG info need to be modified - then a `Booking` amendment must be applied to booking: `RTM1234567`.
+                  value:
+                    transportDocumentReference: '4AD3FA470BB541B980CE'
+                    shippingInstructionsReference: 'b36484d0-1115-43c2-93e4-a378823a8386'
+                    shippingInstructionsStatus: 'RECEIVED'
+                    updatedShippingInstructionsStatus: 'UPDATE CONFIRMED'
+                    transportDocumentTypeCode: 'BOL'
+                    isShippedOnBoardType: true
+                    freightPaymentTermCode: 'PRE'
+                    isElectronic: true
+                    isToOrder: true
+                    invoicePayableAt:
+                      locationType: 'UNCO'
+                      UNLocationCode: 'DKAAR'
+                    partyContactDetails:
+                      - name: 'DCSA test person'
+                        email: 'no-reply@dcsa.example.org'
+                    documentParties:
+                      - party:
+                          partyName: 'DCSA CTK'
+                          partyContactDetails:
+                            - name: 'DCSA test person'
+                              email: 'no-reply@dcsa.example.org'
+                        partyFunction: 'OS'
+                        isToBeNotified: false
+                    consignmentItems:
+                      - carrierBookingReference: 'RTM1234567'
+                        weight: 12000
+                        weightUnit: 'KGM'
+                        descriptionOfGoods: 'Environmentally hazardous substance, liquid, N.O.S (Propiconazole)'
+                        HSCodes:
+                          - '293499'
+                        commoditySubreference: 'DGSubRef003'
+                        cargoItems:
+                          - equipmentReference: 'HLXU1234567'
+                            weight: 12000
+                            weightUnit: 'KGM'
+                            outerPackaging:
+                              numberOfPackages: 400
+                              description: 'Jerrican, steel'
+                    utilizedTransportEquipments:
+                      - isShipperOwned: false
+                        seals:
+                          - number: 'DCSA-CTK-1234'
+                        cargoGrossWeight: 12000
+                        cargoGrossWeightUnit: 'KGM'
+                        equipment:
+                          ISOEquipmentCode: '22GP'
+                          equipmentReference: 'HLXU1234567'
+                          tareWeight: 2370
+                          weightUnit: 'KGM'
+        '404':
+          description: |
+            In case the consumer is requesting the content of the `UpdatedShipping Instructions`, and no update has yet been requested.
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/3.0.0#/components/schemas/Error'
+              examples:
+                notFoundExample:
+                  summary: |
+                    Shipping Instructions update not found
+                  description: |
+                    The `Update Shipping Instructions` does not exist. No updates have been requested by the consumer.
+                    
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: 'GET'
+                    requestUri: '/v3/shipping-instructions/si-123?updatedContent=true'
+                    statusCode: 404
+                    statusCodeText: 'Not Found'
+                    statusCodeMessage: 'No update accessable'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    errorDateTime: '2023-04-13T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: 'Shipping Instructions does not contain an update'
+                        errorCodeMessage: 'The Shipping Instructions has not yet been updated - no update exists'
+        '500':
+          description: |
+            In case a server error occurs in provider system a `500` (Internal Server Error) is returned
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/3.0.0#/components/schemas/Error'
+              examples:
+                internalServerErrorExample:
+                  summary: |
+                    Internal Server Error while fetching the Shipping Instructions
+                  description: |
+                    An Internal Server Error has occurred - the consumer should contact {provider-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+                    
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: 'GET'
+                    requestUri: '/v3/shipping-instructions/si-123'
+                    statusCode: 500
+                    statusCodeText: 'Internal Server Error'
+                    statusCodeMessage: 'Internal Server Error occurred while fetching the Shipping Instructions'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    errorDateTime: '2023-04-13T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: 'Internal Error occurred'
+                        errorCodeMessage: 'Internal Error occurred'
         default:
           description: Unexpected error
           headers:
@@ -414,32 +871,654 @@ paths:
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.1#/components/schemas/error'
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/3.0.0#/components/schemas/Error'
+              examples:
+                getError:
+                  summary: |
+                    GET non-existing Shipping Instructions
+                  description: |
+                    Calling
+                    
+                        GET /v3/shipping-instructions/si-123
+                        
+                    results in an error as `Shipping Instructions` `si-123` does not exist.
+                    
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: 'GET'
+                    requestUri: '/v3/shipping-instructions/si-123'
+                    statusCode: 404
+                    statusCodeText: 'Not Found'
+                    statusCodeMessage: 'The requested shippingInstructionsReference does not exist'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    errorDateTime: '2023-04-13T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: 'Non existent shippingInstructionsReference'
+                        errorCodeMessage: 'shippingInstructionsReference `si-123` does not exist'
+    patch:
+      tags:
+       - Shipping Instructions
+      summary: |
+        Cancels an update to a Shipping Instructions
+      operationId: 'patch-shipping-instructions'
+      parameters:
+        - $ref: '#/components/parameters/documentReference'
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/parameters/Api-Version-Major'
+      description: |
+        A way for the consumer to Cancel an `Updated Shipping Instructions`. This endPoint corresponds with **UseCase 5 - Cancel update to Shipping Instructions**.
+        
+        ## Precondition
+        In order to cancel an `Updated Shipping Instructions`, the status of the `Updated Shipping Instructions` must be in in status `UPDATE RECEIVED`. The status of the `Shipping Instructions` can be either `RECEIVED` or `PENDING UPDATE`.
+
+        ## Postcondition
+        The provider has received a cancellation from the consumer for an `Updated Shipping Instructions` that is in state `UPDATE RECEIVED`.
+        
+        The consumer will receive a `200` (OK) if the payload schema-validates or a `400` (Bad Request) if it does not.
+        
+        ## Flow
+        The following occurs when a provider receives a cancellation:
+        1. The payload is schema-validated. In case the payload **is invalid** a `400` (Bad Request) is returned.
+        
+           **The process stops here!**
+        2. The payload is schema-valid
+        3. The `updatedShippingInstructionsStatus` is set to `UPDATE CANCELLED`.
+        4. All '_relevant_' subscribers will be notified via a [Shipping Instructions Notification](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_NTF/3.0.0-Beta-1#/Notifications/shipping-instructions-notifications).
+      requestBody:
+        description: |
+          Cancel the `Update Shipping Instructions`
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                updatedShippingInstructionsStatus:
+                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/3.0.0#/components/schemas/shippingInstructionsUpdateCancelledStatus'
+              required:
+                - updatedShippingInstructionsStatus
+            examples:
+              cancelUpdateExample:
+                summary: |
+                  Cancel a Shipping Instructions update
+                description: |
+                  Consumer wants to cancel an update provided to a `Shipping Instructions`. The `updatedShippingInstructionsStatus` is set to `UPDATE CANCELLED`
+                value:
+                  updatedShippingInstructionsStatus: 'UPDATE CANCELLED'
+      responses:
+        '200':
+          description: |
+            The `Updated Shipping Instructions` is now cancelled. The `updatedShippingInstructionsStatus` is now `UPDATE CANCELLED`. The `shippingInstructionsStatus` is left unchanged.
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/3.0.0#/components/schemas/ShippingInstructionsRefCancelStatus'
+              examples:
+                cancelUpdateExample:
+                  summary: |
+                    Cancel a Shipping Instructions update
+                  description: |
+                    Consumer wants to cancel an update provided to a `Shipping Instructions`. In this case the `shippingInstructionsStatus` stays as `RECEIVED` and the `updatedShippingInstructionsStatus` is set to `UPDATE CANCELLED`. An optional `reason` can be provided.
+                  value:
+                    shippingInstructionsReference: 'si-123'
+                    shippingInstructionsStatus: 'RECEIVED'
+                    updatedShippingInstructionsStatus: 'UPDATE CANCELLED'
+                cancelRequestedUpdateExample:
+                  summary: |
+                    Cancel a Shipping Instructions update requested by provider
+                  description: |
+                    Consumer wants to cancel an update provided to a `Shipping Instructions`. The update was requested by the provider. The `shippingInstructionsStatus` stays as `PENDING UPDATE` and the `updatedShippingInstructionsStatus` is set to `UPDATE CANCELLED`. An optional `reason` can be provided.
+                  value:
+                    shippingInstructionsReference: 'si-123'
+                    shippingInstructionsStatus: 'PENDING UPDATE'
+                    updatedShippingInstructionsStatus: 'UPDATE CANCELLED'
+                    reason: 'Wrong update provided'
+        '400':
+          description: |
+            In case the Cancel payload does not schema validate a `400` (Bad Request) is returned
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/3.0.0#/components/schemas/Error'
+              examples:
+                badRequestExample:
+                  summary: |
+                    Wrong Update Shipping Instructions status
+                  description: |
+                    `APPROVE` is not a possible value when PATCHING an `Updated Shipping Instructions`.
+                    
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: 'PATCH'
+                    requestUri: '/v3/shipping-instructions/si-123'
+                    statusCode: 400
+                    statusCodeText: 'Bad Request'
+                    statusCodeMessage: 'APPROVE is not a valid status to set'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    errorDateTime: '2023-10-03T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7003
+                        property: 'updatedShippingInstructionsStatus'
+                        value: 'APPROVE'
+                        errorCodeText: 'incorrect value'
+                        errorCodeMessage: 'Only UPDATE CANCELLED is an allowed value: APPROVE was inserted'
+        '404':
+          description: |
+            In case the consumer is trying to cancel a `Shipping Instructions` that does not have an ongoing update request, an `Updated Shipping Instructions` that is in state `UPDATE RECEIVED`.
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/3.0.0#/components/schemas/Error'
+              examples:
+                notUpdateFoundExample:
+                  summary: |
+                    Shipping Instructions update not found
+                  description: |
+                    The `Update Shipping Instructions` does not exist. No updates have been requested by the consumer.
+                    
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: 'PATCH'
+                    requestUri: '/v3/shipping-instructions/si-123'
+                    statusCode: 404
+                    statusCodeText: 'Not Found'
+                    statusCodeMessage: 'No update exists'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    errorDateTime: '2023-04-13T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: 'Shipping Instructions does not contain an update'
+                        errorCodeMessage: 'The Shipping Instructions has no update request - nothing to cancel'
+        '409':
+          description: |
+            In case the provider is already processing the `Updated Shipping Instructions` matching `shippingInstructionsReference='si-123'` it is possible to reject the `PATCH` request with a `409` (Conflict) response
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/3.0.0#/components/schemas/Error'
+              examples:
+                conflictExample:
+                  summary: |
+                    Conflicting Shipping Instructions cancellation
+                  description: |
+                    The `Updated Shipping Instructions` referenced in the `PATCH` request is being processed by the provider. The provider does not support breaking this processing and must complete the processing of the `Updated Shipping Instructions`. The cancellation will not be possible.
+                    
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: 'PATCH'
+                    requestUri: '/v3/shipping-instructions/si-123'
+                    statusCode: 409
+                    statusCodeText: 'Conflict'
+                    statusCodeMessage: 'Is being processed'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    errorDateTime: '2023-04-13T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: 'Shipping Instructions is being processed'
+                        errorCodeMessage: 'The Shipping Instructions cannot be cancelled while it is being processed'
+        '500':
+          description: |
+            In case a server error occurs in provider system a `500` (Internal Server Error) is returned
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/3.0.0#/components/schemas/Error'
+              examples:
+                internalServerErrorExample:
+                  summary: |
+                    Internal Server Error while cancelling the `Shipping Instructions`
+                  description: |
+                    An Internal Server Error has occurred, the consumer should contact {provider-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+                    
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: 'PATCH'
+                    requestUri: '/v3/shipping-instructions/si-123'
+                    statusCode: 500
+                    statusCodeText: 'Internal Server Error'
+                    statusCodeMessage: 'Internal Server Error occurred while cancelling the Shipping Instructions'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    errorDateTime: '2023-04-13T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: 'Internal Error occurred'
+                        errorCodeMessage: 'Internal Error occurred'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/3.0.0#/components/schemas/Error'
+              examples:
+                getError:
+                  summary: |
+                    GET non-existing Shipping Instructions
+                  description: |
+                    Calling
+                    
+                        PATCH /v3/shipping-instructions/si-123
+                        
+                    results in an error as `Shipping Instructions` `si-123` does not exist.
+                    
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: 'PATCH'
+                    requestUri: '/v3/shipping-instructions/si-123'
+                    statusCode: 404
+                    statusCodeText: 'Not Found'
+                    statusCodeMessage: 'The requested shippingInstructionsReference does not exist'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    errorDateTime: '2023-04-13T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: 'Non existent shippingInstructionsReference'
+                        errorCodeMessage: 'shippingInstructionsReference `si-123` does not exist'
   /v3/transport-documents/{transportDocumentReference}:
     get:
       tags:
-       - Transport Documents
-      summary: 'Get Transport Document'
-      operationId: 'getTransportDocument'
+       - Transport Document
+      summary: |
+        Gets the Transport Document
+      operationId: 'get-transport-document'
       description: |
-        Retrieves the Transport Document with the `transportDocumentReference` in the path.
+        Retrieves the `Transport Document` with the `transportDocumentReference` in the path.
       parameters:
         - $ref: '#/components/parameters/transportDocumentReference'
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/parameters/Api-Version-Major'
       responses:
         '200':
-          description: Request successful
+          description: |
+            The `Transport Document`
           headers:
             API-Version:
               $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/headers/API-Version'
-            # Document-Signature:
-            #   schema:
-            #     type: string
-            #   description: The Carrier signature of the Transport Document
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/3.0.0#/components/schemas/transportDocument'
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/3.0.0#/components/schemas/TransportDocument'
+              examples:
+                regularSTDExample:
+                  summary: |
+                    Draft Transport Document with regular Dry cargo
+                  description: |
+                    A `DRAFT` Transport Document waiting for consumer approval.
+                  value:
+                    transportDocumentReference: '62CD536BA8D34C469AFD'
+                    shippingInstructionsReference: 'fc5009a7-25ad-4bb0-9892-4e2dea6bcdd9'
+                    transportDocumentStatus: 'DRAFT'
+                    transportDocumentTypeCode: 'BOL'
+                    isShippedOnBoardType: true
+                    freightPaymentTermCode: 'PRE'
+                    isElectronic: true
+                    isToOrder: true
+                    shippedOnBoardDate: '2023-12-20'
+                    termsAndConditions: |
+                      You agree that this transport document exist is name only for the sake of
+                      testing your conformance with the DCSA EBL API. This transport document is NOT backed
+                      by a real shipment with ANY carrier and NONE of the requested services will be
+                      carried out in real life.
+                    
+                      Unless required by applicable law or agreed to in writing, DCSA provides
+                      this JSON data on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
+                      ANY KIND, either express or implied, including, without limitation, any
+                      warranties or conditions of TITLE, NON-INFRINGEMENT, MERCHANTABILITY,
+                      or FITNESS FOR A PARTICULAR PURPOSE. You are solely responsible for
+                      determining the appropriateness of using or redistributing this JSON
+                      data and assume any risks associated with Your usage of this data.
+                    
+                      In no event and under no legal theory, whether in tort (including negligence),
+                      contract, or otherwise, unless required by applicable law (such as deliberate
+                      and grossly negligent acts) or agreed to in writing, shall DCSA be liable to
+                      You for damages, including any direct, indirect, special, incidental, or
+                      consequential damages of any character arising as a result of this terms or conditions
+                      or out of the use or inability to use the provided JSON data (including but not limited
+                      to damages for loss of goodwill, work stoppage, computer failure or malfunction, or any
+                      and all other commercial damages or losses), even if DCSA has been advised of the
+                      possibility of such damages.
+                    receiptTypeAtOrigin: 'CY'
+                    deliveryTypeAtDestination: 'CY'
+                    cargoMovementTypeAtOrigin: 'FCL'
+                    cargoMovementTypeAtDestination: 'FCL'
+                    serviceContractReference: 'SCR-1234-REGULAR'
+                    carrierCode: 'MSC'
+                    carrierCodeListProvider: 'SMDG'
+                    issuingParty:
+                      partyName: 'Mediterranean Shipping Company'
+                      identifyingCodes:
+                        - codeListProvider: 'SMDG'
+                          codeListName: 'LCL'
+                          partyCode: 'MSC'
+                    transports:
+                      plannedDepartureDate: '2023-12-20'
+                      plannedArrivalDate: '2023-12-22'
+                      portOfLoading:
+                        locationType: 'UNCO'
+                        UNLocationCode: 'DKAAR'
+                      portOfDischarge:
+                        locationType: 'UNLO'
+                        UNLocationCode: 'DEBRV'
+                      vesselName: 'MSC Gülsün'
+                      carrierExportVoyageNumber: '402E'
+                    charges:
+                      - chargeName: 'Fictive transport document fee'
+                        currencyAmount: 1
+                        currencyCode: 'EUR'
+                        paymentTermCode: 'COL'
+                        calculationBasis: 'Per transport document'
+                        unitPrice: 1
+                        quantity: 1
+                    invoicePayableAt:
+                      locationType: 'UNCO'
+                      UNLocationCode: 'DKAAR'
+                    partyContactDetails:
+                      - name: 'DCSA test person'
+                        email: 'no-reply@dcsa.example.org'
+                    documentParties:
+                      - party:
+                          partyName: 'DCSA CTK'
+                          partyContactDetails:
+                            - name: 'DCSA test person'
+                              email: 'no-reply@dcsa.example.org'
+                        partyFunction: 'OS'
+                        isToBeNotified: false
+                    consignmentItems:
+                      - carrierBookingReference: 'CBR_123_REGULAR'
+                        weight: 12000
+                        weightUnit: 'KGM'
+                        descriptionOfGoods: 'Shoes - black, 400 boxes'
+                        HSCodes:
+                          - '640510'
+                        cargoItems:
+                          - equipmentReference: 'NARU3472484'
+                            weight: 12000
+                            weightUnit: 'KGM'
+                            outerPackaging:
+                              numberOfPackages: 400
+                              packageCode: '4G'
+                              description: 'Fibreboard boxes'
+                    utilizedTransportEquipments:
+                      - isShipperOwned: false
+                        seals:
+                          - number: 'DCSA-CTK-1234'
+                        cargoGrossWeight: 12000
+                        cargoGrossWeightUnit: 'KGM'
+                        equipment:
+                          ISOEquipmentCode: '22G1'
+                          equipmentReference: 'NARU3472484'
+                reeferExample:
+                  summary: |
+                    Approved Transport Document with reefer cargo
+                  description: |
+                    An `APPROVED` Transport Document by the consumer waiting to be Issued by the provider. The cargo is `Diary products` which need to be transported using a `Reefer` container at -18° CEL.
+                  value:
+                    transportDocumentReference: 'D8931B95625E4B339F2A'
+                    shippingInstructionsReference: '9051da7d-4099-4930-af35-7add4e68c635'
+                    transportDocumentStatus: 'APPROVED'
+                    transportDocumentTypeCode: 'BOL'
+                    isShippedOnBoardType: true
+                    freightPaymentTermCode: 'PRE'
+                    isElectronic: true
+                    isToOrder: true
+                    shippedOnBoardDate: '2023-12-20'
+                    termsAndConditions: |
+                      You agree that this transport document exist is name only for the sake of
+                      testing your conformance with the DCSA EBL API. This transport document is NOT backed
+                      by a real shipment with ANY carrier and NONE of the requested services will be
+                      carried out in real life.
+                      
+                      Unless required by applicable law or agreed to in writing, DCSA provides
+                      this JSON data on an \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
+                      ANY KIND, either express or implied, including, without limitation, any
+                      warranties or conditions of TITLE, NON-INFRINGEMENT, MERCHANTABILITY,
+                      or FITNESS FOR A PARTICULAR PURPOSE. You are solely responsible for
+                      determining the appropriateness of using or redistributing this JSON
+                      data and assume any risks associated with Your usage of this data.
+                      
+                      In no event and under no legal theory, whether in tort (including negligence),
+                      contract, or otherwise, unless required by applicable law (such as deliberate
+                      and grossly negligent acts) or agreed to in writing, shall DCSA be liable to
+                      You for damages, including any direct, indirect, special, incidental, or
+                      consequential damages of any character arising as a result of this terms or conditions
+                      or out of the use or inability to use the provided JSON data (including but not limited
+                      to damages for loss of goodwill, work stoppage, computer failure or malfunction, or any
+                      and all other commercial damages or losses), even if DCSA has been advised of the
+                      possibility of such damages.
+                    receiptTypeAtOrigin: 'CY'
+                    deliveryTypeAtDestination: 'CY'
+                    cargoMovementTypeAtOrigin: 'FCL'
+                    cargoMovementTypeAtDestination: 'FCL'
+                    serviceContractReference: 'SCR-1234-REEFER'
+                    carrierCode: 'MSC'
+                    carrierCodeListProvider: 'SMDG'
+                    issuingParty:
+                      partyName: 'Mediterranean Shipping Company'
+                      identifyingCodes:
+                        - codeListProvider: 'SMDG'
+                          codeListName: 'LCL'
+                          partyCode: 'MSC'
+                    transports:
+                      plannedDepartureDate: '2023-12-20'
+                      plannedArrivalDate: '2023-12-22'
+                      portOfLoading:
+                        locationType: 'UNCO'
+                        UNLocationCode: 'DKAAR'
+                      portOfDischarge:
+                        locationType: 'UNLO'
+                        UNLocationCode: 'DEBRV'
+                      vesselName: 'Ever Ace'
+                      carrierExportVoyageNumber: '402E'
+                    charges:
+                      - chargeName: 'Fictive transport document fee'
+                        currencyAmount: 1
+                        currencyCode: 'EUR'
+                        paymentTermCode: 'COL'
+                        calculationBasis: 'Per transport document'
+                        unitPrice: 1
+                        quantity: 1
+                    invoicePayableAt:
+                      locationType: 'UNCO'
+                      UNLocationCode: 'DKAAR'
+                    partyContactDetails:
+                      - name: 'DCSA test person'
+                        email: 'no-reply@dcsa.example.org'
+                    documentParties:
+                      - party:
+                          partyName: 'DCSA CTK'
+                          partyContactDetails:
+                            - name: 'DCSA test person'
+                              email: 'no-reply@dcsa.example.org'
+                        partyFunction: 'OS'
+                        isToBeNotified: false
+                    consignmentItems:
+                      - carrierBookingReference: 'CBR_123_REEFER'
+                        weight: 12000
+                        weightUnit: 'KGM'
+                        descriptionOfGoods: 'Dairy products'
+                        HSCodes:
+                          - '04052090'
+                        cargoItems:
+                          - equipmentReference: 'KKFU6671914'
+                            weight: 12000
+                            weightUnit: 'KGM'
+                            outerPackaging:
+                              numberOfPackages: 400
+                              packageCode: 'BQ'
+                              description: 'Bottles'
+                    utilizedTransportEquipments:
+                      - isShipperOwned: false
+                        seals:
+                          - number: 'DCSA-CTK-1234'
+                        cargoGrossWeight: 12000
+                        cargoGrossWeightUnit: 'KGM'
+                        equipment:
+                          ISOEquipmentCode: '45R1'
+                          equipmentReference: 'KKFU6671914'
+                        isNonOperatingReefer: false
+                        activeReeferSettings:
+                          temperatureSetpoint: -18
+                          temperatureUnit: 'CEL'
+                dgExample:
+                  summary: |
+                    Issued Transport Document with DG (Dangerous Goods) cargo
+                  description: |
+                    An `ISSUED` Transport Document by the provider containing DG (Dangerous Goods). The cargo is `Environmentally hazardous substance, liquid, N.O.S (Propiconazole)` which is transported in steel Jarricans.
+                  value:
+                    transportDocumentReference: '4AD3FA470BB541B980CE'
+                    shippingInstructionsReference: 'b36484d0-1115-43c2-93e4-a378823a8386'
+                    transportDocumentStatus: 'ISSUED'
+                    transportDocumentTypeCode: 'BOL'
+                    isShippedOnBoardType: true
+                    freightPaymentTermCode: 'PRE'
+                    isElectronic: true
+                    isToOrder: true
+                    shippedOnBoardDate: '2023-12-20'
+                    termsAndConditions: |
+                      You agree that this transport document exist is name only for the sake of
+                      testing your conformance with the DCSA EBL API. This transport document is NOT backed
+                      by a real shipment with ANY carrier and NONE of the requested services will be
+                      carried out in real life.
+                      
+                      Unless required by applicable law or agreed to in writing, DCSA provides
+                      this JSON data on an \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
+                      ANY KIND, either express or implied, including, without limitation, any
+                      warranties or conditions of TITLE, NON-INFRINGEMENT, MERCHANTABILITY,
+                      or FITNESS FOR A PARTICULAR PURPOSE. You are solely responsible for
+                      determining the appropriateness of using or redistributing this JSON
+                      data and assume any risks associated with Your usage of this data.
+                      
+                      In no event and under no legal theory, whether in tort (including negligence),
+                      contract, or otherwise, unless required by applicable law (such as deliberate
+                      and grossly negligent acts) or agreed to in writing, shall DCSA be liable to
+                      You for damages, including any direct, indirect, special, incidental, or
+                      consequential damages of any character arising as a result of this terms or conditions
+                      or out of the use or inability to use the provided JSON data (including but not limited
+                      to damages for loss of goodwill, work stoppage, computer failure or malfunction, or any
+                      and all other commercial damages or losses), even if DCSA has been advised of the
+                      possibility of such damages.
+                    receiptTypeAtOrigin: 'CY'
+                    deliveryTypeAtDestination: 'CY'
+                    cargoMovementTypeAtOrigin: 'FCL'
+                    cargoMovementTypeAtDestination: 'FCL'
+                    serviceContractReference: 'SCR-1234-DG'
+                    carrierCode: 'HLC'
+                    carrierCodeListProvider: 'SMDG'
+                    issuingParty:
+                      partyName: 'Hapag Lloyd'
+                      identifyingCodes:
+                        - codeListProvider: 'SMDG'
+                          codeListName: 'LCL'
+                          partyCode: 'HLC'
+                    transports:
+                      plannedDepartureDate: '2023-12-20'
+                      plannedArrivalDate: '2023-12-22'
+                      portOfLoading:
+                        locationType: 'UNCO'
+                        UNLocationCode: 'DKAAR'
+                      portOfDischarge:
+                        locationType: 'UNLO'
+                        UNLocationCode: 'DEBRV'
+                      vesselName: 'Berlin Express'
+                      carrierExportVoyageNumber: '402E'
+                    charges:
+                      - chargeName: 'Fictive transport document fee'
+                        currencyAmount: 1
+                        currencyCode: 'EUR'
+                        paymentTermCode: 'COL'
+                        calculationBasis: 'Per transport document'
+                        unitPrice: 1
+                        quantity: 1
+                    invoicePayableAt:
+                      locationType: 'UNCO'
+                      UNLocationCode: 'DKAAR'
+                    partyContactDetails:
+                      - name: 'DCSA test person'
+                        email: 'no-reply@dcsa.example.org'
+                    documentParties:
+                      - party:
+                          partyName: 'DCSA CTK'
+                          partyContactDetails:
+                            - name: 'DCSA test person'
+                              email: 'no-reply@dcsa.example.org'
+                        partyFunction: 'OS'
+                        isToBeNotified: false
+                    consignmentItems:
+                      - carrierBookingReference: 'RTM1234567'
+                        weight: 12000
+                        weightUnit: 'KGM'
+                        descriptionOfGoods: 'Environmentally hazardous substance, liquid, N.O.S (Propiconazole)'
+                        HSCodes:
+                          - '293499'
+                        cargoItems:
+                          - equipmentReference: 'HLXU1234567'
+                            weight: 12000
+                            weightUnit: 'KGM'
+                            outerPackaging:
+                              numberOfPackages: 400
+                              imoPackagingCode: '3A1'
+                              description: 'Jerrican, steel'
+                              dangerousGoods:
+                                - unNumber: '3082'
+                                  properShippingName: 'Environmentally hazardous substance, liquid, N.O.S'
+                                  imoClass: '9'
+                                  packingGroup: 3
+                                  EMSNumber: 'F-A S-F'
+                    utilizedTransportEquipments:
+                      - isShipperOwned: false
+                        seals:
+                          - number: 'DCSA-CTK-1234'
+                        cargoGrossWeight: 12000
+                        cargoGrossWeightUnit: 'KGM'
+                        equipment:
+                          ISOEquipmentCode: '22GP'
+                          equipmentReference: 'HLXU1234567'
+        '500':
+          description: |
+            In case a server error occurs in provider system a `500` (Internal Server Error) is returned
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/3.0.0#/components/schemas/Error'
+              examples:
+                internalServerErrorExample:
+                  summary: |
+                    Internal Server Error while fetching the Transport Document
+                  description: |
+                    An Internal Server Error has occurred - the consumer should contact {provider-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+                    
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: 'GET'
+                    requestUri: '/v3/transport-documents/td-987'
+                    statusCode: 500
+                    statusCodeText: 'Internal Server Error'
+                    statusCodeMessage: 'Internal Server Error occurred while fetching the Transport Document'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    errorDateTime: '2023-04-13T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: 'Internal Error occurred'
+                        errorCodeMessage: 'Internal Error occurred'
         default:
           description: Unexpected error
           headers:
@@ -448,117 +1527,191 @@ paths:
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.1#/components/schemas/error'
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/3.0.0#/components/schemas/Error'
+              examples:
+                getError:
+                  summary: |
+                    GET non-existing Transport Document
+                  description: |
+                    Calling
+                    
+                        GET /v3/transport-documents/td-987
+                        
+                    results in an error as `Transport Document` `td-987` does not exist.
+                    
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: 'GET'
+                    requestUri: '/v3/transport-documents/td-987'
+                    statusCode: 404
+                    statusCodeText: 'Not Found'
+                    statusCodeMessage: 'The requested transportDocumentReference does not exist'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    errorDateTime: '2023-04-13T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: 'Non existent transportDocumentReference'
+                        errorCodeMessage: 'transportDocumentReference `td-987` does not exist'
     patch:
       tags:
-       - Transport Documents
-      summary: 'Approve a Transport Document'
-      operationId: 'approveTransportDocument'
+      - Transport Document
+      summary: |
+        Approve a Transport Document
+      operationId: 'approve-transport-document'
       description: |
-        Approves a Transport Document.
+        A way for the consumer to Approve the `Draft Transport Document`. This endPoint corresponds with **UseCase 7 - Approve Draft Transport Document**.
+        
+        ## Precondition
+        In order to approve a `Draft Transport Document`, the status of the `Transport Document` needs to be in status `DRAFT`
+
+        ## Postcondition
+        The provider has received an approval from the consumer for a `Transport Document` that is in state `DRAFT`.
+        
+        The consumer will receive a `200` (OK) if the payload schema-validates or a `400` (Bad Request) if it does not.
+        
+        ## Flow
+        The following occurs when a provider receives an approval:
+        1. The payload is schema-validated. In case the payload **is invalid** a `400` (Bad Request) is returned.
+        
+           **The process stops here!**
+        2. The payload is schema-valid
+        3. The `transportDocumentStatus` is set to `APPROVED`.
+        4. All '_relevant_' subscribers will be notified via a [Transport Document Notification](https://app.swaggerhub.com/apis/dcsaorg/DCSA_EBL_NTF/3.0.0-Beta-1#/Notifications/transport-document-notifications).
+        
+        The provider wil now start asynchronous processing. Once processed, the new status of the `Transport Document` (`ISSUED`) will be communicated via a `Transport Document Notification`. In case the consumer does not subscribe to notifications it is necessary for the consumer to poll on the
+
+            GET /v3/transport-documents/{transportDocumentReference}
+
+        endPoint to check if the `transportDocumentStatus` in the `Transport Document` has changed.
       parameters:
         - $ref: '#/components/parameters/transportDocumentReference'
-        # - $ref: '#/components/parameters/documentSignature'
         - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/parameters/Api-Version-Major'
       requestBody:
         content:
           application/json:
             schema:
               type: object
-              allOf:
-                - type: object
-                  properties:
-                    documentStatus:
-                      type: string
-                      description: |
-                        This changes the documentStatus to contain the value:
-                        - APPR (Approved)
-                      enum:
-                        - APPR
-                      example:
-                        APPR
+              properties:
+                transportDocumentStatus:
+                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/3.0.0#/components/schemas/transportDocumentApprovedStatus'
               required:
-                - documentStatus
+                - transportDocumentStatus
       responses:
         '200':
-          description: The Transport Document
+          description: |
+            The `Transport Document` has been successfully `APPROVED`
           headers:
             API-Version:
               $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/headers/API-Version'
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/3.0.0#/components/schemas/transportDocumentRefStatus'
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/3.0.0#/components/schemas/TransportDocumentRefStatus'
+              examples:
+                approveExample:
+                  summary: |
+                    Approve Draft Transport Document
+                  description: |
+                    Consumer approves the drafted `Transport Document`.
+                  value:
+                    transportDocumentReference: 'td-987'
+                    transportDocumentStatus: 'APPROVED'
+        '400':
+          description: |
+            In case the Approve payload does not schema validate a `400` (Bad Request) is returned
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/3.0.0#/components/schemas/Error'
+              examples:
+                badRequestExample:
+                  summary: |
+                    Wrong Transport Document status
+                  description: |
+                    `ISSUE` is not a possible value when PATCHING a `Transport Document`.
+                    
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: 'PATCH'
+                    requestUri: '/v3/transport-documents/td-987'
+                    statusCode: 400
+                    statusCodeText: 'Bad Request'
+                    statusCodeMessage: 'ISSUE is not a valid status to set'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    errorDateTime: '2023-10-03T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7003
+                        property: 'transportDocumentStatus'
+                        value: 'ISSUE'
+                        errorCodeText: 'incorrect value'
+                        errorCodeMessage: 'Only APPROVED is an allowed value: ISSUE was inserted'
+        '500':
+          description: |
+            In case a server error occurs in provider system a `500` (Internal Server Error) is returned
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.0.0#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/3.0.0#/components/schemas/Error'
+              examples:
+                internalServerErrorExample:
+                  summary: |
+                    Internal Server Error while approving the `Draft Transport Document`
+                  description: |
+                    An Internal Server Error has occurred - the consumer should contact {provider-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+                    
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: 'PATCH'
+                    requestUri: '/v3/transport-documents/td-987'
+                    statusCode: 500
+                    statusCodeText: 'Internal Server Error'
+                    statusCodeMessage: 'Internal Server Error occurred while approving the Transport Document'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    errorDateTime: '2023-04-13T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: 'Internal Error occurred'
+                        errorCodeMessage: 'Internal Error occurred'
         default:
-          description: Unexpected error
+          description: |
+            Unexpected error
           headers:
             API-Version:
               $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/headers/API-Version'
           content:
             application/json:
               schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.1#/components/schemas/error'
-  /v3/events:
-    get:
-      tags:
-       - Bill of Lading Events
-      summary: 'Get Shipment events'
-      operationId: 'getEvents'
-      description: |
-        Retrieves `Bill of Lading` related `Shipment Events`.
-        
-        
-        If not specified - this list will be sorted by the time the `ShipmentEvent` was created (eventCreatedDateTime) in ascending (ASC) order.
-        The default sort order is by _eventCreatedDateTime_ in ascending order (`ASC`)
-      parameters:
-        # Chunk with specialized booking related ShipmentEvent parameters
-        - $ref: '#/components/parameters/shipmentEventTypeCodes'
-        - $ref: '#/components/parameters/documentTypeCodes'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.2.0#/components/parameters/documentReference'
-        
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.2.0#/components/parameters/equipmentReference'
-
-        # Chunk with base event parameters
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.2.0#/components/parameters/eventCreatedDateTime'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.2.0#/components/parameters/eventDateTime'
-
-        # Chunk with Global related event parameters
-        # - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/parameters/cursor'
-        # - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/parameters/offset'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/parameters/limit'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/parameters/sort'
-        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/parameters/Api-Version-Major'
-      responses:
-        '200':
-          description: Request successful
-          headers:
-            API-Version:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/headers/API-Version'
-            Current-Page:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/headers/Current-Page'
-            Next-Page:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/headers/Next-Page'
-            Prev-Page:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/headers/Prev-Page'
-            Last-Page:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/headers/Last-Page'
-            First-Page:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/headers/First-Page'
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.2.0#/components/schemas/shipmentEvent'
-        default:
-          description: Unexpected error
-          headers:
-            API-Version:
-              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/headers/API-Version'
-          content:
-            application/json:
-              schema:
-                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.1#/components/schemas/error'
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/3.0.0#/components/schemas/Error'
+              examples:
+                getError:
+                  summary: |
+                    GET non-existing Transport Document
+                  description: |
+                    Calling
+                    
+                        PATCH /v3/transport-documents/td-987
+                        
+                    results in an error as `Transport Document` `td-987` does not exist.
+                    
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: 'PATCH'
+                    requestUri: '/v3/transport-documents/td-987'
+                    statusCode: 404
+                    statusCodeText: 'Not Found'
+                    statusCodeMessage: 'The requested transportDocumentReference does not exist'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    errorDateTime: '2023-04-13T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: 'Non existent transportDocumentReference'
+                        errorCodeMessage: 'transportDocumentReference `td-987` does not exist'
 
 components:
   parameters:
@@ -567,114 +1720,35 @@ components:
     # Path params
     #############
     
-    shippingInstructionReference:
+    documentReference:
       in: path
-      name: shippingInstructionReference
+      name: documentReference
       description: |
-        The identifier for a shipping instruction provided by the carrier
+        An identifier for a `Shipping Instructions`. It can either be a `shippingInstructionsReference` or a `transportDocumentReference`.
       schema:
-        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/shippingInstructionReference'
+        type: string
+        pattern: '^\S+(\s+\S+)*$'
+        maxLength: 100
+        example: 'e0559d83-00e2-438e-afd9-fdd610c1a008'
       required: true
     transportDocumentReference:
       in: path
       name: transportDocumentReference
       description: |
-        The transportDocumentReference of the Transport Document
+        The `transportDocumentReference` of the `Transport Document`
       required: true
       schema:
         $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/transportDocumentReference'
-
-    ##############
-    # Query params
-    ##############
-    
-    carrierBookingReferences:
+    updatedContent:
       in: query
-      name: carrierBookingReference
-      explode: false
-      style: form
+      name: updatedContent
       description: |
-        The bookingReference in the Bill of Lading process to filter by.
-
-        It is possible to insert multiple values by comma `,` separating them. For multiple values the OR-operator is used. For example _carrierBookingReference=ABC123123,DEF987987_  Matches **both** documents connected to booking with reference `ABC123123` and booking with reference `DEF987987`.
-      example: [ABC123123,DEF987987]
+        If set to `true`, the payload returned is the content of the `Updated Shipping Instructions`.
+        
+        Default value is `false` in which case the content of the "original" `Shipping Instructions` is returned.
+        
+        **Condition:** Can only be used if an update has been made by the consumer (via **UseCase 3: Submit updated Shipping Instructions**) and **until** a new updated is requested by the provider. If no updates have been made a `404` (Not Found) response will be returned
       schema:
-        type: array
-        items:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/carrierBookingReference'
-    documentReference:
-      in: query
-      name: documentReference
-      description: |
-        A set of unique characters to identify a resource. Specifying this filter will only return events related to this particular `documentReference`. The `documentReference` can point to a Shipping Instruction (`SHI`) or to a Transport Document (`TRD`)
-      schema:
-        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/EVENT_DOMAIN/3.2.0#/components/schemas/documentReference'
-    documentStatus:
-      in: query
-      name: documentStatus
-      description: |
-        Filter by the status of the Shipping Instruction in the process. Possible values are:
-        - RECE (Received)
-        - PENU (Pending Update)
-        - DRAFT (Draft)
-        - PENA (Pending Approval)
-        - APPR (Approved)
-        - ISSU (Issued)
-        - SURR (Surrendered)
-        - VOID (Void)
-
-        More details can be found on <a href="https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/shipmenteventtypecodes.csv">GitHub</a>. Be aware that the list linked to is the `ShipmentEventTypeCodes` which is equivalent to `documentStatus`, the list is a subset of the possible values.
-      schema:
-        $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/3.0.0#/components/schemas/eblShipmentEventTypeCode'
-    documentTypeCodes:
-      in: query
-      name: documentTypeCode
-      explode: false
-      style: form
-      description: |
-        The `documentTypeCode` to filter by. Possible values are
-        - SHI (Shipping Instruction)
-        - TRD (Transport Document)
-
-        It is possible to select multiple values by comma `,` separating them. For multiple values the OR-operator is used. For example _documentTypeCode=SHI,TRD_ Matches **both** `ShipmentEvents` related to Shipping Instructions (`SHI`) and Transport Documents (`TRD`).
-
-        More details can be found on <a href="https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/documenttypecodes.csv">GitHub</a>. Be aware that the list provided here is a subset of the possible values.        
-      example: [SHI]
-      schema:
-        default: [SHI,TRD]
-        type: array
-        items:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/3.0.0#/components/schemas/eblDocumentTypeCode'
-    # equipmentReference:
-    #   in: query
-    #   name: equipmentReference
-    #   description: |
-    #     Filter by the unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.
-    #     According to ISO 6346, a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit). If a container does not comply with ISO 6346, it is suggested to follow Recommendation #2 “Container with non-ISO identification” from SMDG.
-    #   schema:
-    #     $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/equipmentReference'
-    shipmentEventTypeCodes:
-      in: query
-      name: shipmentEventTypeCode
-      explode: false
-      style: form
-      description: |
-        The status of the document in the Bill of Lading process to filter by. Possible values are
-        - RECE (Received)
-        - PENU (Pending Update)
-        - DRAFT (Draft)
-        - PENA (Pending Approval)
-        - APPR (Approved)
-        - ISSU (Issued)
-        - SURR (Surrendered)
-        - VOID (Void)
-
-        It is possible to select multiple values by comma `,` separating them. For multiple values the OR-operator is used. For example _shipmentEventTypeCode=RECE,ISSU_  Matches **both** Received (`RECE`) and Issued (`ISSU`) `ShipmentEvents`.
-
-        More details can be found on <a href="https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/shipmenteventtypecodes.csv">GitHub</a>. Be aware that the list provided here is a subset of the possible values.
-      example: [RECE,ISSU]
-      schema:
-        default: [RECE,PENU,DRFT,PENA,APPR,ISSU,SURR,VOID]
-        type: array
-        items:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/3.0.0#/components/schemas/eblShipmentEventTypeCode'
+        type: boolean
+        default: false
+        example: false
