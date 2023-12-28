@@ -47,6 +47,12 @@ A major rewrite of the Documnetation Domain. Less reuse of objects since endPoin
     - `location` structure changed from an `anyOf` --> `oneOf`
     - `shipmentLocationTypeCode` renamed to `locationTypeCode` with the following modification:
       - `PSR` (Pre-carriage under shipper’s responsibility) and `ECP` (Empty container pick-up location) removed
+  - `requestedEquipments`:
+    - structure changed so `tareWeight` and `tareWeightUnit` along with `isShipperOwned` are specified via a `oneOf` Shipper Owned or Carrier Owned structure
+    - `isNonOperatingReefer`, `activeReeferSettings`, `commodities` and `references` added
+    - `commodityRequestedEquipmentLink` removed (this is now renamed to `commoditySubReference` and a carrierProvided value in the commodity-object)
+    - 
+    - 
 
 <a name="v210"></a>[Release v2.1.0 (23 December 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN/2.1.0)
 ---
