@@ -6,7 +6,7 @@ This Domain specifies reusable objects for the eDocumentation: [Booking](https:/
 
 <a name="v300"></a>[Release v3.0.0 (28 December 2023)](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN/3.0.0)
 ---
-A major rewrite of the Documnetation Domain. Less reuse of objects since endPoints using the objects are asymetric. This release is for Booking v2.0.0 Beta 1 and EBL v3.0.0 Beta 1.
+A major rewrite of the Documnetation Domain. Less reuse of objects since endPoints using the objects are asymetric. This release is for Booking v2.0.0 Beta 1 and EBL v3.0.0 Beta 1. `Dangerous Goods` and `Active Reefer Settins` added and all location objects now use `oneOf` instead of `amnyOf`
 
 - object names are now capitalized
 - objects now contain the `title` property for viasual presentation. It maay contain spaces
@@ -15,7 +15,7 @@ A major rewrite of the Documnetation Domain. Less reuse of objects since endPoin
 - added `requestedChanges` object to keep track of  changes requested by the provider (carrier)
 
 **For Booking**:
-- `CreateBooking` object added in order to create a new Booking. Compared to previous version:
+- `CreateBooking` object added in order to create a new `Booking`. Compared to previous version:
   - `freightPaymentTermCode`, `originChargesPaymentTermCode`, `destinationChargesPaymentTermCode` added
   - `paymentTermCode`, `preCarriageModeOfTransportCode` removed
   - `isCustomsFilingSubmissionByShipper` removed and substituted with the `advanceManifestFilings` in the `Shipping Instructions`
@@ -25,8 +25,8 @@ A major rewrite of the Documnetation Domain. Less reuse of objects since endPoin
   - `shipmentLocations` and `requestedEquipments` is now mandatory
   - `valueAddedServices` removed
   - `commodities` removed from root level and added below `requestedEquipments`
-- `UpdateBooking` object added in order to update an existing Booking
-- `Booking` object added in order to fetch a Booking. Compared to previous version:
+- `UpdateBooking` object added in order to update an existing `Booking`
+- `Booking` object added in order to fetch a `Booking`. Compared to previous version:
   - the object is now a combination of a `Booking Request` and a `Confirmed Booking`
   - `bookingRequestCreatedDateTime` and `bookingRequestUpdateddDateTime` removed
   - `documentStatus` renamed to `bookingStatus` and `amendedBookingStatus` added in order to follow the status for an amendment
@@ -45,7 +45,19 @@ A major rewrite of the Documnetation Domain. Less reuse of objects since endPoin
 - `BookingRefCancelledStatus` object added for the cancellation response
 
 **For Bill of Lading**:
-- 
+- `CreateShippingInstructions` object added in order to create a new Booking. Compared to previous version:
+  - `amendToTransportDocument` removed
+  - `transportDocumentTypeCode` now mandatory
+  - `freightPaymentTermCode`, `originChargesPaymentTermCode`, `destinationChargesPaymentTermCode`, `sendToPlatform`, `invoicePayableAt`, `customsReferences`, `advanceManifestFilings`, `requestedCarrierCertificates` and `requestedCarrierClauses` added
+  - `carrierBookingReference` removed from root level - the one in `consignmentItems` must be used
+  - `placeOfIssue` structure changed from `anyOf` --> `oneOf`
+  - `partyContactDetails` added for contact details regarding the `Transport Document`
+  - `documentParties` is now mandatory
+- `UpdateShippingInstructions` object added in order to update an existing `Shipping Instructions`
+- `ShippingInstructions` object added in order to fetch a `Shipping Instructions`. Compared to previous version:
+- `ShippingInstructionsRefStatus` object added for the `POST` and `PUT` responses
+- `ShippingInstructionsRefCancelStatus` object added for the cancellationof an update response
+- `TransportDocument` object added in order to fetch a `Transport Document`. Compared to previous version:
 
 **Objects modified/added**:
 - `References`: `type` (referenceType) modified:
@@ -78,6 +90,16 @@ A major rewrite of the Documnetation Domain. Less reuse of objects since endPoin
   - `commodityRequestedEquipmentLink` removed
 - `outerPackaging` added as a new object containing the following properties: `packageCode`, `imoPackagingCode`, `numberOfPackages`, `description` and a new `DangerousGoods` object to include a list of DG declarations
 - `Charge` object has renamed `chargeType` into `chargeName`
+- `Dangerous Goods` object added with: `InnerPackaging`, `Limits`, `EmergencyContactDetails`
+- A specialized version of `DangerousGoods` for `Booking` (`DangerousGoods_BKG`) added and additionally includes `specialCertificateNumber` and `additionalContainerCargoHandling`
+- `customsReferences` added as a suplement to `references` for references only related to customs
+- `advanceManifestFilings` object added to handle Manifest Filings and if `SHIPPER` or `CARRIER` should file them
+- `requestedCarrierClauses` and `requestedCarrierCertificates` added to allow for consumer (Shipper) to specify which Certificates and Clauses to include
+
+
+- `transport` renamed to `Transports` object added for the `Transport Document` which:
+  - includes the following locations: `PlaceOfReceipt`, `PortOfLoading`, `PortOfDischarge`, `PlaceOfDelivery` and `OnwardInlandRouting`
+  - and the following properties: 
 
 <a name="v210"></a>[Release v2.1.0 (23 December 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN/2.1.0)
 ---
