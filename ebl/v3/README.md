@@ -14,3 +14,13 @@ Beta 1 release of the DCSA OpenAPI definitions for Bill of Lading 3.0.0. This re
 - Bump [DCSA_Domain to version 3.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v310) (was previously v2.0.3)
 - Event_Domain no longer needed
 - **will be updated**
+- 
+- Bump [Error_Domain to version 3.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/error#v300) (was previously v2.0.0)
+- Event_Domain no longer used
+- Check above Domains to see changes of objects since last version
+- `summary`-endPoints removed
+- `Booking Request` and `Shipment` endPoint consolidated into one GET endPoint
+- amendment flow improved. It is now possible to follow the status of an amendment via the `amendedBookingStatus`
+- `events` endPoint removed and a notification API added to support Push Notifications
+- multiple examples added to most endPoints
+- descriptions improved to all endPoints explaining flows
