@@ -4,6 +4,7 @@ The DCSA Interface Standard for Booking is documented on the [**DCSA BKG Swagger
 
 Publications related to this specification can be found on the DCSA website:
 - [Glossary of Terms](https://knowledge.dcsa.org/s/glossary)
+- [Booking Process](https://dcsa.org/standards/booking-process/)
 
 <a name="v200B1"></a>[Release v2.0.0 Beta 1 (28 December 2023)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0-Beta-1)
 ---
