@@ -1,4 +1,4 @@
-### Booking (BKG) Notification API
+### Booking Notification API
 
 The DCSA Interface Standard for Booking is documented on the [**DCSA BKG SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_BKG).
 
