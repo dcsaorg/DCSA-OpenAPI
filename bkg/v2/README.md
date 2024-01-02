@@ -1,6 +1,6 @@
 ### Booking (BKG) API
 
-The DCSA Interface Standard for Booking is documented on the [**DCSA BKG SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_BKG).
+The DCSA API specifications for Booking is documented on the [**DCSA BKG SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_BKG).
 
 Publications related to this specification can be found on the DCSA website:
 - [Glossary of Terms](https://knowledge.dcsa.org/s/glossary)
