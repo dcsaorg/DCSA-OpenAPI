@@ -8,4 +8,6 @@ Publications related to this specification can be found on the DCSA website:
 
 <a name="v300B1"></a>[Release v3.0.0 Beta 1 (28 December 2023)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.0-Beta-1)
 ---
-Beta 1 release of the DCSA OpenAPI definitions for Bill of Lading 3.0.0. This release adds `Active Reefer Settings` (Phase 1) and `Dangerous Goods`. It removes the Events endPoint and now supports the Notification pattern.
+Beta 1 release of the DCSA OpenAPI definitions for Bill of Lading Notifications 3.0.0.
+
+- This is an initial release.
