@@ -4,6 +4,22 @@ The Location Domain is documented on [**Location Domain SwaggerHub**](https://ap
 
 The primary purpose of this Domain is to specify common components related to a location.
 
+<a name="v400"></a>[Release v4.0.0 (28 December 2023)](https://app.swaggerhub.com/domains-docs/dcsaorg/LOCATION_DOMAIN/4.0.0)
+---
+Add support for CountryLocation- and FreetextLocation-Interfaces
+
+- added `countryLocation` a location-interface to be used if only `country` is known
+- added `freetextLocation` a location-interface to be used if location does not fit any other location-interface
+- a maxLength of `4` set on locationType
+
+<a name="v310"></a>[Release v3.1.0 (28 December 2023)](https://app.swaggerhub.com/domains-docs/dcsaorg/LOCATION_DOMAIN/3.1.0)
+---
+Add support for CityLocation-Interface and removed `enum`
+
+- Bump [DCSA_Domain to version 3.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v310) (was previously v3.0.0)
+- removed enum from `locationType` in order to better support backward compatability
+- added `cityLocation` a location-interface to be used if only `city`, `region` and `country` is known
+
 <a name="v300"></a>[Release v3.0.0 (31 March 2023)](https://app.swaggerhub.com/domains-docs/dcsaorg/LOCATION_DOMAIN/3.0.0)
 ---
 Add location descriminator
