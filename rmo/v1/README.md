@@ -1,7 +1,3 @@
----
-stoplight-id: ozs4u0b14gxnx
----
-
 ## Reefer Monitoring
 
 The DCSA Interface Standard for Reefer Monitoring is documented on [**DCSA Reefer Monitoring**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_RMO) SwaggerHub.
