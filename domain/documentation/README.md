@@ -4,12 +4,127 @@ The Documentation Domain is documented on [**Documentation Domain**](https://app
 
 This Domain specifies reusable objects for the eDocumentation: [Booking](https://app.swaggerhub.com/apis/dcsaorg/DCSA_BKG) and [Electronic Bill of Lading](https://app.swaggerhub.com/apis/dcsaorg/DCSA_EBL).
 
-<a name="v300"></a>[Release v3.0.0 (...)](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN/3.0.0)
+<a name="v300"></a>[Release v3.0.0 (28 December 2023)](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN/3.0.0)
 ---
-Active Reefer Settings has been added
+A major rewrite of the Documnetation Domain. Less reuse of objects since endPoints using the objects are asymetric. This release is for Booking v2.0.0 Beta 1 and EBL v3.0.0 Beta 1. `Dangerous Goods` and `Active Reefer Settins` added and all location objects now use `oneOf` instead of `amnyOf`
 
-- `activeReeferSettings` added to `requestedEquipment`
-- `activeReeferSettings` updated on the `utilizedTransportEquipment`
+- object names are now capitalized
+- objects now contain the `title` property for viasual presentation. It maay contain spaces
+- Bump [DCSA_Domain to version 3.1.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/dcsa#v310) (was previously v2.0.3)
+- Bump [Location_Domain to version 4.0.0](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/domain/location#v400) (was previously v2.0.3)
+- added `requestedChanges` object to keep track of  changes requested by the provider (carrier)
+
+**For Booking**:
+- `CreateBooking` object added in order to create a new `Booking`. Compared to previous version:
+  - `freightPaymentTermCode`, `originChargesPaymentTermCode`, `destinationChargesPaymentTermCode` added
+  - `paymentTermCode`, `preCarriageModeOfTransportCode` removed
+  - `isCustomsFilingSubmissionByShipper` removed and substituted with the `advanceManifestFilings` in the `Shipping Instructions`
+  - `vesselName ` and `vesselIMONumber` moved into `vessel` object
+  - `invoicePayableAt` and `placeOfBLIssue` structure changed from an `anyOf` --> `oneOf`
+  - `partyContactDetails` added for contact details regarding the booking
+  - `shipmentLocations` and `requestedEquipments` is now mandatory
+  - `valueAddedServices` removed
+  - `commodities` removed from root level and added below `requestedEquipments`
+- `UpdateBooking` object added in order to update an existing `Booking`
+- `Booking` object added in order to fetch a `Booking`. Compared to previous version:
+  - the object is now a combination of a `Booking Request` and a `Confirmed Booking`
+  - `bookingRequestCreatedDateTime` and `bookingRequestUpdateddDateTime` removed
+  - `documentStatus` renamed to `bookingStatus` and `amendedBookingStatus` added in order to follow the status for an amendment
+  - `isAMSACIFilingRequired` removed
+  - `commoditySubReference` added to `commodities` inside the `requestedEquipments`
+  - `units` and `ISOEquipmentCode` now mandatory fields inside `confirmedEquipments`
+  - `transports` renamed to `transportPlan` with the following modifications:
+    - all locations are now a `oneOf` instead of an `anyOf`
+    - `carrierServiceCode` and `universalServiceCode` added
+    - `isUnderShippersResponsibility` removed
+    - `advanceManifestFilings` added
+    - `requestedChanges` object added
+    - `reason` field added
+  - `AFD` (AMS Filing Due date) added to `cutOffDateTimeCode` in `shipmentCutOffTimes`
+- `BookingRefStatus` object added for the `POST` and `PUT` responses
+- `BookingRefCancelledStatus` object added for the cancellation response
+
+**For Bill of Lading**:
+- `CreateShippingInstructions` object added in order to create a new Booking. Compared to previous version:
+  - `amendToTransportDocument` removed
+  - `transportDocumentTypeCode` now mandatory
+  - `freightPaymentTermCode`, `originChargesPaymentTermCode`, `destinationChargesPaymentTermCode`, `sendToPlatform`, `invoicePayableAt`, `customsReferences`, `advanceManifestFilings`, `requestedCarrierCertificates` and `requestedCarrierClauses` added
+  - `carrierBookingReference` removed from root level - the one in `consignmentItems` must be used
+  - `placeOfIssue` structure changed from `anyOf` --> `oneOf`
+  - `partyContactDetails` added for contact details regarding the `Transport Document`
+  - `documentParties` is now mandatory
+- `UpdateShippingInstructions` object added in order to update an existing `Shipping Instructions`
+- `ShippingInstructions` object added in order to fetch a `Shipping Instructions`. Compared to previous version:
+  - same differences as `CreateShippingInstructions` object plus:
+    - `documentStatus` renamed to `shippingInstructionsStatus` and an extra `updatedShippingInstructionsStatus` added to keep track of an update
+    - `requestedChanges` object added
+    - `reason` field added
+- `ShippingInstructionsRefStatus` object added for the `POST` and `PUT` responses
+- `ShippingInstructionsRefCancelStatus` object added for the cancellationof an update response
+- `TransportDocument` object added in order to fetch a `Transport Document`. Compared to previous version:
+  - `transportDocumentStatus` added to indicate the status of the `Transport Document`
+  - `transports` and `invociePayableAt` is now mandatory
+  - `references` and `customsReferences` added
+
+**Objects modified/added**:
+- `References`: `type` (referenceType) modified:
+  - `SPO` (Shippers Purchase Order Reference), `CPO` (Consignees Purchase Order Reference) and `SAC` (Shipper Agency Code) added
+  - `PO` (Purchase Order), `RUC` (Registro Único del Contribuyente), `DUE` (Declaração Única de Exportação), `CER` (Canadian Export Reporting System), `AES` (Automated Export System) removed
+  - no longer an `enum` --> has been changed to be a string for backward compatibility
+- `Party`:
+  - `taxAndLegalReferences` object added to keep track of tax and legal references
+  - `taxReference1` and `taxReference2` removed (use `taxAndLegalReferences` instead)
+  - `publicKey` removed as it was not used
+  - `partyContactDetails` is no longer mandatory
+- `PartyContactDetails` structure changed to require either `phone` or `email` or both. `url` has been removed
+- `identifyingCodes`:
+  - `DCSAResponsibleAgencyCode` renamed to `codeListProvider` and updated:
+    - `EXIS` (Exis Technologies Ltd.), `DID` (Decentralized Identifier), `LEI` (Legal Entity Identifier) removed
+    - `NCBH` (NCB Hazcheck), `DCSA` (Digitial Container Shipping Association), `W3C` (World Wide Web Consortium) and `GLEIF` (Global Legal Entity Identifier Foundation) added
+    - changed from `enum` --> string for backwards compatibility
+- `shipmentLocations`:
+  - `location` structure changed from an `anyOf` --> `oneOf`
+  - `shipmentLocationTypeCode` renamed to `locationTypeCode` with the following modification:
+    - `PSR` (Pre-carriage under shipper’s responsibility) and `ECP` (Empty container pick-up location) removed
+- `requestedEquipments`:
+  - structure changed so `tareWeight` and `tareWeightUnit` along with `isShipperOwned` are specified via a `oneOf` Shipper Owned or Carrier Owned structure
+  - `isNonOperatingReefer`, `activeReeferSettings`, `commodities` and `references` added
+  - `commodityRequestedEquipmentLink` removed (this is now renamed to `commoditySubReference` and a carrierProvided value in the commodity-object)
+- `commodity`:
+  - `HSCode` is now a list of `HSCodes` and hence renamed to `HSCodes`
+  - `numberOfPackages` moved into the `outerPackaging` object
+  - `references` added
+  - `commodityRequestedEquipmentLink` removed
+- `outerPackaging` added as a new object containing the following properties: `packageCode`, `imoPackagingCode`, `numberOfPackages`, `description` and a new `DangerousGoods` object to include a list of DG declarations. The `Dangerous Goods` object is not included in the `Shipping Instructions` object
+- `Charge` object has renamed `chargeType` into `chargeName`
+- `Dangerous Goods` object added with: `InnerPackaging`, `Limits`, `EmergencyContactDetails`
+- A specialized version of `DangerousGoods` for `Booking` (`DangerousGoods_BKG`) added and additionally includes `specialCertificateNumber` and `additionalContainerCargoHandling`
+- `customsReferences` added as a suplement to `references` for references only related to customs
+- `advanceManifestFilings` object added to handle Manifest Filings and if `SHIPPER` or `CARRIER` should file them
+- `requestedCarrierClauses` and `requestedCarrierCertificates` added to allow for consumer (Shipper) to specify which Certificates and Clauses to include
+- `consignmentItem`:
+  - `carrierBookingRefernce` is now mandatory
+  - a condition added for `placeOfBLIssue`
+  - `weight` and `weightUnit` is now mandatory
+  - `HSCode` renamed to `HSCodes` and changed into a list
+  - `customsReferences` added
+  - `commoditySubReference` added in order to link a `consignmentItem` to a `commodity`
+- `cargoItem`:
+  - `cargoLineItems` removed and `shippingMarks` moved from `cargoLineItems` to the root of `cargoItem`
+  - `numberOfPackages` and `packageCode` moved into the `outerPackaging`
+  - `packageNameOnBL` removed
+  - `customsReferences` added
+- `utilizedTransportEquipments`:
+  - weights and volume properties not part of the `Shipping Instruction` - only part of the `Transport Document`
+  - `seals` is mandatory
+  - `numberOfPackages` removed
+  - for the `Shipping Instructions` it is possible to choose between Shipper Owned and Carrier Owned equipment. For the `Transport Document` the entire equipment object is included
+  - `customsReferences` added
+- `transports` changed from being an array (representing the Tranport Plan) to a single object with the following properties:
+  - `PlaceOfReceipt`, `PortOfLoading`, `PortOfDischarge`, `PlaceOfDelivery` and `OnwardInlandRouting` added as locations
+  - `plannedArrivalDate` and `plannedDepartureDate`
+  - `preCarriageBy` and `onCarriageBy`
+  - `vesselName`, `carrierExportVoyageNumber` and `universalExportVoyageReference`
 
 <a name="v210"></a>[Release v2.1.0 (23 December 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/DOCUMENTATION_DOMAIN/2.1.0)
 ---
