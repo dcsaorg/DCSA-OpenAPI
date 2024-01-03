@@ -1,0 +1,283 @@
+openapi: 3.0.0
+info:
+  version: 3.0.0-Beta-1
+  title: DCSA EBL Surrender API
+  description: |
+    This API is intended as an API between a carrier (the server) and a EBL Solution Platform (the client).
+    
+    The EBL Solution Platform will submit surrender requests to the carrier, which will be processed asynchronously. Responses to the surrender reqests will be submitted by the carrier via the [DCSA_EBL_SUR_RSP](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR_RSP/3.0.0-Beta-1) API.
+    
+    
+    When the platform submits a surrender request, the platform guarantees *all* of the following:
+  
+    1) The surrender request was submitted by the sole possessor of the EBL.
+    2) Depending on the eBL type:
+       * For non-negoitable ("straight") eBLs, the surrender request was submitted by either the original shipper OR the consignee.
+       * For negotiable eBLs with a named titleholder, the surrender request was submitted by the named titleholder.
+       * For negotiable eBLs without a named titleholder / blank eBLs, possession is sufficient for the entity surrendering the eBL.
+    3) The platform has the EBL in custody while the carrier is evaluating this surrender request. I.e., neither possession nor title holder changes can occur until the carrier responds to this surrender request.
+    
+    Please see the [Surrender Request](#/surrenderRequestDetails) for details on what data the platform will provide.
+    
+    ### Stats API
+    The Stats API offers crucial statistical information for both API providers and consumers to enhance their services and helps DCSA to understand and scale the ecosystem. We expect you to invoke the Stats API for every request made to this API. Further details can be found [here](https://developer.dcsa.org/#/http/guides/api-guides/stats-api)
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  contact:
+    name: Digital Container Shipping Association (DCSA)
+    url: https://dcsa.org
+    email: info@dcsa.org
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/dcsaorg/DCSA_EBL_SUR/3.0.0-Beta-1
+paths:
+  /v3/ebl-surrender-requests:
+    post:
+      tags:
+        - Surrender Requests
+      description: |
+        The EBL Solution Platform uses this endpoint to submit a surrender request.
+        
+        The carrier's answer to the surrender request will be returned via a callback response (see the `Callbacks` tab)
+      parameters:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/parameters/Api-Version-Major'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/surrenderRequestDetails'
+      responses:
+        '202':
+          description: |
+            Submission registered successfully.
+            
+            The carrier will later follow up via the callback with a response.
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.2#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/surrenderRequestAcknowledgement'
+        default:
+          description: Error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.1#/components/schemas/error'
+
+
+components:
+  schemas:
+    
+    ##############
+    # Simple types
+    ##############
+
+    legalName:
+      type: string
+      maxLength: 100
+      pattern: '^\S+(\s+\S+)*$'
+      description: Legal name of the party/user as shown on the endorsement chain
+      example: Digital Container Shipping Association
+
+    registrationNumber: 
+      type: string
+      description: Company registration number of this party. E.g. registration number on the local chamber of commerse. 
+      example: 74567837
+      pattern: '^\S+(\s+\S+)*$'
+
+    locationOfRegistration:
+      type: string
+      description: Country code of the location of registration according to ISO 3166-1 alpha-2
+      maxLength: 2
+      minLength: 2
+      pattern: '^[A-Z]+$'
+      example: NL
+
+    surrenderRequestReference:
+      type: string
+      maxLength: 100
+      example: "Z12345"
+      pattern: "^\\S+(\\s+\\S+)*$"
+      description: |
+        A server defined reference for a concrete surrender request. Surrender request references MUST NOT be reused.
+
+    comments:
+      type: string
+      description: Optional free text comment associated with the surrender request transaction.
+      maxLength: 255
+
+    surrenderRequestCode:
+      type: string
+      enum:
+        - SREQ
+        - AREQ
+      description: |
+        Surrender Request codes:
+        - SREQ (Requested to surrender for Delivery)
+        - AREQ (Requested to surrender for Amendment)
+
+        The surrender request code determines the type of surrender request. Any parallel negotiation between the consignee and the carrier related to any of these type surrender are handled outside this API. Examples could be the shipment release related to a surrender for delivery or the actual contents of the admendment in a surrender related to an amendment.
+        
+        Note that "Switch to paper" is considered an amendment in how it is modelled via the DCSA eBL data standard.
+
+    ##############
+    # Objects 
+    ##############
+    transactionParty:
+      description: 'refers to a company or a legal entity.'
+      type: object
+      properties:
+        eblPlatform:
+          description: |
+            The EBL platform of the transaction party. Must be a code from https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/eblsolutionproviders.csv.
+          type: string
+          pattern: '\S+'
+          maxLength: 4
+          example: 'BOLE'
+        legalName:
+          $ref: '#/components/schemas/legalName'
+        registrationNumber: 
+          $ref: '#/components/schemas/registrationNumber'
+        locationOfRegistration:
+          $ref: '#/components/schemas/locationOfRegistration'
+        taxReference:
+          type: string
+          description: Tax reference used in the location of registration
+          pattern: ^\S+$
+          example: NL859951480B01
+        partyCodes:
+          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/3.0.0#/components/schemas/partyCodes'
+      required:
+        - eblPlatform
+        - legalName
+
+    # partyCodes:
+    #   type: array
+    #   items:
+    #     type: object
+    #     properties:
+    #       partyCode:
+    #         type: string
+    #         maxLength: 100
+    #         minLength: 1
+    #         pattern: '^\S+(\s+\S+)*$'
+    #       partyCodeListProvider:
+    #         type: string
+    #         enum:
+    #         - GLEIF
+    #         - W3C
+    #         - EPUI
+    #         description: |
+    #           Describes the organisation that provides the party code.
+
+    #           - `EPUI`:The party code is an EBL Platform User Identifier (that is, an identifier provided by a platform, used to transfer eBLs). EPIU should be combined with the `codeListName`, to identify the platform that issued the identifier.
+    #           - `GLEIF`: The party code is issued by Global Legal Entity Identifier Foundation (GLEIF). See https://www.gleif.org/en. The `codeNameList` (if omitted) defaults to `LEI`.
+    #           - `W3C`: The party code is issued by a standard created by World Wide Web Consortium (W3C). See https://www.w3.org/. The `codeNameList` (if omitted) defaults to `DID`.
+
+    #       codeListName:
+    #         type: string
+    #         pattern: '^\S+(\s+\S+)*$'
+    #         maxLength: 100
+    #         description: |
+    #           The name of the code list / code generation mechanism / code authority for the party code.
+              
+    #           For `EPUI`:
+    #           * `Wave`: An identifier provided by Wave BL.
+    #           * `CargoX`: An identifier provided by CargoX
+    #           * `EdoxOnline`: An identifier provided by EdoxOnline
+    #           * `IQAX`: An identifier provided by IQAX
+    #           * `EssDOCS`: An identifier provided by essDOCS
+    #           * `Bolero`: An identifier provided by Bolero
+    #           * `TradeGO`: An identifierprovided by TradeGo
+    #           * `Secro`: An identifier provided by Secro
+    #           * `GSBN`: An identifier provided by GSBN
+    #           * `WiseTech`: An identifier provided by WiseTech
+              
+    #           For `W3C`:
+    #           * `DID`: The party code is a Decentralized Identifier (see https://www.w3.org/TR/did-core/).
+              
+    #           For `GLEIF`:
+    #           * `LEI`: The party code is a Legal Entity Identifier (LEI) as issued by Global Legal Entity Identifier Foundation (GLEIF). See https://www.gleif.org/en
+    #     required:
+    #       - partyCode
+    #       - partyCodeListProvider
+
+    endorsementChainLink:
+      type: object
+      properties:
+        actionDateTime:
+          type: string
+          format: date-time
+          description: Date time when the action occured.
+        actor:
+          $ref: '#/components/schemas/transactionParty'
+        recipient:
+          $ref: '#/components/schemas/transactionParty'
+      description: |
+        Entry in the endorsement chain.
+      required:
+       - actionDateTime
+       - actor
+       - recipient
+
+    surrenderRequestAcknowledgement:
+      type: object
+      properties:
+        surrenderRequestReference:      
+          $ref: '#/components/schemas/surrenderRequestReference'
+        transportDocumentReference:
+          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/schemas/transportDocumentReference'
+
+    surrenderRequestDetails:
+      type: object
+      description: |
+        A concrete surrender request related to a transport document.
+        
+        The platform guarantees *all* of the following:
+        
+          1) The surrender request was submitted by the sole possessor of the EBL.
+          2) Depending on the eBL type:
+           * For non-negoitable ("straight") eBLs, the surrender request was submitted by either the original shipper OR the consignee.
+           * For negotiable eBLs with a named titleholder, the surrender request was submitted by the named titleholder.
+           * For negotiable eBLs without a named titleholder / blank eBLs, possession is sufficient for the entity surrendering the eBL.
+          3) The platform has the EBL in custody while the carrier is evaluating this surrender request. I.e., neither possession nor title holder changes can occur until the carrier responds to this surrender request.
+
+      properties:
+        surrenderRequestReference:
+          $ref: '#/components/schemas/surrenderRequestReference'
+        transportDocumentReference:
+          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/schemas/transportDocumentReference'
+        surrenderRequestCode:
+          $ref: '#/components/schemas/surrenderRequestCode'
+        comments:
+          $ref: '#/components/schemas/comments'
+        surrenderRequestedBy:
+          allOf:
+           - $ref: '#/components/schemas/transactionParty'
+           - additionalProperties: true
+             description: |
+               The party that requested the surrender of the EBL.
+               
+               The EBL platform has verified that the party submitting the surrender request was in possion of the EBL and was entitled to perform the surrender ([see description of surrenderRequestDetails](#/components/schemas/surrenderRequestDetails)).
+        endorsementChain:
+          type: array
+          minItems: 0
+          description: |
+            The endorsement chain consist of (a number of) endorsement actions that were performed **after** the eBL bill was issued.
+            
+            For straight B/Ls, the endorsement chain can be omitted. For negotiable eBLs, the endorsement chain must be present, as the carrier receiving the surrender request and will check all endorsements before accepting the eBL. The endorsement chain is the electronic version of the "back side" of the paper world B/L.
+            
+          items:
+            $ref: '#/components/schemas/endorsementChainLink'
+      required:
+        - surrenderRequestReference
+        - transportDocumentReference
+        - surrenderRequestedBy
+        - surrenderRequestCode
