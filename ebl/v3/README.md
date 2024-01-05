@@ -4,7 +4,7 @@ The DCSA Electronic Bill of Lading API is specified on [**SwaggerHub**](https://
 
 Publications related to the Bill of Lading API:
 - [Glossary of Terms](https://knowledge.dcsa.org/s/glossary) maintained on the [dcsa.org](https://dcsa.org) website
-- [Bill of Lading](https://dcsa.org/standards/ebill-of-lading/) contains documents and publications
+- [Bill of Lading](https://dcsa.org/standards/ebill-of-lading/) maintained on the [dcsa.org](https://dcsa.org) website (contains documents and publications)
 - [Bill of Lading Notification](./notification/) maintained here on GitHub
 - [Bill of Lading Issuance](./issuance/) maintained here on GitHub
 - [Bill of Lading Issuance Response](./issuance_response/) maintained here on GitHub
