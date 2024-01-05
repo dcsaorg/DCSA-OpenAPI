@@ -5,12 +5,16 @@ The DCSA Electronci Bill of Lading API is specified on [**SwaggerHub**](https://
 Publications related to the Bill of Lading API:
 - [Glossary of Terms](https://knowledge.dcsa.org/s/glossary) maintained on the [dcsa.org](https://dcsa.org) website
 - [Bill of Lading](https://dcsa.org/standards/ebill-of-lading/) contains documents and publications
-- [Bill of Lading Notification API](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_NTF) maintained on SwaggerHub and is the Notification API linked to the Bill of Lading
+- [Bill of Lading Notification API](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_NTF) maintained on SwaggerHub and is the `Notification API` linked to the `Bill of Lading`
   - ["What's New" in Bill of Lading Notification](./notification/) maintained here on GitHub
-- [Bill of Lading Issuance API](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS) maintained on SwaggerHub and Issuance API linked to the Bill of Lading
+- [Bill of Lading Issuance API](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS) maintained on SwaggerHub and the `Issuance API` linked to the `Bill of Lading`
   - ["What's New" in Bill of Lading Issuance](./issuance/) maintained here on GitHub
-- [Bill of Lading Surrender API](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR) maintained on SwaggerHub and Surrender API linked to the Bill of Lading
+  - [Bill of Lading Issuance Response API](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS_RSP) maintained on SwaggerHub and the `Issuance Response API` linked to the `Issuance API` of the `Bill of Lading`
+    - ["What's New" in Bill of Lading Issuance Response](./issuance_response/) maintained here on GitHub
+- [Bill of Lading Surrender API](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR) maintained on SwaggerHub and `Surrender API` linked to the `Bill of Lading`
   - ["What's New" in Bill of Lading Surrender](./surrender/) maintained here on GitHub
+  - [Bill of Lading Surrender Response API](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR_RSP) maintained on SwaggerHub and the `Surrender Response API` linked to the `Surrender API` of the `Bill of Lading`
+    - ["What's New" in Bill of Lading Issuance Response](./issuance_response/) maintained here on GitHub
 
 <a name="v300B1"></a>[Release v3.0.0 Beta 1 (28 December 2023)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.0-Beta-1)
 ---
