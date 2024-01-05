@@ -1,7 +1,7 @@
 
 
 
-### Electronic Bill of Lading Notification (EBL_NTF) API
+### Bill of Lading Notification (EBL_NTF) API
 
 The DCSA Bill of Lading Notification API is specified on [**SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_EBL_NTF).
 
