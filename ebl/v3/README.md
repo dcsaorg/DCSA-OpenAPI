@@ -1,6 +1,6 @@
 ### Electronic Bill of Lading (EBL) API
 
-The DCSA Electronic Bill of Lading API is specified on [**SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_EBL).
+The DCSA Bill of Lading API is specified on [**SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_EBL).
 
 Publications related to the Bill of Lading API:
 - [Glossary of Terms](https://knowledge.dcsa.org/s/glossary) maintained on the [dcsa.org](https://dcsa.org) website
