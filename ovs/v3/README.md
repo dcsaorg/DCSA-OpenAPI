@@ -2,14 +2,34 @@
 
 The DCSA OVS API is documented on [**OVS SwaggerHub**](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_OVS).
 
-The primary purpose of this API is to specify endPoints for schedules shared between Vessel Partners. This API primarily defines endPoints and otherwise uses the following Domains:
+The primary purpose of this API is to specify endPoints for schedules shared between Vessel Partners. 
+
+## <a name="v300"></a>[Release v3.0.0 (15 January 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_OVS/3.0.0-Beta-2)
+---
+
+- Aligns with v3.0.0 Beta 2.
+
+## <a name="v300B2"></a>[Release v3.0.0 Beta 2 (15 January 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_OVS/3.0.0-Beta-2)
+---
+- Description updated.
+-	carrierServiceName added as a queryParameter
+-	carrierServiceCode is now a mandatory field in the response body\
+- `statusCode` - `OMIT` value corrected.
+- Voyage References now include `R` for round-trip
+- Carrier Service Code is now 11 characters.
+- Enums replaced with String where required.
+- Error schema updated.
+
+
+
+## <a name="v300B1"></a>[Release v3.0.0 Beta 1 (30 June 2022)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_OVS/3.0.0-Beta-1)
+---
+This API primarily defines endPoints and otherwise uses the following Domains:
 - Event Domain
 - Location Domain
 - DCSA Domain
 - Error Domain
 
-<a name="v300B1"></a>[Release v3.0.0 Beta 1 (30 June 2022)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_OVS/3.0.0-Beta-1)
----
 This version focuses on making a schedule endPoint and detaching [JIT 1.0 and JIT 1.1 (Just in Time)](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/jit/v1) into a separate API
 
 - Description updated
