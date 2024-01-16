@@ -1,0 +1,750 @@
+openapi: 3.0.3
+x-stoplight:
+  id: 0008f7730dcdf
+info:
+  version: 1.0.0-Beta-1
+  title: DCSA OpenAPI specification for Arrival Notice
+  description: |
+    API specification issued by DCSA.org.
+
+    For explanation of specific values or objects please refer to the [Information Model v2023.Q4](https://dcsa.org/wp-content/uploads/2024/01/DCSA-Information-Model-2023.Q4.pdf). This API specification does not define the allowable updates and their timing in accordance with the established business rules. Refer to the [DCSA Interface Standard for the Arrival Notice 1.0 Beta 1](http://...) to address this. **All use cases mentioned in this API specification refer to use cases defined in the AN IFS**.
+
+    All other documents related to the Arrival Notice publication can be found [here](https://dcsa.org/standards/arrival-notice/)
+
+    It is possible to use the AN API as a standalone API. In that case use one of the poll endPoints:
+
+        GET /v1/arrival-notices/{arrivalNoticeReference}
+
+    in order to poll information about Arrival Notices.
+
+    ### Notifications
+    It is possible to have notifications pushed to you whenever an Arrival Notice is ready. The format of the notification is defined by the [Arrival Notice Notification API](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_AN_NTF/1.0.0-Beta-1). Signing up for notifications is defined outside the scope of this API specification.
+
+    ### Stats API
+    The Stats API offers crucial statistical information for both API providers and consumers to enhance their services and helps DCSA to understand and scale the ecosystem. We expect you to invoke the Stats API for every request made to this API. Further details can be found [here](https://developer.dcsa.org/#/http/guides/api-guides/stats-api)
+
+    For a changelog, please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/an/v1#v100B1). Please [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments.
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+  contact:
+    name: Digital Container Shipping Association (DCSA)
+    url: 'https://dcsa.org'
+    email: info@dcsa.org
+tags:
+  - name: Arrival Notice
+    description: |
+      The Arrival Notice object for the Shipper
+servers:
+  - url: 'http://localhost:3000'
+paths:
+  '/v1/arrival-notice/{arrivalNoticeReference}':
+    get:
+      tags:
+        - Arrival Notice
+      summary: Get Arrival Notice
+      operationId: get-arrival-notices
+      description: |
+        Retrieves the Arrival Notice with the `arrivalNoticeReference` in the path.
+      parameters:
+        - $ref: '#/components/parameters/arrivalNoticeReferencePathParam'
+        - $ref: '#/components/parameters/Api-Version-Major'
+      responses:
+        '200':
+          description: Request successful
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrivalNotice'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: ../../models/ErrorResponse.yaml
+components:
+  schemas:
+    arrivalNoticeReference:
+      type: string
+      x-stoplight:
+        id: 07syf4c5jpki1
+      pattern: ^\S+(\s+\S+)*$
+      maxLength: 100
+      description: |
+        A set of unique characters provided by carrier to identify an `Arrival Notice`
+      example: ABC709951
+    ArrivalNotice:
+      title: Arrival Notice
+      x-stoplight:
+        id: kyrdygm3ld9tq
+      type: object
+      description: |
+        Notification on the estimated arrival time of the shipment for the consignee to initiate customs clearance and other import procedures.
+      properties:
+        etaAtPlaceOfDeliveryDateTime:
+          type: string
+          format: date-time
+          description: |
+            The date of expected time of arrival of the shipment at place of delivery.
+
+            **Condition**: Only when onward transport is done by the carrier to either an inland point or Door address.
+          example: '2021-11-03T10:23:00-01:00'
+        etaAtPortOfDischargeDateTime:
+          type: string
+          format: date-time
+          description: |
+            The date of expected time of arrival of the vessel at the Port of Discharge.
+          example: '2021-11-03T10:23:00-01:00'
+        freetime:
+          description: |
+            List of freetime applicable to this shipment at destination.
+          type: array
+          items:
+            $ref: '#/components/schemas/Freetime'
+        pickupLocation:
+          $ref: '#/components/schemas/PickupLocation'
+        returnLocation:
+          $ref: '#/components/schemas/ReturnLocation'
+        returnDescription:
+          type: string
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 500
+          description: |
+            Additional instruction on the return process of the container
+          example: Please place container...
+        customsImportDeclarationProcedure:
+          type: string
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 500
+          description: |
+            Instruction on the administrative processes for submitting tax & duties declarations to the local customs agency
+          example: The tax must be declared...
+        additionalInformation:
+          type: string
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 500
+          description: |
+            Free text field to provide additional required information for the consignee to prepare for the shipment arrival e.g. additional required documents to prepare and present for shipment release – country specific.
+          example: Please also provide...
+        carrierContactInformation:
+          $ref: '#/components/schemas/PartyContactDetail'
+        transportDocument:
+          $ref: '#/components/schemas/TransportDocument'
+      required:
+        - etaAtPlaceOfDeliveryDateTime
+        - etaAtPortOfDischargeDateTime
+        - carrierContactInformation
+        - transportDocument
+    Charge:
+      title: Charge
+      x-stoplight:
+        id: 9xfhkkqenqsdt
+      type: object
+      description: |
+        addresses the monetary value of freight and other service charges for a `Transport Document`.
+      properties:
+        chargeName:
+          type: string
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 50
+          description: |
+            Free text field describing the charge to apply
+          example: Documentation fee - Destination
+        currencyAmount:
+          type: number
+          format: float
+          minimum: 0
+          description: |
+            The monetary value of all freight and other service charges for a transport document, with a maximum of 2-digit decimals.
+          example: 1012.12
+        currencyCode:
+          type: string
+          pattern: '^[A-Z]{3}$'
+          maxLength: 3
+          description: |
+            The currency for the charge, using a 3-character code ([ISO 4217](https://en.wikipedia.org/wiki/ISO_4217)).
+          example: DKK
+        paymentTermCode:
+          type: string
+          description: |
+            An indicator of whether a charge is prepaid (PRE) or collect (COL). When prepaid, the charge is the responsibility of the shipper or the Invoice payer on behalf of the shipper (if provided). When collect, the charge is the responsibility of the consignee or the Invoice payer on behalf of the consignee (if provided).
+            - PRE (Prepaid)
+            - COL (Collect)
+          enum:
+            - PRE
+            - COL
+          example: PRE
+        calculationBasis:
+          type: string
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 50
+          description: 'The code specifying the measure unit used for the corresponding unit price for this cost, such as per day, per ton, per square metre.'
+          example: Per day
+        unitPrice:
+          type: number
+          format: float
+          minimum: 0
+          description: |
+            The unit price of this charge item in the currency of the charge.
+          example: 3456.6
+        quantity:
+          type: number
+          format: float
+          minimum: 0
+          description: |
+            The amount of unit for this charge item.
+          example: 34.4
+        invoiceReference:
+          type: string
+          maxLength: 100
+          pattern: ^\S+(\s+\S+)*$
+          description: |
+            Identifier of the invoice towards the consignee in relation to the shipment. 
+          example: INV51XX80YY
+      required:
+        - chargeName
+        - currencyAmount
+        - currencyCode
+        - paymentTermCode
+        - calculationBasis
+        - unitPrice
+        - quantity
+    Freetime:
+      title: Freetime
+      x-stoplight:
+        id: y6pvkyzst0uf0
+      type: object
+      properties:
+        freetimeTypeCode:
+          type: string
+          description: |
+            Description of the freetime type applied. It can be one of the following codes:
+            - DET (Detention)
+            - DEM (Demurrage)
+            - PDM (Per Diem)
+            - STO (Storage)
+          example: DET
+        isoEquipmentCode:
+          type: string
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 4
+          description: |
+            Unique code for the different equipment size and type used to transport commodities. The code can refer to either the ISO size type (e.g. 22G1) or the ISO type group (e.g. 22GP) following the [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346) standard.
+          example: 22GP
+        modeOfTransportCode:
+          type: string
+          description: |
+            The mode of transport for which the freetime object appllies to as defined by DCSA. Can be one of the following values:
+            - VESSEL
+            - RAIL
+            - TRUCK
+            - BARGE
+          example: VESSEL
+        quantity:
+          type: number
+          format: float
+          description: |
+            The number of units for which this freetime item applies.
+        unitOfMeasure:
+          type: string
+          description: |
+            The unit used for the corresponding freetime item, such as calendar days, working days. Can be one of the following values:
+            - CD (Calendar Days)
+            - WD (Working Days)
+            - HR (Hours)
+            - DOD (Day of discharge)
+          example: WOR
+        calculationBasis:
+          type: string
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 1000
+          description: |
+            Description of the conditions under which this freetime item applies. It can include reference to carrier website or individual charge as per service contract/agreement.
+          example: Please see...
+      required:
+        - freetimeTypeCode
+        - isoEquipmentCode
+        - quantity
+        - unitOfMeasure
+        - calculationBasis
+    InvoicePayableAt:
+      title: Invoice Payable At
+      x-stoplight:
+        id: gdh9gp3cw2ure
+      description: |
+        General purpose object to capture `Invoice Payable At` location. The location can be specified in **any** of the following ways: `UN Location Code` or an `Address`.
+      example:
+        locationName: Eiffel Tower
+        locationType: UNLO
+        UNLocationCode: FRPAR
+      oneOf:
+        - $ref: ../../models/AddressLocation.yaml
+        - $ref: ../../models/UnLocationLocation.yaml
+      discriminator:
+        propertyName: locationType
+        mapping:
+          ADDR: ../../models/AddressLocation.yaml
+          UNLO: ../../models/UnLocationLocation.yaml
+      type: object
+    PartyContactDetail:
+      title: Party Contact Detail
+      x-stoplight:
+        id: f5stcc0imex5q
+      type: object
+      description: |
+        The contact details of the person to contact. It is mandatory to provide either `phone` and/or `email` along with the `name`.
+      example:
+        name: Henrik
+        phone: +45 51801234
+      properties:
+        name:
+          type: string
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 100
+          description: |
+            Name of the contact
+          example: Henrik
+      anyOf:
+        - $ref: '#/components/schemas/PhoneRequired'
+        - $ref: '#/components/schemas/EmailRequired'
+      required:
+        - name
+    PhoneRequired:
+      title: Phone required
+      x-stoplight:
+        id: cjv5qi0in9b0j
+      type: object
+      description: |
+        `Phone` is mandatory to provide
+      properties:
+        phone:
+          type: string
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 30
+          description: |
+            Phone number for the contact
+          example: +45 70262970
+      required:
+        - phone
+    EmailRequired:
+      title: Email required
+      x-stoplight:
+        id: tckuwbimfpchr
+      type: object
+      description: |
+        `Email` is mandatory to provide
+      properties:
+        email:
+          type: string
+          pattern: ^.+@\S+$
+          maxLength: 100
+          description: |
+            `E-mail` address to be used
+          example: info@dcsa.org
+      required:
+        - email
+    PickupLocation:
+      title: PickupLocation
+      x-stoplight:
+        id: 6h0fvyad2ohli
+      description: |
+        General purpose object to capture `Pick-up` location specified as: specific equipment handling facility where container is to be picked up by the consignee or its logistics partners.
+
+        The location can be specified in **one** of the following ways: `UN Location Code`, `Facility` or an `Address`.
+      example:
+        locationName: 'HHLA Altenwerder, Hamburg'
+        locationType: FACI
+        UNLocationCode: DEHAM
+        facilityCode: CTA
+        facilityCodeListProvider: SMDG
+      oneOf:
+        - $ref: ../../models/AddressLocation.yaml
+        - $ref: ../../models/UnLocationLocation.yaml
+        - $ref: ../../models/FacilityLocation.yaml
+      discriminator:
+        propertyName: locationType
+        mapping:
+          ADDR: ../../models/AddressLocation.yaml
+          FACI: ../../models/FacilityLocation.yaml
+          UNLO: ../../models/UnLocationLocation.yaml
+    ReturnLocation:
+      title: Return Location
+      x-stoplight:
+        id: p3ry9pscs55hc
+      description: |
+        General purpose object to capture `Return` location specified as: specific equipment handling facility where container is to be returned by the consignee.
+
+        The location can be specified in **one** of the following ways: `UN Location Code`, `Facility` or an `Address`.
+
+        **Condition:** only applicable if there are Carrier Owned Containers (no SOC).
+      example:
+        locationName: Hamburg
+        locationType: UNLO
+        UNLocationCode: DEHAM
+      oneOf:
+        - $ref: ../../models/AddressLocation.yaml
+        - $ref: ../../models/UnLocationLocation.yaml
+        - $ref: ../../models/FacilityLocation.yaml
+      discriminator:
+        propertyName: locationType
+        mapping:
+          ADDR: ../../models/AddressLocation.yaml
+          FACI: ../../models/FacilityLocation.yaml
+          UNLO: ../../models/UnLocationLocation.yaml
+    PlaceOfReceipt:
+      title: Place Of Receipt
+      x-stoplight:
+        id: he2nl8gwogu6l
+      description: |
+        General purpose object to capture `Place of Receipt` location specified as: the location where the cargo is handed over by the shipper, or his agent, to the shipping line. This indicates the point at which the shipping line takes on responsibility for carriage of the container.
+
+        **Condition:** Only when pre-carriage is done by the carrier.
+
+        The location can be specified in **one** of the following ways: `UN Location Code`, `Facility` or an `Address`.
+      example:
+        locationName: Hamburg
+        locationType: UNLO
+        UNLocationCode: DEHAM
+      oneOf:
+        - $ref: ../../models/AddressLocation.yaml
+        - $ref: ../../models/FacilityLocation.yaml
+        - $ref: ../../models/UnLocationLocation.yaml
+      discriminator:
+        propertyName: locationType
+        mapping:
+          ADDR: ../../models/AddressLocation.yaml
+          FACI: ../../models/FacilityLocation.yaml
+          UNLO: ../../models/UnLocationLocation.yaml
+    PlaceOfDelivery:
+      title: PlaceOfDelivery
+      x-stoplight:
+        id: 3s02akbnfseu8
+      description: |
+        General purpose object to capture `Place of Delivery` location specified as: the location where the cargo is handed over to the consignee, or his agent, by the shipping line and where responsibility of the shipping line ceases.
+
+        **Condition:** Only when onward transport is done by the carrier
+
+        The location can be specified in **one** of the following ways: `UN Location Code`, `Facility` or an `Address`.
+      example:
+        locationName: Hamburg
+        locationType: UNLO
+        UNLocationCode: DEHAM
+      oneOf:
+        - $ref: ../../models/AddressLocation.yaml
+        - $ref: ../../models/FacilityLocation.yaml
+        - $ref: ../../models/UnLocationLocation.yaml
+      discriminator:
+        propertyName: locationType
+        mapping:
+          ADDR: ../../models/AddressLocation.yaml
+          FACI: ../../models/FacilityLocation.yaml
+          UNLO: ../../models/UnLocationLocation.yaml
+    PortOfLoading:
+      title: PortOfLoading
+      x-stoplight:
+        id: tzvfv37s3g1f9
+      description: |
+        General purpose object to capture `Port of Loading` location specified as: the location where the cargo is loaded onto a first sea-going vessel for water transportation.
+
+        The location can be specified in **one** of the following ways: `UN Location Code` or `City and Country`.
+      example:
+        locationName: Hamburg
+        locationType: UNLO
+        UNLocationCode: DEHAM
+      oneOf:
+        - $ref: ../../models/CityLocation.yaml
+        - $ref: ../../models/UnLocationLocation.yaml
+      discriminator:
+        propertyName: locationType
+        mapping:
+          CITY: ../../models/CityLocation.yaml
+          UNLO: ../../models/UnLocationLocation.yaml
+    PortOfDischarge:
+      title: PortOfDischarge
+      x-stoplight:
+        id: 79pn8e2wvki8u
+      description: |
+        General purpose object to capture `Port of Discharge` location specified as: the location where the cargo is discharged from the last sea-going vessel.
+
+        The location can be specified in **one** of the following ways: `UN Location Code` or `City and Country`.
+      example:
+        locationName: Hamburg
+        locationType: UNLO
+        UNLocationCode: DEHAM
+      oneOf:
+        - $ref: ../../models/CityLocation.yaml
+        - $ref: ../../models/UnLocationLocation.yaml
+      discriminator:
+        propertyName: locationType
+        mapping:
+          CITY: ../../models/CityLocation.yaml
+          UNLO: ../../models/UnLocationLocation.yaml
+    TransportDocument:
+      title: TransportDocument
+      x-stoplight:
+        id: 6fst8j2we7p02
+      type: object
+      properties:
+        transportDocumentReference:
+          type: string
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 20
+          description: |
+            A unique number allocated by the shipping line to the transport document and the main number used for the tracking of the status of the shipment.
+          example: HHL71800000
+        transportDocumentTypeCode:
+          type: string
+          description: |
+            Specifies the type of the transport document
+            - BOL (Bill of Lading)
+            - SWB (Sea Waybill)
+          enum:
+            - BOL
+            - SWB
+          example: SWB
+        isElectronic:
+          type: boolean
+          description: |
+            An indicator whether the transport document is electronically transferred.
+          example: true
+          default: false
+        deliveryTypeAtDestination:
+          type: string
+          maxLength: 3
+          description: |
+            Indicates the type of service offered at Destination. Options are defined in the Receipt/Delivery entity.
+            - CY (Container yard (incl. rail ramp))
+            - SD (Store Door)
+            - CFS (Container Freight Station)
+          enum:
+            - CY
+            - SD
+            - CFS
+          example: CY
+        cargoMovementTypeAtDestination:
+          type: string
+          maxLength: 3
+          description: |
+            Refers to the shipment term at the unloading of the cargo out of the container. Options are defined in the Cargo Movement Type entity. Possible values are:
+            - `FCL` (Full Container Load)
+            - `LCL` (Less than Container Load)
+          example: FCL
+        carrierImportVoyageNumber:
+          type: string
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 50
+          example: 2103N
+          description: |
+            The identifier of an import voyage. The carrier-specific identifier of the import Voyage.
+        universalImportVoyageReference:
+          type: string
+          pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
+          description: |
+            A global unique voyage reference for the import Voyage, as per DCSA standard, agreed by VSA partners for the voyage. The voyage reference must match the regular expression pattern: `\d{2}[0-9A-Z]{2}[NEWSR]`
+            - `2 digits` for the year
+            - `2 alphanumeric characters` for the sequence number of the voyage
+            - `1 character` for the direction/haul (`N`orth, `E`ast, `W`est, `S`outh or `R`oundtrip).
+          example: 2103N
+        termsAndConditions:
+          type: string
+          maxLength: 50000
+          description: |
+            Carrier terms and conditions of transport.
+        carrierCode:
+          type: string
+          pattern: ^\S+$
+          maxLength: 4
+          description: |
+            The code containing the SCAC and/or the SMDG code to specify the issuing carrier.  Details about the issuer can be given in the Document Parties entity using the party function code MS.
+          example: MMCU
+        carrierCodeListProvider:
+          type: string
+          description: |
+            The provider used for identifying the issuer Code. Possible values are:
+            - SMDG (Ship Message Design Group)
+            - NMFTA (National Motor Freight Traffic Association) _includes SPLC (Standard Point Location Code)_
+          enum:
+            - SMDG
+            - NMFTA
+          example: NMFTA
+        transports:
+          type: object
+          properties:
+            plannedArrivalDate:
+              type: string
+              format: date
+              description: |
+                The planned date of arrival.
+            departureDate:
+              type: string
+              format: date-time
+              description: |
+                The date of departure from the location where the cargo is handed over by the shipper, or his agent, to the shipping line. This can refer either to the Place of Receipt or the Port of Loading. 
+              example: '2021-11-03T09:41:00-08:30'
+            placeOfReceipt:
+              $ref: '#/components/schemas/PlaceOfReceipt'
+            portOfLoading:
+              $ref: '#/components/schemas/PortOfLoading'
+            portOfDischarge:
+              $ref: '#/components/schemas/PortOfDischarge'
+            placeOfDelivery:
+              $ref: '#/components/schemas/PlaceOfDelivery'
+          required:
+            - plannedArrivalDate
+            - departureDate
+            - portOfLoading
+            - portOfDischarge
+        charges:
+          $ref: '#/components/schemas/Charge'
+        invoicePayableAt:
+          $ref: '#/components/schemas/InvoicePayableAt'
+        carrierClauses:
+          type: array
+          maxLength: 1
+          description: |
+            Additional clauses for a specific shipment added by the carrier to the Bill of Lading, subject to local rules / guidelines or certain mandatory information required to be shared with the customer.
+          items:
+            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/clauseContent'
+        documentParties:
+          type: array
+          items:
+            $ref: '#/components/schemas/DocumentParty'
+        utilizedTransportEquipments:
+          type: array
+          minItems: 1
+          description: |
+            A list of `Utilized Transport Equipments` describing the equipment being used.
+          items:
+            type: object
+            properties:
+              equipmentReference:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/equipmentReference'
+              cargoGrossWeight:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/cargoGrossWeight'
+              cargoGrossWeightUnit:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/weightUnit'
+              isoEquipmentCode:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/ISOEquipmentCode'
+              emptyIndicatorCode:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/emptyIndicatorCode'
+              sealNumbers:
+                type: array
+                minItems: 1
+                items:
+                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/sealNumber'
+            required:
+              - equipmentReference
+              - cargoGrossWeight
+              - cargoGrossWeightUnit
+              - emptyIndicatorCode
+              - sealNumbers
+        consignmentItems:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            properties:
+              carrierBookingReference:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/carrierBookingReference'
+              weight:
+                type: number
+                format: float
+                minimum: 0
+                exclusiveMinimum: true
+                description: |
+                  The total weight of all the `CargoItems` listed in the `ConsignmentItem`. Excludes the tare weight of the container(s).
+                example: 13000.3
+              volume:
+                type: number
+                format: float
+                minimum: 0
+                exclusiveMinimum: true
+                description: |
+                  The total volume of all the `CargoItems` listed in the `ConsignmentItem`.
+                example: 12
+              weightUnit:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/weightUnit'
+              volumeUnit:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/volumeUnit'
+              descriptionOfGoods:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/descriptionOfGoods'
+              HSCodes:
+                type: array
+                minLength: 1
+                description: |
+                  A list of `HS Codes` that apply to this `consignmentItem`
+                items:
+                  $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/HSCode'
+              cargoItems:
+                type: array
+                minItems: 1
+                items:
+                  type: object
+                  properties:
+                    shippingMarks:
+                      type: array
+                      minItems: 1
+                      description: |
+                        A list of the `ShippingMarks` applicable to this `cargoItem`
+                      items:
+                        type: string
+                        maxLength: 500
+                        description: |
+                          The identifying details of a package or the actual markings that appear on the package(s). This information is provided by the customer.
+                        example: Made in China
+                    equipmentReference:
+                      $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/equipmentReference'
+                    numberOfPackages:
+                      $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/numberOfPackages'
+                  required:
+                    - equipmentReference
+                    - numberOfPackages
+            required:
+              - carrierBookingReference
+              - weight
+              - weightUnit
+              - descriptionOfGoods
+              - cargoItems
+      required:
+        - transportDocumentReference
+        - transportDocumentTypeCode
+        - isElectronic
+        - deliveryTypeAtDestination
+        - cargoMovementTypeAtDestination
+        - vessel
+        - termsAndConditions
+        - carrierCode
+        - carrierCodeListProvider
+        - invoicePayableAt
+        - utilizedTransportEquipments
+  headers:
+    API-Version:
+      schema:
+        type: string
+        example: 1.0.0
+      description: |
+        SemVer used to indicate the version of the contract (API version) returned.
+  parameters:
+    Api-Version-Major:
+      in: header
+      name: API-Version
+      required: false
+      schema:
+        type: string
+        example: '1'
+      description: |
+        An API-Version header **MAY** be added to the request (optional); if added it **MUST** only contain the **MAJOR** version number. The API-Version header **MUST** be aligned with the URI version.
+    arrivalNoticeReferencePathParam:
+      in: path
+      name: arrivalNoticeReference
+      description: |
+        The `arrivalNoticeReference` of the Arrival Notice to match
+      schema:
+        $ref: '#/components/schemas/arrivalNoticeReference'
+      required: true
