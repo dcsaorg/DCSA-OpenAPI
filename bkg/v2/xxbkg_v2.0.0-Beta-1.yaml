@@ -1,66 +1,67 @@
 openapi: 3.0.3
+x-stoplight:
+  id: af26bd93d7107
 info:
   version: 2.0.0-Beta-1
   title: DCSA OpenAPI specification for Booking
   description: |
     API specification issued by DCSA.org.
-    
+
     For explanation of specific values or objects please refer to the [Information Model 2023.Q4](https://dcsa.org/wp-content/uploads/2024/01/DCSA-Information-Model-2023.Q4.pdf). This API specification does not define the allowable updates and their timing in accordance with the established business rules. Refer to the [DCSA Interface Standard for the Booking process 2.0 Beta 1](https://dcsa.atlassian.net/wiki/external/ZjAyOGZhYThjYjBiNDM5ODlmZjc0ODMxNjc4MWNiZjk) to address this. **All use cases mentioned in this API specification refer to use cases defined in this Booking IFS**.
 
     All other documents related to the Booking publication can be found [here](https://dcsa.org/standards/booking-process/)
-    
+
     It is possible to use the Booking API as a standalone API. In that case poll on the following endPoints:
 
         GET /v2/bookings/{bookingReference}
-    
+
     in order to poll information about status changes.
 
     ### Notifications
     It is possible to have notifications pushed to you whenever the provider needs input and/or a state change. The format of the notification is defined by the [Booking Notification API](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG_NTF/2.0.0-Beta-1). Signing up for notifications is defined outside the scope of this API specification.
-    
+
     ### Stats API
     The Stats API offers crucial statistical information for both API providers and consumers to enhance their services and helps DCSA to understand and scale the ecosystem. We expect you to invoke the Stats API for every request made to the Booking API. Further details can be found [here](https://developer.dcsa.org/#/http/guides/api-guides/stats-api)
-    
-    For a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/bkg/v2#v200B1). Please [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments.
 
+    For a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/bkg/v2#v200B1). Please [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments.
   license:
     name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
   contact:
     name: Digital Container Shipping Association (DCSA)
-    url: https://dcsa.org
+    url: 'https://dcsa.org'
     email: info@dcsa.org
 security: []
 tags:
   - name: Booking
-    description: 'The Booking'
+    description: The Booking
 paths:
   /v2/bookings:
     post:
       tags:
-       - Booking
+        - Booking
       summary: |
         Creates a new Booking
-      operationId: 'create-bookings'
+      operationId: create-bookings
       parameters:
         - $ref: '#/components/parameters/Api-Version-Major'
       description: |
         Creates a new booking request. This endPoint corresponds with **UseCase 1 - Submit booking request**.
-        
+
         **Needs to be updated**
-        
+
         ## Precondition
         The consumer has information for a `Booking Request`
-        
+
         ## Postcondition
         The provider has received the `Booking Request`. 
-        
+
         The consumer will receive a `201` (Created) if the request payload schema-validates or a `400` (Bad Request) if it does not.
-        
+
         ## Flow
         The following occurs when a provider receives a `Booking Request`:
         1. The payload (`Booking Request`) is schema-validated. In case the payload **is invalid** a `400` (Bad Request) is returned.
-        
+
            **The process stops here!**
         2. The payload is schema-valid which means
             - all required properties are provided
@@ -86,14 +87,14 @@ paths:
           - a `201` (Created) response is sent to the consumer with a payload containing `bookingStatus='RECEIVED'`
           - awaits further processing by the provider
           - '_relevant_' subscribers have been notified.
-        
+
         The provider wil now start asynchronous processing. Once processed, the new status of the `Booking Request` will be communicated via a `Booking Notification`. In case the consumer does not subscribe to notifications it is necessary for the consumer to poll on the
-        
+
             GET /v2/bookings/{bookingReference}
             
           endPoint to check if the `bookingStatus` of the `Booking Request` has changed.
       requestBody:
-        description: 'The payload used to create a `Booking Request`'
+        description: The payload used to create a `Booking Request`
         required: true
         content:
           application/json:
@@ -106,282 +107,282 @@ paths:
                 description: |
                   Make a `Booking Request` with standard Dry cargo being sent from Bremerhaven, Germany to Norfolk, US
                 value:
-                  receiptTypeAtOrigin: 'CY'
-                  deliveryTypeAtDestination: 'CY'
-                  cargoMovementTypeAtOrigin: 'FCL'
-                  cargoMovementTypeAtDestination: 'FCL'
-                  serviceContractReference: 'HHL51800000'
-                  freightPaymentTermCode: 'PRE'
-                  originChargesPaymentTermCode: 'PRE'
-                  destinationChargesPaymentTermCode: 'COL'
-                  contractQuotationReference: 'HHL1401'
+                  receiptTypeAtOrigin: CY
+                  deliveryTypeAtDestination: CY
+                  cargoMovementTypeAtOrigin: FCL
+                  cargoMovementTypeAtDestination: FCL
+                  serviceContractReference: HHL51800000
+                  freightPaymentTermCode: PRE
+                  originChargesPaymentTermCode: PRE
+                  destinationChargesPaymentTermCode: COL
+                  contractQuotationReference: HHL1401
                   vessel:
-                    name: 'MAERSK IOWA'
+                    name: MAERSK IOWA
                     vesselIMONumber: '9298686'
-                  carrierServiceCode: 'TA1'
-                  carrierExportVoyageNumber: '403W'
+                  carrierServiceCode: TA1
+                  carrierExportVoyageNumber: 403W
                   isPartialLoadAllowed: false
                   isExportDeclarationRequired: false
                   isImportLicenseRequired: false
                   expectedDepartureDate: '2024-01-20'
-                  incoTerms: 'EXW'
-                  communicationChannelCode: 'AO'
+                  incoTerms: EXW
+                  communicationChannelCode: AO
                   isEquipmentSubstitutionAllowed: false
                   references:
-                    - type: 'FF'
-                      value: 'KN-00103004'
+                    - type: FF
+                      value: KN-00103004
                   documentParties:
                     - party:
-                        partyName: 'KN Bremerhaven'
+                        partyName: KN Bremerhaven
                         address:
-                          name: 'Kuehne + Nagel (AG & Co.) KG'
-                          street: 'Amerikaring'
+                          name: Kuehne + Nagel (AG & Co.) KG
+                          street: Amerikaring
                           streetNumber: '40'
                           postCode: '27568'
-                          city: 'Bremerhaven'
-                          country: 'Germany'
+                          city: Bremerhaven
+                          country: Germany
                       partyContactDetails:
-                        - name: 'Export operations department'
-                          phone: '+49 471 945410'
-                      partyFunction: 'DDR'
+                        - name: Export operations department
+                          phone: +49 471 945410
+                      partyFunction: DDR
                       isToBeNotified: false
                   partyContactDetails:
-                    - name: 'Diane'
-                      phone: '+49 471 945410'
+                    - name: Diane
+                      phone: +49 471 945410
                   shipmentLocations:
                     - location:
-                        locationName: 'Bremerhaven'
-                        locationType: 'UNLO'
-                        UNLocationCode: 'DEBRV'
-                      locationTypeCode: 'POL'
+                        locationName: Bremerhaven
+                        locationType: UNLO
+                        UNLocationCode: DEBRV
+                      locationTypeCode: POL
                     - location:
-                        locationName: 'Norfolk'
-                        locationType: 'UNLO'
-                        UNLocationCode: 'USORF'
-                      locationTypeCode: 'POD'
+                        locationName: Norfolk
+                        locationType: UNLO
+                        UNLocationCode: USORF
+                      locationTypeCode: POD
                   requestedEquipments:
                     - isShipperOwned: false
-                      ISOEquipmentCode: '42GP'
+                      ISOEquipmentCode: 42GP
                       units: 3
                       commodities:
                         - commodityType: 'Dry cargo, Freight all kinds'
                           cargoGrossWeight: 36000
-                          cargoGrossWeightUnit: 'KGM'
+                          cargoGrossWeightUnit: KGM
               reeferExample:
                 summary: |
                   Reefer cargo Booking (Apple Juice)
                 description: |
                   Make a `Booking Request` with reefer requirements (1° celcius with vents and drain holes open and genset required) sent from Bremerhaven, Germany to Norfolk, US
                 value:
-                  receiptTypeAtOrigin: 'CY'
-                  deliveryTypeAtDestination: 'CY'
-                  cargoMovementTypeAtOrigin: 'FCL'
-                  cargoMovementTypeAtDestination: 'FCL'
-                  serviceContractReference: 'HHL51800000'
-                  freightPaymentTermCode: 'PRE'
-                  originChargesPaymentTermCode: 'PRE'
-                  destinationChargesPaymentTermCode: 'COL'
-                  contractQuotationReference: 'HHL1401'
+                  receiptTypeAtOrigin: CY
+                  deliveryTypeAtDestination: CY
+                  cargoMovementTypeAtOrigin: FCL
+                  cargoMovementTypeAtDestination: FCL
+                  serviceContractReference: HHL51800000
+                  freightPaymentTermCode: PRE
+                  originChargesPaymentTermCode: PRE
+                  destinationChargesPaymentTermCode: COL
+                  contractQuotationReference: HHL1401
                   vessel:
-                    name: 'MAERSK IOWA'
+                    name: MAERSK IOWA
                     vesselIMONumber: '9298686'
-                  carrierServiceCode: 'TA1'
-                  carrierExportVoyageNumber: '403W'
+                  carrierServiceCode: TA1
+                  carrierExportVoyageNumber: 403W
                   isPartialLoadAllowed: false
                   isExportDeclarationRequired: false
                   isImportLicenseRequired: false
                   expectedDepartureDate: '2024-01-20'
-                  incoTerms: 'EXW'
-                  communicationChannelCode: 'AO'
+                  incoTerms: EXW
+                  communicationChannelCode: AO
                   isEquipmentSubstitutionAllowed: false
                   references:
-                    - type: 'FF'
-                      value: 'KN-00103004'
+                    - type: FF
+                      value: KN-00103004
                   documentParties:
                     - party:
-                        partyName: 'KN Bremerhaven'
+                        partyName: KN Bremerhaven
                         address:
-                          name: 'Kuehne + Nagel (AG & Co.) KG'
-                          street: 'Amerikaring'
+                          name: Kuehne + Nagel (AG & Co.) KG
+                          street: Amerikaring
                           streetNumber: '40'
                           postCode: '27568'
-                          city: 'Bremerhaven'
-                          country: 'Germany'
+                          city: Bremerhaven
+                          country: Germany
                       partyContactDetails:
-                        - name: 'Export operations department'
-                          phone: '+49 471 945410'
-                      partyFunction: 'DDR'
+                        - name: Export operations department
+                          phone: +49 471 945410
+                      partyFunction: DDR
                       isToBeNotified: false
                   partyContactDetails:
-                    - name: 'Diane'
-                      phone: '+49 471 945410'
+                    - name: Diane
+                      phone: +49 471 945410
                   shipmentLocations:
                     - location:
-                        locationName: 'Bremerhaven'
-                        locationType: 'UNLO'
-                        UNLocationCode: 'DEBRV'
-                      locationTypeCode: 'POL'
+                        locationName: Bremerhaven
+                        locationType: UNLO
+                        UNLocationCode: DEBRV
+                      locationTypeCode: POL
                     - location:
-                        locationName: 'Norfolk'
-                        locationType: 'UNLO'
-                        UNLocationCode: 'USORF'
-                      locationTypeCode: 'POD'
+                        locationName: Norfolk
+                        locationType: UNLO
+                        UNLocationCode: USORF
+                      locationTypeCode: POD
                   requestedEquipments:
                     - isShipperOwned: false
-                      ISOEquipmentCode: '45R1'
+                      ISOEquipmentCode: 45R1
                       units: 3
                       isNonOperatingReefer: false
                       activeReeferSettings:
                         temperatureSetpoint: 1
-                        temperatureUnit: 'CEL'
+                        temperatureUnit: CEL
                         isVentilationOpen: true
                         isDrainholesOpen: false
                         isGeneratorSetRequired: true
                       commodities:
-                        - commodityType: 'Apple juice'
+                        - commodityType: Apple juice
                           HSCodes:
                             - 20097919
                           cargoGrossWeight: 36000
-                          cargoGrossWeightUnit: 'KGM'
+                          cargoGrossWeightUnit: KGM
               norExample:
                 summary: |
                   Standard dry cargo Booking using a Reefer Container
                 description: |
                   Make a `Booking Request` with standard Dry cargo using a reefer container being sent from Bremerhaven, Germany to Norfolk, US
                 value:
-                  receiptTypeAtOrigin: 'CY'
-                  deliveryTypeAtDestination: 'CY'
-                  cargoMovementTypeAtOrigin: 'FCL'
-                  cargoMovementTypeAtDestination: 'FCL'
-                  serviceContractReference: 'HHL51800000'
-                  freightPaymentTermCode: 'PRE'
-                  originChargesPaymentTermCode: 'PRE'
-                  destinationChargesPaymentTermCode: 'COL'
-                  contractQuotationReference: 'HHL1401'
+                  receiptTypeAtOrigin: CY
+                  deliveryTypeAtDestination: CY
+                  cargoMovementTypeAtOrigin: FCL
+                  cargoMovementTypeAtDestination: FCL
+                  serviceContractReference: HHL51800000
+                  freightPaymentTermCode: PRE
+                  originChargesPaymentTermCode: PRE
+                  destinationChargesPaymentTermCode: COL
+                  contractQuotationReference: HHL1401
                   vessel:
-                    name: 'MAERSK IOWA'
+                    name: MAERSK IOWA
                     vesselIMONumber: '9298686'
-                  carrierServiceCode: 'TA1'
-                  carrierExportVoyageNumber: '403W'
+                  carrierServiceCode: TA1
+                  carrierExportVoyageNumber: 403W
                   isPartialLoadAllowed: false
                   isExportDeclarationRequired: false
                   isImportLicenseRequired: false
                   expectedDepartureDate: '2024-01-20'
-                  incoTerms: 'EXW'
-                  communicationChannelCode: 'AO'
+                  incoTerms: EXW
+                  communicationChannelCode: AO
                   isEquipmentSubstitutionAllowed: false
                   references:
-                    - type: 'FF'
-                      value: 'KN-00103004'
+                    - type: FF
+                      value: KN-00103004
                   documentParties:
                     - party:
-                        partyName: 'KN Bremerhaven'
+                        partyName: KN Bremerhaven
                         address:
-                          name: 'Kuehne + Nagel (AG & Co.) KG'
-                          street: 'Amerikaring'
+                          name: Kuehne + Nagel (AG & Co.) KG
+                          street: Amerikaring
                           streetNumber: '40'
                           postCode: '27568'
-                          city: 'Bremerhaven'
-                          country: 'Germany'
+                          city: Bremerhaven
+                          country: Germany
                       partyContactDetails:
-                        - name: 'Export operations department'
-                          phone: '+49 471 945410'
-                      partyFunction: 'DDR'
+                        - name: Export operations department
+                          phone: +49 471 945410
+                      partyFunction: DDR
                       isToBeNotified: false
                   partyContactDetails:
-                    - name: 'Diane'
-                      phone: '+49 471 945410'
+                    - name: Diane
+                      phone: +49 471 945410
                   shipmentLocations:
                     - location:
-                        locationName: 'Bremerhaven'
-                        locationType: 'UNLO'
-                        UNLocationCode: 'DEBRV'
-                      locationTypeCode: 'POL'
+                        locationName: Bremerhaven
+                        locationType: UNLO
+                        UNLocationCode: DEBRV
+                      locationTypeCode: POL
                     - location:
-                        locationName: 'Norfolk'
-                        locationType: 'UNLO'
-                        UNLocationCode: 'USORF'
-                      locationTypeCode: 'POD'
+                        locationName: Norfolk
+                        locationType: UNLO
+                        UNLocationCode: USORF
+                      locationTypeCode: POD
                   requestedEquipments:
                     - isShipperOwned: false
-                      ISOEquipmentCode: '45R1'
+                      ISOEquipmentCode: 45R1
                       isNonOperatingReefer: true
                       units: 3
                       commodities:
                         - commodityType: 'Dry cargo, Freight all kinds'
                           cargoGrossWeight: 36000
-                          cargoGrossWeightUnit: 'KGM'
+                          cargoGrossWeightUnit: KGM
               dgExample:
                 summary: |
                   Dangerous Goods (DG) cargo Booking
                 description: |
                   Make a `Booking Request` with DG cargo (*Environmentally hazardous substance, liquid, N.O.S (Propiconazole)*) being sent from Bremerhaven, Germany to Norfolk, US
                 value:
-                  receiptTypeAtOrigin: 'CY'
-                  deliveryTypeAtDestination: 'CY'
-                  cargoMovementTypeAtOrigin: 'FCL'
-                  cargoMovementTypeAtDestination: 'FCL'
-                  serviceContractReference: 'HHL51800000'
-                  freightPaymentTermCode: 'PRE'
-                  originChargesPaymentTermCode: 'PRE'
-                  destinationChargesPaymentTermCode: 'COL'
-                  contractQuotationReference: 'HHL1401'
+                  receiptTypeAtOrigin: CY
+                  deliveryTypeAtDestination: CY
+                  cargoMovementTypeAtOrigin: FCL
+                  cargoMovementTypeAtDestination: FCL
+                  serviceContractReference: HHL51800000
+                  freightPaymentTermCode: PRE
+                  originChargesPaymentTermCode: PRE
+                  destinationChargesPaymentTermCode: COL
+                  contractQuotationReference: HHL1401
                   vessel:
-                    name: 'MAERSK IOWA'
+                    name: MAERSK IOWA
                     vesselIMONumber: '9298686'
-                  carrierServiceCode: 'TA1'
-                  carrierExportVoyageNumber: '403W'
+                  carrierServiceCode: TA1
+                  carrierExportVoyageNumber: 403W
                   isPartialLoadAllowed: false
                   isExportDeclarationRequired: false
                   isImportLicenseRequired: false
                   expectedDepartureDate: '2024-01-20'
-                  incoTerms: 'EXW'
-                  communicationChannelCode: 'AO'
+                  incoTerms: EXW
+                  communicationChannelCode: AO
                   isEquipmentSubstitutionAllowed: false
                   references:
-                    - type: 'FF'
-                      value: 'KN-00103004'
+                    - type: FF
+                      value: KN-00103004
                   documentParties:
                     - party:
-                        partyName: 'KN Bremerhaven'
+                        partyName: KN Bremerhaven
                         address:
-                          name: 'Kuehne + Nagel (AG & Co.) KG'
-                          street: 'Amerikaring'
+                          name: Kuehne + Nagel (AG & Co.) KG
+                          street: Amerikaring
                           streetNumber: '40'
                           postCode: '27568'
-                          city: 'Bremerhaven'
-                          country: 'Germany'
+                          city: Bremerhaven
+                          country: Germany
                       partyContactDetails:
-                        - name: 'Export operations department'
-                          phone: '+49 471 945410'
-                      partyFunction: 'DDR'
+                        - name: Export operations department
+                          phone: +49 471 945410
+                      partyFunction: DDR
                       isToBeNotified: false
                   partyContactDetails:
-                    - name: 'Diane'
-                      phone: '+49 471 945410'
+                    - name: Diane
+                      phone: +49 471 945410
                   shipmentLocations:
                     - location:
-                        locationName: 'Bremerhaven'
-                        locationType: 'UNLO'
-                        UNLocationCode: 'DEBRV'
-                      locationTypeCode: 'POL'
+                        locationName: Bremerhaven
+                        locationType: UNLO
+                        UNLocationCode: DEBRV
+                      locationTypeCode: POL
                     - location:
-                        locationName: 'Norfolk'
-                        locationType: 'UNLO'
-                        UNLocationCode: 'USORF'
-                      locationTypeCode: 'POD'
+                        locationName: Norfolk
+                        locationType: UNLO
+                        UNLocationCode: USORF
+                      locationTypeCode: POD
                   requestedEquipments:
                     - isShipperOwned: false
-                      ISOEquipmentCode: '42GP'
+                      ISOEquipmentCode: 42GP
                       units: 3
                       commodities:
                         - commodityType: 'Environmentally hazardous substance, liquid, N.O.S (Propiconazole)'
                           HSCodes:
                             - 293499
                           cargoGrossWeight: 36000
-                          cargoGrossWeightUnit: 'KGM'
+                          cargoGrossWeightUnit: KGM
                           outerPackaging:
-                            imoPackagingCode: '3A1'
+                            imoPackagingCode: 3A1
                             numberOfPackages: 100
                             description: 'Jerrican, steel'
                             dangerousGoods:
@@ -398,13 +399,13 @@ paths:
                                 isHot: false
                                 isCompetentAuthorityApprovalProvided: false
                                 emergencyContactDetails:
-                                  contact: 'John Doe'
-                                  phone: '+1 123062970'
-                                EMSNumber: 'F-A S-F'
+                                  contact: John Doe
+                                  phone: +1 123062970
+                                EMSNumber: F-A S-F
                                 isReportableQuantity: false
                                 grossWeight:
                                   value: 12000
-                                  unit: 'KGM'
+                                  unit: KGM
       responses:
         '201':
           description: |
@@ -423,8 +424,8 @@ paths:
                   description: |
                     A `Booking Request` has been received (`bookingStatus='RECEIVED'`), schema validated and stored in provider system
                   value:
-                    carrierBookingRequestReference: 'cbrr-123'
-                    bookingStatus: 'RECEIVED'
+                    carrierBookingRequestReference: cbrr-123
+                    bookingStatus: RECEIVED
         '400':
           description: |
             In case the `Booking Request` does not schema validate a `400` (Bad Request) is returned
@@ -441,21 +442,21 @@ paths:
                     Booking missing receiptTypeAtOrigin
                   description: |
                     `receiptTypeAtOrigin` is a mandatory property in the `Booking Request`. This is an example of how the error object would look in case this property is missing
-                    
+
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
-                    httpMethod: 'POST'
-                    requestUri: '/v2/bookings'
+                    httpMethod: POST
+                    requestUri: /v2/bookings
                     statusCode: 400
-                    statusCodeText: 'Bad Request'
-                    statusCodeMessage: 'receiptTypeAtOrigin not found - it is a mandatory property in Booking request'
-                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    statusCodeText: Bad Request
+                    statusCodeMessage: receiptTypeAtOrigin not found - it is a mandatory property in Booking request
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
                     errorDateTime: '2023-04-13T07:41:00+08:30'
                     errors:
                       - errorCode: 7003
-                        property: 'receiptTypeAtOrigin'
-                        errorCodeText: 'mandatory property missing'
-                        errorCodeMessage: 'receiptTypeAtOrigin must be provided as part of a Booking request'
+                        property: receiptTypeAtOrigin
+                        errorCodeText: mandatory property missing
+                        errorCodeMessage: receiptTypeAtOrigin must be provided as part of a Booking request
         '500':
           description: |
             In case a server error occurs in provider system a `500` (Internal Server Error) is returned
@@ -472,20 +473,20 @@ paths:
                     Internal Server Error while processing Booking Request
                   description: |
                     An Internal Server Error has occurred - the consumer should contact {provider-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
-                    
+
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
-                    httpMethod: 'POST'
-                    requestUri: '/v2/bookings'
+                    httpMethod: POST
+                    requestUri: /v2/bookings
                     statusCode: 500
-                    statusCodeText: 'Internal Server Error'
-                    statusCodeMessage: 'Internal Server Error occurred while processing Booking request'
-                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    statusCodeText: Internal Server Error
+                    statusCodeMessage: Internal Server Error occurred while processing Booking request
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
                     errorDateTime: '2023-04-13T07:41:00+08:30'
                     errors:
                       - errorCode: 7003
-                        errorCodeText: 'Internal Error occurred'
-                        errorCodeMessage: 'Internal Error occurred'
+                        errorCodeText: Internal Error occurred
+                        errorCodeMessage: Internal Error occurred
         default:
           description: |
             For other errors the error object should be populated with relevant information
@@ -502,31 +503,31 @@ paths:
                     Making too many Bookings Requests
                   description: |
                     Calling the endPoint
-                    
+
                         POST /v2/bookings
                         
                     too many times within a timeperiod.
-                    
+
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
-                    httpMethod: 'POST'
-                    requestUri: '/v2/bookings'
+                    httpMethod: POST
+                    requestUri: /v2/bookings
                     statusCode: 429
-                    statusCodeText: 'Too Many Requests'
-                    statusCodeMessage: 'Too many request to create a booking has been requested. Please try again in 1 hour'
-                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    statusCodeText: Too Many Requests
+                    statusCodeMessage: Too many request to create a booking has been requested. Please try again in 1 hour
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
                     errorDateTime: '2023-04-13T07:41:00+08:30'
                     errors:
                       - errorCode: 7003
-                        errorCodeText: 'Max Booking requests reached'
-                        errorCodeMessage: 'A maximum of 10 Bookings can be created per hour'
-  /v2/bookings/{bookingReference}:
+                        errorCodeText: Max Booking requests reached
+                        errorCodeMessage: A maximum of 10 Bookings can be created per hour
+  '/v2/bookings/{bookingReference}':
     put:
       tags:
-       - Booking
+        - Booking
       summary: |
         Updates the Booking
-      operationId: 'update-bookings'
+      operationId: update-bookings
       parameters:
         - $ref: '#/components/parameters/bookingReferencePathParam'
         - $ref: '#/components/parameters/Api-Version-Major'
@@ -535,34 +536,34 @@ paths:
 
         - **UseCase 3 - Submit updated Booking request**
         - **UseCase 7 - Request amendments to confirmed Booking**
-        
+
         This endPoint is to be used in response to
-        
+
         - **UseCase 2 - Request to update Booking request**
         - **UseCase 6 - Request to amend confirmed Booking**
-        
+
         the endPoint can also be used in case `bookingStatus='RECEIVED'` and the consumer has an update to the `Booking Request`.
-        
+
         ### Precondition
         In order to update a `Booking Request`, the status of the `Booking Request` needs to be in state
-        
+
         - `RECEIVED` in case the consumer has updated information for the `Booking Request`
         - `PENDING UPDATE` in case the provider has requested the consumer to update the `Booking Request` (a result of **UseCase 2 - Request to update Booking request**)
         - `UPDATE RECEIVED` in case the consumer has additional changes to an already sent update
         - `PENDING AMENDMENT` in case the provider has requested the consumer to amend the `Booking Request` (a result of **UseCase 6 - Request to amend confirmed Booking**)
         - `CONFIRMED` in case the consumer has an amendment to the `Booking Request`
-        
+
         ## Postcondition
         The provider has received an update (**UseCase 3 - Submit updated Booking request**) or an amendment (**UseCase 7 - Request amendments to confirmed Booking**) to the `Booking Request`.
 
         In case an amendment was received to the `Booking Request`(**UseCase 7 - Request to amend confirmed Booking**) - the amendment will be called `Amended Booking`. The `Amended Booking` and the "original" `Booking Request` will **co-exist** until a new amendment is submitted by the consumer (via **UseCase 7: Request amendments to confirmed Booking**) or until the provider requests an update (sets the `bookingStatus='PENDING AMENDMENT'` via **UseCase 6: Request to amend confirmed Booking**). If the `amendedBookingStatus` is present it always represents the latest version of an amendment received by the provider.
-        
+
         The consumer will receive a `200` (OK) if the payload schema-validates or a `400` (Bad Request) if it does not.
-        
+
         ## Flow
         The following occurs when a provider receives an **update** to a `Booking Request`
         1. The payload (`Booking Request`) is schema-validated. In case the payload **is invalid** a `400` (Bad Request) is returned.
-        
+
            **The process stops here!**
 
         2. The payload is schema-valid which means
@@ -574,7 +575,7 @@ paths:
            **For the rest of this description and in all examples the value `cbrr-123` will be used as `carrierBookingRequestReference`**
 
         3. The response depends on which useCase is the reason for calling this endPoint (what the `bookingStatus` is):
-        
+
             - If `bookingStatus` **is** `RECEIVED` then this endPoint is being used in addition to **UseCase 1 - Submit booking request**. In this case the consumer would like to make an update to an already sent `Booking Request` - this is done via **UseCase 3 - Submit updated Booking Request**. The `bookingStatus` now changes to `UPDATE RECEIVED`.
             
               A `200` (OK) response corresponding to the following payload is returned
@@ -641,7 +642,7 @@ paths:
           - '_relevant_' subscribers have been notified.
 
         The provider wil now start asynchronous processing. Once processed, the new status of the `Booking` and `Amended Booking Request` will be communicated via a `Booking Notification`. In case the consumer does not subscribe to notifications it is necessary for the consumer to poll on the
-        
+
             GET /v2/bookings/{bookingReference}
             
           endPoint to check if the `bookingStatus` and `amendedBookingStatus` of the `Booking` has changed.
@@ -669,287 +670,287 @@ paths:
                 description: |
                   Updating a `Booking Request` with standard Dry cargo being sent from Bremerhaven, Germany to Norfolk, US
                 value:
-                  carrierBookingRequestReference: 'cbrr-123'
-                  receiptTypeAtOrigin: 'CY'
-                  deliveryTypeAtDestination: 'CY'
-                  cargoMovementTypeAtOrigin: 'FCL'
-                  cargoMovementTypeAtDestination: 'FCL'
-                  serviceContractReference: 'HHL51800000'
-                  freightPaymentTermCode: 'PRE'
-                  originChargesPaymentTermCode: 'PRE'
-                  destinationChargesPaymentTermCode: 'COL'
-                  contractQuotationReference: 'HHL1401'
+                  carrierBookingRequestReference: cbrr-123
+                  receiptTypeAtOrigin: CY
+                  deliveryTypeAtDestination: CY
+                  cargoMovementTypeAtOrigin: FCL
+                  cargoMovementTypeAtDestination: FCL
+                  serviceContractReference: HHL51800000
+                  freightPaymentTermCode: PRE
+                  originChargesPaymentTermCode: PRE
+                  destinationChargesPaymentTermCode: COL
+                  contractQuotationReference: HHL1401
                   vessel:
-                    name: 'MAERSK IOWA'
+                    name: MAERSK IOWA
                     vesselIMONumber: '9298686'
-                  carrierServiceCode: 'TA1'
-                  carrierExportVoyageNumber: '403W'
+                  carrierServiceCode: TA1
+                  carrierExportVoyageNumber: 403W
                   isPartialLoadAllowed: false
                   isExportDeclarationRequired: false
                   isImportLicenseRequired: false
                   expectedDepartureDate: '2024-01-20'
-                  incoTerms: 'EXW'
-                  communicationChannelCode: 'AO'
+                  incoTerms: EXW
+                  communicationChannelCode: AO
                   isEquipmentSubstitutionAllowed: false
                   references:
-                    - type: 'FF'
-                      value: 'KN-00103004'
+                    - type: FF
+                      value: KN-00103004
                   documentParties:
                     - party:
-                        partyName: 'KN Bremerhaven'
+                        partyName: KN Bremerhaven
                         address:
-                          name: 'Kuehne + Nagel (AG & Co.) KG'
-                          street: 'Amerikaring'
+                          name: Kuehne + Nagel (AG & Co.) KG
+                          street: Amerikaring
                           streetNumber: '40'
                           postCode: '27568'
-                          city: 'Bremerhaven'
-                          country: 'Germany'
+                          city: Bremerhaven
+                          country: Germany
                       partyContactDetails:
-                        - name: 'Export operations department'
-                          phone: '+49 471 945410'
-                      partyFunction: 'DDR'
+                        - name: Export operations department
+                          phone: +49 471 945410
+                      partyFunction: DDR
                       isToBeNotified: false
                   partyContactDetails:
-                    - name: 'Diane'
-                      phone: '+49 471 945410'
+                    - name: Diane
+                      phone: +49 471 945410
                   shipmentLocations:
                     - location:
-                        locationName: 'Bremerhaven'
-                        locationType: 'UNLO'
-                        UNLocationCode: 'DEBRV'
-                      locationTypeCode: 'POL'
+                        locationName: Bremerhaven
+                        locationType: UNLO
+                        UNLocationCode: DEBRV
+                      locationTypeCode: POL
                     - location:
-                        locationName: 'Norfolk'
-                        locationType: 'UNLO'
-                        UNLocationCode: 'USORF'
-                      locationTypeCode: 'POD'
+                        locationName: Norfolk
+                        locationType: UNLO
+                        UNLocationCode: USORF
+                      locationTypeCode: POD
                   requestedEquipments:
                     - isShipperOwned: false
-                      ISOEquipmentCode: '42GP'
+                      ISOEquipmentCode: 42GP
                       units: 3
                       commodities:
                         - commodityType: 'Dry cargo, Freight all kinds'
                           cargoGrossWeight: 36000
-                          cargoGrossWeightUnit: 'KGM'
+                          cargoGrossWeightUnit: KGM
               reeferExample:
                 summary: |
                   Reefer cargo Booking (Apple Juice)
                 description: |
                   Updating a `Booking Request` with reefer requirements (2° celcius with vents and drain holes open and genset required) sent from Bremerhaven, Germany to Norfolk, US
                 value:
-                  carrierBookingRequestReference: 'cbrr-123'
-                  receiptTypeAtOrigin: 'CY'
-                  deliveryTypeAtDestination: 'CY'
-                  cargoMovementTypeAtOrigin: 'FCL'
-                  cargoMovementTypeAtDestination: 'FCL'
-                  serviceContractReference: 'HHL51800000'
-                  freightPaymentTermCode: 'PRE'
-                  originChargesPaymentTermCode: 'PRE'
-                  destinationChargesPaymentTermCode: 'COL'
-                  contractQuotationReference: 'HHL1401'
+                  carrierBookingRequestReference: cbrr-123
+                  receiptTypeAtOrigin: CY
+                  deliveryTypeAtDestination: CY
+                  cargoMovementTypeAtOrigin: FCL
+                  cargoMovementTypeAtDestination: FCL
+                  serviceContractReference: HHL51800000
+                  freightPaymentTermCode: PRE
+                  originChargesPaymentTermCode: PRE
+                  destinationChargesPaymentTermCode: COL
+                  contractQuotationReference: HHL1401
                   vessel:
-                    name: 'MAERSK IOWA'
+                    name: MAERSK IOWA
                     vesselIMONumber: '9298686'
-                  carrierServiceCode: 'TA1'
-                  carrierExportVoyageNumber: '403W'
+                  carrierServiceCode: TA1
+                  carrierExportVoyageNumber: 403W
                   isPartialLoadAllowed: false
                   isExportDeclarationRequired: false
                   isImportLicenseRequired: false
                   expectedDepartureDate: '2024-01-20'
-                  incoTerms: 'EXW'
-                  communicationChannelCode: 'AO'
+                  incoTerms: EXW
+                  communicationChannelCode: AO
                   isEquipmentSubstitutionAllowed: false
                   references:
-                    - type: 'FF'
-                      value: 'KN-00103004'
+                    - type: FF
+                      value: KN-00103004
                   documentParties:
                     - party:
-                        partyName: 'KN Bremerhaven'
+                        partyName: KN Bremerhaven
                         address:
-                          name: 'Kuehne + Nagel (AG & Co.) KG'
-                          street: 'Amerikaring'
+                          name: Kuehne + Nagel (AG & Co.) KG
+                          street: Amerikaring
                           streetNumber: '40'
                           postCode: '27568'
-                          city: 'Bremerhaven'
-                          country: 'Germany'
+                          city: Bremerhaven
+                          country: Germany
                       partyContactDetails:
-                        - name: 'Export operations department'
-                          phone: '+49 471 945410'
-                      partyFunction: 'DDR'
+                        - name: Export operations department
+                          phone: +49 471 945410
+                      partyFunction: DDR
                       isToBeNotified: false
                   partyContactDetails:
-                    - name: 'Diane'
-                      phone: '+49 471 945410'
+                    - name: Diane
+                      phone: +49 471 945410
                   shipmentLocations:
                     - location:
-                        locationName: 'Bremerhaven'
-                        locationType: 'UNLO'
-                        UNLocationCode: 'DEBRV'
-                      locationTypeCode: 'POL'
+                        locationName: Bremerhaven
+                        locationType: UNLO
+                        UNLocationCode: DEBRV
+                      locationTypeCode: POL
                     - location:
-                        locationName: 'Norfolk'
-                        locationType: 'UNLO'
-                        UNLocationCode: 'USORF'
-                      locationTypeCode: 'POD'
+                        locationName: Norfolk
+                        locationType: UNLO
+                        UNLocationCode: USORF
+                      locationTypeCode: POD
                   requestedEquipments:
                     - isShipperOwned: false
-                      ISOEquipmentCode: '45R1'
+                      ISOEquipmentCode: 45R1
                       units: 3
                       isNonOperatingReefer: false
                       activeReeferSettings:
                         temperatureSetpoint: 2
-                        temperatureUnit: 'CEL'
+                        temperatureUnit: CEL
                         isVentilationOpen: true
                         isDrainholesOpen: false
                         isGeneratorSetRequired: true
                       commodities:
-                        - commodityType: 'Apple juice'
+                        - commodityType: Apple juice
                           HSCodes:
                             - 20097919
                           cargoGrossWeight: 36000
-                          cargoGrossWeightUnit: 'KGM'
+                          cargoGrossWeightUnit: KGM
               norExample:
                 summary: |
                   Standard dry cargo Booking using a Reefer Container
                 description: |
                   Update a `Booking Request` with standard Dry cargo using a reefer container being sent from Bremerhaven, Germany to Norfolk, US
                 value:
-                  carrierBookingRequestReference: 'cbrr-123'
-                  receiptTypeAtOrigin: 'CY'
-                  deliveryTypeAtDestination: 'CY'
-                  cargoMovementTypeAtOrigin: 'FCL'
-                  cargoMovementTypeAtDestination: 'FCL'
-                  serviceContractReference: 'HHL51800000'
-                  freightPaymentTermCode: 'PRE'
-                  originChargesPaymentTermCode: 'PRE'
-                  destinationChargesPaymentTermCode: 'COL'
-                  contractQuotationReference: 'HHL1401'
+                  carrierBookingRequestReference: cbrr-123
+                  receiptTypeAtOrigin: CY
+                  deliveryTypeAtDestination: CY
+                  cargoMovementTypeAtOrigin: FCL
+                  cargoMovementTypeAtDestination: FCL
+                  serviceContractReference: HHL51800000
+                  freightPaymentTermCode: PRE
+                  originChargesPaymentTermCode: PRE
+                  destinationChargesPaymentTermCode: COL
+                  contractQuotationReference: HHL1401
                   vessel:
-                    name: 'MAERSK IOWA'
+                    name: MAERSK IOWA
                     vesselIMONumber: '9298686'
-                  carrierServiceCode: 'TA1'
-                  carrierExportVoyageNumber: '403W'
+                  carrierServiceCode: TA1
+                  carrierExportVoyageNumber: 403W
                   isPartialLoadAllowed: false
                   isExportDeclarationRequired: false
                   isImportLicenseRequired: false
                   expectedDepartureDate: '2024-01-20'
-                  incoTerms: 'EXW'
-                  communicationChannelCode: 'AO'
+                  incoTerms: EXW
+                  communicationChannelCode: AO
                   isEquipmentSubstitutionAllowed: false
                   references:
-                    - type: 'FF'
-                      value: 'KN-00103004'
+                    - type: FF
+                      value: KN-00103004
                   documentParties:
                     - party:
-                        partyName: 'KN Bremerhaven'
+                        partyName: KN Bremerhaven
                         address:
-                          name: 'Kuehne + Nagel (AG & Co.) KG'
-                          street: 'Amerikaring'
+                          name: Kuehne + Nagel (AG & Co.) KG
+                          street: Amerikaring
                           streetNumber: '40'
                           postCode: '27568'
-                          city: 'Bremerhaven'
-                          country: 'Germany'
+                          city: Bremerhaven
+                          country: Germany
                       partyContactDetails:
-                        - name: 'Export operations department'
-                          phone: '+49 471 945410'
-                      partyFunction: 'DDR'
+                        - name: Export operations department
+                          phone: +49 471 945410
+                      partyFunction: DDR
                       isToBeNotified: false
                   partyContactDetails:
-                    - name: 'Diane'
-                      phone: '+49 471 945410'
+                    - name: Diane
+                      phone: +49 471 945410
                   shipmentLocations:
                     - location:
-                        locationName: 'Bremerhaven'
-                        locationType: 'UNLO'
-                        UNLocationCode: 'DEBRV'
-                      locationTypeCode: 'POL'
+                        locationName: Bremerhaven
+                        locationType: UNLO
+                        UNLocationCode: DEBRV
+                      locationTypeCode: POL
                     - location:
-                        locationName: 'Norfolk'
-                        locationType: 'UNLO'
-                        UNLocationCode: 'USORF'
-                      locationTypeCode: 'POD'
+                        locationName: Norfolk
+                        locationType: UNLO
+                        UNLocationCode: USORF
+                      locationTypeCode: POD
                   requestedEquipments:
                     - isShipperOwned: false
-                      ISOEquipmentCode: '45R1'
+                      ISOEquipmentCode: 45R1
                       isNonOperatingReefer: true
                       units: 3
                       commodities:
                         - commodityType: 'Dry cargo, Freight all kinds'
                           cargoGrossWeight: 36000
-                          cargoGrossWeightUnit: 'KGM'
+                          cargoGrossWeightUnit: KGM
               dgExample:
                 summary: |
                   Dangerous Goods (DG) cargo Booking
                 description: |
                   Update a `Confirmed Booking` (a `Booking` with `carrierBookingReference='cbr-987'`) with DG cargo (*Environmentally hazardous substance, liquid, N.O.S (Propiconazole)*) being sent from Bremerhaven, Germany to Norfolk, US
                 value:
-                  carrierBookingRequestReference: 'cbrr-123'
-                  carrierBookingReference: 'cbr-987'
-                  receiptTypeAtOrigin: 'CY'
-                  deliveryTypeAtDestination: 'CY'
-                  cargoMovementTypeAtOrigin: 'FCL'
-                  cargoMovementTypeAtDestination: 'FCL'
-                  serviceContractReference: 'HHL51800000'
-                  freightPaymentTermCode: 'PRE'
-                  originChargesPaymentTermCode: 'PRE'
-                  destinationChargesPaymentTermCode: 'COL'
-                  contractQuotationReference: 'HHL1401'
+                  carrierBookingRequestReference: cbrr-123
+                  carrierBookingReference: cbr-987
+                  receiptTypeAtOrigin: CY
+                  deliveryTypeAtDestination: CY
+                  cargoMovementTypeAtOrigin: FCL
+                  cargoMovementTypeAtDestination: FCL
+                  serviceContractReference: HHL51800000
+                  freightPaymentTermCode: PRE
+                  originChargesPaymentTermCode: PRE
+                  destinationChargesPaymentTermCode: COL
+                  contractQuotationReference: HHL1401
                   vessel:
-                    name: 'MAERSK IOWA'
+                    name: MAERSK IOWA
                     vesselIMONumber: '9298686'
-                  carrierServiceCode: 'TA1'
-                  carrierExportVoyageNumber: '403W'
+                  carrierServiceCode: TA1
+                  carrierExportVoyageNumber: 403W
                   isPartialLoadAllowed: false
                   isExportDeclarationRequired: false
                   isImportLicenseRequired: false
                   expectedDepartureDate: '2024-01-20'
-                  incoTerms: 'EXW'
-                  communicationChannelCode: 'AO'
+                  incoTerms: EXW
+                  communicationChannelCode: AO
                   isEquipmentSubstitutionAllowed: false
                   references:
-                    - type: 'FF'
-                      value: 'KN-00103004'
+                    - type: FF
+                      value: KN-00103004
                   documentParties:
                     - party:
-                        partyName: 'KN Bremerhaven'
+                        partyName: KN Bremerhaven
                         address:
-                          name: 'Kuehne + Nagel (AG & Co.) KG'
-                          street: 'Amerikaring'
+                          name: Kuehne + Nagel (AG & Co.) KG
+                          street: Amerikaring
                           streetNumber: '40'
                           postCode: '27568'
-                          city: 'Bremerhaven'
-                          country: 'Germany'
+                          city: Bremerhaven
+                          country: Germany
                       partyContactDetails:
-                        - name: 'Export operations department'
-                          phone: '+49 471 945410'
-                      partyFunction: 'DDR'
+                        - name: Export operations department
+                          phone: +49 471 945410
+                      partyFunction: DDR
                       isToBeNotified: false
                   partyContactDetails:
-                    - name: 'Diane'
-                      phone: '+49 471 945410'
+                    - name: Diane
+                      phone: +49 471 945410
                   shipmentLocations:
                     - location:
-                        locationName: 'Bremerhaven'
-                        locationType: 'UNLO'
-                        UNLocationCode: 'DEBRV'
-                      locationTypeCode: 'POL'
+                        locationName: Bremerhaven
+                        locationType: UNLO
+                        UNLocationCode: DEBRV
+                      locationTypeCode: POL
                     - location:
-                        locationName: 'Norfolk'
-                        locationType: 'UNLO'
-                        UNLocationCode: 'USORF'
-                      locationTypeCode: 'POD'
+                        locationName: Norfolk
+                        locationType: UNLO
+                        UNLocationCode: USORF
+                      locationTypeCode: POD
                   requestedEquipments:
                     - isShipperOwned: false
-                      ISOEquipmentCode: '42GP'
+                      ISOEquipmentCode: 42GP
                       units: 3
                       commodities:
                         - commodityType: 'Environmentally hazardous substance, liquid, N.O.S (Propiconazole)'
                           HSCodes:
                             - 293499
                           cargoGrossWeight: 36000
-                          cargoGrossWeightUnit: 'KGM'
+                          cargoGrossWeightUnit: KGM
                           outerPackaging:
-                            imoPackagingCode: '3A1'
+                            imoPackagingCode: 3A1
                             numberOfPackages: 100
                             description: 'Jerrican, steel'
                             dangerousGoods:
@@ -966,13 +967,13 @@ paths:
                                 isHot: false
                                 isCompetentAuthorityApprovalProvided: false
                                 emergencyContactDetails:
-                                  contact: 'John Doe'
-                                  phone: '+1 123062970'
-                                EMSNumber: 'F-A S-F'
+                                  contact: John Doe
+                                  phone: +1 123062970
+                                EMSNumber: F-A S-F
                                 isReportableQuantity: false
                                 grossWeight:
                                   value: 12000
-                                  unit: 'KGM'
+                                  unit: KGM
       responses:
         '200':
           description: |
@@ -1001,37 +1002,37 @@ paths:
                     Booking request updated
                   description: |
                     An updated `Booking request` received, schema validated and stored in provider system - the `Booking` now awaits provider action
-                    
+
                         bookingStatus='UPDATE RECEIVED'
                   value:
-                    carrierBookingRequestReference: 'cbrr-123'
-                    bookingStatus: 'UPDATE RECEIVED'
+                    carrierBookingRequestReference: cbrr-123
+                    bookingStatus: UPDATE RECEIVED
                 pendingAmendmentApprovalExample:
                   summary: |
                     Confirmed Booking amendment
                   description: |
                     An amendment to a `Confirmed Booking` received, schema validated and stored in provider system - the `Booking` now awaits provider action
-                    
+
                         bookingStatus='CONFIRMED'
                         amendedBookingStatus: 'AMENDMENT RECEIVED'
                   value:
-                    carrierBookingRequestReference: 'cbrr-123'
-                    carrierBookingReference: 'cbr-987'
-                    bookingStatus: 'CONFIRMED'
-                    amendedBookingStatus: 'AMENDMENT RECEIVED'
+                    carrierBookingRequestReference: cbrr-123
+                    carrierBookingReference: cbr-987
+                    bookingStatus: CONFIRMED
+                    amendedBookingStatus: AMENDMENT RECEIVED
                 pendingAmendmentExample:
                   summary: |
                     Confirm requested Booking amendment
                   description: |
                     A requested amendment to a `Confirmed Booking` by the provider has been received, schema validated and stored in provider system. The `Booking` now awaits provider action
-                    
+
                         bookingStatus='PENDING AMENDMENT'
                         amendedBookingStatus: 'AMENDMENT RECEIVED'
                   value:
-                    carrierBookingRequestReference: 'cbrr-123'
-                    carrierBookingReference: 'cbr-987'
-                    bookingStatus: 'PENDING AMENDMENT'
-                    amendedBookingStatus: 'AMENDMENT RECEIVED'
+                    carrierBookingRequestReference: cbrr-123
+                    carrierBookingReference: cbr-987
+                    bookingStatus: PENDING AMENDMENT
+                    amendedBookingStatus: AMENDMENT RECEIVED
         '400':
           description: |
             In case the updated/amended `Booking request` does not schema validate a `400` (Bad Request) is returned
@@ -1048,21 +1049,21 @@ paths:
                     Booking missing receiptTypeAtOrigin
                   description: |
                     `receiptTypeAtOrigin` is a mandatory property in the `Booking request`. This is an example of how the error object would look in case this property is missing
-                    
+
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
-                    httpMethod: 'PUT'
-                    requestUri: '/v2/bookings/cbrr-123'
+                    httpMethod: PUT
+                    requestUri: /v2/bookings/cbrr-123
                     statusCode: 400
-                    statusCodeText: 'Bad Request'
-                    statusCodeMessage: 'receiptTypeAtOrigin not found - it is a mandatory property in Booking request'
-                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    statusCodeText: Bad Request
+                    statusCodeMessage: receiptTypeAtOrigin not found - it is a mandatory property in Booking request
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
                     errorDateTime: '2023-04-13T07:41:00+08:30'
                     errors:
                       - errorCode: 7003
-                        property: 'receiptTypeAtOrigin'
-                        errorCodeText: 'mandatory property missing'
-                        errorCodeMessage: 'receiptTypeAtOrigin must be provided as part of a Booking request'
+                        property: receiptTypeAtOrigin
+                        errorCodeText: mandatory property missing
+                        errorCodeMessage: receiptTypeAtOrigin must be provided as part of a Booking request
         '409':
           description: |
             In case the provider is processing an already updated `Booking request` - it is possible for the provider to reject new incomming requests by returning a `409` (Conflict)
@@ -1079,20 +1080,20 @@ paths:
                     Conflicting request
                   description: |
                     The provider is already processing a request and needs to finish this process before any new requests are processed
-                    
+
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
-                    httpMethod: 'PUT'
-                    requestUri: '/v2/bookings/cbrr-123'
+                    httpMethod: PUT
+                    requestUri: /v2/bookings/cbrr-123
                     statusCode: 409
-                    statusCodeText: 'Conflict'
-                    statusCodeMessage: 'Previous request is being processed. Please try again later'
-                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    statusCodeText: Conflict
+                    statusCodeMessage: Previous request is being processed. Please try again later
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
                     errorDateTime: '2023-04-13T07:41:00+08:30'
                     errors:
                       - errorCode: 7003
-                        errorCodeText: 'Conflicting request is being processed'
-                        errorCodeMessage: 'The Booking cannot be updated/amended while it is being processed. Please try again later'
+                        errorCodeText: Conflicting request is being processed
+                        errorCodeMessage: The Booking cannot be updated/amended while it is being processed. Please try again later
         '500':
           description: |
             In case a server error occurs in provider system a `500` (Internal Server Error) is returned
@@ -1109,20 +1110,20 @@ paths:
                     Internal Server Error while processing Booking request
                   description: |
                     An Internal Server Error has occurred - the consumer should contact {provider-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
-                    
+
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
-                    httpMethod: 'PUT'
-                    requestUri: '/v2/bookings/cbrr-123'
+                    httpMethod: PUT
+                    requestUri: /v2/bookings/cbrr-123
                     statusCode: 500
-                    statusCodeText: 'Internal Server Error'
-                    statusCodeMessage: 'Internal Server Error occurred while processing Booking request'
-                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    statusCodeText: Internal Server Error
+                    statusCodeMessage: Internal Server Error occurred while processing Booking request
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
                     errorDateTime: '2023-04-13T07:41:00+08:30'
                     errors:
                       - errorCode: 7003
-                        errorCodeText: 'Internal Error occurred'
-                        errorCodeMessage: 'Internal Error occurred'
+                        errorCodeText: Internal Error occurred
+                        errorCodeMessage: Internal Error occurred
         default:
           description: |
             For other errors the error object should be populated with relevant information
@@ -1139,38 +1140,38 @@ paths:
                     Updating too many Bookings requests
                   description: |
                     Calling the endPoint GET /v2/bookings/cbrr-123 too many times within a timeperiod.
-                    
+
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
-                    httpMethod: 'PUT'
-                    requestUri: '/v2/bookings/cbrr-123'
+                    httpMethod: PUT
+                    requestUri: /v2/bookings/cbrr-123
                     statusCode: 429
-                    statusCodeText: 'Too Many Requests'
-                    statusCodeMessage: 'Too many request to update a booking has been requested. Please try again in 1 hour'
-                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    statusCodeText: Too Many Requests
+                    statusCodeMessage: Too many request to update a booking has been requested. Please try again in 1 hour
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
                     errorDateTime: '2023-04-13T07:41:00+08:30'
                     errors:
                       - errorCode: 7003
-                        errorCodeText: 'Max Booking requests reached'
-                        errorCodeMessage: 'A maximum of 10 Bookings can be updated per hour'
+                        errorCodeText: Max Booking requests reached
+                        errorCodeMessage: A maximum of 10 Bookings can be updated per hour
     get:
       tags:
-       - Booking
+        - Booking
       summary: |
         Gets the Booking
-      operationId: 'get-bookings'
+      operationId: get-bookings
       description: |
         Retrieves the `Booking Request` with the `bookingReference`. The path can contain a `carrierBookingRequestReference` or a `carrierBookingReference`. It is recommended to use this endPoint to `GET` data before an update is made to make sure latest version is being updated.
 
         The default payload when calling this endPoint is the "original" `Booking`. It is also possible to get the latest amendment to a `Booking` called the `Amended Booking`. In order to get the `Amended Booking`, it is necessary to use the query parameter `amendedContent` and set it to `true`.
-        
+
             GET /v2/bookings/{bookingReference}?amendedContent=true
-        
+
         The `status` of the "original" `Booking` is included in both payloads as `bookingStatus`. `amendedBookingStatus` and related content is only available after the provider has approved the `Booking` via **UseCase 5: Confirm Booking request** and until:
         - the provider requests for a new amendment (**UseCase 6: Request to amend confirmed Booking**) in which case the "old update" is no longer accessable.
         - the consumer submits a new amendment (**UseCase 7: Request amendment to confirmed Booking**) in which case the "new update" provided **replaces** the "old update".
         - the provider re-confirms the `Booking` (**UseCase 5: Confirm booking request**) in which case the "old update" is no longer accessable.
-        
+
         If `amendedContent=true` is requested but no amendment has yet been provided by the consumer **or** the state of the "original" `Booking` is `PENDING AMENDMENT`, then a `404` (Not Found) is returned.
 
         If the provider is requesting some changes to the `Booking` this will also be part of the "original" `Booking` payload in the `requestedChanges` property. This property is **conditional** on the `bookingStatus='PENDING UPDATE'` (in case the `Booking` has not yet been confirmed) or `bookingStatus='PENDING AMENDMENT'` (in case it is a confirmed `Booking`).
@@ -1197,176 +1198,176 @@ paths:
                   description: |
                     Gets a `Booking Request` with standard Dry cargo which has not yet been confirmed. The `Booking` is in state `PENDING UPDATE` and requires some changes (specified in the `requestedChanges` property)
                   value:
-                    carrierBookingRequestReference: 'cbrr-123'
-                    bookingStatus: 'PENDING UPDATE'
-                    receiptTypeAtOrigin: 'CY'
-                    deliveryTypeAtDestination: 'CY'
-                    cargoMovementTypeAtOrigin: 'FCL'
-                    cargoMovementTypeAtDestination: 'FCL'
-                    serviceContractReference: 'HHL51800000'
-                    freightPaymentTermCode: 'PRE'
-                    originChargesPaymentTermCode: 'PRE'
-                    destinationChargesPaymentTermCode: 'COL'
-                    contractQuotationReference: 'HHL1401'
+                    carrierBookingRequestReference: cbrr-123
+                    bookingStatus: PENDING UPDATE
+                    receiptTypeAtOrigin: CY
+                    deliveryTypeAtDestination: CY
+                    cargoMovementTypeAtOrigin: FCL
+                    cargoMovementTypeAtDestination: FCL
+                    serviceContractReference: HHL51800000
+                    freightPaymentTermCode: PRE
+                    originChargesPaymentTermCode: PRE
+                    destinationChargesPaymentTermCode: COL
+                    contractQuotationReference: HHL1401
                     vessel:
-                      name: 'MAERSK IOWA'
+                      name: MAERSK IOWA
                       vesselIMONumber: '9298686'
-                    carrierServiceCode: 'TA1'
-                    carrierExportVoyageNumber: '403W'
+                    carrierServiceCode: TA1
+                    carrierExportVoyageNumber: 403W
                     isPartialLoadAllowed: false
                     isExportDeclarationRequired: false
                     isImportLicenseRequired: false
                     expectedDepartureDate: '2024-01-20'
-                    incoTerms: 'EXW'
-                    communicationChannelCode: 'AO'
+                    incoTerms: EXW
+                    communicationChannelCode: AO
                     isEquipmentSubstitutionAllowed: false
                     references:
-                      - type: 'FF'
-                        value: 'KN-00103004'
+                      - type: FF
+                        value: KN-00103004
                     documentParties:
                       - party:
-                          partyName: 'KN Bremerhaven'
+                          partyName: KN Bremerhaven
                           address:
-                            name: 'Kuehne + Nagel (AG & Co.) KG'
-                            street: 'Amerikaring'
+                            name: Kuehne + Nagel (AG & Co.) KG
+                            street: Amerikaring
                             streetNumber: '40'
                             postCode: '27568'
-                            city: 'Bremerhaven'
-                            country: 'Germany'
+                            city: Bremerhaven
+                            country: Germany
                         partyContactDetails:
-                          - name: 'Export operations department'
-                            phone: '+49 471 945410'
-                        partyFunction: 'DDR'
+                          - name: Export operations department
+                            phone: +49 471 945410
+                        partyFunction: DDR
                         isToBeNotified: false
                     partyContactDetails:
-                      - name: 'Diane'
-                        phone: '+49 471 945410'
+                      - name: Diane
+                        phone: +49 471 945410
                     shipmentLocations:
                       - location:
-                          locationName: 'Bremerhaven'
-                          locationType: 'UNLO'
-                          UNLocationCode: 'DEBRV'
-                        locationTypeCode: 'POL'
+                          locationName: Bremerhaven
+                          locationType: UNLO
+                          UNLocationCode: DEBRV
+                        locationTypeCode: POL
                       - location:
-                          locationName: 'Norfolk'
-                          locationType: 'UNLO'
-                          UNLocationCode: 'USORF'
-                        locationTypeCode: 'POD'
+                          locationName: Norfolk
+                          locationType: UNLO
+                          UNLocationCode: USORF
+                        locationTypeCode: POD
                     requestedEquipments:
                       - isShipperOwned: false
-                        ISOEquipmentCode: '42GP'
+                        ISOEquipmentCode: 42GP
                         units: 3
                         commodities:
                           - commodityType: 'Dry cargo, Freight all kinds'
                             cargoGrossWeight: 36000
-                            cargoGrossWeightUnit: 'KGM'
+                            cargoGrossWeightUnit: KGM
                     requestedChanges:
-                      - field: '$.requestedEquipment.units'
-                        message: 'Not enough available "42GP" equipment. Please change to "22G1" instead'
+                      - field: $.requestedEquipment.units
+                        message: Not enough available "42GP" equipment. Please change to "22G1" instead
                 dryConfirmedExample:
                   summary: |
                     Gets a confirmed Standard dry cargo Booking
                   description: |
                     Gets a `Confirmed Booking` with standard Dry cargo. In this example the `Booking` has previously received an amendment which was confirmed (`amendedBookingStatus='AMENDMENT CONFIRMED'`)
-                    
+
                     As part of the confirmation the `Booking` is enriched with a `transportPlan`, `shipmentCutOffTimes`, `carrierClauses` and in this example also an `advanceManifestFiling` since the `Booking` is arriving in US.
                   value:
-                    carrierBookingRequestReference: 'cbrr-123'
-                    carrierBookingReference: 'cbr-987'
-                    bookingStatus: 'CONFIRMED'
-                    amendedBookingStatus: 'AMENDMENT CONFIRMED'
-                    receiptTypeAtOrigin: 'CY'
-                    deliveryTypeAtDestination: 'CY'
-                    cargoMovementTypeAtOrigin: 'FCL'
-                    cargoMovementTypeAtDestination: 'FCL'
-                    serviceContractReference: 'HHL51800000'
-                    freightPaymentTermCode: 'PRE'
-                    originChargesPaymentTermCode: 'PRE'
-                    destinationChargesPaymentTermCode: 'COL'
-                    contractQuotationReference: 'HHL1401'
+                    carrierBookingRequestReference: cbrr-123
+                    carrierBookingReference: cbr-987
+                    bookingStatus: CONFIRMED
+                    amendedBookingStatus: AMENDMENT CONFIRMED
+                    receiptTypeAtOrigin: CY
+                    deliveryTypeAtDestination: CY
+                    cargoMovementTypeAtOrigin: FCL
+                    cargoMovementTypeAtDestination: FCL
+                    serviceContractReference: HHL51800000
+                    freightPaymentTermCode: PRE
+                    originChargesPaymentTermCode: PRE
+                    destinationChargesPaymentTermCode: COL
+                    contractQuotationReference: HHL1401
                     vessel:
-                      name: 'MAERSK IOWA'
+                      name: MAERSK IOWA
                       vesselIMONumber: '9298686'
-                    carrierServiceCode: 'TA1'
-                    carrierExportVoyageNumber: '403W'
+                    carrierServiceCode: TA1
+                    carrierExportVoyageNumber: 403W
                     isPartialLoadAllowed: false
                     isExportDeclarationRequired: false
                     isImportLicenseRequired: false
                     expectedDepartureDate: '2024-01-20'
-                    incoTerms: 'EXW'
-                    communicationChannelCode: 'AO'
+                    incoTerms: EXW
+                    communicationChannelCode: AO
                     isEquipmentSubstitutionAllowed: false
                     references:
-                      - type: 'FF'
-                        value: 'KN-00103004'
+                      - type: FF
+                        value: KN-00103004
                     documentParties:
                       - party:
-                          partyName: 'KN Bremerhaven'
+                          partyName: KN Bremerhaven
                           address:
-                            name: 'Kuehne + Nagel (AG & Co.) KG'
-                            street: 'Amerikaring'
+                            name: Kuehne + Nagel (AG & Co.) KG
+                            street: Amerikaring
                             streetNumber: '40'
                             postCode: '27568'
-                            city: 'Bremerhaven'
-                            country: 'Germany'
+                            city: Bremerhaven
+                            country: Germany
                         partyContactDetails:
-                          - name: 'Export operations department'
-                            phone: '+49 471 945410'
-                        partyFunction: 'DDR'
+                          - name: Export operations department
+                            phone: +49 471 945410
+                        partyFunction: DDR
                         isToBeNotified: false
                     partyContactDetails:
-                      - name: 'Diane'
-                        phone: '+49 471 945410'
+                      - name: Diane
+                        phone: +49 471 945410
                     shipmentLocations:
                       - location:
-                          locationName: 'Bremerhaven'
-                          locationType: 'UNLO'
-                          UNLocationCode: 'DEBRV'
-                        locationTypeCode: 'POL'
+                          locationName: Bremerhaven
+                          locationType: UNLO
+                          UNLocationCode: DEBRV
+                        locationTypeCode: POL
                       - location:
-                          locationName: 'Norfolk'
-                          locationType: 'UNLO'
-                          UNLocationCode: 'USORF'
-                        locationTypeCode: 'POD'
+                          locationName: Norfolk
+                          locationType: UNLO
+                          UNLocationCode: USORF
+                        locationTypeCode: POD
                     requestedEquipments:
                       - isShipperOwned: false
-                        ISOEquipmentCode: '42GP'
+                        ISOEquipmentCode: 42GP
                         units: 3
                         commodities:
                           - commodityType: 'Dry cargo, Freight all kinds'
                             cargoGrossWeight: 36000
-                            cargoGrossWeightUnit: 'KGM'
+                            cargoGrossWeightUnit: KGM
                     confirmedEquipments:
-                      - ISOEquipmentCode: '42GP'
+                      - ISOEquipmentCode: 42GP
                         units: 3
                     transportPlan:
-                      - transportPlanStage: 'MNC'
+                      - transportPlanStage: MNC
                         transportPlanStageSequenceNumber: 1
                         loadLocation:
-                          locationName: 'Bremerhaven'
-                          locationType: 'UNLO'
-                          UNLocationCode: 'DEBRV'
+                          locationName: Bremerhaven
+                          locationType: UNLO
+                          UNLocationCode: DEBRV
                         dischargeLocation:
-                          locationName: 'Norfolk'
-                          locationType: 'UNLO'
-                          UNLocationCode: 'USORF'
+                          locationName: Norfolk
+                          locationType: UNLO
+                          UNLocationCode: USORF
                         plannedDepartureDate: '2024-01-20'
                         plannedArrivalDate: '2024-01-31'
-                        modeOfTransport: 'VESSEL'
-                        vesselName: 'MAERSK IOWA'
+                        modeOfTransport: VESSEL
+                        vesselName: MAERSK IOWA
                         vesselIMONumber: '9298686'
-                        carrierSerivceCode: 'TA1'
-                        carrierExportVoyageNumber: '403W'
+                        carrierSerivceCode: TA1
+                        carrierExportVoyageNumber: 403W
                     shipmentCutOffTimes:
-                      - cutOffDateTimeCode: 'DCO'
+                      - cutOffDateTimeCode: DCO
                         cutOffDateTime: '2024-01-17T22:30:00.000'
-                      - cutOffDateTimeCode: 'VCO' 
+                      - cutOffDateTimeCode: VCO
                         cutOffDateTime: '2024-01-18T22:30:00.000'
-                      - cutOffDateTimeCode: 'FCO' 
+                      - cutOffDateTimeCode: FCO
                         cutOffDateTime: '2024-01-19T13:30:00.000'
                     advanceManifestFilings:
-                      - manifestTypeCode: 'ACE'
-                        countryCode: 'US'
+                      - manifestTypeCode: ACE
+                        countryCode: US
                     carrierClauses:
                       - 'The date of shipment, the carrying vessel and the schedule are not guaranteed and are always subject to changes.'
                       - ' Operations such as lifting, stowage, drayage and customs declaration of containers are based on the description of the nature, quantity, measurement and weight declared by the Shipper. The Shipper shall be liable for any damage, loss, expense and fines incurred by Carrier XYZ or its agents due to incorrectness or incompleteness of such declaration.'
@@ -1375,7 +1376,7 @@ paths:
         '404':
           description: |
             In case the consumer is requesting the `Amended Booking` by calling:
-            
+
                 GET /v2/bookings/{bookingReference}?amendedContent=true
                 
             but:
@@ -1397,20 +1398,20 @@ paths:
                     Missing amended Booking
                   description: |
                     The `Amended Booking` response is requested - but no `Amended Booking` exists.
-                    
+
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
-                    httpMethod: 'GET'
-                    requestUri: '/v2/bookings/cbrr-123?amendedContent=true'
+                    httpMethod: GET
+                    requestUri: /v2/bookings/cbrr-123?amendedContent=true
                     statusCode: 404
-                    statusCodeText: 'Not Found'
-                    statusCodeMessage: 'No amended booking exists'
-                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    statusCodeText: Not Found
+                    statusCodeMessage: No amended booking exists
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
                     errorDateTime: '2023-04-13T07:41:00+08:30'
                     errors:
                       - errorCode: 7003
-                        errorCodeText: 'No amended booking'
-                        errorCodeMessage: 'No amended booking available'
+                        errorCodeText: No amended booking
+                        errorCodeMessage: No amended booking available
         '500':
           description: |
             In case a server error occurs in provider system a `500` (Internal Server Error) is returned
@@ -1427,20 +1428,20 @@ paths:
                     Internal Server Error while processing Booking request
                   description: |
                     An Internal Server Error has occurred - the consumer should contact {provider-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
-                    
+
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
-                    httpMethod: 'GET'
-                    requestUri: '/v2/bookings/cbrr-123'
+                    httpMethod: GET
+                    requestUri: /v2/bookings/cbrr-123
                     statusCode: 500
-                    statusCodeText: 'Internal Server Error'
-                    statusCodeMessage: 'Internal Server Error occurred while processing Booking request'
-                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    statusCodeText: Internal Server Error
+                    statusCodeMessage: Internal Server Error occurred while processing Booking request
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
                     errorDateTime: '2023-04-13T07:41:00+08:30'
                     errors:
                       - errorCode: 7003
-                        errorCodeText: 'Internal Error occurred'
-                        errorCodeMessage: 'Internal Error occurred'
+                        errorCodeText: Internal Error occurred
+                        errorCodeMessage: Internal Error occurred
         default:
           description: |
             Unexpected error
@@ -1457,33 +1458,33 @@ paths:
                     GET non-existing Booking Request
                   description: |
                     Calling
-                    
+
                         GET /v2/bookings/cbrr-123
                         
                     results in an error as booking `cbrr-123` does not exist.
-                    
+
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
-                    httpMethod: 'GET'
-                    requestUri: '/v2/bookings/cbrr-123'
+                    httpMethod: GET
+                    requestUri: /v2/bookings/cbrr-123
                     statusCode: 404
-                    statusCodeText: 'Not Found'
-                    statusCodeMessage: 'The requested carrierBookingRequestReference does not exist'
-                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    statusCodeText: Not Found
+                    statusCodeMessage: The requested carrierBookingRequestReference does not exist
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
                     errorDateTime: '2023-04-13T07:41:00+08:30'
                     errors:
                       - errorCode: 7003
-                        errorCodeText: 'Non existent carrierBookingRequestReference'
-                        errorCodeMessage: 'carrierBookingRequestReference `cbrr-123` does not exist'
+                        errorCodeText: Non existent carrierBookingRequestReference
+                        errorCodeMessage: carrierBookingRequestReference `cbrr-123` does not exist
     patch:
       tags:
-       - Booking
+        - Booking
       summary: |
         Cancels the Booking or cancels a Booking Amendment
-      operationId: 'cancel-booking'
+      operationId: cancel-booking
       description: |
         A shipper initiated cancellation of the `Booking` or `Booking Amendment`. This endPoint corresponds with **UseCase 11 - Cancel Booking by shipper** or **UseCase 9 - Cancel amendment to confirmed Booking**.
-        
+
         ## Precondition
         In order to cancel a `Booking`, the `bookingStatus` must be either
         - `RECEIVED`
@@ -1497,20 +1498,20 @@ paths:
 
         ## Postcondition
         The provider has received a cancellation from the consumer for a `Booking` or for a `Booking Amendment`.
-        
+
         The consumer will receive a `200` (OK) if the payload schema-validates or a `400` (Bad Request) if it does not.
-        
+
         ## Flow
         The following occurs when a provider receives a cancellation request:
         1. The payload is schema-validated. In case the payload **is invalid** a `400` (Bad Request) is returned.
-        
+
            **The process stops here!**
         2. The payload is schema-valid which means:
 
            - all required properties are provided.
            - all values provided have correct data type.
         3. Depending on the paylod of the request - either:
-        
+
            - the entire `Booking` is cancelled (including any ongoing amendment). This is the case when the payload contains `bookingStatus='CANCELLED'`.
            
              When cancelling a `Booking` the `amendedBookingStatus` is set to `AMENDMENT CANCELLED`
@@ -1528,31 +1529,31 @@ paths:
               type: object
               oneOf:
                 - type: object
-                  title: 'Cancel entire Booking'
+                  title: Cancel entire Booking
                   properties:
                     bookingStatus:
                       type: string
                       maxLength: 50
                       description: |
                         Setting the `bookingStatus` to `CANCELLED` cancels the entire `Booking` (also any ongoing amendment requests). The `Booking` will discontinue if the request is accepted by the provider.
-                        
+
                         Only possible value to set is `CANCELLED`.
-                      example: 'CANCELLED'
+                      example: CANCELLED
                   required:
                     - bookingStatus
                 - type: object
-                  title: 'Only cancel the amendment to a Booking'
+                  title: Only cancel the amendment to a Booking
                   properties:
                     amendedBookingStatus:
                       type: string
                       maxLength: 50
                       description: |
                         Setting the `amendedBookingStatus` to `AMENDMENT CANCELLED` **only** cancels the amendment to the `Booking`. 
-                        
+
                         It is a precondition that the `amendedBookingStatus` **is** `AMENDMENT RECEIVED` in order to cancel it. If this is not the case a `404` (Not Found) error response should be returned.
-                        
+
                         Only possible value to set is `AMENDMENT CANCELLED`.
-                      example: 'AMENDMENT CANCELLED'
+                      example: AMENDMENT CANCELLED
                   required:
                     - amendedBookingStatus
               properties:
@@ -1561,7 +1562,7 @@ paths:
                   maxLength: 5000
                   description: |
                     An optional property where a reason for cancelling the booking or the amendment can be given.
-                  example: 'Booking cancelled due to internal problems'
+                  example: Booking cancelled due to internal problems
               required:
                 - bookingStatus
             examples:
@@ -1571,15 +1572,15 @@ paths:
                 description: |
                   The consumer wants to cancel the entire `Booking`. This is done by setting the `bookingStatus` to `CANCELLED` and provide an optional `reason`.
                 value:
-                  bookingStatus: 'CANCELLED'
-                  reason: 'Customer cancelled order'
+                  bookingStatus: CANCELLED
+                  reason: Customer cancelled order
               amendmentCancelledExample:
                 summary: |
                   Amendment cancelled
                 description: |
                   The consumer wants to **only** cancel the amendment (and keep the `Booking`). This is done by setting the `amendedBookingStatus` to `AMENDMENT CANCELLED`.
                 value:
-                  amendedBookingStatus: 'AMENDMENT CANCELLED'
+                  amendedBookingStatus: AMENDMENT CANCELLED
       responses:
         '200':
           description: |
@@ -1598,30 +1599,30 @@ paths:
                   description: |
                     The consumer has requested that the entire `Booking` should be cancelled. `bookingStatus` is set to `CANCELLED` and `amendedBookingStatus` is set to `AMENDMENT CANCELLED`.
                   value:
-                    carrierBookingRequestReference: 'cbrr-123'
-                    carrierBookingReference: 'cbr-987'
-                    bookingStatus: 'CANCELLED'
-                    amendedBookingStatus: 'AMENDMENT CANCELLED'
+                    carrierBookingRequestReference: cbrr-123
+                    carrierBookingReference: cbr-987
+                    bookingStatus: CANCELLED
+                    amendedBookingStatus: AMENDMENT CANCELLED
                 amendmentCancelled1Example:
                   summary: |
                     Amendment cancelled on a confirmed Booking
                   description: |
                     The consumer has requested that the amendment to a confirmed `Booking` is to be cancelled. The status of the `Booking` stays as `CONFIRMED`. The `amendedBookingStatus` is set to `AMENDMENT CANCELLED`.
                   value:
-                    carrierBookingRequestReference: 'cbrr-123'
-                    carrierBookingReference: 'cbr-987'
-                    bookingStatus: 'CONFIRMED'
-                    amendedBookingStatus: 'AMENDMENT CANCELLED'
+                    carrierBookingRequestReference: cbrr-123
+                    carrierBookingReference: cbr-987
+                    bookingStatus: CONFIRMED
+                    amendedBookingStatus: AMENDMENT CANCELLED
                 amendmentCancelled2Example:
                   summary: |
                     Amendment requested by provider cancelled by consumer
                   description: |
                     The consumer has requested that the amendment to a confirmed `Booking` is to be cancelled. The status of the `Booking` stays as `PENDING AMENDMENT`. The `amendedBookingStatus` is set to `AMENDMENT CANCELLED`.
                   value:
-                    carrierBookingRequestReference: 'cbrr-123'
-                    carrierBookingReference: 'cbr-987'
-                    bookingStatus: 'PENDING AMENDMENT'
-                    amendedBookingStatus: 'AMENDMENT CANCELLED'
+                    carrierBookingRequestReference: cbrr-123
+                    carrierBookingReference: cbr-987
+                    bookingStatus: PENDING AMENDMENT
+                    amendedBookingStatus: AMENDMENT CANCELLED
         '409':
           description: |
             In case the provider is processing an already updated Booking request - it is possible for the provider to reject the cancellation by returning a `409` (Conflict)
@@ -1638,20 +1639,20 @@ paths:
                     Conflicting request
                   description: |
                     The provider is already processing a request and needs to finish this process.
-                    
+
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
-                    httpMethod: 'PATCH'
-                    requestUri: '/v2/bookings/cbrr-123'
+                    httpMethod: PATCH
+                    requestUri: /v2/bookings/cbrr-123
                     statusCode: 409
-                    statusCodeText: 'Conflict'
-                    statusCodeMessage: 'Previous request is being processed. Please try again later'
-                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    statusCodeText: Conflict
+                    statusCodeMessage: Previous request is being processed. Please try again later
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
                     errorDateTime: '2023-04-13T07:41:00+08:30'
                     errors:
                       - errorCode: 7003
-                        errorCodeText: 'Conflicting request is being processed'
-                        errorCodeMessage: 'Conflicting request is being processed'
+                        errorCodeText: Conflicting request is being processed
+                        errorCodeMessage: Conflicting request is being processed
         default:
           description: Unexpected error
           headers:
@@ -1661,16 +1662,14 @@ paths:
             application/json:
               schema:
                 $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/3.0.0#/components/schemas/Error'
-
 components:
   headers:
     API-Version:
       schema:
         type: string
-        example: '2.0.0-Beta-1'
+        example: 2.0.0-Beta-1
       description: |
         SemVer used to indicate the version of the contract (API version) returned.
-  
   parameters:
     Api-Version-Major:
       in: header
@@ -1681,17 +1680,12 @@ components:
         example: '2'
       description: |
         An API-Version header **MAY** be added to the request (optional); if added it **MUST** only contain **MAJOR** version. API-Version header **MUST** be aligned with the URI version.
-  
-    #############
-    # Path params
-    #############
-    
     amendedContent:
       in: query
       name: amendedContent
       description: |
         Controls wether the content of this payload is the amendmended Booking (`amendedContent=true`) or the confirmed Booking (`amendedContent=false`).
-        
+
         If `amendedContent=true` and no amendment has been requested or if the provider is not able to send the amendment - the response will be a `404` Not Found
       schema:
         type: boolean
@@ -1708,5 +1702,5 @@ components:
         type: string
         pattern: ^\S+(\s+\S+)*$
         maxLength: 100
-        example: 'CBR001'
+        example: CBR001
       required: true
