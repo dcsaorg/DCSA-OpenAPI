@@ -1,7 +1,3 @@
----
-stoplight-id: 3n6g8ruddctpn
----
-
 ### Arrival Notice (AN) API
 
 The DCSA Arrival Notice API is specified on [**SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_AN).

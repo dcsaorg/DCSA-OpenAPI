@@ -1,7 +1,3 @@
----
-stoplight-id: r41c4470pdz7c
----
-
 ### Arrival Notice Notification (AN_NTF) API
 
 The DCSA Arrival Notice Notification API is specified on [**SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_AN_NTF).
