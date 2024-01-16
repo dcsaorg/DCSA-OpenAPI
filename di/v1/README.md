@@ -1,7 +1,3 @@
----
-stoplight-id: c8a688a13f3ce
----
-
 ### Delivery Instructions (DI) API
 
 The DCSA Interface Standard for Delivery Instructions is documented on the [**DCSA DI SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_DI).
