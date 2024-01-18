@@ -1,6 +1,6 @@
-openapi: 3.1.0
+openapi: 3.0.3
 x-stoplight:
-  id: rgho0z92i5v42
+  id: 1p5u246pps3qi
 info:
   title: Stats API
   version: '1.0'
@@ -11,7 +11,7 @@ info:
     name: Digital Container Shipping Association (DCSA)
     email: info@dcsa.org
     url: 'https://dcsa.org/'
-  description: 'The Stats API, version 1.0.0, is a service provided by the Digital Container Shipping Association (DCSA). It serves as an optional, anonymous tool for reporting the statistics of a reference API''s usage between peers. The aim of the Stats API is to help the DCSA gauge the level of adoption of the reference API, providing vital information that influences future investment and development decisions.'
+  description: "The Stats API, version 1.0.0, is a service provided by the Digital Container Shipping Association (DCSA). \r\nIt serves as an optional tool for reporting the statistics of a reference API''s usage between peers. \r\nThe aim of the Stats API is to help the DCSA gauge the level of adoption of the reference API, providing vital information that influences future investment and development decisions."
 servers:
   - url: 'http://api.dcsa.org'
 paths:
@@ -53,12 +53,71 @@ paths:
                   type: string
                   enum:
                     - TNT
+                    - TNT_NTF
                     - OVS
                     - EBL
+                    - EBL_NTF
+                    - EBL_SUR
+                    - EBL_SUR_RSP
+                    - EBL_ISS
+                    - EBL_ISS_SUR
                     - BKG
+                    - BKG_NTF
                     - CBF
-                  example: TNT
-                  description: The DCSA standard being referred.
+                    - JIT
+                    - CS
+                    - AN
+                    - AN_NTF
+                    - DI
+                    - DI_NTF
+                    - RMC
+                    - RMC_NTF
+                    - RMO
+                    - RMO_NTF
+                    - IC
+                    - IC_NTF
+                    - IO
+                    - IO_NTF
+                    - DO
+                    - DO_NTF
+                    - TO
+                    - TO_NTF
+                    - CRO
+                    - CRO_NTF
+                  description: |
+                    The DCSA standard being referred.
+                    - `TNT` (Track and Trace)
+                    - `TNT_NTF` (Track and Trace Notifications)
+                    - `OVS` (Operational Vessel Schedules)
+                    - `EBL` (Electronic Bill of Lading)
+                    - `EBL_NTF` (Electronic Bill of Lading Notifications)
+                    - `EBL_SUR` (Electronic Bill of Lading Surrender)
+                    - `EBL_SUR_RSP` (Electronic Bill of Lading Surrender Response)
+                    - `EBL_ISS` (Electronic Bill of Lading Issuance)
+                    - `EBL_ISS_RSP` (Electronic Bill of Lading Issuance Response)
+                    - `BKG` (Booking)
+                    - `BKG` (Booking Notifications)
+                    - `CBF` (Consolidated Booking Forecast)
+                    - `JIT` (Just In Time Portcall)
+                    - `CS` (Commercial Schedules)
+                    - `AN` (Arrival Notice)
+                    - `AN_NTF` (Arrival Notice Notifications)
+                    - `DI` (Delivery Instruction)
+                    - `DI_NTF` (Delivery Instruction Notifications)
+                    - `RMC` (Reefer Monitoring Commercial)
+                    - `RMC_NTF` (Reefer Monitoring Commercial Notifications)
+                    - `RMO` (Operational Reefer Monitoring)
+                    - `RMO_NTF` (Operational Reefer Monitoring Notifications)
+                    - `IC` (IoT Commercial)
+                    - `IC_NTF` (IoT Commercial Notifications)
+                    - `IO` (IoT Operations)
+                    - `IO_NTF` (IoT Operations Notifications)
+                    - `DO` (Delivery Order)
+                    - `DO_NTF` (Delivery Order Notifications)
+                    - `TO` (Transport Order)
+                    - `TO_NTF` (Transport Order Notifications)
+                    - `CRO` (Container Release Order)
+                    - `CRO_NTF` (Container Release Order Notifications)
                 method:
                   type: string
                   enum:
@@ -66,25 +125,33 @@ paths:
                     - GET
                     - PUT
                     - DELETE
+                    - PATCH
                   example: GET
                   description: The HTTP Method used in the referenced API call.
-                relativePath:
+                path:
                   type: string
                   example: /v2/events
                   description: The context path of the reference API call.
                   x-stoplight:
-                    id: 3vvjudjbjwmfo
+                    id: f636eu8miqu88
                 version:
                   type: string
                   x-stoplight:
-                    id: 4qidlphcu8hsv
-                  example: v2.2
+                    id: wwmas97zoisjo
+                  example: 2.2.0
                   description: DCSA version of the API being used.
+                statusCode:
+                  type: integer
+                  x-stoplight:
+                    id: cy1zgcy127m67
+                  format: int32
+                  example: 200
+                  description: "Http response status code of respective reference call.\r\nFor quality monitoring purposes.  "
                 params:
                   type: array
                   x-stoplight:
-                    id: w9yewwcb6ntdi
-                  description: The request parameters being used.
+                    id: n2s8ohu65wreo
+                  description: The request query parameters being used.
                   minItems: 0
                   uniqueItems: true
                   example:
@@ -92,22 +159,61 @@ paths:
                     - equipmentReference
                   items:
                     x-stoplight:
-                      id: 7nrwgb6yjwv1j
+                      id: 7af29u3bwnubb
                     type: string
                 uniqueAdopterHash:
                   type: string
                   description: "SHA-256 of the adopter. \r\n\r\n> *Rules to be defined.*"
                   x-stoplight:
-                    id: i0r1skfclxygo
+                    id: iem9syusrn81j
+                  example: ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad
               required:
                 - domain
                 - method
-                - relativePath
+                - path
                 - version
         description: ''
       tags:
         - RealTime
     parameters: []
+  /v1/stats-summary:
+    post:
+      summary: Stats Summary
+      operationId: post-v1-stats-summary
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-stoplight:
+        id: 923k81lod9m4g
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatSummary'
+        description: ''
+      parameters:
+        - $ref: '#/components/parameters/api-key'
+      description: This endpoint allows you to report the daily usage statistics of a all DCSA APIs being used.
+      tags:
+        - Summary
 components:
   schemas:
     ErrorResponse:
@@ -198,6 +304,178 @@ components:
         - statusCode
         - statusCodeText
         - errorDateTime
+    StatSummary:
+      title: StatSummary
+      x-stoplight:
+        id: m53qj3os2p1k5
+      type: object
+      properties:
+        date:
+          type: string
+          x-stoplight:
+            id: 56xs0qjdu5kfn
+          format: date
+          example: '2023-11-01'
+          description: Statistics created date in `ISO 8601` format.
+        domain:
+          type: string
+          enum:
+            - TNT
+            - TNT_NTF
+            - OVS
+            - EBL
+            - EBL_NTF
+            - EBL_SUR
+            - EBL_SUR_RSP
+            - EBL_ISS
+            - EBL_ISS_SUR
+            - BKG
+            - BKG_NTF
+            - CBF
+            - JIT
+            - CS
+            - AN
+            - AN_NTF
+            - DI
+            - DI_NTF
+            - RMC
+            - RMC_NTF
+            - RMO
+            - RMO_NTF
+            - IC
+            - IC_NTF
+            - IO
+            - IO_NTF
+            - DO
+            - DO_NTF
+            - TO
+            - TO_NTF
+            - CRO
+            - CRO_NTF
+          description: |
+            The DCSA standard being referred.
+            - `TNT` (Track and Trace)
+            - `TNT_NTF` (Track and Trace Notifications)
+            - `OVS` (Operational Vessel Schedules)
+            - `EBL` (Electronic Bill of Lading)
+            - `EBL_NTF` (Electronic Bill of Lading Notifications)
+            - `EBL_SUR` (Electronic Bill of Lading Surrender)
+            - `EBL_SUR_RSP` (Electronic Bill of Lading Surrender Response)
+            - `EBL_ISS` (Electronic Bill of Lading Issuance)
+            - `EBL_ISS_RSP` (Electronic Bill of Lading Issuance Response)
+            - `BKG` (Booking)
+            - `BKG` (Booking Notifications)
+            - `CBF` (Consolidated Booking Forecast)
+            - `JIT` (Just In Time Portcall)
+            - `CS` (Commercial Schedules)
+            - `AN` (Arrival Notice)
+            - `AN_NTF` (Arrival Notice Notifications)
+            - `DI` (Delivery Instruction)
+            - `DI_NTF` (Delivery Instruction Notifications)
+            - `RMC` (Reefer Monitoring Commercial)
+            - `RMC_NTF` (Reefer Monitoring Commercial Notifications)
+            - `RMO` (Operational Reefer Monitoring)
+            - `RMO_NTF` (Operational Reefer Monitoring Notifications)
+            - `IC` (IoT Commercial)
+            - `IC_NTF` (IoT Commercial Notifications)
+            - `IO` (IoT Operations)
+            - `IO_NTF` (IoT Operations Notifications)
+            - `DO` (Delivery Order)
+            - `DO_NTF` (Delivery Order Notifications)
+            - `TO` (Transport Order)
+            - `TO_NTF` (Transport Order Notifications)
+            - `CRO` (Container Release Order)
+            - `CRO_NTF` (Container Release Order Notifications)
+          example: TNT
+        stats:
+          type: array
+          x-stoplight:
+            id: qgevzfr6onahs
+          items:
+            x-stoplight:
+              id: slp5uvsplnqpt
+            type: object
+            properties:
+              method:
+                type: string
+                enum:
+                  - POST
+                  - GET
+                  - PUT
+                  - DELETE
+                  - PATCH
+                example: GET
+                description: The HTTP Method used in the referenced API call.
+              path:
+                type: string
+                example: /v2/events
+                description: The context path of the referenced API call.
+                x-stoplight:
+                  id: 53j13qt3nhvwp
+              version:
+                x-stoplight:
+                  id: fad23fc6mmzwg
+                type: string
+                example: 2.2.0
+                description: DCSA version of the API being used.
+              params:
+                type: array
+                x-stoplight:
+                  id: ynes5rsggf2lq
+                minItems: 0
+                description: Unique set of request parameters being used for the referenced API.
+                example:
+                  - eventTypes
+                  - equipmentReference
+                items:
+                  x-stoplight:
+                    id: 2kqm6gxby4oe9
+                  type: string
+              totalApiRequests:
+                type: integer
+                x-stoplight:
+                  id: ufu7cejwxz2fp
+                description: Total request count for the day for the referenced API.
+                example: 1000000
+                format: int64
+              totalSuccessRequests:
+                type: integer
+                x-stoplight:
+                  id: xjmdf6bvmijgq
+                format: int64
+                description: "Total success request count for the day for the referenced API.\r\n\r\nResponses considered successful : `200`, `201`, `202`, `204`"
+                example: 900000
+              totalFailureRequests:
+                type: integer
+                x-stoplight:
+                  id: 9p4w05nq22kkd
+                format: int64
+                description: Total failure request count for the day for the referenced API.
+                example: 100000
+                minimum: 0
+              avgResponseTime:
+                type: integer
+                x-stoplight:
+                  id: qypvezar4tpyx
+                format: int64
+                description: Average response time for the referenced API in `milliseconds`.
+                example: 437
+              uniqueAdopterCount:
+                type: integer
+                x-stoplight:
+                  id: yfr1kyjv4a43y
+                format: int64
+                example: 20
+                description: Number of unique adopters using the standard.
+            required:
+              - method
+              - version
+              - totalApiRequests
+              - uniqueAdopterCount
+      required:
+        - date
+        - domain
+        - stats
   parameters:
     api-key:
       name: DCSA-API-KEY
