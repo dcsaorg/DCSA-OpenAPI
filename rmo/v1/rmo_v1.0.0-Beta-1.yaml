@@ -3,7 +3,7 @@ x-stoplight:
   id: 29d30143d7267
 info:
   version: 1.0.0-Beta-1
-  title: DCSA OpenAPI specification for Operational Reefer Monitoring
+  title: DCSA OpenAPI specification for Reefer Monitoring Operational
   description: |-
     Exchange data uniformly on data collected from live reefers between operational supply chain partners such as carriers, terminals and vessel operators.
 
@@ -33,8 +33,8 @@ paths:
       description: Fetch the current monitoring data available for reefer container fleet
       operationId: fetchReefer
       parameters:
-        - $ref: ../../domain/event/event_domain_v3.1.0.yaml#/components/parameters/eventDateTime
-        - $ref: ../../domain/event/event_domain_v3.1.0.yaml#/components/parameters/equipmentReference
+        - $ref: ../../domain/event/event_domain_v3.2.0.yaml#/components/parameters/eventDateTime
+        - $ref: ../../domain/event/event_domain_v3.2.0.yaml#/components/parameters/equipmentReference
         - schema:
             type: boolean
           in: query
@@ -128,12 +128,23 @@ paths:
                         inspectionDate: '2023-12-10T10:34:12Z'
                         expiryDate: '2023-12-10T10:34:12Z'
                         inspectionResult: PASSED
-        default:
-          description: Unexpected error
+        '404':
+          description: Not Found
           content:
             application/json:
-              schema:
-                $ref: ../../domain/error/error_domain_v3.0.0.yaml#/components/schemas/Error
+              example:
+                httpMethod: "GET"
+                requestUri: "/events"
+                statusCode: 404,
+                statusCodeText: "Not Found"
+                statusCodeMessage: "Either no container found or no events to report"
+                errorDateTime: "2024-01-23T07:41:00+08:30"
+                errors: [
+                  {
+                    errorCodeText: "No reefer data available",
+                    errorCodeMessage: "Either no container found or no events to report for given reefer container"
+                  }
+                ]
 tags:
   - name: Events
     description: Event operations
@@ -210,7 +221,7 @@ components:
                 x-stoplight:
                   id: g00uxr7yazobi
                 description: |-
-                  An indicator of the severity of the alarm being reported.  Possible values are:
+                  An indicator of the severity of the alarm being reported.  The same alarm code may increase in severity over time.    Possible values are:
                   * `CRITICAL` risk to cargo and the equipment, requires intervention
                   * `ALARM` possible risk to cargo, investigation required
                   * `WARNING` warning of an abnormal situation, little or no change to operational running
@@ -301,8 +312,6 @@ components:
     controllerSoftwareVersion:
       type: string
       description: The software version running on the controller device
-      x-stoplight:
-        id: 0vrofhp33s7sx
     equipmentOptions:
       type: array
       description: List of equipment options available on the container
