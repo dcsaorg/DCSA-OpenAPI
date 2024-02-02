@@ -1,0 +1,93 @@
+openapi: 3.0.0
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/dcsaorg/DCSA_EBL_ISS_RSP/3.0.0-Beta-1
+info:
+  version: 3.0.0-Beta-1
+  title: |
+    DCSA OpenAPI specification for responding to an issuance request. 
+  description:  |
+    This API is intended as an API between a carrier (the server) and a EBL Solution Platform (the client).
+  
+    This API is a counter part to the [DCSA_EBL_ISS](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS/3.0.0-Beta-1) API.
+  
+    When the document is to be surrendered, it should happen via a version of the [DCSA_EBL_SUR API](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR/3.0.0-Beta-1).
+  
+    API specification issued by DCSA.org.
+
+    ### Stats API
+    The Stats API offers crucial statistical information for both API providers and consumers to enhance their services and helps DCSA to understand and scale the ecosystem. We expect you to invoke the Stats API for every request made to this API. Further details can be found [here](https://developer.dcsa.org/#/http/guides/api-guides/stats-api)
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  contact:
+    name: Digital Container Shipping Association (DCSA)
+    url: https://dcsa.org
+    email: info@dcsa.org
+paths:
+  /v3/ebl-issuance-responses:
+    post:
+      tags:
+       - Issue Response
+      summary: Respond to a transport document issuance request
+      description: |
+        Submit a response to a carrier issuance request.
+      parameters:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.2#/components/parameters/Api-Version-Major'
+      requestBody:  
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/issuanceResponse'
+      responses:
+        '204':
+          description: Carrier's acknowledgement of the Issuance Response
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.2#/components/headers/API-Version'
+        default:
+          description: Request successful
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.2#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.0#/components/schemas/error'
+
+components:
+  schemas:
+    issuanceResponse:
+      type: object
+      properties:
+        transportDocumentReference:
+          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/schemas/transportDocumentReference'
+        issuanceResponseCode:
+          type: string
+          enum:
+            - ISSU
+            - BREQ
+            - REFU
+          description: |
+            The platforms verdict on the issuance of the EBL  identified by the `transportDocumentReference`
+            
+            Options are:
+              * `ISSU`: The document was successfully `ISSU` and successfully delivered to the initial possessor.
+              * `BREQ`: The platform reviewed the document and believe they cannot issue the document due to an error/issue with the content of the issuance request.
+              * `REFU`: The eBL issuance is rejected for a reason that the issuing eBL platform cannot resolve (for example when an Interoperable transfer fails, due to a reject of the receiving eBL platform via the `BENV` code from the interoperability standard). One reason could be that the `issueTo` referenced a valid eBL platform but the receiving platform did not recognise the recipient specified.
+
+            Regardless of the response code, the issuance request is now considered handled. In case of successful issuance, the platform will still have some responsiblity but that is covered by other processes and APIs (e.g., the DCSA_SUR API mentioned in the description of this API). In case of failed issuance, it is up to the carrier to resolve the issue and, if needed, submit a revised issuance request.
+        reason:
+          type: string
+          maxLength: 255
+          pattern: "^\\S+(\\s+\\S+)*$"
+          example: null
+          description: |
+            Human readable description of the rationale for an unsuccessful issuance.
+            
+            The `reason` should be omitted when the `issuanceResponseCode` is `ISSU` or `TEXP`. If the platform for some reason chooses to deviate from this and provide the field anyway, they should use canned phrased like `Issued` that matches the meaning of the `issuanceResponseCode`.
+      required:
+        - transportDocumentReference
+        - issuanceResponseCode
