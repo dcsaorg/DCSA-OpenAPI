@@ -48,6 +48,19 @@
           "given": "$..weightUnit"
         }
       ]
+    },
+    "All_Objects": {
+      "id": "8DUgKT8NVg1hRxNY398JB",
+      "description": "Matching all `weightUnit`",
+      "name": "All_Objects",
+      "targets": [
+        {
+          "formats": [
+            "oas3"
+          ],
+          "given": "$.components.schemas.*[?(@.type == 'object']"
+        }
+      ]
     }
   },
   "rules": {
@@ -168,7 +181,8 @@
       },
       "name": "simpleType-validation-WeightUnit-No-$ref-linking",
       "description": "The `weightUnit` **MUST** not be defined using `$ref`",
-      "message": "WeightUnit {{error}}"
+      "message": "WeightUnit {{error}}",
+      "resolved": false
     },
     "simpleType-validation-Weight-minimum": {
       "id": "24c4DWeDGHWxyjFmLdiG2",
@@ -183,6 +197,34 @@
       "name": "simpleType-validation-Weight-minimum",
       "description": "The `weight` **MUST** have a minimum value of `0`",
       "message": "Weight MUST have a minimum value of 0"
+    },
+    "simpleType-validation-Weight-No-$ref-linking": {
+      "id": "FaqJcT3fc-KsdUIM7hHjd",
+      "given": [
+        "#Weight"
+      ],
+      "severity": "error",
+      "then": {
+        "function": "noRefInSimpleType"
+      },
+      "name": "simpleType-validation-Weight-No-$ref-linking",
+      "description": "The `weight` **MUST** not be defined using `$ref`",
+      "message": "Weight {{error}}",
+      "resolved": false
+    },
+    "objectType-validation-title-property-must-use-TitleCaseText": {
+      "id": "xTndm4WZC-FQkVAlTWJSE",
+      "given": [
+        "#All_Objects"
+      ],
+      "severity": "warn",
+      "then": {
+        "function": ""
+      },
+      "name": "objectType-validation-title-property-must-use-TitleCaseText",
+      "description": "The `title` property **MUST** use `Title Case Text` (not CaseText)",
+      "message": "{{path}} - {{error}}",
+      "resolved": true
     }
   },
   "x-embeddedFunctions": [
@@ -190,7 +232,7 @@
       "id": "Y9n6wjWj_-QxlX7wxuZff",
       "extendedFrom": "",
       "name": "noRefInSimpleType",
-      "content": "import { createRulesetFunction } from '@stoplight/spectral-core';\n\nexport default createRulesetFunction(\n  {\n    input: null,\n    options: null,\n  },\n  // https://github.com/stoplightio/spectral/blob/develop/docs/guides/5-custom-functions.md#writing-functions\n  function noRefInSimpleType(input, options, context) {\n    if (true) {\n      return [\n        {\n          message: ` - MUST not be defined using a $ref.`,\n        },\n      ];\n    }\n  }\n);"
+      "content": "import { createRulesetFunction } from '@stoplight/spectral-core';\n\nexport default createRulesetFunction(\n  {\n    input: null,\n    options: null,\n  },\n  // https://github.com/stoplightio/spectral/blob/develop/docs/guides/5-custom-functions.md#writing-functions\n  function noRefInSimpleType(input, options, context) {\n    if (Object.keys(input).length === 1 && input['$ref']) {\n      return [\n        {\n          message: ` - MUST not be defined using a $ref.`,\n        },\n      ];\n    }\n  }\n);"
     },
     {
       "id": "SaCdkhp-SlvEX5829USLQ",
