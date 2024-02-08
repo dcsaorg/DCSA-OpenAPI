@@ -51,43 +51,89 @@
     },
     "All_Objects": {
       "id": "8DUgKT8NVg1hRxNY398JB",
-      "description": "Matching all `weightUnit`",
+      "description": "Matching all `objects` defined",
       "name": "All_Objects",
       "targets": [
         {
           "formats": [
             "oas3"
           ],
-          "given": "$.components.schemas.*[?(@.type == 'object']"
+          "given": "$.components.schemas..[?(@ && @.type === 'object')]"
+        },
+        {
+          "formats": [
+            "oas2"
+          ],
+          "given": "$.components.schemas..[?(@ && @.type === 'object')]"
+        }
+      ]
+    },
+    "ArrivalNoticeNotification": {
+      "id": "0THssOMuXyutsRt2714u8",
+      "name": "ArrivalNoticeNotification",
+      "targets": [
+        {
+          "formats": [
+            "oas3"
+          ],
+          "given": "$..ArrivalNoticeNotification"
+        }
+      ]
+    },
+    "All_Objects_With_Title": {
+      "id": "M0oUVeJuFxn00D0mnwCDE",
+      "description": "Matching all `objects` defined with a `title` property",
+      "name": "All_Objects_With_Title",
+      "targets": [
+        {
+          "formats": [
+            "oas3"
+          ],
+          "given": "$.components.schemas..[?(@ && @.type === 'object' && @.title === 'title')]"
+        },
+        {
+          "formats": [
+            "oas2"
+          ],
+          "given": "$.components.schemas..[?(@ && @.type === 'object' && @.title === 'title')]"
+        }
+      ]
+    },
+    "All_Non_Objects": {
+      "id": "uUC23CwhIBHSIGtRaY5x6",
+      "description": "Matching all `objects` defined with a `title` property",
+      "name": "All_Non_Objects",
+      "targets": [
+        {
+          "formats": [
+            "oas3"
+          ],
+          "given": "$.components.schemas..[?(@.type && @.type !== 'object')]"
+        },
+        {
+          "formats": [
+            "oas2"
+          ],
+          "given": "$.components.schemas..[?(@.type && @.type !== 'object')]"
+        }
+      ]
+    },
+    "Volume": {
+      "id": "DBhiX8xP6YSmzP2ZP2GL6",
+      "description": "Matching all `volume`",
+      "name": "Volume",
+      "targets": [
+        {
+          "formats": [
+            "oas3"
+          ],
+          "given": "$..volume"
         }
       ]
     }
   },
   "rules": {
-    "simpleType-validation-EquipmentReference-type": {
-      "id": "Cx3jVcBhdiDjS7h_VTWxg",
-      "given": [
-        "#EquipmentReference"
-      ],
-      "severity": "error",
-      "then": [
-        {
-          "function": "truthy",
-          "field": "type"
-        },
-        {
-          "function": "equals",
-          "functionOptions": {
-            "value": "string"
-          },
-          "field": "type"
-        }
-      ],
-      "name": "simpleType-validation-EquipmentReference-type",
-      "description": "The `equipmentReference` **MUST** be a `string` type",
-      "message": "EquipmentReference {{error}}"
-    },
-    "simpleType-validation-EquipmentReference-maxlength": {
+    "simpleType-validation-EquipmentReference": {
       "id": "C-kCTrX8UL3xsP3NSxQZN",
       "given": [
         "#EquipmentReference"
@@ -102,61 +148,27 @@
           "field": "maxLength"
         },
         {
-          "function": "truthy",
-          "field": "maxLength"
+          "function": "equals",
+          "functionOptions": {
+            "value": "string"
+          },
+          "field": "type"
         }
       ],
-      "name": "simpleType-validation-EquipmentReference-maxlength",
-      "description": "The `equipmentReference` **MUST** be maxLength of `11`",
+      "name": "simpleType-validation-EquipmentReference",
+      "description": "The `equipmentReference` **MUST** be:\r\n* type: `string`\r\n* maxLength: `11`",
       "message": "EquipmentReference {{error}}"
     },
-    "simpleType-validation-Weight-exclusiveMinimum": {
+    "simpleType-validation-Weight": {
       "id": "ndnY3xO3aXLqzs7ZIK9yG",
       "given": [
         "#Weight"
       ],
       "severity": "error",
-      "then": {
-        "function": "truthy",
-        "field": "exclusiveMinimum"
-      },
-      "name": "simpleType-validation-Weight-exclusiveMinimum",
-      "description": "The `weight` **MUST** have exclusiveMinimum set to `true`",
-      "message": "Weight {{error}}"
-    },
-    "simpleType-validation-Weight-type": {
-      "id": "vj2-Vt_ecIimNmpG0jUus",
-      "given": [
-        "#Weight"
-      ],
-      "severity": "error",
       "then": [
         {
           "function": "truthy",
-          "field": "type"
-        },
-        {
-          "function": "equals",
-          "functionOptions": {
-            "value": "number"
-          },
-          "field": "type"
-        }
-      ],
-      "name": "simpleType-validation-Weight-type",
-      "description": "The `weight` **MUST** be a `number` type",
-      "message": "Weight {{error}}"
-    },
-    "simpleType-validation-Weight-format": {
-      "id": "FC33fVhF2N61VeCkHhuA1",
-      "given": [
-        "#Weight"
-      ],
-      "severity": "error",
-      "then": [
-        {
-          "function": "truthy",
-          "field": "format"
+          "field": "exclusiveMinimum"
         },
         {
           "function": "equals",
@@ -164,10 +176,24 @@
             "value": "float"
           },
           "field": "format"
+        },
+        {
+          "function": "equals",
+          "functionOptions": {
+            "value": "number"
+          },
+          "field": "type"
+        },
+        {
+          "function": "equals",
+          "functionOptions": {
+            "value": 2
+          },
+          "field": "minimum"
         }
       ],
-      "name": "simpleType-validation-Weight-format",
-      "description": "The `weight` **MUST** be a `float` format",
+      "name": "simpleType-validation-Weight",
+      "description": "The `weight` **MUST** have:\r\n* type: `number`\r\n* format: `float`\r\n* minimum: `0`\r\n* exclusiveMinimum: `true`",
       "message": "Weight {{error}}"
     },
     "simpleType-validation-WeightUnit-No-$ref-linking": {
@@ -184,20 +210,6 @@
       "message": "WeightUnit {{error}}",
       "resolved": false
     },
-    "simpleType-validation-Weight-minimum": {
-      "id": "24c4DWeDGHWxyjFmLdiG2",
-      "given": [
-        "#Weight"
-      ],
-      "severity": "error",
-      "then": {
-        "function": "falsy",
-        "field": "minimum"
-      },
-      "name": "simpleType-validation-Weight-minimum",
-      "description": "The `weight` **MUST** have a minimum value of `0`",
-      "message": "Weight MUST have a minimum value of 0"
-    },
     "simpleType-validation-Weight-No-$ref-linking": {
       "id": "FaqJcT3fc-KsdUIM7hHjd",
       "given": [
@@ -212,16 +224,117 @@
       "message": "Weight {{error}}",
       "resolved": false
     },
-    "objectType-validation-title-property-must-use-TitleCaseText": {
+    "objectType-validation-objects-should-have-title-property": {
       "id": "n-b4uMqW1zZVHvmCCcYgT",
       "given": [
         "#All_Objects"
       ],
       "severity": "warn",
       "then": {
-        "function": "defined"
+        "function": "defined",
+        "field": "title"
       },
-      "name": "objectType-validation-title-property-must-use-TitleCaseText"
+      "name": "objectType-validation-objects-should-have-title-property",
+      "message": "{{property}} is missing"
+    },
+    "objectType-validation-title-property-must-use-TitleCaseText": {
+      "id": "L5Y9rK-hOY69V_5P_YeVb",
+      "given": [
+        "#All_Objects_With_Title"
+      ],
+      "severity": "error",
+      "then": {
+        "function": "pattern",
+        "functionOptions": {
+          "match": "^[A-Z][a-z]+( +[A-Z][a-z]+)*$"
+        },
+        "field": "title"
+      },
+      "name": "objectType-validation-title-property-must-use-TitleCaseText",
+      "message": "Title must match \"Title Case Text\""
+    },
+    "simpleType-validation-Volume": {
+      "id": "y4UY016ap-ciXDIxbv15L",
+      "given": [
+        "#Volume"
+      ],
+      "severity": "error",
+      "then": [
+        {
+          "function": "equals",
+          "functionOptions": {
+            "value": "number"
+          },
+          "field": "type"
+        },
+        {
+          "function": "equals",
+          "functionOptions": {
+            "value": "float"
+          },
+          "field": "format"
+        },
+        {
+          "function": "truthy",
+          "field": "exclusiveMinimum"
+        },
+        {
+          "function": "equals",
+          "functionOptions": {
+            "value": 2
+          },
+          "field": "minimum"
+        }
+      ],
+      "name": "simpleType-validation-Volume",
+      "description": "The `volume` **MUST** be:\r\n* type: `number`\r\n* format: `float`\r\n* minimum: `0`\r\n* exclusiveMinimum: `true`",
+      "message": "Volume {{error}}",
+      "resolved": true
+    },
+    "simpleType-validation-Volume-No-$ref-linking": {
+      "id": "mVyt7RwRwgT12fQw7Ijn6",
+      "given": [
+        "#Volume"
+      ],
+      "severity": "error",
+      "then": {
+        "function": "noRefInSimpleType"
+      },
+      "name": "simpleType-validation-Volume-No-$ref-linking",
+      "description": "The `volume` **MUST** not be defined using `$ref`",
+      "message": "Volume {{error}}",
+      "resolved": false
+    },
+    "simpleType-validation-EquipmentReference-No-$ref-linking": {
+      "id": "nXVG_zykQMx_L8lIMDYXI",
+      "given": [
+        "#EquipmentReference"
+      ],
+      "severity": "error",
+      "then": {
+        "function": "noRefInSimpleType"
+      },
+      "name": "simpleType-validation-EquipmentReference-No-$ref-linking",
+      "description": "The `equipmentReference` **MUST** not be defined using `$ref`",
+      "message": "EquipmentReference {{error}}",
+      "resolved": false
+    },
+    "simpleType-validation-WeightUnit": {
+      "id": "pCutQqFgMBRTAv8d2O1h3",
+      "given": [
+        "#WeightUnit"
+      ],
+      "severity": "error",
+      "then": {
+        "function": "equals",
+        "functionOptions": {
+          "value": "string"
+        },
+        "field": "type"
+      },
+      "name": "simpleType-validation-WeightUnit",
+      "description": "The `weightUnit` **MUST** have:\r\n* type: `string`",
+      "message": "WeightUnit {{error}}"
     }
   },
   "x-embeddedFunctions": [
@@ -235,7 +348,7 @@
       "id": "SaCdkhp-SlvEX5829USLQ",
       "extendedFrom": "",
       "name": "equals",
-      "content": "import { createRulesetFunction } from '@stoplight/spectral-core';\n\nexport default createRulesetFunction(\n  {\n    input: null,\n    options: {\n      type: \"object\",\n      additionalProperties: false,\n      required: [\"value\"],\n\n      properties: {\n        value: {\n          type: [\"string\", \"integer\"]\n        }\n      }\n    },\n  },\n  // https://github.com/stoplightio/spectral/blob/develop/docs/guides/5-custom-functions.md#writing-functions\n  function equals(input, options, context) {\n    const { value } = options;\n\n    if (input !== value) {\n      return [\n        {\n          message: ` - value must equal \"${value}\", value provided: \"${input}\".`,\n        },\n      ];\n    }\n  },\n);"
+      "content": "import { createRulesetFunction } from '@stoplight/spectral-core';\n\nexport default createRulesetFunction(\n  {\n    input: null,\n    options: {\n      type: \"object\",\n      additionalProperties: false,\n      required: [\"value\"],\n\n      properties: {\n        value: {\n          type: [\"string\", \"integer\"]\n        }\n      }\n    },\n  },\n  // https://github.com/stoplightio/spectral/blob/develop/docs/guides/5-custom-functions.md#writing-functions\n  function equals(input, options, context) {\n    const { value } = options;\n\n    if (input) {\n      if (input !== value) {\n      return [\n        {\n          message: ` - value must equal \"${value}\", value provided: \"${input}\".`,\n        },\n      ];\n      }\n    } else {\n      return [\n        {\n          message: ` - value must equal \"${value}\" no value provided!`,\n        },\n      ];\n    }\n  },\n);"
     }
   ],
   "extendedDefault": false
