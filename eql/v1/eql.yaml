@@ -1,0 +1,859 @@
+openapi: 3.0.0
+x-stoplight:
+  id: 5lbgrnim04b9o
+info:
+  title: Equipment Lifecycle
+  version: '1.0'
+  description: 'This API is for managing the `equipment` (i.e. container) events with ocean carriers, for reporting inbound events, on/off hire status and equipment interchange.'
+  contact:
+    name: Digital Container Shipping Association (DCSA)
+    url: 'https://dcsa.org'
+    email: info@dcsa.org
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+servers:
+  - url: 'http://localhost:3000'
+paths:
+  /v1/gate:
+    post:
+      summary: Create a Gate Movement
+      operationId: post-gate
+      responses:
+        '200':
+          description: OK
+      description: To be implemented by the `container operator` so that a `container facility` can provide actual gate movement events (gate in/gate out) as they occur to the `container operator`.
+      tags:
+        - Gate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                equipmentReference:
+                  type: string
+                equipmentEventTypeCode:
+                  type: string
+                eventDateTime:
+                  type: string
+                eventLocation:
+                  type: object
+                  properties:
+                    locationName:
+                      type: string
+                    locationType:
+                      type: string
+                    UNLocationCode:
+                      type: string
+                    facilityCode:
+                      type: string
+                    facilityCodeListProvider:
+                      type: string
+                facilityTypeCode:
+                  type: string
+                emptyIndicatorCode:
+                  type: string
+                relatedDocumentReferences:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                      value:
+                        type: string
+            examples:
+              Gate Out at Depot - Minimum Dataset:
+                value:
+                  equipmentReference: APZU4812090
+                  equipmentEventTypeCode: GTOT
+                  eventDateTime: '2024-02-12T07:41:00+08:30'
+                  eventLocation:
+                    locationName: Container Depot Inc
+                    locationType: FACI
+                    UNLocationCode: GBLIV
+                    facilityCode: JMDA
+                    facilityCodeListProvider: BIC
+                  facilityTypeCode: DEPO
+                  emptyIndicatorCode: EMPTY
+                  relatedDocumentReferences:
+                    - type: BKG (Booking)
+                      value: ABC123123123
+              Gate In at Depot - Minimum Dataset:
+                value:
+                  equipmentReference: APZU4812090
+                  equipmentEventTypeCode: GTIN
+                  eventDateTime: '2024-02-12T07:41:00+08:30'
+                  eventLocation:
+                    locationName: Container Depot Inc
+                    locationType: FACI
+                    UNLocationCode: GBLIV
+                    facilityCode: JMDA
+                    facilityCodeListProvider: BIC
+                  facilityTypeCode: DEPO
+                  emptyIndicatorCode: FULL
+                  relatedDocumentReferences:
+                    - type: BKG (Booking)
+                      value: ABC123123123
+              Gate In at Depot - Full Dataset with Trucker SCAC and Chassis:
+                value:
+                  equipmentReference: APZU4812090
+                  equipmentEventTypeCode: GTIN
+                  equipmentCondition: UNKNOWN
+                  eventClassifierCode: ACT
+                  eventDateTime: '2024-02-12T07:41:00+08:30'
+                  eventLocation:
+                    locationName: Container Depot Inc
+                    locationType: FACI
+                    UNLocationCode: GBLIV
+                    facilityCode: JMDA
+                    facilityCodeListProvider: BIC
+                  facilityTypeCode: DEPO
+                  emptyIndicatorCode: FULL
+                  ISOEquipmentCode: 22GP
+                  transportProvider:
+                    partyName: Asseco Denmark
+                    carrierCode: MMCU
+                    carrierCodeListProvider: NMFTA
+                  relatedDocumentReferences:
+                    - type: BKG (Booking)
+                      value: ABC123123123
+                    - type: TRD (Transport Document)
+                      value: ABCD9876543
+                  transportCall:
+                    modeOfTransport: TRUCK
+                    licencePlate: NV18 NLD
+                    chassisLicencePlate: ACSZ 400002
+              Gate Out at Depot - Full Dataset with Trucker SCAC and Chassis:
+                value:
+                  equipmentReference: APZU4812090
+                  equipmentEventTypeCode: GTOT
+                  equipmentCondition: UNKNOWN
+                  eventClassifierCode: ACT
+                  eventDateTime: '2024-02-12T07:41:00+08:30'
+                  eventLocation:
+                    locationName: Container Depot Inc
+                    locationType: FACI
+                    UNLocationCode: GBLIV
+                    facilityCode: JMDA
+                    facilityCodeListProvider: BIC
+                  facilityTypeCode: DEPO
+                  emptyIndicatorCode: EMPTY
+                  ISOEquipmentCode: 22GP
+                  transportProvider:
+                    partyName: Asseco Denmark
+                    carrierCode: MMCU
+                    carrierCodeListProvider: NMFTA
+                  relatedDocumentReferences:
+                    - type: BKG (Booking)
+                      value: ABC123123123
+                    - type: TRD (Transport Document)
+                      value: ABCD9876543
+                  transportCall:
+                    modeOfTransport: TRUCK
+                    licencePlate: NV18 NLD
+                    chassisLicencePlate: ACSZ 400002
+              Gate In at Terminal:
+                value:
+                  equipmentReference: APZU4812090
+                  equipmentEventTypeCode: GTIN
+                  eventClassifierCode: ACT
+                  eventDateTime: '2024-02-12T07:41:00+08:30'
+                  eventLocation:
+                    locationName: Container Terminal Inc
+                    locationType: FACI
+                    UNLocationCode: DKAAR
+                    facilityCode: APMT
+                    facilityCodeListProvider: SMDG
+                  facilityTypeCode: POTE
+                  emptyIndicatorCode: FULL
+                  ISOEquipmentCode: 22GP
+                  transportProvider:
+                    partyName: Asseco Denmark
+                    carrierCode: MMCU
+                    carrierCodeListProvider: NMFTA
+                  relatedDocumentReferences:
+                    - type: BKG (Booking)
+                      value: ABC123123123
+                    - type: TRD (Transport Document)
+                      value: ABCD9876543
+                  transportCall:
+                    modeOfTransport: TRUCK
+                    licencePlate: NV18 NLD
+                    chassisLicencePlate: ACSZ 400002
+              Gate Out at Terminal:
+                value:
+                  equipmentReference: APZU4812090
+                  equipmentEventTypeCode: GTOT
+                  eventClassifierCode: ACT
+                  eventDateTime: '2024-02-12T07:41:00+08:30'
+                  eventLocation:
+                    locationName: Container Terminal Inc
+                    locationType: FACI
+                    UNLocationCode: DKAAR
+                    facilityCode: APMT
+                    facilityCodeListProvider: SMDG
+                  facilityTypeCode: POTE
+                  emptyIndicatorCode: FULL
+                  ISOEquipmentCode: 22GP
+                  transportProvider:
+                    partyName: Asseco Denmark
+                    carrierCode: MMCU
+                    carrierCodeListProvider: NMFTA
+                  relatedDocumentReferences:
+                    - type: BKG (Booking)
+                      value: ABC123123123
+                    - type: TRD (Transport Document)
+                      value: ABCD9876543
+                  transportCall:
+                    modeOfTransport: TRUCK
+                    licencePlate: NV18 NLD
+                    chassisLicencePlate: ACSZ 400002
+      parameters:
+        - schema:
+            type: string
+            example: 1.0.0-Beta-1
+          in: header
+          name: API-Version
+          description: 'An API-Version header **MUST** be provided to the request (mandatory). The header **MUST** be a [SemVer](https://semver.org/) specifying the provider (the calling party) API version.'
+          required: true
+    parameters: []
+  /v1/release:
+    get:
+      summary: Release a Container from a Facility
+      tags:
+        - Announcement
+      responses: {}
+      operationId: get-release
+      description: ''
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: API-Version
+          description: 'An API-Version header **MUST** be provided to the request (mandatory). The header **MUST** be a [SemVer](https://semver.org/) specifying the provider (the calling party) API version.'
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/releaseEquipment'
+            examples:
+              Reefer Container Release with Setpoints Configured:
+                value:
+                  releaseNumber: '123567'
+                  approvalDate: '2024-01-08T16:35:38.862Z'
+                  expirationDate: '2024-01-18T16:35:38.862Z'
+                  releaseDate: '2024-01-09T16:35:38.862Z'
+                  relatedDocumentReferences:
+                    - type: BKG (Booking)
+                      value: ABC123123123
+                  emptyIndicatorCode: EMPTY
+                  ISOEquipmentCode: 22R1
+                  eventLocation:
+                    locationName: Container Depot Inc
+                    locationType: FACI
+                    UNLocationCode: GBLIV
+                    facilityCode: JMDA
+                    facilityCodeListProvider: BIC
+                  reeferSetpoints:
+                    temperature: -15
+                    temperatureUnit: CEL
+                    o2: 75.3
+                    co2: 75.3
+                    humidity: 95.6
+              Specific Container Release with Handling Instructions and Equipment Options:
+                value:
+                  releaseNumber: '123567'
+                  approvalDate: '2024-01-08T16:35:38.862Z'
+                  expirationDate: '2024-01-18T16:35:38.862Z'
+                  releaseDate: '2024-01-09T16:35:38.862Z'
+                  relatedDocumentReferences:
+                    - type: BKG (Booking)
+                      value: ABC123123123
+                  equipmentReference: APZU4812090
+                  emptyIndicatorCode: EMPTY
+                  ISOEquipmentCode: 22GP
+                  eventLocation:
+                    locationName: Container Depot Inc
+                    locationType: FACI
+                    UNLocationCode: GBLIV
+                    facilityCode: JMDA
+                    facilityCodeListProvider: BIC
+                  equipmentOptions:
+                    - Steel Floor
+                  handlingInstructions:
+                    - CCT
+              Full Container Released for Collection from Terminal:
+                value:
+                  releaseNumber: '123567'
+                  approvalDate: '2024-01-08T16:35:38.862Z'
+                  expirationDate: '2024-01-18T16:35:38.862Z'
+                  releaseDate: '2024-01-09T16:35:38.862Z'
+                  relatedDocumentReferences:
+                    - type: BKG (Booking)
+                      value: ABC123123123
+                  equipmentReference: APZU4812090
+                  emptyIndicatorCode: FULL
+                  ISOEquipmentCode: 22GP
+                  eventLocation:
+                    locationName: Container Terminal Inc
+                    locationType: FACI
+                    UNLocationCode: DKAAR
+                    facilityCode: APMT
+                    facilityCodeListProvider: SMDG
+          application/xml:
+            schema:
+              type: object
+              properties: {}
+        description: ''
+    parameters: []
+  /v1/acceptance:
+    post:
+      summary: Authorise Acceptance of a Container to a Facility
+      operationId: post-v1-acceptance
+      responses:
+        '200':
+          description: OK
+      description: 'For providing an `Acceptance Order` from a container operator to the container facility, for requesting or authorising acceptance of a full container.  Equivilent of COPARN BGM+126.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/acceptanceOrder'
+            examples:
+              Authorise Acceptance of Empty Return at Depot:
+                value:
+                  acceptanceNumber: '1234567'
+                  approvalDate: '2024-01-08T16:35:38.862Z'
+                  expirationDate: '2024-01-08T16:35:38.862Z'
+                  acceptanceDate: '2024-01-08T16:35:38.862Z'
+                  relatedDocumentReferences:
+                    - type: BKG (Booking)
+                      value: ABC123123123
+                    - type: TRD (Transport Document)
+                      value: 85943567-eedb-98d3-f4ed-aed697474ed4
+                  equipmentReference: APZU4812090
+                  emptyIndicatorCode: EMPTY
+                  ISOEquipmentCode: 22GP
+                  eventLocation:
+                    locationName: Container Depot Inc
+                    locationType: FACI
+                    UNLocationCode: GBLIV
+                    facilityCode: JMDA
+                    facilityCodeListProvider: BIC
+              Authorise Acceptance of Full Container at Terminal:
+                value:
+                  acceptanceNumber: '1234567'
+                  approvalDate: '2024-01-08T16:35:38.862Z'
+                  expirationDate: '2024-01-08T16:35:38.862Z'
+                  acceptanceDate: '2024-01-08T16:35:38.862Z'
+                  relatedDocumentReferences:
+                    - type: BKG (Booking)
+                      value: ABC123123123
+                    - type: TRD (Transport Document)
+                      value: 85943567-eedb-98d3-f4ed-aed697474ed4
+                  equipmentReference: APZU4812090
+                  emptyIndicatorCode: EMPTY
+                  ISOEquipmentCodeGroup: 22GP
+                  ISOEquipmentCode: 22GP
+                  eventLocation:
+                    locationName: Container Terminal Inc
+                    locationType: FACI
+                    UNLocationCode: DKAAR
+                    facilityCode: APMT
+                    facilityCodeListProvider: SMDG
+              Authorise Acceptance of Full Reefer Container at Terminal:
+                value:
+                  acceptanceNumber: '1234567'
+                  approvalDate: '2024-01-08T16:35:38.862Z'
+                  expirationDate: '2024-01-08T16:35:38.862Z'
+                  acceptanceDate: '2024-01-08T16:35:38.862Z'
+                  relatedDocumentReferences:
+                    - type: BKG (Booking)
+                      value: ABC123123123
+                    - type: TRD (Transport Document)
+                      value: 85943567-eedb-98d3-f4ed-aed697474ed4
+                  equipmentReference: APZU4812090
+                  emptyIndicatorCode: EMPTY
+                  ISOEquipmentCodeGroup: 22GP
+                  ISOEquipmentCode: 22R1
+                  reeferSetpoints:
+                    temperature: -15
+                    temperatureUnit: CEL
+                    o2: 75.3
+                    co2: 75.3
+                    humidity: 95.6
+                  eventLocation:
+                    locationName: Container Terminal Inc
+                    locationType: FACI
+                    UNLocationCode: DKAAR
+                    facilityCode: APMT
+                    facilityCodeListProvider: SMDG
+      tags:
+        - Announcement
+  '/hire/{adviceNumber}':
+    get:
+      summary: Check Hire Status
+      tags:
+        - Hire
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/hireStatus'
+              examples:
+                On Hired Container:
+                  value:
+                    gateEventDate: '2024-01-08T16:35:38.862Z'
+                    hireEventDate: '2024-01-10T16:35:38.862Z'
+                    isHired: true
+                    eventLocation:
+                      locationName: Container Depot Inc
+                      locationType: FACI
+                      UNLocationCode: BEANR
+                      facilityCode: MEGA
+                      facilityCodeListProvider: BIC
+                    adviceNumber: ADV12345
+                    status: CONFIRMED
+                Gated In Container - Pending Estimate Approval to Off Hire:
+                  value:
+                    gateEventDate: '2024-01-08T16:35:38.862Z'
+                    isHired: true
+                    eventLocation:
+                      locationName: Container Depot Inc
+                      locationType: FACI
+                      UNLocationCode: BEANR
+                      facilityCode: MEGA
+                      facilityCodeListProvider: BIC
+                    adviceNumber: ADV12345
+                    status: ESTIMATE_PENDING
+                Gated In Container - Pending Repair to Off Hire:
+                  value:
+                    gateEventDate: '2024-01-08T16:35:38.862Z'
+                    isHired: true
+                    eventLocation:
+                      locationName: Container Depot Inc
+                      locationType: FACI
+                      UNLocationCode: BEANR
+                      facilityCode: MEGA
+                      facilityCodeListProvider: BIC
+                    adviceNumber: ADV12345
+                    status: REPAIR_PENDING
+                Off Hired Container:
+                  value:
+                    gateEventDate: '2024-01-08T16:35:38.862Z'
+                    hireEventDate: '2024-01-15T16:35:38.862Z'
+                    isHired: false
+                    eventLocation:
+                      locationName: Container Depot Inc
+                      locationType: FACI
+                      UNLocationCode: BEANR
+                      facilityCode: MEGA
+                      facilityCodeListProvider: BIC
+                    adviceNumber: ADV12345
+                    status: CONFIRMED
+      operationId: get-hire
+      description: 'To be implemented by the container lessor, enabling a container operator to find the current status of a container and if it is registered as on or off hire.'
+    parameters:
+      - schema:
+          type: string
+        name: adviceNumber
+        in: path
+        required: true
+components:
+  schemas:
+    eventLocation:
+      description: |
+        General purpose object to capture the location in the `EquipmentEvent` whenever it is **not** associated with a `TransportCall` (this could be stuffing and stripping). The location can be specified in **one** of the following ways:
+
+        - `UN Location Code`
+        - `Facility`
+        - `Address`
+        - `Geolocation`
+      oneOf:
+        - $ref: ../../domain/location/dcsa_location_v3.1.0.yaml#/components/schemas/unLocationLocation
+        - $ref: ../../domain/location/dcsa_location_v3.1.0.yaml#/components/schemas/facilityLocation
+        - $ref: ../../domain/location/dcsa_location_v3.1.0.yaml#/components/schemas/addressLocation
+        - $ref: ../../domain/location/dcsa_location_v3.1.0.yaml#/components/schemas/geoLocation
+      discriminator:
+        propertyName: locationType
+        mapping:
+          UNLO: ../../domain/location/dcsa_location_v3.1.0.yaml#/components/schemas/unLocationLocation
+          FACI: ../../domain/location/dcsa_location_v3.1.0.yaml#/components/schemas/facilityLocation
+          ADDR: ../../domain/location/dcsa_location_v3.1.0.yaml#/components/schemas/addressLocation
+          GEOL: ../../domain/location/dcsa_location_v3.1.0.yaml#/components/schemas/geoLocation
+    gateMovement:
+      title: gateMovement
+      x-stoplight:
+        id: 770evdb2n8czw
+      type: object
+      description: A Gate Movement (in or out) from a terminal or container facility.
+      x-examples:
+        Example 1:
+          equipmentReference: APZU4812090
+          equipmentEventTypeCode: GTIN
+          eventDateTime: '2024-01-07T15:40:28Z'
+          eventLocation: USLAXVNTU
+          facilityTypeCode: DEPO
+          emptyIndicatorCode: EMPTY
+          documentReferences:
+            - documentReferenceType: BKG (Booking)
+              documentReferenceValue: ABC123123123
+            - documentReferenceType: TRD (Transport Document)
+              documentReferenceValue: 85943567-eedb-98d3-f4ed-aed697474ed4
+          ISOEquipmentCode: 42G1
+      x-tags:
+        - Gate
+      properties:
+        equipmentReference:
+          $ref: ../../domain/dcsa/dcsa_domain_v1.0.0.yaml#/components/schemas/equipmentReference
+        equipmentEventTypeCode:
+          type: string
+          description: |
+            Unique identifier for equipmentEventTypeCode.
+            - GTIN (Gated in)
+            - GTOT (Gated out)
+          enum:
+            - GTIN
+            - GTOT
+          example: GTIN
+        equipmentCondition:
+          type: string
+          x-stoplight:
+            id: 5t58b14g1al0g
+          description: Indicate the overall condition of a container
+        eventClassifierCode:
+          $ref: ../../domain/event/event_domain_v3.2.0.yaml#/components/schemas/eventClassifierCode
+        eventDateTime:
+          $ref: ../../domain/event/event_domain_v3.2.0.yaml#/components/schemas/eventDateTime
+        eventLocation:
+          oneOf:
+            - $ref: ../../domain/location/dcsa_location_v3.1.0.yaml#/components/schemas/facilityLocation
+        facilityTypeCode:
+          $ref: ../../domain/dcsa/dcsa_domain_v1.0.0.yaml#/components/schemas/facilityTypeCode
+        emptyIndicatorCode:
+          type: string
+          example: EMPTY
+        ISOEquipmentCode:
+          $ref: ../../domain/dcsa/dcsa_domain_v3.1.0.yaml#/components/schemas/ISOEquipmentCode
+        transportProvider:
+          type: object
+          description: |
+            The party providing the transport at time of gate movement
+          allOf:
+            - type: object
+              properties:
+                partyName:
+                  allOf:
+                    - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/partyName'
+            - type: object
+              properties:
+                carrierCode:
+                  allOf:
+                    - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/carrierCode'
+            - type: object
+              properties:
+                carrierCodeListProvider:
+                  allOf:
+                    - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/carrierCodeListProvider'
+          required:
+            - carrierCode
+            - carrierCodeListProvider
+        relatedDocumentReferences:
+          $ref: '#/components/schemas/relatedDocumentReferences'
+        references:
+          type: array
+          items:
+            $ref: '#/components/schemas/references'
+        seals:
+          $ref: ../../domain/documentation/documentation_domain_v3.0.0.yaml#/components/schemas/seals
+        transportCall:
+          oneOf:
+            - $ref: ../../domain/event/event_domain_v3.2.0.yaml#/components/schemas/truckTransportCall
+            - $ref: ../../domain/event/event_domain_v3.2.0.yaml#/components/schemas/railTransportCall
+      required:
+        - equipmentReference
+        - equipmentEventTypeCode
+        - eventDateTime
+        - eventLocation
+        - facilityTypeCode
+        - relatedDocumentReferences
+    hireStatus:
+      title: hireStatus
+      x-stoplight:
+        id: hre90cajapyzj
+      type: object
+      properties:
+        gateEventDate:
+          type: string
+          x-stoplight:
+            id: g75hyj9yioo6i
+          format: date-time
+          example: '2024-01-08T16:35:38.862Z'
+        hireEventDate:
+          type: string
+          x-stoplight:
+            id: 1e0qjsazx56wt
+          format: date-time
+          example: '2024-01-08T16:35:38.862Z'
+        isHired:
+          type: boolean
+          x-stoplight:
+            id: 8xi0fa6mmyxof
+          example: true
+        eventLocation:
+          oneOf:
+            - $ref: ../../domain/location/dcsa_location_v3.1.0.yaml#/components/schemas/facilityLocation
+        adviceNumber:
+          type: string
+          x-stoplight:
+            id: stdo8mubigsvj
+          example: ADV12345
+        status:
+          type: string
+          x-stoplight:
+            id: u9gqtzle4te6j
+          example: ESTIMATE_PENDING
+          description: |-
+            One of the following Status Codes will be provided:
+
+            * ESTIMATE_PENDING - Estimate needs to be approved
+            * REPAIR_PENDING - Repair needs to be completed
+            * CONFIRMED - Container is confirmed on or off hired as per contract
+    reeferSetpoints:
+      type: object
+      properties:
+        temperature:
+          type: number
+          description: |
+            The setpoint value of the temperature of the Reefer.
+            COA UDM Key: P22
+          format: float
+          example: -15
+        temperatureUnit:
+          enum:
+            - CEL
+            - FAH
+          description: |
+            The unit for temperature in Celsius or Fahrenheit
+            - CEL (Celsius)
+            - FAH (Fahrenheit)
+          example: CEL
+        o2:
+          type: number
+          description: |-
+            The value of the controlled atmosphere value in percent
+            COA UDM Key: P10
+          format: float
+          minimum: 0
+          maximum: 100
+          example: 75.3
+        co2:
+          type: number
+          description: |
+            The value of the controlled atmosphere value in percent.
+
+            COA UDM Key: P8
+          format: float
+          minimum: 0
+          maximum: 100
+          example: 75.3
+        humidity:
+          type: number
+          description: |-
+            The value of the controlled atmosphere humidity value. in percent
+
+            COA UDM Key: P7
+          format: float
+          minimum: 0
+          maximum: 100
+          example: 95.6
+    references:
+      type: array
+      description: |
+        References provided by the carrier or depot relative to the movement, it maybe an on or off hire reference for leasedequipment.
+      example:
+        - type: EQ
+          value: APZU4812090
+      items:
+        type: object
+        properties:
+          type:
+            $ref: ../../domain/dcsa/dcsa_domain_v3.1.0.yaml#/components/schemas/referenceType
+          value:
+            $ref: ../../domain/dcsa/dcsa_domain_v3.1.0.yaml#/components/schemas/referenceValue
+      required:
+        - type
+        - value
+    relatedDocumentReferences:
+      type: array
+      description: 'A list of related document references, it is expected that the carrier booking ref is always provided.'
+      example:
+        - type: BKG (Booking)
+          value: ABC123123123
+        - type: TRD (Transport Document)
+          value: 85943567-eedb-98d3-f4ed-aed697474ed4
+      minItems: 1
+      items:
+        type: object
+        properties:
+          type:
+            type: string
+            description: Describes where the documentReferenceValue is pointing to
+            example: BKG (Booking)
+            enum:
+              - BKG (Booking)
+              - TRD (Transport Document)
+          value:
+            type: string
+            description: The value of the identifier the documentReferenceType is describing
+            example: 123e4567-e89b-12d3-a456-426614174000
+        required:
+          - type
+          - value
+    releaseEquipment:
+      title: releaseEquipment
+      x-stoplight:
+        id: zcvsvludkos43
+      type: object
+      description: For the release of containers instruction between the carrier and depot
+      properties:
+        releaseNumber:
+          type: string
+          x-stoplight:
+            id: if7bwylf5fhmc
+          example: '1234567'
+        approvalDate:
+          type: string
+          x-stoplight:
+            id: ak6yc8bddj2xe
+          description: |
+            Date that the approval for release was granted
+          format: date-time
+          example: '2024-01-08T16:35:38.862Z'
+        expirationDate:
+          type: string
+          x-stoplight:
+            id: h99kifem8668r
+          description: The date that the release may expire and be renewed
+          format: date-time
+          example: '2024-01-08T16:35:38.862Z'
+        releaseDate:
+          type: string
+          x-stoplight:
+            id: auobhzzcjqrmi
+          description: Date that the container is planned to be released for collection.
+          format: date-time
+          example: '2024-01-08T16:35:38.862Z'
+        relatedDocumentReferences:
+          $ref: '#/components/schemas/relatedDocumentReferences'
+        equipmentReference:
+          $ref: ../../domain/dcsa/dcsa_domain_v1.0.0.yaml#/components/schemas/equipmentReference
+        emptyIndicatorCode:
+          type: string
+          example: EMPTY
+        ISOEquipmentCodeGroup:
+          type: string
+          x-stoplight:
+            id: 8cyl884i8qqjv
+          description: Usually released under a group code then the codeco provides the type.
+          example: 22GP
+        ISOEquipmentCode:
+          $ref: ../../domain/dcsa/dcsa_domain_v3.1.0.yaml#/components/schemas/ISOEquipmentCode
+        eventLocation:
+          $ref: '#/components/schemas/eventLocation'
+        equipmentOptions:
+          type: array
+          x-stoplight:
+            id: vlmf9zf4j8mca
+          description: 'Options for equipment such as `Food Grade`, `Wooden Floor`, `Steel Floor` that come from booking request and need to be relayed to the depot.'
+          items:
+            x-stoplight:
+              id: szh5ke9d51zyy
+            type: string
+            example: Steel Floor
+        handlingInstructions:
+          type: array
+          x-stoplight:
+            id: cctxin6pz7ozq
+          example:
+            - CCT
+          description: 'Handling Instructions that should be coded as per SMDG Handling Codes, to advise instructiosn from booking request to the depot where special handling or preparation is required, i.e. `CCT = Prepare for Cotton`, `GOH = Goods On Hangars`'
+          items:
+            x-stoplight:
+              id: 5vy23egncvhpc
+            type: string
+            example: CCT
+        reeferSetpoints:
+          $ref: '#/components/schemas/reeferSetpoints'
+        comments:
+          type: string
+          x-stoplight:
+            id: io9fvhvgv0pfd
+          example: some remarks to support handling or other instructions
+      required:
+        - releaseNumber
+        - relatedDocumentReferences
+    acceptanceOrder:
+      title: acceptanceOrder
+      x-stoplight:
+        id: 6teeh714vreen
+      type: object
+      properties:
+        acceptanceNumber:
+          type: string
+          example: '1234567'
+          x-stoplight:
+            id: svg7sf9tdkefc
+        approvalDate:
+          type: string
+          description: |
+            Date that the approval for release was granted
+          format: date-time
+          example: '2024-01-08T16:35:38.862Z'
+        expirationDate:
+          type: string
+          description: The date that the release may expire and be renewed
+          format: date-time
+          example: '2024-01-08T16:35:38.862Z'
+        acceptanceDate:
+          type: string
+          description: Date that the container is planned to be released for collection.
+          format: date-time
+          example: '2024-01-08T16:35:38.862Z'
+          x-stoplight:
+            id: cjd64o5m8p2av
+        relatedDocumentReferences:
+          $ref: '#/components/schemas/relatedDocumentReferences'
+        equipmentReference:
+          $ref: ../../domain/dcsa/dcsa_domain_v1.0.0.yaml#/components/schemas/equipmentReference
+        emptyIndicatorCode:
+          type: string
+          example: EMPTY
+        ISOEquipmentCodeGroup:
+          type: string
+          description: Usually released under a group code then the codeco provides the type.
+          example: 22GP
+        ISOEquipmentCode:
+          $ref: ../../domain/dcsa/dcsa_domain_v3.1.0.yaml#/components/schemas/ISOEquipmentCode
+        eventLocation:
+          $ref: '#/components/schemas/eventLocation'
+        handlingInstructions:
+          type: array
+          example:
+            - CCT
+          description: 'Handling Instructions that should be coded as per SMDG Handling Codes, to advise instructiosn from booking request to the depot where special handling or preparation is required, i.e. `CCT = Prepare for Cotton`, `GOH = Goods On Hangars`'
+          items:
+            type: string
+            example: CCT
+        reeferSetpoints:
+          $ref: '#/components/schemas/reeferSetpoints'
+        comments:
+          type: string
+          example: some remarks to support handling or other instructions
+      required:
+        - equipmentReference
