@@ -17,6 +17,12 @@
       "extendedFrom": "",
       "name": "equals",
       "content": "import { createRulesetFunction } from '@stoplight/spectral-core';\n\nexport default createRulesetFunction(\n  {\n    input: null,\n    options: {\n      type: \"object\",\n      additionalProperties: false,\n      required: [\"value\"],\n\n      properties: {\n        value: {\n          type: [\"string\", \"integer\"]\n        }\n      }\n    },\n  },\n  // https://github.com/stoplightio/spectral/blob/develop/docs/guides/5-custom-functions.md#writing-functions\n  function equals(input, options, context) {\n    const { value } = options;\n\n    const propertyName = context.path[[context.path.length - 2]];\n    const propertyProperty = context.path[[context.path.length - 1]];\n    if (input !== undefined) {\n      if (input !== value) {\n      return [\n        {\n          message: propertyName + `.` + propertyProperty + `: value must equal \"${value}\", value provided: \"${input}\".`,\n        },\n      ];\n      }\n    } else {\n      return [\n        {\n          message: propertyName + `.` + propertyProperty + `: value must equal \"${value}\" no value provided!`,\n        },\n      ];\n    }\n  },\n);"
+    },
+    {
+      "id": "UPXI6GiG0IVwCQgFhjc4t",
+      "extendedFrom": "",
+      "name": "noRefInSimpleType",
+      "content": "import { createRulesetFunction } from '@stoplight/spectral-core';\n\nexport default createRulesetFunction(\n  {\n    input: null,\n    options: null,\n  },\n  // https://github.com/stoplightio/spectral/blob/develop/docs/guides/5-custom-functions.md#writing-functions\n  function noRefInSimpleType(input, options, context) {\n    if (Object.keys(input).length === 1 && input['$ref']) {\n      const propertyName = context.path[[context.path.length - 1]];\n      return [\n        {\n          message: propertyName + `: MUST not be defined using a $ref.`,\n        },\n      ];\n    }\n  }\n);"
     }
   ],
   "extendedDefault": false
