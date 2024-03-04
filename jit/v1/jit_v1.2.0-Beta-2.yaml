@@ -4,7 +4,6 @@ x-stoplight:
 info:
   title: DCSA OpenAPI specification for Just in Time Portcalls
   version: 1.2.0-Beta-1
-  summary: DCSA OpenAPI specification for Just in Time Portcalls
   description: "API specification issued by DCSA.org\r\n\r\nThis API supports **JIT** v1.2 (Just in Time Portcalls). JIT is used for negotiating timestamps between vessel and port/terminal and other services providers. To create a new timestamp the `POST /v1/timestamps` endPoint is to be used.\r\n\r\nFor explanation to specific values or objects please refer to the [Information Model 2022.2 - **to be updated in July**].\r\n\r\nThis API does not define the business rules regarding what is allowed to update at what time. For this the [Just in Time Portcall IFS v1.2](https://dcsa.my.salesforce.com/sfc/p/#2o000000YvHJ/a/7T000000Db84/Rp.tknLWVuS79ZXmWUU_IXgexNiFXgSJExKnNPv5si8) should be consulted.\r\n\r\nIt is possible to use this API as a standalone API. In order to do so it is necessary to use the poll-endPoint `GET /v1/events` in order to pull event information.\r\n\r\nIt is recomended to implement the [DCSA Just in Time Portcalls (JIT) Event Hub v1.2](https://app.swaggerhub.com/apis/dcsaorg/JIT_EVENT_HUB/1.2.0-Beta-1) in order to use the push model. Here events are pushed as they occur.\r\n\r\nFor a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/jit/v1#v120B1). Please also [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments.\r\n\r\nFor an example of an implementation of this API please check the [JIT Reference Implementation](https://github.com/dcsaorg/DCSA-JIT).\r\n\r\n[Digital Container Shipping Association (DCSA) - Website](https://dcsa.org/)"
   license:
     name: Apache 2.0
@@ -77,7 +76,7 @@ paths:
             API-Version:
               schema:
                 type: string
-                example: 1.0.0
+                example: 1.2.0
               description: SemVer used to indicate the version of the contract (API version) returned.
             Current-Page:
               schema:
@@ -110,7 +109,7 @@ paths:
             API-Version:
               schema:
                 type: string
-                example: 1.0.0
+                example: 1.2.0
               description: SemVer used to indicate the version of the contract (API version) returned.
           content:
             application/json:
@@ -234,6 +233,13 @@ paths:
             - `REQ` (Requested)
             - `EST` (Estimated)
             It is possible to select multiple values by comma (,) separating them. For multiple values the OR-operator is used. For example eventClassifierCode=EST,ACT matches both Estimated (EST) and Actual (ACT) events.Default is all eventClassifierCodes.
+        - schema:
+            type: string
+            maxLength: 50
+            example: 2103S
+          in: query
+          name: carrierExportVoyageNumber
+          description: Filter on the vessel operator-specific identifier of the export Voyage.  Specifying this filter will only return events related to this particular `carrierExportVoyageNumber`.
 components:
   schemas:
     Address:
@@ -383,7 +389,7 @@ components:
           x-stoplight:
             id: isvadpbkeknvt
           example: CONT
-          description: "Categorization of ocean-going vessels distinguished by the main cargo the vessel carries. Possible values:\r\n\r\nGCGO (General cargo)\r\n- CONT (Container)\r\n- RORO (RoRo)\r\n- CARC (Car carrier)\r\n- PASS (Passenger)\r\n- FERY (Ferry)\r\n- BULK (Bulk)\r\n- TANK (Tanker)\r\n- LGTK (Liquefied gas tanker)\r\n- ASSI (Assistance)\r\n- PILO (Pilot boat)"
+          description: "Categorization of ocean-going vessels distinguished by the main cargo the vessel carries. Possible values:\r\n\r\n`GCGO` (General cargo)\r\n- `CONT` (Container)\r\n- `RORO` (RoRo)\r\n- `CARC` (Car carrier)\r\n- `PASS` (Passenger)\r\n- `FERY` (Ferry)\r\n- `BULK` (Bulk)\r\n- `TANK` (Tanker)\r\n- `LGTK` (Liquefied gas tanker)\r\n- `ASSI` (Assistance)\r\n- `PILO` (Pilot boat)."
         draft:
           type: number
           x-stoplight:
@@ -444,69 +450,7 @@ components:
           maxLength: 100
           example: Port of Amsterdam
         address:
-          type: object
-          x-stoplight:
-            id: h7mfifp8s4srb
-          description: An object for storing address related information.
-          required:
-            - name
-          properties:
-            name:
-              type: string
-              x-stoplight:
-                id: gcns48t11humy
-              description: Name of the address.
-              maxLength: 100
-              example: John
-            street:
-              type: string
-              x-stoplight:
-                id: 13kjptnac1kwo
-              description: The name of the street of the party’s address.
-              example: Ruijggoordweg
-              maxLength: 100
-            streetNumber:
-              type: string
-              x-stoplight:
-                id: ro3cbp642al6v
-              example: '100'
-              maxLength: 50
-              description: The number of the street of the party’s address.
-            floor:
-              type: string
-              x-stoplight:
-                id: agix4a3kdbhgq
-              description: The floor of the party’s street number.
-              maxLength: 50
-              example: N/A
-            postCode:
-              type: string
-              x-stoplight:
-                id: 67ph6kzvy7332
-              description: The post code of the party’s address.
-              maxLength: 50
-              example: 1047 HM
-            city:
-              type: string
-              x-stoplight:
-                id: jmwdas7uyu936
-              description: The city name of the party’s address.
-              maxLength: 65
-              example: Amsterdam
-            stateRegion:
-              type: string
-              x-stoplight:
-                id: qqo43cgrlxrmf
-              description: The state/region of the party’s address.
-              example: North Holland
-              maxLength: 65
-            country:
-              type: string
-              x-stoplight:
-                id: jv3qmjun3di1z
-              description: The country of the party’s address.
-              maxLength: 75
-              example: The Netherlands
+          $ref: '#/components/schemas/Address'
     FacilityLocation:
       title: FacilityLocation
       x-stoplight:
@@ -658,7 +602,7 @@ components:
           type: string
           x-stoplight:
             id: jtgqib926anzl
-          description: "The party function code of the publisher. The values are divided into 4 categories:\r\n\r\nCarrier\r\n- CA (Carrier)\r\n- AG (Carrier local agent)\r\n- VSL (Vessel)\r\nPort\r\n- ATH (Port Authorities)\r\n- PLT (Port Pilot)\r\n- TWG (Towage service provider)\r\n- MOR (Mooring service provider)\r\nTerminal\r\n- TR (Terminal)\r\nService Provider\r\n- LSH (Lashing service provider)\r\n- BUK (Bunker service provider)\r\n- SLU (Sludge service provider)\r\n- SVP (Any other service provider)\r\n\r\nMore details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/publisherrole.csv)"
+          description: "The party function code of the publisher. The values are divided into 4 categories:\r\n\r\nCarrier\r\n- `CA` (Carrier)\r\n- `AG` (Carrier local agent)\r\n- `VSL` (Vessel)\r\nPort\r\n- `ATH` (Port Authorities)\r\n- `PLT` (Port Pilot)\r\n- `TWG` (Towage service provider)\r\n- `MOR` (Mooring service provider)\r\nTerminal\r\n- `TR` (Terminal)\r\nService Provider\r\n- `LSH` (Lashing service provider)\r\n- `BUK` (Bunker service provider)\r\n- `SLU` (Sludge service provider)\r\n- `SVP` (Any other service provider)\r\n\r\nMore details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/publisherrole.csv)"
           example: CA
         vesselIMONumber:
           type: string
@@ -779,20 +723,20 @@ components:
           x-stoplight:
             id: 4barus9qz6tci
           example: ACT
-          description: "Code for the event classifier.\r\n\r\n- PLN (Planned)\r\n- ACT (Actual)\r\n- REQ (Requested)\r\n- EST (Estimated)\r\n\r\nMore details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/eventclassifiercodes.csv).\r\n\r\n**NB**: This is a conditional field and must match timestamps defined in the IFS."
+          description: "Code for the event classifier.\r\n\r\n- `PLN` (Planned)\r\n- `ACT` (Actual)\r\n- `REQ` (Requested)\r\n- `EST` (Estimated)\r\n\r\nMore details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/eventclassifiercodes.csv).\r\n\r\n**NB**: This is a conditional field and must match timestamps defined in the IFS."
         operationsEventTypeCode:
           type: string
           x-stoplight:
             id: r96k6isbiglrf
           example: STRT
-          description: "The code to identify the type of event that is related to the operation\r\n\r\n- STRT (Started)\r\n- CMPL (Completed)\r\n- ARRI (Arrived)\r\n- DEPA (Departed)\r\n- OMIT (Omitted)\r\n- CANC (Cancelled)\r\n\r\nMore details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/operationseventtypecodes.csv).\r\n\r\n**NB**: This is a conditional field and has to be aligned with other fields such as `portCallServiceTypeCode`. One such example is if `portCallServiceTypeCode` is not null then `operationsEventTypeCode` should be either: STRT (Started), COMP (Completed) or CANC (Cancelled). If `portCallServiceTypeCode` is null then `operationsEventTypeCode` is one of: ARRI (Arrived), DEPA (Departed) or OMIT (Omitted). Please check the IFS for allowed combinations."
+          description: "The code to identify the type of event that is related to the operation\r\n\r\n- `STRT` (Started)\r\n- `CMPL` (Completed)\r\n- `ARRI` (Arrived)\r\n- `DEPA` (Departed)\r\n- `OMIT` (Omitted)\r\n- `CANC` (Cancelled)\r\n\r\nMore details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/operationseventtypecodes.csv).\r\n\r\n**NB**: This is a conditional field and has to be aligned with other fields such as `portCallServiceTypeCode`. One such example is if `portCallServiceTypeCode` is not null then `operationsEventTypeCode` should be either: STRT (Started), COMP (Completed) or CANC (Cancelled). If `portCallServiceTypeCode` is null then `operationsEventTypeCode` is one of: ARRI (Arrived), DEPA (Departed) or OMIT (Omitted). Please check the IFS for allowed combinations."
         modeOfTransport:
           type: string
           x-stoplight:
             id: jqxvxxk1pjh9z
           deprecated: true
           example: VESSEL
-          description: "**NB**: this field is marked deprecated since the standard is only defined for `VESSEL` and therefore redundant.\r\n\r\nJIT 1.0 and JIT 1.1 timestamps have used this field to differentiate timestamps. Since JIT 1.2 this is no longer needed except for 1 pair of JIT 1.1 timestamps that JIT 1.2 still needs for the sake of backward compatability. These timestamps have the portCallServiceTypeCode set to SAFE."
+          description: "**NB**: this field is marked deprecated since the standard is only defined for `VESSEL` and therefore redundant.\r\n\r\nJIT 1.0 and JIT 1.1 timestamps have used this field to differentiate timestamps. Since JIT 1.2 this is no longer needed except for 1 pair of JIT 1.1 timestamps that JIT 1.2 still needs for the sake of backward compatability. These timestamps have the portCallServiceTypeCode set to `SAFE`."
         portCallPhaseTypeCode:
           type: string
           x-stoplight:
@@ -804,7 +748,7 @@ components:
           x-stoplight:
             id: 2jj1n87sxz53j
           example: BUNK
-          description: "The type of the service provided in the port call\r\n\r\n- PILO (Pilotage)\r\n- MOOR (Mooring)\r\n- CRGO (Cargo operations)\r\n- TOWG (Towage)\r\n- BUNK (Bunkering)\r\n- LASH (Lashing)\r\n- SAFE (Safety)\r\n- FAST (All Fast)\r\n- GWAY (Gangway down and secure)\r\n- ANCO (Anchorage operations)\r\n- SLUG (Sludge)\r\n- SHPW (Shore Power)\r\n- LCRO (Loading cargo operations)\r\n- DCRO (Discharge cargo operations)\r\n- VRDY (Vessel ready)\r\n\r\nMore details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/portcallservicetypecodes.csv).\r\n\r\n**NB**: This is a conditional field and must match timestamps defined in the IFS."
+          description: "The type of the service provided in the port call\r\n\r\n- `PILO` (Pilotage)\r\n- `MOOR` (Mooring)\r\n- `CRGO` (Cargo operations)\r\n- `TOWG` (Towage)\r\n- `BUNK` (Bunkering)\r\n- `LASH` (Lashing)\r\n- `SAFE` (Safety)\r\n- `FAST` (All Fast)\r\n- `GWAY` (Gangway down and secure)\r\n- `ANCO` (Anchorage operations)\r\n- `SLUG` (Sludge)\r\n- `SHPW` (Shore Power)\r\n- `LCRO` (Loading cargo operations)\r\n- `DCRO` (Discharge cargo operations)\r\n- `VRDY` (Vessel ready)\r\n\r\nMore details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/portcallservicetypecodes.csv).\r\n\r\n**NB**: This is a conditional field and must match timestamps defined in the IFS."
         eventDateTime:
           type: string
           x-stoplight:
@@ -982,7 +926,7 @@ components:
           type: string
           x-stoplight:
             id: x6670lcr1gxi2
-          description: "Code for the event classifier can be\r\n\r\n- ACT (Actual)\r\n- PLN (Planned)\r\n- EST (Estimated)\r\n- REQ (Requested)"
+          description: "Code for the event classifier can be\r\n\r\n- `ACT` (Actual)\r\n- `PLN` (Planned)\r\n- `EST` (Estimated)\r\n- `REQ` (Requested)"
           example: ACT
         eventDateTime:
           type: string
@@ -1053,7 +997,7 @@ components:
               x-stoplight:
                 id: liln4yne9ml67
               example: SMDG
-              description: "The provider used for identifying the facility Code. Some facility codes are only defined in combination with an UN Location Code\r\n\r\n- BIC (Requires a UN Location Code)\r\n- SMDG (Requires a UN Location Code)"
+              description: "The provider used for identifying the facility Code. Some facility codes are only defined in combination with an UN Location Code\r\n\r\n- `BIC` (Requires a UN Location Code)\r\n- `SMDG` (Requires a UN Location Code)."
             address:
               $ref: '#/components/schemas/Address'
               x-stoplight:
@@ -1076,7 +1020,7 @@ components:
           x-stoplight:
             id: en4nuqi6g7nr5
           example: BRTH
-          description: "A specialized version of the facilityCode to be used in Operations events. The code to identify the specific type of facility.\r\n\r\n- PBPL (Pilot boarding place)\r\n- BRTH (Berth)\r\n- ANCH (Anchorage Location)"
+          description: "A specialized version of the facilityCode to be used in Operations events. The code to identify the specific type of facility.\r\n\r\n- `PBPL` (Pilot boarding place)\r\n- `BRTH` (Berth)\r\n- `ANCH` (Anchorage Location)"
         delayReasonCode:
           type: string
           x-stoplight:
@@ -1125,6 +1069,7 @@ components:
         id: ui3am52u5xhzr
       type: object
       required:
+        - transportCallID
         - modeOfTransport
       properties:
         transportCallID:
@@ -1252,14 +1197,8 @@ components:
           anyOf:
             - $ref: '#/components/schemas/GeoLocation'
             - $ref: '#/components/schemas/FacilityLocation'
-              x-stoplight:
-                id: 8wj966wik5j7x
             - $ref: '#/components/schemas/UNLocationLocation'
-              x-stoplight:
-                id: yejfk4b1ataes
             - $ref: '#/components/schemas/Address'
-              x-stoplight:
-                id: 8jab64wlljkpm
         vessel:
           x-stoplight:
             id: scmss5du2rdrz
@@ -1309,4 +1248,4 @@ components:
               description: Identifies the code list provider used for the operator and partner carriercodes.
               enum:
                 - SMDG
-                - 'NMFTA '
+                - NMFTA
