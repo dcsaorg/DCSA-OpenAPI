@@ -1,88 +1,71 @@
 openapi: 3.0.0
 x-stoplight:
-  id: 06c2d014dbdea
+  id: m7pgcqwk42kbf
 info:
-  version: 2.0.0-Beta-1
-  title: DCSA OpenAPI specification for Booking Notifications
+  version: 1.0.0-Beta-1
+  title: DCSA OpenAPI specification for Arrival Notice Notifications
   description: |
     API specification issued by DCSA.org.
-    
-    Booking Notifications for [DCSA OpenAPI specification for Booking](https://app.swaggerhub.com/apis/dcsaorg/DCSA_BKG/2.0.0-Beta-1) is a lightweight notification based on [CloudEvents](https://cloudevents.io/). The `POST` endPoint of the consumer is called whenever a `Booking` that is being subscribed to changes state or is updated.
-    
-    Subscribing to notification is done outside scope of this API.
-    
-    ### Stats API
-    The Stats API offers crucial statistical information for both API providers and consumers to enhance their services and helps DCSA to understand and scale the ecosystem. We expect you to invoke the Stats API for every request made to the Booking Notification API. Further details can be found [here](https://developer.dcsa.org/#/http/guides/api-guides/stats-api)
 
-    For a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/bkg/notification/v2#v200B1). Please also [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments.
+    Arrival Notice Notifications for [DCSA OpenAPI specification for Arrival Notice](https://app.swaggerhub.com/apis/dcsaorg/DCSA_AN/1.0.0-Beta-1) is a lightweight notification based on [CloudEvents](https://cloudevents.io/). The `POST` endPoint of the consumer is called whenever an `Arrival Notice` that is being subscribed to is created.
+
+    Subscribing to notification is done outside scope of this API.
+
+    ### Stats API
+    The Stats API offers crucial statistical information for both API providers and consumers to enhance their services and helps DCSA to understand and scale the ecosystem. We expect you to invoke the Stats API for every request made to this API. Further details can be found [here](https://developer.dcsa.org/#/http/guides/api-guides/stats-api)
+
+    For a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/an/notification/v1#v100B1). Please also [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments.
   contact:
     name: Digital Container Shipping Association (DCSA)
-    url: https://dcsa.org
+    url: 'https://dcsa.org'
     email: info@dcsa.org
 tags:
   - name: Notifications
     description: Notification operations
 servers:
-  - url: 'http://localhost:3000'
+  - url: 'http://localhost:9000'
 paths:
-  /v2/booking-notifications:
+  /v1/arrival-notice-notifications:
     post:
       tags:
-       - Notifications
-      summary: 'Send a new Booking Notification'
-      operationId: booking-notifications
+        - Notifications
+      summary: Send a new Arrival Notice Notification
+      operationId: arrival-notice-notifications
       description: |
-        Creates a new [`Booking Notification`](#/BookingNotification). This endPoint is called whenever a `Booking` that a cosumer has subscribed to changes state or is updated.
+        Creates a new [`Arrival Notice Notification`](#/ArrivalNoticeNotification). This endPoint is called whenever an `Arrival Notice` that a cosumer has subscribed to is created.
       parameters:
-      - name: API-Version
-        in: header
-        description: |
-          An API-Version header **MUST** be provided to the request (mandatory). The header **MUST** be a [SemVer](https://semver.org/) specifying the provider (the calling party) API version.
-        required: true
-        schema:
-          type: string
-          example: '2.0.0-Beta-1'
+        - name: API-Version
+          in: header
+          description: |
+            An API-Version header **MUST** be provided to the request (mandatory). The header **MUST** be a [SemVer](https://semver.org/) specifying the provider (the calling party) API version.
+          required: true
+          schema:
+            type: string
+            example: 1.0.0-Beta-1
       requestBody:
         description: |
-          The payload used to create a [`Booking Notification`](#/BookingNotification)
+          The payload used to create an [`Arrival Notice Notification`](#/ArrivalNoticeNotification)
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BookingNotification'
+              $ref: '#/components/schemas/ArrivalNoticeNotification'
             examples:
               receivedExample:
                 summary: |
-                  Booking request received
+                  Arrival Notice received
                 description: |
-                  A notification explaining that a `Booking Request` has been received and stored in provider system (`bookingStatus='RECEIVED'`).
+                  A notification explaining that an `Arrival Notice` has been created in provider system.
                 value:
                   specversion: '1.0'
-                  id: '3cecb101-7a1a-43a4-9d62-e88a131651e2'
+                  id: 3cecb101-7a1a-43a4-9d62-e88a131651e2
                   source: 'https://member.com/'
-                  type: 'org.dcsa.booking-notification.v2'
+                  type: org.dcsa.arrival-notice-notification.v1
                   time: '2018-04-05T17:31:00Z'
-                  datacontenttype: 'application/json'
+                  datacontenttype: application/json
                   data:
-                    bookingStatus: 'RECEIVED'
-                    carrierBookingRequestReference: '24595eb0-5cfc-4381-9c3a-cedc1975e9aa'
-              declinedExample:
-                summary: |
-                  Booking amendment declined
-                description: |
-                  A notification explaining that an amendment to a `Booking` has been declined (`amendedBookingStatus='AMENDMENT DECLINED'`)
-                value:
-                  specversion: '1.0'
-                  id: '3cecb101-7a1a-43a4-9d62-e88a131651e2'
-                  source: 'https://member.com/'
-                  type: 'org.dcsa.booking-notification.v2'
-                  time: '2018-04-05T17:31:00Z'
-                  datacontenttype: 'application/json'
-                  data:
-                    bookingStatus: 'CONFIRMED'
-                    amendedBookingStatus: 'AMENDMENT DECLINED'
-                    carrierBookingRequestReference: '24595eb0-5cfc-4381-9c3a-cedc1975e9aa'
-                    carrierBookingReference: 'ABC709951'
-                    reason: 'Declined because of no equipment availability'
+                    arrivalNoticeReference: 24595eb0-5cfc-4381-9c3a-cedc1975e9aa
+                    carrierBookingReference: HHL987
+                    transportDocumentReference: HHL123
       responses:
         '204':
           description: |
@@ -93,16 +76,18 @@ paths:
                 [SemVer](https://semver.org/) used to indicate the version of the consumer (the responding party). This is optional to provide.
               schema:
                 type: string
-                example: 2.0.0-Beta-1
+                example: 1.0.0-Beta-1
       servers:
         - url: 'http://localhost:3000'
       x-stoplight:
         id: 8qnfcuf7ka477
 components:
   schemas:
-    BookingNotification:
+    ArrivalNoticeNotification:
       type: object
-      title: 'Booking Notification'
+      x-stoplight:
+        id: okd2c3sti7b4k
+      title: Arrival Notice Notification
       description: |
         `CloudEvent` specific properties for the `Notification`.
       properties:
@@ -138,14 +123,18 @@ components:
           description: |
             This attribute contains a value describing the type of event related to the originating occurrence. Often this attribute is used for routing, observability, policy enforcement, etc. The format of this is producer defined and might include information such as the version of the type - see [Versioning of CloudEvents in the Primer](https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/primer.md#versioning-of-cloudevents) for more information.
           enum:
-            - org.dcsa.booking-notification.v2
-          example: org.dcsa.booking-notification.v2
+            - org.dcsa.arrival-notice-notification.v1
+          example: org.dcsa.arrival-notice-notification.v1
         time:
           type: string
           format: date-time
           description: |
             Timestamp of when the occurrence happened. If the time of the occurrence cannot be determined then this attribute MAY be set to some other time (such as the current time) by the CloudEvents producer, however all producers for the same `source` MUST be consistent in this respect. In other words, either they all use the actual time of the occurrence or they all use the same algorithm to determine the value used.
           example: '2018-04-05T17:31:00Z'
+        equipmentReference:
+          type: string
+          maxLength: 11
+          description: 'This is equipment'
         datacontenttype:
           type: string
           description: |
@@ -157,68 +146,44 @@ components:
 
             When translating an event message with no `datacontenttype` attribute to a different format or protocol binding, the target `datacontenttype` SHOULD be set explicitly to the implied `datacontenttype` of the source.
           enum:
-          - application/json
+            - application/json
           example: application/json
         data:
           type: object
           description: |
-            `Booking` specific properties for the `Notification`
+            `Arrival Notice` specific properties for the `Notification`
           properties:
-            bookingStatus:
+            equipmentReference:
+              maxLength: 11
+              type: integer
+              description: 'This is equipment'
+            arrivalNoticeReference:
               type: string
-              maxLength: 50
-              description: |
-                The status of the `Booking`. Possible values are:
-                - `RECEIVED` (Booking request has been received)
-                - `PENDING UPDATE` (An update is required to the Booking)
-                - `UPDATE RECEIVED` (An update has been received and is awaiting to be processed)
-                - `CONFIRMED` (Booking has been Confirmed)
-                - `PENDING AMENDMENT` (An amendment is required to the Booking)
-                - `REJECTED` (Booking discontinued by carrier before it has been Confirmed)
-                - `DECLINED` (Booking discontinued by carrier after it has been Confirmed)
-                - `CANCELLED` (Booking discontinued by consumer)
-                - `COMPLETED` (The Transport Document this Booking is connected to has been Surrendered for Delivery)
-
-                More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/bookingstatuses.csv).
-              example: 'RECEIVED'
-            amendedBookingStatus:
-              type: string
-              maxLength: 50
-              description: |
-                The status of latest amendment added to the `Booking`. If no amendment has been requested - then this property is empty. Possible values are:
-                - `AMENDMENT RECEIVED` (An amendment has been received and is awaiting to be processed)
-                - `AMENDMENT CONFIRMED` (Amendment is confirmed)
-                - `AMENDMENT DECLINED` (Amendment discontinued by provider)
-                - `AMENDMENT CANCELLED` (Amendment discontinued by consumer)
-
-                More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/bookingstatuses.csv).
-              example: 'AMENDMENT RECEIVED'
-            carrierBookingRequestReference:
-              type: string
-              pattern: '^\S+(\s+\S+)*$'
+              pattern: ^\S+(\s+\S+)*$
               maxLength: 100
               description: |
-                A reference to the booking during the booking request phase.
-
-                **Conditional:** `carrierBookingRequestReference` and/or `carrierBookingReference` is required to provide
-              example: '24595eb0-5cfc-4381-9c3a-cedc1975e9aa'
+                A set of unique characters provided by carrier to identify an `Arrival Notice`
+              example: 24595eb0-5cfc-4381-9c3a-cedc1975e9aa
             carrierBookingReference:
-              type: integer
-              pattern: '^\S+(\s+\S+)*$'
+              type: string
+              pattern: ^\S+(\s+\S+)*$
               maxLength: 35
               description: |
                 The `carrierBookingReference` if know. Often this will not be known until the booking has been confirmed. Is available during a booking amendment.
 
                 **Conditional:** `carrierBookingRequestReference` and/or `carrierBookingReference` is required to provide
-              example: 'ABC709951'
-            reason:
+              example: ABC709951
+            transportDocumentReference:
               type: string
-              maxLength: 5000
+              pattern: ^\S+(\s+\S+)*$
+              maxLength: 20
               description: |
-                This property can be used to explain `bookingStatus`.
-              example: 'Rejected because of strike...'
+                A unique number allocated by the shipping line to the transport document and the main number used for the tracking of the status of the shipment.
+              example: HHL71800000
           required:
-            - bookingStatus
+            - arrivalNoticeReference
+            - carrierBookingReference
+            - transportDocumentReference
       required:
         - specversion
         - id
@@ -227,5 +192,3 @@ components:
         - time
         - datacontenttype
         - data
-      x-stoplight:
-        id: okd2c3sti7b4k
