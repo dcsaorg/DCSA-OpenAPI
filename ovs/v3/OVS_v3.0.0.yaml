@@ -269,6 +269,9 @@ components:
         id: 37pvn11as2qkc
       type: object
       description: "\t\nA transportCall in the schedule. A transportCall can be either just a Port or further specified as a terminalCall.\n\nThe order of the list is the sequence of the list"
+      required:
+        - transportCallReference
+        - carrierImportVoyageNumber
       properties:
         portVisitReference:
           type: string
@@ -317,9 +320,9 @@ components:
             id: dt9xme8zmy3n2
           description: 'General purpose object to capture location-related data, the location can be specified in **one** of the following ways: `UN Location Code`, a `Facility` or an `Address`.'
           oneOf:
-            - $ref: ../../models/UnLocationLocation.yaml
-            - $ref: ../../models/FacilitySMDGLocation.yaml
-            - $ref: ../../models/AddressLocation.yaml
+            - $ref: '#/components/schemas/UNLocationLocation'
+            - $ref: '#/components/schemas/FacilitySMDGLocation'
+            - $ref: '#/components/schemas/AddressLocation'
         statusCode:
           type: string
           x-stoplight:
@@ -332,9 +335,6 @@ components:
             id: vux2gn6fosbgq
           items:
             $ref: '#/components/schemas/Timestamp'
-      required:
-        - transportCallReference
-        - carrierImportVoyageNumber
     Timestamp:
       title: Timestamp
       x-stoplight:
@@ -388,6 +388,169 @@ components:
         - eventTypeCode
         - eventClassifierCode
         - eventDateTime
+    AddressLocation:
+      title: Address Location
+      x-stoplight:
+        id: 7lubypdxb6mmg
+      type: object
+      description: An interface used to express a location using an `Address` object.
+      required:
+        - locationType
+        - address
+      properties:
+        locationName:
+          type: string
+          x-stoplight:
+            id: n7fong1q8pjz6
+          description: The name of the location.
+          example: Port of Amsterdam
+          maxLength: 100
+        locationType:
+          type: string
+          x-stoplight:
+            id: 5rg7p8kwuibxt
+          description: Discriminator used to identify this as an `Address` location interface.
+          example: ADDR
+          maxLength: 4
+        address:
+          type: object
+          x-stoplight:
+            id: hvd7bhamm4ddm
+          required:
+            - name
+          description: An object for storing address related information.
+          properties:
+            name:
+              type: string
+              x-stoplight:
+                id: gs66kwkbgjbnq
+              description: Name of the address.
+              example: John
+              maxLength: 100
+            street:
+              type: string
+              x-stoplight:
+                id: ikr1qny61yngg
+              description: The name of the street of the party’s address.
+              example: Ruijggoordweg
+              maxLength: 100
+            streetNumber:
+              type: string
+              x-stoplight:
+                id: kgviri7xjh6jk
+              description: The number of the street of the party’s address.
+              example: '100'
+              maxLength: 50
+            floor:
+              type: string
+              x-stoplight:
+                id: 2b90ghfmdnuzb
+              description: The floor of the party’s street number.
+              example: N/A
+              maxLength: 50
+            postCode:
+              type: string
+              x-stoplight:
+                id: qh477we17171v
+              description: The post code of the party’s address.
+              example: 1047 HM
+              maxLength: 50
+            city:
+              type: string
+              x-stoplight:
+                id: mam9o3p1v1xf4
+              description: The city name of the party’s address.
+              example: Amsterdam
+              maxLength: 65
+            stateRegion:
+              type: string
+              x-stoplight:
+                id: 1cz0m003w024d
+              description: The state/region of the party’s address.
+              example: North Holland
+              maxLength: 65
+            country:
+              type: string
+              x-stoplight:
+                id: 5bkxe09r2qlqt
+              description: The country of the party’s address.
+              example: The Netherlands
+              maxLength: 75
+    UNLocationLocation:
+      title: UNLocation Location
+      x-stoplight:
+        id: x4suin19xkq6q
+      type: object
+      description: An interface used to express a location using a `Un Location Code`.
+      required:
+        - locationType
+        - UNLocationCode
+      properties:
+        locationName:
+          type: string
+          x-stoplight:
+            id: 4c18hs0i6ys6p
+          description: The name of the location.
+          example: Port of Amsterdam
+          maxLength: 100
+          pattern: ^\S+(\s+\S+)*$
+        locationType:
+          type: string
+          x-stoplight:
+            id: 2wthlqxorc4dy
+          description: Discriminator used to identify this as a `UNLocation` location interface.
+          example: UNLO
+          maxLength: 4
+        UNLocationCode:
+          type: string
+          x-stoplight:
+            id: a1nomkthncy9h
+          description: "The UN Location code specifying where the place is located. The pattern used must be\r\n\r\n - 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)\r\n - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used\r\n\r\nMore info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)"
+          example: NLAMS
+          pattern: '^[A-Z]{2}[A-Z2-9]{3}$'
+          minLength: 5
+          maxLength: 5
+    FacilitySMDGLocation:
+      title: Facility SMDG Location
+      x-stoplight:
+        id: y3cpqlgmgy2b9
+      type: object
+      description: An interface used to express a location using a `Facility` by the `SMDG` code list. The `facilitySMDGCode` does not contain the `UNLocationCode` - this should be provided in the `UnLocationCode` attribute.
+      required:
+        - locationType
+        - UNLocationCode
+        - facilitySMDGCode
+      properties:
+        locationName:
+          type: string
+          x-stoplight:
+            id: sk9wmzuuysvll
+          description: The name of the location.
+          example: Port of Amsterdam
+          maxLength: 100
+        locationType:
+          type: string
+          x-stoplight:
+            id: sddcjdatphg1o
+          description: Discriminator used to identify this as a `Facility Location` interface only using `SMDG` code list.
+          example: FACS
+          maxLength: 4
+        UNLocationCode:
+          type: string
+          x-stoplight:
+            id: mxkse3a3ub9t1
+          description: "The UN Location code specifying where the place is located. The pattern used must be\r\n\r\n - 2 characters for the country code using [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)\r\n - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used\r\n\r\nMore info can be found here: [UN/LOCODE](https://en.wikipedia.org/wiki/UN/LOCODE)"
+          example: NLAMS
+          pattern: '^[A-Z]{2}[A-Z2-9]{3}$'
+          minLength: 5
+          maxLength: 5
+        facilitySMDGCode:
+          type: string
+          x-stoplight:
+            id: jrksswrdxnvad
+          description: "The code used for identifying the specific facility. This code does not include the UN Location Code.\r\n\r\nThe codeList used by SMDG is the [SMDG Terminal Code List](https://smdg.org/wp-content/uploads/Codelists/Terminals/SMDG-Terminal-Code-List-v20210401.xlsx)"
+          example: ACT
+          maxLength: 6
 tags:
   - name: Operational Vessel Schedules
     description: ' '
