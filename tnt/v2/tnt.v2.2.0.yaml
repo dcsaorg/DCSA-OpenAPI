@@ -14,6 +14,83 @@ info:
     email: info@dcsa.org
 servers:
   - url: 'http://localhost:3000'
-paths: {}
+paths:
+  /v2/events:
+    get:
+      summary: Find events
+      tags: []
+      responses: {}
+      operationId: get-v2-events
+      x-stoplight:
+        id: 1sr5r7sai6wkd
+      description: "Returns all events filtered by the queryParameters.\r\n\r\n**NB**: It is possible to combine queryParameters. When combining queryParameters be aware that it is also possible to make combinations that are mutual contradicting.\r\n\r\nExample: shipmentEventTypeCode=DRFT and equipmentEventTypeCode=GTIN\r\n\r\nSince there is no event that can be a ShipmentEvent and an EquipmentEvent at the same time **this will return an empty list!**"
+      parameters:
+        - schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - SHIPMENT
+                - TRANSPORT
+                - EQUIPMENT
+          in: query
+          name: eventType
+          description: |
+            The type of event(s) to filter by. Possible values are
+
+            - SHIPMENT (Shipment events)
+            - TRANSPORT (Transport events)
+            - EQUIPMENT (Equipment events)
+
+            It is possible to select multiple values by comma (,) separating them. For multiple values the OR-operator is used. For example eventType=SHIPMENT,EQUIPMENT matches both Shipment- and Equipment-events.
+
+            Default value is all event types.
+        - schema:
+            default: 'RECE,DRFT,PENA,PENU,REJE,APPR,ISSU,SURR,SUBM,VOID,CONF,REQS,CMPL,HOLD,RELS'
+            type: array
+            items:
+              type: string
+              enum:
+                - RECE
+                - DRFT
+                - PENA
+                - PENU
+                - REJE
+                - APPR
+                - ISSU
+                - SURR
+                - SUBM
+                - VOID
+                - CONF
+                - REQS
+                - CMPL
+                - HOLD
+                - RELS
+          in: query
+          name: shipmentEventTypeCode
+          description: |
+            The status of the document in the process to filter by. Possible values are
+            - RECE (Received)
+            - DRFT (Drafted)
+            - PENA (Pending Approval)
+            - PENU (Pending Update)
+            - REJE (Rejected)
+            - APPR (Approved)
+            - ISSU (Issued)
+            - SURR (Surrendered)
+            - SUBM (Submitted)
+            - VOID (Void)
+            - CONF (Confirmed)
+            - REQS (Requested)
+            - CMPL (Completed)
+            - HOLD (On Hold)
+            - RELS (Released)
+            
+            It is possible to select multiple values by comma (,) separating them. For multiple values the OR-operator is used. For example <i>shipmentEventTypeCode=RECE,DRFT</i>  Matches <b>both</b> Received (RECE) and Drafted (DRFT) shipment events.
+            
+            Default is all shipmentEventTypeCodes.
+            
+            This filter is only relevant when filtering on ShipmentEvents
+          example: 'RECE,DRFT'
 components:
   schemas: {}
