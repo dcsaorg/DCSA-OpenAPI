@@ -1707,9 +1707,11 @@ components:
         example: CBR001
       required: true
   schemas:
+
     #################
     # Error Responses
     #################
+
     ErrorResponse:
       title: Error Response
       x-stoplight:
@@ -1917,9 +1919,9 @@ components:
         - name
         - country
 
-    ############################
-    # Address Location Interface
-    ############################
+    #############################
+    # FAcility Location Interface
+    #############################
 
     FacilityLocation:
       title: Facility Location
@@ -2021,6 +2023,11 @@ components:
       required:
         - locationType
         - UNLocationCode
+
+    ################
+    # Create Booking
+    ################
+
     CreateBooking:
       x-stoplight:
         id: 2im5qoznlh1pl
@@ -2364,9 +2371,11 @@ components:
             **Example:** 2 x 20' containing 50% shoes and 50% t-shirts can be requested within the same Requested Equipment object only if each 20' will contain 50% shoes and 50% t-shirts. If 1 x 20' will contain 100% shoes and the other 20' will be 100% t-shirts, 2 separate Requested Equipment objects must be defined.
           items:
             $ref: '#/components/schemas/RequestedEquipment_SHI'
+
     ########################
     # Active Reefer Settings
     ########################
+
     ActiveReeferSettings:
       type: object
       title: Active Reefer Settings
@@ -2461,6 +2470,7 @@ components:
           description: |
             Indicator of whether cargo requires Controlled Atmosphere.
           example: true
+
     ActiveReeferSettings_BKG:
       type: object
       title: Active Reefer Settings
@@ -2477,117 +2487,11 @@ components:
           example: true
       allOf:
         - $ref: '#/components/schemas/ActiveReeferSettings'
-    Commodity:
-      type: object
-      title: Commodity
-      description: |
-        Type of goods, defined by its commodity type
-      properties:
-        commodityType:
-          type: string
-          pattern: ^\S+(\s+\S+)*$
-          maxLength: 550
-          description: |
-            High-level description of goods to be shipped which allow the carrier to confirm acceptance and commercial terms. To be replaced by "description of goods" upon submission of `Shipping Instructions`
-          example: Mobile phones
-        HSCodes:
-          type: array
-          description: |
-            A list of `HS Codes` that apply to this `commodity`
-          items:
-            type: string
-            pattern: '^\d{6,10}$'
-            minLength: 6
-            maxLength: 10
-            description: |
-              Used by customs to classify the product being shipped. The type of HS code depends on country and customs requirements. The code must be at least 6 and at most 10 digits.
 
-              More information can be found here: [HS Nomenclature 2022 edition](https://www.wcoomd.org/en/topics/nomenclature/instrument-and-tools/hs-nomenclature-2022-edition/hs-nomenclature-2022-edition.aspx ).
+    ################
+    # Document Party
+    ################
 
-              This standard is based on the 2022 revision.
-            example: '851713'
-        cargoGrossWeight:
-          type: number
-          format: float
-          example: 36000
-          minimum: 0
-          exclusiveMinimum: true
-          description: |
-            The estimated grand total gross weight of the cargo, including packaging items being carried, which can be expressed in imperial or metric terms, as provided by the shipper.
-        cargoGrossWeightUnit:
-          type: string
-          description: |
-            The unit of measure which can be expressed in imperial or metric terms
-            - `KGM` (Kilograms)
-            - `LBR` (Pounds)
-          enum:
-            - KGM
-            - LBR
-          example: KGM
-        cargoGrossVolume:
-          type: number
-          format: float
-          example: 360
-          minimum: 0
-          exclusiveMinimum: true
-          description: |
-            The grand total volume of the commodity
-        cargoGrossVolumeUnit:
-          type: string
-          description: |
-            The unit of measure which can be expressed in either imperial or metric terms
-            - `FTQ` (Cubic foot)
-            - `MTQ` (Cubic meter)
-          enum:
-            - MTQ
-            - FTQ
-          example: MTQ
-        exportLicenseIssueDate:
-          type: string
-          format: date
-          description: |
-            Issue date of the export license applicable to the booking. Mandatory to provide in booking request for specific commodities
-          example: '2021-05-14'
-        exportLicenseExpiryDate:
-          type: string
-          format: date
-          description: |
-            Expiry date of the export license applicable to the booking.
-
-            Mandatory to provide in booking request for specific commodities.
-          example: '2021-05-21'
-        outerPackaging:
-          $ref: '#/components/schemas/OuterPackaging'
-        references:
-          type: array
-          description: |
-            A list of `References`
-          items:
-            $ref: '#/components/schemas/Reference'
-      required:
-        - commodityType
-        - cargoGrossWeight
-        - cargoGrossWeightUnit
-    Commodity_CONF:
-      type: object
-      title: Commodity
-      description: |
-        Type of goods, defined by its commodity type
-      properties:
-        commoditySubreference:
-          type: string
-          maxLength: 100
-          pattern: ^\S+(\s+\S+)*$
-          description: |
-            A unique reference for this commodity object assigned by the carrier in the booking confirmation. The reference must be provided by the shipper as part of the `Shipping Instructions` for the carrier to link the consignment item to this commodity. A commodity reference is only unique in the context of a booking.
-
-            **Conditional:** Mandatory to provide for `CONFIRMED` bookings
-          example: COM-001
-      allOf:
-        - $ref: '#/components/schemas/Commodity'
-      ################
-      # Document Party
-      ################
     DocumentParty:
       type: object
       title: Document Party
@@ -2637,6 +2541,7 @@ components:
         - party
         - partyFunction
         - isToBeNotified
+
     Party:
       type: object
       title: Party
@@ -2671,6 +2576,7 @@ components:
             $ref: '#/components/schemas/TaxLegalReference'
       required:
         - partyName
+
     PartyContactDetail:
       type: object
       title: Party Contact Detail
@@ -2718,6 +2624,7 @@ components:
             - email
       required:
         - name
+
     IdentifyingCode:
       type: object
       title: Identifying Code
@@ -2760,6 +2667,7 @@ components:
       required:
         - codeListProvider
         - partyCode
+
     TaxLegalReference:
       type: object
       title: Tax & Legal Reference
@@ -2806,59 +2714,6 @@ components:
         - type
         - countryCode
         - value
-    OuterPackaging:
-      type: object
-      title: Outer Packaging
-      description: |
-        Object for outer packaging/overpack specification. Examples of overpacks are a number of packages stacked on to a pallet and secured by strapping or placed in a protective outer packaging such as a box or crate to form one unit for the convenience of handling and stowage during transport. It is an array of the attributes below.
-
-        **Conditional:** Mandatory for DG (Dangerous Goods) cargo.
-      properties:
-        packageCode:
-          type: string
-          pattern: '^[A-Z0-9]{2}$'
-          description: |
-            A code identifying the outer packaging/overpack. `PackageCode` must follow the codes specified in [Recommendation N°21 - Revision 12  Annexes V and VI](https://unece.org/sites/default/files/2021-06/rec21_Rev12e_Annex-V-VI_2021.xls)
-
-            **Condition:** only applicable to dangerous goods if the `IMO packaging code` is not available.
-          example: 5H
-        imoPackagingCode:
-          type: string
-          pattern: '^[A-Z0-9]{1,5}$'
-          description: |
-            The code of the packaging as per IMO.
-
-            **Condition:** only applicable to dangerous goods if specified in the IMO IMDG code amendment version 41-22. If not available, the `packageCode` as per UN recommendation 21 should be used.
-          example: 1A2
-        numberOfPackages:
-          type: integer
-          format: int32
-          minimum: 1
-          description: |
-            Specifies the number of outer packagings/overpacks associated with this `Commodity`.
-
-            **Conditional:** In case this `OuterPackaging` includes `Dangerous Goods` the `numberOfPackages` is mandatory to provide
-          example: 18
-        # unRecomemendation21PackingCode:
-        #   type: string
-        #   pattern: '^[A-Z0-9]{2}$'
-        #   description: |
-        #     The code of the packaging as per UN recommendation 21.
-        #     **Condition:** only applicable to dangerous goods if the IMO packaging code is not available.
-        #   example: 1A
-        description:
-          type: string
-          maxLength: 100
-          description: |
-            Description of the outer packaging/overpack.
-          example: 'Drum, steel'
-        dangerousGoods:
-          type: array
-          minLength: 1
-          description: |
-            A list of `Dangerous Goods` related to the `Commodity`
-          items:
-            $ref: '#/components/schemas/DangerousGoods_BKG'
 
     ###########
     # Reference
@@ -2958,50 +2813,10 @@ components:
         - location
         - locationTypeCode
 
-    SocEquipment:
-      type: object
-      title: Shipper owned Equipment
-      properties:
-        tareWeight:
-          type: number
-          format: float
-          minimum: 0
-          exclusiveMinimum: true
-          description: |
-            The weight of an empty container (gross container weight).
-          example: 4800
-        tareWeightUnit:
-          type: string
-          description: |
-            The unit of measure which can be expressed in imperial or metric terms
-            - `KGM` (Kilograms)
-            - `LBR` (Pounds)
-          enum:
-            - KGM
-            - LBR
-          example: KGM
-        isShipperOwned:
-          type: boolean
-          description: |
-            Indicates whether the container is shipper owned (`SOC`).
-          example: true
-      required:
-        - tareWeight
-        - tareWeightUnit
-        - isShipperOwned
-    CocEquipment:
-      type: object
-      x-stoplight:
-        id: f16bac5e97b11
-      title: Carrier owned Equipment
-      properties:
-        isShipperOwned:
-          type: boolean
-          description: |
-            Indicates whether the container is shipper owned (`SOC`).
-          example: false
-      required:
-        - isShipperOwned
+    ######################
+    # Requested Equipments
+    ######################
+
     RequestedEquipment:
       type: object
       title: Requested Equipment
@@ -3070,6 +2885,7 @@ components:
       required:
         - ISOEquipmentCode
         - units
+
     RequestedEquipment_CAR:
       type: object
       title: Requested Equipment
@@ -3084,6 +2900,7 @@ components:
             $ref: '#/components/schemas/Commodity_CONF'
       allOf:
         - $ref: '#/components/schemas/RequestedEquipment'
+
     RequestedEquipment_SHI:
       type: object
       title: Requested Equipment
@@ -3098,3 +2915,668 @@ components:
             $ref: '#/components/schemas/Commodity'
       allOf:
         - $ref: '#/components/schemas/RequestedEquipment'
+
+    SocEquipment:
+      type: object
+      title: Shipper owned Equipment
+      properties:
+        tareWeight:
+          type: number
+          format: float
+          minimum: 0
+          exclusiveMinimum: true
+          description: |
+            The weight of an empty container (gross container weight).
+          example: 4800
+        tareWeightUnit:
+          type: string
+          description: |
+            The unit of measure which can be expressed in imperial or metric terms
+            - `KGM` (Kilograms)
+            - `LBR` (Pounds)
+          enum:
+            - KGM
+            - LBR
+          example: KGM
+        isShipperOwned:
+          type: boolean
+          description: |
+            Indicates whether the container is shipper owned (`SOC`).
+          example: true
+      required:
+        - tareWeight
+        - tareWeightUnit
+        - isShipperOwned
+
+    CocEquipment:
+      type: object
+      x-stoplight:
+        id: j7phiab4rb1fl
+      title: Carrier owned Equipment
+      properties:
+        isShipperOwned:
+          type: boolean
+          description: |
+            Indicates whether the container is shipper owned (`SOC`).
+          example: false
+      required:
+        - isShipperOwned
+
+    ###########
+    # Commodity
+    ###########
+
+    Commodity:
+      type: object
+      title: Commodity
+      description: |
+        Type of goods, defined by its commodity type
+      properties:
+        commodityType:
+          type: string
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 550
+          description: |
+            High-level description of goods to be shipped which allow the carrier to confirm acceptance and commercial terms. To be replaced by "description of goods" upon submission of `Shipping Instructions`
+          example: Mobile phones
+        HSCodes:
+          type: array
+          description: |
+            A list of `HS Codes` that apply to this `commodity`
+          items:
+            type: string
+            pattern: '^\d{6,10}$'
+            minLength: 6
+            maxLength: 10
+            description: |
+              Used by customs to classify the product being shipped. The type of HS code depends on country and customs requirements. The code must be at least 6 and at most 10 digits.
+
+              More information can be found here: [HS Nomenclature 2022 edition](https://www.wcoomd.org/en/topics/nomenclature/instrument-and-tools/hs-nomenclature-2022-edition/hs-nomenclature-2022-edition.aspx ).
+
+              This standard is based on the 2022 revision.
+            example: '851713'
+        cargoGrossWeight:
+          type: number
+          format: float
+          example: 36000
+          minimum: 0
+          exclusiveMinimum: true
+          description: |
+            The estimated grand total gross weight of the cargo, including packaging items being carried, which can be expressed in imperial or metric terms, as provided by the shipper.
+        cargoGrossWeightUnit:
+          type: string
+          description: |
+            The unit of measure which can be expressed in imperial or metric terms
+            - `KGM` (Kilograms)
+            - `LBR` (Pounds)
+          enum:
+            - KGM
+            - LBR
+          example: KGM
+        cargoGrossVolume:
+          type: number
+          format: float
+          example: 360
+          minimum: 0
+          exclusiveMinimum: true
+          description: |
+            The grand total volume of the commodity
+        cargoGrossVolumeUnit:
+          type: string
+          description: |
+            The unit of measure which can be expressed in either imperial or metric terms
+            - `FTQ` (Cubic foot)
+            - `MTQ` (Cubic meter)
+          enum:
+            - MTQ
+            - FTQ
+          example: MTQ
+        exportLicenseIssueDate:
+          type: string
+          format: date
+          description: |
+            Issue date of the export license applicable to the booking. Mandatory to provide in booking request for specific commodities
+          example: '2021-05-14'
+        exportLicenseExpiryDate:
+          type: string
+          format: date
+          description: |
+            Expiry date of the export license applicable to the booking.
+
+            Mandatory to provide in booking request for specific commodities.
+          example: '2021-05-21'
+        outerPackaging:
+          $ref: '#/components/schemas/OuterPackaging'
+        references:
+          type: array
+          description: |
+            A list of `References`
+          items:
+            $ref: '#/components/schemas/Reference'
+      required:
+        - commodityType
+        - cargoGrossWeight
+        - cargoGrossWeightUnit
+
+    Commodity_CONF:
+      type: object
+      title: Commodity
+      description: |
+        Type of goods, defined by its commodity type
+      properties:
+        commoditySubreference:
+          type: string
+          maxLength: 100
+          pattern: ^\S+(\s+\S+)*$
+          description: |
+            A unique reference for this commodity object assigned by the carrier in the booking confirmation. The reference must be provided by the shipper as part of the `Shipping Instructions` for the carrier to link the consignment item to this commodity. A commodity reference is only unique in the context of a booking.
+
+            **Conditional:** Mandatory to provide for `CONFIRMED` bookings
+          example: COM-001
+      allOf:
+        - $ref: '#/components/schemas/Commodity'
+
+    # Outer Packaging
+
+    OuterPackaging:
+      type: object
+      title: Outer Packaging
+      description: |
+        Object for outer packaging/overpack specification. Examples of overpacks are a number of packages stacked on to a pallet and secured by strapping or placed in a protective outer packaging such as a box or crate to form one unit for the convenience of handling and stowage during transport. It is an array of the attributes below.
+
+        **Conditional:** Mandatory for DG (Dangerous Goods) cargo.
+      properties:
+        packageCode:
+          type: string
+          pattern: '^[A-Z0-9]{2}$'
+          description: |
+            A code identifying the outer packaging/overpack. `PackageCode` must follow the codes specified in [Recommendation N°21 - Revision 12  Annexes V and VI](https://unece.org/sites/default/files/2021-06/rec21_Rev12e_Annex-V-VI_2021.xls)
+
+            **Condition:** only applicable to dangerous goods if the `IMO packaging code` is not available.
+          example: 5H
+        imoPackagingCode:
+          type: string
+          pattern: '^[A-Z0-9]{1,5}$'
+          description: |
+            The code of the packaging as per IMO.
+
+            **Condition:** only applicable to dangerous goods if specified in the IMO IMDG code amendment version 41-22. If not available, the `packageCode` as per UN recommendation 21 should be used.
+          example: 1A2
+        numberOfPackages:
+          type: integer
+          format: int32
+          minimum: 1
+          description: |
+            Specifies the number of outer packagings/overpacks associated with this `Commodity`.
+
+            **Conditional:** In case this `OuterPackaging` includes `Dangerous Goods` the `numberOfPackages` is mandatory to provide
+          example: 18
+        description:
+          type: string
+          maxLength: 100
+          description: |
+            Description of the outer packaging/overpack.
+          example: 'Drum, steel'
+        dangerousGoods:
+          type: array
+          minLength: 1
+          description: |
+            A list of `Dangerous Goods` related to the `Commodity`
+          items:
+            $ref: '#/components/schemas/DangerousGoods_BKG'
+
+    # Dangerous Goods
+
+    DangerousGoods_BKG:
+      type: object
+      title: 'Dangerous Goods'
+      description: |
+        Specification for `Dangerous Goods`. It is mandatory to either provide the `unNumber` or the `naNumber`. Dangerous Goods is based on **IMDG Amendment Version 41-22**.
+      properties:
+        specialCertificateNumber:
+          type: string
+          maxLength: 255
+          description: |
+            Text field to indicate certificate number & segment for specific stowage requirements overulling IMDG code
+          example: '22663:3'
+        additionalContainerCargoHandling:
+          type: string
+          maxLength: 255
+          description: |
+            Text field to provide cargo handling information already known at the booking stage.
+          example: 'To be handled with extreme care'
+      allOf:
+        - $ref: '#/components/schemas/DangerousGoods'
+      required:
+        - properShippingName
+        - imoClass
+        - isMarinePollutant
+        - isLimitedQuantity
+        - isExceptedQuantity
+        - isSalvagePackings
+        - isEmptyUncleanedResidue
+        - isWaste
+        - isHot
+        - isCompetentAuthorityApprovalProvided
+        - isReportableQuantity
+        - emergencyContactDetails
+        - grossWeight
+
+    DangerousGoods:
+      type: object
+      title: 'Dangerous Goods'
+      oneOf:
+        - type: object
+          title: UN Number
+          properties:
+            unNumber:
+              type: string
+              pattern: '^\d{4}$'
+              description: |
+                United Nations Dangerous Goods Identifier (UNDG) assigned by the UN Sub-Committee of Experts on the Transport of Dangerous Goods and shown in the IMO IMDG.
+              example: '1463'
+          required:
+            - unNumber
+        - type: object
+          title: NA Number
+          properties:
+            naNumber:
+              type: string
+              pattern: '^\d{4}$'
+              description: |
+                Four-digit number that is assigned to dangerous, hazardous, and harmful substances by the United States Department of Transportation.
+              example: '9037'
+          required:
+            - naNumber
+      properties:
+        codedVariantList:
+          type: string
+          pattern: '^[0-3][0-9A-Z]{3}$'
+          description: |
+            Four-character code supplied by Exis Technologies that assists to remove ambiguities when identifying a variant within a single UN number or NA number that may occur when two companies exchange DG information.
+            
+            Character | Valid Characters | Description
+            :--------:|------------------|------------
+            1| 0, 1, 2, 3|The packing group. Code 0 indicates there is no packing group
+            2|0 to 9 and A to Z|A sequence letter for the PSN, or 0 if there were no alternative PSNs
+            3 and 4|0 to 9 and A to Z|Two sequence letters for other information, for the cases where the variant is required because of different in subrisks, packing instruction etc.
+          example: '2200'
+        properShippingName:
+          type: string
+          maxLength: 250
+          description: |
+            The proper shipping name for goods under IMDG Code, or the product name for goods under IBC Code and IGC Code, or the bulk cargo shipping name for goods under IMSBC Code, or the name of oil for goods under Annex I to the MARPOL Convention.
+          example: 'Chromium Trioxide, anhydrous'
+        technicalName:
+          type: string
+          maxLength: 250
+          description: |
+            The recognized chemical or biological name or other name currently used for the referenced dangerous goods as described in chapter 3.1.2.8 of the IMDG Code.
+        imoClass:
+          type: string
+          maxLength: 4
+          description: |
+            The hazard class code of the referenced dangerous goods according to the specified regulation. Examples of possible values are:
+
+            - `1.1A` (Substances and articles which have a mass explosion hazard)
+            - `1.6N` (Extremely insensitive articles which do not have a mass explosion hazard)
+            - `2.1` (Flammable gases)
+            - `8` (Corrosive substances)
+
+            The value must comply with one of the values in the [DG IMO Class value table](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/dcsa/reference-data/imoclasses-v3.1.0.csv)
+          example: '1.4S'
+        subsidiaryRisk1:
+          type: string
+          pattern: '^[0-9](\.[0-9])?$'
+          description: |
+            Any risk in addition to the class of the referenced dangerous goods according to the IMO IMDG Code.
+          example: '1.2'
+        subsidiaryRisk2:
+          type: string
+          pattern: '^[0-9](\.[0-9])?$'
+          description: |
+            Any risk in addition to the class of the referenced dangerous goods according to the IMO IMDG Code.
+          example: '1.2'
+        isMarinePollutant:
+          type: boolean
+          description: |
+            Indicates if the goods belong to the classification of Marine Pollutant.
+          example: false
+        packingGroup:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 3
+          description: |
+            The packing group according to the UN Recommendations on the Transport of Dangerous Goods and IMO IMDG Code.
+          example: 3
+        isLimitedQuantity:
+          type: boolean
+          description: |
+            Indicates if the dangerous goods can be transported as limited quantity in accordance with Chapter 3.4 of the IMO IMDG Code.
+          example: false
+        isExceptedQuantity:
+          type: boolean
+          description: |
+            Indicates if the dangerous goods can be transported as excepted quantity in accordance with Chapter 3.5 of the IMO IMDG Code.
+          example: false
+        isSalvagePackings:
+          type: boolean
+          description: |
+            Indicates if the cargo has special packaging for the transport, recovery or disposal of damaged, defective, leaking or nonconforming hazardous materials packages, or hazardous materials that have spilled or leaked.
+          example: false
+        isEmptyUncleanedResidue:
+          type: boolean
+          description: |
+            Indicates if the cargo is residue.
+          example: false
+        isWaste:
+          type: boolean
+          description: |
+            Indicates if waste is being shipped
+          example: false
+        isHot:
+          type: boolean
+          description: |
+            Indicates if high temperature cargo is shipped.
+          example: false
+        isCompetentAuthorityApprovalProvided:
+          type: boolean
+          description: |
+            Indicates if the cargo require approval from authorities
+          example: false
+        competentAuthorityApproval:
+          type: string
+          pattern: '^\S+(\s+\S+)*$'
+          maxLength: 70
+          description: |
+            Name and reference number of the competent authority providing the approval.
+          example: '{Name and reference...}'
+        segregationGroups:
+          type: array
+          description: |
+            List of the segregation groups applicable to specific hazardous goods according to the IMO IMDG Code.
+            
+            **Condition:** only applicable to specific hazardous goods.
+          items:
+            type: string
+            maxLength: 2
+            description: |
+              Grouping of Dangerous Goods having certain similar chemical properties. Possible values are:
+              
+              - `1` (Acids)
+              - `2` (Ammonium Compounds)
+              - `3` (Bromates)
+              - `4` (Chlorates)
+              - `5` (Chlorites)
+              - `6` (Cyanides)
+              - `7` (Heavy metals and their salts)
+              - `8` (Hypochlorites)
+              - `9` (Lead and its compounds)
+              - `10` (Liquid halogenated hydrocarbons)
+              - `11` (Mercury and mercury compounds)
+              - `12` (Nitrites and their mixtures)
+              - `13` (Perchlorates)
+              - `14` (Permanganates)
+              - `15` (Powdered metals)
+              - `16` (Peroxides),
+              - `17` (Azides)
+              - `18` (Alkalis)
+            example: '12'
+        innerPackagings:
+          type: array
+          description: |
+            A list of `Inner Packings` contained inside this `outer packaging/overpack`.
+          items:
+            $ref: '#/components/schemas/InnerPackaging'
+        emergencyContactDetails:
+          $ref: '#/components/schemas/EmergencyContactDetails'
+        EMSNumber:
+          type: string
+          maxLength: 7
+          description: |
+            The emergency schedule identified in the IMO EmS Guide – Emergency Response Procedures for Ships Carrying Dangerous Goods. Comprises 2 values; 1 for spillage and 1 for fire. Possible values spillage: S-A to S-Z. Possible values fire: F-A to F-Z.
+          example: F-A S-Q
+        endOfHoldingTime:
+          type: string
+          format: date
+          description: |
+            Date by when the refrigerated liquid needs to be delivered.
+          example: '2021-09-03'
+        fumigationDateTime:
+          type: string
+          format: date-time
+          description: |
+            Date & time when the container was fumigated
+          example: '2021-09-03T09:03:00-02:00'
+        isReportableQuantity:
+          type: boolean
+          description: |
+            Indicates if a container of hazardous material is at the reportable quantity level. If `TRUE`, a report to the relevant authority must be made in case of spill.
+          example: false
+        inhalationZone:
+          type: string
+          maxLength: 1
+          minLength: 1
+          description: |
+            The zone classification of the toxicity of the inhalant. Possible values are:
+            - `A` (Hazard Zone A) can be asigned to specific gases and liquids
+            - `B` (Hazard Zone B) can be asigned to specific gases and liquids
+            - `C` (Hazard Zone C) can **only** be asigned to specific gases
+            - `D` (Hazard Zone D) can **only** be asigned to specific gases
+          example: 'A'
+        grossWeight:
+          type: object
+          description: |
+            Total weight of the goods carried, including packaging.
+          properties:
+            value:
+              type: number
+              format: float
+              example: 12000.3
+              minimum: 0
+              exclusiveMinimum: true
+              description: |
+                The grand total weight of the DG cargo and weight per UNNumber/NANumber including packaging items being carried, which can be expressed in imperial or metric terms, as provided by the shipper.
+            unit:
+              type: string
+              description: |
+                The unit of measure which can be expressed in imperial or metric terms
+                - `KGM` (Kilograms)
+                - `LBR` (Pounds)
+              enum:
+                - KGM
+                - LBR
+              example: 'KGM'
+          required:
+            - value
+            - unit
+        netWeight:
+          type: object
+          description: |
+            Total weight of the goods carried, excluding packaging.
+          properties:
+            value:
+              type: number
+              format: float
+              description: |
+                Total weight of the goods carried, excluding packaging.
+              example: 2.4
+            unit:
+              type: string
+              description: |
+                Unit of measure used to describe the `netWeight`. Possible values are
+                - `KGM` (Kilograms)
+                - `LBR` (Pounds)
+              enum:
+                - KGM
+                - LBR
+              example: 'KGM'
+          required:
+            - value
+            - unit
+        netExplosiveContent:
+          type: object
+          description: |
+            The total weight of the explosive substances, without the packaging’s, casings, etc.
+          properties:
+            value:
+              type: number
+              format: float
+              description: |
+                The total weight of the explosive substances, without the packaging’s, casings, etc.
+              example: 2.4
+            unit:
+              type: string
+              description: |
+                Unit of measure used to describe the `netExplosiveWeight`. Possible values are
+                - `KGM` (Kilograms)
+                - `GRM` (Grams)
+              enum:
+                - KGM
+                - GRM
+              example: KGM
+          required:
+            - value
+            - unit
+        volume:
+          type: object
+          description: |
+            The volume of the referenced dangerous goods.
+            
+            **Condition:** only applicable to liquids and gas.
+          properties:
+            value:
+              type: number
+              format: float
+              description: |
+                The volume of the referenced dangerous goods.
+              example: 2.4
+            unit:
+              type: string 
+              description: |
+                The unit of measure which can be expressed in either imperial or metric terms
+                - `FTQ` (Cubic foot)
+                - `MTQ` (Cubic meter)
+                - `LTR` (Litre)
+              enum:
+                - MTQ
+                - FTQ
+                - LTR
+              example: 'MTQ'
+        limits:
+          $ref: '#/components/schemas/Limits'
+
+    InnerPackaging:
+      type: object
+      title: 'Inner Packaging'
+      description: |
+        Object for inner packaging specification
+      properties:
+        quantity:
+          type: integer
+          format: int32
+          description: |
+            Count of `Inner Packagings` of the referenced `Dangerous Goods`.
+          example: 20
+        material:
+          type: string
+          maxLength: 100
+          description: |
+            The `material` used for the `Inner Packaging` of the referenced `Dangerous Goods`.
+          example: 'Plastic'
+        description:
+          type: string
+          maxLength: 100
+          description: |
+            Description of the packaging.
+          example: 'Wowen plastic water resistant Bag'
+      required:
+        - quantity
+        - material
+        - description
+
+    EmergencyContactDetails:
+      type: object
+      title: 'Emergency Contact Details'
+      description: |
+        24 hr emergency contact details
+      properties:
+        contact:
+          type: string
+          maxLength: 255
+          description: |
+            Name of the Contact person during an emergency.
+          example: 'Henrik Larsen'
+        provider:
+          type: string
+          maxLength: 255
+          description: |
+            Name of the third party vendor providing emergency support
+          example: 'GlobeTeam'
+        phone:
+          type: string
+          pattern: '^\S+(\s+\S+)*$'
+          maxLength: 30
+          description: |
+            Phone number for the contact
+          example: '+45 70262970'
+        referenceNumber:
+          type: string
+          maxLength: 255
+          description: |
+            Contract reference for the emergency support provided by an external third party vendor.
+          example: '12234'
+      required:
+        - contact
+        - phone
+
+    Limits:
+      type: object
+      description: |
+        Limits for the `Dangerous Goods`. The same `Temperature Unit` needs to apply to all attributes in this structure.
+      properties:
+        temperatureUnit:
+          type: string
+          description: |
+            The unit for **all attributes in the limits structure** in Celsius or Fahrenheit
+            
+            - `CEL` (Celsius)
+            - `FAH` (Fahrenheit)
+          enum:
+            - CEL
+            - FAH
+          example: 'CEL'
+        flashPoint:
+          type: number
+          format: float
+          description: |
+            Lowest temperature at which a chemical can vaporize to form an ignitable mixture in air. Condition: only applicable to specific hazardous goods according to the IMO IMDG Code amendment version 41-22.
+          example: 42.0
+        transportControlTemperature:
+          type: number
+          format: float
+          description: |
+            Maximum temperature at which certain substance (such as organic peroxides and self-reactive and related substances) can be safely transported for a prolonged period.
+          example: 24.1
+        transportEmergencyTemperature:
+          type: number
+          format: float
+          description: |
+            Temperature at which emergency procedures shall be implemented
+          example: 74.1
+        SADT:
+          type: number
+          format: float
+          description: |
+            Lowest temperature in which self-accelerating decomposition may occur in a substance
+          example: 54.1
+        SAPT:
+          type: number
+          format: float
+          description: |
+            Lowest temperature in which self-accelerating polymerization may occur in a substance
+          example: 70.0
+      required:
+        - temperatureUnit
+
