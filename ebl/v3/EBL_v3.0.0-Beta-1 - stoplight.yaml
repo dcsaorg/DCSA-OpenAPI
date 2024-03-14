@@ -934,7 +934,11 @@ paths:
               type: object
               properties:
                 updatedShippingInstructionsStatus:
-                  $ref: '#/components/schemas/shippingInstructionsUpdateCancelledStatus'
+                  type: string
+                  maxLength: 50
+                  description: |
+                    The status of the `Updated Shipping Instructions`. It can only be `UPDATE CANCELLED`
+                  example: 'UPDATE CANCELLED'
               required:
                 - updatedShippingInstructionsStatus
             examples:
@@ -2040,31 +2044,114 @@ components:
       title: 'Shipping Instructions'
       properties:
         shippingInstructionsReference:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/shippingInstructionsReference'
+          type: string
+          pattern: '^\S+(\s+\S+)*$'
+          maxLength: 100
+          description: |
+            The identifier for a `Shipping Istructions` provided by the carrier for system purposes.
+          example: 'e0559d83-00e2-438e-afd9-fdd610c1a008'
         transportDocumentTypeCode:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/transportDocumentTypeCode'
+          type: string
+          description: |
+            Specifies the type of the transport document
+            - `BOL` (Bill of Lading)
+            - `SWB` (Sea Waybill)
+          enum:
+            - BOL
+            - SWB
+          example: 'SWB'
         isShippedOnBoardType:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/isShippedOnBoardType'
+          type: boolean
+          description: |
+            Specifies whether the Transport Document is a received for shipment, or shipped on board.
+          example: true
         freightPaymentTermCode:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/freightPaymentTermCode'
+          type: string
+          description: |
+            An indicator of whether freight and ancillary fees for the main transport are prepaid (`PRE`) or collect (`COL`). When prepaid the charges are the responsibility of the shipper or the Invoice payer on behalf of the shipper (if provided). When collect, the charges are the responsibility of the consignee or the Invoice payer on behalf of the consignee (if provided).
+
+            - `PRE` (Prepaid)
+            - `COL` (Collect)
+          enum:
+            - PRE
+            - COL
+          example: PRE
         originChargesPaymentTermCode:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/originChargesPaymentTermCode'
+          type: string
+          description: |
+            An indicator of whether origin charges are prepaid (`PRE`) or collect (`COL`). When prepaid, the charges are the responsibility of the shipper or the Invoice payer on behalf of the shipper (if provided). When collect, the charges are the responsibility of the consignee or the Invoice payer on behalf of the consignee (if provided). Examples of origin charges are customs clearance fees, documentation fees, container packing and loading charges levied at the port of origin to cover the costs of preparing the cargo for shipment. They include the cost of inland transportation to the port, when applicable.
+
+            - `PRE` (Prepaid)
+            - `COL` (Collect)
+          enum:
+            - PRE
+            - COL
+          example: PRE
         destinationChargesPaymentTermCode:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/destinationChargesPaymentTermCode'
+          type: string
+          description: |
+            An indicator of whether destination charges are prepaid (`PRE`) or collect (`COL`). When prepaid, the charges are the responsibility of the shipper or the Invoice payer on behalf of the shipper (if provided). When collect, the charges are the responsibility of the consignee or the Invoice payer on behalf of the consignee (if provided). Examples of destination charges are customs clearance fees, documentation fees, terminal handling fees at the destination port and the costs of inland transportation from the port to the final delivery location, when applicable.
+
+            - `PRE` (Prepaid)
+            - `COL` (Collect)
+          enum:
+            - PRE
+            - COL
+          example: PRE
         isElectronic:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/isElectronic'
+          type: boolean
+          description: |
+            An indicator whether the transport document is electronically transferred.
+          example: true
         sendToPlatform:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/sendToPlatform'
+          type: string
+          maxLength: 4
+          description: |
+            Indicates the shipper’s platform on which the eBL should be issued. The value **MUST** be one of:
+            - `WAVE` (Wave)
+            - `CARX` (CargoX)
+            - `ESSD` (EssDocs)
+            - `BOLE` (Bolero)
+            - `EDOX` (EdoxOnline)
+            - `IQAX` (IQAX)
+            - `SECR` (Secro)
+            - `TRGO` (TradeGo)
+            
+            **Condition:** Mandatory for electronic Bill of Lading (`isElectronic=TRUE`).
+          example: 'WAVE'
         isToOrder:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/isToOrder'
+          type: boolean
+          description: |
+            Indicates whether the B/L is issued `to order` or not. If `true`, the B/L is considered negotiable and an Endorsee party can be defined in the Document parties. If no Endorsee is defined, the B/L is blank endorsed. If `false`, the B/L is considered non-negotiable (also referred to as `straight`).
+            
+            `isToOrder` must be `false` if `transportDocumentTypeCode='SWB'` (Sea Waybill).
+          example: false
         numberOfCopiesWithCharges:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/numberOfCopiesWithCharges'
+          type: integer
+          format: int32
+          minimum: 0
+          description: 'The requested number of copies of the Transport document to be issued by the carrier including charges. Only applicable for physical (paper) documents'
+          example: 2
         numberOfCopiesWithoutCharges:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/numberOfCopiesWithoutCharges'
+          type: integer
+          format: int32
+          minimum: 0
+          description: 'The requested number of copies of the Transport document to be issued by the carrier **NOT** including charges. Only applicable for physical (paper) documents'
+          example: 2
         numberOfOriginalsWithCharges:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/numberOfOriginalsWithCharges'
+          type: integer
+          format: int32
+          minimum: 0
+          description: |
+            Number of originals of the bill of lading that has been requested by the customer with charges. Only applicable for physical documents.
+          example: 1
         numberOfOriginalsWithoutCharges:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/numberOfOriginalsWithoutCharges'
+          type: integer
+          format: int32
+          minimum: 0
+          description: |
+            Number of originals of the bill of lading that has been requested by the customer without charges. Only applicable for physical documents.
+          example: 1
         displayedNameForPlaceOfReceipt:
           description: |
             The name to be used in order to specify how the `Place of Receipt` should be displayed on the transport document to match the name and/or address provided on the letter of credit.
@@ -2072,7 +2159,10 @@ components:
           minItems: 1
           maxItems: 5
           items:
-            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/displayedName'
+            type: string
+            maxLength: 35
+            description: |
+              A line of the address to be displayed on the transport document.
         displayedNameForPortOfLoad:
           description: |
             The name to be used in order to specify how the `Port of Load` should be displayed on the transport document to match the name and/or address provided on the letter of credit.
@@ -2080,7 +2170,10 @@ components:
           minItems: 1
           maxItems: 5
           items:
-            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/displayedName'
+            type: string
+            maxLength: 35
+            description: |
+              A line of the address to be displayed on the transport document.
         displayedNameForPortOfDischarge:
           description: |
             The name to be used in order to specify how the `Port of Discharge` should be displayed on the transport document to match the name and/or address provided on the letter of credit.
@@ -2088,7 +2181,10 @@ components:
           minItems: 1
           maxItems: 5
           items:
-            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/displayedName'
+            type: string
+            maxLength: 35
+            description: |
+              A line of the address to be displayed on the transport document.
         displayedNameForPlaceOfDelivery:
           description: |
             The name to be used in order to specify how the `Place of Delivery` should be displayed on the transport document to match the name and/or address provided on the letter of credit.
@@ -2096,7 +2192,10 @@ components:
           minItems: 1
           maxItems: 5
           items:
-            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/displayedName'
+            type: string
+            maxLength: 35
+            description: |
+              A line of the address to be displayed on the transport document.
         placeOfIssue:
           type: object
           description: |
@@ -2108,13 +2207,13 @@ components:
             locationType: 'UNLO'
             UNLocationCode: 'NLAMS'
           oneOf:
-            - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/LOCATION_DOMAIN/4.0.0#/components/schemas/addressLocation'
-            - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/LOCATION_DOMAIN/4.0.0#/components/schemas/unLocationLocation'
+            - $ref: '#/components/schemas/AddressLocation'
+            - $ref: '#/components/schemas/UNLocationLocation'
           discriminator:
             propertyName: locationType
             mapping:
-              ADDR: 'https://api.swaggerhub.com/domains/dcsaorg/LOCATION_DOMAIN/4.0.0#/components/schemas/addressLocation'
-              UNLO: 'https://api.swaggerhub.com/domains/dcsaorg/LOCATION_DOMAIN/4.0.0#/components/schemas/unLocationLocation'
+              ADDR: '#/components/schemas/AddressLocation'
+              UNLO: '#/components/schemas/UNLocationLocation'
         invoicePayableAt:
           type: object
           description: |
@@ -2126,13 +2225,13 @@ components:
             locationType: 'UNLO'
             UNLocationCode: 'FRPAR'
           oneOf:
-            - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/LOCATION_DOMAIN/4.0.0#/components/schemas/addressLocation'
-            - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/LOCATION_DOMAIN/4.0.0#/components/schemas/unLocationLocation'
+            - $ref: '#/components/schemas/AddressLocation'
+            - $ref: '#/components/schemas/UNLocationLocation'
           discriminator:
             propertyName: locationType
             mapping:
-              ADDR: 'https://api.swaggerhub.com/domains/dcsaorg/LOCATION_DOMAIN/4.0.0#/components/schemas/addressLocation'
-              UNLO: 'https://api.swaggerhub.com/domains/dcsaorg/LOCATION_DOMAIN/4.0.0#/components/schemas/unLocationLocation'
+              ADDR: '#/components/schemas/AddressLocation'
+              UNLO: '#/components/schemas/UNLocationLocation'
         partyContactDetails:
           type: array
           description: |
@@ -2210,37 +2309,140 @@ components:
       title: 'Shipping Instructions'
       properties:
         shippingInstructionsReference:
-          $ref: '#/components/schemas/shippingInstructionsReference'
+          type: string
+          pattern: '^\S+(\s+\S+)*$'
+          maxLength: 100
+          description: |
+            The identifier for a `Shipping Istructions` provided by the carrier for system purposes.
+          example: 'e0559d83-00e2-438e-afd9-fdd610c1a008'
         transportDocumentReference:
-          $ref: '#/components/schemas/transportDocumentReference'
+          type: string
+          pattern: '^\S+(\s+\S+)*$'
+          maxLength: 20
+          description: |
+            A unique number allocated by the shipping line to the transport document and the main number used for the tracking of the status of the shipment.
+          example: 'HHL71800000'
         shippingInstructionsStatus:
-          $ref: '#/components/schemas/shippingInstructionsStatus'
+          type: string
+          maxLength: 50
+          description: |
+            The status of the `Shipping Instructions`. Possible values are:
+            - `RECEIVED` (Shipping Instructions has been received)
+            - `PENDING UPDATE` (An update is required to the Shipping Instructions)
+            - `COMPLETED` (The Shipping Instructions can no longer be modified - the related Transport Document has been surrendered for delivery)
+          example: 'RECEIVED'
         updatedShippingInstructionsStatus:
-          $ref: '#/components/schemas/updatedShippingInstructionsStatus'
+          type: string
+          maxLength: 50
+          description: |
+            The status of the latest update to the `Shipping Instructions`. If no update has been requested - then this field is empty. Possible values are:
+            - `UPDATE RECEIVED` (An update to a Shipping Instructions is waiting to be processed)
+            - `UPDATE CONFIRMED` (An update to a Shipping Instructions has been confirmed)
+            - `UPDATE CANCELLED` (An update to a Shipping Instructions is discontinued by consumer)
+            - `UPDATE DECLINED` (An update to a Shipping Instructions is discontinued by provider)
+          example: 'UPDATE RECEIVED'
         transportDocumentTypeCode:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/transportDocumentTypeCode'
+          type: string
+          description: |
+            Specifies the type of the transport document
+            - `BOL` (Bill of Lading)
+            - `SWB` (Sea Waybill)
+          enum:
+            - BOL
+            - SWB
+          example: 'SWB'
         isShippedOnBoardType:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/isShippedOnBoardType'
+          type: boolean
+          description: |
+            Specifies whether the Transport Document is a received for shipment, or shipped on board.
+          example: true
         freightPaymentTermCode:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/freightPaymentTermCode'
+          type: string
+          description: |
+            An indicator of whether freight and ancillary fees for the main transport are prepaid (`PRE`) or collect (`COL`). When prepaid the charges are the responsibility of the shipper or the Invoice payer on behalf of the shipper (if provided). When collect, the charges are the responsibility of the consignee or the Invoice payer on behalf of the consignee (if provided).
+
+            - `PRE` (Prepaid)
+            - `COL` (Collect)
+          enum:
+            - PRE
+            - COL
+          example: PRE
         originChargesPaymentTermCode:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/originChargesPaymentTermCode'
+          type: string
+          description: |
+            An indicator of whether origin charges are prepaid (`PRE`) or collect (`COL`). When prepaid, the charges are the responsibility of the shipper or the Invoice payer on behalf of the shipper (if provided). When collect, the charges are the responsibility of the consignee or the Invoice payer on behalf of the consignee (if provided). Examples of origin charges are customs clearance fees, documentation fees, container packing and loading charges levied at the port of origin to cover the costs of preparing the cargo for shipment. They include the cost of inland transportation to the port, when applicable.
+
+            - `PRE` (Prepaid)
+            - `COL` (Collect)
+          enum:
+            - PRE
+            - COL
+          example: PRE
         destinationChargesPaymentTermCode:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/destinationChargesPaymentTermCode'
+          type: string
+          description: |
+            An indicator of whether destination charges are prepaid (`PRE`) or collect (`COL`). When prepaid, the charges are the responsibility of the shipper or the Invoice payer on behalf of the shipper (if provided). When collect, the charges are the responsibility of the consignee or the Invoice payer on behalf of the consignee (if provided). Examples of destination charges are customs clearance fees, documentation fees, terminal handling fees at the destination port and the costs of inland transportation from the port to the final delivery location, when applicable.
+
+            - `PRE` (Prepaid)
+            - `COL` (Collect)
+          enum:
+            - PRE
+            - COL
+          example: PRE
         isElectronic:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/isElectronic'
+          type: boolean
+          description: |
+            An indicator whether the transport document is electronically transferred.
+          example: true
         sendToPlatform:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/sendToPlatform'
+          type: string
+          maxLength: 4
+          description: |
+            Indicates the shipper’s platform on which the eBL should be issued. The value **MUST** be one of:
+            - `WAVE` (Wave)
+            - `CARX` (CargoX)
+            - `ESSD` (EssDocs)
+            - `BOLE` (Bolero)
+            - `EDOX` (EdoxOnline)
+            - `IQAX` (IQAX)
+            - `SECR` (Secro)
+            - `TRGO` (TradeGo)
+            
+            **Condition:** Mandatory for electronic Bill of Lading (`isElectronic=TRUE`).
+          example: 'WAVE'
         isToOrder:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/isToOrder'
+          type: boolean
+          description: |
+            Indicates whether the B/L is issued `to order` or not. If `true`, the B/L is considered negotiable and an Endorsee party can be defined in the Document parties. If no Endorsee is defined, the B/L is blank endorsed. If `false`, the B/L is considered non-negotiable (also referred to as `straight`).
+            
+            `isToOrder` must be `false` if `transportDocumentTypeCode='SWB'` (Sea Waybill).
+          example: false
         numberOfCopiesWithCharges:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/numberOfCopiesWithCharges'
+          type: integer
+          format: int32
+          minimum: 0
+          description: 'The requested number of copies of the Transport document to be issued by the carrier including charges. Only applicable for physical (paper) documents'
+          example: 2
         numberOfCopiesWithoutCharges:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/numberOfCopiesWithoutCharges'
+          type: integer
+          format: int32
+          minimum: 0
+          description: 'The requested number of copies of the Transport document to be issued by the carrier **NOT** including charges. Only applicable for physical (paper) documents'
+          example: 2
         numberOfOriginalsWithCharges:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/numberOfOriginalsWithCharges'
+          type: integer
+          format: int32
+          minimum: 0
+          description: |
+            Number of originals of the bill of lading that has been requested by the customer with charges. Only applicable for physical documents.
+          example: 1
         numberOfOriginalsWithoutCharges:
-          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/numberOfOriginalsWithoutCharges'
+          type: integer
+          format: int32
+          minimum: 0
+          description: |
+            Number of originals of the bill of lading that has been requested by the customer without charges. Only applicable for physical documents.
+          example: 1
         displayedNameForPlaceOfReceipt:
           description: |
             The name to be used in order to specify how the `Place of Receipt` should be displayed on the transport document to match the name and/or address provided on the letter of credit.
@@ -2248,7 +2450,10 @@ components:
           minItems: 1
           maxItems: 5
           items:
-            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/displayedName'
+            type: string
+            maxLength: 35
+            description: |
+              A line of the address to be displayed on the transport document.
         displayedNameForPortOfLoad:
           description: |
             The name to be used in order to specify how the `Port of Load` should be displayed on the transport document to match the name and/or address provided on the letter of credit.
@@ -2256,7 +2461,10 @@ components:
           minItems: 1
           maxItems: 5
           items:
-            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/displayedName'
+            type: string
+            maxLength: 35
+            description: |
+              A line of the address to be displayed on the transport document.
         displayedNameForPortOfDischarge:
           description: |
             The name to be used in order to specify how the `Port of Discharge` should be displayed on the transport document to match the name and/or address provided on the letter of credit.
@@ -2264,7 +2472,10 @@ components:
           minItems: 1
           maxItems: 5
           items:
-            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/displayedName'
+            type: string
+            maxLength: 35
+            description: |
+              A line of the address to be displayed on the transport document.
         displayedNameForPlaceOfDelivery:
           description: |
             The name to be used in order to specify how the `Place of Delivery` should be displayed on the transport document to match the name and/or address provided on the letter of credit.
@@ -2272,7 +2483,10 @@ components:
           minItems: 1
           maxItems: 5
           items:
-            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/displayedName'
+            type: string
+            maxLength: 35
+            description: |
+              A line of the address to be displayed on the transport document.
         placeOfIssue:
           type: object
           description: |
@@ -2284,13 +2498,13 @@ components:
             locationType: 'UNLO'
             UNLocationCode: 'NLAMS'
           oneOf:
-            - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/LOCATION_DOMAIN/4.0.0#/components/schemas/addressLocation'
-            - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/LOCATION_DOMAIN/4.0.0#/components/schemas/unLocationLocation'
+            - $ref: '#/components/schemas/AddressLocation'
+            - $ref: '#/components/schemas/UNLocationLocation'
           discriminator:
             propertyName: locationType
             mapping:
-              ADDR: 'https://api.swaggerhub.com/domains/dcsaorg/LOCATION_DOMAIN/4.0.0#/components/schemas/addressLocation'
-              UNLO: 'https://api.swaggerhub.com/domains/dcsaorg/LOCATION_DOMAIN/4.0.0#/components/schemas/unLocationLocation'
+              ADDR: '#/components/schemas/AddressLocation'
+              UNLO: '#/components/schemas/UNLocationLocation'
         invoicePayableAt:
           type: object
           description: |
@@ -2302,13 +2516,13 @@ components:
             locationType: 'UNLO'
             UNLocationCode: 'FRPAR'
           oneOf:
-            - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/LOCATION_DOMAIN/4.0.0#/components/schemas/addressLocation'
-            - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/LOCATION_DOMAIN/4.0.0#/components/schemas/unLocationLocation'
+            - $ref: '#/components/schemas/AddressLocation'
+            - $ref: '#/components/schemas/UNLocationLocation'
           discriminator:
             propertyName: locationType
             mapping:
-              ADDR: 'https://api.swaggerhub.com/domains/dcsaorg/LOCATION_DOMAIN/4.0.0#/components/schemas/addressLocation'
-              UNLO: 'https://api.swaggerhub.com/domains/dcsaorg/LOCATION_DOMAIN/4.0.0#/components/schemas/unLocationLocation'
+              ADDR: '#/components/schemas/AddressLocation'
+              UNLO: '#/components/schemas/UNLocationLocation'
         partyContactDetails:
           type: array
           description: |
@@ -2373,7 +2587,12 @@ components:
           items:
             $ref: '#/components/schemas/RequestedChange'
         reason:
-          $ref: '#/components/schemas/reason_EBL'
+          type: string
+          title: reason
+          maxLength: 5000
+          description: |
+            This field can be used to explain `shippingInstructionsStatus` and/or `updatedShippingInstructionsStatus`.
+          example: 'Rejected because of of wrong equipmentReference'
       required:
         - shippingInstructionsStatus
         - transportDocumentTypeCode
@@ -2394,13 +2613,38 @@ components:
         The `shippingInstructionsReference`, possibly the `transportDocumentReference` along with the `shippingInstructionsStatus` and `updatedShippingInstructionsStatus`, an optional list of `requestedChanges` to be applied to the `Shipping Instructions` and and optional `reason`field is returned.
       properties:
         shippingInstructionsReference:
-          $ref: '#/components/schemas/shippingInstructionsReference'
+          type: string
+          pattern: '^\S+(\s+\S+)*$'
+          maxLength: 100
+          description: |
+            The identifier for a `Shipping Istructions` provided by the carrier for system purposes.
+          example: 'e0559d83-00e2-438e-afd9-fdd610c1a008'
         transportDocumentReference:
-          $ref: '#/components/schemas/transportDocumentReference'
+          type: string
+          pattern: '^\S+(\s+\S+)*$'
+          maxLength: 20
+          description: |
+            A unique number allocated by the shipping line to the transport document and the main number used for the tracking of the status of the shipment.
+          example: 'HHL71800000'
         shippingInstructionsStatus:
-          $ref: '#/components/schemas/shippingInstructionsStatus'
+          type: string
+          maxLength: 50
+          description: |
+            The status of the `Shipping Instructions`. Possible values are:
+            - `RECEIVED` (Shipping Instructions has been received)
+            - `PENDING UPDATE` (An update is required to the Shipping Instructions)
+            - `COMPLETED` (The Shipping Instructions can no longer be modified - the related Transport Document has been surrendered for delivery)
+          example: 'RECEIVED'
         updatedShippingInstructionsStatus:
-          $ref: '#/components/schemas/updatedShippingInstructionsStatus'
+          type: string
+          maxLength: 50
+          description: |
+            The status of the latest update to the `Shipping Instructions`. If no update has been requested - then this field is empty. Possible values are:
+            - `UPDATE RECEIVED` (An update to a Shipping Instructions is waiting to be processed)
+            - `UPDATE CONFIRMED` (An update to a Shipping Instructions has been confirmed)
+            - `UPDATE CANCELLED` (An update to a Shipping Instructions is discontinued by consumer)
+            - `UPDATE DECLINED` (An update to a Shipping Instructions is discontinued by provider)
+          example: 'UPDATE RECEIVED'
         requestedChanges:
           type: array
           description: |
@@ -2408,7 +2652,12 @@ components:
           items:
             $ref: '#/components/schemas/RequestedChange'
         reason:
-          $ref: '#/components/schemas/reason_EBL'
+          type: string
+          title: reason
+          maxLength: 5000
+          description: |
+            This field can be used to explain `shippingInstructionsStatus` and/or `updatedShippingInstructionsStatus`.
+          example: 'Rejected because of of wrong equipmentReference'
       required:
         - shippingInstructionsStatus
 
@@ -2419,17 +2668,80 @@ components:
         The `shippingInstructionsReference`, possibly the `transportDocumentReference` along with the `shippingInstructionsStatus` and `updatedShippingInstructionsStatus` and and optional `reason`field is returned.
       properties:
         shippingInstructionsReference:
-          $ref: '#/components/schemas/shippingInstructionsReference'
+          type: string
+          pattern: '^\S+(\s+\S+)*$'
+          maxLength: 100
+          description: |
+            The identifier for a `Shipping Istructions` provided by the carrier for system purposes.
+          example: 'e0559d83-00e2-438e-afd9-fdd610c1a008'
         transportDocumentReference:
-          $ref: '#/components/schemas/transportDocumentReference'
+          type: string
+          pattern: '^\S+(\s+\S+)*$'
+          maxLength: 20
+          description: |
+            A unique number allocated by the shipping line to the transport document and the main number used for the tracking of the status of the shipment.
+          example: 'HHL71800000'
         shippingInstructionsStatus:
-          $ref: '#/components/schemas/shippingInstructionsStatus'
+          type: string
+          maxLength: 50
+          description: |
+            The status of the `Shipping Instructions`. Possible values are:
+            - `RECEIVED` (Shipping Instructions has been received)
+            - `PENDING UPDATE` (An update is required to the Shipping Instructions)
+            - `COMPLETED` (The Shipping Instructions can no longer be modified - the related Transport Document has been surrendered for delivery)
+          example: 'RECEIVED'
         updatedShippingInstructionsStatus:
-          $ref: '#/components/schemas/shippingInstructionsUpdateCancelledStatus'
+          type: string
+          maxLength: 50
+          description: |
+            The status of the `Updated Shipping Instructions`. It can only be `UPDATE CANCELLED`
+          example: 'UPDATE CANCELLED'
         reason:
-          $ref: '#/components/schemas/reason_EBL'
+          type: string
+          title: reason
+          maxLength: 5000
+          description: |
+            This field can be used to explain `shippingInstructionsStatus` and/or `updatedShippingInstructionsStatus`.
+          example: 'Rejected because of of wrong equipmentReference'
       required:
         - shippingInstructionsStatus
+
+    ##################
+    # Requested Change
+    ##################
+
+    RequestedChange:
+      type: object
+      title: Requested Change
+      description: |
+        A change required to the document in order for the carrier to accepted it
+      properties:
+        field:
+          type: string
+          maxLength: 500
+          description: |
+            The field that caused the error, e.g. a failed validation. The field can be expressed as a [JSONpath](https://github.com/json-path/JsonPath) using either the [DOT] Notation or the [Bracket] Notation.
+          example: $.location.facilityCode
+        # property:
+        #   type: string
+        #   maxLength: 100
+        #   description: |
+        #     The name of the property causing the error.
+        #   example: 'facilityCode'
+        # jsonPath:
+        #   type: string
+        #   maxLength: 500
+        #   description: |
+        #     A path to the property causing the error, formatted according to [JSONpath](https://github.com/json-path/JsonPath).
+        #   example: '$.location.facilityCode'
+        message:
+          type: string
+          maxLength: 500
+          description: |
+            A description of the problem that needs attention.
+          example: Spaces not allowed in facility code
+      required:
+        - message
 
     #################
     # Error Responses
@@ -2831,6 +3143,7 @@ components:
         - party
         - partyFunction
         - isToBeNotified
+
     Party:
       type: object
       title: Party
@@ -2865,6 +3178,7 @@ components:
             $ref: '#/components/schemas/TaxLegalReference'
       required:
         - partyName
+
     PartyContactDetail:
       type: object
       title: Party Contact Detail
@@ -2913,6 +3227,7 @@ components:
             - email
       required:
         - name
+
     IdentifyingCode:
       type: object
       title: Identifying Code
@@ -2921,42 +3236,24 @@ components:
           type: string
           maxLength: 5
           description: >
-            A DCSA provided code for
-            [UN/CEFACT](https://unece.org/fileadmin/DAM/trade/untdid/d16b/tred/tred3055.htm)
-            code list providers:
+            A DCSA provided code for [UN/CEFACT](https://unece.org/fileadmin/DAM/trade/untdid/d16b/tred/tred3055.htm) code list providers:
 
             - `ISO` (International Standards Organization)
-
             - `UNECE` (United Nations Economic Commission for Europe)
-
             - `LLOYD` (Lloyd's register of shipping)
-
             - `BIC` (Bureau International des Containeurs)
-
             - `IMO` (International Maritime Organization)
-
             - `SCAC` (Standard Carrier Alpha Code)
-
             - `ITIGG` (International Transport Implementation Guidelines Group)
-
             - `ITU` (International Telecommunication Union)
-
             - `SMDG` (Shipplanning Message Development Group)
-
             - `NCBH` (NCB Hazcheck)
-
             - `FMC` (Federal Maritime Commission)
-
             - `CBSA` (Canada Border Services Agency)
-
             - `DCSA` (Digitial Container Shipping Association)
-
             - `W3C` (World Wide Web Consortium)
-
             - `GLEIF` (Global Legal Entity Identifier Foundation)
-
             - `EPI` (EBL Platform Identifier)
-
             - `ZZZ` (Mutually defined)
           example: SMDG
         partyCode:
@@ -2974,38 +3271,26 @@ components:
       required:
         - codeListProvider
         - partyCode
+
     TaxLegalReference:
       type: object
       title: Tax & Legal Reference
       description: >
-        Reference that uniquely identifies a party for tax and/or legal purposes
-        in accordance with the relevant jurisdiction.
-
+        Reference that uniquely identifies a party for tax and/or legal purposes in accordance with the relevant jurisdiction.
 
         A list of examples:
 
-
         | Type  | Country | Description |
-
         |-------|:-------:|-------------|
-
         |PAN|IN|Goods and Services Tax Identification Number in India|
-
         |GSTIN|IN|Goods and Services Tax Identification Number in India|
-
         |IEC|IN|Importer-Exported Code in India|
-
         |RUC|EC|Registro Único del Contribuyente in Ecuador|
-
         |RUC|PE|Registro Único del Contribuyente in Peru|
-
         |NIF|MG|Numéro d’Identification Fiscal in Madagascar|
-
         |NIF|DZ|Numéro d’Identification Fiscal in Algeria|
 
-
-        Allowed combinations of `type` and `country` are maintained in
-        [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/documentation/reference-data/taxandlegalreferences-v300.csv).
+        Allowed combinations of `type` and `country` are maintained in [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/documentation/reference-data/taxandlegalreferences-v300.csv).
       properties:
         type:
           type: string
@@ -3035,9 +3320,11 @@ components:
         - type
         - countryCode
         - value
-      ###########
-      # Reference
-      ###########
+
+    ###########
+    # Reference
+    ###########
+
     Reference:
       type: object
       title: Reference
@@ -3074,3 +3361,1346 @@ components:
       required:
         - type
         - value
+
+    ##################
+    # Consignment Item
+    ##################
+
+    ConsignmentItem:
+      type: object
+      title: 'Consignment Item'
+      description: |
+        Defines a list of `CargoItems` belonging together and the associated `Booking`. A `ConsignmentItem` can be split across multiple containers (`UtilizedTransportEquipment`) by referencing multiple `CargoItems`
+      properties:
+        carrierBookingReference:
+          type: string
+          pattern: '^\S+(\s+\S+)*$'
+          maxLength: 35
+          # Extended description of carrierBookingReference compared to DCSA_DOMAIN description
+          description: |
+            The associated booking number provided by the carrier for this `Consignment Item`.
+            
+            When multiple `carrierBookingReferences` are used then the bookings referred to must all contain the same:
+            - transportPlan
+            - shipmentLocations
+            - receiptTypeAtOrigin
+            - deliveryTypeAtDestination
+            - cargoMovementTypeAtOrigin
+            - cargoMovementTypeAtDestination
+            - serviceContractReference
+            - termsAndConditions
+            - Place of B/L Issue (if provided)
+          example: 'ABC709951'
+        weight:
+          type: number
+          format: float
+          minimum: 0
+          exclusiveMinimum: true
+          # Extended description of weight compared to DCSA_DOMAIN description
+          description: |
+            The total weight of all the `CargoItems` listed in the `ConsignmentItem`. Excludes the tare weight of the container(s).
+          example: 13000.3
+        weightUnit:
+          type: string
+          description: |
+            The unit of measure which can be expressed in imperial or metric terms
+            - `KGM` (Kilograms)
+            - `LBR` (Pounds)
+          enum:
+            - KGM
+            - LBR
+          example: 'KGM'
+        volume:
+          type: number
+          format: float
+          minimum: 0
+          exclusiveMinimum: true
+          # Extended description of volume compared to DCSA_DOMAIN description
+          description: |
+            The total volume of all the `CargoItems` listed in the `ConsignmentItem`.
+          example: 12.0
+        volumeUnit:
+          type: string 
+          description: |
+            The unit of measure which can be expressed in either imperial or metric terms
+            - `FTQ` (Cubic foot)
+            - `MTQ` (Cubic meter)
+          enum:
+            - MTQ
+            - FTQ
+          example: 'MTQ'
+        descriptionOfGoods:
+          type: string
+          maxLength: 5000
+          pattern: '^\S+(\s+\S+)*$'
+          description: 'The cargo description are details which accurately and properly describe the cargo being shipped in the container(s) as provided by the shipper.'
+          example: '300 boxes of blue shoes size 47'
+        HSCodes:
+          type: array
+          minLength: 1
+          description: |
+            A list of `HS Codes` that apply to this `consignmentItem`
+          items:
+            type: string
+            pattern: '^\d{6,10}$'
+            minLength: 6
+            maxLength: 10
+            description: |
+              Used by customs to classify the product being shipped. The type of HS code depends on country and customs requirements. The code must be at least 6 and at most 10 digits.
+              
+              More information can be found here: [HS Nomenclature 2022 edition](https://www.wcoomd.org/en/topics/nomenclature/instrument-and-tools/hs-nomenclature-2022-edition/hs-nomenclature-2022-edition.aspx ).
+              
+              This standard is based on the 2022 revision.
+            example: '851713'
+        references:
+          type: array
+          description: |
+            A list of `References`
+          items:
+            $ref: '#/components/schemas/Reference'
+        customsReferences:
+          type: array
+          description: |
+            A list of `Customs references`
+          items:
+            $ref: '#/components/schemas/CustomsReference'
+      required:
+        - carrierBookingReference
+        - weight
+        - weightUnit
+        - descriptionOfGoods
+        - HSCodes
+        - cargoItems
+
+    ConsignmentItem_CAR:
+      type: object
+      title: 'Consignment Item'
+      description: |
+        Defines a list of `CargoItems` belonging together and the associated `Booking`. A `ConsignmentItem` can be split across multiple containers (`UtilizedTransportEquipment`) by referencing multiple `CargoItems`
+      properties:
+        cargoItems:
+          type: array
+          minItems: 1
+          description: |
+            A list of all `cargoItems`
+          items:
+            $ref: '#/components/schemas/CargoItem_CAR'
+      allOf:
+        - $ref: '#/components/schemas/ConsignmentItem'
+      required:
+        - cargoItems
+
+    ConsignmentItem_SHI:
+      type: object
+      title: 'Consignment Item'
+      description: |
+        Defines a list of `CargoItems` belonging together and the associated `Booking`. A `ConsignmentItem` can be split across multiple containers (`UtilizedTransportEquipment`) by referencing multiple `CargoItems`
+      properties:
+        commoditySubreference:
+          type: string
+          maxLength: 100
+          pattern: '^\S+(\s+\S+)*$'
+          description: |
+            A unique reference to the commodity object assigned by the carrier in the booking confirmation. The reference must be provided by the shipper as part of the `Shipping Instructions` for the carrier to link this consignment item to the commodity. A commodity reference is only unique in the context of a booking.
+          example: 'COM-001'
+        cargoItems:
+          type: array
+          minItems: 1
+          description: |
+            A list of all `cargoItems`
+          items:
+            $ref: '#/components/schemas/CargoItem_SHI'
+      allOf:
+        - $ref: '#/components/schemas/ConsignmentItem'
+      required:
+        - cargoItems
+        - commoditySubreference
+
+    ##################
+    # Custom Reference
+    ##################
+
+    CustomsReference:
+      type: object
+      title: 'Custom Reference'
+      description: |
+        Reference associated with customs and/or excise purposes required by the relevant authorities for the import, export, or transit of the goods.
+
+        A (small) list of examples:
+        
+        | Type  | Country | Description |
+        |-------|:-------:|-------------|
+        |ACID|EG|Advance Cargo Information Declaration in Egypt|
+        |CERS|CA|Canadian Export Reporting System|
+        |ITN|US|Internal Transaction Number in US|
+        |PEB|ID|PEB reference number|
+        |CSN|IN|Cargo Summary Notification (CSN)|
+        
+        Allowed combinations of `type` and `country` are maintained in [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/documentation/reference-data/customsreferences-v300.csv).
+      properties:
+        type:
+          type: string
+          pattern: '^\S+(\s+\S+)*$'
+          maxLength: 50
+          description: |
+            The reference type code as defined in the relevant customs jurisdiction.
+          example: 'ACID'
+        countryCode:
+          type: string
+          pattern: '^[A-Z]{2}$'
+          minLength: 2
+          maxLength: 2
+          description: |
+            The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+          example: 'DK'
+        value:
+          type: string
+          pattern: '^\S+(\s+\S+)*$'
+          maxLength: 100
+          description: |
+            The value of the `customsReference`
+          example: '4988470982020120017'
+      required:
+        - type
+        - countryCode
+        - value
+
+    ############
+    # Cargo Item
+    ############
+
+    CargoItem_CAR:
+      type: object
+      title: 'Cargo Item'
+      description: |
+        A `cargoItem` is the smallest unit used by stuffing. A `cargoItem` cannot be split across containers.
+      properties:
+        shippingMarks:
+          type: array
+          minItems: 1
+          description: |
+            A list of the `ShippingMarks` applicable to this `cargoItem`
+          items:
+            type: string
+            maxLength: 500
+            description: |
+              The identifying details of a package or the actual markings that appear on the package(s). This information is provided by the customer.
+            example: 'Made in China'
+        equipmentReference:
+          type: string
+          pattern: '^\S+(\s+\S+)*$'
+          maxLength: 11
+          description: |
+            The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.
+            According to [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346), a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit).
+            
+            If a container does not comply with [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346), it is suggested to follow [Recommendation #2: Containers with non-ISO identification](https://smdg.org/documents/smdg-recommendations) from SMDG.
+          example: 'APZU4812090'
+        weight:
+          type: number
+          format: float
+          minimum: 0
+          exclusiveMinimum: true
+          description: |
+            The total weight of the cargo including packaging items being carried in the container(s). Excludes the tare weight of the container(s).
+          example: 13000.3
+        weightUnit:
+          type: string
+          description: |
+            The unit of measure which can be expressed in imperial or metric terms
+            - `KGM` (Kilograms)
+            - `LBR` (Pounds)
+          enum:
+            - KGM
+            - LBR
+          example: 'KGM'
+        volume:
+          type: number
+          format: float
+          minimum: 0
+          exclusiveMinimum: true
+          description: |
+            Calculated by multiplying the width, height, and length of the packed cargo.
+          example: 12.0
+        volumeUnit:
+          type: string 
+          description: |
+            The unit of measure which can be expressed in either imperial or metric terms
+            - `FTQ` (Cubic foot)
+            - `MTQ` (Cubic meter)
+          enum:
+            - MTQ
+            - FTQ
+          example: 'MTQ'
+        outerPackaging:
+          $ref: '#/components/schemas/OuterPackaging_CAR'
+        customsReferences:
+          type: array
+          description: |
+            A list of `Customs references`
+          items:
+            $ref: '#/components/schemas/CustomsReference'
+      required:
+        - equipmentReference
+        - weight
+        - weightUnit
+        - outerPackaging
+
+    CargoItem_SHI:
+      type: object
+      title: 'Cargo Item'
+      description: |
+        A `cargoItem` is the smallest unit used by stuffing. A `cargoItem` cannot be split across containers.
+      properties:
+        shippingMarks:
+          type: array
+          minItems: 1
+          description: |
+            A list of the `ShippingMarks` applicable to this `cargoItem`
+          items:
+            type: string
+            maxLength: 500
+            description: |
+              The identifying details of a package or the actual markings that appear on the package(s). This information is provided by the customer.
+            example: 'Made in China'
+        equipmentReference:
+          type: string
+          pattern: '^\S+(\s+\S+)*$'
+          maxLength: 11
+          description: |
+            The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.
+            According to [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346), a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit).
+            
+            If a container does not comply with [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346), it is suggested to follow [Recommendation #2: Containers with non-ISO identification](https://smdg.org/documents/smdg-recommendations) from SMDG.
+          example: 'APZU4812090'
+        weight:
+          type: number
+          format: float
+          minimum: 0
+          exclusiveMinimum: true
+          description: |
+            The total weight of the cargo including packaging items being carried in the container(s). Excludes the tare weight of the container(s).
+          example: 13000.3
+        weightUnit:
+          type: string
+          description: |
+            The unit of measure which can be expressed in imperial or metric terms
+            - `KGM` (Kilograms)
+            - `LBR` (Pounds)
+          enum:
+            - KGM
+            - LBR
+          example: 'KGM'
+        volume:
+          type: number
+          format: float
+          minimum: 0
+          exclusiveMinimum: true
+          description: |
+            Calculated by multiplying the width, height, and length of the packed cargo.
+          example: 12.0
+        volumeUnit:
+          type: string 
+          description: |
+            The unit of measure which can be expressed in either imperial or metric terms
+            - `FTQ` (Cubic foot)
+            - `MTQ` (Cubic meter)
+          enum:
+            - MTQ
+            - FTQ
+          example: 'MTQ'
+        outerPackaging:
+          $ref: '#/components/schemas/OuterPackaging_SHI'
+        customsReferences:
+          type: array
+          description: |
+            A list of `Customs references`
+          items:
+            $ref: '#/components/schemas/CustomsReference'
+      required:
+        - equipmentReference
+        - weight
+        - weightUnit
+        - outerPackaging
+
+    ################
+    # Outerpackaging
+    ################
+
+    # Object used for the POST Shipping Instructions - here it is **not** possible to modify DG attributes
+    # Compared to the outerPackaging of the Booking - this object also contains the `packageCode`
+    OuterPackaging_SHI:
+      type: object
+      title: 'Outer Packaging'
+      description: |
+        Object for outer packaging/overpack specification. Examples of overpacks are a number of packages stacked on to a pallet and secured by strapping or placed in a protective outer packaging such as a box or crate to form one unit for the convenience of handling and stowage during transport. It is an array of the attributes below.
+      properties:
+        packageCode:
+          type: string
+          pattern: '^[A-Z0-9]{2}$'
+          description: |
+            A code identifying the outer packaging/overpack. `PackageCode` must follow the codes specified in [Recommendation N°21 - Revision 12  Annexes V and VI](https://unece.org/sites/default/files/2021-06/rec21_Rev12e_Annex-V-VI_2021.xls)
+            
+            **Condition:** only applicable to dangerous goods if the `IMO packaging code` is not available.
+          example: 5H
+        numberOfPackages:
+          type: integer
+          format: int32
+          minimum: 1
+          # Extended description of numberOfPackages compared to DCSA_DOMAIN description
+          description: |
+            Specifies the number of outer packagings/overpacks associated with this `Cargo Item`.
+          example: 18
+        description:
+          type: string
+          maxLength: 100
+          description: |
+            Description of the outer packaging/overpack.
+          example: Drum, steel
+      required:
+        - numberOfPackages
+
+    OuterPackaging_CAR:
+      type: object
+      title: 'Outer Packaging'
+      description: |
+        Object for outer packaging/overpack specification. Examples of overpacks are a number of packages stacked on to a pallet and secured by strapping or placed in a protective outer packaging such as a box or crate to form one unit for the convenience of handling and stowage during transport. It is an array of the attributes below.
+      properties:
+        imoPackagingCode:
+          type: string
+          pattern: '^[A-Z0-9]{1,5}$'
+          description: |
+            The code of the packaging as per IMO.
+            
+            **Condition:** only applicable to dangerous goods if specified in the IMO IMDG code amendment version 41-22. If not available, the package code as per UN recommendation 21 should be used.
+          example: 1A2
+        dangerousGoods:
+          type: array
+          description: |
+            A list of `Dangerous Goods`
+          items:
+            $ref: '#/components/schemas/DangerousGoods_CAR'
+      allOf:
+        - $ref: '#/components/schemas/OuterPackaging_SHI'
+      required:
+        - description
+
+    #################
+    # Dangerous Goods
+    #################
+
+    DangerousGoods_CAR:
+      type: object
+      title: 'Dangerous Goods'
+      description: |
+        Specification for `Dangerous Goods`. It is mandatory to either provide the `unNumber` or the `naNumber`. Dangerous Goods is based on **IMDG Amendment Version 41-22**.
+      allOf:
+        - $ref: '#/components/schemas/DangerousGoods'
+      required:
+        - properShippingName
+        - imoClass
+
+    DangerousGoods:
+      type: object
+      title: Dangerous Goods
+      oneOf:
+        - type: object
+          title: UN Number
+          properties:
+            unNumber:
+              type: string
+              pattern: '^\d{4}$'
+              description: |
+                United Nations Dangerous Goods Identifier (UNDG) assigned by the UN Sub-Committee of Experts on the Transport of Dangerous Goods and shown in the IMO IMDG.
+              example: '1463'
+          required:
+            - unNumber
+        - type: object
+          title: NA Number
+          properties:
+            naNumber:
+              type: string
+              pattern: '^\d{4}$'
+              description: |
+                Four-digit number that is assigned to dangerous, hazardous, and harmful substances by the United States Department of Transportation.
+              example: '9037'
+          required:
+            - naNumber
+      properties:
+        codedVariantList:
+          type: string
+          pattern: '^[0-3][0-9A-Z]{3}$'
+          description: |
+            Four-character code supplied by Exis Technologies that assists to remove ambiguities when identifying a variant within a single UN number or NA number that may occur when two companies exchange DG information.
+
+            Character | Valid Characters | Description
+            :--------:|------------------|------------
+            1| 0, 1, 2, 3|The packing group. Code 0 indicates there is no packing group
+            2|0 to 9 and A to Z|A sequence letter for the PSN, or 0 if there were no alternative PSNs
+            3 and 4|0 to 9 and A to Z|Two sequence letters for other information, for the cases where the variant is required because of different in subrisks, packing instruction etc.
+          example: '2200'
+        properShippingName:
+          type: string
+          maxLength: 250
+          description: |
+            The proper shipping name for goods under IMDG Code, or the product name for goods under IBC Code and IGC Code, or the bulk cargo shipping name for goods under IMSBC Code, or the name of oil for goods under Annex I to the MARPOL Convention.
+          example: 'Chromium Trioxide, anhydrous'
+        technicalName:
+          type: string
+          maxLength: 250
+          description: |
+            The recognized chemical or biological name or other name currently used for the referenced dangerous goods as described in chapter 3.1.2.8 of the IMDG Code.
+        imoClass:
+          type: string
+          maxLength: 4
+          description: |
+            The hazard class code of the referenced dangerous goods according to the specified regulation. Examples of possible values are:
+
+            - `1.1A` (Substances and articles which have a mass explosion hazard)
+            - `1.6N` (Extremely insensitive articles which do not have a mass explosion hazard)
+            - `2.1` (Flammable gases)
+            - `8` (Corrosive substances)
+
+            The value must comply with one of the values in the [DG IMO Class value table](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/dcsa/reference-data/imoclasses-v3.1.0.csv)
+          example: 1.4S
+        subsidiaryRisk1:
+          type: string
+          pattern: '^[0-9](\.[0-9])?$'
+          description: |
+            Any risk in addition to the class of the referenced dangerous goods according to the IMO IMDG Code.
+          example: '1.2'
+        subsidiaryRisk2:
+          type: string
+          pattern: '^[0-9](\.[0-9])?$'
+          description: |
+            Any risk in addition to the class of the referenced dangerous goods according to the IMO IMDG Code.
+          example: '1.2'
+        isMarinePollutant:
+          type: boolean
+          description: |
+            Indicates if the goods belong to the classification of Marine Pollutant.
+          example: false
+        packingGroup:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 3
+          description: |
+            The packing group according to the UN Recommendations on the Transport of Dangerous Goods and IMO IMDG Code.
+          example: 3
+        isLimitedQuantity:
+          type: boolean
+          description: |
+            Indicates if the dangerous goods can be transported as limited quantity in accordance with Chapter 3.4 of the IMO IMDG Code.
+          example: false
+        isExceptedQuantity:
+          type: boolean
+          description: |
+            Indicates if the dangerous goods can be transported as excepted quantity in accordance with Chapter 3.5 of the IMO IMDG Code.
+          example: false
+        isSalvagePackings:
+          type: boolean
+          description: |
+            Indicates if the cargo has special packaging for the transport, recovery or disposal of damaged, defective, leaking or nonconforming hazardous materials packages, or hazardous materials that have spilled or leaked.
+          example: false
+        isEmptyUncleanedResidue:
+          type: boolean
+          description: |
+            Indicates if the cargo is residue.
+          example: false
+        isWaste:
+          type: boolean
+          description: |
+            Indicates if waste is being shipped
+          example: false
+        isHot:
+          type: boolean
+          description: |
+            Indicates if high temperature cargo is shipped.
+          example: false
+        isCompetentAuthorityApprovalProvided:
+          type: boolean
+          description: |
+            Indicates if the cargo require approval from authorities
+          example: false
+        competentAuthorityApproval:
+          type: string
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 70
+          description: |
+            Name and reference number of the competent authority providing the approval.
+          example: '{Name and reference...}'
+        segregationGroups:
+          type: array
+          description: |
+            List of the segregation groups applicable to specific hazardous goods according to the IMO IMDG Code.
+
+            **Condition:** only applicable to specific hazardous goods.
+          items:
+            type: string
+            maxLength: 2
+            description: |
+              Grouping of Dangerous Goods having certain similar chemical properties. Possible values are:
+
+              - `1` (Acids)
+              - `2` (Ammonium Compounds)
+              - `3` (Bromates)
+              - `4` (Chlorates)
+              - `5` (Chlorites)
+              - `6` (Cyanides)
+              - `7` (Heavy metals and their salts)
+              - `8` (Hypochlorites)
+              - `9` (Lead and its compounds)
+              - `10` (Liquid halogenated hydrocarbons)
+              - `11` (Mercury and mercury compounds)
+              - `12` (Nitrites and their mixtures)
+              - `13` (Perchlorates)
+              - `14` (Permanganates)
+              - `15` (Powdered metals)
+              - `16` (Peroxides),
+              - `17` (Azides)
+              - `18` (Alkalis)
+            example: '12'
+        innerPackagings:
+          type: array
+          description: |
+            A list of `Inner Packings` contained inside this `outer packaging/overpack`.
+          items:
+            $ref: '#/components/schemas/InnerPackaging'
+        emergencyContactDetails:
+          $ref: '#/components/schemas/EmergencyContactDetails'
+        EMSNumber:
+          type: string
+          maxLength: 7
+          description: |
+            The emergency schedule identified in the IMO EmS Guide – Emergency Response Procedures for Ships Carrying Dangerous Goods. Comprises 2 values; 1 for spillage and 1 for fire. Possible values spillage: S-A to S-Z. Possible values fire: F-A to F-Z.
+          example: F-A S-Q
+        endOfHoldingTime:
+          type: string
+          format: date
+          description: |
+            Date by when the refrigerated liquid needs to be delivered.
+          example: '2021-09-03'
+        fumigationDateTime:
+          type: string
+          format: date-time
+          description: |
+            Date & time when the container was fumigated
+          example: '2021-09-03T09:03:00-02:00'
+        isReportableQuantity:
+          type: boolean
+          description: |
+            Indicates if a container of hazardous material is at the reportable quantity level. If `TRUE`, a report to the relevant authority must be made in case of spill.
+          example: false
+        inhalationZone:
+          type: string
+          maxLength: 1
+          minLength: 1
+          description: |
+            The zone classification of the toxicity of the inhalant. Possible values are:
+
+            - `A` (Hazard Zone A) can be asigned to specific gases and liquids
+            - `B` (Hazard Zone B) can be asigned to specific gases and liquids
+            - `C` (Hazard Zone C) can **only** be asigned to specific gases
+            - `D` (Hazard Zone D) can **only** be asigned to specific gases
+          example: A
+        grossWeight:
+          type: object
+          description: |
+            Total weight of the goods carried, including packaging.
+          properties:
+            value:
+              type: number
+              format: float
+              example: 12000.3
+              minimum: 0
+              exclusiveMinimum: true
+              description: |
+                The grand total weight of the DG cargo and weight per `UNNumber`/`NANumber` including packaging items being carried, which can be expressed in imperial or metric terms, as provided by the shipper.
+            unit:
+              type: string
+              description: |
+                The unit of measure which can be expressed in imperial or metric terms
+
+                - `KGM` (Kilograms)
+                - `LBR` (Pounds)
+              enum:
+                - KGM
+                - LBR
+              example: KGM
+          required:
+            - value
+            - unit
+        netWeight:
+          type: object
+          description: |
+            Total weight of the goods carried, excluding packaging.
+          properties:
+            value:
+              type: number
+              format: float
+              description: |
+                Total weight of the goods carried, excluding packaging.
+              example: 2.4
+            unit:
+              type: string
+              description: |
+                Unit of measure used to describe the `netWeight`. Possible values are
+
+                - `KGM` (Kilograms)
+                - `LBR` (Pounds)
+              enum:
+                - KGM
+                - LBR
+              example: KGM
+          required:
+            - value
+            - unit
+        netExplosiveContent:
+          type: object
+          description: |
+            The total weight of the explosive substances, without the packaging’s, casings, etc.
+          properties:
+            value:
+              type: number
+              format: float
+              description: |
+                The total weight of the explosive substances, without the packaging’s, casings, etc.
+              example: 2.4
+            unit:
+              type: string
+              description: |
+                Unit of measure used to describe the `netExplosiveWeight`. Possible values are
+
+                - `KGM` (Kilograms)
+                - `GRM` (Grams)
+              enum:
+                - KGM
+                - GRM
+              example: KGM
+          required:
+            - value
+            - unit
+        volume:
+          type: object
+          description: |
+            The volume of the referenced dangerous goods.
+
+            **Condition:** only applicable to liquids and gas.
+          properties:
+            value:
+              type: number
+              format: float
+              description: |
+                The volume of the referenced dangerous goods.
+              example: 2.4
+            unit:
+              type: string
+              description: |
+                The unit of measure which can be expressed in either imperial or metric terms
+
+                - `FTQ` (Cubic foot)
+                - `MTQ` (Cubic meter)
+                - `LTR` (Litre)
+              enum:
+                - MTQ
+                - FTQ
+                - LTR
+              example: MTQ
+        limits:
+          $ref: '#/components/schemas/Limits'
+
+    InnerPackaging:
+      type: object
+      title: Inner Packaging
+      description: |
+        Object for inner packaging specification
+      properties:
+        quantity:
+          type: integer
+          format: int32
+          description: |
+            Count of `Inner Packagings` of the referenced `Dangerous Goods`.
+          example: 20
+        material:
+          type: string
+          maxLength: 100
+          description: |
+            The `material` used for the `Inner Packaging` of the referenced `Dangerous Goods`.
+          example: Plastic
+        description:
+          type: string
+          maxLength: 100
+          description: |
+            Description of the packaging.
+          example: Wowen plastic water resistant Bag
+      required:
+        - quantity
+        - material
+        - description
+
+    EmergencyContactDetails:
+      type: object
+      title: Emergency Contact Details
+      description: |
+        24 hr emergency contact details
+      properties:
+        contact:
+          type: string
+          maxLength: 255
+          description: |
+            Name of the Contact person during an emergency.
+          example: Henrik Larsen
+        provider:
+          type: string
+          maxLength: 255
+          description: |
+            Name of the third party vendor providing emergency support
+          example: GlobeTeam
+        phone:
+          type: string
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 30
+          description: |
+            Phone number for the contact
+          example: +45 70262970
+        referenceNumber:
+          type: string
+          maxLength: 255
+          description: |
+            Contract reference for the emergency support provided by an external third party vendor.
+          example: '12234'
+      required:
+        - contact
+        - phone
+
+    Limits:
+      type: object
+      description: |
+        Limits for the `Dangerous Goods`. The same `Temperature Unit` needs to apply to all attributes in this structure.
+      properties:
+        temperatureUnit:
+          type: string
+          description: |
+            The unit for **all attributes in the limits structure** in Celsius or Fahrenheit
+
+            - `CEL` (Celsius)
+            - `FAH` (Fahrenheit)
+          enum:
+            - CEL
+            - FAH
+          example: CEL
+        flashPoint:
+          type: number
+          format: float
+          description: |
+            Lowest temperature at which a chemical can vaporize to form an ignitable mixture in air. Condition: only applicable to specific hazardous goods according to the IMO IMDG Code amendment version 41-22.
+          example: 42
+        transportControlTemperature:
+          type: number
+          format: float
+          description: |
+            Maximum temperature at which certain substance (such as organic peroxides and self-reactive and related substances) can be safely transported for a prolonged period.
+          example: 24.1
+        transportEmergencyTemperature:
+          type: number
+          format: float
+          description: |
+            Temperature at which emergency procedures shall be implemented
+          example: 74.1
+        SADT:
+          type: number
+          format: float
+          description: |
+            Lowest temperature in which self-accelerating decomposition may occur in a substance
+          example: 54.1
+        SAPT:
+          type: number
+          format: float
+          description: |
+            Lowest temperature in which self-accelerating polymerization may occur in a substance
+          example: 70
+      required:
+        - temperatureUnit
+
+    ##############################
+    # Utilized Transport Equipment
+    ##############################
+
+    # Calculated fields have been removed
+    UtilizedTransportEquipment_CAR:
+      type: object
+      title: 'Utilized Transport Equipment'
+      description: |
+        Specifies the container (`equipment`), the total `weight`, total `volume`, possible `ActiveReeferSettings`, `seals` and `references`
+      properties:
+        equipment:
+          $ref: '#/components/schemas/Equipment'
+        cargoGrossWeight:
+          type: number
+          format: float
+          example: 12000.0
+          minimum: 0
+          exclusiveMinimum: true
+          description: |
+            The grand total weight of the cargo and weight per container including packaging, which can be expressed in imperial or metric terms, as provided by the shipper. Excludes the tare weight of the container.
+        cargoGrossWeightUnit:
+          type: string
+          description: |
+            The unit of measure which can be expressed in imperial or metric terms
+            - `KGM` (Kilograms)
+            - `LBR` (Pounds)
+          enum:
+            - KGM
+            - LBR
+          example: 'KGM'
+        cargoGrossVolume:
+          type: number
+          format: float
+          example: 120.0
+          minimum: 0
+          exclusiveMinimum: true
+          description: |
+            The grand total volume of the cargo per container, which can be expressed in imperial or metric terms, as provided by the shipper.
+        cargoGrossVolumeUnit:
+          type: string 
+          description: |
+            The unit of measure which can be expressed in either imperial or metric terms
+            - `FTQ` (Cubic foot)
+            - `MTQ` (Cubic meter)
+            
+            **Conditional:** if `cargoGrossVolume` is provided then `cargoGrossVolumeUnit` is required
+          enum:
+            - MTQ
+            - FTQ
+          example: 'MTQ'
+        isShipperOwned:
+          type: boolean
+          description: |
+            Indicates whether the container is shipper owned (SOC).
+          example: true
+        isNonOperatingReefer:
+          type: boolean
+          description: |
+            If the equipment is a Reefer Container then setting this attribute will indicate that the container should be treated as a `DRY` container.
+            
+            **Condition:** Only applicable if `ISOEquipmentCode` shows a Reefer type.
+          example: false
+        activeReeferSettings:
+          $ref: '#/components/schemas/ActiveReeferSettings'
+        seals:
+          type: array
+          minLength: 1
+          description: |
+            A list of `Seals`
+          items:
+            $ref: '#/components/schemas/Seal'
+        references:
+          type: array
+          description: |
+            A list of `References`
+          items:
+            $ref: '#/components/schemas/Reference'
+        customsReferences:
+          type: array
+          description: |
+            A list of `Customs references`
+          items:
+            $ref: '#/components/schemas/CustomsReference'
+      required:
+        - equipment
+        - cargoGrossWeight
+        - cargoGrossWeightUnit
+        - isShipperOwned
+        - seals
+
+    UtilizedTransportEquipment_SHI:
+      type: object
+      title: 'Utilized Transport Equipment'
+      description: |
+        Specifies the container (`Equipment`), `Seals` and `References`
+      properties:
+        seals:
+          type: array
+          minLength: 1
+          description: |
+            A list of `Seals`
+          items:
+            $ref: '#/components/schemas/Seal'
+        references:
+          type: array
+          description: |
+            A list of `References`
+          items:
+            $ref: '#/components/schemas/Reference'
+        customsReferences:
+          type: array
+          description: |
+            A list of `Customs references`
+          items:
+            $ref: '#/components/schemas/CustomsReference'
+      oneOf:
+        - $ref: '#/components/schemas/UTEquipment'
+        - $ref: '#/components/schemas/UTEquipmentReference'
+      discriminator:
+        propertyName: isShipperOwned
+        mapping:
+          'true': '#/components/schemas/UTEquipment'
+          'false': '#/components/schemas/UTEquipmentReference'
+      required:
+        - seals
+
+    UTEquipment:
+      type: object
+      title: 'Shipper Owned Equipment (SoC)'
+      description: |
+        To be used for SoC (Shipper owned Containers). If `isShipperOwned` is true then the equipment used needs to be specified
+      properties:
+        isShipperOwned:
+          type: boolean
+          description: |
+            Indicates whether the container is shipper owned (SOC).
+          example: true
+        equipment:
+          $ref: '#/components/schemas/RequiredEquipment'
+      required:
+        - isShipperOwned
+        - equipment
+
+    UTEquipmentReference:
+      type: object
+      title: 'Carrier Owned Equipment'
+      description: |
+        To be used when referring to carrier owned containers (`isShipperOwned` is false). In this case it is only necessary to provide `equipmentReference`
+      properties:
+        isShipperOwned:
+          type: boolean
+          description: |
+            Indicates whether the container is shipper owned (SOC).
+          example: false
+        equipmentReference:
+          type: string
+          pattern: '^\S+(\s+\S+)*$'
+          maxLength: 11
+          description: |
+            The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.
+            According to [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346), a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit).
+            
+            If a container does not comply with [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346), it is suggested to follow [Recommendation #2: Containers with non-ISO identification](https://smdg.org/documents/smdg-recommendations) from SMDG.
+          example: 'APZU4812090'
+      required:
+        - isShipperOwned
+        - equipmentReference
+
+    ###########
+    # Equipment
+    ###########
+
+    Equipment:
+      type: object
+      description: |
+        Used for storing cargo in/on during transport. The equipment size/type is defined by the ISO 6346 code. The most common equipment size/type is 20'/40'/45' DRY Freight Container, but several different versions exist.
+      properties:
+        equipmentReference:
+          type: string
+          pattern: '^\S+(\s+\S+)*$'
+          maxLength: 11
+          description: |
+            The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.
+            According to [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346), a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit).
+            
+            If a container does not comply with [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346), it is suggested to follow [Recommendation #2: Containers with non-ISO identification](https://smdg.org/documents/smdg-recommendations) from SMDG.
+          example: 'APZU4812090'
+        ISOEquipmentCode:
+          type: string
+          pattern: '^\S+(\s+\S+)*$'
+          maxLength: 4
+          description: |
+            Unique code for the different equipment size and type used to transport commodities. The code can refer to either the ISO size type (e.g. 22G1) or the ISO type group (e.g. 22GP) following the [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346) standard.
+          example: '22GP'
+        tareWeight:
+          type: number
+          format: float
+          minimum: 0
+          exclusiveMinimum: true
+          description: |
+            The weight of an empty container (gross container weight).
+          example: 4800.0
+        weightUnit:
+          type: string
+          description: |
+            The unit of measure which can be expressed in imperial or metric terms
+            - `KGM` (Kilograms)
+            - `LBR` (Pounds)
+            
+            **Conditional:** Mandatory to provide if `tareWeight` is provided
+          enum:
+            - KGM
+            - LBR
+          example: 'KGM'
+      required:
+        - equipmentReference
+
+    RequiredEquipment:
+      type: object
+      title: 'Equipment'
+      description: |
+        Used for storing cargo in/on during transport. The equipment size/type is defined by the ISO 6346 code. The most common equipment size/type is 20'/40'/45' DRY Freight Container, but several different versions exist.
+      allOf:
+        - $ref: '#/components/schemas/Equipment'
+      required:
+        - equipmentReference
+        - ISOEquipmentCode
+        - tareWeight
+        - weightUnit
+
+    ######
+    # Seal
+    ######
+
+    Seal:
+      type: object
+      description: |
+        Addresses the seal-related information associated with the shipment equipment. A seal is put on a shipment equipment once it is loaded. This `Seal` is meant to stay on until the shipment equipment reaches its final destination.
+      properties:
+        number:
+          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/sealNumber'
+        source:
+          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/sealSource'
+        type:
+          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/schemas/sealType'
+      required:
+        - number
+
+    ########################
+    # Active Reefer Settings
+    ########################
+
+    ActiveReeferSettings:
+      type: object
+      title: Active Reefer Settings
+      description: |
+        The specifications for a Reefer equipment.
+
+        **Condition:** Only applicable when `isNonOperatingReefer` is set to `false`
+      properties:
+        temperatureSetpoint:
+          type: number
+          format: float
+          description: |
+            Target value of the temperature for the Reefer based on the cargo requirement.
+          example: -15
+        temperatureUnit:
+          type: string
+          description: |
+            The unit for temperature in Celsius or Fahrenheit
+
+            - `CEL` (Celsius)
+            - `FAH` (Fahrenheit)
+
+            **Condition:** Mandatory to provide if `temperatureSetpoint` is provided
+          enum:
+            - CEL
+            - FAH
+          example: CEL
+        o2Setpoint:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 100
+          description: |
+            The percentage of the controlled atmosphere CO<sub>2</sub> target value
+          example: 25
+        co2Setpoint:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 100
+          description: |
+            The percentage of the controlled atmosphere CO<sub>2</sub> target value
+          example: 25
+        humiditySetpoint:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 100
+          description: |
+            The percentage of the controlled atmosphere humidity target value
+          example: 95.6
+        airExchangeSetpoint:
+          type: number
+          format: float
+          minimum: 0
+          description: |
+            Target value for the air exchange rate which is the rate at which outdoor air replaces indoor air within a Reefer container
+          example: 15.4
+        airExchangeUnit:
+          type: string
+          description: |
+            The unit for `airExchange` in metrics- or imperial- units per hour
+            - `MQH` (Cubic metre per hour)
+            - `FQH` (Cubic foot per hour)
+
+            **Condition:** Mandatory to provide if `airExchange` is provided
+          enum:
+            - MQH
+            - FQH
+          example: MQH
+        isVentilationOpen:
+          type: boolean
+          description: |
+            If `true` the ventilation orifice is `Open` - if `false` the ventilation orifice is `closed`
+          example: true
+        isDrainholesOpen:
+          type: boolean
+          description: |
+            Is drainholes open on the container
+          example: true
+        isBulbMode:
+          type: boolean
+          description: |
+            Is special container setting for handling flower bulbs active
+          example: true
+        isColdTreatmentRequired:
+          type: boolean
+          description: |
+            Indicator whether cargo requires cold treatment prior to loading at origin or during transit, but prior arrival at POD
+          example: true
+        isControlledAtmosphereRequired:
+          type: boolean
+          description: |
+            Indicator of whether cargo requires Controlled Atmosphere.
+          example: true
+
+    ##########################
+    # Advance Manifest Filings
+    ##########################
+
+    AdvanceManifestFiling_BKG:
+      type: object
+      title: Advance Manifest Filing
+      description: |
+        An Advance Maifest Filing defined by a Manifest type code in combination with a country code.
+
+        A list of `manifestTypeCodes` together with `countryCode` is maintained in [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/documentation/reference-data/advancemanifestfilings-v300.csv). A (small) subset can be seen here:
+
+        | manifestTypeCode | countryCode | Description |
+        |-----------------------|:-------------:|-------------|
+        |ACI|EG|Advance Cargo Information in Egypt|
+        |ACE|US|Automated Commercial Environment in the United States|
+        |AFR|JP|Cargo Summary Notification (CSN)|
+      properties:
+        manifestTypeCode:
+          type: string
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 50
+          description: |
+            The Manifest type code as defined by the provider. A list of `manifestTypeCodes` together with `countryCode` is maintained in [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/documentation/reference-data/advancemanifestfilings-v300.csv)
+          example: ACE
+        countryCode:
+          type: string
+          pattern: '^[A-Z]{2}$'
+          minLength: 2
+          maxLength: 2
+          description: |
+            The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+          example: DK
+      example:
+        manifestTypeCode: ACE
+        countryCode: US
+      required:
+        - manifestTypeCode
+        - countryCode
+
+    AdvanceManifestFiling_EBL:
+      type: object
+      title: 'Advance Manifest Filing'
+      properties:
+        advanceManifestFilingsHouseBLPerformedBy:
+          type: string
+          description: |
+            Indicates whether the shipper (`SHIPPER`) will perform the advance manifest filing(s) for the House BL directly or if the carrier (`CARRIER`) should file them on their behalf. Allowed values are:
+            
+            - `SHIPPER` (the shipper does the filing)
+            - `CARRIER` (the carrier does the filing)
+            
+            In case of self-filing (`SHIPPER`), the shipper can provide their `selfFilerCode` for each manifest.
+        
+            **Condition:** The `selfFilerCode` must be provided when `manifestTypeCode` is either `ACE` (US) or `ACI` (CA) and the `advanceManifestFilingsHouseBLPerformedBy` is set to `SHIPPER`.
+          enum:
+            - SHIPPER
+            - CARRIER
+          example: 'SHIPPER'
+        selfFilerCode:
+          type: string
+          pattern: '^\S+(\s+\S+)*$'
+          maxLength: 100
+          description: |
+            Code identifying the party who will submit the advance manifest filing(s) for the House BL.
+            
+            **Mandatory** if `manifestTypeCode` is either `ACE` (US) or `ACI` (CA) and `advanceManifestFilingsHouseBLPerformedBy` is set to `SHIPPER`.
+          example: 'FLXP'
+      allOf:
+        - $ref: '#/components/schemas/AdvanceManifestFiling_BKG'
+      required:
+        - advanceManifestFilingsHouseBLPerformedBy
+
+    ################################
+    # Requested Carrier Certificates
+    ################################
+
+    RequestedCarrierCertificate:
+      type: string
+      maxLength: 100
+      title: 'Requested Carrier Certificate'
+      description: |
+        Name of the certificate. Detailed information about carrier certificates can be found [here](https://dcsa.org/wp-content/uploads/2023/12/28-12-2023_Carrier-Certificates-shipment-voyage-particulars-and-vessel-particulars.pdf). Possible values are:
+        - `SHIPMENT_VOYAGE_PARTICULARS_1` (Shipment-Voyage Particulars 1)
+        - `SHIPMENT_VOYAGE_PARTICULARS_2` (Shipment-Voyage Particulars 2)
+        - `SHIPMENT_VOYAGE_PARTICULARS_3` (Shipment-Voyage Particulars 3)
+        - `SHIPMENT_VOYAGE_PARTICULARS_4` (Shipment-Voyage Particulars 4)
+        - `SHIPMENT_VOYAGE_PARTICULARS_5` (Shipment-Voyage Particulars 5)
+        - `SHIPMENT_VOYAGE_PARTICULARS_6` (Shipment-Voyage Particulars 6)
+        - `SHIPMENT_VOYAGE_PARTICULARS_7` (Shipment-Voyage Particulars 7)
+        - `VESSEL_PARTICULARS_1` (Vessel Particulars 1)
+        - `VESSEL_PARTICULARS_2` (Vessel Particulars 2)
+        - `VESSEL_PARTICULARS_3` (Vessel Particulars 3)
+        - `VESSEL_PARTICULARS_4` (Vessel Particulars 4)
+        - `VESSEL_PARTICULARS_5` (Vessel Particulars 5)
+        - `VESSEL_PARTICULARS_6` (Vessel Particulars 6)
+        - `VESSEL_PARTICULARS_7` (Vessel Particulars 7)
+        - `VESSEL_PARTICULARS_8` (Vessel Particulars 8)
+        - `VESSEL_PARTICULARS_9` (Vessel Particulars 9)
+        - `VESSEL_PARTICULARS_10` (Vessel Particulars 10)
+        - `VESSEL_PARTICULARS_11` (Vessel Particulars 11)
+        - `VESSEL_PARTICULARS_12` (Vessel Particulars 12)
+        - `VESSEL_PARTICULARS_13` (Vessel Particulars 13)
+        - `VESSEL_PARTICULARS_14` (Vessel Particulars 14)
+        - `VESSEL_PARTICULARS_15` (Vessel Particulars 15)
+        - `VESSEL_PARTICULARS_16` (Vessel Particulars 16)
+        - `VESSEL_PARTICULARS_17` (Vessel Particulars 17)
+        - `VESSEL_PARTICULARS_18` (Vessel Particulars 18)
+
+        More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/carriercertificates.csv).
+      example: 'VESSEL_PARTICULARS_1'
+
+    ###########################
+    # Requested Carrier Clauses
+    ###########################
+
+    RequestedCarrierClause:
+      type: string
+      maxLength: 100
+      title: 'Requested Carrier Clause'
+      description: |
+        A clause to request from the carrier. Detailed information about the carrier clauses can be found [here](https://dcsa.org/wp-content/uploads/2023/12/202312-Standardised-Clauses-BL.pdf). Possible values are:
+        - `CARGO_CARGOSPECIFICS` (Cargo/Cargo specifics)
+        - `VESSELCONVEYANCE_COUNTRYSPECIFIC` (Vessel conveyance/Country Specific)
+        - `CARGO_RETURNOFEMPTYCONTAINER` (Cargo/Return of Empty Container)
+        - `CARGO_CARGOVALUE` (Cargo/Cargo value)
+        - `CARGO_REEFERTEMPERATURE` (Cargo/Reefer temperature)
+        - `CARGO_CONFLICTINGTEMPERATURES_MIXEDLOADS` (Cargo/Conflicting temperatures / Mixed loads)
+        
+        More infomation can be read [here](https://dcsa.org/wp-content/uploads/2023/12/202312-Standardised-Clauses-BL.pdf)
+      example: 'CARGO_CARGOSPECIFICS'
+
