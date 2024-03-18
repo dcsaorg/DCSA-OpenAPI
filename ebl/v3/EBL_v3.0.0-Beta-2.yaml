@@ -1621,7 +1621,7 @@ paths:
                   maxLength: 50
                   description: |
                     The status of the `Transport Document`. It can only be `APPROVED`
-                  example: 'APPROVED'
+                  example: APPROVED
               required:
                 - transportDocumentStatus
       responses:
@@ -2021,7 +2021,7 @@ components:
           description: |
             A list of `Advance Manifest Filings` specified by the Shipper to indicate whom is to do the Filing
           items:
-            $ref: '#/components/schemas/AdvanceManifestFiling_EBL'
+            $ref: '#/components/schemas/AdvanceManifestFiling'
         requestedCarrierCertificates:
           type: array
           description: |
@@ -2284,7 +2284,7 @@ components:
           description: |
             A list of `Advance Manifest Filings` specified by the Shipper to indicate whom is to do the Filing
           items:
-            $ref: '#/components/schemas/AdvanceManifestFiling_EBL'
+            $ref: '#/components/schemas/AdvanceManifestFiling'
         requestedCarrierCertificates:
           type: array
           description: |
@@ -2574,7 +2574,7 @@ components:
           description: |
             A list of `Advance Manifest Filings` specified by the Shipper to indicate whom is to do the Filing
           items:
-            $ref: '#/components/schemas/AdvanceManifestFiling_EBL'
+            $ref: '#/components/schemas/AdvanceManifestFiling'
         requestedCarrierCertificates:
           type: array
           description: |
@@ -2951,11 +2951,9 @@ components:
       required:
         - name
         - country
-
-    #############################
-    # Facility Location Interface
-    #############################
-
+      #############################
+      # Facility Location Interface
+      #############################
     CityLocation:
       type: object
       x-stoplight:
@@ -2981,36 +2979,34 @@ components:
           properties:
             city:
               type: string
-              pattern: '^\S+(\s+\S+)*$'
+              pattern: ^\S+(\s+\S+)*$
               maxLength: 65
               description: |
                 The city name of the party’s address.
-              example: 'Amsterdam'
+              example: Amsterdam
             stateRegion:
               type: string
               maxLength: 65
               description: |
                 The state/region of the party’s address.
               nullable: true
-              example: 'North Holland'
+              example: North Holland
             country:
               type: string
-              pattern: '^\S+(\s+\S+)*$'
+              pattern: ^\S+(\s+\S+)*$
               maxLength: 75
               description: |
                 The country of the party’s address.
-              example: 'The Netherlands'
+              example: The Netherlands
           required:
-          - city
-          - country
+            - city
+            - country
       required:
         - locationType
         - city
-
-    #############################
-    # Facility Location Interface
-    #############################
-
+      #############################
+      # Facility Location Interface
+      #############################
     FacilityLocation:
       title: Facility Location
       x-stoplight:
@@ -3062,11 +3058,9 @@ components:
         - locationType
         - facilityCode
         - facilityCodeListProvider
-
-    ###############################
-    # UNLocation Location Interface
-    ###############################
-
+      ###############################
+      # UNLocation Location Interface
+      ###############################
     UNLocationLocation:
       title: UNLocation Location
       type: object
@@ -3101,11 +3095,9 @@ components:
       required:
         - locationType
         - UNLocationCode
-
-    ################
-    # Document Party
-    ################
-
+      ################
+      # Document Party
+      ################
     DocumentParty:
       type: object
       title: Document Party
@@ -3298,11 +3290,9 @@ components:
         - type
         - countryCode
         - value
-
-    ###########
-    # Reference
-    ###########
-
+      ###########
+      # Reference
+      ###########
     Reference:
       type: object
       title: Reference
@@ -4515,11 +4505,15 @@ components:
           description: |
             Indicator of whether cargo requires Controlled Atmosphere.
           example: true
+
     ##########################
     # Advance Manifest Filings
     ##########################
-    AdvanceManifestFiling_BKG:
+
+    AdvanceManifestFiling:
       type: object
+      x-stoplight:
+        id: 2f1ec01b73824
       title: Advance Manifest Filing
       description: |
         An Advance Maifest Filing defined by a Manifest type code in combination with a country code.
@@ -4547,16 +4541,6 @@ components:
           description: |
             The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
           example: DK
-      example:
-        manifestTypeCode: ACE
-        countryCode: US
-      required:
-        - manifestTypeCode
-        - countryCode
-    AdvanceManifestFiling_EBL:
-      type: object
-      title: Advance Manifest Filing
-      properties:
         advanceManifestFilingsHouseBLPerformedBy:
           type: string
           description: |
@@ -4581,13 +4565,20 @@ components:
 
             **Mandatory** if `manifestTypeCode` is either `ACE` (US) or `ACI` (CA) and `advanceManifestFilingsHouseBLPerformedBy` is set to `SHIPPER`.
           example: FLXP
-      allOf:
-        - $ref: '#/components/schemas/AdvanceManifestFiling_BKG'
+      example:
+        manifestTypeCode: ACE
+        countryCode: US
+        advanceManifestFilingsHouseBLPerformedBy: SHIPPER
+        selfFilerCode: FLXP123
       required:
+        - manifestTypeCode
+        - countryCode
         - advanceManifestFilingsHouseBLPerformedBy
-      ################################
-      # Requested Carrier Certificates
-      ################################
+
+    ################################
+    # Requested Carrier Certificates
+    ################################
+
     RequestedCarrierCertificate:
       type: string
       maxLength: 100
@@ -5036,24 +5027,6 @@ components:
             A list of `Customs references`
           items:
             $ref: '#/components/schemas/CustomsReference'
-      # advanceManifestFilings:
-      #   type: array
-      #   description: |
-      #     A list of `Advance Manifest Filings` specified by the Shipper to indicate whom is to do the Filing
-      #   items:
-      #     $ref: '#/components/schemas/AdvanceManifestFiling_EBL'
-      # requestedCarrierCertificates:
-      #   type: array
-      #   description: |
-      #     Certificate(s) requested by the Shipper for the Carrier to include as part of the shipment documentation pack
-      #   items:
-      #     $ref: '#/components/schemas/RequestedCarrierCertificate'
-      # requestedCarrierClauses:
-      #   type: array
-      #   description: |
-      #     Clauses requested by the Shipper for the Carrier to include in the `Transport Document` `Carrier clauses`
-      #   items:
-      #     $ref: '#/components/schemas/RequestedCarrierClause'
       required:
         - transportDocumentReference
         - transportDocumentStatus
@@ -5076,11 +5049,9 @@ components:
         - carrierCodeListProvider
         - issuingParty
         - transports
-
-    ####################################
-    # Transport Document Status response
-    ####################################
-
+      ####################################
+      # Transport Document Status response
+      ####################################
     TransportDocumentRefStatus:
       type: object
       title: Transport Document Response
@@ -5111,11 +5082,9 @@ components:
       required:
         - transportDocumentReference
         - transportDocumentStatus
-
-    ############
-    # Transports
-    ############
-
+      ############
+      # Transports
+      ############
     Transports:
       type: object
       properties:
@@ -5189,7 +5158,6 @@ components:
         - portOfDischarge
         - vesselName
         - carrierExportVoyageNumber
-
     PlaceOfReceipt:
       description: |
         General purpose object to capture `Place of Receipt` location specified as: the location where the cargo is handed over by the shipper, or his agent, to the shipping line. This indicates the point at which the shipping line takes on responsibility for carriage of the container.
@@ -5211,7 +5179,6 @@ components:
           ADDR: '#/components/schemas/AddressLocation'
           FACI: '#/components/schemas/FacilityLocation'
           UNLO: '#/components/schemas/UNLocationLocation'
-
     PortOfLoading:
       description: |
         General purpose object to capture `Port of Loading` location specified as: the location where the cargo is loaded onto a first sea-going vessel for water transportation.
@@ -5229,7 +5196,6 @@ components:
         mapping:
           CITY: '#/components/schemas/CityLocation'
           UNLO: '#/components/schemas/UNLocationLocation'
-
     PortOfDischarge:
       description: |
         General purpose object to capture `Port of Discharge` location specified as: the location where the cargo is discharged from the last sea-going vessel.
@@ -5247,7 +5213,6 @@ components:
         mapping:
           CITY: '#/components/schemas/CityLocation'
           UNLO: '#/components/schemas/UNLocationLocation'
-
     PlaceOfDelivery:
       description: |
         General purpose object to capture `Place of Delivery` location specified as: the location where the cargo is handed over to the consignee, or his agent, by the shipping line and where responsibility of the shipping line ceases.
@@ -5269,7 +5234,6 @@ components:
           ADDR: '#/components/schemas/AddressLocation'
           FACI: '#/components/schemas/FacilityLocation'
           UNLO: '#/components/schemas/UNLocationLocation'
-
     OnwardInlandRouting:
       description: |
         General purpose object to capture `Onward Inland Routing` location specified as the end location of the inland movement that takes place after the container(s) being delivered to the port of discharge/place of delivery for account and risk of merchant (merchant haulage).
@@ -5289,11 +5253,9 @@ components:
           ADDR: '#/components/schemas/AddressLocation'
           FACI: '#/components/schemas/FacilityLocation'
           UNLO: '#/components/schemas/UNLocationLocation'
-
     ########
     # Charge
     ########
-
     Charge:
       type: object
       description: |
