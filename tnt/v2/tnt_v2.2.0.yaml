@@ -46,26 +46,9 @@ paths:
 
             Default value is all event types.
         - schema:
-            default: 'RECE,DRFT,PENA,PENU,REJE,APPR,ISSU,SURR,SUBM,VOID,CONF,REQS,CMPL,HOLD,RELS'
+            default:
+              - RECE
             type: array
-            items:
-              type: string
-              enum:
-                - RECE
-                - DRFT
-                - PENA
-                - PENU
-                - REJE
-                - APPR
-                - ISSU
-                - SURR
-                - SUBM
-                - VOID
-                - CONF
-                - REQS
-                - CMPL
-                - HOLD
-                - RELS
           in: query
           name: shipmentEventTypeCode
           description: |
@@ -91,27 +74,12 @@ paths:
             Default is all shipmentEventTypeCodes.
 
             This filter is only relevant when filtering on ShipmentEvents
-          example: 'RECE,DRFT'
+          example:
+            - RECE
+            - DRFT
           style: form
-        - schema:
-            type: array
-            default: 'CBR,BKG,SHI,SRM,TRD,ARN,VGM,CAS,CUS,DGD,OOG'
-            items:
-              type: string
-              enum:
-                - CBR
-                - BKG
-                - SHI
-                - SRM
-                - TRD
-                - ARN
-                - VGM
-                - CAS
-                - CUS
-                - DGD
-                - OOG
+        - name: documentTypeCode
           in: query
-          name: documentTypeCode
           description: |
             The documentTypeCode to filter by. Possible values are
             - CBR (Carrier Booking Request Reference)
@@ -132,6 +100,34 @@ paths:
 
             This filter is only relevant when filtering on ShipmentEvents
           style: form
+          schema:
+            type: array
+            default:
+              - CBR
+              - BKG
+              - SHI
+              - SRM
+              - TRD
+              - ARN
+              - VGM
+              - CAS
+              - CUS
+              - DGD
+              - OOG
+            items:
+              type: string
+              enum:
+                - CBR
+                - BKG
+                - SHI
+                - SRM
+                - TRD
+                - ARN
+                - VGM
+                - CAS
+                - CUS
+                - DGD
+                - OOG
         - schema:
             type: string
             maxLength: 35
@@ -171,8 +167,12 @@ paths:
               enum:
                 - ARRI
                 - DEPA
-            default: 'ARRI,DEPA'
-            example: 'ARRI,DEPA'
+            default:
+              - ARRI
+              - DEPA
+            example:
+              - ARRI
+              - DEPA
           in: query
           name: transportEventTypeCode
           description: |
@@ -186,5 +186,133 @@ paths:
 
             This filter is only relevant when filtering on TransportEvents
           style: form
+        - schema:
+            type: string
+            format: uuid
+            example: 9679a405-3316-42a5-8533-aba000f5689c
+          in: query
+          name: scheduleID
+          description: |
+            ID uniquely identifying a schedule, to filter events by.  
+            This filter was added by mistake and is thus deprecated.
+          deprecated: true
+        - schema:
+            type: string
+            maxLength: 100
+            example: 123e4567-e89b-12d3-a456-426614174000
+          in: query
+          name: transportCallID
+          description: |
+            ID uniquely identifying a transport call, to filter events by.  
+            Specifying this filter will only return events related to this particular transportCallID
+        - schema:
+            type: string
+            example: '9321483'
+            maxLength: 7
+          in: query
+          name: vesselIMONumber
+          description: |
+            The identifier of vessel for which schedule details are published. 
+            Depending on schedule type, this may not be available yet.  Specifying this filter will only return events related to this particular vesselIMONumber.
+        - schema:
+            type: string
+            example: 2103S
+            maxLength: 50
+          in: query
+          name: carrierVoyageNumber
+          description: |
+            Filter on the vessel operator-specific identifier of the Voyage.  
+            Specifying this filter will only return events related to this particular carrierVoyageNumber.  
+            **Deprecated**: Use exportVoyageNumber instead
+          deprecated: true
+        - schema:
+            type: string
+            example: 2103S
+            maxLength: 50
+          in: query
+          name: exportVoyageNumber
+          description: |
+            Filter on the vessel operator-specific identifier of the export Voyage.  
+            Specifying this filter will only return events related to this particular exportVoyageNumber.
+        - schema:
+            type: string
+            example: FE1
+            maxLength: 5
+          in: query
+          name: carrierServiceCode
+          description: |
+            Filter on the carrier specific identifier of the service.  
+            Specifying this filter will only return events related to this particular carrierServiceCode
+        - schema:
+            type: string
+            example: FRPAR
+            maxLength: 5
+          in: query
+          name: UNLocationCode
+          description: |
+            The UN Location code specifying where the place is located.  
+            Specifying this filter will only return events related to this particular UN Location code.
+        - schema:
+            type: string
+          in: query
+          name: equipmentEventTypeCode
+          description: |
+            Unique identifier for equipmentEventTypeCode.
+            - LOAD (Loaded)
+            - DISC (Discharged)
+            - GTIN (Gated in)
+            - GTOT (Gated out)
+            - STUF (Stuffed)
+            - STRP (Stripped)
+            - PICK (Pick-up)
+            - DROP (Drop-off)
+            - INSP (Inspected)
+            - RSEA (Resealed)
+            - RMVD (Removed)
+
+            It is possible to select multiple values by comma (,) separating them. For multiple values the OR-operator is used. For example <i>equipmentEventTypeCode=GTIN,GTOT</i> matches <b>both</b> Gated in (GTIN) and Gated out (GTOT) equipment events.
+
+            Default is all equipmentEventTypeCodes.
+
+            This filter is only relevant when filtering on EquipmentEvents
+        - schema:
+            type: string
+            example: APZU4812090
+            maxLength: 15
+          in: query
+          name: equipmentReference
+          description: 'Will filter by the unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.  Specifying this filter will only return events related to this particular equipmentReference'
+        - schema:
+            type: string
+          in: query
+          name: eventCreatedDateTime
+          description: 'Limit the result based on the creating date of the event. It is possible to use operators on this query parameter. This is done by adding a colon followed by an operator at the end of the queryParameterName (before the =)  eventCreatedDateTime:gte=2021-04-01T14:12:56+01:00  would result in all events created ≥ 2021-04-01T14:12:56+01:00'
+        - schema:
+            type: string
+            minLength: 1
+            default: '100'
+            example: '100'
+          in: query
+          name: limit
+          description: Maximum number of items to return.
+        - schema:
+            type: string
+            example: fE9mZnNldHw9MTAmbGltaXQ9MTA=
+          in: query
+          name: cursor
+          description: 'A server generated value to specify a specific point in a collection result, used for pagination.'
+        - schema:
+            type: string
+            example: 'carrierBookingReference:DESC'
+          in: query
+          name: sort
+          description: 'A comma-separated list of field names to define the sort order. Field names should be suffixed by a (:) followed by either the keyword ASC (for ascending order) or DESC (for descening order) to specify direction. :ASC may be omitted, in which case ascending order will be used.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              anyOf:
+                - {}
+              type: object
 components:
   schemas: {}
