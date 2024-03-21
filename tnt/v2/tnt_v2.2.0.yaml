@@ -428,6 +428,312 @@ paths:
           name: eventID
           description: The ID of the event to receive
           deprecated: true
+  /v2/event-subscriptions:
+    get:
+      summary: Receive a list of your active subscriptions
+      tags: []
+      responses:
+        '200':
+          description: Returns a list of subscriptions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Subscription'
+          headers:
+            API-Version:
+              schema:
+                type: string
+                example: 1.0.0
+              description: SemVer used to indicate the version of the contract (API version) returned.
+            Current-Page:
+              schema:
+                type: string
+                example: fE9mZnNldHw9MCZsaW1pdD01
+              description: A link to the current page.
+            Next-Page:
+              schema:
+                type: string
+                example: fE9mZnNldHw9NSZsaW1pdD01
+              description: A link to the next page. Next-Page header link MAY be omitted if the current page is the last page.
+            Prev-Page:
+              schema:
+                type: string
+                example: fE9mZnNldHw9MCZsaW1pdD01
+              description: A link to the previous page. Previous-Page header link MAY be omitted if the current page is the first page.
+            Last-Page:
+              schema:
+                type: string
+                example: fE9mZnNldHw9NTkmbGltaXQ9NQ==
+              description: A link to the last page. Last-Page header link MAY be omitted if the current page is the last page.
+            First-Page:
+              schema:
+                type: string
+                example: fE9mZnNldHw9NjAmbGltaXQ9NQ==
+              description: A link to thefirst page. First-Page header link MAY be omitted if current page is the first page.
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          headers:
+            API-Version:
+              schema:
+                type: string
+                example: 1.0.0
+              description: SemVer used to indicate the version of the contract (API version) returned.
+      operationId: get-v2-event-subscriptions
+      x-stoplight:
+        id: zbok2dnko7lud
+      parameters:
+        - schema:
+            type: integer
+            default: 100
+            example: 100
+            minLength: 1
+            format: int32
+          in: query
+          name: limit
+          description: Maximum number of items to return.
+        - schema:
+            type: string
+            example: fE9mZnNldHw9MTAmbGltaXQ9MTA=
+          in: query
+          name: cursor
+          description: 'A server generated value to specify a specific point in a collection result, used for pagination.'
+        - schema:
+            type: string
+            example: 'carrierBookingReference:DESC'
+          in: query
+          name: sort
+          description: 'A comma-separated list of field names to define the sort order. Field names should be suffixed by a (:) followed by either the keyword ASC (for ascending order) or DESC (for descening order) to specify direction. **:ASC** may be omitted, in which case ascending order will be used.'
+        - schema:
+            type: string
+            example: '1'
+          in: header
+          name: API-Version
+          description: An API-Version header MAY be added to the request (optional); if added it MUST only contain MAJOR version. API-Version header MUST be aligned with the URI version.
+    post:
+      summary: Create a subscription
+      tags: []
+      responses:
+        '201':
+          description: Subscription created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+          headers:
+            API-Version:
+              schema:
+                type: string
+                example: 1.0.0
+              description: SemVer used to indicate the version of the contract (API version) returned.
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          headers:
+            API-Version:
+              schema:
+                type: string
+                example: 1.0.0
+              description: SemVer used to indicate the version of the contract (API version) returned.
+      operationId: post-v2-event-subscriptions
+      x-stoplight:
+        id: 5cal5eua9uzil
+      requestBody:
+        description: "Parameters used to configure the subscription. It is possible to only receive cirtain types of events by adding filter values to the subscription.\r\n\r\nAll values in the subscription body except: callback, secret and subscriptionID will be used as filters. All filters specified must be filfilled in order to match an Event. A logical AND is used between filters. So\r\n\r\nshipmentEventTypeCode=DRFT&carrierBookingReference=ABC123123\r\n\r\nmeans that the events matched must both be Draft (shipmentEventTypeCode=DRFT) and be connected to carrierBookingReference ABC123123 (carrierBookingReference=ABC123123)\r\n\r\nFilters that are specified as (comma separated) lists use logical OR between list values. So\r\n\r\neventType=SHIPMENT,TRANSPORT\r\n\r\nmeans that both Shipment- and Transport-events will be matched by this subscription."
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SunscriptionBodyWithSecret'
+      parameters:
+        - schema:
+            type: string
+            example: '1'
+          in: header
+          name: API-Version
+          description: An API-Version header MAY be added to the request (optional); if added it MUST only contain MAJOR version. API-Version header MUST be aligned with the URI version.
+  '/v2/event-subscriptions/{subscriptionID}':
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: subscriptionID
+        in: path
+        required: true
+        description: The universal unique ID of the subscription.
+        example: 23e4567e-89b1-12d3-a456-426614174000
+    get:
+      summary: Find a subscription by subscription ID
+      tags: []
+      responses:
+        '200':
+          description: Subscription returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              schema:
+                type: string
+                example: 1.0.0
+              description: SemVer used to indicate the version of the contract (API version) returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      operationId: get-v2-event-subscriptions-subscriptionID
+      x-stoplight:
+        id: 3ui740g2l6s7r
+      parameters:
+        - schema:
+            type: string
+            example: '1'
+          in: header
+          name: API-Version
+          description: An API-Version header MAY be added to the request (optional); if added it MUST only contain MAJOR version. API-Version header MUST be aligned with the URI version.
+    delete:
+      summary: Stop a subscription using the subscription ID
+      tags: []
+      responses:
+        '204':
+          description: Subscription stopped
+          headers:
+            API-Version:
+              schema:
+                type: string
+                example: 1.0.0
+              description: SemVer used to indicate the version of the contract (API version) returned.
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              schema:
+                type: string
+                example: 1.0.0
+              description: SemVer used to indicate the version of the contract (API version) returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      operationId: delete-v2-event-subscriptions-subscriptionID
+      x-stoplight:
+        id: g8kgcoipyychb
+      parameters:
+        - schema:
+            type: string
+            example: '1'
+          in: header
+          description: An API-Version header MAY be added to the request (optional); if added it MUST only contain MAJOR version. API-Version header MUST be aligned with the URI version.
+          name: API-Version
+    put:
+      summary: Alter a subscription
+      tags: []
+      responses:
+        '200':
+          description: Subscription updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+          headers:
+            API-Version:
+              schema:
+                type: string
+                example: 1.0.0
+              description: SemVer used to indicate the version of the contract (API version) returned.
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              schema:
+                type: string
+                example: 1.0.0
+              description: "\t SemVer used to indicate the version of the contract (API version) returned."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      operationId: put-v2-event-subscriptions-subscriptionID
+      x-stoplight:
+        id: 0ybsyjbu3178f
+      parameters:
+        - schema:
+            type: string
+            example: '1'
+          in: header
+          name: API-Version
+          description: An API-Version header MAY be added to the request (optional); if added it MUST only contain MAJOR version. API-Version header MUST be aligned with the URI version.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Subscription'
+  '/v2/event-subscriptions/{subscriptionID}/secret':
+    parameters:
+      - schema:
+          type: string
+        name: subscriptionID
+        in: path
+        required: true
+        description: The universal unique ID of the subscription.
+        example: 123e4567-e89b-12d3-a456-426614174000
+    put:
+      summary: ' Resets the Secret on an existing subscription'
+      tags: []
+      responses:
+        '204':
+          description: Secret updated
+          headers:
+            API-Version:
+              schema:
+                type: string
+                example: 1.0.0
+              description: SemVer used to indicate the version of the contract (API version) returned.
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              schema:
+                type: string
+                example: 1.0.0
+              description: SemVer used to indicate the version of the contract (API version) returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      operationId: put-v2-event-subscriptions-subscriptionID-secret
+      x-stoplight:
+        id: 2b6un2omzjhbi
+      parameters:
+        - schema:
+            type: string
+            example: '1'
+          in: header
+          name: API-Version
+          description: ' string (header) An API-Version header MAY be added to the request (optional); if added it MUST only contain MAJOR version. API-Version header MUST be aligned with the URI version.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                secret:
+                  type: string
+                  x-stoplight:
+                    id: zmhqtx318of0w
+                  description: A Base64 encoded secret shared between the Publisher and the Subscriber. It is used to compute the contents of the Notification-Signature header.
+                  example: MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDM2NTc4NjIzODk3NDY5MDgyNzM0OTg3MTIzNzg2NA==
+                  format: byte
 components:
   schemas:
     TransportEvent:
@@ -1278,3 +1584,251 @@ components:
             id: xa8z0knkliybh
           description: Detailed error message.
           example: The request did not contain one of the three required query parameters.
+    SubscriptionBody:
+      title: Subscription
+      x-stoplight:
+        id: e5kiyu3pkweo1
+      type: object
+      required:
+        - callbackUrl
+      properties:
+        callbackUrl:
+          type: string
+          x-stoplight:
+            id: bd62k9fwffwlp
+          description: The endPoint where a Carrier whould send back events to the Shipper. The callback can contain query parameters uniquely identifying the originator of the events.
+          example: 'https://myserver.com/send/callback/here?shipperRef=123456'
+          format: uri
+        eventType:
+          type: string
+          x-stoplight:
+            id: 182gd95s0nukp
+          description: "List of eventType to filter by. If multiple values are selected - the OR-operator will be used.\r\n\r\nPossible values are\r\n\r\n- SHIPMENT (Shipment events)\r\n- TRANSPORT (Transport events)\r\n- EQUIPMENT (Equipment events)\r\n\r\nDefault is none as it will not filter on eventType if not specified."
+          example: TRANSPORT
+          enum:
+            - SHIPMENT
+            - TRANSPORT
+            - EQUIPMENT
+        shipmentEventTypeCode:
+          type: array
+          x-stoplight:
+            id: qva8fx65w090v
+          example:
+            - RECE
+            - DRFT
+          items:
+            $ref: '#/components/schemas/ShipmentEventTypeCode'
+        documentTypeCode:
+          type: array
+          x-stoplight:
+            id: 9a05jrj60xmuz
+          description: "List of documentTypeCode to filter by. If multiple values are selected - the OR-operator will be used.\r\n\r\nDefault is none as it will not filter on documentTypeCode if not specified."
+          example:
+            - SHI
+            - TRD
+          items:
+            $ref: '#/components/schemas/DocumentTypeCode'
+        carrierBookingReference:
+          type: string
+          x-stoplight:
+            id: 4pp4sn2aucq9s
+          description: ' set of unique characters provided by carrier to identify a booking.'
+          example: ABC709951
+          maxLength: 35
+        bookingReference:
+          type: string
+          x-stoplight:
+            id: 8pqfiygskzpmt
+          description: "The identifier for a shipment, which is issued by and unique within each of the carriers.\r\n\r\n**Deprecated** - use carrierBookingReference instead."
+          deprecated: true
+          example: ABC709951
+          maxLength: 35
+        transportDocumentID:
+          type: string
+          x-stoplight:
+            id: 8621pk1zvyf8z
+          description: "Uniquely identify a transport document.\r\n\r\n**Deprecated** - use transportDocumentReference instead."
+          format: uuid
+          deprecated: true
+        transportDocumentReference:
+          type: string
+          x-stoplight:
+            id: j79laxdrs0xxr
+          maxLength: 20
+          description: A unique number allocated by the shipping line to the transport document and the main number used for the tracking of the status of the shipment.
+        transportDocumentTypeCode:
+          type: array
+          x-stoplight:
+            id: 9stxb1xm49c6z
+          description: "List of transportDocumentType to filter by. If multiple values are selected - the OR-operator will be used.\r\n\r\nDefault is none as it will not filter on transportDocumentType if not specified.\r\n\r\n**Deprecated**: Not to be used any more."
+          deprecated: true
+          items:
+            x-stoplight:
+              id: 9686vakqvuryp
+            enum:
+              - BOL
+              - SWB
+        transportEventTypeCode:
+          type: array
+          x-stoplight:
+            id: ea8l4v6z7qk4p
+          description: "List of transportEventTypeCode to filter by. If multiple values are selected - the OR-operator will be used.\r\n\r\nDefault is none as it will not filter on transportEventTypeCode if not specified."
+          items:
+            x-stoplight:
+              id: r9kw85e16bdhl
+            enum:
+              - ARRI
+              - DEPA
+        scheduleID:
+          type: string
+          x-stoplight:
+            id: hyfud0jc3zbm6
+          deprecated: true
+          format: uuid
+          description: "ID uniquely identifying a schedul.\r\n\r\n**Deprecated** as this was added by mistake."
+        transportCallID:
+          type: string
+          x-stoplight:
+            id: sq5xr6xvblzj1
+          description: The unique identifier for a transport call.
+          example: 123e4567-e89b-12d3-a456-426614174000
+          maxLength: 100
+        vesselIMONumber:
+          type: string
+          x-stoplight:
+            id: 4pzgus7y1ychu
+          description: 'The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd''s register code, which does not change during the lifetime of the vessel.'
+          example: '9321483'
+          maxLength: 7
+        carrierVoyageNumber:
+          type: string
+          x-stoplight:
+            id: mhaow489ppvm8
+          description: The vessel operator-specific identifier of the Voyage.
+          example: 2103S
+          maxLength: 50
+          deprecated: true
+        exportVoyageNumber:
+          type: string
+          x-stoplight:
+            id: g80ogczbaz43o
+          description: The vessel operator-specific identifier of the export Voyage.
+          example: 2103S
+          maxLength: 50
+        carrierServiceCode:
+          type: string
+          x-stoplight:
+            id: hdfrx91co91gz
+          description: The code of the service for which the schedule details are published.
+          example: FE1
+          maxLength: 5
+        UNLocationCode:
+          type: string
+          x-stoplight:
+            id: x8tfa9us5okhk
+          description: The UN Location code specifying where the place is located.
+          example: FRPAR
+          maxLength: 5
+        equipmentEventTypeCode:
+          type: string
+          x-stoplight:
+            id: fggq2jtezezyy
+        equipmentReference:
+          type: string
+          x-stoplight:
+            id: ezzgk6kktm52i
+          description: 'The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible. According to ISO 6346, a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit). If a container does not comply with ISO 6346, it is suggested to follow Recommendation #2 “Container with non-ISO identification” from SMDG.'
+          example: APZU4812090
+          maxLength: 15
+    Subscription:
+      title: Subscriptionn
+      x-stoplight:
+        id: 9k2fwmxqe1ho6
+      allOf:
+        - type: object
+          properties:
+            subscriptionID:
+              type: string
+              description: The carrier issues a unique ID to the shipper or consignee for that subscription.
+              example: 8fbdc2d8-57c8-48b9-a04b-18fd8ec1d809
+              format: uuid
+        - $ref: '#/components/schemas/SubscriptionBody'
+    ShipmentEventTypeCode:
+      title: ShipmentEventTypeCode
+      x-stoplight:
+        id: 6f9r35u4o5rrv
+      type: string
+      description: |
+        The status of the document in the process. Possible values are
+        - RECE (Received)
+        - DRFT (Drafted)
+        - PENA (Pending Approval)
+        - PENU (Pending Update)
+        - REJE (Rejected)
+        - APPR (Approved)
+        - ISSU (Issued)
+        - SURR (Surrendered)
+        - SUBM (Submitted)
+        - VOID (Void)
+        - CONF (Confirmed)
+        - REQS (Requested)
+        - CMPL (Completed)
+        - HOLD (On Hold)
+        - RELS (Released)
+
+        More details can be found on <a href="https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/shipmenteventtypecodes.csv">GitHub</a>
+      enum:
+        - RECE
+        - DRFT
+        - PENA
+        - PENU
+        - REJE
+        - APPR
+        - ISSU
+        - SURR
+        - SUBM
+        - VOID
+        - CONF
+        - REQS
+        - CMPL
+        - HOLD
+        - RELS
+      example: DRFT
+    DocumentTypeCode:
+      title: DocumentTypeCode
+      x-stoplight:
+        id: n0b50jkkgv9wq
+      type: string
+      description: |-
+        The code to identify the type of information documentID points to. Can be one of the following values - CBR (Carrier Booking Request Reference) - BKG (Booking) - SHI (Shipping Instruction) - SRM (Shipment Release Message) - TRD (Transport Document) - ARN (Arrival Notice) - VGM (Verified Gross Mass) - CAS (Cargo Survey) - CUS (Customs Inspection) - DGD (Dangerous Goods Declaration) - OOG (Out of Gauge)
+        More details can be found on <a href="https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/documenttypecodes.csv">GitHub</a>
+      example: SHI
+      enum:
+        - CBR
+        - BKG
+        - SHI
+        - SRM
+        - TRD
+        - ARN
+        - VGM
+        - CAS
+        - CUS
+        - DGD
+        - OOG
+    SunscriptionBodyWithSecret:
+      title: SunscriptionBodyWithSecret
+      x-stoplight:
+        id: bcisr6k4u6kiv
+      allOf:
+        - $ref: '#/components/schemas/SubscriptionBody'
+        - type: object
+          required:
+            - secret
+          properties:
+            secret:
+              type: string
+              x-stoplight:
+                id: j3fui5h5entn1
+              description: A shared secret shared between the Publisher and the Subscriber. It is used to compute the contents of the Notification-Signature header. Only valid in POST calls - anywhere else must be omitted!
+              format: byte
+              example: MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDM2NTc4NjIzODk3NDY5MDgyNzM0OTg3MTIzNzg2NA==
