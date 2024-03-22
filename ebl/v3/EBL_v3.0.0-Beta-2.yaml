@@ -1224,8 +1224,9 @@ paths:
                       portOfDischarge:
                         locationType: UNLO
                         UNLocationCode: DEBRV
-                      vesselName: MSC Gülsün
-                      carrierExportVoyageNumber: 402E
+                      vesselVoyage:
+                        - vesselName: MSC Gülsün
+                          carrierExportVoyageNumber: 402E
                     charges:
                       - chargeName: Fictive transport document fee
                         currencyAmount: 1
@@ -1331,8 +1332,9 @@ paths:
                       portOfDischarge:
                         locationType: UNLO
                         UNLocationCode: DEBRV
-                      vesselName: Ever Ace
-                      carrierExportVoyageNumber: 402E
+                      vesselVoyage:
+                        - vesselName: Ever Ace
+                          carrierExportVoyageNumber: 402E
                     charges:
                       - chargeName: Fictive transport document fee
                         currencyAmount: 1
@@ -1442,8 +1444,9 @@ paths:
                       portOfDischarge:
                         locationType: UNLO
                         UNLocationCode: DEBRV
-                      vesselName: Berlin Express
-                      carrierExportVoyageNumber: 402E
+                      vesselVoyage:
+                        - vesselName: Berlin Express
+                          carrierExportVoyageNumber: 402E
                     charges:
                       - chargeName: Fictive transport document fee
                         currencyAmount: 1
@@ -5307,38 +5310,49 @@ components:
           $ref: '#/components/schemas/PlaceOfDelivery'
         onwardInlandRouting:
           $ref: '#/components/schemas/OnwardInlandRouting'
-        vesselName:
-          type: string
-          pattern: ^\S+(\s+\S+)*$
-          maxLength: 50
+        vesselVoyage:
+          type: array
+          minLength: 1
           description: |
-            The name of the first sea going Vessel on board which the cargo is loaded or intended to be loaded
-          example: King of the Seas
-        carrierExportVoyageNumber:
-          type: string
-          pattern: ^\S+(\s+\S+)*$
-          maxLength: 50
-          example: 2103S
-          description: |
-            The identifier of an export voyage. The carrier-specific identifier of the export Voyage.
-        universalExportVoyageReference:
-          type: string
-          pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
-          minLength: 5
-          maxLength: 5
-          description: |
-            A global unique voyage reference for the export Voyage, as per DCSA standard, agreed by VSA partners for the voyage. The voyage reference must match the regular expression pattern: `\d{2}[0-9A-Z]{2}[NEWSR]`
-            - `2 digits` for the year
-            - `2 alphanumeric characters` for the sequence number of the voyage
-            - `1 character` for the direction/haul (`N`orth, `E`ast, `W`est, `S`outh or `R`oundtrip).
-          example: 2103N
+            Allow the possibility to include multiple vessels/voyages in the `Transport Document` (e.g. the first sea going vessel and the mother vessel). At least one is mandatory to provide.
+          items:
+            type: object
+            description: 'Vessel and export voyage'
+            properties:
+              vesselName:
+                type: string
+                pattern: ^\S+(\s+\S+)*$
+                maxLength: 50
+                description: |
+                  The name of the first sea going Vessel on board which the cargo is loaded or intended to be loaded
+                example: King of the Seas
+              carrierExportVoyageNumber:
+                type: string
+                pattern: ^\S+(\s+\S+)*$
+                maxLength: 50
+                example: 2103S
+                description: |
+                  The identifier of an export voyage. The carrier-specific identifier of the export Voyage.
+              universalExportVoyageReference:
+                type: string
+                pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
+                minLength: 5
+                maxLength: 5
+                description: |
+                  A global unique voyage reference for the export Voyage, as per DCSA standard, agreed by VSA partners for the voyage. The voyage reference must match the regular expression pattern: `\d{2}[0-9A-Z]{2}[NEWSR]`
+                  - `2 digits` for the year
+                  - `2 alphanumeric characters` for the sequence number of the voyage
+                  - `1 character` for the direction/haul (`N`orth, `E`ast, `W`est, `S`outh or `R`oundtrip).
+                example: 2103N
+            required:
+              - vesselName
+              - carrierExportVoyageNumber
       required:
         - plannedArrivalDate
         - plannedDepartureDate
         - portOfLoading
         - portOfDischarge
-        - vesselName
-        - carrierExportVoyageNumber
+        - vesselVoyage
     PlaceOfReceipt:
       description: |
         General purpose object to capture `Place of Receipt` location specified as: the location where the cargo is handed over by the shipper, or his agent, to the shipping line. This indicates the point at which the shipping line takes on responsibility for carriage of the container.
