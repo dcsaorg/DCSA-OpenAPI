@@ -21,22 +21,23 @@ paths:
       tags: []
       responses:
         '200':
-          description: OK
+          description: Successful operation
           content:
-            application/xml:
+            application/json:
               schema:
-                anyOf:
-                  - items:
-                      $ref: '#/components/schemas/TransportEvent'
-                  - x-stoplight:
-                      id: bby47ja45i328
-                    items:
-                      $ref: '#/components/schemas/ShipmentEvent'
-                  - x-stoplight:
-                      id: 7h4c3z87e7rkq
-                    items:
-                      $ref: '#/components/schemas/EquipmentEvent'
                 type: array
+                items:
+                  anyOf:
+                    - items:
+                        $ref: '#/components/schemas/TransportEvent'
+                    - x-stoplight:
+                        id: e1q5zdtdkmynx
+                      items:
+                        $ref: '#/components/schemas/ShipmentEvent'
+                    - x-stoplight:
+                        id: dbdim3jxk031r
+                      items:
+                        $ref: '#/components/schemas/EquipmentEvent'
           headers:
             API-Version:
               schema:
@@ -79,8 +80,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties: {}
+                $ref: '#/components/schemas/Error'
       operationId: get-v2-events
       x-stoplight:
         id: 1sr5r7sai6wkd
@@ -110,6 +110,23 @@ paths:
             default:
               - RECE
             type: array
+            items:
+              enum:
+                - RECE
+                - DRFT
+                - PENA
+                - PENU
+                - REJE
+                - APPR
+                - ISSU
+                - SURR
+                - SUBM
+                - VOID
+                - CONF
+                - REQS
+                - CMPL
+                - HOLD
+                - RELS
           in: query
           name: shipmentEventTypeCode
           description: |
@@ -313,10 +330,8 @@ paths:
           description: |
             The UN Location code specifying where the place is located.  
             Specifying this filter will only return events related to this particular UN Location code.
-        - schema:
-            type: string
+        - name: equipmentEventTypeCode
           in: query
-          name: equipmentEventTypeCode
           description: |
             Unique identifier for equipmentEventTypeCode.
             - LOAD (Loaded)
@@ -336,6 +351,35 @@ paths:
             Default is all equipmentEventTypeCodes.
 
             This filter is only relevant when filtering on EquipmentEvents
+          schema:
+            default:
+              - LOAD
+              - DISC
+              - GTIN
+              - GTOT
+              - STUF
+              - STRP
+              - PICK
+              - DROP
+              - INSP
+              - RSEA
+              - RMVD
+            type: array
+            items:
+              type: string
+              enum:
+                - LOAD
+                - DISC
+                - GTIN
+                - GTOT
+                - STUF
+                - STRP
+                - PICK
+                - DROP
+                - INSP
+                - RSEA
+                - RMVD
+              example: GTIN
         - schema:
             type: string
             example: APZU4812090
@@ -347,7 +391,16 @@ paths:
             type: string
           in: query
           name: eventCreatedDateTime
-          description: 'Limit the result based on the creating date of the event. It is possible to use operators on this query parameter. This is done by adding a colon followed by an operator at the end of the queryParameterName (before the =)  eventCreatedDateTime:gte=2021-04-01T14:12:56+01:00  would result in all events created ≥ 2021-04-01T14:12:56+01:00'
+          description: |
+            Limit the result based on the creating date of the event. It is possible to use operators on this query parameter. This is done by adding a colon followed by an operator at the end of the queryParameterName (before the =)  eventCreatedDateTime:gte=2021-04-01T14:12:56+01:00  would result in all events created ≥ 2021-04-01T14:12:56+01:00
+            The following operators are supported
+            - &#58;gte (&#8805; Greater than or equal)
+            - &#58;gt (&#62; Greater than)
+            - &#58;lte (&#8804; Less than or equal)
+            - &#58;lt (&#60; Less tha)
+            - &#58;eq (&#61; Equal to)
+            If no operator is provided, a <b>strictlt equal</b> is used (this is equivalent to <b>&#58;eq</b> operator).
+          example: '2021-04-01T14:12:56+01:00'
         - schema:
             type: string
             minLength: 1
@@ -374,8 +427,6 @@ paths:
           in: header
           name: API-Version
           description: An API-Version header MAY be added to the request (optional); if added it MUST only contain MAJOR version. API-Version header MUST be aligned with the URI version.
-      requestBody:
-        content: {}
   '/v2/events/{eventID}':
     parameters:
       - schema:
@@ -392,7 +443,7 @@ paths:
           content:
             application/json:
               schema:
-                anyOf:
+                oneOf:
                   - $ref: '#/components/schemas/ShipmentEvent'
                   - $ref: '#/components/schemas/TransportEvent'
                   - $ref: '#/components/schemas/EquipmentEvent'
@@ -428,6 +479,7 @@ paths:
           name: eventID
           description: The ID of the event to receive
           deprecated: true
+          required: true
   /v2/event-subscriptions:
     get:
       summary: Receive a list of your active subscriptions
@@ -494,6 +546,7 @@ paths:
             example: 100
             minLength: 1
             format: int32
+            minimum: 1
           in: query
           name: limit
           description: Maximum number of items to return.
@@ -548,6 +601,7 @@ paths:
         id: 5cal5eua9uzil
       requestBody:
         description: "Parameters used to configure the subscription. It is possible to only receive cirtain types of events by adding filter values to the subscription.\r\n\r\nAll values in the subscription body except: callback, secret and subscriptionID will be used as filters. All filters specified must be filfilled in order to match an Event. A logical AND is used between filters. So\r\n\r\nshipmentEventTypeCode=DRFT&carrierBookingReference=ABC123123\r\n\r\nmeans that the events matched must both be Draft (shipmentEventTypeCode=DRFT) and be connected to carrierBookingReference ABC123123 (carrierBookingReference=ABC123123)\r\n\r\nFilters that are specified as (comma separated) lists use logical OR between list values. So\r\n\r\neventType=SHIPMENT,TRANSPORT\r\n\r\nmeans that both Shipment- and Transport-events will be matched by this subscription."
+        required: true
         content:
           application/json:
             schema:
@@ -926,6 +980,7 @@ components:
             - CMPL
             - HOLD
             - RELS
+          example: DRFT
         documentID:
           type: string
           x-stoplight:
@@ -1133,6 +1188,7 @@ components:
           description: "Unique identifier for Event Type Code, for transport events this is either\r\n\r\n- LOAD (Loaded)\r\n- DISC (Discharged)\r\n- GTIN (Gated in)\r\n- GTOT (Gated out)\r\n- STUF (Stuffed)\r\n- STRP (Stripped)\r\n\r\n**Deprecated** - use equipmentEventTypeCode instead"
           example: LOAD
           maxLength: 4
+          deprecated: true
           enum:
             - LOAD
             - DISC
@@ -1545,11 +1601,11 @@ components:
           items:
             $ref: '#/components/schemas/SubError'
         statusCode:
-          type: string
+          type: integer
           x-stoplight:
             id: 46qxljgybmuvv
           description: The HTTP status code.
-          example: '400'
+          example: 400
         statusCodeText:
           type: string
           x-stoplight:
@@ -1600,15 +1656,12 @@ components:
           example: 'https://myserver.com/send/callback/here?shipperRef=123456'
           format: uri
         eventType:
-          type: string
+          type: array
           x-stoplight:
             id: 182gd95s0nukp
-          description: "List of eventType to filter by. If multiple values are selected - the OR-operator will be used.\r\n\r\nPossible values are\r\n\r\n- SHIPMENT (Shipment events)\r\n- TRANSPORT (Transport events)\r\n- EQUIPMENT (Equipment events)\r\n\r\nDefault is none as it will not filter on eventType if not specified."
-          example: TRANSPORT
-          enum:
-            - SHIPMENT
-            - TRANSPORT
-            - EQUIPMENT
+          items:
+            type: string
+            $ref: '#/components/schemas/EventType'
         shipmentEventTypeCode:
           type: array
           x-stoplight:
@@ -1674,11 +1727,7 @@ components:
             id: ea8l4v6z7qk4p
           description: "List of transportEventTypeCode to filter by. If multiple values are selected - the OR-operator will be used.\r\n\r\nDefault is none as it will not filter on transportEventTypeCode if not specified."
           items:
-            x-stoplight:
-              id: r9kw85e16bdhl
-            enum:
-              - ARRI
-              - DEPA
+            $ref: '#/components/schemas/TransportEventTypeCode'
         scheduleID:
           type: string
           x-stoplight:
@@ -1730,9 +1779,11 @@ components:
           example: FRPAR
           maxLength: 5
         equipmentEventTypeCode:
-          type: string
+          type: array
           x-stoplight:
             id: fggq2jtezezyy
+          items:
+            $ref: '#/components/schemas/EquipmentEventTypeCode'
         equipmentReference:
           type: string
           x-stoplight:
@@ -1800,7 +1851,18 @@ components:
         id: n0b50jkkgv9wq
       type: string
       description: |-
-        The code to identify the type of information documentID points to. Can be one of the following values - CBR (Carrier Booking Request Reference) - BKG (Booking) - SHI (Shipping Instruction) - SRM (Shipment Release Message) - TRD (Transport Document) - ARN (Arrival Notice) - VGM (Verified Gross Mass) - CAS (Cargo Survey) - CUS (Customs Inspection) - DGD (Dangerous Goods Declaration) - OOG (Out of Gauge)
+        The code to identify the type of information documentID points to. Can be one of the following values 
+        - CBR (Carrier Booking Request Reference) 
+        - BKG (Booking) - SHI (Shipping Instruction) 
+        - SRM (Shipment Release Message) 
+        - TRD (Transport Document) 
+        - ARN (Arrival Notice) 
+        - VGM (Verified Gross Mass) 
+        - CAS (Cargo Survey) 
+        - CUS (Customs Inspection) 
+        - DGD (Dangerous Goods Declaration) 
+        - OOG (Out of Gauge)
+
         More details can be found on <a href="https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/documenttypecodes.csv">GitHub</a>
       example: SHI
       enum:
@@ -1832,3 +1894,77 @@ components:
               description: A shared secret shared between the Publisher and the Subscriber. It is used to compute the contents of the Notification-Signature header. Only valid in POST calls - anywhere else must be omitted!
               format: byte
               example: MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDM2NTc4NjIzODk3NDY5MDgyNzM0OTg3MTIzNzg2NA==
+    EquipmentEventTypeCode:
+      title: EquipmentEventTypeCode
+      x-stoplight:
+        id: nuofgxpncb024
+      type: string
+      description: |-
+        List of equipmentEventTypeCode to filter by. If multiple values are selected - the OR-operator will be used.
+
+        Default is none as it will not filter on equipmentEventTypeCode if not specified.
+
+        Unique identifier for equipmentEventTypeCode.
+
+        - LOAD (Loaded)
+        - DISC (Discharged)
+        - GTIN (Gated in)
+        - GTOT (Gated out)
+        - STUF (Stuffed)
+        - STRP (Stripped)
+        - PICK (Pick-up)
+        - DROP (Drop-off)
+        - INSP (Inspected)
+        - RSEA (Resealed)
+        - RMVD (Removed)
+
+        More details can be found on <a href="https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/equipmenteventtypecodes.csv">GitHub</a>
+      enum:
+        - LOAD
+        - DISC
+        - GTIN
+        - GTOT
+        - STUF
+        - STRP
+        - PICK
+        - DROP
+        - INSP
+        - RSEA
+        - RMVD
+    TransportEventTypeCode:
+      title: TransportEventTypeCode
+      x-stoplight:
+        id: rlrwrg6oheht3
+      type: string
+      description: |-
+        List of transportEventTypeCode to filter by. If multiple values are selected - the OR-operator will be used.
+
+        Default is none as it will not filter on transportEventTypeCode if not specified.
+
+        Identifier for type of Transport event
+
+        - ARRI (Arrived)
+        - DEPA (Departed)
+
+        More details can be found on <a href="https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/transporteventtypecodes.csv">Github</a>
+      enum:
+        - ARRI
+        - DEPA
+    EventType:
+      title: EventType
+      x-stoplight:
+        id: kkrdmo4sskqel
+      type: string
+      description: |
+        List the evenType to filter by. If multiple values are selected - the OR-operator will be used.
+
+        Possible values are
+        - SHIPMENT (Shipment events)
+        - TRANSPORT (Transport events)
+        - EQUIPMENT (Equipment events)
+
+        Default is none as it will not filter on eventType if not specified.
+      enum:
+        - SHIPMENT
+        - TRANSPORT
+        - EQUIPMENT
