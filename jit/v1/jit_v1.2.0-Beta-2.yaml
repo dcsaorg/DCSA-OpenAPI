@@ -1,0 +1,1193 @@
+openapi: 3.0.3
+x-stoplight:
+  id: c5zfk0bkgzyas
+info:
+  version: 1.2.0-Beta-2
+  title: DCSA OpenAPI specification for Just in Time Portcalls
+  description: "API specification issued by DCSA.org\r\n\r\nThis API supports **JIT** v1.2 (Just in Time Portcalls). JIT is used for negotiating timestamps between vessel and port/terminal and other services providers. To create a new timestamp the `POST /v1/timestamps` endPoint is to be used.\r\n\r\nFor explanation to specific values or objects please refer to the [Information Model 2022.2 - **to be updated in July**].\r\n\r\nThis API does not define the business rules regarding what is allowed to update at what time. For this the [Just in Time Portcall IFS v1.2](https://dcsa.my.salesforce.com/sfc/p/#2o000000YvHJ/a/7T000000Db84/Rp.tknLWVuS79ZXmWUU_IXgexNiFXgSJExKnNPv5si8) should be consulted\r\n\r\nIt is possible to use this API as a standalone API. In order to do so it is necessary to use the poll-endPoint `GET /v1/events` in order to pull event information.\r\n\r\nIt is recomended to implement the [DCSA Just in Time Portcalls (JIT) Event Hub v1.2](https://app.swaggerhub.com/apis/dcsaorg/JIT_EVENT_HUB/1.2.0-Beta-1) in order to use the push model. Here events are pushed as they occur.\r\n\r\nFor a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/jit/v1#v120B1). Please also [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments.\r\n\r\nFor an example of an implementation of this API please check the [JIT Reference Implementation](https://github.com/dcsaorg/DCSA-JIT).\r\n\r\n[Digital Container Shipping Association (DCSA) - Website](https://dcsa.org/)"
+  contact:
+    name: Digital Container Shipping Association (DCSA)
+    url: 'https://dcsa.org'
+    email: info@dcsa.org
+  license:
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+    name: Apache 2.0
+servers:
+  - url: 'http://localhost:3000'
+paths:
+  /v1/timestamps:
+    post:
+      summary: Post a new timestamp
+      description: 'A timestamp object provides the date-time when a specific event is expected, requested or planned to occur or has occured.'
+      operationId: post-v1-timestamps
+      parameters:
+        - name: API-Version
+          in: header
+          description: An API-Version header **MAY** be added to the request (optional); if added it **MUST** only contain **MAJOR** version. API-Version header **MUST** be aligned with the URI version.
+          schema:
+            type: string
+            example: '1'
+      requestBody:
+        description: The new Timestamp
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Timestamp'
+      responses:
+        '204':
+          description: Timestamp successfully posted
+          headers:
+            API-Version:
+              schema:
+                type: string
+                example: 1.2.0
+              description: SemVer used to indicate the version of the contract (API version) returned.
+        default:
+          description: "\t\r\nUnexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          headers:
+            API-Version:
+              schema:
+                type: string
+                example: 1.2.0
+              description: SemVer used to indicate the version of the contract (API version) returned.
+      servers:
+        - url: 'http://localhost:3000'
+      x-stoplight:
+        id: dw4v1okzqafqf
+  /v1/events:
+    get:
+      summary: Get operations events
+      description: "Retrieves Operations events. The default sort order is by `eventCreatedDateTime` in descending order (`DESC`).\r\n\r\nIt is possible to combine queryParameters. When combing queryParameters the logical AND is used between them. The response list must fulfill all queryParameters. An example of this is when the following queryParameters are used:\r\n\r\n**`eventCreatedDateTime:gte=2021-04-01T14:12:56+01:00 and vesselIMONumber=9321484`**\r\n\r\nthen all events in the response list returned must be connected to vesselIMONumber `9321484` **AND** have an eventCreatedDateTime ≥ `2021-04-01T14:12:56+01:00`\r\n\r\nNB: When combining queryParameters be aware that it is also possible to make combinations that are mutual contradicting! An example of this could be when the following queryParameters are used:\r\n\r\n**`vesselIMONumber=9321484 and carrierServiceCode=FE1`**\r\n\r\nif there are no Vessels with IMO number `9321484` on Carrier Service Code `FE1`. If this is the case then this response **will return an empty list!**\r\n\r\n"
+      operationId: get-v1-events
+      parameters:
+        - name: API-Version
+          in: header
+          description: An API-Version header **MAY** be added to the request (optional); if added it **MUST** only contain **MAJOR** version. API-Version header **MUST** be aligned with the URI version.
+          schema:
+            type: string
+            example: '1'
+        - name: transportCallID
+          in: query
+          description: 'ID uniquely identifying a transport call, to filter events by.  Specifying this filter will only return events related to this particular transportCallID.'
+          schema:
+            type: string
+            maxLength: 100
+            example: 123e4567-e89b-12d3-a456-426614174000
+        - name: vesselIMONumber
+          in: query
+          description: 'The identifier of vessel for which schedule details are published. Depending on schedule type, this may not be available yet.  Specifying this filter will only return events related to this particular vesselIMONumber.'
+          schema:
+            type: string
+            maxLength: 7
+            example: '9321483'
+        - name: carrierVoyageNumber
+          in: query
+          description: 'Filter on the vessel operator-specific identifier of the Voyage.  Specifying this filter will only return events related to this particular carrierVoyageNumber.  Deprecated: Use exportVoyageNumber instead.'
+          deprecated: true
+          schema:
+            type: string
+            maxLength: 50
+            example: 2103S
+        - name: exportVoyageNumber
+          in: query
+          description: 'Filter on the vessel operator-specific identifier of the export Voyage.  Specifying this filter will only return events related to this particular exportVoyageNumber.  Deprecated: Use carrierExportVoyageNumber instead.'
+          deprecated: true
+          schema:
+            type: string
+            maxLength: 50
+            example: 2103S
+        - name: carrierServiceCode
+          in: query
+          description: Filter on the carrier specific identifier of the service.  Specifying this filter will only return events related to this particular carrierServiceCode.
+          schema:
+            type: string
+            maxLength: 5
+            example: FE1
+        - name: UNLocationCode
+          in: query
+          description: The UN Location code specifying where the place is located.  Specifying this filter will only return events related to this particular UN Location code.
+          schema:
+            type: string
+            maxLength: 5
+            example: FRPAR
+        - name: operationsEventTypeCode
+          in: query
+          description: |-
+            The code to identify the type of event that is related to the operation.
+            - `STRT` (Started)
+            - `CMPL` (Completed)
+            - `ARRI` (Arrived)
+            - `DEPA` (Departed)
+            - `OMIT` (Omitted)
+            - `CANC` (Cancelled)
+            It is possible to select multiple values by comma (,) separating them. For multiple values the OR-operator is used. For example operationsEventTypeCode=ARRI,CMPL matches both Arrived (ARRI) and Completed (CMPL) operations events.
+          schema:
+            type: string
+            default: ' STRT,CMPL,ARRI,DEPA,OMIT,CANC'
+            example: 'ARRI,CMPL'
+        - name: eventCreatedDateTime
+          in: query
+          description: |-
+            Limit the result based on the creating date of the event. It is possible to use operators on this query parameter. This is done by adding a colon followed by an operator at the end of the queryParameterName (before the =)  eventCreatedDateTime:gte=2021-04-01T14:12:56+01:00  would result in all events created ≥ 2021-04-01T14:12:56+01:00. The following operators are supported
+            - :gte (≥ Greater than or equal)
+            - :gt (> Greater than)
+            - :lte (≤ Less than or equal)
+            - :lt (< Less than)
+            - :eq (= Equal to)
+            If no operator is provided, a strictly equal is used (this is equivalent to :eq operator).
+          schema:
+            type: string
+            format: date-time
+            example: '2021-04-01T14:12:56+01:00'
+        - name: limit
+          in: query
+          description: Maximum number of items to return.
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            default: 100
+            example: 100
+        - name: cursor
+          in: query
+          description: 'A server generated value to specify a specific point in a collection result, used for pagination.'
+          schema:
+            type: string
+            example: fE9mZnNldHw9MTAmbGltaXQ9MTA=
+        - name: sort
+          in: query
+          description: 'A `,`(comma)separated list of field names to define the sort order. Field names should be suffixed by a `:`(colon) followed by either the keyword `ASC` (for ascending order) or `DESC` (for descening order) to specify direction. `:ASC` may be omitted, in which case ascending order will be used.'
+          schema:
+            type: string
+            example: 'carrierBookingReference:DESC'
+        - name: eventClassifierCode
+          in: query
+          description: |-
+            Code for the event classifier.
+            - `PLN` (Planned)
+            - `ACT` (Actual)
+            - `REQ` (Requested)
+            - `EST` (Estimated)
+            It is possible to select multiple values by comma (,) separating them. For multiple values the OR-operator is used. For example eventClassifierCode=EST,ACT matches both Estimated (EST) and Actual (ACT) events.Default is all eventClassifierCodes.
+          schema:
+            type: string
+            default: 'ACT,PLN,EST,REQ'
+            example: 'EST,ACT'
+        - name: carrierExportVoyageNumber
+          in: query
+          description: Filter on the vessel operator-specific identifier of the export Voyage.  Specifying this filter will only return events related to this particular `carrierExportVoyageNumber`.
+          schema:
+            type: string
+            maxLength: 50
+            example: 2103S
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OperationsEvent'
+          headers:
+            API-Version:
+              schema:
+                type: string
+                example: 1.2.0
+              description: SemVer used to indicate the version of the contract (API version) returned.
+            Current-Page:
+              schema:
+                type: string
+                example: fE9mZnNldHw9MCZsaW1pdD01
+              description: A link to the current page.
+            Next-Page:
+              schema:
+                type: string
+                example: fE9mZnNldHw9NSZsaW1pdD01
+              description: A link to the next page. Next-Page header link MAY be omitted if the current page is the last page.
+            Prev-Page:
+              schema:
+                type: string
+                example: fE9mZnNldHw9MCZsaW1pdD01
+              description: A link to the previous page. Previous-Page header link MAY be omitted if the current page is the first page.
+            Last-Page:
+              schema:
+                type: string
+                example: fE9mZnNldHw9NTkmbGltaXQ9NQ==
+              description: A link to the last page. Last-Page header link MAY be omitted if the current page is the last page.
+            First-Page:
+              schema:
+                type: string
+                example: fE9mZnNldHw9NjAmbGltaXQ9NQ==
+              description: A link to thefirst page. First-Page header link MAY be omitted if current page is the first page.
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          headers:
+            API-Version:
+              schema:
+                type: string
+                example: 1.2.0
+              description: SemVer used to indicate the version of the contract (API version) returned.
+      servers:
+        - url: 'http://localhost:3000'
+      x-stoplight:
+        id: hvruiixr7tj7r
+components:
+  schemas:
+    Timestamp:
+      type: object
+      title: Timestamp
+      description: "\t\nA digital record of the time of occurrence of an Operations event."
+      properties:
+        timestampID:
+          type: string
+          description: Sender defined ID to enable the receiver to easily detect duplicate messages cased by at least once delivery guarantees.
+          format: uuid
+          example: a82eaf34-cf69-4be3-8df7-881349dde693
+        replyToTimestampID:
+          type: string
+          description: Allow sender to respond to a specific `timestamp`.
+          format: uuid
+          example: a82eaf34-cf69-4be3-8df7-881349dde693
+        publisher:
+          $ref: '#/components/schemas/Publisher'
+        publisherRole:
+          type: string
+          enum:
+            - CA
+            - AG
+            - VSL
+            - ATH
+            - PLT
+            - TWG
+            - MOR
+            - TR
+            - LSH
+            - BUK
+            - SLU
+            - SVP
+          description: "The party function code of the publisher. The values are divided into 4 categories:\r\n\r\nCarrier\r\n- `CA` (Carrier)\r\n- `AG` (Carrier local agent)\r\n- `VSL` (Vessel)\r\nPort\r\n- `ATH` (Port Authorities)\r\n- `PLT` (Port Pilot)\r\n- `TWG` (Towage service provider)\r\n- `MOR` (Mooring service provider)\r\nTerminal\r\n- `TR` (Terminal)\r\nService Provider\r\n- `LSH` (Lashing service provider)\r\n- `BUK` (Bunker service provider)\r\n- `SLU` (Sludge service provider)\r\n- `SVP` (Any other service provider)\r\n\r\nMore details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/publisherrole.csv)"
+          example: CA
+        vesselIMONumber:
+          type: string
+          description: "The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd's register code, which does not change during the lifetime of the vessel\r\n\r\n**NB**: vesselIMONumber is deprecated at the top level - vesselIMONumber needs to also be provided inside the vessel object."
+          maxLength: 7
+          example: '9321483'
+          x-deprecated: true
+        vessel:
+          $ref: '#/components/schemas/Vessel'
+        carrierServiceCode:
+          type: string
+          description: The Carrier specific code of the service for which the schedule details are published.
+          maxLength: 5
+          example: FE1
+        importVoyageNumber:
+          type: string
+          description: "The identifier of an import voyage. The vessel operator-specific identifier of the import Voyage.\r\n\r\n**NB**: the importVoyageNumber is deprecated. Use `carrierImportVoyageNumber`."
+          maxLength: 50
+          example: 2103N
+          x-deprecated: true
+        exportVoyageNumber:
+          type: string
+          description: "The identifier of an export voyage. The vessel operator-specific identifier of the export Voyage.\r\n\r\nNB: the exportVoyageNumber is deprecated use `carrierExportVoyageNumber`."
+          maxLength: 50
+          example: 2103S
+          x-deprecated: true
+        carrierImportVoyageNumber:
+          type: string
+          description: The identifier of an import voyage. The vessel operator-specific identifier of the import Voyage.
+          maxLength: 50
+          example: 2103N
+        carrierExportVoyageNumber:
+          type: string
+          description: The identifier of an export voyage. The vessel operator-specific identifier of the export Voyage.
+          maxLength: 50
+          example: 2103S
+        portVisitReference:
+          type: string
+          description: The unique reference that can be used to link different `transportCallReferences` to the same port visit. The reference is provided by the port to uniquely identify a port call.
+          maxLength: 50
+          example: NLRTM1234589
+        transportCallSequenceNumber:
+          type: integer
+          description: Transport operator's key that uniquely identifies each individual call. This key is essential to distinguish between two separate calls at the same location within one voyage.
+          format: int32
+          example: 2
+        carrierTransportCallReference:
+          type: string
+          description: Carrier definied reference to a TransportCall
+          maxLength: 100
+        vesselPosition:
+          $ref: '#/components/schemas/GeoLocation'
+        UNLocationCode:
+          type: string
+          description: The **UN Location Code** specifying where the Facility is located.
+          maxLength: 5
+          example: NLAMS
+        facilitySMDGCode:
+          type: string
+          description: "The SMDG code used for identifying the specific facility. This code does not include the UN Location Code.\r\n\r\n**NB**: facilitySMDGCode is deprecated - facilityCode together with facilityCodeListProvider in the eventLocation object should be used instead."
+          maxLength: 6
+          example: ADI
+          x-deprecated: true
+        facilityTypeCode:
+          type: string
+          enum:
+            - PBPL
+            - BRTH
+            - ANCH
+          description: "A specialized version of the facilityCode to be used in Operations events. The code to identify the specific type of facility.\r\n\r\n- `PBPL` (Pilot boarding place)\r\n- `BRTH` (Berth)\r\n- `ANCH` (Anchorage)\r\n\r\nMore details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/facilitytypes.csv).\r\n\r\n**NB**: This is a conditional field and is connected to `portCallServiceTypeCode`. Please check the IFS for allowed combinations."
+          example: BRTH
+        eventLocation:
+          description: 'General purpose object to capture the location in the `timestamp`. The location can be specified in **any** of the following ways: `UN Location Code`, `FacilitySMDG` or `Geo Location`. In addition to the above `Address` and `Facility` should only be used when the terminal/location cannot be expressed using a **SMDG** code but needs an **Address** or **BIC** code'
+          anyOf:
+            - $ref: '#/components/schemas/UNLocationLocation'
+            - $ref: '#/components/schemas/FacilitySMDGLocation'
+            - $ref: '#/components/schemas/AddressLocation'
+            - $ref: '#/components/schemas/FacilityLocation'
+            - $ref: '#/components/schemas/GeoLocation'
+        eventCreatedDateTime:
+          type: string
+          description: "The timestamp of when the event leading to this request was created (this would be a time in the past).\r\n\r\nIf omitted the time of when the request will be recieved will be used."
+          format: date-time
+          example: '2021-01-09T14:12:56+01:00'
+        milesToDestinationPort:
+          type: number
+          description: Remaining distance reported by the vessel to the next destination port in nautical miles.
+          format: float
+          example: 0
+        eventClassifierCode:
+          type: string
+          enum:
+            - PLN
+            - ACT
+            - REQ
+            - EST
+          description: "Code for the event classifier.\r\n\r\n- `PLN` (Planned)\r\n- `ACT` (Actual)\r\n- `REQ` (Requested)\r\n- `EST` (Estimated)\r\n\r\nMore details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/eventclassifiercodes.csv).\r\n\r\n**NB**: This is a conditional field and must match timestamps defined in the IFS."
+          example: ACT
+        operationsEventTypeCode:
+          type: string
+          enum:
+            - STRT
+            - CMPL
+            - ARRI
+            - DEPA
+            - OMIT
+            - CANC
+          description: "The code to identify the type of event that is related to the operation\r\n\r\n- `STRT` (Started)\r\n- `CMPL` (Completed)\r\n- `ARRI` (Arrived)\r\n- `DEPA` (Departed)\r\n- `OMIT` (Omitted)\r\n- `CANC` (Cancelled)\r\n\r\nMore details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/operationseventtypecodes.csv).\r\n\r\n**NB**: This is a conditional field and has to be aligned with other fields such as `portCallServiceTypeCode`. One such example is if `portCallServiceTypeCode` is not null then `operationsEventTypeCode` should be either: `STRT` (Started), `COMP` (Completed) or `CANC` (Cancelled). If `portCallServiceTypeCode` is null then `operationsEventTypeCode` is one of: `ARRI` (Arrived), `DEPA` (Departed) or `OMIT` (Omitted). Please check the IFS for allowed combinations."
+          example: STRT
+        modeOfTransport:
+          type: string
+          description: "**NB**: this field is marked deprecated since the standard is only defined for `VESSEL` and therefore redundant.\r\n\r\nJIT 1.0 and JIT 1.1 timestamps have used this field to differentiate timestamps. Since JIT 1.2 this is no longer needed except for 1 pair of JIT 1.1 timestamps that JIT 1.2 still needs for the sake of backward compatability. These timestamps have the portCallServiceTypeCode set to `SAFE`."
+          example: VESSEL
+          x-deprecated: true
+        portCallPhaseTypeCode:
+          type: string
+          enum:
+            - INBD
+            - ALGS
+            - SHIF
+            - OUTB
+          description: "The general direction of the vessel for which information applies\r\n\r\n- `INBD` (Inbound)\r\n- `ALGS` (Alongside)\r\n- `SHIF` (Shifting)\r\n- `OUTB` (Outbound)\r\n\r\nMore details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/portcallphasetypecodes.csv).\r\n\r\n**NB**: This is a conditional field and must match timestamps according to the IFS. Please be aware that JIT 1.0 does not know about this field. Server implementations are expected to map this to a valid timestamp. If `portCallServiceTypeCode` is `PILO` (Pilotage) and `portCallPhaseTypeCode` is Null then `portCallPhaseTypeCode` can be set to `INBD` (Inbound)."
+          example: ALGS
+        portCallServiceTypeCode:
+          type: string
+          enum:
+            - PILO
+            - MOOR
+            - CRGO
+            - TOWG
+            - BUNK
+            - LASH
+            - SAFE
+            - FAST
+            - GWAY
+            - ANCO
+            - SLUG
+            - SHPW
+            - LCRO
+            - DCRO
+            - VRDY
+          description: "The type of the service provided in the port call\r\n\r\n- `PILO` (Pilotage)\r\n- `MOOR` (Mooring)\r\n- `CRGO` (Cargo operations)\r\n- `TOWG` (Towage)\r\n- `BUNK` (Bunkering)\r\n- `LASH` (Lashing)\r\n- `SAFE` (Safety)\r\n- `FAST` (All Fast)\r\n- `GWAY` (Gangway down and secure)\r\n- `ANCO` (Anchorage operations)\r\n- `SLUG` (Sludge)\r\n- `SHPW` (Shore Power)\r\n- `LCRO` (Loading cargo operations)\r\n- `DCRO` (Discharge cargo operations)\r\n- `VRDY` (Vessel ready)\r\n\r\nMore details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/portcallservicetypecodes.csv).\r\n\r\n**NB**: This is a conditional field and must match timestamps defined in the IFS."
+          example: BUNK
+        eventDateTime:
+          type: string
+          description: 'The local date and time, where the event took place or when the event will take place, in ISO 8601 format.'
+          format: date-time
+          example: '2019-11-12T07:41:00+08:30'
+        carrierVoyageNumber:
+          type: string
+          description: "The vessel operator-specific identifier of the Voyage.\r\n\r\n**Deprecated**: Use `carrierExportVoyageNumber` and/or `carrierImportVoyageNumber` instead."
+          maxLength: 50
+          example: 2103S
+          x-deprecated: true
+        delayReasonCode:
+          type: string
+          description: 'Reason code for the delay. See SMDG [Code list DELAY](https://smdg.org/documents/smdg-code-lists/delay-reason-and-port-call-activity/) for a list of valid codes to be used for this attribute.'
+          maxLength: 3
+          example: STR
+        remark:
+          type: string
+          description: Free text to provide additional information on the context.
+          maxLength: 500
+          example: Port closed due to strike
+      required:
+        - publisher
+        - publisherRole
+        - vesselIMONumber
+        - carrierServiceCode
+        - UNLocationCode
+        - eventClassifierCode
+        - operationsEventTypeCode
+        - eventDateTime
+        - carrierVoyageNumber
+      x-stoplight:
+        id: hq4ulvcjufc8b
+    Publisher:
+      type: object
+      title: Publisher
+      description: Refers to a company or a legal entity.
+      properties:
+        partyName:
+          type: string
+          description: Name of the party.
+          maxLength: 100
+          example: Asseco Denmark
+        taxReference1:
+          type: string
+          description: The identifying number of the consignee or shipper (Individual or entity) used for tax purposes.
+          maxLength: 20
+          example: CVR-25645774
+        taxReference2:
+          type: string
+          description: Optional second identifying number of the consignee or shipper (Individual or entity) used for tax purposes.
+          maxLength: 20
+          example: CVR-25645774
+        publicKey:
+          type: string
+          description: The public key used for a digital signature.
+          maxLength: 500
+          example: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IkFzaW
+        address:
+          $ref: '#/components/schemas/Address'
+          description: An object for storing address related information.
+        identifyingCodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentifyingCode'
+        nmftaCode:
+          type: string
+          description: "The Standard Carrier Alpha Code (SCAC) provided by NMFTA.\r\n\r\n**Deprecated**: Replaced by DCSAResponsibleAgencyCode and partyCode defined in the identifyingCodes list."
+          maxLength: 4
+          example: MMCU
+          x-deprecated: true
+      x-stoplight:
+        id: 35dha7rtd8189
+    Address:
+      type: object
+      title: address
+      properties:
+        name:
+          type: string
+          description: Name of the address.
+          maxLength: 100
+          example: Henrik
+        street:
+          type: string
+          description: The name of the street of the party’s address.
+          maxLength: 100
+          example: Kronprincessegad
+        streetNumber:
+          type: string
+          description: The number of the street of the party’s address.
+          maxLength: 50
+          example: '54'
+        floor:
+          type: string
+          description: The floor of the party’s street number.
+          maxLength: 50
+          example: 5. sal
+        postCode:
+          type: string
+          description: The post code of the party’s address.
+          maxLength: 10
+          example: '1306'
+        city:
+          type: string
+          description: The city name of the party’s address.
+          maxLength: 65
+          example: København
+        stateRegion:
+          type: string
+          description: The state/region of the party’s address.
+          maxLength: 65
+          example: N/A
+        country:
+          type: string
+          description: The country of the party’s address.
+          maxLength: 75
+          example: Denmark
+      x-stoplight:
+        id: 1mvgq9vfs49pn
+    IdentifyingCode:
+      type: object
+      title: identifyingCode
+      properties:
+        codeListResponsibleAgencyCode:
+          type: string
+          enum:
+            - '5'
+            - '6'
+            - '11'
+            - '20'
+            - '54'
+            - '182'
+            - '274'
+            - '296'
+            - '306'
+            - '399'
+            - zzz
+          description: |
+            UN/CEFACT codes for code list providers:
+            - 5 (ISO)
+            - 6 (UN/ECE)
+            - 11 (Lloyd's register of shipping)
+            - 20 (BIC (Bureau International des Containeurs)
+            - 54 (IMO (incl. IMDG))
+            - 182 (Standard Carrier Alpha Code (SCAC))
+            - 274 (ITIGG)
+            - 296 (ITU)
+            - 306 (SMDG)
+            - 399 (EXIS)
+            - zzz (Mutually defined)
+
+            <b>Deprecated:</b> Use DCSAResponsibleAgencyCode instead
+          example: '306'
+          x-deprecated: true
+        DCSAResponsibleAgencyCode:
+          type: string
+          enum:
+            - ISO
+            - UNECE
+            - LLOYD
+            - BIC
+            - IMO
+            - SCAC
+            - ITIGG
+            - ITU
+            - SMDG
+            - EXIS
+            - FMC
+            - CBSA
+            - ZZZ
+          description: |
+            A DCSA provided code for UN/CEFACT code list providers:
+            - ISO
+            - UNECE
+            - LLOYD (Lloyd's register of shipping)
+            - BIC (Bureau International des Containeurs)
+            - IMO
+            - SCAC (Standard Carrier Alpha Code)
+            - ITIGG
+            - ITU
+            - SMDG
+            - EXIS
+            - FMC (Federal Maritime Commission)
+            - CBSA (Canada Border Services Agency)
+            - ZZZ (Mutually defined)
+          example: SMDG
+        partyCode:
+          type: string
+          description: Code to identify the party as provided by the agency
+          maxLength: 100
+          example: MSK
+        codeListName:
+          type: string
+          description: 'The name of the list, provided by the responsible agency'
+          maxLength: 100
+          example: LCL
+      required:
+        - DCSAResponsibleAgencyCode
+        - partyCode
+      x-stoplight:
+        id: 48jt8kl4hjbhu
+    Vessel:
+      type: object
+      title: Vessel
+      description: 'A floating, sea going structure (mother vessels and feeder vessels) with either an internal or external mode of propulsion designed for the transport of cargo and/or passengers. Ocean vessels are uniquely identified by an IMO number consisting of 7 digits.'
+      properties:
+        vesselIMONumber:
+          type: string
+          description: 'The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd''s register code, which does not change during the lifetime of the vessel.'
+          maxLength: 7
+          example: '9321483'
+        name:
+          type: string
+          description: The name of the Vessel given by the Vessel Operator and registered with IMO.
+          maxLength: 35
+          example: King of the Seas
+        lengthOverall:
+          type: number
+          description: "The maximum length of a ship's hull measured parallel to the waterline (Length OverAll).\r\n\r\nIf the length is specified in feet (`FOT`) then the decimal part should be concidered as a fraction of a foot and not as a number of inches. E.g. 120.5 feet means 120 and a half foot (which would be 120'6\")."
+          format: float
+          example: 245.45
+        width:
+          type: number
+          description: "Overall width of the ship measured at the widest point of the nominal waterline.\r\n\r\nIf the width is specified in feet (`FOT`) then the decimal part should be concidered as a fraction of a foot and not as a number of inches. E.g. 120.5 feet means 120 and a half foot (which would be 120'6\")."
+          format: float
+          example: 37.33
+        callSign:
+          type: string
+          description: 'A unique alphanumeric identity that belongs to the vessel and is assigned by the International Telecommunication Union (ITU). It consists of a threeletter alphanumeric prefix that indicates nationality, followed by one to four characters to identify the individual vessel. For instance, vessels registered under Denmark are assigned the prefix ranges 5PA-5QZ, OUAOZZ, and XPA-XPZ. The Call Sign changes whenever a vessel changes its flag.'
+          maxLength: 10
+          example: NCVV
+        type:
+          type: string
+          enum:
+            - GCGO
+            - CONT
+            - RORO
+            - CARC
+            - PASS
+            - FERY
+            - BULK
+            - TANK
+            - LGTK
+            - ASSI
+            - PILO
+          description: |
+            Categorization of ocean-going vessels distinguished by the main cargo the vessel carries. Possible values:
+            - GCGO (General cargo)
+            - CONT (Container)
+            - RORO (RoRo)
+            - CARC (Car carrier)
+            - PASS (Passenger)
+            - FERY (Ferry)
+            - BULK (Bulk)
+            - TANK (Tanker)
+            - LGTK (Liquefied gas tanker)
+            - ASSI (Assistance)
+            - PILO (Pilot boat)
+          example: CONT
+        draft:
+          type: number
+          description: "The actual draft of the vessel.\r\n\r\nIf the draft is specified in feet (`FOT`) then the decimal part should be concidered as a fraction of a foot and not as a number of inches. E.g. 120.5 feet means 120 and a half foot (which would be 120'6\")."
+          format: float
+          example: 12.5
+        dimensionUnit:
+          type: string
+          enum:
+            - MTR
+            - FOT
+          description: "The unit of measure which can be expressed in\r\n\r\n- `MTR` (Meter)\r\n- `FOT` (Foot)"
+          example: MTR
+      required:
+        - vesselIMONumber
+      x-stoplight:
+        id: zdujg1ootwt4x
+    GeoLocation:
+      type: object
+      title: GeoLocation
+      description: An interface used to express a location using `latitude` and `longitude`.
+      properties:
+        locationName:
+          type: string
+          description: The name of the location.
+          maxLength: 100
+          example: Port of Amsterdam
+        latitude:
+          type: string
+          description: Geographic coordinate that specifies the north–south position of a point on the Earth's surface.
+          maxLength: 10
+          example: '48.8585500'
+        longitude:
+          type: string
+          description: Geographic coordinate that specifies the east–west position of a point on the Earth's surface.
+          maxLength: 11
+          example: '2.294492036'
+      required:
+        - latitude
+        - longitude
+      x-stoplight:
+        id: ank8dzfl0y9bw
+    UNLocationLocation:
+      type: object
+      title: UNLocationLocation
+      description: An interface used to express a location using a `Un Location Code`.
+      properties:
+        locationName:
+          type: string
+          description: The name of the location.
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 100
+          example: Port of Amsterdam
+        UNLocationCode:
+          type: string
+          description: The UN Location code specifying where the place is located.
+          maxLength: 5
+          example: FRPAR
+      required:
+        - UNLocationCode
+      x-stoplight:
+        id: 13b7kw1hbb937
+    FacilitySMDGLocation:
+      type: object
+      title: FacilitySMDGLocation
+      description: An interface used to express a location using a `Facility` by the `SMDG` code list. The `facilitySMDGCode` does not contain the `UNLocationCode` - this should be provided in the `UnLocationCode` attribute.
+      properties:
+        locationName:
+          type: string
+          description: The name of the location.
+          maxLength: 100
+          example: Port of Amsterdam
+        UNLocationCode:
+          type: string
+          description: The UN Location code specifying where the place is located.
+          maxLength: 5
+          example: FRPAR
+        facilitySMDGCode:
+          type: string
+          description: "The code used for identifying the specific facility. This code does not include the UN Location Code.\r\n\r\nThe codeList used by SMDG is the [SMDG Terminal Code List](https://smdg.org/wp-content/uploads/Codelists/Terminals/SMDG-Terminal-Code-List-v20210401.xlsx)"
+          maxLength: 6
+          example: ACT
+      required:
+        - UNLocationCode
+        - facilitySMDGCode
+      x-stoplight:
+        id: 77trb3u6i4w1w
+    AddressLocation:
+      type: object
+      title: AddressLocation
+      properties:
+        locationName:
+          type: string
+          description: The name of the location.
+          maxLength: 100
+          example: Port of Amsterdam
+        address:
+          $ref: '#/components/schemas/Address'
+      required:
+        - address
+      x-stoplight:
+        id: gvp020l2socrn
+    FacilityLocation:
+      type: object
+      title: FacilityLocation
+      description: An interface used to express a location using a `Facility`. The facility can either be expressed using a `BIC` code or a `SMDG` code. The `facilityCode` does not contain the `UNLocationCode` - this should be provided in the `UnLocationCode` attribute.
+      properties:
+        locationName:
+          type: string
+          description: The name of the location.
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 100
+          example: Port of Amsterdam
+        UNLocationCode:
+          type: string
+          description: The UN Location code specifying where the place is located. This field is conditionally mandatory depending on the value of the facilityCodeListProvider field.
+          maxLength: 5
+          example: FRPAR
+        facilityCode:
+          type: string
+          description: "The code used for identifying the specific facility. This code does not include the UN Location Code.\r\n"
+          maxLength: 6
+          example: ADT
+        facilityCodeListProvider:
+          type: string
+          enum:
+            - BIC
+            - SMDG
+          description: "The provider used for identifying the facility Code. Some facility codes are only defined in combination with an `UN Location Code`\r\n\r\n- BIC (Requires a UN Location Code)\r\n- SMDG (Requires a UN Location Code)\r\n"
+          example: SMDG
+      required:
+        - facilityCode
+        - facilityCodeListProvider
+      x-stoplight:
+        id: y6ndcwtkajir9
+    Error:
+      type: object
+      title: Error
+      properties:
+        httpMethod:
+          type: string
+          description: The HTTP request method type.
+          example: POST
+        requestUri:
+          type: string
+          description: The request URI.
+          example: 'https://dcsa.org/dcsa/tnt/v1/events'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubError'
+        statusCode:
+          type: integer
+          description: The HTTP status code
+          example: 400
+        statusCodeText:
+          type: string
+          description: The textual representation of the response status.
+          example: Bad Request
+        errorDateTime:
+          type: string
+          description: The date and time (in ISO 8601 format) the error occurred.
+          format: date-time
+          example: '2019-11-12T07:41:00+08:30'
+      required:
+        - httpMethod
+        - requestUri
+        - errors
+        - statusCode
+        - statusCodeText
+        - errorDateTime
+      x-stoplight:
+        id: nf521sfl0h7e0
+    SubError:
+      type: object
+      title: Sub error
+      properties:
+        reason:
+          type: string
+          description: High level error message.
+          example: invalidQuery
+        message:
+          type: string
+          description: Detailed error message.
+          example: The request did not contain one of the three required query parameters.
+      required:
+        - reason
+        - message
+      x-stoplight:
+        id: zab928tf8zxaz
+    OperationsEvent:
+      type: object
+      title: OperationsEvent
+      description: The operations event entity is a specialization of the event entity to support specification of data that only applies to an operations even
+      properties:
+        eventID:
+          type: string
+          description: "The unique identifier for the event (the message - not the source).\r\n\r\n**NB**: This field should be considered Metadata."
+          format: uuid
+          example: 3cecb101-7a1a-43a4-9d62-e88a131651e2
+        eventCreatedDateTime:
+          type: string
+          description: "The timestamp of when the event was created.\r\n\r\n**NB**: This field should be considered Metadata"
+          format: date-time
+          example: '2021-01-09T14:12:56+01:00'
+        eventType:
+          type: string
+          enum:
+            - OPERATIONS
+          description: "The Event Type of the object - to be used as a discriminator.\r\n\r\n**NB**: This field should be considered Metadata."
+          example: OPERATIONS
+        eventClassifierCode:
+          type: string
+          enum:
+            - PLN
+            - ACT
+            - REQ
+            - EST
+          description: "Code for the event classifier can be\r\n\r\n- `ACT` (Actual)\r\n- `PLN` (Planned)\r\n- `EST` (Estimated)\r\n- `REQ` (Requested)"
+          example: ACT
+        eventDateTime:
+          type: string
+          description: 'The local date and time, where the event took place or when the event will take place, in ISO 8601 format.'
+          format: date-time
+          example: '2019-11-12T07:41:00+08:30'
+        operationsEventTypeCode:
+          type: string
+          enum:
+            - STRT
+            - CMPL
+            - ARRI
+            - DEPA
+            - OMIT
+            - CANC
+          description: "The code to identify the type of event that is related to the operation\r\n\r\n- STRT (Started)\r\n- CMPL (Completed)\r\n- ARRI (Arrived)\r\n- DEPA (Departed)\r\n- OMIT (Omitted)\r\n- CANC (Cancelled)\r\n\r\nMore details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/operationseventtypecodes.csv)"
+          example: STRT
+        publisher:
+          $ref: '#/components/schemas/Publisher'
+        publisherRole:
+          type: string
+          description: "The party function code of the publisher. The values are divided into 4 categories:\r\n\r\nCarrier\r\n- `CA` (Carrier)\r\n- `AG` (Carrier local agent)\r\n- `VSL` (Vessel)\r\nPort\r\n- `ATH` (Port Authorities)\r\n- `PLT` (Port Pilot)\r\n- `TWG` (Towage service provider)\r\n- `MOR` (Mooring service provider)\r\nTerminal\r\n- `TR` (Terminal)\r\nService Provider\r\n- `LSH`(Lashing service provider)\r\n- `BUK` (Bunker service provider)\r\n- `SLU` (Sludge service provider)\r\n- `SVP` (Any other service provider)\r\n\r\nMore details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/publisherrole.csv)"
+          example: TR
+        eventLocation:
+          type: object
+          description: The location where the event takes place.
+          properties:
+            locationName:
+              type: string
+              description: The name of the location.
+              maxLength: 100
+              example: Port of Amsterdam
+            latitude:
+              type: string
+              description: Geographic coordinate that specifies the north–south position of a point on the Earth's surface.
+              maxLength: 10
+              example: '48.8585500'
+            longitude:
+              type: string
+              description: Geographic coordinate that specifies the east–west position of a point on the Earth's surface.
+              maxLength: 11
+              example: '2.294492036'
+            UNLocationCode:
+              type: string
+              description: The UN Location code specifying where the place is located.
+              maxLength: 5
+              example: FRPAR
+            facilityCode:
+              type: string
+              description: The code used for identifying the specific facility. This code does not include the UN Location Code.
+              maxLength: 6
+              example: ADT
+            facilityCodeListProvider:
+              type: string
+              enum:
+                - BIC
+                - SMDG
+              description: "The provider used for identifying the facility Code. Some facility codes are only defined in combination with an UN Location Code\r\n\r\n- `BIC` (Requires a UN Location Code)\r\n- `SMDG` (Requires a UN Location Code)."
+              example: SMDG
+            address:
+              $ref: '#/components/schemas/Address'
+              description: Address related information.
+        portCallServiceTypeCode:
+          type: string
+          enum:
+            - PILO
+            - MOOR
+            - CRGO
+            - TOWG
+            - BUNK
+            - LASH
+            - SAFE
+            - FAST
+            - GWAY
+            - ANCO
+            - SLUG
+            - SHPW
+            - LCRO
+            - DCRO
+            - VRDY
+          description: "The type of the service provided in the port call\r\n\r\n- `PILO` (Pilotage)\r\n- `MOOR` (Mooring)\r\n- `CRGO` (Cargo operations)\r\n- `TOWG` (Towage)\r\n- `BUNK` (Bunkering)\r\n- `LASH` (Lashing)\r\n- `SAFE` (Safety)\r\n- `FAST` (All Fast)\r\n- `GWAY` (Gangway down and secure)\r\n- `ANCO` (Anchorage operations)\r\n- `SLUG` (Sludge)\r\n- `SHPW` (Shore Power)\r\n- `LCRO` (Loading cargo operations)\r\n- `DCRO` (Discharge cargo operations)\r\n- `VRDY` (Vessel ready)\r\n\r\nMore details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/portcallservicetypecodes.csv).\r\n"
+          example: BUNK
+        portCallPhaseTypeCode:
+          type: string
+          enum:
+            - INBD
+            - ALGS
+            - SHIF
+            - OUTB
+          description: "The general direction of the vessel for which information applies\r\n\r\n- `INBD` (Inbound)\r\n- `ALGS` (Alongside)\r\n- `SHIF` (Shifting)\r\n- `OUTB` (Outbound)\r\n\r\nMore details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/portcallphasetypecodes.csv).\r\n"
+          example: ALGS
+        facilityTypeCode:
+          type: string
+          enum:
+            - PBPL
+            - BRTH
+            - ANCH
+          description: "A specialized version of the facilityCode to be used in Operations events. The code to identify the specific type of facility.\r\n\r\n- `PBPL` (Pilot boarding place)\r\n- `BRTH` (Berth)\r\n- `ANCH` (Anchorage Location)"
+          example: BRTH
+        delayReasonCode:
+          type: string
+          description: 'Reason code for the delay. See SMDG [Code list DELAY ](https://smdg.org/documents/smdg-code-lists/delay-reason-and-port-call-activity/) for a list of valid codes to be used for this attribute.'
+          maxLength: 3
+          example: WEA
+        remark:
+          type: string
+          description: Free text to provide additional information on the context.
+          maxLength: 500
+          example: Port closed due to strike
+        transportCall:
+          $ref: '#/components/schemas/TransportCall'
+        vesselPosition:
+          $ref: '#/components/schemas/GeoLocation'
+        milesToDestinationPort:
+          type: number
+          description: Remaining distance reported by the vessel to the next destination port in nautical miles.
+          format: float
+          example: 245.45
+        vesselDraft:
+          type: number
+          description: "The actual draft of the vessel.\r\n\r\nIf the draft is specified in feet (FOT) then the decimal part should be concidered as a fraction of a foot and not as a number of inches. E.g. 120.5 feet means 120 and a half foot (which would be 120'6\")."
+          format: float
+          example: 12.5
+        vesselDraftUnit:
+          type: string
+          enum:
+            - MTR
+            - FOT
+          description: "The unit of measure which can be expressed in\r\n\r\n- MTR (Meter)\r\n- FOT (Foot)"
+          example: MTR
+      required:
+        - eventCreatedDateTime
+        - eventType
+        - eventClassifierCode
+        - eventDateTime
+        - operationsEventTypeCode
+        - publisher
+        - publisherRole
+        - transportCall
+      x-stoplight:
+        id: x0ecjsqc7k205
+    TransportCall:
+      type: object
+      title: TransportCall
+      properties:
+        transportCallID:
+          type: string
+          description: "The unique identifier for a transport call\r\n\r\nDeprecated: Use transportCallReference instead."
+          maxLength: 100
+          example: 123e4567-e89b-12d3-a456-426614174000
+        transportCallReference:
+          type: string
+          description: "A carrier definied reference to a TransportCall.\r\n\r\nIn the case the Means of Transport is a Vessel and the facility is a Port/Terminal - this reference should be considered a Terminal Call Reference."
+          maxLength: 100
+        portVisitReference:
+          type: string
+          description: The unique reference that can be used to link different transportCallReferences to the same port visit. The reference is provided by the port to uniquely identify a port call.
+          maxLength: 50
+          example: NLRTM1234589
+        carrierServiceCode:
+          type: string
+          description: The Carrier specific code of the service for which the schedule details are published.
+          maxLength: 5
+          example: FE1
+        carrierVoyageNumber:
+          type: string
+          description: "The vessel operator-specific identifier of the Voyage.\\r\\nIn case there are multiple voyages the export voyage is chosen.\r\n\r\n**Deprecated**: Use `carrierExportVoyageNumber` or `carrierImportVoyageNumber` instead."
+          maxLength: 50
+          example: 2103S
+          x-deprecated: true
+        exportVoyageNumber:
+          type: string
+          description: "The identifier of an export voyage. The vessel operator-specific identifier of the export Voyage.\r\n**Deprecated**: Use carrierExportVoyageNumber instead."
+          maxLength: 50
+          example: 2103S
+          x-deprecated: true
+        carrierExportVoyageNumber:
+          type: string
+          description: The identifier of an export voyage. The vessel operator-specific identifier of the export Voyage.
+          maxLength: 50
+          example: 2103S
+        importVoyageNumber:
+          type: string
+          description: "The identifier of an import voyage. The vessel operator-specific identifier of the import Voyage.\r\n**Deprecated**: Use carrierImportVoyageNumber instead."
+          maxLength: 50
+          example: 2103N
+          x-deprecated: true
+        carrierImportVoyageNumber:
+          type: string
+          description: The identifier of an import voyage. The vessel operator-specific identifier of the import Voyage.
+          maxLength: 50
+          example: 2103N
+        transportCallSequenceNumber:
+          type: integer
+          description: Transport operator's key that uniquely identifies each individual call. This key is essential to distinguish between two separate calls at the same location within one voyage.
+          format: int32
+          example: 2
+        UNLocationCode:
+          type: string
+          description: "The UN Location code specifying where the place is located.\r\n\r\n**Deprecated**: Use UN Location Code defined in the location object instead."
+          maxLength: 5
+          example: FRPAR
+          x-deprecated: true
+        facilityCode:
+          type: string
+          description: "The code used for identifying the specific facility. This code does not include the UN Location Code.\r\n**Deprecated**: Use facilityCode defined in the location object instead."
+          maxLength: 6
+          example: ADT
+          x-deprecated: true
+        facilityCodeListProvider:
+          type: string
+          enum:
+            - BIC
+            - SMDG
+          description: "The provider used for identifying the facility Code.The provider used for identifying the facility Code. Some facility codes are only defined in combination with an UN Location Code\r\n\r\n- `BIC` (Requires a UN Location Code)\r\n- `SMDG` (Requires a UN Location Code).\r\n**Deprecated**: Use facilityCodeListProvider defined in the location object instead."
+          example: SMDG
+          x-deprecated: true
+        facilityTypeCode:
+          type: string
+          enum:
+            - BORD
+            - CLOC
+            - COFS
+            - OFFD
+            - DEPO
+            - INTE
+            - POTE
+            - PBPL
+            - BRTH
+            - RAMP
+            - WAYP
+          description: "A specialized version of the facilityCode to be used in TransportCalls. The code to identify the specific type of facility.\r\n\r\n- `BOCR` (Border crossing)\r\n- `CLOC` (Customer location)\r\n- `COFS` (Container freight station)\r\n- `COYA` (Deprecated - use OFFD intead)\r\n- `OFFD` (Off dock storage)\r\n- `DEPO` (Depot)\r\n- `INTE` (Inland terminal)\r\n- `POTE` (Port terminal)\r\n- `RAMP` (Ramp)\r\n\r\n**Deprecated**: Use facilityTypeCode defined on Event root level instead."
+          example: POTE
+          x-deprecated: true
+        otherFacility:
+          type: string
+          description: "An alternative way to capture the facility when no standardized DCSA facility code can be found.\r\n**Deprecated**: Use address object defined in the location object instead."
+          maxLength: 50
+          example: Depot location or address
+          x-deprecated: true
+        modeOfTransport:
+          type: string
+          enum:
+            - VESSEL
+            - RAIL
+            - TRUCK
+            - BARGE
+          description: The mode of transport as defined by DCSA.
+        location:
+          anyOf:
+            - $ref: '#/components/schemas/GeoLocation'
+            - $ref: '#/components/schemas/FacilityLocation'
+            - $ref: '#/components/schemas/UNLocationLocation'
+            - $ref: '#/components/schemas/Address'
+        vessel:
+          type: object
+          description: 'Describes a floating, sea going structure (mother vessels and feeder vessels) with either an internal or external mode of propulsion designed for the transport of cargo and/or passengers. Ocean vessels are uniquely identified by an IMO number consisting of 7 digits, or alternatively by their AIS signal with an MMSI number.'
+          properties:
+            vesselIMONumber:
+              type: string
+              description: 'The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd''s register code, which does not change during the lifetime of the vessel.'
+              maxLength: 7
+              example: '9321483'
+            vesselName:
+              type: string
+              description: The name of the Vessel given by the Vessel Operator and registered with IMO.
+              maxLength: 35
+              example: King of the Seas
+            vesselFlag:
+              type: string
+              description: The flag of the nation whose laws the vessel is registered under. This is the ISO 3166 two-letter country code.
+              maxLength: 2
+              example: DE
+            vesselCallSignNumber:
+              type: string
+              description: 'A unique alphanumeric identity that belongs to the vessel and is assigned by the International Telecommunication Union (ITU). It consists of a threeletter alphanumeric prefix that indicates nationality, followed by one to four characters to identify the individual vessel. For instance, vessels registered under Denmark are assigned the prefix ranges 5PA-5QZ, OUAOZZ, and XPA-XPZ. The Call Sign changes whenever a vessel changes its flag.'
+              maxLength: 10
+              example: NCVV
+            vesselOperatorCarrierCode:
+              type: string
+              description: The carrier who is in charge of the vessel operation based on either the SMDG or SCAC code lists.
+              maxLength: 10
+              example: MAEU
+            vesselOperatorCarrierCodeListProvider:
+              type: string
+              enum:
+                - SMDG
+                - NMFTA
+              description: Identifies the code list provider used for the operator and partner carriercodes.
+          required:
+            - vesselIMONumber
+      required:
+        - transportCallID
+        - modeOfTransport
+      x-stoplight:
+        id: y0s89bsug3not
