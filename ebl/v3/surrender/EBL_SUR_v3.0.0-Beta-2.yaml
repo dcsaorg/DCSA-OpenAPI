@@ -1,0 +1,627 @@
+openapi: 3.0.3
+info:
+  version: 3.0.0-Beta-2
+  title: DCSA EBL Surrender API
+  description: |
+    This API is intended as an API between a carrier (the server) and a EBL Solution Platform (the client).
+
+    The EBL Solution Platform will submit surrender requests to the carrier, which will be processed asynchronously. Responses to the surrender reqests will be submitted by the carrier via the [DCSA_EBL_SUR_RSP](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR_RSP/3.0.0-Beta-2) API.
+
+    When the platform submits a surrender request, the platform guarantees *all* of the following:
+
+    1) The surrender request was submitted by the sole possessor of the EBL.
+    2) Depending on the eBL type:
+       * For non-negoitable ("straight") eBLs, the surrender request was submitted by either the original shipper OR the consignee.
+       * For negotiable eBLs with a named titleholder, the surrender request was submitted by the named titleholder.
+       * For negotiable eBLs without a named titleholder / blank eBLs, possession is sufficient for the entity surrendering the eBL.
+    3) The platform has the EBL in custody while the carrier is evaluating this surrender request. I.e., neither possession nor title holder changes can occur until the carrier responds to this surrender request.
+
+    Please see the [Surrender Request](#/surrenderRequestDetails) for details on what data the platform will provide.
+
+    ### Stats API
+    The Stats API offers crucial statistical information for both API providers and consumers to enhance their services and helps DCSA to understand and scale the ecosystem. We expect you to invoke the Stats API for every request made to this API. Further details can be found [here](https://labs.dcsa.org/#/http/guides/api-guides/stats-api/introduction)
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+  contact:
+    name: Digital Container Shipping Association (DCSA)
+    url: 'https://dcsa.org'
+    email: info@dcsa.org
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: 'https://virtserver.swaggerhub.com/dcsaorg/DCSA_EBL_SUR/3.0.0-Beta-2'
+tags:
+  - name: Surrender Requests
+    description: |
+      The Surrender Requests
+paths:
+  /v3/ebl-surrender-requests:
+    post:
+      tags:
+        - Surrender Requests
+      operationId: create-surrender-request
+      summary: |
+        Creates a Surrender Request
+      description: |
+        The EBL Solution Platform uses this endpoint to submit a surrender request.
+
+        The carrier's answer to the surrender request will be returned via a callback response (see the `Callbacks` tab)
+      parameters:
+        - $ref: '#/components/parameters/Api-Version-Major'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SurrenderRequestDetails'
+      responses:
+        '202':
+          description: |
+            Submission registered successfully.
+
+            The carrier will later follow up via the callback with a response.
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SurrenderRequestAcknowledgement'
+        default:
+          description: Error
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  headers:
+    API-Version:
+      schema:
+        type: string
+        example: 3.0.0-Beta-2
+      description: |
+        SemVer used to indicate the version of the contract (API version) returned.
+  parameters:
+    Api-Version-Major:
+      in: header
+      name: API-Version
+      required: false
+      schema:
+        type: string
+        example: '3'
+      description: |
+        An API-Version header **MAY** be added to the request (optional); if added it **MUST** only contain **MAJOR** version. API-Version header **MUST** be aligned with the URI version.
+  schemas:
+    TransactionParty:
+      description: refers to a company or a legal entity.
+      type: object
+      properties:
+        eblPlatform:
+          description: |
+            The EBL platform of the transaction party. Must be a code from https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/eblsolutionproviders.csv.
+          type: string
+          pattern: \S+
+          maxLength: 40
+        legalName:
+          type: string
+          maxLength: 100
+          pattern: ^\S+(\s+\S+)*$
+          description: Legal name of the party/user as shown on the endorsement chain
+          example: Digital Container Shipping Association
+        registrationNumber:
+          type: string
+          description: Company registration number of this party. E.g. registration number on the local chamber of commerse.
+          example: '74567837'
+          pattern: ^\S+(\s+\S+)*$
+        locationOfRegistration:
+          type: string
+          description: Country code of the location of registration according to ISO 3166-1 alpha-2
+          maxLength: 2
+          minLength: 2
+          pattern: '^[A-Z]+$'
+          example: NL
+        taxReference:
+          type: string
+          description: Tax reference used in the location of registration
+          pattern: ^\S+$
+          example: NL859951480B01
+        partyCodes:
+          type: array
+          items:
+            type: object
+            properties:
+              partyCode:
+                type: string
+                maxLength: 100
+                minLength: 1
+                pattern: '^\S+(\s+\S+)*$'
+                description: |
+                  Code to identify the party as provided by the `partyCodeListProvider` and `codeListName`
+                example: '529900T8BM49AURSDO55'
+              codeListProvider:
+                type: string
+                description: |
+                  Describes the organisation that provides the party code.
+
+                  - `EPUI`:The party code is an EBL Platform User Identifier (that is, an identifier provided by a platform, used to transfer eBLs). EPIU should be combined with the `codeListName`, to identify the platform that issued the identifier.
+                  - `GLEIF`: The party code is issued by Global Legal Entity Identifier Foundation (GLEIF). See https://www.gleif.org/en. The `codeNameList` (if omitted) defaults to `LEI`.
+                  - `W3C`: The party code is issued by a standard created by World Wide Web Consortium (W3C). See https://www.w3.org/. The `codeNameList` (if omitted) defaults to `DID`.
+                enum:
+                - GLEIF
+                - W3C
+                - EPUI
+                example: 'EPUI'
+              codeListName:
+                type: string
+                pattern: '^\S+(\s+\S+)*$'
+                maxLength: 100
+                description: |
+                  The name of the code list / code generation mechanism / code authority for the party code.
+                  
+                  For `EPUI`:
+                  * `Wave`: An identifier provided by Wave BL.
+                  * `CargoX`: An identifier provided by CargoX
+                  * `EdoxOnline`: An identifier provided by EdoxOnline
+                  * `IQAX`: An identifier provided by IQAX
+                  * `EssDOCS`: An identifier provided by essDOCS
+                  * `Bolero`: An identifier provided by Bolero
+                  * `TradeGO`: An identifierprovided by TradeGo
+                  * `Secro`: An identifier provided by Secro
+                  * `GSBN`: An identifier provided by GSBN
+                  * `WiseTech`: An identifier provided by WiseTech
+                  
+                  For `W3C`:
+                  * `DID`: The party code is a Decentralized Identifier (see https://www.w3.org/TR/did-core/).
+                  
+                  For `GLEIF`:
+                  * `LEI`: The party code is a Legal Entity Identifier (LEI) as issued by Global Legal Entity Identifier Foundation (GLEIF). See https://www.gleif.org/en
+                example: 'Bolero'
+            required:
+              - partyCode
+              - codeListProvider
+      required:
+        - eblPlatform
+        - legalName
+    EndorsementChainLink:
+      type: object
+      properties:
+        actionDateTime:
+          type: string
+          format: date-time
+          description: Date time when the action occured.
+        actor:
+          $ref: '#/components/schemas/TransactionParty'
+        recipient:
+          $ref: '#/components/schemas/TransactionParty'
+      description: |
+        Entry in the endorsement chain.
+      required:
+        - actionDateTime
+        - actor
+        - recipient
+    SurrenderRequestAcknowledgement:
+      type: object
+      properties:
+        surrenderRequestReference:
+          type: string
+          maxLength: 100
+          pattern: ^\S+(\s+\S+)*$
+          description: |
+            A server defined reference for a concrete surrender request. Surrender request references MUST NOT be reused.
+          example: Z12345
+        transportDocumentReference:
+          type: string
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 20
+          description: |
+            A unique number allocated by the shipping line to the transport document and the main number used for the tracking of the status of the shipment.
+          example: HHL71800000
+    SurrenderRequestDetails:
+      type: object
+      description: |
+        A concrete surrender request related to a transport document.
+
+        The platform guarantees *all* of the following:
+
+          1) The surrender request was submitted by the sole possessor of the EBL.
+          2) Depending on the eBL type:
+           * For non-negoitable ("straight") eBLs, the surrender request was submitted by either the original shipper OR the consignee.
+           * For negotiable eBLs with a named titleholder, the surrender request was submitted by the named titleholder.
+           * For negotiable eBLs without a named titleholder / blank eBLs, possession is sufficient for the entity surrendering the eBL.
+          3) The platform has the EBL in custody while the carrier is evaluating this surrender request. I.e., neither possession nor title holder changes can occur until the carrier responds to this surrender request.
+      properties:
+        surrenderRequestReference:
+          type: string
+          maxLength: 100
+          pattern: ^\S+(\s+\S+)*$
+          description: |
+            A server defined reference for a concrete surrender request. Surrender request references MUST NOT be reused.
+          example: Z12345
+        transportDocumentReference:
+          type: string
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 20
+          description: |
+            A unique number allocated by the shipping line to the transport document and the main number used for the tracking of the status of the shipment.
+          example: HHL71800000
+        surrenderRequestCode:
+          type: string
+          description: |
+            Surrender Request codes:
+            - `SREQ` (Requested to surrender for Delivery)
+            - `AREQ` (Requested to surrender for Amendment)
+
+            The surrender request code determines the type of surrender request. Any parallel negotiation between the consignee and the carrier related to any of these type surrender are handled outside this API. Examples could be the shipment release related to a surrender for delivery or the actual contents of the admendment in a surrender related to an amendment.
+
+            Note that "Switch to paper" is considered an amendment in how it is modelled via the DCSA eBL data standard.
+          enum:
+            - SREQ
+            - AREQ
+          example: SREQ
+        comments:
+          type: string
+          maxLength: 255
+          description: Optional free text comment associated with the surrender request transaction.
+          example: As requested...
+        surrenderRequestedBy:
+          allOf:
+            - $ref: '#/components/schemas/TransactionParty'
+            - additionalProperties: true
+              description: |
+                The party that requested the surrender of the EBL.
+
+                The EBL platform has verified that the party submitting the surrender request was in possion of the EBL and was entitled to perform the surrender ([see description of surrenderRequestDetails](#/components/schemas/surrenderRequestDetails)).
+        endorsementChain:
+          type: array
+          minItems: 0
+          description: |
+            The endorsement chain consist of (a number of) endorsement actions that were performed **after** the eBL bill was issued.
+
+            For straight B/Ls, the endorsement chain can be omitted. For negotiable eBLs, the endorsement chain must be present, as the carrier receiving the surrender request and will check all endorsements before accepting the eBL. The endorsement chain is the electronic version of the "back side" of the paper world B/L.
+          items:
+            $ref: '#/components/schemas/EndorsementChainLink'
+      required:
+        - surrenderRequestReference
+        - transportDocumentReference
+        - surrenderRequestedBy
+        - surrenderRequestCode
+
+    Party:
+      type: object
+      title: Party
+      description: |
+        Refers to a company or a legal entity.
+      properties:
+        partyName:
+          type: string
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 100
+          description: |
+            Name of the party.
+          example: Asseco Denmark
+        address:
+          $ref: '#/components/schemas/Address'
+        partyContactDetails:
+          type: array
+          minItems: 1
+          description: |
+            A list of contact details
+          items:
+            $ref: '#/components/schemas/PartyContactDetail'
+        identifyingCodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentifyingCode'
+        taxLegalReferences:
+          description: |
+            A list of `Tax References` for a `Party`
+          type: array
+          items:
+            $ref: '#/components/schemas/TaxLegalReference'
+      required:
+        - partyName
+    PartyContactDetail:
+      type: object
+      title: Party Contact Detail
+      description: |
+        The contact details of the person to contact. It is mandatory to provide either `phone` and/or `email` along with the `name`.
+      example:
+        name: Henrik
+        phone: +45 51801234
+      properties:
+        name:
+          type: string
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 100
+          description: |
+            Name of the contact
+          example: Henrik
+      anyOf:
+        - type: object
+          title: Phone required
+          description: |
+            `Phone` is mandatory to provide
+          properties:
+            phone:
+              type: string
+              pattern: ^\S+(\s+\S+)*$
+              maxLength: 30
+              description: |
+                Phone number for the contact
+              example: +45 70262970
+          required:
+            - phone
+        - type: object
+          title: Email required
+          description: |
+            `Email` is mandatory to provide
+          properties:
+            email:
+              type: string
+              pattern: ^.+@\S+$
+              maxLength: 100
+              description: |
+                `E-mail` address to be used
+              example: info@dcsa.org
+          required:
+            - email
+      required:
+        - name
+    IdentifyingCode:
+      type: object
+      title: Identifying Code
+      properties:
+        codeListProvider:
+          type: string
+          maxLength: 5
+          description: |
+            A DCSA provided code for [UN/CEFACT](https://unece.org/fileadmin/DAM/trade/untdid/d16b/tred/tred3055.htm) code list providers:
+            - `ISO` (International Standards Organization)
+            - `UNECE` (United Nations Economic Commission for Europe)
+            - `LLOYD` (Lloyd's register of shipping)
+            - `BIC` (Bureau International des Containeurs)
+            - `IMO` (International Maritime Organization)
+            - `SCAC` (Standard Carrier Alpha Code)
+            - `ITIGG` (International Transport Implementation Guidelines Group)
+            - `ITU` (International Telecommunication Union)
+            - `SMDG` (Shipplanning Message Development Group)
+            - `NCBH` (NCB Hazcheck)
+            - `FMC` (Federal Maritime Commission)
+            - `CBSA` (Canada Border Services Agency)
+            - `DCSA` (Digitial Container Shipping Association)
+            - `W3C` (World Wide Web Consortium)
+            - `GLEIF` (Global Legal Entity Identifier Foundation)
+            - `EPI` (EBL Platform Identifier)
+            - `ZZZ` (Mutually defined)
+          example: SMDG
+        partyCode:
+          type: string
+          description: |
+            Code to identify the party as provided by the code list provider
+          maxLength: 100
+          example: MSK
+        codeListName:
+          type: string
+          description: |
+            The name of the list, provided by the code list provider
+          maxLength: 100
+          example: LCL
+      required:
+        - codeListProvider
+        - partyCode
+    TaxLegalReference:
+      type: object
+      title: Tax & Legal Reference
+      description: |
+        Reference that uniquely identifies a party for tax and/or legal purposes in accordance with the relevant jurisdiction.
+        A list of examples:
+        | Type  | Country | Description | |-------|:-------:|-------------| |PAN|IN|Goods and Services Tax Identification Number in India| |GSTIN|IN|Goods and Services Tax Identification Number in India| |IEC|IN|Importer-Exported Code in India| |RUC|EC|Registro Único del Contribuyente in Ecuador| |RUC|PE|Registro Único del Contribuyente in Peru| |NIF|MG|Numéro d’Identification Fiscal in Madagascar| |NIF|DZ|Numéro d’Identification Fiscal in Algeria|
+        Allowed combinations of `type` and `country` are maintained in [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/documentation/reference-data/taxandlegalreferences-v300.csv).
+      properties:
+        type:
+          type: string
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 50
+          description: |
+            The reference type code as defined by the relevant tax and/or legal authority.
+          example: PAN
+        countryCode:
+          type: string
+          pattern: '^[A-Z]{2}$'
+          minLength: 2
+          maxLength: 2
+          description: |
+            The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+          example: DK
+        value:
+          type: string
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 100
+          description: |
+            The value of the `taxLegalReference`
+          example: AAAAA0000A
+      required:
+        - type
+        - countryCode
+        - value
+    Address:
+      type: object
+      title: Address
+      description: |
+        An object for storing address related information
+      properties:
+        name:
+          type: string
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 100
+          description: |
+            Name of the address
+          example: Henrik
+        street:
+          type: string
+          maxLength: 100
+          description: The name of the street of the party’s address.
+          example: Ruijggoordweg
+        streetNumber:
+          type: string
+          maxLength: 50
+          description: The number of the street of the party’s address.
+          example: '100'
+        floor:
+          type: string
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 50
+          description: |
+            The floor of the party’s street number.
+          example: N/A
+        postCode:
+          type: string
+          maxLength: 50
+          description: The post code of the party’s address.
+          example: 1047 HM
+        city:
+          type: string
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 65
+          description: |
+            The city name of the party’s address.
+          example: Amsterdam
+        stateRegion:
+          type: string
+          maxLength: 65
+          description: The state/region of the party’s address.
+          nullable: true
+          example: North Holland
+        country:
+          type: string
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 75
+          description: |
+            The country of the party’s address.
+          example: The Netherlands
+      required:
+        - name
+        - country
+
+    #################
+    # Error Responses
+    #################
+    ErrorResponse:
+      title: Error Response
+      type: object
+      description: Unexpected error
+      properties:
+        httpMethod:
+          description: |
+            The HTTP method used to make the request e.g. `GET`, `POST`, etc
+          type: string
+          example: POST
+          enum:
+            - GET
+            - HEAD
+            - POST
+            - PUT
+            - DELETE
+            - OPTION
+            - PATCH
+        requestUri:
+          description: |
+            The URI that was requested.
+          type: string
+          example: /v1/events
+        statusCode:
+          description: |
+            The HTTP status code returned.
+          type: integer
+          format: int32
+          example: 400
+        statusCodeText:
+          description: |
+            A standard short description corresponding to the HTTP status code.
+          type: string
+          maxLength: 50
+          example: Bad Request
+        statusCodeMessage:
+          description: |
+            A long description corresponding to the HTTP status code with additional information.
+          type: string
+          maxLength: 200
+          example: The supplied data could not be accepted
+        providerCorrelationReference:
+          description: |
+            A unique identifier to the HTTP request within the scope of the API provider.
+          type: string
+          maxLength: 100
+          example: 4426d965-0dd8-4005-8c63-dc68b01c4962
+        errorDateTime:
+          description: |
+            The DateTime corresponding to the error occurring. Must be formatted using [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format.
+          type: string
+          format: date-time
+          example: '2019-11-12T07:41:00+08:30'
+        errors:
+          type: array
+          description: |
+            An array of errors providing more detail about the root cause.
+          minItems: 1
+          items:
+            type: object
+            title: Detailed Error
+            properties:
+              errorCode:
+                type: integer
+                format: int32
+                description: |
+                  The detailed error code returned.
+
+                    - `7000-7999` Technical error codes
+                    - `8000-8999` Functional error codes
+                    - `9000-9999` API provider-specific error codes            
+
+                  [Error codes as specified by DCSA](https://dcsa.atlassian.net/wiki/spaces/DTG/pages/197132308/Standard+Error+Codes).
+                minimum: 7000
+                maximum: 9999
+                example: 7003
+              property:
+                type: string
+                maxLength: 100
+                description: |
+                  The name of the property causing the error.
+                example: facilityCode
+              value:
+                type: string
+                maxLength: 500
+                description: |
+                  The value of the property causing the error serialised as a string exactly as in the original request.
+                example: SG SIN WHS
+              jsonPath:
+                type: string
+                maxLength: 500
+                description: |
+                  A path to the property causing the error, formatted according to [JSONpath](https://github.com/json-path/JsonPath).
+                example: $.location.facilityCode
+              errorCodeText:
+                description: |
+                  A standard short description corresponding to the `errorCode`.
+                type: string
+                maxLength: 100
+                example: invalidData
+              errorCodeMessage:
+                type: string
+                maxLength: 200
+                description: |
+                  A long description corresponding to the `errorCode` with additional information.
+                example: Spaces not allowed in facility code
+            required:
+              - errorCodeText
+              - errorCodeMessage
+      required:
+        - httpMethod
+        - requestUri
+        - statusCode
+        - statusCodeText
+        - errorDateTime
+        - errors
