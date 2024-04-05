@@ -302,15 +302,12 @@ components:
           description: |
             Name of the party.
           example: Asseco Denmark
-        address:
-          $ref: '#/components/schemas/Address'
-        partyContactDetails:
-          type: array
-          minItems: 1
+        eblPlatform:
           description: |
-            A list of contact details
-          items:
-            $ref: '#/components/schemas/PartyContactDetail'
+            The EBL platform of the transaction party. Must be a code from https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/eblsolutionproviders.csv.
+          type: string
+          pattern: \S+
+          maxLength: 4
         identifyingCodes:
           type: array
           items:
@@ -323,53 +320,7 @@ components:
             $ref: '#/components/schemas/TaxLegalReference'
       required:
         - partyName
-    PartyContactDetail:
-      type: object
-      title: Party Contact Detail
-      description: |
-        The contact details of the person to contact. It is mandatory to provide either `phone` and/or `email` along with the `name`.
-      example:
-        name: Henrik
-        phone: +45 51801234
-      properties:
-        name:
-          type: string
-          pattern: ^\S+(\s+\S+)*$
-          maxLength: 100
-          description: |
-            Name of the contact
-          example: Henrik
-      anyOf:
-        - type: object
-          title: Phone required
-          description: |
-            `Phone` is mandatory to provide
-          properties:
-            phone:
-              type: string
-              pattern: ^\S+(\s+\S+)*$
-              maxLength: 30
-              description: |
-                Phone number for the contact
-              example: +45 70262970
-          required:
-            - phone
-        - type: object
-          title: Email required
-          description: |
-            `Email` is mandatory to provide
-          properties:
-            email:
-              type: string
-              pattern: ^.+@\S+$
-              maxLength: 100
-              description: |
-                `E-mail` address to be used
-              example: info@dcsa.org
-          required:
-            - email
-      required:
-        - name
+        - eblPlatform
     IdentifyingCode:
       type: object
       title: Identifying Code
@@ -447,64 +398,6 @@ components:
         - type
         - countryCode
         - value
-    Address:
-      type: object
-      title: Address
-      description: |
-        An object for storing address related information
-      properties:
-        name:
-          type: string
-          pattern: ^\S+(\s+\S+)*$
-          maxLength: 100
-          description: |
-            Name of the address
-          example: Henrik
-        street:
-          type: string
-          maxLength: 100
-          description: The name of the street of the party’s address.
-          example: Ruijggoordweg
-        streetNumber:
-          type: string
-          maxLength: 50
-          description: The number of the street of the party’s address.
-          example: '100'
-        floor:
-          type: string
-          pattern: ^\S+(\s+\S+)*$
-          maxLength: 50
-          description: |
-            The floor of the party’s street number.
-          example: N/A
-        postCode:
-          type: string
-          maxLength: 50
-          description: The post code of the party’s address.
-          example: 1047 HM
-        city:
-          type: string
-          pattern: ^\S+(\s+\S+)*$
-          maxLength: 65
-          description: |
-            The city name of the party’s address.
-          example: Amsterdam
-        stateRegion:
-          type: string
-          maxLength: 65
-          description: The state/region of the party’s address.
-          nullable: true
-          example: North Holland
-        country:
-          type: string
-          pattern: ^\S+(\s+\S+)*$
-          maxLength: 75
-          description: |
-            The country of the party’s address.
-          example: The Netherlands
-      required:
-        - name
-        - country
 
     #################
     # Error Responses
