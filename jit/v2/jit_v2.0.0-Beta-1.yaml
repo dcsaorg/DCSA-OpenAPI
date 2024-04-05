@@ -184,6 +184,22 @@ paths:
             type: string
             maxLength: 50
             example: 2103S
+        - schema:
+            type: string
+            pattern: '^SR\d{5}[A-Z]$'
+            maxLength: 8
+            example: SR12345A
+          in: query
+          name: universalServiceReference
+          description: 'The **U**niversal **S**ervice **R**eference (`USR`) as defined by **DCSA** to filter by. The service code must match the regular expression pattern: `SR\d{5}[A-Z]`. The letters `SR` followed by `5 digits`, followed by a checksum-character as a capital letter from `A to Z`. The result will only return schedules including the service reference.'
+        - schema:
+            type: string
+            pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
+            example: 2201N
+            maxLength: 5
+          in: query
+          name: universalVoyageReference
+          description: The Universal Reference of a `Voyage` - can be both **importUniversalVoyageReference** and **exportUniversalVoyageReference**. The result will only return schedules including the `Ports` where `universalVoyageReference` is either `importUniversalVoyageReference` or `exportUniversalVoyageReference`.
       responses:
         '200':
           description: Successful operation
@@ -246,6 +262,18 @@ components:
       type: object
       title: Timestamp
       description: "\t\nA digital record of the time of occurrence of an Operations event."
+      x-stoplight:
+        id: a47k8u8y7s1ob
+      required:
+        - publisher
+        - publisherRole
+        - vesselIMONumber
+        - carrierServiceCode
+        - UNLocationCode
+        - eventClassifierCode
+        - operationsEventTypeCode
+        - eventDateTime
+        - carrierVoyageNumber
       properties:
         timestampID:
           type: string
@@ -289,6 +317,13 @@ components:
           description: The Carrier specific code of the service for which the schedule details are published.
           maxLength: 5
           example: FE1
+        universalServiceReference:
+          type: string
+          x-stoplight:
+            id: xiiqdw0zdzlqd
+          pattern: '^SR\d{5}[A-Z]$'
+          example: SR12345A
+          description: 'A global unique service reference, as per DCSA standard, agreed by VSA partners for the service. The service reference must match the regular expression pattern: `SR\d{5}[A-Z]`. The letters `SR` followed by `5 digits`, followed by a checksum-character as a capital letter from `A to Z`.'
         importVoyageNumber:
           type: string
           description: "The identifier of an import voyage. The vessel operator-specific identifier of the import Voyage.\r\n\r\n**NB**: the importVoyageNumber is deprecated. Use `carrierImportVoyageNumber`."
@@ -311,6 +346,20 @@ components:
           description: The identifier of an export voyage. The vessel operator-specific identifier of the export Voyage.
           maxLength: 50
           example: 2103S
+        universalImportVoyageReference:
+          type: string
+          x-stoplight:
+            id: 8o4w35kse4vaa
+          pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
+          example: 2103N
+          description: "A global unique voyage reference for the import Voyage, as per DCSA standard, agreed by VSA partners for the voyage. The voyage reference must match the regular expression pattern: `\\d{2}[0-9A-Z]{2}[NEWSR]`\r\n- `2 digits` for the year\r\n- `2 alphanumeric characters` for the sequence number of the voyage\r\n- `1 character` for the direction/haul (`N`orth, `E`ast, `W`est, `S`outh or `R`oundtrip)."
+        universalExportVoyageReference:
+          type: string
+          x-stoplight:
+            id: hb85godvxaqg0
+          example: 2103N
+          pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
+          description: "A global unique voyage reference for the export Voyage, as per DCSA standard, agreed by VSA partners for the voyage. The voyage reference must match the regular expression pattern: `\\d{2}[0-9A-Z]{2}[NEWSR]`\r\n- `2 digits` for the year\r\n- `2 alphanumeric characters` for the sequence number of the voyage\r\n- `1 character` for the direction/haul (`N`orth, `E`ast, `W`est, `S`outh or `R`oundtrip)."
         portVisitReference:
           type: string
           description: The unique reference that can be used to link different `transportCallReferences` to the same port visit. The reference is provided by the port to uniquely identify a port call.
@@ -439,18 +488,6 @@ components:
           description: Free text to provide additional information on the context.
           maxLength: 500
           example: Port closed due to strike
-      required:
-        - publisher
-        - publisherRole
-        - vesselIMONumber
-        - carrierServiceCode
-        - UNLocationCode
-        - eventClassifierCode
-        - operationsEventTypeCode
-        - eventDateTime
-        - carrierVoyageNumber
-      x-stoplight:
-        id: a47k8u8y7s1ob
     Publisher:
       type: object
       title: Publisher
@@ -1065,6 +1102,14 @@ components:
           description: The Carrier specific code of the service for which the schedule details are published.
           maxLength: 5
           example: FE1
+        universalServiceReference:
+          type: string
+          x-stoplight:
+            id: neppzedw7rxa3
+          example: SR12345A
+          pattern: '^SR\d{5}[A-Z]$'
+          maxLength: 8
+          description: 'A global unique service reference, as per DCSA standard, agreed by VSA partners for the service. The service reference must match the regular expression pattern: `SR\d{5}[A-Z]`. The letters `SR` followed by `5 digits`, followed by a checksum-character as a capital letter from `A to Z`.'
         carrierVoyageNumber:
           type: string
           description: "The vessel operator-specific identifier of the Voyage.\\r\\nIn case there are multiple voyages the export voyage is chosen.\r\n\r\n**Deprecated**: Use `carrierExportVoyageNumber` or `carrierImportVoyageNumber` instead."
@@ -1093,6 +1138,20 @@ components:
           description: The identifier of an import voyage. The vessel operator-specific identifier of the import Voyage.
           maxLength: 50
           example: 2103N
+        universalImportVoyageReference:
+          type: string
+          x-stoplight:
+            id: 1yxyv2kyzzczc
+          example: 2103N
+          pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
+          description: "A global unique voyage reference for the import Voyage, as per DCSA standard, agreed by VSA partners for the voyage. The voyage reference must match the regular expression pattern: `\\d{2}[0-9A-Z]{2}[NEWSR]`\r\n- `2 digits` for the year\r\n- `2 alphanumeric characters` for the sequence number of the voyage\r\n- `1 character` for the direction/haul (`N`orth, `E`ast, `W`est, `S`outh or `R`oundtrip)."
+        universalExportVoyageReference:
+          type: string
+          x-stoplight:
+            id: 83lzduo1nshru
+          pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
+          example: 2103N
+          description: "A global unique voyage reference for the export Voyage, as per DCSA standard, agreed by VSA partners for the voyage. The voyage reference must match the regular expression pattern: `\\d{2}[0-9A-Z]{2}[NEWSR]`\r\n- `2 digits` for the year\r\n- `2 alphanumeric characters` for the sequence number of the voyage\r\n- `1 character` for the direction/haul (`N`orth, `E`ast, `W`est, `S`outh or `R`oundtrip)."
         transportCallSequenceNumber:
           type: integer
           description: Transport operator's key that uniquely identifies each individual call. This key is essential to distinguish between two separate calls at the same location within one voyage.
@@ -1192,4 +1251,3 @@ components:
                 - SMDG
                 - NMFTA
               description: Identifies the code list provider used for the operator and partner carriercodes.
-      description: ''
