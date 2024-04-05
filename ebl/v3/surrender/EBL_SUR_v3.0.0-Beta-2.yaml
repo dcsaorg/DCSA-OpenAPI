@@ -5,7 +5,7 @@ info:
   description: |
     This API is intended as an API between a carrier (the server) and a EBL Solution Platform (the client).
 
-    The EBL Solution Platform will submit surrender requests to the carrier, which will be processed asynchronously. Responses to the surrender reqests will be submitted by the carrier via the [DCSA_EBL_SUR_RSP](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR_RSP/3.0.0-Beta-2) API.
+    The EBL Solution Platform will submit surrender requests to the carrier, which will be processed asynchronously. Responses to the surrender reqests will be submitted by the carrier via the [DCSA EBL Surrender Response API](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR_RSP/3.0.0-Beta-2) API.
 
     When the platform submits a surrender request, the platform guarantees *all* of the following:
 
@@ -96,95 +96,70 @@ components:
         An API-Version header **MAY** be added to the request (optional); if added it **MUST** only contain **MAJOR** version. API-Version header **MUST** be aligned with the URI version.
   schemas:
     TransactionParty:
-      description: refers to a company or a legal entity.
       type: object
+      title: Transaction Party
+      description: Refers to a company or a legal entity.
       properties:
         eblPlatform:
           description: |
             The EBL platform of the transaction party. Must be a code from https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/eblsolutionproviders.csv.
           type: string
           pattern: \S+
-          maxLength: 40
-        legalName:
+          maxLength: 4
+        partyName:
           type: string
+          pattern: ^\S+(\s+\S+)*$
           maxLength: 100
-          pattern: ^\S+(\s+\S+)*$
-          description: Legal name of the party/user as shown on the endorsement chain
-          example: Digital Container Shipping Association
-        registrationNumber:
-          type: string
-          description: Company registration number of this party. E.g. registration number on the local chamber of commerse.
-          example: '74567837'
-          pattern: ^\S+(\s+\S+)*$
-        locationOfRegistration:
-          type: string
-          description: Country code of the location of registration according to ISO 3166-1 alpha-2
-          maxLength: 2
-          minLength: 2
-          pattern: '^[A-Z]+$'
-          example: NL
-        taxReference:
-          type: string
-          description: Tax reference used in the location of registration
-          pattern: ^\S+$
-          example: NL859951480B01
-        partyCodes:
+          description: |
+            Name of the party.
+          example: Globeteam
+        identifyingCodes:
           type: array
           items:
-            type: object
-            properties:
-              partyCode:
-                type: string
-                maxLength: 100
-                minLength: 1
-                pattern: '^\S+(\s+\S+)*$'
-                description: |
-                  Code to identify the party as provided by the `partyCodeListProvider` and `codeListName`
-                example: '529900T8BM49AURSDO55'
-              codeListProvider:
-                type: string
-                description: |
-                  Describes the organisation that provides the party code.
-
-                  - `EPUI`:The party code is an EBL Platform User Identifier (that is, an identifier provided by a platform, used to transfer eBLs). EPIU should be combined with the `codeListName`, to identify the platform that issued the identifier.
-                  - `GLEIF`: The party code is issued by Global Legal Entity Identifier Foundation (GLEIF). See https://www.gleif.org/en. The `codeNameList` (if omitted) defaults to `LEI`.
-                  - `W3C`: The party code is issued by a standard created by World Wide Web Consortium (W3C). See https://www.w3.org/. The `codeNameList` (if omitted) defaults to `DID`.
-                enum:
-                - GLEIF
-                - W3C
-                - EPUI
-                example: 'EPUI'
-              codeListName:
-                type: string
-                pattern: '^\S+(\s+\S+)*$'
-                maxLength: 100
-                description: |
-                  The name of the code list / code generation mechanism / code authority for the party code.
-                  
-                  For `EPUI`:
-                  * `Wave`: An identifier provided by Wave BL.
-                  * `CargoX`: An identifier provided by CargoX
-                  * `EdoxOnline`: An identifier provided by EdoxOnline
-                  * `IQAX`: An identifier provided by IQAX
-                  * `EssDOCS`: An identifier provided by essDOCS
-                  * `Bolero`: An identifier provided by Bolero
-                  * `TradeGO`: An identifierprovided by TradeGo
-                  * `Secro`: An identifier provided by Secro
-                  * `GSBN`: An identifier provided by GSBN
-                  * `WiseTech`: An identifier provided by WiseTech
-                  
-                  For `W3C`:
-                  * `DID`: The party code is a Decentralized Identifier (see https://www.w3.org/TR/did-core/).
-                  
-                  For `GLEIF`:
-                  * `LEI`: The party code is a Legal Entity Identifier (LEI) as issued by Global Legal Entity Identifier Foundation (GLEIF). See https://www.gleif.org/en
-                example: 'Bolero'
-            required:
-              - partyCode
-              - codeListProvider
+            $ref: '#/components/schemas/IdentifyingCode'
+        taxLegalReferences:
+          description: |
+            A list of `Tax References` for a `Party`
+          type: array
+          items:
+            $ref: '#/components/schemas/TaxLegalReference'
       required:
         - eblPlatform
-        - legalName
+        - partyName
+    SurrenderRequestedBy:
+      type: object
+      title: Surrender Requested By
+      description: |
+        The party that requested the surrender of the EBL.
+
+        The EBL platform has verified that the party submitting the surrender request was in possion of the EBL and was entitled to perform the surrender ([see description of surrenderRequestDetails](#/components/schemas/surrenderRequestDetails)).
+      properties:
+        eblPlatform:
+          description: |
+            The EBL platform of the transaction party. Must be a code from https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/eblsolutionproviders.csv.
+          type: string
+          pattern: \S+
+          maxLength: 4
+        partyName:
+          type: string
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 100
+          description: |
+            Name of the party.
+          example: Globeteam
+        identifyingCodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentifyingCode'
+        taxLegalReferences:
+          description: |
+            A list of `Tax References` for a `Party`
+          type: array
+          items:
+            $ref: '#/components/schemas/TaxLegalReference'
+      required:
+        - eblPlatform
+        - partyName
     EndorsementChainLink:
       type: object
       properties:
@@ -267,13 +242,7 @@ components:
           description: Optional free text comment associated with the surrender request transaction.
           example: As requested...
         surrenderRequestedBy:
-          allOf:
-            - $ref: '#/components/schemas/TransactionParty'
-            - additionalProperties: true
-              description: |
-                The party that requested the surrender of the EBL.
-
-                The EBL platform has verified that the party submitting the surrender request was in possion of the EBL and was entitled to perform the surrender ([see description of surrenderRequestDetails](#/components/schemas/surrenderRequestDetails)).
+          $ref: '#/components/schemas/SurrenderRequestedBy'
         endorsementChain:
           type: array
           minItems: 0
@@ -289,38 +258,6 @@ components:
         - surrenderRequestedBy
         - surrenderRequestCode
 
-    Party:
-      type: object
-      title: Party
-      description: |
-        Refers to a company or a legal entity.
-      properties:
-        partyName:
-          type: string
-          pattern: ^\S+(\s+\S+)*$
-          maxLength: 100
-          description: |
-            Name of the party.
-          example: Asseco Denmark
-        eblPlatform:
-          description: |
-            The EBL platform of the transaction party. Must be a code from https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/eblsolutionproviders.csv.
-          type: string
-          pattern: \S+
-          maxLength: 4
-        identifyingCodes:
-          type: array
-          items:
-            $ref: '#/components/schemas/IdentifyingCode'
-        taxLegalReferences:
-          description: |
-            A list of `Tax References` for a `Party`
-          type: array
-          items:
-            $ref: '#/components/schemas/TaxLegalReference'
-      required:
-        - partyName
-        - eblPlatform
     IdentifyingCode:
       type: object
       title: Identifying Code
