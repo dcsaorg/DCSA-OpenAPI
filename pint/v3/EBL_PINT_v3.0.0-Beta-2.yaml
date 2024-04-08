@@ -1,0 +1,953 @@
+openapi: 3.0.3
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: 'https://virtserver.swaggerhub.com/dcsaorg/DCSA_EBL_PINT/3.0.0-Beta-2'
+info:
+  version: 3.0.0-Beta-2
+  title: DCSA eBL Platform Interoperabiity API
+  description: |
+    <h1>DCSA OpenAPI specification for electronic Bill of Lading (eBL) Platform Interoperability (PINT) standard </h1>
+
+    <h2>The Envelope Transfer</h2>
+
+    The PINT API is designed to support non-repudiable transfer of eBL document and any number of additional documents between two eBL platforms. 
+
+    In the most common scenario, the sending eBL platform executes the envelope transfer by:
+    1. Initiating the envelope transfer using [**'Start envelope transfer'**](#/Start%20envelope%20transfer) endpoint
+    2. Transfering the additional documents (one at the time) using [**'Transfer additional document'**](#/Transfer%20additional%20document) endpoint
+    3. Completing the envelope transfer using [**'Finish envelope transfer'**](#/Finish%20envelope%20transfer) endpoint
+
+    <h2>The eBL document</h2>
+
+    The envelope transfer from the sending eBL Platform to the receiving eBL Platform always contains the **eBL document** (transferred via [**'Start envelope transfer'**](#/Start%20envelope%20transfer) endpoint request body [`EblEnvelope.transportDocument`](#/EblEnvelope) schema object). The eBL document must be unchanged between different envelope transfers for the lifetime of the eBL document. 
+
+    The PINT API is designed to support transfer of the following types of eBL documents:
+    1. Straight eBL documents. This type of eBL document is defined by [`EblEnvelope.transportDocument.isToOrder`](#/EblEnvelope) attribute to `false`
+    2. Blank-endorsed eBL documents. This type of eBL document is created by setting [`EblEnvelope.transportDocument.isToOrder`](#/EblEnvelope) attribute to `true`, and making sure that [`EblEnvelope.transportDocument.documentparties[]`](#/EblEnvelope) list does not contain document party where `DocumentParty.partyFunction` has value `END` (Endorsee)
+    3. To-order/Negotiable eBL documents. This type of eBL document is created by setting the [`EblEnvelope.transportDocument.isToOrder`](#/EblEnvelope) attribute to `true`, and making sure that [`EblEnvelope.transportDocument.documentparties[]`](#/EblEnvelope) list contains document party where `DocumentParty.partyFunction` has value `END` (Endorsee). If the current endorsee party is also in possession of the eBL (possessor), this party can endorse some other party on the same eBL Platform (and make that other party new endorsee) by executing transaction with [`Transaction.action`](#/Transaction) type `ENDO` (Endorsement). IMPORTANT: To-order eBL workflows are still not fully supported in this version of PINT API.
+
+    <h2>The Additional Documents</h2>
+
+    The envelope transfer can optionally contain one or more **additional documents** which can be transferred via [**'Transfer additional document'**](#/Transfer%20additional%20document) endpoint:
+    - **'Digital copy of the original physical B/L document' document** (described via [`EnvelopeManifest.eBLVisualisationByCarrier`](#/EnvelopeManifest) schema object that has been previously transferred via [**'Start envelope transfer'**](#/Start%20envelope%20transfer) endpoint as JWS-signed payload of [`EblEnvelope.envelopeManifestSignedContent`](#/EblEnvelope) schema object) a.k.a. **eBLVisualisationByCarrier document**. If transferred with the initial eBL envelope transfer, eBLVisualisationByCarrier document must be transferred with every subsequent envelope transfer for the lifetime of the eBL document. Also, eBLVisualisationByCarrier document must be unchanged between different envelope transfers for the lifetime of the eBL document.
+    - **Supporting document** (described via entry in the [`EnvelopeManifest.supportingDocuments[]`](#/EnvelopeManifest) list object that has been previously transferred via [**'Start envelope transfer'**](#/Start%20envelope%20transfer) endpoint  as JWS-signed payload of [`EblEnvelope.envelopeManifestSignedContent`](#/EblEnvelope) schema object). For every envelope transfer, the sending platform can choose which supporting documents it wants to send to the receiving platform irrespective of the contents of the previously received envelope transfer. All details of the supporting documents transferred from sending to receiving platform as a part of the envelope transfer are only privy to these 2 platforms.
+
+    <h2>Non-repudiation</h2>
+
+    When receiving [**'Start envelope transfer'**](#/Start%20envelope%20transfer) endpoint request, the receiving platform should confirm the integrity of the received [`EblEnvelope`](#/EblEnvelope) schema object for non-repudiation purposes. Since it has been decided not to use JWS for signing of [`EblEnvelope`](#/EblEnvelope) (for network traffic optimization purposes) itself, the receiving platform can confirm the integrity of the envelope data by confirming integrity of the [`EblEnvelope.envelopeManifestSignedContent`](#/EblEnvelope) JWS-signed payload [`EnvelopeManifest`](#/EnvelopeManifest), and then use contents of [`EnvelopeManifest`](#/EnvelopeManifest) schema object to confirm the integrity of the other [`EblEnvelope`](#/EblEnvelope) schema object attributes (further details can be found in the description of [`EblEnvelope`](#/EblEnvelope) schema attributes).
+
+    At various stages during the envelope transfer process, the receiving platform can inform the sending platform whether envelope transfer has been accepted or rejected by sending the final response using the [`EnvelopeTransferFinishedResponse`](#/EnvelopeTransferFinishedResponse) schema object which has been wrapped in JWS-signed response [`EnvelopeTransferFinishedResponseSignedContent`](#/EnvelopeTransferFinishedResponseSignedContent) schema object for non-repudiation purposes. All other response schema types are unsigned, and therefore they can not be used by the sending platform for the non-repudiation purposes.
+
+    ### Stats API
+    The Stats API offers crucial statistical information for both API providers and consumers to enhance their services and helps DCSA to understand and scale the ecosystem. We expect you to invoke the Stats API for every request made to this API. Further details can be found [here](https://labs.dcsa.org/#/http/guides/api-guides/stats-api/introduction)
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+  contact:
+    name: Digital Container Shipping Association (DCSA)
+    url: 'https://dcsa.org'
+    email: info@dcsa.org
+tags:
+  - name: Finish envelope transfer
+    description: Finish envelope transfer
+  - name: Get JWKS (JSON Web Key Set)
+    description: Get JWKS (JSON Web Key Set)
+  - name: Start envelope transfer
+    description: Start envelope transfer
+  - name: Transfer additional document
+    description: Transfer additional document
+paths:
+  /v3/envelopes:
+    post:
+      tags:
+        - Start envelope transfer
+      operationId: post-evenlopes
+      summary: Start the eBL envelope transfer
+      description: |
+        Start the eBL envelope transfer.
+      parameters:
+        - $ref: '#/components/parameters/Api-Version-Major'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EblEnvelope'
+      responses:
+        '200':
+          description: |
+            The Receiving platform either accepts the envelope transfer immedidately (if there are no additional documents to be transferred, or if it concludes that it is already in the possesion of all the additional documents mentioned in the [`EnvelopeManifest`](#/EnvelopeManifest)), or concludes that in has previously accepted the envelope transfer with the same contents.
+
+            The signed response [`EnvelopeTransferFinishedResponseSignedContent`](#/EnvelopeTransferFinishedResponseSignedContent) JWS-signed payload must contain [`EnvelopeTransferFinishedResponse.responseCode`](#/EnvelopeTransferFinishedResponse) that signals the accepted envelope transfer (`RECE` or `DUPE`).
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeTransferFinishedResponseSignedContent'
+        '201':
+          description: |
+            The Receiving platform acknowledges that the envelope transfer is now active for this envelope transfer request.
+
+            The sending platform should transfer all supporting documents listed in the [`EblEnvelope.envelopeManifestSignedContent`](#/EblEnvelope) JWS-signed payload [`EnvelopeManifest.supportingDocuments`](#/EnvelopeManifest) list, as well as eBLVisualisationByCarrier document if attribute [`EnvelopeManifest.eBLVisualisationByCarrier`](#/EnvelopeManifest) was defined, prior to sending request to finish the envelope transfer.
+
+            If the sending platform attempts to start a new envelope transfer for an eBL that already has the active envelope transfer that is not yet completed, the receiving platform should assume that the sending platform is retrying the envelope transfer. The receiving platform should assume that the sending platform is aware that the previous envelope transfer failed or that the sending platform is not aware that the previous envelope transfer started.
+
+            The [`EnvelopeTransferStartedResponse`](#/EnvelopeTransferStartedResponse) response is unsigned. The sending platform is required to finish the envelope transfer via [**'Finish envelope transfer'**](#/Finish%20envelope%20transfer) endpoint in order to get a signed response [`EnvelopeTransferFinishedResponseSignedContent`](#/EnvelopeTransferFinishedResponseSignedContent) with the JWS-signed payload `EnvelopeTransferFinishedResponse` carrying the information whether the receiving platform has accepted or rejected the envelope transfer.
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeTransferStartedResponse'
+        '422':
+          description: |
+            Receiving platform rejects the envelope transfer.
+
+            The signed response [`EnvelopeTransferFinishedResponseSignedContent`](#/EnvelopeTransferFinishedResponseSignedContent) JWS-signed payload must contain [`EnvelopeTransferFinishedResponse.responseCode`](#/EnvelopeTransferFinishedResponse) attribute value that signals the rejected envelope transfer (`BENV`, `BETR` or `BSIG`).
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeTransferFinishedResponseSignedContent'
+        default:
+          description: |
+            Request failed for the unexpected reason. The unsigned response [`error`](https://app.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.1#/components/schemas/error) contains all the error details.
+
+            The sending platform is required to retry the envelope transfer until they get a signed response [`EnvelopeTransferFinishedResponseSignedContent`](#/EnvelopeTransferFinishedResponseSignedContent) with the JWS-signed payload [`EnvelopeTransferFinishedResponse.responseCode`](#/EnvelopeTransferFinishedResponse) attribute value providing the information whether the receiving platform has accepted or rejected the envelope transfer.  
+
+            In the rare corner cases, the unsigned `error` response could come from middleware and hide a true envelope transfer acceptance/rejection message. The sending platform will be liable if they act on an unsigned reponse that does *not* match the actions of the receiving platform.
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  '/v3/envelopes/{envelopeReference}/additional-documents/{documentChecksum}':
+    put:
+      tags:
+        - Transfer additional document
+      operationId: put-additional-documents
+      summary: Transfer additional document associated with the eBL envelope transfer
+      description: |
+        Transfer **additional document** associated with an eBL envelope transfer. The transfered document should be either one of the **supporting documents** from the [`EnvelopeManifest.supportingDocuments`](#/EnvelopeManifest) list, or **eBLVisualisationByCarrier document** if attribute [`EnvelopeManifest.eBLVisualisationByCarrier`](#/EnvelopeManifest) was defined.
+
+        The `requestBody` should contain the document being transferred. It is recommended to use the `application/json` media type for the `requestBody`. The media type provided in the initial `ISSU` (Issuance) transaction is the one that will be associated with the transferred additional document in the end.
+
+        The receiving platform should check that the transferred document has been declared at the start of the eBL envelope transfer.
+        This should be done by verifying that the `documentChecksum` URL path parameter matches either [`EnvelopeManifest.eBLVisualisationByCarrier.documentChecksum`](#/EnvelopeManifest) attribute value (in which case the receiving platform can conclude that the sending platform has transferred the **eBLVisualisationByCarrier document**), or one of the [`DocumentMetadata.documentChecksum`](#/DocumentMetadata) values from the [`EnvelopeManifest.supportingDocuments[]`](#/EnvelopeManifest) list (in which case the receiving platform can conclude that the sending platform has transferred the **supporting document**)
+         
+        Furthermore, the receiving platform should compute the SHA-256 checksum of the transferred additional document, and verify that it matches the value of `documentChecksum` URL path parameter. The SHA-256 checksum MUST be calculated based on the deserialized payload.
+
+        If all the above mentioned verifications have been successfull, the receiving platform can conclude that the additional document was transferred successfully.
+      parameters:
+        - $ref: '#/components/parameters/envelopeReference'
+        - $ref: '#/components/parameters/documentChecksum'
+        - $ref: '#/components/parameters/Api-Version-Major'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: string
+              format: byte
+              description: |
+                A Base64 encoded payload containing the file to transfer.
+              example: UmF3IGNvbnRlbnQgb2YgdGhlIGZpbGUgYmVpbmcgdHJhbnNmZXJyZWQ=
+      responses:
+        '204':
+          description: |
+            The receiving platform acknowledges that the additional document was transferred successfully.
+
+            If the envelope transfer eventually gets accepted,the receiving platform will acknowledge the additional document transfer with a JWS-signed response [`EnvelopeTransferFinishedResponseSignedContent`](#/EnvelopeTransferFinishedResponseSignedContent) containing JWS-signed payload [`EnvelopeTransferFinishedResponse.receivedAdditionalDocumentChecksums[]`](#/EnvelopeTransferFinishedResponse) list containing the additional document checksum. Therefore, this is unsigned response.
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+        '409':
+          description: |
+            The Receiving platform has discovered conflict between the request and the current state of the envelope transfer.
+            E.g. the checksum or the size of the transferred additional document does not match the data provided in the URL path or in the request at the start of the envelope transfer.
+
+            The signed response `EnvelopeTransferFinishedResponseSignedContent` JWS-signed payload must contain [`EnvelopeTransferFinishedResponse.responseCode`](#/EnvelopeTransferFinishedResponse) attribute value that signals the issue with the envelope transfer that does *not* reject the envelope transfer (`INCD`).
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeTransferFinishedResponseSignedContent'
+        '422':
+          description: |
+            The Receiving platform rejects the envelope transfer.
+
+            The signed response `EnvelopeTransferFinishedResponseSignedContent` JWS-signed payload must contain [`EnvelopeTransferFinishedResponse.responseCode`](#/EnvelopeTransferFinishedResponse) attribute value that signals the rejected envelope transfer (`BENV`, `BETR` or `BSIG`).
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeTransferFinishedResponseSignedContent'
+        default:
+          description: |
+            Request failed for the unexpected reason. The unsigned response [`error`](https://app.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.1#/components/schemas/error) contains all the error details.
+
+            The sending platform is required to retry the additional document transfer until they get a signed response [`EnvelopeTransferFinishedResponseSignedContent`](#/EnvelopeTransferFinishedResponseSignedContent) with the JWS-signed payload [`EnvelopeTransferFinishedResponse.responseCode`](#/EnvelopeTransferFinishedResponse) attribute value providing the information whether the receiving platform has accepted or rejected the envelope transfer.  
+
+            In the rare corner cases, the unsigned `error` response could come from middleware and hide a true envelope transfer acceptance/rejection message. The sending platform will be liable if they act on an unsigned reponse that does *not* match the actions of the receiving platform.
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  '/v3/envelopes/{envelopeReference}/finish-transfer':
+    put:
+      tags:
+        - Finish envelope transfer
+      operationId: put-finish-transfer
+      summary: Finish the eBL envelope transfer
+      description: |
+        Finish the eBL envelope transfer.
+
+        The sending platform believes all additional documents have been transferred and the envelope transfer can now be completed. 
+
+        Prior to acepting envelope transfer, the receiving platform should ensure that all supporting documents listed in the [`EnvelopeManifest.supportingDocument`](#/EnvelopeManifest) list have been successfully transferred, as well as eBLVisualisationByCarrier document if attribute [`EnvelopeManifest.eBLVisualisationByCarrier`](#/EnvelopeManifest) was defined. Otherwise, The receiving platform should reject the envelope transfer.
+      parameters:
+        - $ref: '#/components/parameters/envelopeReference'
+        - $ref: '#/components/parameters/Api-Version-Major'
+      responses:
+        '200':
+          description: |
+            The Receiving platform accepts the envelope transfer.
+
+            The signed response `EnvelopeTransferFinishedResponseSignedContent` JWS-signed payload must contain [`EnvelopeTransferFinishedResponse.responseCode`](#/EnvelopeTransferFinishedResponse) attribute value that signals the accepted envelope transfer (`RECE` or `DUPE`).
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeTransferFinishedResponseSignedContent'
+        '409':
+          description: |
+            The Receiving platform has discovered conflict between the request and the current state of the envelope transfer.
+
+            The signed response [`EnvelopeTransferFinishedResponseSignedContent`](#/EnvelopeTransferFinishedResponseSignedContent) JWS-signed payload must contain [`EnvelopeTransferFinishedResponse.responseCode`](#/EnvelopeTransferFinishedResponse) attribute value that signals the issue with the envelope transfer that does *not* reject the envelope transfer (`DISE` or `MDOC`).
+
+            In the case of `MDOC` [`responseCode`](#/EnvelopeTransferFinishedResponse), the receiving platform cannot accept the envelope transfer due to one or more missing additional documents. In this case, the sending platform should (re)send the missing documents (provided in [`EnvelopeTransferFinishedResponse.missingAdditionalDocumentChecksums[]`](#/EnvelopeTransferFinishedResponse) list)  and then retry to finish the envelope transfer.
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeTransferFinishedResponseSignedContent'
+        '422':
+          description: |
+            The Receiving platform rejects the envelope transfer.
+
+            The signed response `EnvelopeTransferFinishedResponseSignedContent` JWS-signed payload must contain [`EnvelopeTransferFinishedResponse.responseCode`](#/EnvelopeTransferFinishedResponse) attribute value that signals the rejected envelope transfer (`BENV`, `BETR` or `BSIG`).
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvelopeTransferFinishedResponseSignedContent'
+        default:
+          description: |
+            Request failed for the unexpected reason. The unsigned response [`error`](https://app.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.1#/components/schemas/error) contains all the error details.
+
+            The sending platform shoud retry to finish the envelope transfer until it gets the signed response [`EnvelopeTransferFinishedResponseSignedContent`](#/EnvelopeTransferFinishedResponseSignedContent) with the JWS-signed payload [`EnvelopeTransferFinishedResponse.responseCode`](#/EnvelopeTransferFinishedResponse) attribute value providing the information whether the receiving platform has accepted or rejected the envelope transfer.  
+
+            In the rare corner cases, the unsigned `error` response could come from middleware and hide a true envelope transfer acceptance/rejection message. The sending platform will be liable if they act on an unsigned reponse that does *not* match the actions of the receiving platform.       
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  headers:
+    API-Version:
+      schema:
+        type: string
+        example: 3.0.0-Beta-2
+      description: |
+        SemVer used to indicate the version of the contract (API version) returned.
+  schemas:
+    ##############
+    # Simple types
+    ##############
+    DocumentChecksum:
+      type: string
+      pattern: '^[0-9a-f]+$'
+      maxLength: 64
+      minLength: 64
+      description: |
+        The checksum of the document computed using SHA-256 hash algorithm according to [RFC 6234](https://datatracker.ietf.org/doc/html/rfc6234).
+      example: 76a7d14c83d7268d643ae7345c448de60701f955d264a743e6928a0b8268b24f
+
+    ##############
+    # Objects 
+    ##############
+    ErrorResponse:
+      title: Error Response
+      type: object
+      description: Unexpected error
+      properties:
+        httpMethod:
+          description: |
+            The HTTP method used to make the request e.g. `GET`, `POST`, etc
+          type: string
+          example: POST
+          enum:
+            - GET
+            - HEAD
+            - POST
+            - PUT
+            - DELETE
+            - OPTION
+            - PATCH
+        requestUri:
+          description: |
+            The URI that was requested.
+          type: string
+          example: /v1/events
+        statusCode:
+          description: |
+            The HTTP status code returned.
+          type: integer
+          format: int32
+          example: 400
+        statusCodeText:
+          description: |
+            A standard short description corresponding to the HTTP status code.
+          type: string
+          maxLength: 50
+          example: Bad Request
+        statusCodeMessage:
+          description: |
+            A long description corresponding to the HTTP status code with additional information.
+          type: string
+          maxLength: 200
+          example: The supplied data could not be accepted
+        providerCorrelationReference:
+          description: |
+            A unique identifier to the HTTP request within the scope of the API provider.
+          type: string
+          maxLength: 100
+          example: 4426d965-0dd8-4005-8c63-dc68b01c4962
+        errorDateTime:
+          description: |
+            The DateTime corresponding to the error occurring. Must be formatted using [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format.
+          type: string
+          format: date-time
+          example: '2019-11-12T07:41:00+08:30'
+        errors:
+          type: array
+          description: |
+            An array of errors providing more detail about the root cause.
+          minItems: 1
+          items:
+            type: object
+            title: Detailed Error
+            properties:
+              errorCode:
+                type: integer
+                format: int32
+                description: |
+                  The detailed error code returned.
+
+                    - `7000-7999` Technical error codes
+                    - `8000-8999` Functional error codes
+                    - `9000-9999` API provider-specific error codes            
+
+                  [Error codes as specified by DCSA](https://dcsa.atlassian.net/wiki/spaces/DTG/pages/197132308/Standard+Error+Codes).
+                minimum: 7000
+                maximum: 9999
+                example: 7003
+              property:
+                type: string
+                maxLength: 100
+                description: |
+                  The name of the property causing the error.
+                example: facilityCode
+              value:
+                type: string
+                maxLength: 500
+                description: |
+                  The value of the property causing the error serialised as a string exactly as in the original request.
+                example: SG SIN WHS
+              jsonPath:
+                type: string
+                maxLength: 500
+                description: |
+                  A path to the property causing the error, formatted according to [JSONpath](https://github.com/json-path/JsonPath).
+                example: $.location.facilityCode
+              errorCodeText:
+                description: |
+                  A standard short description corresponding to the `errorCode`.
+                type: string
+                maxLength: 100
+                example: invalidData
+              errorCodeMessage:
+                type: string
+                maxLength: 200
+                description: |
+                  A long description corresponding to the `errorCode` with additional information.
+                example: Spaces not allowed in facility code
+            required:
+              - errorCodeText
+              - errorCodeMessage
+      required:
+        - httpMethod
+        - requestUri
+        - statusCode
+        - statusCodeText
+        - errorDateTime
+        - errors
+
+    EblEnvelope:
+      type: object
+      properties:
+        transportDocument:
+          allOf:
+            - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/3.0.0#/components/schemas/TransportDocument'
+          description: |
+            The receiving platform is required to validate the eBL document (a.k.a. transport document) by computing the SHA-256 checksum of the `transportDocument` attribute value, and and confirming it's equal to received 'EblEnvelope.envelopeManifestSignedContent' JWS-signed payload [`EnvelopeManifest.transportDocumentChecksum`](#/EnvelopeManifest) attribute value.
+        envelopeManifestSignedContent:
+          $ref: '#/components/schemas/EnvelopeManifestSignedContent'
+        envelopeTransferChain:
+          type: array
+          items:
+            $ref: '#/components/schemas/EnvelopeTransferChainEntrySignedContent'
+          description: |
+            The ordered list of [`EnvelopeTransferChainEntrySignedContent`](#/EnvelopeTransferChainEntrySignedContent) entries associated with the eBL document.
+
+            The receiving platform is required to validate that all the list entries are present, valid, and they are correctly ordered by:
+            1. Computing the SHA-256 checksum of the last [`EnvelopeTransferChainEntrySignedContent`](#/EnvelopeTransferChainEntrySignedContent) entry in the `envelopeTransferChain[]` list, and confirming it's equal to received `EblEnvelope.envelopeManifestSignedContent` JWS-signed payload [`EnvelopeManifest.lastEnvelopeTransferChainEntrySignedContentChecksum`](#/EnvelopeManifest) attribute value. 
+            2. Walking back through the `envelopeTransferChain[]` list from the last entry, for each previous [`EnvelopeTransferChainEntrySignedContent`](#/EnvelopeTransferChainEntrySignedContent) entry in the list, computing the SHA-256 checksum and confirming it's equal to the current [`EnvelopeTransferChainEntrySignedContent`](#/EnvelopeTransferChainEntrySignedContent) entry JWT-signed payload [`EnvelopeTransferChainEntry.previousEnvelopeTransferChainEntrySignedContentChecksum`](#/EnvelopeTransferChainEntry) attribute value.
+
+            The receiving platform can reject the envelope with `BENV` [`responseCode`](#/EnvelopeTransferFinishedResponse) if it concludes that the list entries are not correctly ordered by the sending platform, or discovers any other validity-related issue in the list.
+
+            The first [`EnvelopeTransferChainEntry`](#/EnvelopeTransferChainEntry) in the `envelopeTransferChain[]` list should contain the ISSU (issuance) transaction as the first transaction in the [`EnvelopeTransferChainEntry.transactions[]`](#/EnvelopeTransferChainEntry) list. 
+      required:
+        - transportDocument
+        - envelopeManifestSignedContent
+        - envelopeTransferChain
+
+    EnvelopeManifest:
+      type: object
+      properties:
+        transportDocumentChecksum:
+          type: string
+          minLength: 64
+          maxLength: 64
+          description: |
+            The checksum of the eBL document (a.k.a. transport document) computed using SHA-256 hash algorithm according to [RFC 6234](https://datatracker.ietf.org/doc/html/rfc6234).
+
+            In order to guard itself against different types of MITM attacks (e.g. 'replay attack' where last entry in the [`EblEnvelope.envelopeTransferChain`](#/EblEnvelope) list is replaced with the similar entry extracted from the another envelope transfer previously sent by the same sending platform), upon start of the envelope transfer the receiving platform should validate that the [`EnvelopeManifest.transportDocumentChecksum`](#/EnvelopeManifest) attribute and the [`EnvelopeTransferChainEntry.transportDocumentChecksum`](#/EnvelopeTransferChainEntry) attribute of the last entry in the [`EblEnvelope.envelopeTransferChain`](#/EblEnvelope) list have the same value. 
+          example: 583c29ab3e47f2d80899993200d3fbadb9f8a367f3a39f715935c46d7a283006
+        lastEnvelopeTransferChainEntrySignedContentChecksum:
+          type: string
+          minLength: 64
+          maxLength: 64
+          pattern: '^[0-9a-f]+$'
+          # TODO: Verify and if necessary update the example, or remove it alltogether
+          example: 20a0257b313ae08417e07f6555c4ec829a512c083f3ead16b41158018a22abe9
+          description: |
+            This attribute should contain the checksum of the last [`EnvelopeTransferChainEntrySignedContent`](#/EnvelopeTransferChainEntrySignedContent) entry in the [`EblEnvelope.envelopeTransferChain[]`](#/EblEnvelope) list. The checksum is computed using SHA-256 hash algorithm according to [RFC 6234](https://datatracker.ietf.org/doc/html/rfc6234).
+        eBLVisualisationByCarrier:
+          allOf:
+            - $ref: '#/components/schemas/DocumentMetadata'
+          description: |
+            actual type: [`DocumentMetadata`](#\DocumentMetadata)
+
+            This attribute is used to simplify validation of the document metadata of the **'Digital copy of the original physical B/L document' document** a.k.a. **eBLVisualisationByCarrier document**. If this attribute is defined, for each [`EnvelopeTransferChainEntrySignedContent`](#/EnvelopeTransferChainEntrySignedContent) entry in the [`EblEnvelope.envelopeTransferChain[]`](#/EblEnvelope) list, JWS-signed payload [`EnvelopeTransferChainEntry.eBLVisualisationByCarrier`](#/EnvelopeTransferChainEntry) attribute value should be identical to the value of this attribute.
+        supportingDocuments:
+          type: array
+          items:
+            $ref: '#/components/schemas/DocumentMetadata'
+      required:
+        - transportDocumentChecksum
+        - lastEnvelopeTransferChainEntrySignedContentChecksum
+        - supportingDocuments
+
+    EnvelopeManifestSignedContent:
+      type: string
+      pattern: '^([a-zA-Z0-9_=]+)\.([a-zA-Z0-9_=]+)\.([a-zA-Z0-9_\-\+\/=]+)$'
+      description: |
+        JWS content with compact serialization according to [RFC 7515](https://datatracker.ietf.org/doc/html/rfc7515#section-7.1). JWS-signed payload is defined in schema [EnvelopeManifest](#/EnvelopeManifest).
+      # TODO: Verify and if necessary update the example, or remove it alltogether
+      example: eyJhbGciOiJSUzI1NiIsImtpZCI6IlVhRVdLNmt2ZkRITzNZT2NwUGl2M1RCT2JQTzk2SFZhR2U0czFhUUxBZU0ifQ.eyJkb2N1bWVudEhhc2giOiI4ZGM5OWQ4YWM5MjIyNDBjNTVjMDM4NDVmNDlkZWY2NDE4NzE0NjY1MWJhZTRmOWE2MzEzMTI3N2NmMDBkOWRmIiwicHJldmlvdXNFbnZlbG9wZUhhc2giOm51bGwsInRyYW5zYWN0aW9ucyI6W3siYWN0aW9uIjoiSVNTVSIsImNvbW1lbnRzIjoiVGhlIEIvTCBoYXMgYmVlbiBpc3N1ZWQuIiwidGltZXN0YW1wIjoxNjU4Mzg1MTY2MzAyNDQyMjAwLCJpc1RvT3JkZXIiOnRydWUsInBsYXRmb3JtSG9zdCI6ImxvY2FsaG9zdDo4NDQzIiwidHJhbnNmZXJlZSI6IjQzNTQ5ODUwMjQ4QGxvY2FsaG9zdDo4NDQzIn1dfQ.c4SJ9-61fE6RmeIuZ3EI-TSM0M6qXuOudtr3YhpDjqVMaYk_RYpaWYvw75ssTbjgGFKTBKCy5lpmOfb8Fq--Qu2k0MWbH6qdX5jTYwl0DX946RQg-hnmVTg9np3bmqVeKqKURyV-UUdG-KK_XCGzPZ-lZkeUlpMcIthQFs0pCODR9GPytv7ZXLPZFOmHM9fn3FD2yRqVhQzcs7HdcxMjCx6hkBW8Z-jW4qteVy2_E9uqjkKwlu_cQLoY83Z0mcjn0PZNQvKF10x7q1_Jjf_Su19UigTUu3pFMrzo4iPS_jcrFoIb3TSZNSzbgAwtujSBFOufPDyEmxlx1sH0ZowMvA
+
+    EnvelopeTransferChainEntry:
+      type: object
+      properties:
+        eblPlatform:
+          type: string
+          pattern: \S+
+          maxLength: 4
+          description: |
+            The EBL platform of the transaction party. 
+            The value **MUST** be one of:
+            - `WAVE` (Wave)
+            - `CARX` (CargoX)
+            - `ESSD` (EssDOCS)
+            - `IDT` (ICE Digital Trade)
+            - `BOLE` (Bolero)
+            - `EDOX` (EdoxOnline)
+            - `IQAX` (IQAX)
+            - `SECR` (Secro)
+            - `TRGO` (TradeGO)
+            - `ETEU` (eTEU)
+          example: BOLE
+        transportDocumentChecksum:
+          type: string
+          minLength: 64
+          maxLength: 64
+          description: |
+            The checksum of the eBL document (a.k.a. transport document) computed using SHA-256 hash algorithm according to [RFC 6234](https://datatracker.ietf.org/doc/html/rfc6234).
+
+            In order to guard itself against different types of MITM attacks (e.g. 'replay attack' where last entry in the [`EblEnvelope.envelopeTransferChain`](#/EblEnvelope) list is replaced with the similar entry extracted from the another envelope transfer previously sent by the same sending platform), upon start of the envelope transfer the receiving platform should validate that the [`EnvelopeManifest.transportDocumentChecksum`](#/EnvelopeManifest) attribute and the [`EnvelopeTransferChainEntry.transportDocumentChecksum`](#/EnvelopeTransferChainEntry) attribute of the last entry in the [`EblEnvelope.envelopeTransferChain`](#/EblEnvelope) list have the same value. 
+          example: 583c29ab3e47f2d80899993200d3fbadb9f8a367f3a39f715935c46d7a283006
+        previousEnvelopeTransferChainEntrySignedContentChecksum:
+          type: string
+          minLength: 64
+          maxLength: 64
+          pattern: '^[0-9a-f]+$'
+          nullable: true
+          # TODO: Verify and if necessary update the example, or remove it alltogether
+          example: 20a0257b313ae08417e07f6555c4ec829a512c083f3ead16b41158018a22abe9
+          description: |
+            This attribute should *not* be defined for the first entry in the [`EblEnvelope.envelopeTransferChain[]`](#/EblEnvelope) list. For all other entries after the first entry in the [`EblEnvelope.envelopeTransferChain[]`](#/EblEnvelope) list, this attribute **must** be defined and contain the checksum of the previous [`EnvelopeTransferChainEntrySignedContent`](#/EnvelopeTransferChainEntrySignedContent) entry in the [`EblEnvelope.envelopeTransferChain[]`](#/EblEnvelope) list. This attribute can be used to track signed envelope transfers between platforms (for details check description of [`EblEnvelope.envelopeTransferChain[]`](#/EblEnvelope)).
+
+            The checksum is computed over the entire [`EnvelopeTransferChainEntrySignedContent`](#/EnvelopeTransferChainEntrySignedContent) entry (JWS-signed payload is described in the `EnvelopeTransferChainEntry` schema). The checksum is computed using SHA-256 hash algorithm according to [RFC 6234](https://datatracker.ietf.org/doc/html/rfc6234).
+        eBLVisualisationByCarrier:
+          allOf:
+            - $ref: '#/components/schemas/DocumentMetadata'
+          description: |
+            actual type: [`DocumentMetadata`](#\DocumentMetadata)
+
+            This attribute is used to transfer metadata of the **'Digital copy of the original physical B/L document' document** a.k.a. **eBLVisualisationByCarrier document**. If this attribute is defined with the initial eBL envelope transfer(in the first `EnvelopeTransferChainEntrySignedContent` entry in the [`EblEnvelope.envelopeTransferChain[]`](#/EblEnvelope) list), eBLVisualisationByCarrier document **must** be transferred with every subsequent envelope transfer for the lifetime of the eBL document. Also, eBLVisualisationByCarrier document must be unchanged between different envelope transfers for the lifetime of the eBL document (in other words, for each `EnvelopeTransferChainEntrySignedContent` entry in the [`EblEnvelope.envelopeTransferChain[]`](#/EblEnvelope) list, JWS-signed payload `EnvelopeTransferChainEntry.eBLVisualisationByCarrier` attribute must have the identical value).
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Transaction'
+      required:
+        - eblPlatform
+        - transportDocumentChecksum
+        - transactions
+
+    EnvelopeTransferChainEntrySignedContent:
+      type: string
+      pattern: '^([a-zA-Z0-9_=]+)\.([a-zA-Z0-9_=]+)\.([a-zA-Z0-9_\-\+\/=]+)$'
+      description: |
+        JWS content with compact serialization according to [RFC 7515](https://datatracker.ietf.org/doc/html/rfc7515#section-7.1). JWS-signed payload is defined in schema [EnvelopeTransferChainEntry](#/EnvelopeTransferChainEntry).
+      # TODO: Verify and if necessary update the example, or remove it alltogether  
+      example: eyJhbGciOiJSUzI1NiIsImtpZCI6IlVhRVdLNmt2ZkRITzNZT2NwUGl2M1RCT2JQTzk2SFZhR2U0czFhUUxBZU0ifQ.eyJkb2N1bWVudEhhc2giOiI4ZGM5OWQ4YWM5MjIyNDBjNTVjMDM4NDVmNDlkZWY2NDE4NzE0NjY1MWJhZTRmOWE2MzEzMTI3N2NmMDBkOWRmIiwicHJldmlvdXNFbnZlbG9wZUhhc2giOm51bGwsInRyYW5zYWN0aW9ucyI6W3siYWN0aW9uIjoiSVNTVSIsImNvbW1lbnRzIjoiVGhlIEIvTCBoYXMgYmVlbiBpc3N1ZWQuIiwidGltZXN0YW1wIjoxNjU4Mzg1MTY2MzAyNDQyMjAwLCJpc1RvT3JkZXIiOnRydWUsInBsYXRmb3JtSG9zdCI6ImxvY2FsaG9zdDo4NDQzIiwidHJhbnNmZXJlZSI6IjQzNTQ5ODUwMjQ4QGxvY2FsaG9zdDo4NDQzIn1dfQ.c4SJ9-61fE6RmeIuZ3EI-TSM0M6qXuOudtr3YhpDjqVMaYk_RYpaWYvw75ssTbjgGFKTBKCy5lpmOfb8Fq--Qu2k0MWbH6qdX5jTYwl0DX946RQg-hnmVTg9np3bmqVeKqKURyV-UUdG-KK_XCGzPZ-lZkeUlpMcIthQFs0pCODR9GPytv7ZXLPZFOmHM9fn3FD2yRqVhQzcs7HdcxMjCx6hkBW8Z-jW4qteVy2_E9uqjkKwlu_cQLoY83Z0mcjn0PZNQvKF10x7q1_Jjf_Su19UigTUu3pFMrzo4iPS_jcrFoIb3TSZNSzbgAwtujSBFOufPDyEmxlx1sH0ZowMvA
+
+    EnvelopeTransferStartedResponse:
+      type: object
+      properties:
+        envelopeReference:
+          type: string
+          maxLength: 100
+          description: |
+            Opaque receiving platform-provided identifier for a given eBL envelope.
+          example: 4TkP5nvgTly0MwFrDxfIkR2rvOjkUIgzibBoKABU
+        transportDocumentChecksum:
+          type: string
+          minLength: 64
+          maxLength: 64
+          description: |
+            The checksum of the eBL document (a.k.a. transport document) computed using SHA-256 hash algorithm according to [RFC 6234](https://datatracker.ietf.org/doc/html/rfc6234).
+
+            In order to guard itself against different types of MITM attacks (e.g. 'replay attack' where last entry in the [`EblEnvelope.envelopeTransferChain`](#/EblEnvelope) list is replaced with the similar entry extracted from the another envelope transfer previously sent by the same sending platform), upon start of the envelope transfer the receiving platform should validate that the [`EnvelopeManifest.transportDocumentChecksum`](#/EnvelopeManifest) attribute and the [`EnvelopeTransferChainEntry.transportDocumentChecksum`](#/EnvelopeTransferChainEntry) attribute of the last entry in the [`EblEnvelope.envelopeTransferChain`](#/EblEnvelope) list have the same value. 
+          example: 583c29ab3e47f2d80899993200d3fbadb9f8a367f3a39f715935c46d7a283006
+        lastEnvelopeTransferChainEntrySignedContentChecksum:
+          type: string
+          minLength: 64
+          maxLength: 64
+          pattern: '^[0-9a-f]+$'
+          # TODO: Verify and if necessary update the example, or remove it alltogether
+          example: 20a0257b313ae08417e07f6555c4ec829a512c083f3ead16b41158018a22abe9
+          description: |
+            This attribute should contain the checksum of the last [`EnvelopeTransferChainEntrySignedContent`](#/EnvelopeTransferChainEntrySignedContent) entry in the [`EblEnvelope.envelopeTransferChain[]`](#/EblEnvelope) list received. The checksum is computed using SHA-256 hash algorithm according to [RFC 6234](https://datatracker.ietf.org/doc/html/rfc6234).
+        missingAdditionalDocumentChecksums:
+          type: array
+          description: |
+            The list of the checksums of the additional documents that the receiving platform expect to receive in good order before it can accept the envelope transfer.
+          items:
+            $ref: '#/components/schemas/DocumentChecksum'
+      required:
+        - envelopeReference
+        - transportDocumentChecksum
+        - lastEnvelopeTransferChainEntrySignedContentChecksum
+        - missingAdditionalDocumentChecksums
+
+    EnvelopeTransferFinishedResponse:
+      type: object
+      required:
+        - lastEnvelopeTransferChainEntrySignedContentChecksum
+        - responseCode
+      # TODO: Verify and if necessary update the example, or remove it alltogether
+      example:
+        lastEnvelopeTransferChainEntrySignedContentChecksum: d56a93a7e9f86a2d895df818e0440bdca6ffe03246e2fee14131f2e66c84c75a
+        responseCode: RECE
+      properties:
+        lastEnvelopeTransferChainEntrySignedContentChecksum:
+          type: string
+          minLength: 64
+          maxLength: 64
+          pattern: '^[0-9a-f]+$'
+          description: |
+            This attribute should contain the checksum of the last [`EnvelopeTransferChainEntrySignedContent`](#/EnvelopeTransferChainEntrySignedContent) entry in the [`EblEnvelope.envelopeTransferChain[]`](#/EblEnvelope) list received. The checksum is computed using SHA-256 hash algorithm according to [RFC 6234](https://datatracker.ietf.org/doc/html/rfc6234).
+          # TODO: Verify and if necessary update the example, or remove it alltogether
+          example: 20a0257b313ae08417e07f6555c4ec829a512c083f3ead16b41158018a22abe9
+        responseCode:
+          type: string
+          description: |
+            The response code can have one of the following values:
+            - `RECE` (Received)
+            - `DUPE` (Duplicated Envelope)
+            - `BSIG` (Bad Signature)
+            - `BETR` (Bad Envelope Transfer)
+            - `BENV` (Bad Envelope)
+            - `INCD` (Inconclusive Document)
+            - `MDOC` (Missing Document)
+            - `DISE` (Disputed Envelope)
+
+            The `RECE` `responseCode` is used when the receiving platform acknowledges that the envelope transfer is accepted. 
+            This response code can also be used when replying to [**'Start envelope transfer'**](#/Start%20envelope%20transfer) endpoint request if and only if the receiving platform is already in possesion of all the additional documents listed in the `EnvelopeManifest`, and is ready to commit to accepting the envelope transfer.  This should only happen in special cases (e.g. Platform A which has performed the intial envelope transfer with additional documents to platform B later during the lifetime of the same eBL receives [**'Start envelope transfer'**](#/Start%20envelope%20transfer) endpoint request from some other Platform C with `EnvelopeManifest` listing additional documents, for which it concludes (based on checksum comparison) that they are identical to the addition documents from the intial envelope transfer). The `RECE` `responseCode` should be used together with the HTTP `200 Ok` response status code.
+
+            The `DUPE` `responseCode` is used in place of `RECE` `responseCode` when the receiving platform has already previously acknowledged and accepted the transfer of this envelope. In this case, the receiving platform asserts that this envelope transfer request is invalid but the prior envelope transfer was successful.  The receiving platform should include accepted version of last `EnvelopeTransferChainEntrySignedContent` entry in `EblEnvelope.envelopeTransferChain` list in the `duplicateOfAcceptedEnvelopeTransferChainEntrySignedContent` field. The receiving platform is only required to detect DUPE `responseCode` if the EnvelopeTransferChainEntrySignedContentChecksum is the same between the two transfer attempt and the sending platform is expected to reuse the same envelope. The `DUPE` `responseCode` should be used together with the HTTP `200 Ok` response status code.
+
+            The `BSIG` `responseCode` is used when the receiving platform could not process the envelope related to a signature and rejects the concrete transfer request. This response code should be used when the receiving platform decides to reject envelope transfer due to the issues with the signature used to create JWS content when starting envelope transfer (`EblEnvelope.envelopeManifestSignedContent`, and/or one or more `EnvelopeTransferChainEntrySignedContentChecksum` entries in the `EblEnvelope.envelopeTransferChain` list). Example use cases: the signature was made by an unknown key, the key or signature expired, the signed content does not match the EnvelopeTransferChainEntrySignedContentChecksum, etc. In this case, the receiving platform makes no assertions about the validity of the envelope contents. The sending platform may attempt to resolve the signature issue and retry with the same EnvelopeTransferChainEntrySignedContentChecksum. The `BSIG` `responseCode` should be used together with a HTTP `422 Unprocessable Content` response status code.
+
+            The `BETR` `responseCode` is used when the receiving platform concludes that the envelopeReference parameter provided in the URL path does not match currently active envelope transfer, and therefore it decides to reject the envelope transfer. The sending platform should start a new envelope transfer to recover. The `BETR` `responseCode` should be used together with a HTTP `422 Unprocessable Content` response status code.
+
+            The `BENV` `responseCode` is used when the receiving platform can not process the envelope and rejects the concrete envelope transfer request. This response code can be used when the receiving platform knows the transfer cannot succeed in the future and the sending platform should retain the eBL. Example use cases could be that the envelope does not list the receiving platform as the intended recipient, the transferee ID is unknown, an invalid action code was used in the transactions for this envelope transfer, etc. In this case, the receiving platform is asserting that the envelope itself is not acceptable. Basically any use case where the receiving platform decides to reject the envelope transfer for technical reasons that are not covered by either `BSIG` `responseCode` or `BETR` `responseCode`. The `BENV` `responseCode` should be used together with a HTTP `422 Unprocessable Content` response status code.
+
+            The `INCD` `responseCode` is used when the receiving platform concludes that the transferred additional document's checksum or size does not match the document checksum or size provided either directly in URL path or in `EnvelopeManifest` sent in the start envelope transfer request. The `INCD` `responseCode` does *not* reject the envelope transfer. The sending platform should try to either resend the correct document, or attempt to start new envelope transfer request with changed `EnvelopeManifest` that will contain correct document checksum and/or size for the inconclusive document. The `INCD` `responseCode` is not valid as a response to the start of a envelope transfer.  The `INCD` `responseCode` should be used together with a HTTP `409 Conflict` response status code.
+
+            The `MDOC` `responseCode` is used when the receiving platform cannot accept the envelope transfer due to a missing additional document.  The `MDOC` `responseCode` does *not* reject the envelope transfer. The sending platform should resend relevant documents (provided in `missingAdditionalDocumentChecksums`) and then retry finishing the envelope transfer. The `MDOC` `responseCode` is not valid as a response to the start of a envelope transfer.  The `MDOC` `responseCode` should be used together with a HTTP `409 Conflict` response status code.
+
+            The `DISE` `responseCode` is used when the receiving platform has successfully parsed the envelope and validated the signatures.  However, the receiving platform believes the envelope contradicts its current knowledge of the envelope transfer chain for the eBL document and there is a risk of double spending. The concrete detection method is implementation-specific. However, a method would be for the receiving platform to confirm whether it has `EnvelopeTransferChainEntrySignedContentChecksum` for the document, which are not listed in the transferred eBL envelope. Dispute resolution is not covered in the API and must be handled in via out of band process. The `DISE` `responseCode` should be used together with the HTTP `409 Conflict` response status code.
+
+            Unless otherwise stated for a given response code, receiving platform will reject the active envelope transfer (if any). Some failures that result in receiving platform rejecting the envelope transfer may be retriable, in which case the sending platform can attempt a new envelope transfer for the same envelope.
+
+            The sending platform must not rely on the HTTP response status code alone as it is not covered by the signature. When there is a mismatch between the HTTP response status code and the signed response `EnvelopeTransferFinishedResponseSignedResponse` JWS-signed payload [`EnvelopeTransferFinishedResponse.responseCode`](#/EnvelopeTransferFinishedResponse), [`responseCode`](#/EnvelopeTransferFinishedResponse) decides the outcome.
+          enum:
+            - RECE
+            - DUPE
+            - BSIG
+            - BENV
+            - MDOC
+            - BETR
+            - DISE
+          example: RECE
+        duplicateOfAcceptedEnvelopeTransferChainEntrySignedContent:
+          allOf:
+            - $ref: '#/components/schemas/EnvelopeTransferChainEntrySignedContent'
+          description: |
+            actual type: [`EnvelopeTransferChainEntrySignedContent`](#/EnvelopeTransferChainEntrySignedContent) 
+
+            This attribute should be defined only in the case that [`responseCode`](#/EnvelopeTransferFinishedResponse) attribute has `DUPE` value, indicating that receiving platform has already received and accepted envelope transfer for the eBL document that is the sending platform trying to resend in the duplicate envelope transfer.
+            This attribute should contain the last [`EnvelopeTransferChainEntrySignedContent`](#/EnvelopeTransferChainEntrySignedContent) entry in the [`EblEnvelope.envelopeTransferChain[]`](#/EblEnvelope) list received at the start of already received and accepted envelope transfer. 
+
+            The provided entry might differ in the retry (e.g. due to signing with the private key that differs from the private key used to sign already received and accepted envelope transfer). 
+        reason:
+          type: string
+          nullable: true
+          description: |
+            Free text comment for clarifying the result or suggesting follow up actions. Should be null or omitted when [`responseCode`](#/EnvelopeTransferFinishedResponse) is `RECE`, where there is no additional information to be given.
+          maxLength: 255
+          example: null
+        missingAdditionalDocumentChecksums:
+          type: array
+          description: |
+            Used with the `MDOC` [`responseCode`](#/EnvelopeTransferFinishedResponse) to signal which additional documents the receiving platform believes have not been transferred.
+
+            For other response codes, this attribute should be omitted.
+          items:
+            $ref: '#/components/schemas/DocumentChecksum'
+        receivedAdditionalDocumentChecksums:
+          type: array
+          description: |
+            The receiving platform includes this attribute with the `RECE` or `DUPE` [`responseCode`](#/EnvelopeTransferFinishedResponse) to confirm all additional documents it received during the envelope transfer. This attribute must include all the additional documents included in the envelope transfer request (including the ones the receiving platform already had). This attribute provides the sending platform with a signed receipt of the documents.
+
+            For other response codes, this attribute should be omitted.
+          items:
+            $ref: '#/components/schemas/DocumentChecksum'
+
+    EnvelopeTransferFinishedResponseSignedContent:
+      type: string
+      pattern: '^([a-zA-Z0-9_=]+)\.([a-zA-Z0-9_=]+)\.([a-zA-Z0-9_\-\+\/=]*)$'
+      description: |
+        JWS content with compact serialization according to [RFC 7515](https://datatracker.ietf.org/doc/html/rfc7515#section-7.1). JWS-signed payload is defined in schema [EnvelopeTransferFinishedResponse](#/EnvelopeTransferFinishedResponse).
+      # TODO: Verify and if necessary update the example, or remove it alltogether
+      example: eyJhbGciOiJSUzI1NiIsImtpZCI6IlVhRVdLNmt2ZkRITzNZT2NwUGl2M1RCT2JQTzk2SFZhR2U0czFhUUxBZU0ifQ.eyJyZXNwb25zZVRvRW52ZWxvcGVIYXNoIjoiZDU2YTkzYTdlOWY4NmEyZDg5NWRmODE4ZTA0NDBiZGNhNmZmZTAzMjQ2ZTJmZWUxNDEzMWYyZTY2Yzg0Yzc1YSIsInJlc3BvbnNlQ29kZSI6IlJFQ1YifQ.P2_evKyvHH25BrvW4eIxp7xo9S73oK90QomKEjZDrn3AX8drv7aeVrNYYPPh4vqK78fTVair-0Ww9G7czX9Q3xlATTPlTQrNPuThh_-nPOvNDqHBwZuq_nop6lQwIS210OQa__C4z-oGvO8m56pfXvpgfTIC9nesnIuNFtrdr1lU81q4ZQnnZI0GvWaB_4Q320PoAXmKN4EwjY5gTqdKMAvz9a5PNnWfGPkIrM-CBm_MNLpl9NAcpJONRdwI9i9zTi42NZCUnbowHuHnYNuz3WfWzVA43U4IdEBDU6XeIem0Zm331KlBAukOhZiyN8Bp7ZK7XGx50a6XcY3190lX5Q
+
+    DocumentMetadata:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Carrier rendered copy of the original B/L document.pdf
+        size:
+          type: number
+          minimum: 1
+          pattern: ^\d+$
+          description: the Size of the document in bytes
+          example: 4194304
+        mediaType:
+          type: string
+          description: The Media Type (MIME type) of the document
+          example: application/pdf
+        documentChecksum:
+          $ref: '#/components/schemas/DocumentChecksum'
+      required:
+        - name
+        - size
+        - mediaType
+        - documentChecksum
+      description: |
+        The document metadata that describes the document.
+
+    Transaction:
+      type: object
+      properties:
+        action:
+          type: string
+          description: |
+            Action denotes the transaction type, which can have one of the following values:
+            - `ISSU` (Issuance)
+            - `TRNS` (Transfer of possession)
+            - `ENDO` (Endorsement a.k.a. Transfer of title)
+            - `RESD` (Request to surrender for delivery)
+            - `RESA` (Request to surrender for amendment)
+            - `SACC` (Surrender accepted)
+            - `SREJ` (Surrender rejected)
+
+            The `ISSU` `action` is used for the eBL issuance transaction from the carrier party to the shipper party, and must appear exactly once in the first transaction of the first [`EnvelopeTransferChainEntry`](#/EnvelopeTransferChainEntry) entry (as JWS payload of [`EnvelopeTransferChainEntrySignedContent`](#/EnvelopeTransferChainEntrySignedContent) entry) in the [`EblEnvelope.envelopeTransferChain`](#/EblEnvelope) list. If the eBL document is issued to the shipper party that resides on the different eBL Platform from the carrier's platform, initial envelope transfer should contain envelope transfer chain where first entry's first transaction has `ISSU` `action` type. 
+
+            The `TRNS` `action` is used for the transfer of possession of the eBL from the current possessor party to the new possessor party.
+
+            The `ENDO` `action` is used for the endorsement (a.k.a. transfer of title, or the right to take the delivery of the goods) of To-order eBL documents, where the new endorsee party is not named in the eBL document. The endorsement should always happen on the platform of the user that is not only the current endorsee, but also the current possessor of the eBL document. If the new endorsee party resides on the different eBL Platform from the current endorsee's platform, the envelope transfer process is used to notify the new endorsee of the `ENDO` `action` transaction for non-repudiation purposes, and will NOT result in the transfer of possession of the eBL documment contained in the envelope. 
+
+            If the party is the current possessor, and the party is the current consignee/endorsee/shipper (or eBL document is blank-endorsed), the party may request to surrender the eBL to the carrier. This is done by using one of the Request to surrender action types (`RESD` `action` or `RESA` `action`) and with the issuing carrier or the relevant carrier agent as the `recipient` of the action. 
+             
+             The `RESD` `action` is used when the party wants to request the delivery of the goods. If the request is accepted (for details see `SACC` `action`), the carrier and the party submitting the surrender request will negotiate how the goods will be delivered (e.g. via DCSA shipment release API).
+             
+             The `RESA` `action` is used when the party wants to surrender the eBL document, so that the carrier can issue an amended eBL document. If the request is accepted (for details see `SACC` `action` resonse), the alignment on the exact change(s) that need to be made to the eBL document is done outside of the PINT API (e.g. via the DCSA EBL API). If the request is accepted, the existing eBL document is voided along with its envelope transfer chain, and the amended eBL document must be reissued with a new envelope transfer chain (for details see the `ISSU` `action` type description paragraph above). The `RESA` `action` is also used for switch to paper as the DCSA process flow for switching to paper is part of the amendment process (e.g. to note how many originals and copies with and without charges should be issued).
+
+            If a surrender request (`RESD` `action` or `RESA` `action`) is not addressed to the carrier that issued the eBL document or to their legal representative, then the receiving platform should reject the envelope transfer with the [`EnvelopeTransferFinishedResponse`](#/EnvelopeTransferFinishedResponse) containing `BENV` [`responseCode`](#/EnvelopeTransferFinishedResponse).
+
+            The `SACC` `action` is used by the carrier to asynchronously accept the surrender request initiated via `RESD` `action` or `RESA` `action`. If the party that submitted the surrender request is on the different platform, the envelope transfer process is used to notify the (surrender request submitter) party of the `SACC` `action` transaction for non-repudiation purposes, and will NOT result in the transfer of possession of the eBL documment contained in the envelope. No transactions may occur after a `SACC` `action` transaction. Any envelope transfer chain changes with new transactions after a `SACC` `action` transaction are invalid and should be answered with the [`EnvelopeTransferFinishedResponse`](#/EnvelopeTransferFinishedResponse) containing `BENV` [`responseCode`](#/EnvelopeTransferFinishedResponse). 
+
+            The `SREJ` `action` is used by the carrier to asynchronously reject the surrender request initiated via `RESD` `action` or `RESA` `action`, and return the eBL document possession to the party that submitted the surrender request.
+
+            When the transaction recipient is residing on the different platform from the transaction actor's platform, the transaction should be followed by the envelope transfer from the actor's (sending) platform to the recipient's (receiving) platform. If the envelope transfer is caused by either `ENDO` `action` or `SACC` `action` transaction (where the recipient is on the different platform), the envelope transfer process is NOT causing transfer of possession of the eBL document, but is merely used as notificaiton for the non-repudiation purposes.
+          enum:
+            - ISSU
+            - ENDO
+            - TRNS
+            - RESD
+            - RESA
+            - SACC
+            - SREJ
+        actor:
+          $ref: '#/components/schemas/TransactionParty'
+        recipient:
+          $ref: '#/components/schemas/TransactionParty'
+        timestamp:
+          type: number
+          description: Unix epoch with millisecond precision of when the transaction was created.
+          example: 1658385166302442200
+        comments:
+          type: string
+          description: Free text comment for the party receiving the transaction.
+          maxLength: 255
+          example: The B/L has been issued.
+      required:
+        - action
+        - actor
+        - timestamp
+        - recipient
+
+    TransactionParty:
+      description: Refers to a company or a legal entity.
+      type: object
+      properties:
+        eblPlatform:
+          type: string
+          pattern: \S+
+          maxLength: 4
+          description: |
+            The EBL platform of the transaction party. 
+            The value **MUST** be one of:
+            - `WAVE` (Wave)
+            - `CARX` (CargoX)
+            - `ESSD` (EssDOCS)
+            - `IDT` (ICE Digital Trade)
+            - `BOLE` (Bolero)
+            - `EDOX` (EdoxOnline)
+            - `IQAX` (IQAX)
+            - `SECR` (Secro)
+            - `TRGO` (TradeGO)
+            - `ETEU` (eTEU)
+          example: BOLE
+        partyName:
+          type: string
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 100
+          description: |
+            Name of the party.
+          example: Globeteam
+        identifyingCodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentifyingCode'
+        taxLegalReferences:
+          description: |
+            A list of `Tax References` for a `Party`
+          type: array
+          items:
+            $ref: '#/components/schemas/TaxLegalReference'
+      required:
+        - eblPlatform
+        - partyName
+
+    IdentifyingCode:
+      type: object
+      title: Identifying Code
+      properties:
+        codeListProvider:
+          type: string
+          maxLength: 5
+          description: |
+            A DCSA provided code for [UN/CEFACT](https://unece.org/fileadmin/DAM/trade/untdid/d16b/tred/tred3055.htm) code list providers:
+            - `ISO` (International Standards Organization)
+            - `UNECE` (United Nations Economic Commission for Europe)
+            - `LLOYD` (Lloyd's register of shipping)
+            - `BIC` (Bureau International des Containeurs)
+            - `IMO` (International Maritime Organization)
+            - `SCAC` (Standard Carrier Alpha Code)
+            - `ITIGG` (International Transport Implementation Guidelines Group)
+            - `ITU` (International Telecommunication Union)
+            - `SMDG` (Shipplanning Message Development Group)
+            - `NCBH` (NCB Hazcheck)
+            - `FMC` (Federal Maritime Commission)
+            - `CBSA` (Canada Border Services Agency)
+            - `DCSA` (Digitial Container Shipping Association)
+            - `W3C` (World Wide Web Consortium)
+            - `GLEIF` (Global Legal Entity Identifier Foundation)
+            - `EPI` (EBL Platform Identifier)
+            - `ZZZ` (Mutually defined)
+          example: SMDG
+        partyCode:
+          type: string
+          description: |
+            Code to identify the party as provided by the code list provider
+          maxLength: 100
+          example: MSK
+        codeListName:
+          type: string
+          description: |
+            The name of the list, provided by the code list provider
+          maxLength: 100
+          example: LCL
+      required:
+        - codeListProvider
+        - partyCode
+    TaxLegalReference:
+      type: object
+      title: Tax & Legal Reference
+      description: |
+        Reference that uniquely identifies a party for tax and/or legal purposes in accordance with the relevant jurisdiction.
+        A list of examples:
+        
+        | Type  | Country | Description |
+        |-------|:-------:|-------------|
+        |PAN|IN|Goods and Services Tax Identification Number in India|
+        |GSTIN|IN|Goods and Services Tax Identification Number in India|
+        |IEC|IN|Importer-Exported Code in India|
+        |RUC|EC|Registro Único del Contribuyente in Ecuador|
+        |RUC|PE|Registro Único del Contribuyente in Peru|
+        |NIF|MG|Numéro d’Identification Fiscal in Madagascar|
+        |NIF|DZ|Numéro d’Identification Fiscal in Algeria|
+        
+        Allowed combinations of `type` and `country` are maintained in [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/documentation/reference-data/taxandlegalreferences-v300.csv).
+      properties:
+        type:
+          type: string
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 50
+          description: |
+            The reference type code as defined by the relevant tax and/or legal authority.
+          example: PAN
+        countryCode:
+          type: string
+          pattern: '^[A-Z]{2}$'
+          minLength: 2
+          maxLength: 2
+          description: |
+            The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+          example: DK
+        value:
+          type: string
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 100
+          description: |
+            The value of the `taxLegalReference`
+          example: AAAAA0000A
+      required:
+        - type
+        - countryCode
+        - value
+
+  parameters:
+    ##############
+    # Parameters #
+    ##############
+    Api-Version-Major:
+      in: header
+      name: API-Version
+      required: false
+      schema:
+        type: string
+        example: '3'
+      description: |
+        An API-Version header **MAY** be added to the request (optional); if added it **MUST** only contain **MAJOR** version. API-Version header **MUST** be aligned with the URI version.
+    envelopeReference:
+      in: path
+      name: envelopeReference
+      schema:
+        type: string
+        maxLength: 100
+        description: |
+          Opaque receiving platform-provided identifier for a given eBL envelope.
+        example: 4TkP5nvgTly0MwFrDxfIkR2rvOjkUIgzibBoKABU
+      required: true
+      description: |
+        The receiving platform-provided unique identifier for the given eBL envelope.
+      example: 4TkP5nvgTly0MwFrDxfIkR2rvOjkUIgzibBoKABU
+    documentChecksum:
+      in: path
+      name: documentChecksum
+      schema:
+        $ref: '#/components/schemas/DocumentChecksum'
+      required: true
+      description: |
+        The checksum of the document computed using SHA-256 hash algorithm according to [RFC 6234](https://datatracker.ietf.org/doc/html/rfc6234).
+      example: 7d00064ed0b90467ff7aff6032d8e2d94845745b6590895cd95708d2ee4243d8
