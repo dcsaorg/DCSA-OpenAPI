@@ -1,0 +1,235 @@
+openapi: 3.0.3
+info:
+  version: 3.0.0-Beta-2
+  title: DCSA EBL Surrender Response API
+  description: |
+    This API is intended as an API between a carrier (the client) and a EBL Solution Platform (the server).
+
+    This API is used to respond to requests that were submitted via the [DCSA EBL Surrender API](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR/3.0.0-Beta-2) API.
+
+    ### Stats API
+    The Stats API offers crucial statistical information for both API providers and consumers to enhance their services and helps DCSA to understand and scale the ecosystem. We expect you to invoke the Stats API for every request made to this API. Further details can be found [here](https://labs.dcsa.org/#/http/guides/api-guides/stats-api/introduction)
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+  contact:
+    name: Digital Container Shipping Association (DCSA)
+    url: 'https://dcsa.org'
+    email: info@dcsa.org
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: 'https://virtserver.swaggerhub.com/dcsaorg/DCSA_EBL_SUR_RSP/3.0.0-Beta-2'
+tags:
+  - name: Surrender Request responses
+    description: |
+      The Surrender Request responses
+paths:
+  /v3/ebl-surrender-responses:
+    post:
+      tags:
+        - Surrender Request responses
+      operationId: post-ebl-surrender-responses
+      description: |
+        The carrier uses this endpoint to inform the EBL Solution Platform about the verdict for a given surrender request.
+      parameters:
+        - $ref: '#/components/parameters/Api-Version-Major'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SurrenderRequestAnswer'
+      responses:
+        '204':
+          description: Request successful
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+        '409':
+          description: |
+            A carrier may only answer once to a surrender request. Subsequent attempts to answer are considered an error and should be rejected with a 409 Conflict code.
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: Error
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  headers:
+    API-Version:
+      schema:
+        type: string
+        example: 3.0.0-Beta-2
+      description: |
+        SemVer used to indicate the version of the contract (API version) returned.
+  parameters:
+    Api-Version-Major:
+      in: header
+      name: API-Version
+      required: false
+      schema:
+        type: string
+        example: '3'
+      description: |
+        An API-Version header **MAY** be added to the request (optional); if added it **MUST** only contain **MAJOR** version. API-Version header **MUST** be aligned with the URI version.
+  schemas:
+    ErrorResponse:
+      title: Error Response
+      type: object
+      description: Unexpected error
+      properties:
+        httpMethod:
+          description: |
+            The HTTP method used to make the request e.g. `GET`, `POST`, etc
+          type: string
+          example: POST
+          enum:
+            - GET
+            - HEAD
+            - POST
+            - PUT
+            - DELETE
+            - OPTION
+            - PATCH
+        requestUri:
+          description: |
+            The URI that was requested.
+          type: string
+          example: /v1/events
+        statusCode:
+          description: |
+            The HTTP status code returned.
+          type: integer
+          format: int32
+          example: 400
+        statusCodeText:
+          description: |
+            A standard short description corresponding to the HTTP status code.
+          type: string
+          maxLength: 50
+          example: Bad Request
+        statusCodeMessage:
+          description: |
+            A long description corresponding to the HTTP status code with additional information.
+          type: string
+          maxLength: 200
+          example: The supplied data could not be accepted
+        providerCorrelationReference:
+          description: |
+            A unique identifier to the HTTP request within the scope of the API provider.
+          type: string
+          maxLength: 100
+          example: 4426d965-0dd8-4005-8c63-dc68b01c4962
+        errorDateTime:
+          description: |
+            The DateTime corresponding to the error occurring. Must be formatted using [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format.
+          type: string
+          format: date-time
+          example: '2019-11-12T07:41:00+08:30'
+        errors:
+          type: array
+          description: |
+            An array of errors providing more detail about the root cause.
+          minItems: 1
+          items:
+            type: object
+            title: Detailed Error
+            properties:
+              errorCode:
+                type: integer
+                format: int32
+                description: |
+                  The detailed error code returned.
+
+                    - `7000-7999` Technical error codes
+                    - `8000-8999` Functional error codes
+                    - `9000-9999` API provider-specific error codes            
+
+                  [Error codes as specified by DCSA](https://dcsa.atlassian.net/wiki/spaces/DTG/pages/197132308/Standard+Error+Codes).
+                minimum: 7000
+                maximum: 9999
+                example: 7003
+              property:
+                type: string
+                maxLength: 100
+                description: |
+                  The name of the property causing the error.
+                example: facilityCode
+              value:
+                type: string
+                maxLength: 500
+                description: |
+                  The value of the property causing the error serialised as a string exactly as in the original request.
+                example: SG SIN WHS
+              jsonPath:
+                type: string
+                maxLength: 500
+                description: |
+                  A path to the property causing the error, formatted according to [JSONpath](https://github.com/json-path/JsonPath).
+                example: $.location.facilityCode
+              errorCodeText:
+                description: |
+                  A standard short description corresponding to the `errorCode`.
+                type: string
+                maxLength: 100
+                example: invalidData
+              errorCodeMessage:
+                type: string
+                maxLength: 200
+                description: |
+                  A long description corresponding to the `errorCode` with additional information.
+                example: Spaces not allowed in facility code
+            required:
+              - errorCodeText
+              - errorCodeMessage
+      required:
+        - httpMethod
+        - requestUri
+        - statusCode
+        - statusCodeText
+        - errorDateTime
+        - errors
+
+    SurrenderRequestAnswer:
+      type: object
+      properties:
+        surrenderRequestReference:
+          type: string
+          maxLength: 100
+          example: Z12345
+          pattern: ^\S+(\s+\S+)*$
+          description: |
+            The surrender request provided by the EBL solution in the surrender request.
+        action:
+          type: string
+          description: |
+            Action performed:
+            - `SURR` (Surrendered)
+            - `SREJ` (Surrender rejected)
+
+            When the carrier accepts the surrender (`SURR`), the platform will inform the party that submitted the surrender request that the surrender has been accepted.  If the surrender is due to an admendment, the carrier will follow up with issuing the admended document to the party that submitted the surrender. The carrier will immediately become the possessor of the bill and can now void it.
+
+            When the carrier rejects the surrender (`SREJ`), the EBL is returned to the party that submitted the surrender request.
+          enum:
+            - SURR
+            - SREJ
+        comments:
+          type: string
+          description: Free text comment associated with the surrender request transaction.  Must be provided for rejections but should be omitted when accepting the surrender.
+          maxLength: 255
+          pattern: ^\S+(\s+\S+)*$
+          example: Comments...
+      required:
+        - surrenderRequestReference
+        - action
