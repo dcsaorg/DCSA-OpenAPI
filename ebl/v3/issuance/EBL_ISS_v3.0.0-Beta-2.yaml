@@ -222,7 +222,7 @@ components:
         document:
           $ref: '#/components/schemas/TransportDocument'
         issueTo:
-          $ref: '#/components/schemas/Party'
+          $ref: '#/components/schemas/IssueToParty'
         eBLVisualisationByCarrier:
           $ref: '#/components/schemas/SupportingDocument'
       required:
@@ -739,7 +739,25 @@ components:
           maxLength: 100
           description: |
             Name of the party.
-          example: Asseco Denmark
+          example: Globeteam
+        eblPlatform:
+          type: string
+          pattern: \S+
+          maxLength: 4
+          description: |
+            The EBL platform of the transaction party. 
+            The value **MUST** be one of:
+            - `WAVE` (Wave)
+            - `CARX` (CargoX)
+            - `ESSD` (EssDOCS)
+            - `IDT` (ICE Digital Trade)
+            - `BOLE` (Bolero)
+            - `EDOX` (EdoxOnline)
+            - `IQAX` (IQAX)
+            - `SECR` (Secro)
+            - `TRGO` (TradeGO)
+            - `ETEU` (eTEU)
+          example: BOLE
         address:
           $ref: '#/components/schemas/Address'
         partyContactDetails:
@@ -814,39 +832,45 @@ components:
       properties:
         codeListProvider:
           type: string
-          maxLength: 5
+          maxLength: 100
           description: |
-            A DCSA provided code for [UN/CEFACT](https://unece.org/fileadmin/DAM/trade/untdid/d16b/tred/tred3055.htm) code list providers:
-            - `ISO` (International Standards Organization)
-            - `UNECE` (United Nations Economic Commission for Europe)
-            - `LLOYD` (Lloyd's register of shipping)
-            - `BIC` (Bureau International des Containeurs)
-            - `IMO` (International Maritime Organization)
-            - `SCAC` (Standard Carrier Alpha Code)
-            - `ITIGG` (International Transport Implementation Guidelines Group)
-            - `ITU` (International Telecommunication Union)
-            - `SMDG` (Shipplanning Message Development Group)
-            - `NCBH` (NCB Hazcheck)
-            - `FMC` (Federal Maritime Commission)
-            - `CBSA` (Canada Border Services Agency)
-            - `DCSA` (Digitial Container Shipping Association)
-            - `W3C` (World Wide Web Consortium)
+            A list of codes identifying a party. Possible values are:
+
+            - `WAVE` (Wave)
+            - `CARX` (CargoX)
+            - `ESSD` (EssDOCS)
+            - `IDT` (ICE Digital Trade)
+            - `BOLE` (Bolero)
+            - `EDOX` (EdoxOnline)
+            - `IQAX` (IQAX)
+            - `SECR` (Secro)
+            - `TRGO` (TradeGO)
+            - `ETEU` (eTEU)
+            - `GSBN` (Global Shipping Business Network)
+            - `WISE` (WiseTech)
             - `GLEIF` (Global Legal Entity Identifier Foundation)
-            - `EPI` (EBL Platform Identifier)
+            - `W3C` (World Wide Web Consortium)
+            - `DNB` (Dun and Bradstreet)
+            - `FMC` (Federal Maritime Commission)
+            - `DCSA` (Digitial Container Shipping Association)
             - `ZZZ` (Mutually defined)
-          example: SMDG
+          example: W3C
         partyCode:
           type: string
+          maxLength: 100
           description: |
             Code to identify the party as provided by the code list provider
-          maxLength: 100
           example: MSK
         codeListName:
           type: string
-          description: |
-            The name of the list, provided by the code list provider
           maxLength: 100
-          example: LCL
+          description: |
+            The name of the code list, code generation mechanism or code authority for the `partyCode`. Example values could be:
+
+            - `DID` (Decentralized Identifier) for `codeListProvider` `W3C`
+            - `LEI` (Legal Entity Identifier) for `codeListProvider` `GLEIF`
+            - `DUNS` (Data Universal Numbering System) for `codeListProvider` `DNB`
+          example: DID
       required:
         - codeListProvider
         - partyCode
@@ -885,10 +909,9 @@ components:
         - type
         - countryCode
         - value
-
-    ###########
-    # Reference
-    ###########
+      ###########
+      # Reference
+      ###########
     Reference:
       type: object
       title: Reference
@@ -1825,10 +1848,9 @@ components:
         - weight
         - weightUnit
         - outerPackaging
-
-    ################
-    # Outerpackaging
-    ################
+      ################
+      # Outerpackaging
+      ################
     OuterPackaging:
       type: object
       title: Outer Packaging
@@ -1878,10 +1900,9 @@ components:
       required:
         - numberOfPackages
         - description
-
-    #################
-    # Dangerous Goods
-    #################
+      #################
+      # Dangerous Goods
+      #################
     DangerousGoods:
       type: object
       title: Dangerous Goods
@@ -2319,3 +2340,47 @@ components:
           example: 70
       required:
         - temperatureUnit
+    IssueToParty:
+      type: object
+      title: Issue To Party
+      description: |
+        Refers to a company or a legal entity.
+      properties:
+        partyName:
+          type: string
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 100
+          description: |
+            Name of the party.
+          example: Globeteam
+        sendToPlatform:
+          type: string
+          pattern: \S+
+          maxLength: 4
+          description: |
+            The EBL platform of the transaction party. 
+            The value **MUST** be one of:
+            - `WAVE` (Wave)
+            - `CARX` (CargoX)
+            - `ESSD` (EssDOCS)
+            - `IDT` (ICE Digital Trade)
+            - `BOLE` (Bolero)
+            - `EDOX` (EdoxOnline)
+            - `IQAX` (IQAX)
+            - `SECR` (Secro)
+            - `TRGO` (TradeGO)
+            - `ETEU` (eTEU)
+          example: BOLE
+        identifyingCodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentifyingCode'
+        taxLegalReferences:
+          description: |
+            A list of `Tax References` for a `Party`
+          type: array
+          items:
+            $ref: '#/components/schemas/TaxLegalReference'
+      required:
+        - partyName
+        - sendToPlatform
