@@ -104,7 +104,7 @@ paths:
           description: |
             Receiving platform rejects the envelope transfer.
 
-            The signed response [`EnvelopeTransferFinishedResponseSignedContent`](#/EnvelopeTransferFinishedResponseSignedContent) JWS-signed payload must contain [`EnvelopeTransferFinishedResponse.responseCode`](#/EnvelopeTransferFinishedResponse) attribute value that signals the rejected envelope transfer (`BENV`, `BETR` or `BSIG`).
+            The signed response [`EnvelopeTransferFinishedResponseSignedContent`](#/EnvelopeTransferFinishedResponseSignedContent) JWS-signed payload must contain [`EnvelopeTransferFinishedResponse.responseCode`](#/EnvelopeTransferFinishedResponse) attribute value that signals the rejected envelope transfer (`BENV` or `BSIG`).
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -183,7 +183,7 @@ paths:
           description: |
             The Receiving platform rejects the envelope transfer.
 
-            The signed response `EnvelopeTransferFinishedResponseSignedContent` JWS-signed payload must contain [`EnvelopeTransferFinishedResponse.responseCode`](#/EnvelopeTransferFinishedResponse) attribute value that signals the rejected envelope transfer (`BENV`, `BETR` or `BSIG`).
+            The signed response `EnvelopeTransferFinishedResponseSignedContent` JWS-signed payload must contain [`EnvelopeTransferFinishedResponse.responseCode`](#/EnvelopeTransferFinishedResponse) attribute value that signals the rejected envelope transfer (`BENV` or `BSIG`).
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -251,7 +251,7 @@ paths:
           description: |
             The Receiving platform rejects the envelope transfer.
 
-            The signed response `EnvelopeTransferFinishedResponseSignedContent` JWS-signed payload must contain [`EnvelopeTransferFinishedResponse.responseCode`](#/EnvelopeTransferFinishedResponse) attribute value that signals the rejected envelope transfer (`BENV`, `BETR` or `BSIG`).
+            The signed response `EnvelopeTransferFinishedResponseSignedContent` JWS-signed payload must contain [`EnvelopeTransferFinishedResponse.responseCode`](#/EnvelopeTransferFinishedResponse) attribute value that signals the rejected envelope transfer (`BENV` or `BSIG`).
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -608,7 +608,6 @@ components:
             - `RECE` (Received)
             - `DUPE` (Duplicated Envelope)
             - `BSIG` (Bad Signature)
-            - `BETR` (Bad Envelope Transfer)
             - `BENV` (Bad Envelope)
             - `INCD` (Inconclusive Document)
             - `MDOC` (Missing Document)
@@ -621,9 +620,7 @@ components:
 
             The `BSIG` `responseCode` is used when the receiving platform could not process the envelope related to a signature and rejects the concrete transfer request. This response code should be used when the receiving platform decides to reject envelope transfer due to the issues with the signature used to create JWS content when starting envelope transfer (`EblEnvelope.envelopeManifestSignedContent`, and/or one or more `EnvelopeTransferChainEntrySignedContentChecksum` entries in the `EblEnvelope.envelopeTransferChain` list). Example use cases: the signature was made by an unknown key, the key or signature expired, the signed content does not match the EnvelopeTransferChainEntrySignedContentChecksum, etc. In this case, the receiving platform makes no assertions about the validity of the envelope contents. The sending platform may attempt to resolve the signature issue and retry with the same EnvelopeTransferChainEntrySignedContentChecksum. The `BSIG` `responseCode` should be used together with a HTTP `422 Unprocessable Content` response status code.
 
-            The `BETR` `responseCode` is used when the receiving platform concludes that the envelopeReference parameter provided in the URL path does not match currently active envelope transfer, and therefore it decides to reject the envelope transfer. The sending platform should start a new envelope transfer to recover. The `BETR` `responseCode` should be used together with a HTTP `422 Unprocessable Content` response status code.
-
-            The `BENV` `responseCode` is used when the receiving platform can not process the envelope and rejects the concrete envelope transfer request. This response code can be used when the receiving platform knows the transfer cannot succeed in the future and the sending platform should retain the eBL. Example use cases could be that the envelope does not list the receiving platform as the intended recipient, the transferee ID is unknown, an invalid action code was used in the transactions for this envelope transfer, etc. In this case, the receiving platform is asserting that the envelope itself is not acceptable. Basically any use case where the receiving platform decides to reject the envelope transfer for technical reasons that are not covered by either `BSIG` `responseCode` or `BETR` `responseCode`. The `BENV` `responseCode` should be used together with a HTTP `422 Unprocessable Content` response status code.
+            The `BENV` `responseCode` is used when the receiving platform can not process the envelope and rejects the concrete envelope transfer request. This response code can be used when the receiving platform knows the transfer cannot succeed in the future and the sending platform should retain the eBL. Example use cases could be that the envelope does not list the receiving platform as the intended recipient, the transferee ID is unknown, an invalid action code was used in the transactions for this envelope transfer, etc. In this case, the receiving platform is asserting that the envelope itself is not acceptable. Basically any use case where the receiving platform decides to reject the envelope transfer for technical reasons that are not covered by `BSIG` `responseCode`. The `BENV` `responseCode` should be used together with a HTTP `422 Unprocessable Content` response status code.
 
             The `INCD` `responseCode` is used when the receiving platform concludes that the transferred additional document's checksum or size does not match the document checksum or size provided either directly in URL path or in `EnvelopeManifest` sent in the start envelope transfer request. The `INCD` `responseCode` does *not* reject the envelope transfer. The sending platform should try to either resend the correct document, or attempt to start new envelope transfer request with changed `EnvelopeManifest` that will contain correct document checksum and/or size for the inconclusive document. The `INCD` `responseCode` is not valid as a response to the start of a envelope transfer.  The `INCD` `responseCode` should be used together with a HTTP `409 Conflict` response status code.
 
@@ -640,7 +637,6 @@ components:
             - BSIG
             - BENV
             - MDOC
-            - BETR
             - DISE
           example: RECE
         duplicateOfAcceptedEnvelopeTransferChainEntrySignedContent:
