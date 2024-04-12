@@ -1,6 +1,6 @@
 ### Platform Interoperability (PINT) API
 
-The DCSA Pla API is specified on [**SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_EBL_PINT).
+The DCSA Platform Interoperability API is specified on [**SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_EBL_PINT).
 
 Publications related to the PINT API:
 - [Glossary of Terms](https://knowledge.dcsa.org/s/glossary) maintained on the [dcsa.org](https://dcsa.org) website
