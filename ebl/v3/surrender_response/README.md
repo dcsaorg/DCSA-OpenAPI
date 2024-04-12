@@ -8,6 +8,10 @@ Publications related to the Bill of Lading Surrender Response API:
 - [Bill of Lading](./../) maintained here on GitHub
 - [Bill of Lading Surrender](./../surrender/) maintained here on GitHub (the Surrender API linked to this API)
 
+<a name="v300B2"></a>[Release v3.0.0 Beta 2 (12 April 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR_RSP/3.0.0-Beta-2)
+---
+To be updated...
+
 <a name="v300B1"></a>[Release v3.0.0 Beta 1 (28 December 2023)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR_RSP/3.0.0-Beta-1)
 ---
 Initial release of the DCSA OpenAPI definitions for Bill of Lading Surrender Response 3.0.0-Beta-1.
