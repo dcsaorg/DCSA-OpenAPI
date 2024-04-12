@@ -243,6 +243,153 @@ components:
       required:
         - name
         - content
+
+    IssueToParty:
+      type: object
+      title: Issue To Party
+      description: |
+        Refers to a company or a legal entity.
+      properties:
+        partyName:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 100
+          description: |
+            Name of the party.
+          example: Globeteam
+        sendToPlatform:
+          type: string
+          pattern: \S+
+          maxLength: 4
+          description: |
+            The EBL platform of the transaction party. 
+            The value **MUST** be one of:
+            - `WAVE` (Wave)
+            - `CARX` (CargoX)
+            - `ESSD` (EssDOCS)
+            - `IDT` (ICE Digital Trade)
+            - `BOLE` (Bolero)
+            - `EDOX` (EdoxOnline)
+            - `IQAX` (IQAX)
+            - `SECR` (Secro)
+            - `TRGO` (TradeGO)
+            - `ETEU` (eTEU)
+            
+            Must be a code this list [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/reference-data/eblsolutionproviders-v3.0.0-Beta-2.csv).
+          example: BOLE
+        identifyingCodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentifyingCode'
+        taxLegalReferences:
+          description: |
+            A list of `Tax References` for a `Party`
+          type: array
+          items:
+            $ref: '#/components/schemas/TaxLegalReference'
+      required:
+        - partyName
+        - sendToPlatform
+
+    IdentifyingCode:
+      type: object
+      title: Identifying Code
+      properties:
+        codeListProvider:
+          type: string
+          maxLength: 100
+          description: |
+            A list of codes identifying a party. Possible values are:
+
+            - `WAVE` (Wave)
+            - `CARX` (CargoX)
+            - `ESSD` (EssDOCS)
+            - `IDT` (ICE Digital Trade)
+            - `BOLE` (Bolero)
+            - `EDOX` (EdoxOnline)
+            - `IQAX` (IQAX)
+            - `SECR` (Secro)
+            - `TRGO` (TradeGO)
+            - `ETEU` (eTEU)
+            - `GSBN` (Global Shipping Business Network)
+            - `WISE` (WiseTech)
+            - `GLEIF` (Global Legal Entity Identifier Foundation)
+            - `W3C` (World Wide Web Consortium)
+            - `DNB` (Dun and Bradstreet)
+            - `FMC` (Federal Maritime Commission)
+            - `DCSA` (Digitial Container Shipping Association)
+            - `ZZZ` (Mutually defined)
+
+          example: W3C
+        partyCode:
+          type: string
+          maxLength: 100
+          description: |
+            Code to identify the party as provided by the code list provider
+          example: MSK
+        codeListName:
+          type: string
+          maxLength: 100
+          description: |
+            The name of the code list, code generation mechanism or code authority for the `partyCode`. Example values could be:
+
+            - `DID` (Decenbtralized Identifier) for `codeListProvider` `W3C`
+            - `LEI` (Legal Entity Identifier) for `codeListProvider` `GLEIF`
+            - `DUNS` (Data Universal Numbering System) for `codeListProvider` `DNB`
+
+          example: DID
+      required:
+        - codeListProvider
+        - partyCode
+    TaxLegalReference:
+      type: object
+      title: Tax & Legal Reference
+      description: |
+        Reference that uniquely identifies a party for tax and/or legal purposes in accordance with the relevant jurisdiction.
+        A list of examples:
+
+        | Type  | Country | Description |
+        |-------|:-------:|-------------|
+        |PAN|IN|Goods and Services Tax Identification Number in India|
+        |GSTIN|IN|Goods and Services Tax Identification Number in India|
+        |IEC|IN|Importer-Exported Code in India|
+        |RUC|EC|Registro Único del Contribuyente in Ecuador|
+        |RUC|PE|Registro Único del Contribuyente in Peru|
+        |NIF|MG|Numéro d'Identification Fiscal in Madagascar|
+        |NIF|DZ|Numéro d'Identification Fiscal in Algeria|
+
+        Allowed combinations of `type` and `country` are maintained in [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/documentation/reference-data/taxandlegalreferences-v300.csv).
+      properties:
+        type:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 50
+          description: |
+            The reference type code as defined by the relevant tax and/or legal authority.
+          example: PAN
+        countryCode:
+          type: string
+          pattern: '^[A-Z]{2}$'
+          minLength: 2
+          maxLength: 2
+          description: |
+            The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+          example: DK
+        value:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 100
+          description: |
+            The value of the `taxLegalReference`
+          example: AAAAA0000A
+      required:
+        - type
+        - countryCode
+        - value
+
+    ####################
+    # Transport Document
+    ####################
     TransportDocument:
       type: object
       title: Transport Document
@@ -511,7 +658,7 @@ components:
             - NMFTA
           example: NMFTA
         issuingParty:
-          $ref: '#/components/schemas/Party'
+          $ref: '#/components/schemas/IssuingParty'
         carrierClauses:
           type: array
           description: |
@@ -574,7 +721,7 @@ components:
                   maxLength: 2
                   description: |
                     The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
-                  example: DK
+                  example: NL
               required:
                 - countryCode
         invoicePayableAt:
@@ -620,12 +767,23 @@ components:
           items:
             $ref: '#/components/schemas/PartyContactDetail'
         documentParties:
-          type: array
-          minItems: 1
+          type: object
           description: |
-            A list of `Document Parties`
-          items:
-            $ref: '#/components/schemas/DocumentParty'
+            All `Parties` with associated roles.
+          properties:
+            shipper:
+              $ref: '#/components/schemas/Shipper'
+            consignee:
+              $ref: '#/components/schemas/Consignee'
+            endorsee:
+              $ref: '#/components/schemas/Endorsee'
+            other:
+              type: array
+              description: A list of document parties that can be optionally provided in the `Shipping Instructions` and `Transport Document`.
+              items:
+                $ref: '#/components/schemas/OtherDocumentParty'
+          required:
+            - shipper
         consignmentItems:
           type: array
           minItems: 1
@@ -674,113 +832,10 @@ components:
         - carrierCodeListProvider
         - issuingParty
         - transports
-      ################
-      # Document Party
-      ################
-    DocumentParty:
-      type: object
-      title: Document Party
-      description: |
-        Associates a `Party` with a role.
-      properties:
-        party:
-          $ref: '#/components/schemas/Party'
-        partyFunction:
-          type: string
-          maxLength: 3
-          description: |
-            Specifies the role of the party in a given context. Possible values are:
 
-            - `OS` (Original shipper)
-            - `CN` (Consignee)
-            - `COW` (Invoice payer on behalf of the consignor (shipper))
-            - `COX` (Invoice payer on behalf of the consignee)
-            - `MS` (Document/message issuer/sender)
-            - `N1` (First Notify Party)
-            - `N2` (Second Notify Party)
-            - `NI` (Other Notify Party)
-            - `DDR` (Consignor's freight forwarder)
-            - `DDS` (Consignee's freight forwarder)
-            - `HE` (Carrier booking office (transportation office))
-            - `SCO` (Service contract owner - Defined by DCSA)
-            - `BA` (Booking Agency)
-            - `END` (Endorsee Party)
-          example: DDS
-        displayedAddress:
-          description: |
-            The address to be displayed in the `Transport Document`. The displayed address may be used to match the address provided in the letter of credit. It is mandatory to provide a displayed address if the B/L needs to be switched to paper later in the process
-          type: array
-          minItems: 1
-          maxItems: 5
-          items:
-            type: string
-            maxLength: 35
-            description: |
-              A single address line to be used when a B/L needs to be printed.
-            example: Strawinskylaan 4117
-        isToBeNotified:
-          type: boolean
-          description: |
-            Used to decide whether the party will be notified of the arrival of the cargo.
-          example: true
-      required:
-        - party
-        - partyFunction
-        - isToBeNotified
-    Party:
-      type: object
-      title: Party
-      description: |
-        Refers to a company or a legal entity.
-      properties:
-        partyName:
-          type: string
-          pattern: ^\S(?:.*\S)?$
-          maxLength: 100
-          description: |
-            Name of the party.
-          example: Globeteam
-        eblPlatform:
-          type: string
-          pattern: \S+
-          maxLength: 4
-          description: |
-            The EBL platform of the transaction party. 
-            The value **MUST** be one of:
-            - `WAVE` (Wave)
-            - `CARX` (CargoX)
-            - `ESSD` (EssDOCS)
-            - `IDT` (ICE Digital Trade)
-            - `BOLE` (Bolero)
-            - `EDOX` (EdoxOnline)
-            - `IQAX` (IQAX)
-            - `SECR` (Secro)
-            - `TRGO` (TradeGO)
-            - `ETEU` (eTEU)
-            
-            Must be a code this list [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/reference-data/eblsolutionproviders-v3.0.0-Beta-2.csv).
-          example: BOLE
-        address:
-          $ref: '#/components/schemas/Address'
-        partyContactDetails:
-          type: array
-          minItems: 1
-          description: |
-            A list of contact details
-          items:
-            $ref: '#/components/schemas/PartyContactDetail'
-        identifyingCodes:
-          type: array
-          items:
-            $ref: '#/components/schemas/IdentifyingCode'
-        taxLegalReferences:
-          description: |
-            A list of `Tax References` for a `Party`
-          type: array
-          items:
-            $ref: '#/components/schemas/TaxLegalReference'
-      required:
-        - partyName
+    ######################
+    # Party Contact Detail
+    ######################
     PartyContactDetail:
       type: object
       title: Party Contact Detail
@@ -828,92 +883,10 @@ components:
             - email
       required:
         - name
-    IdentifyingCode:
-      type: object
-      title: Identifying Code
-      properties:
-        codeListProvider:
-          type: string
-          maxLength: 100
-          description: |
-            A list of codes identifying a party. Possible values are:
 
-            - `WAVE` (Wave)
-            - `CARX` (CargoX)
-            - `ESSD` (EssDOCS)
-            - `IDT` (ICE Digital Trade)
-            - `BOLE` (Bolero)
-            - `EDOX` (EdoxOnline)
-            - `IQAX` (IQAX)
-            - `SECR` (Secro)
-            - `TRGO` (TradeGO)
-            - `ETEU` (eTEU)
-            - `GSBN` (Global Shipping Business Network)
-            - `WISE` (WiseTech)
-            - `GLEIF` (Global Legal Entity Identifier Foundation)
-            - `W3C` (World Wide Web Consortium)
-            - `DNB` (Dun and Bradstreet)
-            - `FMC` (Federal Maritime Commission)
-            - `DCSA` (Digitial Container Shipping Association)
-            - `ZZZ` (Mutually defined)
-          example: W3C
-        partyCode:
-          type: string
-          maxLength: 100
-          description: |
-            Code to identify the party as provided by the code list provider
-          example: MSK
-        codeListName:
-          type: string
-          maxLength: 100
-          description: |
-            The name of the code list, code generation mechanism or code authority for the `partyCode`. Example values could be:
-
-            - `DID` (Decentralized Identifier) for `codeListProvider` `W3C`
-            - `LEI` (Legal Entity Identifier) for `codeListProvider` `GLEIF`
-            - `DUNS` (Data Universal Numbering System) for `codeListProvider` `DNB`
-          example: DID
-      required:
-        - codeListProvider
-        - partyCode
-    TaxLegalReference:
-      type: object
-      title: Tax & Legal Reference
-      description: |
-        Reference that uniquely identifies a party for tax and/or legal purposes in accordance with the relevant jurisdiction.
-        A list of examples:
-        | Type  | Country | Description | |-------|:-------:|-------------| |PAN|IN|Goods and Services Tax Identification Number in India| |GSTIN|IN|Goods and Services Tax Identification Number in India| |IEC|IN|Importer-Exported Code in India| |RUC|EC|Registro Único del Contribuyente in Ecuador| |RUC|PE|Registro Único del Contribuyente in Peru| |NIF|MG|Numéro d’Identification Fiscal in Madagascar| |NIF|DZ|Numéro d’Identification Fiscal in Algeria|
-        Allowed combinations of `type` and `country` are maintained in [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/documentation/reference-data/taxandlegalreferences-v300.csv).
-      properties:
-        type:
-          type: string
-          pattern: ^\S(?:.*\S)?$
-          maxLength: 50
-          description: |
-            The reference type code as defined by the relevant tax and/or legal authority.
-          example: PAN
-        countryCode:
-          type: string
-          pattern: '^[A-Z]{2}$'
-          minLength: 2
-          maxLength: 2
-          description: |
-            The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
-          example: DK
-        value:
-          type: string
-          pattern: ^\S(?:.*\S)?$
-          maxLength: 100
-          description: |
-            The value of the `taxLegalReference`
-          example: AAAAA0000A
-      required:
-        - type
-        - countryCode
-        - value
-      ###########
-      # Reference
-      ###########
+    ###########
+    # Reference
+    ###########
     Reference:
       type: object
       title: Reference
@@ -925,12 +898,12 @@ components:
           maxLength: 3
           description: |
             The reference type codes defined by DCSA. Possible values are:
-            - `FF` (Freight Forwarder's Reference)
-            - `SI` (Shipper's Reference)
+            - `FF` (Freight Forwarder’s Reference)
+            - `SI` (Shipper’s Reference)
             - `SPO` (Shippers Purchase Order Reference)
             - `CPO` (Consignees Purchase Order Reference)
-            - `CR` (Customer's Reference)
-            - `AAO` (Consignee's Reference)
+            - `CR` (Customer’s Reference)
+            - `AAO` (Consignee’s Reference)
             - `ECR` (Empty container release reference)
             - `CSI` (Customer shipment ID)
             - `BPR` (Booking party reference number)
@@ -946,756 +919,7 @@ components:
       required:
         - type
         - value
-      ############
-      # Transports
-      ############
-    Transports:
-      type: object
-      properties:
-        plannedArrivalDate:
-          type: string
-          format: date
-          description: |
-            The planned date of arrival.
-        plannedDepartureDate:
-          type: string
-          format: date
-          description: |
-            The planned date of departure.
-        preCarriageBy:
-          type: string
-          maxLength: 50
-          description: |
-            Mode of transportation for pre-carriage when transport to the port of loading is organized by the carrier. If this attributes is populated, then a Place of Receipt must also be defined. The currently supported values include:
-            - `VESSEL` (Vessel)
-            - `RAIL` (Rail)
-            - `TRUCK` (Truck)
-            - `BARGE` (Barge)
-          example: RAIL
-        onCarriageBy:
-          type: string
-          maxLength: 50
-          description: |
-            Mode of transportation for on-carriage when transport from the port of discharge is organized by the carrier. If this attributes is populated, then a Place of Delivery must also be defined. The currently supported values include:
-            - `VESSEL` (Vessel)
-            - `RAIL` (Rail)
-            - `TRUCK` (Truck)
-            - `BARGE` (Barge)
-          example: TRUCK
-        placeOfReceipt:
-          $ref: '#/components/schemas/PlaceOfReceipt'
-        portOfLoading:
-          $ref: '#/components/schemas/PortOfLoading'
-        portOfDischarge:
-          $ref: '#/components/schemas/PortOfDischarge'
-        placeOfDelivery:
-          $ref: '#/components/schemas/PlaceOfDelivery'
-        onwardInlandRouting:
-          $ref: '#/components/schemas/OnwardInlandRouting'
-        vesselVoyage:
-          type: array
-          minItems: 1
-          description: |
-            Allow the possibility to include multiple vessels/voyages in the `Transport Document` (e.g. the first sea going vessel and the mother vessel). At least one is mandatory to provide.
-          items:
-            type: object
-            description: Vessel and export voyage
-            properties:
-              vesselName:
-                type: string
-                pattern: ^\S(?:.*\S)?$
-                maxLength: 50
-                description: |
-                  The name of the first sea going Vessel on board which the cargo is loaded or intended to be loaded
-                example: King of the Seas
-              carrierExportVoyageNumber:
-                type: string
-                pattern: ^\S(?:.*\S)?$
-                maxLength: 50
-                example: 2103S
-                description: |
-                  The identifier of an export voyage. The carrier-specific identifier of the export Voyage.
-              universalExportVoyageReference:
-                type: string
-                pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
-                minLength: 5
-                maxLength: 5
-                description: |
-                  A global unique voyage reference for the export Voyage, as per DCSA standard, agreed by VSA partners for the voyage. The voyage reference must match the regular expression pattern: `\d{2}[0-9A-Z]{2}[NEWSR]`
-                  - `2 digits` for the year
-                  - `2 alphanumeric characters` for the sequence number of the voyage
-                  - `1 character` for the direction/haul (`N`orth, `E`ast, `W`est, `S`outh or `R`oundtrip).
-                example: 2103N
-            required:
-              - vesselName
-              - carrierExportVoyageNumber
-      required:
-        - plannedArrivalDate
-        - plannedDepartureDate
-        - portOfLoading
-        - portOfDischarge
-        - vesselVoyage
-    PlaceOfReceipt:
-      description: |
-        General purpose object to capture `Place of Receipt` location specified as: the location where the cargo is handed over by the shipper, or his agent, to the shipping line. This indicates the point at which the shipping line takes on responsibility for carriage of the container.
 
-        **Condition:** Only when pre-carriage is done by the carrier.
-
-        The location can be specified in **one** of the following ways: `UN Location Code`, `Facility` or an `Address`.
-      example:
-        locationName: Hamburg
-        locationType: UNLO
-        UNLocationCode: DEHAM
-      oneOf:
-        - $ref: '#/components/schemas/AddressLocation'
-        - $ref: '#/components/schemas/FacilityLocation'
-        - $ref: '#/components/schemas/UNLocationLocation'
-      discriminator:
-        propertyName: locationType
-        mapping:
-          ADDR: '#/components/schemas/AddressLocation'
-          FACI: '#/components/schemas/FacilityLocation'
-          UNLO: '#/components/schemas/UNLocationLocation'
-    PortOfLoading:
-      description: |
-        General purpose object to capture `Port of Loading` location specified as: the location where the cargo is loaded onto a first sea-going vessel for water transportation.
-
-        The location can be specified in **one** of the following ways: `UN Location Code` or `City and Country`.
-      example:
-        locationName: Hamburg
-        locationType: UNLO
-        UNLocationCode: DEHAM
-      oneOf:
-        - $ref: '#/components/schemas/CityLocation'
-        - $ref: '#/components/schemas/UNLocationLocation'
-      discriminator:
-        propertyName: locationType
-        mapping:
-          CITY: '#/components/schemas/CityLocation'
-          UNLO: '#/components/schemas/UNLocationLocation'
-    PortOfDischarge:
-      description: |
-        General purpose object to capture `Port of Discharge` location specified as: the location where the cargo is discharged from the last sea-going vessel.
-
-        The location can be specified in **one** of the following ways: `UN Location Code` or `City and Country`.
-      example:
-        locationName: Hamburg
-        locationType: UNLO
-        UNLocationCode: DEHAM
-      oneOf:
-        - $ref: '#/components/schemas/CityLocation'
-        - $ref: '#/components/schemas/UNLocationLocation'
-      discriminator:
-        propertyName: locationType
-        mapping:
-          CITY: '#/components/schemas/CityLocation'
-          UNLO: '#/components/schemas/UNLocationLocation'
-    PlaceOfDelivery:
-      description: |
-        General purpose object to capture `Place of Delivery` location specified as: the location where the cargo is handed over to the consignee, or his agent, by the shipping line and where responsibility of the shipping line ceases.
-
-        **Condition:** Only when onward transport is done by the carrier
-
-        The location can be specified in **one** of the following ways: `UN Location Code`, `Facility` or an `Address`.
-      example:
-        locationName: Hamburg
-        locationType: UNLO
-        UNLocationCode: DEHAM
-      oneOf:
-        - $ref: '#/components/schemas/AddressLocation'
-        - $ref: '#/components/schemas/FacilityLocation'
-        - $ref: '#/components/schemas/UNLocationLocation'
-      discriminator:
-        propertyName: locationType
-        mapping:
-          ADDR: '#/components/schemas/AddressLocation'
-          FACI: '#/components/schemas/FacilityLocation'
-          UNLO: '#/components/schemas/UNLocationLocation'
-    OnwardInlandRouting:
-      description: |
-        General purpose object to capture `Onward Inland Routing` location specified as the end location of the inland movement that takes place after the container(s) being delivered to the port of discharge/place of delivery for account and risk of merchant (merchant haulage).
-
-        The location can be specified in **one** of the following ways: `UN Location Code`, `Facility` or an `Address`.
-      example:
-        locationName: Hamburg
-        locationType: UNLO
-        UNLocationCode: DEHAM
-      oneOf:
-        - $ref: '#/components/schemas/AddressLocation'
-        - $ref: '#/components/schemas/FacilityLocation'
-        - $ref: '#/components/schemas/UNLocationLocation'
-      discriminator:
-        propertyName: locationType
-        mapping:
-          ADDR: '#/components/schemas/AddressLocation'
-          FACI: '#/components/schemas/FacilityLocation'
-          UNLO: '#/components/schemas/UNLocationLocation'
-    ########
-    # Charge
-    ########
-    Charge:
-      type: object
-      description: |
-        Addresses the monetary value of freight and other service charges for a `Booking`.
-      properties:
-        chargeName:
-          type: string
-          pattern: ^\S(?:.*\S)?$
-          maxLength: 50
-          description: |
-            Free text field describing the charge to apply
-          example: Documentation fee - Destination
-        currencyAmount:
-          type: number
-          format: float
-          minimum: 0
-          description: |
-            The monetary value of all freight and other service charges for a transport document, with a maximum of 2-digit decimals.
-          example: 1012.12
-        currencyCode:
-          type: string
-          pattern: '^[A-Z]{3}$'
-          minLength: 3
-          maxLength: 3
-          description: |
-            The currency for the charge, using a 3-character code ([ISO 4217](https://en.wikipedia.org/wiki/ISO_4217)).
-          example: DKK
-        paymentTermCode:
-          type: string
-          description: |
-            An indicator of whether a charge is prepaid (PRE) or collect (COL). When prepaid, the charge is the responsibility of the shipper or the Invoice payer on behalf of the shipper (if provided). When collect, the charge is the responsibility of the consignee or the Invoice payer on behalf of the consignee (if provided).
-
-            - `PRE` (Prepaid)
-            - `COL` (Collect)
-          enum:
-            - PRE
-            - COL
-          example: PRE
-        calculationBasis:
-          type: string
-          pattern: ^\S(?:.*\S)?$
-          maxLength: 50
-          description: |
-            The code specifying the measure unit used for the corresponding unit price for this cost, such as per day, per ton, per square metre.
-          example: Per day
-        unitPrice:
-          type: number
-          format: float
-          minimum: 0
-          description: |
-            The unit price of this charge item in the currency of the charge.
-          example: 3456.6
-        quantity:
-          type: number
-          format: float
-          minimum: 0
-          description: |
-            The amount of unit for this charge item.
-          example: 34.4
-      required:
-        - chargeName
-        - currencyAmount
-        - currencyCode
-        - paymentTermCode
-        - calculationBasis
-        - unitPrice
-        - quantity
-      ############################
-      # Address Location Interface
-      ############################
-    AddressLocation:
-      title: Address Location
-      type: object
-      description: An interface used to express a location using an `Address` object.
-      properties:
-        locationName:
-          type: string
-          description: The name of the location.
-          example: Port of Amsterdam
-          maxLength: 100
-        locationType:
-          type: string
-          maxLength: 4
-          description: Discriminator used to identify this as an `Address` location interface.
-          example: ADDR
-        address:
-          $ref: '#/components/schemas/Address'
-      required:
-        - locationType
-        - address
-    Address:
-      type: object
-      title: Address
-      description: |
-        An object for storing address related information
-      properties:
-        name:
-          type: string
-          pattern: ^\S(?:.*\S)?$
-          maxLength: 100
-          description: |
-            Name of the address
-          example: Henrik
-        street:
-          type: string
-          maxLength: 100
-          description: The name of the street of the party’s address.
-          example: Ruijggoordweg
-        streetNumber:
-          type: string
-          maxLength: 50
-          description: The number of the street of the party’s address.
-          example: '100'
-        floor:
-          type: string
-          pattern: ^\S(?:.*\S)?$
-          maxLength: 50
-          description: |
-            The floor of the party’s street number.
-          example: N/A
-        postCode:
-          type: string
-          maxLength: 50
-          description: The post code of the party’s address.
-          example: 1047 HM
-        city:
-          type: string
-          pattern: ^\S(?:.*\S)?$
-          maxLength: 65
-          description: |
-            The city name of the party’s address.
-          example: Amsterdam
-        stateRegion:
-          type: string
-          maxLength: 65
-          description: The state/region of the party’s address.
-          nullable: true
-          example: North Holland
-        country:
-          type: string
-          pattern: ^\S(?:.*\S)?$
-          maxLength: 75
-          description: |
-            The country of the party’s address.
-          example: The Netherlands
-      required:
-        - name
-        - country
-      #############################
-      # Facility Location Interface
-      #############################
-    CityLocation:
-      type: object
-      description: |
-        An interface used to express a location using a `City`, `state/region` and `country`
-      properties:
-        locationName:
-          type: string
-          description: The name of the location.
-          pattern: ^\S(?:.*\S)?$
-          example: Port of Amsterdam
-          maxLength: 100
-        locationType:
-          type: string
-          description: |
-            Discriminator used to identify this as a `City Location` interface
-          example: CITY
-        city:
-          type: object
-          description: |
-            An object for storing city, state/region and coutry related information
-          properties:
-            city:
-              type: string
-              pattern: ^\S(?:.*\S)?$
-              maxLength: 65
-              description: |
-                The city name of the party’s address.
-              example: Amsterdam
-            stateRegion:
-              type: string
-              maxLength: 65
-              description: |
-                The state/region of the party’s address.
-              nullable: true
-              example: North Holland
-            country:
-              type: string
-              pattern: ^\S(?:.*\S)?$
-              maxLength: 75
-              description: |
-                The country of the party’s address.
-              example: The Netherlands
-          required:
-            - city
-            - country
-      required:
-        - locationType
-        - city
-      #############################
-      # Facility Location Interface
-      #############################
-    FacilityLocation:
-      title: Facility Location
-      type: object
-      description: |
-        An interface used to express a location using a `Facility`. The facility can either be expressed using a `BIC` code or a `SMDG` code. The `facilityCode` does not contain the `UNLocationCode` - this should be provided in the `UnLocationCode` attribute.
-      properties:
-        locationName:
-          type: string
-          description: The name of the location.
-          pattern: ^\S(?:.*\S)?$
-          example: Port of Amsterdam
-          maxLength: 100
-        locationType:
-          type: string
-          maxLength: 4
-          description: |
-            Discriminator used to identify this as a `Facility Location` interface
-          example: FACI
-        UNLocationCode:
-          type: string
-          pattern: '^[A-Z]{2}[A-Z2-9]{3}$'
-          minLength: 5
-          maxLength: 5
-          example: NLAMS
-          description: |-
-            The UN Location code specifying where the place is located. The pattern used must be
-
-            - 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
-            - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used
-
-            More info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)
-
-            This field is **conditionally mandatory** depending on the value of the `facilityCodeListProvider` field.
-        facilityCode:
-          type: string
-          pattern: ^\S(?:.*\S)?$
-          maxLength: 6
-          description: |-
-            The code used for identifying the specific facility. This code does not include the UN Location Code.
-            The definition of the code depends on the `facilityCodeListProvider`. As code list providers maintain multiple codeLists the following codeList is used:
-            - for `SMDG` - the codeList used is the [SMDG Terminal Code List](https://smdg.org/wp-content/uploads/Codelists/Terminals/SMDG-Terminal-Code-List-v20210401.xlsx)  - for `BIC` - the codeList used is the [BIC Facility Codes](https://www.bic-code.org/facility-codes/)
-          nullable: false
-          example: ADT
-        facilityCodeListProvider:
-          type: string
-          description: |
-            The provider used for identifying the facility Code. Some facility codes are only defined in combination with an `UN Location Code`
-            - `BIC` (Requires a UN Location Code) - `SMDG` (Requires a UN Location Code)
-          enum:
-            - BIC
-            - SMDG
-          example: SMDG
-      required:
-        - locationType
-        - facilityCode
-        - facilityCodeListProvider
-      ###############################
-      # UNLocation Location Interface
-      ###############################
-    UNLocationLocation:
-      title: UNLocation Location
-      type: object
-      description: An interface used to express a location using a `Un Location Code`.
-      additionalProperties: false
-      properties:
-        locationName:
-          type: string
-          description: The name of the location.
-          pattern: ^\S(?:.*\S)?$
-          example: Port of Amsterdam
-          maxLength: 100
-        locationType:
-          type: string
-          maxLength: 4
-          description: Discriminator used to identify this as a `UNLocation` location interface.
-          example: UNLO
-        UNLocationCode:
-          type: string
-          pattern: '^[A-Z]{2}[A-Z2-9]{3}$'
-          minLength: 5
-          maxLength: 5
-          example: NLAMS
-          description: |-
-            The UN Location code specifying where the place is located. The pattern used must be
-
-            - 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
-            - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used
-
-            More info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)
-      required:
-        - locationType
-        - UNLocationCode
-      ##################
-      # Custom Reference
-      ##################
-    CustomsReference:
-      type: object
-      title: Custom Reference
-      description: |
-        Reference associated with customs and/or excise purposes required by the relevant authorities for the import, export, or transit of the goods.
-
-        A (small) list of examples:
-
-        | Type  | Country | Description |
-        |-------|:-------:|-------------|
-        |ACID|EG|Advance Cargo Information Declaration in Egypt|
-        |CERS|CA|Canadian Export Reporting System|
-        |ITN|US|Internal Transaction Number in US|
-        |PEB|ID|PEB reference number|
-        |CSN|IN|Cargo Summary Notification (CSN)|
-
-        Allowed combinations of `type` and `country` are maintained in [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/documentation/reference-data/customsreferences-v300.csv).
-      properties:
-        type:
-          type: string
-          pattern: ^\S(?:.*\S)?$
-          maxLength: 50
-          description: |
-            The reference type code as defined in the relevant customs jurisdiction.
-          example: ACID
-        countryCode:
-          type: string
-          pattern: '^[A-Z]{2}$'
-          minLength: 2
-          maxLength: 2
-          description: |
-            The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
-          example: DK
-        value:
-          type: string
-          pattern: ^\S(?:.*\S)?$
-          maxLength: 100
-          description: |
-            The value of the `customsReference`
-          example: '4988470982020120017'
-      required:
-        - type
-        - countryCode
-        - value
-      ##############################
-      # Utilized Transport Equipment
-      ##############################
-    UtilizedTransportEquipment:
-      type: object
-      title: Utilized Transport Equipment
-      description: |
-        Specifies the container (`equipment`), the total `weight`, total `volume`, possible `ActiveReeferSettings`, `seals` and `references`
-      properties:
-        equipment:
-          $ref: '#/components/schemas/Equipment'
-        isShipperOwned:
-          type: boolean
-          description: |
-            Indicates whether the container is shipper owned (SOC).
-          example: true
-        isNonOperatingReefer:
-          type: boolean
-          description: |
-            If the equipment is a Reefer Container then setting this attribute will indicate that the container should be treated as a `DRY` container.
-
-            **Condition:** Only applicable if `ISOEquipmentCode` shows a Reefer type.
-          example: false
-        activeReeferSettings:
-          $ref: '#/components/schemas/ActiveReeferSettings'
-        seals:
-          type: array
-          minItems: 1
-          description: |
-            A list of `Seals`
-          items:
-            $ref: '#/components/schemas/Seal'
-        references:
-          type: array
-          description: |
-            A list of `References`
-          items:
-            $ref: '#/components/schemas/Reference'
-        customsReferences:
-          type: array
-          description: |
-            A list of `Customs references`
-          items:
-            $ref: '#/components/schemas/CustomsReference'
-      required:
-        - equipment
-        - isShipperOwned
-        - seals
-      ###########
-      # Equipment
-      ###########
-    Equipment:
-      type: object
-      description: |
-        Used for storing cargo in/on during transport. The equipment size/type is defined by the ISO 6346 code. The most common equipment size/type is 20'/40'/45' DRY Freight Container, but several different versions exist.
-      properties:
-        equipmentReference:
-          type: string
-          pattern: ^\S(?:.*\S)?$
-          maxLength: 11
-          description: |
-            The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.
-            According to [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346), a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit).
-
-            If a container does not comply with [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346), it is suggested to follow [Recommendation #2: Containers with non-ISO identification](https://smdg.org/documents/smdg-recommendations) from SMDG.
-          example: APZU4812090
-        ISOEquipmentCode:
-          type: string
-          pattern: ^\S(?:.*\S)?$
-          maxLength: 4
-          description: |
-            Unique code for the different equipment size and type used to transport commodities. The code can refer to either the ISO size type (e.g. 22G1) or the ISO type group (e.g. 22GP) following the [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346) standard.
-          example: 22GP
-        tareWeight:
-          type: number
-          format: float
-          minimum: 0
-          exclusiveMinimum: true
-          description: |
-            The weight of an empty container (gross container weight).
-          example: 4800
-        weightUnit:
-          type: string
-          description: |
-            The unit of measure which can be expressed in imperial or metric terms
-            - `KGM` (Kilograms)
-            - `LBR` (Pounds)
-
-            **Conditional:** Mandatory to provide if `tareWeight` is provided
-          enum:
-            - KGM
-            - LBR
-          example: KGM
-      required:
-        - equipmentReference
-      ######
-      # Seal
-      ######
-    Seal:
-      type: object
-      description: |
-        Addresses the seal-related information associated with the shipment equipment. A seal is put on a shipment equipment once it is loaded. This `Seal` is meant to stay on until the shipment equipment reaches its final destination.
-      properties:
-        number:
-          type: string
-          maxLength: 15
-          description: Identifies a seal affixed to the container.
-          example: VET123
-        source:
-          type: string
-          description: |
-            The source of the seal, namely who has affixed the seal. This attribute links to the Seal Source ID defined in the Seal Source reference data entity.
-            - `CAR` (Carrier)
-            - `SHI` (Shipper)
-            - `VET` (Veterinary)
-            - `CUS` (Customs)
-          enum:
-            - CAR
-            - SHI
-            - VET
-            - CUS
-          example: CUS
-      required:
-        - number
-      ########################
-      # Active Reefer Settings
-      ########################
-    ActiveReeferSettings:
-      type: object
-      title: Active Reefer Settings
-      description: |
-        The specifications for a Reefer equipment.
-
-        **Condition:** Only applicable when `isNonOperatingReefer` is set to `false`
-      properties:
-        temperatureSetpoint:
-          type: number
-          format: float
-          description: |
-            Target value of the temperature for the Reefer based on the cargo requirement.
-          example: -15
-        temperatureUnit:
-          type: string
-          description: |
-            The unit for temperature in Celsius or Fahrenheit
-
-            - `CEL` (Celsius)
-            - `FAH` (Fahrenheit)
-
-            **Condition:** Mandatory to provide if `temperatureSetpoint` is provided
-          enum:
-            - CEL
-            - FAH
-          example: CEL
-        o2Setpoint:
-          type: number
-          format: float
-          minimum: 0
-          maximum: 100
-          description: |
-            The percentage of the controlled atmosphere CO<sub>2</sub> target value
-          example: 25
-        co2Setpoint:
-          type: number
-          format: float
-          minimum: 0
-          maximum: 100
-          description: |
-            The percentage of the controlled atmosphere CO<sub>2</sub> target value
-          example: 25
-        humiditySetpoint:
-          type: number
-          format: float
-          minimum: 0
-          maximum: 100
-          description: |
-            The percentage of the controlled atmosphere humidity target value
-          example: 95.6
-        airExchangeSetpoint:
-          type: number
-          format: float
-          minimum: 0
-          description: |
-            Target value for the air exchange rate which is the rate at which outdoor air replaces indoor air within a Reefer container
-          example: 15.4
-        airExchangeUnit:
-          type: string
-          description: |
-            The unit for `airExchange` in metrics- or imperial- units per hour
-            - `MQH` (Cubic metre per hour)
-            - `FQH` (Cubic foot per hour)
-
-            **Condition:** Mandatory to provide if `airExchange` is provided
-          enum:
-            - MQH
-            - FQH
-          example: MQH
-        isVentilationOpen:
-          type: boolean
-          description: |
-            If `true` the ventilation orifice is `Open` - if `false` the ventilation orifice is `closed`
-          example: true
-        isDrainholesOpen:
-          type: boolean
-          description: |
-            Is drainholes open on the container
-          example: true
-        isBulbMode:
-          type: boolean
-          description: |
-            Is special container setting for handling flower bulbs active
-          example: true
-        isColdTreatmentRequired:
-          type: boolean
-          description: |
-            Indicator whether cargo requires cold treatment prior to loading at origin or during transit, but prior arrival at POD
-          example: true
-        isControlledAtmosphereRequired:
-          type: boolean
-          description: |
-            Indicator of whether cargo requires Controlled Atmosphere.
-          example: true
     ##################
     # Consignment Item
     ##################
@@ -1781,9 +1005,58 @@ components:
         - descriptionOfGoods
         - HSCodes
         - cargoItems
-      ############
-      # Cargo Item
-      ############
+
+    ###################
+    # Customs Reference
+    ###################
+    CustomsReference:
+      type: object
+      title: Custom Reference
+      description: |
+        Reference associated with customs and/or excise purposes required by the relevant authorities for the import, export, or transit of the goods.
+
+        A (small) list of examples:
+
+        | Type  | Country | Description |
+        |-------|:-------:|-------------|
+        |ACID|EG|Advance Cargo Information Declaration in Egypt|
+        |CERS|CA|Canadian Export Reporting System|
+        |ITN|US|Internal Transaction Number in US|
+        |PEB|ID|PEB reference number|
+        |CSN|IN|Cargo Summary Notification (CSN)|
+
+        Allowed combinations of `type` and `country` are maintained in [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/documentation/reference-data/customsreferences-v300.csv).
+      properties:
+        type:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 50
+          description: |
+            The reference type code as defined in the relevant customs jurisdiction.
+          example: ACID
+        countryCode:
+          type: string
+          pattern: '^[A-Z]{2}$'
+          minLength: 2
+          maxLength: 2
+          description: |
+            The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+          example: DK
+        value:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 100
+          description: |
+            The value of the `customsReference`
+          example: '4988470982020120017'
+      required:
+        - type
+        - countryCode
+        - value
+
+    ############
+    # Cargo Item
+    ############
     CargoItem:
       type: object
       title: Cargo Item
@@ -1832,8 +1105,6 @@ components:
             The unit of measure which can be expressed in either imperial or metric terms
             - `FTQ` (Cubic foot)
             - `MTQ` (Cubic meter)
-
-            **Conditional:** Mandatory to provide if `volume` is provided
           enum:
             - MTQ
             - FTQ
@@ -1851,9 +1122,10 @@ components:
         - weight
         - weightUnit
         - outerPackaging
-      ################
-      # Outerpackaging
-      ################
+
+    #################
+    # Outer Packaging
+    #################
     OuterPackaging:
       type: object
       title: Outer Packaging
@@ -1903,9 +1175,10 @@ components:
       required:
         - numberOfPackages
         - description
-      #################
-      # Dangerous Goods
-      #################
+
+    #################
+    # Dangerous Goods
+    #################
     DangerousGoods:
       type: object
       title: Dangerous Goods
@@ -2343,11 +1616,825 @@ components:
           example: 70
       required:
         - temperatureUnit
-    IssueToParty:
+
+    ##############################
+    # Utilized Transport Equipment
+    ##############################
+    UtilizedTransportEquipment:
       type: object
-      title: Issue To Party
+      title: Utilized Transport Equipment
       description: |
-        Refers to a company or a legal entity.
+        Specifies the container (`equipment`), the total `weight`, total `volume`, possible `ActiveReeferSettings`, `seals` and `references`
+      properties:
+        equipment:
+          $ref: '#/components/schemas/Equipment'
+        isShipperOwned:
+          type: boolean
+          description: |
+            Indicates whether the container is shipper owned (SOC).
+          example: true
+        isNonOperatingReefer:
+          type: boolean
+          description: |
+            If the equipment is a Reefer Container then setting this attribute will indicate that the container should be treated as a `DRY` container.
+
+            **Condition:** Only applicable if `ISOEquipmentCode` shows a Reefer type.
+          example: false
+        activeReeferSettings:
+          $ref: '#/components/schemas/ActiveReeferSettings'
+        seals:
+          type: array
+          minItems: 1
+          description: |
+            A list of `Seals`
+          items:
+            $ref: '#/components/schemas/Seal'
+        references:
+          type: array
+          description: |
+            A list of `References`
+          items:
+            $ref: '#/components/schemas/Reference'
+        customsReferences:
+          type: array
+          description: |
+            A list of `Customs references`
+          items:
+            $ref: '#/components/schemas/CustomsReference'
+      required:
+        - equipment
+        - isShipperOwned
+        - seals
+
+    ###########
+    # Equipment
+    ###########
+    Equipment:
+      type: object
+      description: |
+        Used for storing cargo in/on during transport. The equipment size/type is defined by the ISO 6346 code. The most common equipment size/type is 20'/40'/45' DRY Freight Container, but several different versions exist.
+      properties:
+        equipmentReference:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 11
+          description: |
+            The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.
+            According to [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346), a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit).
+
+            If a container does not comply with [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346), it is suggested to follow [Recommendation #2: Containers with non-ISO identification](https://smdg.org/documents/smdg-recommendations) from SMDG.
+          example: APZU4812090
+        ISOEquipmentCode:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 4
+          description: |
+            Unique code for the different equipment size and type used to transport commodities. The code can refer to either the ISO size type (e.g. 22G1) or the ISO type group (e.g. 22GP) following the [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346) standard.
+          example: 22GP
+        tareWeight:
+          type: number
+          format: float
+          minimum: 0
+          exclusiveMinimum: true
+          description: |
+            The weight of an empty container (gross container weight).
+          example: 4800
+        weightUnit:
+          type: string
+          description: |
+            The unit of measure which can be expressed in imperial or metric terms
+            - `KGM` (Kilograms)
+            - `LBR` (Pounds)
+
+            **Conditional:** Mandatory to provide if `tareWeight` is provided
+          enum:
+            - KGM
+            - LBR
+          example: KGM
+      required:
+        - equipmentReference
+
+    ######
+    # Seal
+    ######
+    Seal:
+      type: object
+      description: |
+        Addresses the seal-related information associated with the shipment equipment. A seal is put on a shipment equipment once it is loaded. This `Seal` is meant to stay on until the shipment equipment reaches its final destination.
+      properties:
+        number:
+          type: string
+          maxLength: 15
+          description: 'Identifies a seal affixed to the container.'
+          example: VET123
+        source:
+          type: string
+          description: |
+            The source of the seal, namely who has affixed the seal. This attribute links to the Seal Source ID defined in the Seal Source reference data entity.
+            - `CAR` (Carrier)
+            - `SHI` (Shipper)
+            - `VET` (Veterinary)
+            - `CUS` (Customs)
+          enum:
+            - CAR
+            - SHI
+            - VET
+            - CUS
+          example: 'CUS'
+      required:
+        - number
+
+    ########################
+    # Active Reefer Settings
+    ########################
+    ActiveReeferSettings:
+      type: object
+      title: Active Reefer Settings
+      description: |
+        The specifications for a Reefer equipment.
+
+        **Condition:** Only applicable when `isNonOperatingReefer` is set to `false`
+      properties:
+        temperatureSetpoint:
+          type: number
+          format: float
+          description: |
+            Target value of the temperature for the Reefer based on the cargo requirement.
+          example: -15
+        temperatureUnit:
+          type: string
+          description: |
+            The unit for temperature in Celsius or Fahrenheit
+
+            - `CEL` (Celsius)
+            - `FAH` (Fahrenheit)
+
+            **Condition:** Mandatory to provide if `temperatureSetpoint` is provided
+          enum:
+            - CEL
+            - FAH
+          example: CEL
+        o2Setpoint:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 100
+          description: |
+            The percentage of the controlled atmosphere CO<sub>2</sub> target value
+          example: 25
+        co2Setpoint:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 100
+          description: |
+            The percentage of the controlled atmosphere CO<sub>2</sub> target value
+          example: 25
+        humiditySetpoint:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 100
+          description: |
+            The percentage of the controlled atmosphere humidity target value
+          example: 95.6
+        airExchangeSetpoint:
+          type: number
+          format: float
+          minimum: 0
+          description: |
+            Target value for the air exchange rate which is the rate at which outdoor air replaces indoor air within a Reefer container
+          example: 15.4
+        airExchangeUnit:
+          type: string
+          description: |
+            The unit for `airExchange` in metrics- or imperial- units per hour
+            - `MQH` (Cubic metre per hour)
+            - `FQH` (Cubic foot per hour)
+
+            **Condition:** Mandatory to provide if `airExchange` is provided
+          enum:
+            - MQH
+            - FQH
+          example: MQH
+        isVentilationOpen:
+          type: boolean
+          description: |
+            If `true` the ventilation orifice is `Open` - if `false` the ventilation orifice is `closed`
+          example: true
+        isDrainholesOpen:
+          type: boolean
+          description: |
+            Is drainholes open on the container
+          example: true
+        isBulbMode:
+          type: boolean
+          description: |
+            Is special container setting for handling flower bulbs active
+          example: true
+        isColdTreatmentRequired:
+          type: boolean
+          description: |
+            Indicator whether cargo requires cold treatment prior to loading at origin or during transit, but prior arrival at POD
+          example: true
+        isControlledAtmosphereRequired:
+          type: boolean
+          description: |
+            Indicator of whether cargo requires Controlled Atmosphere.
+          example: true
+
+    ############
+    # Transports
+    ############
+    Transports:
+      type: object
+      properties:
+        plannedArrivalDate:
+          type: string
+          format: date
+          description: |
+            The planned date of arrival.
+        plannedDepartureDate:
+          type: string
+          format: date
+          description: |
+            The planned date of departure.
+        preCarriageBy:
+          type: string
+          maxLength: 50
+          description: |
+            Mode of transportation for pre-carriage when transport to the port of loading is organized by the carrier. If this attributes is populated, then a Place of Receipt must also be defined. The currently supported values include:
+            - `VESSEL` (Vessel)
+            - `RAIL` (Rail)
+            - `TRUCK` (Truck)
+            - `BARGE` (Barge)
+          example: RAIL
+        onCarriageBy:
+          type: string
+          maxLength: 50
+          description: |
+            Mode of transportation for on-carriage when transport from the port of discharge is organized by the carrier. If this attributes is populated, then a Place of Delivery must also be defined. The currently supported values include:
+            - `VESSEL` (Vessel)
+            - `RAIL` (Rail)
+            - `TRUCK` (Truck)
+            - `BARGE` (Barge)
+          example: TRUCK
+        placeOfReceipt:
+          $ref: '#/components/schemas/PlaceOfReceipt'
+        portOfLoading:
+          $ref: '#/components/schemas/PortOfLoading'
+        portOfDischarge:
+          $ref: '#/components/schemas/PortOfDischarge'
+        placeOfDelivery:
+          $ref: '#/components/schemas/PlaceOfDelivery'
+        onwardInlandRouting:
+          $ref: '#/components/schemas/OnwardInlandRouting'
+        vesselVoyage:
+          type: array
+          minItems: 1
+          description: |
+            Allow the possibility to include multiple vessels/voyages in the `Transport Document` (e.g. the first sea going vessel and the mother vessel). At least one is mandatory to provide.
+          items:
+            type: object
+            description: 'Vessel and export voyage'
+            properties:
+              vesselName:
+                type: string
+                pattern: ^\S(?:.*\S)?$
+                maxLength: 50
+                description: |
+                  The name of the first sea going Vessel on board which the cargo is loaded or intended to be loaded
+                example: King of the Seas
+              carrierExportVoyageNumber:
+                type: string
+                pattern: ^\S(?:.*\S)?$
+                maxLength: 50
+                example: 2103S
+                description: |
+                  The identifier of an export voyage. The carrier-specific identifier of the export Voyage.
+              universalExportVoyageReference:
+                type: string
+                pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
+                minLength: 5
+                maxLength: 5
+                description: |
+                  A global unique voyage reference for the export Voyage, as per DCSA standard, agreed by VSA partners for the voyage. The voyage reference must match the regular expression pattern: `\d{2}[0-9A-Z]{2}[NEWSR]`
+                  - `2 digits` for the year
+                  - `2 alphanumeric characters` for the sequence number of the voyage
+                  - `1 character` for the direction/haul (`N`orth, `E`ast, `W`est, `S`outh or `R`oundtrip).
+                example: 2103N
+            required:
+              - vesselName
+              - carrierExportVoyageNumber
+      required:
+        - plannedArrivalDate
+        - plannedDepartureDate
+        - portOfLoading
+        - portOfDischarge
+        - vesselVoyage
+    PlaceOfReceipt:
+      description: |
+        General purpose object to capture `Place of Receipt` location specified as: the location where the cargo is handed over by the shipper, or his agent, to the shipping line. This indicates the point at which the shipping line takes on responsibility for carriage of the container.
+
+        **Condition:** Only when pre-carriage is done by the carrier.
+
+        The location can be specified in **one** of the following ways: `UN Location Code`, `Facility` or an `Address`.
+      example:
+        locationName: Hamburg
+        locationType: UNLO
+        UNLocationCode: DEHAM
+      oneOf:
+        - $ref: '#/components/schemas/AddressLocation'
+        - $ref: '#/components/schemas/FacilityLocation'
+        - $ref: '#/components/schemas/UNLocationLocation'
+      discriminator:
+        propertyName: locationType
+        mapping:
+          ADDR: '#/components/schemas/AddressLocation'
+          FACI: '#/components/schemas/FacilityLocation'
+          UNLO: '#/components/schemas/UNLocationLocation'
+    PortOfLoading:
+      description: |
+        General purpose object to capture `Port of Loading` location specified as: the location where the cargo is loaded onto a first sea-going vessel for water transportation.
+
+        The location can be specified in **one** of the following ways: `UN Location Code` or `City and Country`.
+      example:
+        locationName: Hamburg
+        locationType: UNLO
+        UNLocationCode: DEHAM
+      oneOf:
+        - $ref: '#/components/schemas/CityLocation'
+        - $ref: '#/components/schemas/UNLocationLocation'
+      discriminator:
+        propertyName: locationType
+        mapping:
+          CITY: '#/components/schemas/CityLocation'
+          UNLO: '#/components/schemas/UNLocationLocation'
+    PortOfDischarge:
+      description: |
+        General purpose object to capture `Port of Discharge` location specified as: the location where the cargo is discharged from the last sea-going vessel.
+
+        The location can be specified in **one** of the following ways: `UN Location Code` or `City and Country`.
+      example:
+        locationName: Hamburg
+        locationType: UNLO
+        UNLocationCode: DEHAM
+      oneOf:
+        - $ref: '#/components/schemas/CityLocation'
+        - $ref: '#/components/schemas/UNLocationLocation'
+      discriminator:
+        propertyName: locationType
+        mapping:
+          CITY: '#/components/schemas/CityLocation'
+          UNLO: '#/components/schemas/UNLocationLocation'
+    PlaceOfDelivery:
+      description: |
+        General purpose object to capture `Place of Delivery` location specified as: the location where the cargo is handed over to the consignee, or his agent, by the shipping line and where responsibility of the shipping line ceases.
+
+        **Condition:** Only when onward transport is done by the carrier
+
+        The location can be specified in **one** of the following ways: `UN Location Code`, `Facility` or an `Address`.
+      example:
+        locationName: Hamburg
+        locationType: UNLO
+        UNLocationCode: DEHAM
+      oneOf:
+        - $ref: '#/components/schemas/AddressLocation'
+        - $ref: '#/components/schemas/FacilityLocation'
+        - $ref: '#/components/schemas/UNLocationLocation'
+      discriminator:
+        propertyName: locationType
+        mapping:
+          ADDR: '#/components/schemas/AddressLocation'
+          FACI: '#/components/schemas/FacilityLocation'
+          UNLO: '#/components/schemas/UNLocationLocation'
+    OnwardInlandRouting:
+      description: |
+        General purpose object to capture `Onward Inland Routing` location specified as the end location of the inland movement that takes place after the container(s) being delivered to the port of discharge/place of delivery for account and risk of merchant (merchant haulage).
+
+        The location can be specified in **one** of the following ways: `UN Location Code`, `Facility` or an `Address`.
+      example:
+        locationName: Hamburg
+        locationType: UNLO
+        UNLocationCode: DEHAM
+      oneOf:
+        - $ref: '#/components/schemas/AddressLocation'
+        - $ref: '#/components/schemas/FacilityLocation'
+        - $ref: '#/components/schemas/UNLocationLocation'
+      discriminator:
+        propertyName: locationType
+        mapping:
+          ADDR: '#/components/schemas/AddressLocation'
+          FACI: '#/components/schemas/FacilityLocation'
+          UNLO: '#/components/schemas/UNLocationLocation'
+
+    ########
+    # Charge
+    ########
+    Charge:
+      type: object
+      description: |
+        Addresses the monetary value of freight and other service charges for a `Booking`.
+      properties:
+        chargeName:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 50
+          description: |
+            Free text field describing the charge to apply
+          example: Documentation fee - Destination
+        currencyAmount:
+          type: number
+          format: float
+          minimum: 0
+          description: |
+            The monetary value of all freight and other service charges for a transport document, with a maximum of 2-digit decimals.
+          example: 1012.12
+        currencyCode:
+          type: string
+          pattern: '^[A-Z]{3}$'
+          minLength: 3
+          maxLength: 3
+          description: |
+            The currency for the charge, using a 3-character code ([ISO 4217](https://en.wikipedia.org/wiki/ISO_4217)).
+          example: DKK
+        paymentTermCode:
+          type: string
+          description: |
+            An indicator of whether a charge is prepaid (PRE) or collect (COL). When prepaid, the charge is the responsibility of the shipper or the Invoice payer on behalf of the shipper (if provided). When collect, the charge is the responsibility of the consignee or the Invoice payer on behalf of the consignee (if provided).
+
+            - `PRE` (Prepaid)
+            - `COL` (Collect)
+          enum:
+            - PRE
+            - COL
+          example: PRE
+        calculationBasis:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 50
+          description: |
+            The code specifying the measure unit used for the corresponding unit price for this cost, such as per day, per ton, per square metre.
+          example: Per day
+        unitPrice:
+          type: number
+          format: float
+          minimum: 0
+          description: |
+            The unit price of this charge item in the currency of the charge.
+          example: 3456.6
+        quantity:
+          type: number
+          format: float
+          minimum: 0
+          description: |
+            The amount of unit for this charge item.
+          example: 34.4
+      required:
+        - chargeName
+        - currencyAmount
+        - currencyCode
+        - paymentTermCode
+        - calculationBasis
+        - unitPrice
+        - quantity
+
+    ############################
+    # Address Location Interface
+    ############################
+    AddressLocation:
+      title: Address Location
+      type: object
+      description: An interface used to express a location using an `Address` object.
+      properties:
+        locationName:
+          type: string
+          description: The name of the location.
+          example: Port of Amsterdam
+          maxLength: 100
+        locationType:
+          type: string
+          maxLength: 4
+          description: Discriminator used to identify this as an `Address` location interface.
+          example: ADDR
+        address:
+          $ref: '#/components/schemas/Address'
+      required:
+        - locationType
+        - address
+    Address:
+      type: object
+      title: Address
+      description: |
+        An object for storing address related information
+      properties:
+        name:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 100
+          description: |
+            Name of the address
+          example: Henrik
+        street:
+          type: string
+          maxLength: 100
+          description: The name of the street of the party’s address.
+          example: Ruijggoordweg
+        streetNumber:
+          type: string
+          maxLength: 50
+          description: The number of the street of the party’s address.
+          example: '100'
+        floor:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 50
+          description: |
+            The floor of the party’s street number.
+          example: N/A
+        postCode:
+          type: string
+          maxLength: 50
+          description: The post code of the party’s address.
+          example: 1047 HM
+        city:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 65
+          description: |
+            The city name of the party’s address.
+          example: Amsterdam
+        stateRegion:
+          type: string
+          maxLength: 65
+          description: The state/region of the party’s address.
+          nullable: true
+          example: North Holland
+        country:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 75
+          description: |
+            The country of the party’s address.
+          example: The Netherlands
+      required:
+        - name
+        - country
+
+    #########################
+    # City Location Interface
+    #########################
+    CityLocation:
+      type: object
+      title: City Location
+      description: |
+        An interface used to express a location using a `City`, `state/region` and `country`
+      properties:
+        locationName:
+          type: string
+          description: The name of the location.
+          pattern: ^\S(?:.*\S)?$
+          example: Port of Amsterdam
+          maxLength: 100
+        locationType:
+          type: string
+          description: |
+            Discriminator used to identify this as a `City Location` interface
+          example: CITY
+        city:
+          type: object
+          description: |
+            An object for storing city, state/region and coutry related information
+          properties:
+            city:
+              type: string
+              pattern: ^\S(?:.*\S)?$
+              maxLength: 65
+              description: |
+                The city name of the party’s address.
+              example: Amsterdam
+            stateRegion:
+              type: string
+              maxLength: 65
+              description: |
+                The state/region of the party’s address.
+              nullable: true
+              example: North Holland
+            countryCode:
+              type: string
+              pattern: '^[A-Z]{2}$'
+              minLength: 2
+              maxLength: 2
+              description: |
+                The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+              example: NL
+          required:
+            - city
+            - country
+      required:
+        - locationType
+        - city
+
+    #############################
+    # Facility Location Interface
+    #############################
+    FacilityLocation:
+      type: object
+      title: Facility Location
+      description: |
+        An interface used to express a location using a `Facility`. The facility can either be expressed using a `BIC` code or a `SMDG` code. The `facilityCode` does not contain the `UNLocationCode` - this should be provided in the `UnLocationCode` attribute.
+      properties:
+        locationName:
+          type: string
+          description: The name of the location.
+          pattern: ^\S(?:.*\S)?$
+          example: Port of Amsterdam
+          maxLength: 100
+        locationType:
+          type: string
+          maxLength: 4
+          description: |
+            Discriminator used to identify this as a `Facility Location` interface
+          example: FACI
+        UNLocationCode:
+          type: string
+          pattern: '^[A-Z]{2}[A-Z2-9]{3}$'
+          minLength: 5
+          maxLength: 5
+          example: NLAMS
+          description: |-
+            The UN Location code specifying where the place is located. The pattern used must be
+            
+            - 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+            - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used
+            
+            More info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)
+            
+            This field is **conditionally mandatory** depending on the value of the `facilityCodeListProvider` field.
+        facilityCode:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 6
+          description: |-
+            The code used for identifying the specific facility. This code does not include the UN Location Code.
+            The definition of the code depends on the `facilityCodeListProvider`. As code list providers maintain multiple codeLists the following codeList is used:
+            - for `SMDG` - the codeList used is the [SMDG Terminal Code List](https://smdg.org/wp-content/uploads/Codelists/Terminals/SMDG-Terminal-Code-List-v20210401.xlsx)  - for `BIC` - the codeList used is the [BIC Facility Codes](https://www.bic-code.org/facility-codes/)
+          nullable: false
+          example: ADT
+        facilityCodeListProvider:
+          type: string
+          description: |
+            The provider used for identifying the facility Code. Some facility codes are only defined in combination with an `UN Location Code`
+            - `BIC` (Requires a UN Location Code) - `SMDG` (Requires a UN Location Code)
+          enum:
+            - BIC
+            - SMDG
+          example: SMDG
+      required:
+        - locationType
+        - facilityCode
+        - facilityCodeListProvider
+
+    ###############################
+    # UNLocation Location Interface
+    ###############################
+    UNLocationLocation:
+      title: UNLocation Location
+      type: object
+      description: An interface used to express a location using a `Un Location Code`.
+      additionalProperties: false
+      properties:
+        locationName:
+          type: string
+          description: The name of the location.
+          pattern: ^\S(?:.*\S)?$
+          example: Port of Amsterdam
+          maxLength: 100
+        locationType:
+          type: string
+          maxLength: 4
+          description: Discriminator used to identify this as a `UNLocation` location interface.
+          example: UNLO
+        UNLocationCode:
+          type: string
+          pattern: '^[A-Z]{2}[A-Z2-9]{3}$'
+          minLength: 5
+          maxLength: 5
+          example: NLAMS
+          description: |-
+            The UN Location code specifying where the place is located. The pattern used must be
+
+            - 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+            - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used
+
+            More info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)
+      required:
+        - locationType
+        - UNLocationCode
+
+    ##################
+    # Document Parties
+    ##################
+    OtherDocumentParty:
+      type: object
+      title: Other Document Party
+      description: |
+        A list of document parties that can be optionally provided in the `Shipping Instructions` and `Transport Document`.
+      properties:
+        party:
+          $ref: '#/components/schemas/Party'
+        partyFunction:
+          type: string
+          maxLength: 3
+          description: |
+            Specifies the role of the party in a given context. Possible values are:
+
+            - `SCO` (Service Contract Owner)
+            - `DDR` (Consignor's freight forwarder)
+            - `DDS` (Consignee's freight forwarder)
+            - `COW` (Invoice payer on behalf of the consignor (shipper))
+            - `COX` (Invoice payer on behalf of the consignee)
+            - `N1` (First Notify Party)
+            - `N2` (Second Notify Party)
+            - `NI` (Other Notify Party)
+          example: DDS
+      required:
+        - party
+        - partyFunction
+
+    PartyAddress:
+      type: object
+      title: Address
+      description: |
+        An object for storing address related information
+      properties:
+        street:
+          type: string
+          description: The name of the street of the party’s address.
+          maxLength: 100
+          example: Ruijggoordweg
+        streetNumber:
+          type: string
+          description: The number of the street of the party’s address.
+          maxLength: 50
+          example: '100'
+        floor:
+          type: string
+          description: |
+            The floor of the party’s street number.
+          pattern: '^\S(?:.*\S)?$'
+          maxLength: 50
+          example: 2nd
+        postCode:
+          type: string
+          description: The post code of the party’s address.
+          maxLength: 50
+          example: 1047 HM
+        city:
+          type: string
+          description: |
+            The city name of the party’s address.
+          pattern: '^\S(?:.*\S)?$'
+          maxLength: 65
+          example: Amsterdam
+        UNLocationCode:
+          type: string
+          description: |
+            The UN Location code specifying where the carrier booking office is located. The pattern used must be
+            - 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+            - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used
+            More info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)
+          pattern: '^[A-Z]{2}[A-Z2-9]{3}$'
+          minLength: 5
+          maxLength: 5
+          example: NLAMS
+        stateRegion:
+          type: string
+          nullable: true
+          description: The state/region of the party’s address.
+          maxLength: 65
+          example: North Holland
+        countryCode:
+          type: string
+          description: |
+            The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+          pattern: '^[A-Z]{2}$'
+          minLength: 2
+          maxLength: 2
+          example: NL
+      required:
+        - street
+        - streetNumber
+        - city
+        - countryCode
+
+    Shipper:
+      type: object
+      title: Shipper
+      description: |
+        The party by whom or in whose name or on whose behalf a contract of carriage of goods by sea has been concluded with a carrier, or the party by whom or in whose name, or on whose behalf, the goods are actually delivered to the carrier in relation to the contract of carriage by sea.
+
+        **Condition:** Either the `address` or the `displayedAddress` must be included in the `Transport Document`.
       properties:
         partyName:
           type: string
@@ -2355,27 +2442,23 @@ components:
           maxLength: 100
           description: |
             Name of the party.
-          example: Globeteam
-        sendToPlatform:
-          type: string
-          pattern: \S+
-          maxLength: 4
+          example: IKEA Denmark
+        address:
+          $ref: '#/components/schemas/PartyAddress'
+        displayedAddress:
+          type: array
+          minItems: 1
+          maxItems: 999
           description: |
-            The EBL platform of the transaction party. 
-            The value **MUST** be one of:
-            - `WAVE` (Wave)
-            - `CARX` (CargoX)
-            - `ESSD` (EssDOCS)
-            - `IDT` (ICE Digital Trade)
-            - `BOLE` (Bolero)
-            - `EDOX` (EdoxOnline)
-            - `IQAX` (IQAX)
-            - `SECR` (Secro)
-            - `TRGO` (TradeGO)
-            - `ETEU` (eTEU)
+            The address of the party to be displayed on the `Transport Document`. The displayed address may be used to match the address provided in the `Letter of Credit`. For physical BL (`isElectronic=false`), it is only allowed to provide max 2 lines of 35 characters. No limit for electronic BL (`isElectronic=true`).
             
-            Must be a code this list [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/reference-data/eblsolutionproviders-v3.0.0-Beta-2.csv).
-          example: BOLE
+            **Condition:** if provided, the displayed address must be included in the Transport Document.
+          items:
+            type: string
+            maxLength: 35
+            description: |
+              A single address line
+            example: Strawinskylaan 4117
         identifyingCodes:
           type: array
           items:
@@ -2386,6 +2469,185 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/TaxLegalReference'
+        partyContactDetails:
+          type: array
+          minItems: 1
+          description: |
+            A list of contact details
+          items:
+            $ref: '#/components/schemas/PartyContactDetail'
       required:
         - partyName
-        - sendToPlatform
+
+    Consignee:
+      type: object
+      title: Consignee
+      description: |
+        The party to which goods are consigned in the `Master Bill of Lading`.
+        
+        **Condition:** Mandatory for non-negotiable BL (`isToOrder=false`)
+      properties:
+        partyName:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 100
+          description: |
+            Name of the party.
+          example: IKEA Denmark
+        address:
+          $ref: '#/components/schemas/PartyAddress'
+        displayedAddress:
+          type: array
+          minItems: 1
+          maxItems: 999
+          description: |
+            The address of the party to be displayed on the `Transport Document`. The displayed address may be used to match the address provided in the `Letter of Credit`. For physical BL (`isElectronic=false`), it is only allowed to provide max 2 lines of 35 characters. No limit for electronic BL (`isElectronic=true`).
+            
+            **Condition:** if provided, the displayed address must be included in the Transport Document.
+          items:
+            type: string
+            maxLength: 35
+            description: |
+              A single address line
+            example: Strawinskylaan 4117
+        identifyingCodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentifyingCode'
+        taxLegalReferences:
+          description: |
+            A list of `Tax References` for a `Party`
+          type: array
+          items:
+            $ref: '#/components/schemas/TaxLegalReference'
+        partyContactDetails:
+          type: array
+          minItems: 1
+          description: |
+            A list of contact details
+          items:
+            $ref: '#/components/schemas/PartyContactDetail'
+      required:
+        - partyName
+
+    Endorsee:
+      type: object
+      title: Endorsee
+      description: |
+        The party to whom the title to the goods is transferred by means of endorsement.
+        
+        **Condition:** Can only be provided for negotiable BLs (`isToOrder=true`). If a negotiable BL does not have an `Endorsee`, the BL is said to be "blank endorsed". Note `Consignee` and `Endorsee` are mutually exclusive.
+      properties:
+        partyName:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 100
+          description: |
+            Name of the party.
+          example: IKEA Denmark
+        address:
+          $ref: '#/components/schemas/PartyAddress'
+        displayedAddress:
+          type: array
+          minItems: 1
+          maxItems: 999
+          description: |
+            The address of the party to be displayed on the `Transport Document`. The displayed address may be used to match the address provided in the `Letter of Credit`. For physical BL (`isElectronic=false`), it is only allowed to provide max 2 lines of 35 characters. No limit for electronic BL (`isElectronic=true`).
+            
+            **Condition:** if provided, the displayed address must be included in the Transport Document.
+          items:
+            type: string
+            maxLength: 35
+            description: |
+              A single address line
+            example: Strawinskylaan 4117
+        identifyingCodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentifyingCode'
+        taxLegalReferences:
+          description: |
+            A list of `Tax References` for a `Party`
+          type: array
+          items:
+            $ref: '#/components/schemas/TaxLegalReference'
+        partyContactDetails:
+          type: array
+          minItems: 1
+          description: |
+            A list of contact details
+          items:
+            $ref: '#/components/schemas/PartyContactDetail'
+      required:
+        - partyName
+
+    Party:
+      type: object
+      title: Party
+      description: |
+        Refers to a company or a legal entity.
+      properties:
+        partyName:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 100
+          description: |
+            Name of the party.
+          example: Asseco Denmark
+        address:
+          $ref: '#/components/schemas/PartyAddress'
+        identifyingCodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentifyingCode'
+        taxLegalReferences:
+          description: |
+            A list of `Tax References` for a `Party`
+          type: array
+          items:
+            $ref: '#/components/schemas/TaxLegalReference'
+        partyContactDetails:
+          type: array
+          minItems: 1
+          description: |
+            A list of contact details
+          items:
+            $ref: '#/components/schemas/PartyContactDetail'
+      required:
+        - partyName
+
+    IssuingParty:
+      type: object
+      title: Party
+      description: |
+        Refers to a company or a legal entity.
+      properties:
+        partyName:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 100
+          description: |
+            Name of the party.
+          example: Asseco Denmark
+        address:
+          $ref: '#/components/schemas/PartyAddress'
+        identifyingCodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentifyingCode'
+        taxLegalReferences:
+          description: |
+            A list of `Tax References` for a `Party`
+          type: array
+          items:
+            $ref: '#/components/schemas/TaxLegalReference'
+        partyContactDetails:
+          type: array
+          minItems: 1
+          description: |
+            A list of contact details
+          items:
+            $ref: '#/components/schemas/PartyContactDetail'
+      required:
+        - partyName
+        - address
