@@ -7,6 +7,10 @@ Publications related to the Booking API:
 - [Booking Process](https://dcsa.org/standards/booking-process/) contains documents and publications
 - [Booking Notification](./notification/) maintained here on GitHub
 
+<a name="v200B2"></a>[Release v2.0.0 Beta 2 (12 April 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0-Beta-2)
+---
+To be updated...
+
 <a name="v200B1"></a>[Release v2.0.0 Beta 1 (28 December 2023)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0-Beta-1)
 ---
 Beta 1 release of the DCSA OpenAPI definitions for Booking 2.0.0. This release adds `Active Reefer Settings` and `Dangerous Goods`. It improves the amendment flow. It removes the Events endPoint and now supports the Notification pattern.
