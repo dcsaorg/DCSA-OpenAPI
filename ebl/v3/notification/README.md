@@ -10,6 +10,10 @@ Publications related to the Bill of Lading Notification API:
 - [Bill of Lading](https://dcsa.org/standards/ebill-of-lading/) maintained on the [dcsa.org](https://dcsa.org) website (contains documents and publications)
 - [Bill of Lading](./../) maintained here on GitHub
 
+<a name="v300B2"></a>[Release v3.0.0 Beta 2 (12 April 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_NTF/3.0.0-Beta-2)
+---
+To be updated...
+
 <a name="v300B1"></a>[Release v3.0.0 Beta 1 (28 December 2023)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_NTF/3.0.0-Beta-1)
 ---
 Initial release of the DCSA OpenAPI definitions for Bill of Lading Notifications 3.0.0-Beta-1.
