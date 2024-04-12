@@ -11,6 +11,10 @@ Publications related to the Bill of Lading API:
 - [Bill of Lading Surrender](./surrender/) maintained here on GitHub
 - [Bill of Lading Surrender Response](./surrender_response/) maintained here on GitHub
 
+<a name="v300B2"></a>[Release v3.0.0 Beta 2 (12 April 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.0-Beta-2)
+---
+To be updated...
+
 <a name="v300B1"></a>[Release v3.0.0 Beta 1 (28 December 2023)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.0-Beta-1)
 ---
 Beta 1 release of the DCSA OpenAPI definitions for Bill of Lading 3.0.0. This release adds `Active Reefer Settings` (Phase 1) and `Dangerous Goods`. It removes the Events endPoint and now supports the Notification pattern.
