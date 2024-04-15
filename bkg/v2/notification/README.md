@@ -9,7 +9,8 @@ Publications related to the Booking Notification API:
 
 <a name="v200B2"></a>[Release v2.0.0 Beta 2 (12 April 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG_NTF/2.0.0-Beta-2)
 ---
-To be updated...
+- Minor details to the API description have been updated.
+- `subscriptionReference` has been added to the metadata section
 
 <a name="v200B1"></a>[Release v2.0.0 Beta 1 (28 December 2023)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG_NTF/2.0.0-Beta-1)
 ---
