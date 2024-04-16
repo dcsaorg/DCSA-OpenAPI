@@ -2,57 +2,26 @@ openapi: 3.0.3
 info:
   version: 2.0.0-Beta-3
   title: DCSA OpenAPI specification for Booking
-  description: >
+  description: |
     API specification issued by DCSA.org.
 
+    For explanation of specific values or objects please refer to the [Information Model 2024.Q1](https://dcsa-website.cdn.prismic.io/dcsa-website/ZhlC9TjCgu4jzyW5_20240402-DCSA-Information-Model-2024.Q1-ReleaseCandidate_01.pdf). This API specification does not define the allowable updates and their timing in accordance with the established business rules. Refer to the [DCSA Interface Standard for the Booking process 2.0 Beta 3](https://dcsa.org/standards/booking/documentation-booking-2-beta-3) to address this. **All use cases mentioned in this API specification refer to use cases defined in this Booking IFS**.
 
-    For explanation of specific values or objects please refer to the
-    [Information Model
-    2024.Q1](https://dcsa-website.cdn.prismic.io/dcsa-website/ZhlC9TjCgu4jzyW5_20240402-DCSA-Information-Model-2024.Q1-ReleaseCandidate_01.pdf).
-    This API specification does not define the allowable updates and their
-    timing in accordance with the established business rules. Refer to the [DCSA
-    Interface Standard for the Booking process 2.0 Beta
-    2](https://dcsa.org/standards/booking/documentation-booking-2-beta-2)
-    to address this. **All use cases mentioned in this API specification refer
-    to use cases defined in this Booking IFS**.
+    All other documents related to the Booking publication can be found [here](https://dcsa.org/standards/booking-process/)
 
-
-    All other documents related to the Booking publication can be found
-    [here](https://dcsa.org/standards/booking-process/)
-
-
-    It is possible to use the Booking API as a standalone API. In that case poll
-    on the following endPoints:
+    It is possible to use the Booking API as a standalone API. In that case poll on the following endPoints:
 
         GET /v2/bookings/{bookingReference}
 
     in order to poll information about status changes.
 
-
     ### Notifications
-
-    It is possible to have notifications pushed to you whenever the provider
-    needs input and/or a state change. The format of the notification is defined
-    by the [Booking Notification
-    API](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG_NTF/2.0.0-Beta-2).
-    Signing up for notifications is defined outside the scope of this API
-    specification.
-
+    It is possible to have notifications pushed to you whenever the provider needs input and/or a state change. The format of the notification is defined by the [Booking Notification API](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG_NTF/2.0.0-Beta-3). Signing up for notifications is defined outside the scope of this API specification.
 
     ### Stats API
+    The Stats API offers crucial statistical information for both API providers and consumers to enhance their services and helps DCSA to understand and scale the ecosystem. We expect you to invoke the Stats API for every request made to the Booking API. Further details can be found [here](https://labs.dcsa.org/#/http/guides/api-guides/stats-api/introduction)
 
-    The Stats API offers crucial statistical information for both API providers
-    and consumers to enhance their services and helps DCSA to understand and
-    scale the ecosystem. We expect you to invoke the Stats API for every request
-    made to the Booking API. Further details can be found
-    [here](https://labs.dcsa.org/#/http/guides/api-guides/stats-api/introduction)
-
-
-    For a changelog please click
-    [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/bkg/v2#v200B2).
-    Please [create a GitHub
-    issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any
-    questions/comments.
+    For a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/bkg/v2#v200B2). Please [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments.
   license:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
@@ -74,34 +43,23 @@ paths:
       operationId: create-bookings
       parameters:
         - $ref: '#/components/parameters/Api-Version-Major'
-      description: >
-        Creates a new booking request. This endPoint corresponds with **UseCase
-        1 - Submit booking request**.
-
+      description: |
+        Creates a new booking request. This endPoint corresponds with **UseCase 1 - Submit booking request**.
 
         **Needs to be updated**
 
-
         ## Precondition
-
         The consumer has information for a `Booking Request`
 
-
         ## Postcondition
-
         The provider has received the `Booking Request`. 
 
-
-        The consumer will receive a `201` (Created) if the request payload
-        schema-validates or a `400` (Bad Request) if it does not.
-
+        The consumer will receive a `201` (Created) if the request payload schema-validates or a `400` (Bad Request) if it does not.
 
         ## Flow
-
         The following occurs when a provider receives a `Booking Request`:
 
-        1. The payload (`Booking Request`) is schema-validated. In case the
-        payload **is invalid** a `400` (Bad Request) is returned.
+        1. The payload (`Booking Request`) is schema-validated. In case the payload **is invalid** a `400` (Bad Request) is returned.
 
            **The process stops here!**
         2. The payload is schema-valid which means
@@ -119,27 +77,20 @@ paths:
               bookingStatus: 'RECEIVED'
             }
             ```
-        4. All '_relevant_' subscribers will be notified via a [Booking
-        Notification](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG_NTF/2.0.0-Beta-2#/Notifications/booking-notifications).
+        4. All '_relevant_' subscribers will be notified via a [Booking Notification](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG_NTF/2.0.0-Beta-3#/Notifications/booking-notifications).
 
-
-        For `POST` `Booking Request` the process ends here. The `Booking
-        Request`
-
+        For `POST` `Booking Request` the process ends here. The `Booking Request`
           - is now stored in the provider system
           - has status `RECEIVED`
           - a `201` (Created) response is sent to the consumer with a payload containing `bookingStatus='RECEIVED'`
           - awaits further processing by the provider
           - '_relevant_' subscribers have been notified.
 
-        The provider wil now start asynchronous processing. Once processed, the
-        new status of the `Booking Request` will be communicated via a `Booking
-        Notification`. In case the consumer does not subscribe to notifications
-        it is necessary for the consumer to poll on the
+        The provider wil now start asynchronous processing. Once processed, the new status of the `Booking Request` will be communicated via a `Booking Notification`. In case the consumer does not subscribe to notifications it is necessary for the consumer to poll on the
 
             GET /v2/bookings/{bookingReference}
             
-          endPoint to check if the `bookingStatus` of the `Booking Request` has changed.
+        endPoint to check if the `bookingStatus` of the `Booking Request` has changed.
       requestBody:
         description: The payload used to create a `Booking Request`
         required: true
@@ -151,9 +102,8 @@ paths:
               dryExample:
                 summary: |
                   Standard dry cargo Booking
-                description: >
-                  Make a `Booking Request` with standard Dry cargo being sent
-                  from Bremerhaven, Germany to Norfolk, US
+                description: |
+                  Make a `Booking Request` with standard Dry cargo being sent from Bremerhaven, Germany to Norfolk, US
                 value:
                   receiptTypeAtOrigin: CY
                   deliveryTypeAtDestination: CY
@@ -222,10 +172,8 @@ paths:
               reeferExample:
                 summary: |
                   Reefer cargo Booking (Apple Juice)
-                description: >
-                  Make a `Booking Request` with reefer requirements (1° celcius
-                  with vents and drain holes open and genset required) sent from
-                  Bremerhaven, Germany to Norfolk, US
+                description: |
+                  Make a `Booking Request` with reefer requirements (1° celcius with vents and drain holes open and genset required) sent from Bremerhaven, Germany to Norfolk, US
                 value:
                   receiptTypeAtOrigin: CY
                   deliveryTypeAtDestination: CY
@@ -303,10 +251,8 @@ paths:
               norExample:
                 summary: |
                   Standard dry cargo Booking using a Reefer Container
-                description: >
-                  Make a `Booking Request` with standard Dry cargo using a
-                  reefer container being sent from Bremerhaven, Germany to
-                  Norfolk, US
+                description: |
+                  Make a `Booking Request` with standard Dry cargo using a reefer container being sent from Bremerhaven, Germany to Norfolk, US
                 value:
                   receiptTypeAtOrigin: CY
                   deliveryTypeAtDestination: CY
@@ -376,10 +322,8 @@ paths:
               dgExample:
                 summary: |
                   Dangerous Goods (DG) cargo Booking
-                description: >
-                  Make a `Booking Request` with DG cargo (*Environmentally
-                  hazardous substance, liquid, N.O.S (Propiconazole)*) being
-                  sent from Bremerhaven, Germany to Norfolk, US
+                description: |
+                  Make a `Booking Request` with DG cargo (*Environmentally hazardous substance, liquid, N.O.S (Propiconazole)*) being sent from Bremerhaven, Germany to Norfolk, US
                 value:
                   receiptTypeAtOrigin: CY
                   deliveryTypeAtDestination: CY
@@ -441,9 +385,8 @@ paths:
                       ISOEquipmentCode: 42GP
                       units: 3
                       commodities:
-                        - commodityType: >-
-                            Environmentally hazardous substance, liquid, N.O.S
-                            (Propiconazole)
+                        - commodityType: |
+                            Environmentally hazardous substance, liquid, N.O.S (Propiconazole)
                           HSCodes:
                             - '293499'
                           cargoGrossWeight: 36000
@@ -454,9 +397,8 @@ paths:
                             description: 'Jerrican, steel'
                             dangerousGoods:
                               - unNumber: '3082'
-                                properShippingName: >-
-                                  Environmentally hazardous substance, liquid,
-                                  N.O.S
+                                properShippingName: |
+                                  Environmentally hazardous substance, liquid, N.O.S
                                 imoClass: '9'
                                 isMarinePollutant: false
                                 packingGroup: 3
@@ -477,11 +419,8 @@ paths:
                                   unit: KGM
       responses:
         '201':
-          description: >
-            `Booking Request` has been successfully created in the provider
-            system. The status of the `Booking Request` is now `RECEIVED`. The
-            consumer is now awaiting provider to process the `Booking Request`
-            asynchronously.
+          description: |
+            `Booking Request` has been successfully created in the provider system. The status of the `Booking Request` is now `RECEIVED`. The consumer is now awaiting provider to process the `Booking Request` asynchronously.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -493,17 +432,14 @@ paths:
                 receExample:
                   summary: |
                     Booking request received
-                  description: >
-                    A `Booking Request` has been received
-                    (`bookingStatus='RECEIVED'`), schema validated and stored in
-                    provider system
+                  description: |
+                    A `Booking Request` has been received (`bookingStatus='RECEIVED'`), schema validated and stored in provider system
                   value:
                     carrierBookingRequestReference: cbrr-123
                     bookingStatus: RECEIVED
         '400':
-          description: >
-            In case the `Booking Request` does not schema validate a `400` (Bad
-            Request) is returned
+          description: |
+            In case the `Booking Request` does not schema validate a `400` (Bad Request) is returned
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -515,35 +451,28 @@ paths:
                 badRequestExample:
                   summary: |
                     Booking missing receiptTypeAtOrigin
-                  description: >
-                    `receiptTypeAtOrigin` is a mandatory property in the
-                    `Booking Request`. This is an example of how the error
-                    object would look in case this property is missing
+                  description: |
+                    `receiptTypeAtOrigin` is a mandatory property in the `Booking Request`. This is an example of how the error object would look in case this property is missing
 
-
-                    **NB**: `errorCode` not yet standardized by DCSA. Value
-                    `7003` is just a "random example"
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
                     httpMethod: POST
                     requestUri: /v2/bookings
                     statusCode: 400
                     statusCodeText: Bad Request
-                    statusCodeMessage: >-
-                      receiptTypeAtOrigin not found - it is a mandatory property
-                      in Booking request
+                    statusCodeMessage: |
+                      receiptTypeAtOrigin not found - it is a mandatory property in Booking request
                     providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
                     errorDateTime: '2023-04-13T07:41:00+08:30'
                     errors:
                       - errorCode: 7003
                         property: receiptTypeAtOrigin
                         errorCodeText: mandatory property missing
-                        errorCodeMessage: >-
-                          receiptTypeAtOrigin must be provided as part of a
-                          Booking request
+                        errorCodeMessage: |
+                          receiptTypeAtOrigin must be provided as part of a Booking request
         '500':
-          description: >
-            In case a server error occurs in provider system a `500` (Internal
-            Server Error) is returned
+          description: |
+            In case a server error occurs in provider system a `500` (Internal Server Error) is returned
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -555,23 +484,17 @@ paths:
                 internalServerErrorExample:
                   summary: |
                     Internal Server Error while processing Booking Request
-                  description: >
-                    An Internal Server Error has occurred - the consumer should
-                    contact {provider-support} and provide the
-                    `providerCorrelationReference` (in the example this is
-                    `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+                  description: |
+                    An Internal Server Error has occurred - the consumer should contact {provider-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
 
-
-                    **NB**: `errorCode` not yet standardized by DCSA. Value
-                    `7003` is just a "random example"
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
                     httpMethod: POST
                     requestUri: /v2/bookings
                     statusCode: 500
                     statusCodeText: Internal Server Error
-                    statusCodeMessage: >-
-                      Internal Server Error occurred while processing Booking
-                      request
+                    statusCodeMessage: |
+                      Internal Server Error occurred while processing Booking request
                     providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
                     errorDateTime: '2023-04-13T07:41:00+08:30'
                     errors:
@@ -579,9 +502,8 @@ paths:
                         errorCodeText: Internal Error occurred
                         errorCodeMessage: Internal Error occurred
         default:
-          description: >
-            For other errors the error object should be populated with relevant
-            information
+          description: |
+            For other errors the error object should be populated with relevant information
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -593,24 +515,21 @@ paths:
                 tooManyRequestsExample:
                   summary: |
                     Making too many Bookings Requests
-                  description: >
+                  description: |
                     Calling the endPoint
 
                         POST /v2/bookings
-                        
+
                     too many times within a timeperiod.
 
-
-                    **NB**: `errorCode` not yet standardized by DCSA. Value
-                    `7003` is just a "random example"
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
                     httpMethod: POST
                     requestUri: /v2/bookings
                     statusCode: 429
                     statusCodeText: Too Many Requests
-                    statusCodeMessage: >-
-                      Too many request to create a booking has been requested.
-                      Please try again in 1 hour
+                    statusCodeMessage: |
+                      Too many request to create a booking has been requested. Please try again in 1 hour
                     providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
                     errorDateTime: '2023-04-13T07:41:00+08:30'
                     errors:
@@ -627,85 +546,37 @@ paths:
       parameters:
         - $ref: '#/components/parameters/bookingReferencePathParam'
         - $ref: '#/components/parameters/Api-Version-Major'
-      description: >
-        Updates the `Booking Request` with the `bookingReference`. The path can
-        contain either a `carrierBookingRequestReference` or a
-        `carrierBookingReference`. This endPoint corresponds with either
-
-
+      description: |
+        Updates the `Booking Request` with the `bookingReference`. The path can contain either a `carrierBookingRequestReference` or a `carrierBookingReference`. This endPoint corresponds with either
         - **UseCase 3 - Submit updated Booking request**
-
         - **UseCase 7 - Request amendments to confirmed Booking**
 
-
         This endPoint is to be used in response to
-
-
         - **UseCase 2 - Request to update Booking request**
-
         - **UseCase 6 - Request to amend confirmed Booking**
 
-
-        the endPoint can also be used in case `bookingStatus='RECEIVED'` and the
-        consumer has an update to the `Booking Request`.
-
+        the endPoint can also be used in case `bookingStatus='RECEIVED'` and the consumer has an update to the `Booking Request`.
 
         ### Precondition
-
-        In order to update a `Booking Request`, the status of the `Booking
-        Request` needs to be in state
-
-
-        - `RECEIVED` in case the consumer has updated information for the
-        `Booking Request`
-
-        - `PENDING UPDATE` in case the provider has requested the consumer to
-        update the `Booking Request` (a result of **UseCase 2 - Request to
-        update Booking request**)
-
-        - `UPDATE RECEIVED` in case the consumer has additional changes to an
-        already sent update
-
-        - `PENDING AMENDMENT` in case the provider has requested the consumer to
-        amend the `Booking Request` (a result of **UseCase 6 - Request to amend
-        confirmed Booking**)
-
-        - `CONFIRMED` in case the consumer has an amendment to the `Booking
-        Request`
-
+        In order to update a `Booking Request`, the status of the `Booking Request` needs to be in state
+        - `RECEIVED` in case the consumer has updated information for the `Booking Request`
+        - `PENDING UPDATE` in case the provider has requested the consumer to update the `Booking Request` (a result of **UseCase 2 - Request to update Booking request**)
+        - `UPDATE RECEIVED` in case the consumer has additional changes to an already sent update
+        - `PENDING AMENDMENT` in case the provider has requested the consumer to amend the `Booking Request` (a result of **UseCase 6 - Request to amend confirmed Booking**)
+        - `CONFIRMED` in case the consumer has an amendment to the `Booking Request`
 
         ## Postcondition
+        The provider has received an update (**UseCase 3 - Submit updated Booking request**) or an amendment (**UseCase 7 - Request amendments to confirmed Booking**) to the `Booking Request`.
 
-        The provider has received an update (**UseCase 3 - Submit updated
-        Booking request**) or an amendment (**UseCase 7 - Request amendments to
-        confirmed Booking**) to the `Booking Request`.
+        In case an amendment was received to the `Booking Request`(**UseCase 7 - Request to amend confirmed Booking**) - the amendment will be called `Amended Booking`. The `Amended Booking` and the "original" `Booking Request` will **co-exist** until a new amendment is submitted by the consumer (via **UseCase 7: Request amendments to confirmed Booking**) or until the provider requests an update (sets the `bookingStatus='PENDING AMENDMENT'` via **UseCase 6: Request to amend confirmed Booking**). If the `amendedBookingStatus` is present it always represents the latest version of an amendment received by the provider.
 
-
-        In case an amendment was received to the `Booking Request`(**UseCase 7 -
-        Request to amend confirmed Booking**) - the amendment will be called
-        `Amended Booking`. The `Amended Booking` and the "original" `Booking
-        Request` will **co-exist** until a new amendment is submitted by the
-        consumer (via **UseCase 7: Request amendments to confirmed Booking**) or
-        until the provider requests an update (sets the `bookingStatus='PENDING
-        AMENDMENT'` via **UseCase 6: Request to amend confirmed Booking**). If
-        the `amendedBookingStatus` is present it always represents the latest
-        version of an amendment received by the provider.
-
-
-        The consumer will receive a `200` (OK) if the payload schema-validates
-        or a `400` (Bad Request) if it does not.
-
+        The consumer will receive a `200` (OK) if the payload schema-validates or a `400` (Bad Request) if it does not.
 
         ## Flow
-
-        The following occurs when a provider receives an **update** to a
-        `Booking Request`
-
-        1. The payload (`Booking Request`) is schema-validated. In case the
-        payload **is invalid** a `400` (Bad Request) is returned.
+        The following occurs when a provider receives an **update** to a `Booking Request`
+        1. The payload (`Booking Request`) is schema-validated. In case the payload **is invalid** a `400` (Bad Request) is returned.
 
            **The process stops here!**
-
         2. The payload is schema-valid which means
            - all required properties are provided
            - all values provided have correct data type
@@ -713,10 +584,7 @@ paths:
            The updated `Booking Request` is stored in the provider system.
 
            **For the rest of this description and in all examples the value `cbrr-123` will be used as `carrierBookingRequestReference`**
-
-        3. The response depends on which useCase is the reason for calling this
-        endPoint (what the `bookingStatus` is):
-
+        3. The response depends on which useCase is the reason for calling this endPoint (what the `bookingStatus` is):
             - If `bookingStatus` **is** `RECEIVED` then this endPoint is being used in addition to **UseCase 1 - Submit booking request**. In this case the consumer would like to make an update to an already sent `Booking Request` - this is done via **UseCase 3 - Submit updated Booking Request**. The `bookingStatus` now changes to `UPDATE RECEIVED`.
             
               A `200` (OK) response corresponding to the following payload is returned
@@ -726,7 +594,6 @@ paths:
                 bookingStatus: 'UPDATE RECEIVED'
               }
               ```
-
             - If `bookingStatus` is `PENDING UPDATE` then this endPoint is being used as a reponse to **UseCase 2 - Request to update Booking request** in this case the provider has requested an update to a `Booking Request`.  The `bookingStatus` now changes to `UPDATE RECEIVED`.
 
               A `200` (OK) response corresponding to the following payload is returned
@@ -736,7 +603,6 @@ paths:
                 bookingStatus: 'UPDATE RECEIVED'
               }
               ```
-            
             - If `bookingStatus` is `UPDATE RECEIVED` then this endPoint is being used to update an already sent update. The `bookingStatus` stays as `UPDATE RECEIVED`.
 
               A `200` (OK) response corresponding to the following payload is returned
@@ -746,7 +612,6 @@ paths:
                 bookingStatus: 'UPDATE RECEIVED'
               }
               ```
-            
             - If `bookingStatus` is `PENDING AMENDMENT` then this endPoint is being used as a response to **UseCase 6 - Request to amend Confirmed Booking**, in this case the provider has requested an amendment to a `Confirmed Booking`. The `bookingStatus` stays `PENDING AMENDMENT` and `amendedBookingStatus` is set to `AMENDMENT RECEVIED`.
             
               A `200` (OK) response corresponding to the following payload is returned
@@ -758,7 +623,6 @@ paths:
                 amendedBookingStatus: 'AMENDMENT RECEIVED'
               }
               ```
-            
             - If `bookingStatus` is `CONFIRMED` then this endPoint is being used in order to request an amendment to a `Confirmed Booking` this is done via **UseCase 7 - Request Amendments to Confirmed Booking**. The `bookingStatus` stays `CONFIRMED` and `amendedBookingStatus` is set to `AMENDMENT RECEIVED`.
             
               A `200` (OK) response corresponding to the following payload is returned
@@ -770,12 +634,9 @@ paths:
                 amendedBookingStatus: 'AMENDMENT RECEIVED'
               }
               ```
-        4. All '_relevant_' subscribers will be notified via a [Booking
-        Notification](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG_NTF/2.0.0-Beta-2#/Notifications/booking-notifications).
-
+        4. All '_relevant_' subscribers will be notified via a [Booking Notification](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG_NTF/2.0.0-Beta-3#/Notifications/booking-notifications).
 
         For `PUT` `Booking Request` the process ends here. The `Booking Request`
-
           - is now stored in the provider system
           - a `200` (OK) response is sent to the consumer with the status of the `Booking` (and possibly also with the `amendedBookingStatus`) with one of the following values (depending on the useCase):
             - `bookingStatus='UPDATE RECEIVED'` (if endPoint used before a `Booking`has been confirmed)
@@ -784,24 +645,18 @@ paths:
           - awaits further processing by the provider
           - '_relevant_' subscribers have been notified.
 
-        The provider wil now start asynchronous processing. Once processed, the
-        new status of the `Booking` and `Amended Booking Request` will be
-        communicated via a `Booking Notification`. In case the consumer does not
-        subscribe to notifications it is necessary for the consumer to poll on
-        the
-
+        The provider wil now start asynchronous processing. Once processed, the new status of the `Booking` and `Amended Booking Request` will be communicated via a `Booking Notification`. In case the consumer does not subscribe to notifications it is necessary for the consumer to poll on the
             GET /v2/bookings/{bookingReference}
             
-          endPoint to check if the `bookingStatus` and `amendedBookingStatus` of the `Booking` has changed.
+        endPoint to check if the `bookingStatus` and `amendedBookingStatus` of the `Booking` has changed.
           
-          If the consumer wants to get the content of the `Amended Booking` provided via this `PUT` endPoint, the `GET` endPoint needs to be used in combination with the `?amendedContent=true` queryParameter:
+        If the consumer wants to get the content of the `Amended Booking` provided via this `PUT` endPoint, the `GET` endPoint needs to be used in combination with the `?amendedContent=true` queryParameter:
+            GET /v2/bookings/{bookingReference}?amendedContent=true
 
-              GET /v2/bookings/{bookingReference}?amendedContent=true
+        It is possible to `GET` the content of the `Amended Booking` via the example above until either:
 
-          It is possible to `GET` the content of the `Amended Booking` via the example above until either:
-
-          - the provider requests for a new amendment (**UseCase 6: Request to amend confirmed Booking**) in which case the "old update" is no longer accessible
-          - the consumer submits a new update (**UseCase 7: Request amendment to confirmed Booking**) in which case the "new amendment" provided **replaces** the "old amendment".
+        - the provider requests for a new amendment (**UseCase 6: Request to amend confirmed Booking**) in which case the "old update" is no longer accessible
+        - the consumer submits a new update (**UseCase 7: Request amendment to confirmed Booking**) in which case the "new amendment" provided **replaces** the "old amendment".
       requestBody:
         description: |
           Parameters used to update the `Booking request`
@@ -814,9 +669,8 @@ paths:
               dryExample:
                 summary: |
                   Standard dry cargo Booking
-                description: >
-                  Updating a `Booking Request` with standard Dry cargo being
-                  sent from Bremerhaven, Germany to Norfolk, US
+                description: |
+                  Updating a `Booking Request` with standard Dry cargo being sent from Bremerhaven, Germany to Norfolk, US
                 value:
                   carrierBookingRequestReference: cbrr-123
                   receiptTypeAtOrigin: CY
@@ -886,10 +740,8 @@ paths:
               reeferExample:
                 summary: |
                   Reefer cargo Booking (Apple Juice)
-                description: >
-                  Updating a `Booking Request` with reefer requirements (2°
-                  celcius with vents and drain holes open and genset required)
-                  sent from Bremerhaven, Germany to Norfolk, US
+                description: |
+                  Updating a `Booking Request` with reefer requirements (2° celcius with vents and drain holes open and genset required) sent from Bremerhaven, Germany to Norfolk, US
                 value:
                   carrierBookingRequestReference: cbrr-123
                   receiptTypeAtOrigin: CY
@@ -969,10 +821,8 @@ paths:
               norExample:
                 summary: |
                   Standard dry cargo Booking using a Reefer Container
-                description: >
-                  Update a `Booking Request` with standard Dry cargo using a
-                  reefer container being sent from Bremerhaven, Germany to
-                  Norfolk, US
+                description: |
+                  Update a `Booking Request` with standard Dry cargo using a reefer container being sent from Bremerhaven, Germany to Norfolk, US
                 value:
                   carrierBookingRequestReference: cbrr-123
                   receiptTypeAtOrigin: CY
@@ -1042,12 +892,8 @@ paths:
               dgExample:
                 summary: |
                   Dangerous Goods (DG) cargo Booking
-                description: >
-                  Update a `Confirmed Booking` (a `Booking` with
-                  `carrierBookingReference='cbr-987'`) with DG cargo
-                  (*Environmentally hazardous substance, liquid, N.O.S
-                  (Propiconazole)*) being sent from Bremerhaven, Germany to
-                  Norfolk, US
+                description: |
+                  Update a `Confirmed Booking` (a `Booking` with `carrierBookingReference='cbr-987'`) with DG cargo (*Environmentally hazardous substance, liquid, N.O.S (Propiconazole)*) being sent from Bremerhaven, Germany to Norfolk, US
                 value:
                   carrierBookingRequestReference: cbrr-123
                   carrierBookingReference: cbr-987
@@ -1112,9 +958,8 @@ paths:
                       ISOEquipmentCode: 42GP
                       units: 3
                       commodities:
-                        - commodityType: >-
-                            Environmentally hazardous substance, liquid, N.O.S
-                            (Propiconazole)
+                        - commodityType: |
+                            Environmentally hazardous substance, liquid, N.O.S (Propiconazole)
                           HSCodes:
                             - '293499'
                           cargoGrossWeight: 36000
@@ -1125,9 +970,8 @@ paths:
                             description: 'Jerrican, steel'
                             dangerousGoods:
                               - unNumber: '3082'
-                                properShippingName: >-
-                                  Environmentally hazardous substance, liquid,
-                                  N.O.S
+                                properShippingName: |
+                                  Environmentally hazardous substance, liquid, N.O.S
                                 imoClass: '9'
                                 isMarinePollutant: false
                                 packingGroup: 3
@@ -1148,31 +992,16 @@ paths:
                                   unit: KGM
       responses:
         '200':
-          description: >
-            The `Booking request` has been successfully updated in the provider
-            systemwith one of the following combinations (depending on the use
-            case):
-
-            - `bookingStatus='PENDING UPDATE'` in case the consumer has provided
-            an update to a `Booking request` and is awaiting the provider to
-            take action
-
-            - `bookingStatus='PENDING AMENDMENT'` and
-            `amendedBookingStatus='AMENDMENT RECEIVED'` in case the provider has
-            requested an amendment and the consumer has provided an amendment to
-            a `Confirmed Booking` and is awaiting the provider to take action
-
-            - `bookingStatus='CONFIRMED'` and `amendedBookingStatus='AMENDMENT
-            RECEIVED'` in case the consumer has provided an amendment to a
-            `Confirmed Booking` and is awaiting the provider to take action
-
+          description: |
+            The `Booking request` has been successfully updated in the provider systemwith one of the following combinations (depending on the use case):
+            - `bookingStatus='PENDING UPDATE'` in case the consumer has provided an update to a `Booking request` and is awaiting the provider to take action
+            - `bookingStatus='PENDING AMENDMENT'` and `amendedBookingStatus='AMENDMENT RECEIVED'` in case the provider has requested an amendment and the consumer has provided an amendment to a `Confirmed Booking` and is awaiting the provider to take action
+            - `bookingStatus='CONFIRMED'` and `amendedBookingStatus='AMENDMENT RECEIVED'` in case the consumer has provided an amendment to a `Confirmed Booking` and is awaiting the provider to take action
 
             The status of the `Booking` can be monitored on the
-
                 GET /v2/bookings/{bookingReference}
 
-              endPoint by the consumer. If the consumer wants to get the content of the `Amended Booking` the `GET` endPoint needs to be used in combination with the `?amendedContent=true` queryParameter:
-
+            endPoint by the consumer. If the consumer wants to get the content of the `Amended Booking` the `GET` endPoint needs to be used in combination with the `?amendedContent=true` queryParameter:
                 GET /v2/bookings/{bookingReference}?amendedContent=true
           headers:
             API-Version:
@@ -1185,11 +1014,8 @@ paths:
                 updateReceivedExample:
                   summary: |
                     Booking request updated
-                  description: >
-                    An updated `Booking request` received, schema validated and
-                    stored in provider system - the `Booking` now awaits
-                    provider action
-
+                  description: |
+                    An updated `Booking request` received, schema validated and stored in provider system - the `Booking` now awaits provider action
                         bookingStatus='UPDATE RECEIVED'
                   value:
                     carrierBookingRequestReference: cbrr-123
@@ -1197,11 +1023,8 @@ paths:
                 pendingAmendmentApprovalExample:
                   summary: |
                     Confirmed Booking amendment
-                  description: >
-                    An amendment to a `Confirmed Booking` received, schema
-                    validated and stored in provider system - the `Booking` now
-                    awaits provider action
-
+                  description: |
+                    An amendment to a `Confirmed Booking` received, schema validated and stored in provider system - the `Booking` now awaits provider action
                         bookingStatus='CONFIRMED'
                         amendedBookingStatus: 'AMENDMENT RECEIVED'
                   value:
@@ -1212,11 +1035,8 @@ paths:
                 pendingAmendmentExample:
                   summary: |
                     Confirm requested Booking amendment
-                  description: >
-                    A requested amendment to a `Confirmed Booking` by the
-                    provider has been received, schema validated and stored in
-                    provider system. The `Booking` now awaits provider action
-
+                  description: |
+                    A requested amendment to a `Confirmed Booking` by the provider has been received, schema validated and stored in provider system. The `Booking` now awaits provider action
                         bookingStatus='PENDING AMENDMENT'
                         amendedBookingStatus: 'AMENDMENT RECEIVED'
                   value:
@@ -1225,9 +1045,8 @@ paths:
                     bookingStatus: PENDING AMENDMENT
                     amendedBookingStatus: AMENDMENT RECEIVED
         '400':
-          description: >
-            In case the updated/amended `Booking request` does not schema
-            validate a `400` (Bad Request) is returned
+          description: |
+            In case the updated/amended `Booking request` does not schema validate a `400` (Bad Request) is returned
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -1239,36 +1058,28 @@ paths:
                 badRequestExample:
                   summary: |
                     Booking missing receiptTypeAtOrigin
-                  description: >
-                    `receiptTypeAtOrigin` is a mandatory property in the
-                    `Booking request`. This is an example of how the error
-                    object would look in case this property is missing
+                  description: |
+                    `receiptTypeAtOrigin` is a mandatory property in the `Booking request`. This is an example of how the error object would look in case this property is missing
 
-
-                    **NB**: `errorCode` not yet standardized by DCSA. Value
-                    `7003` is just a "random example"
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
                     httpMethod: PUT
                     requestUri: /v2/bookings/cbrr-123
                     statusCode: 400
                     statusCodeText: Bad Request
-                    statusCodeMessage: >-
-                      receiptTypeAtOrigin not found - it is a mandatory property
-                      in Booking request
+                    statusCodeMessage: |
+                      receiptTypeAtOrigin not found - it is a mandatory property in Booking request
                     providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
                     errorDateTime: '2023-04-13T07:41:00+08:30'
                     errors:
                       - errorCode: 7003
                         property: receiptTypeAtOrigin
                         errorCodeText: mandatory property missing
-                        errorCodeMessage: >-
-                          receiptTypeAtOrigin must be provided as part of a
-                          Booking request
+                        errorCodeMessage: |
+                          receiptTypeAtOrigin must be provided as part of a Booking request
         '409':
-          description: >
-            In case the provider is processing an already updated `Booking
-            request` - it is possible for the provider to reject new incomming
-            requests by returning a `409` (Conflict)
+          description: |
+            In case the provider is processing an already updated `Booking request` - it is possible for the provider to reject new incomming requests by returning a `409` (Conflict)
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -1280,19 +1091,16 @@ paths:
                 conflictExample:
                   summary: |
                     Conflicting request
-                  description: >
-                    The provider is already processing a request and needs to
-                    finish this process before any new requests are processed
+                  description: |
+                    The provider is already processing a request and needs to finish this process before any new requests are processed
 
-
-                    **NB**: `errorCode` not yet standardized by DCSA. Value
-                    `7003` is just a "random example"
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
                     httpMethod: PUT
                     requestUri: /v2/bookings/cbrr-123
                     statusCode: 409
                     statusCodeText: Conflict
-                    statusCodeMessage: >-
+                    statusCodeMessage: |
                       Previous request is being processed. Please try again
                       later
                     providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
@@ -1300,13 +1108,11 @@ paths:
                     errors:
                       - errorCode: 7003
                         errorCodeText: Conflicting request is being processed
-                        errorCodeMessage: >-
-                          The Booking cannot be updated/amended while it is
-                          being processed. Please try again later
+                        errorCodeMessage: |
+                          The Booking cannot be updated/amended while it is being processed. Please try again later
         '500':
-          description: >
-            In case a server error occurs in provider system a `500` (Internal
-            Server Error) is returned
+          description: |
+            In case a server error occurs in provider system a `500` (Internal Server Error) is returned
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -1318,23 +1124,17 @@ paths:
                 internalServerErrorExample:
                   summary: |
                     Internal Server Error while processing Booking request
-                  description: >
-                    An Internal Server Error has occurred - the consumer should
-                    contact {provider-support} and provide the
-                    `providerCorrelationReference` (in the example this is
-                    `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+                  description: |
+                    An Internal Server Error has occurred - the consumer should contact {provider-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
 
-
-                    **NB**: `errorCode` not yet standardized by DCSA. Value
-                    `7003` is just a "random example"
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
                     httpMethod: PUT
                     requestUri: /v2/bookings/cbrr-123
                     statusCode: 500
                     statusCodeText: Internal Server Error
-                    statusCodeMessage: >-
-                      Internal Server Error occurred while processing Booking
-                      request
+                    statusCodeMessage: |
+                      Internal Server Error occurred while processing Booking request
                     providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
                     errorDateTime: '2023-04-13T07:41:00+08:30'
                     errors:
@@ -1356,21 +1156,17 @@ paths:
                 tooManyRequestsExample:
                   summary: |
                     Updating too many Bookings requests
-                  description: >
-                    Calling the endPoint GET /v2/bookings/cbrr-123 too many
-                    times within a timeperiod.
+                  description: |
+                    Calling the endPoint GET /v2/bookings/cbrr-123 too many times within a timeperiod.
 
-
-                    **NB**: `errorCode` not yet standardized by DCSA. Value
-                    `7003` is just a "random example"
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
                     httpMethod: PUT
                     requestUri: /v2/bookings/cbrr-123
                     statusCode: 429
                     statusCodeText: Too Many Requests
-                    statusCodeMessage: >-
-                      Too many request to update a booking has been requested.
-                      Please try again in 1 hour
+                    statusCodeMessage: |
+                      Too many request to update a booking has been requested. Please try again in 1 hour
                     providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
                     errorDateTime: '2023-04-13T07:41:00+08:30'
                     errors:
@@ -1383,55 +1179,22 @@ paths:
       summary: |
         Gets the Booking
       operationId: get-bookings
-      description: >
-        Retrieves the `Booking Request` with the `bookingReference`. The path
-        can contain a `carrierBookingRequestReference` or a
-        `carrierBookingReference`. It is recommended to use this endPoint to
-        `GET` data before an update is made to make sure latest version is being
-        updated.
+      description: |
+        Retrieves the `Booking Request` with the `bookingReference`. The path can contain a `carrierBookingRequestReference` or a `carrierBookingReference`. It is recommended to use this endPoint to `GET` data before an update is made to make sure latest version is being updated.
 
-
-        The default payload when calling this endPoint is the "original"
-        `Booking`. It is also possible to get the latest amendment to a
-        `Booking` called the `Amended Booking`. In order to get the `Amended
-        Booking`, it is necessary to use the query parameter `amendedContent`
-        and set it to `true`.
-
+        The default payload when calling this endPoint is the "original" `Booking`. It is also possible to get the latest amendment to a `Booking` called the `Amended Booking`. In order to get the `Amended Booking`, it is necessary to use the query parameter `amendedContent` and set it to `true`.
             GET /v2/bookings/{bookingReference}?amendedContent=true
 
-        The `status` of the "original" `Booking` is included in both payloads as
-        `bookingStatus`. `amendedBookingStatus` and related content is only
-        available after the provider has approved the `Booking` via **UseCase 5:
-        Confirm Booking request** and until:
+        The `status` of the "original" `Booking` is included in both payloads as `bookingStatus`. `amendedBookingStatus` and related content is only available after the provider has approved the `Booking` via **UseCase 5: Confirm Booking request** and until:
+        - the provider requests for a new amendment (**UseCase 6: Request to amend confirmed Booking**) in which case the "old update" is no longer accessable.
+        - the consumer submits a new amendment (**UseCase 7: Request amendment to confirmed Booking**) in which case the "new update" provided **replaces** the "old update".
+        - the provider re-confirms the `Booking` (**UseCase 5: Confirm booking request**) in which case the "old update" is no longer accessable.
 
-        - the provider requests for a new amendment (**UseCase 6: Request to
-        amend confirmed Booking**) in which case the "old update" is no longer
-        accessable.
+        If `amendedContent=true` is requested but no amendment has yet been provided by the consumer **or** the state of the "original" `Booking` is `PENDING AMENDMENT`, then a `404` (Not Found) is returned.
 
-        - the consumer submits a new amendment (**UseCase 7: Request amendment
-        to confirmed Booking**) in which case the "new update" provided
-        **replaces** the "old update".
+        If the provider is requesting some changes to the `Booking` this will also be part of the "original" `Booking` payload in the `requestedChanges` property. This property is **conditional** on the `bookingStatus='PENDING UPDATE'` (in case the `Booking` has not yet been confirmed) or `bookingStatus='PENDING AMENDMENT'` (in case it is a confirmed `Booking`).
 
-        - the provider re-confirms the `Booking` (**UseCase 5: Confirm booking
-        request**) in which case the "old update" is no longer accessable.
-
-
-        If `amendedContent=true` is requested but no amendment has yet been
-        provided by the consumer **or** the state of the "original" `Booking` is
-        `PENDING AMENDMENT`, then a `404` (Not Found) is returned.
-
-
-        If the provider is requesting some changes to the `Booking` this will
-        also be part of the "original" `Booking` payload in the
-        `requestedChanges` property. This property is **conditional** on the
-        `bookingStatus='PENDING UPDATE'` (in case the `Booking` has not yet been
-        confirmed) or `bookingStatus='PENDING AMENDMENT'` (in case it is a
-        confirmed `Booking`).
-
-
-        In case no subscription (`Notification`) has been set up - it is
-        possible to use this endPoint to poll on in order to detect if
-        `bookingStatus` and/or `amendedBookingStatus` has changed.
+        In case no subscription (`Notification`) has been set up - it is possible to use this endPoint to poll on in order to detect if `bookingStatus` and/or `amendedBookingStatus` has changed.
       parameters:
         - $ref: '#/components/parameters/bookingReferencePathParam'
         - $ref: '#/components/parameters/amendedContent'
@@ -1450,11 +1213,8 @@ paths:
                 dryNotConfirmedExample:
                   summary: |
                     Standard dry cargo Booking (not confirmed)
-                  description: >
-                    Gets a `Booking Request` with standard Dry cargo which has
-                    not yet been confirmed. The `Booking` is in state `PENDING
-                    UPDATE` and requires some changes (specified in the
-                    `requestedChanges` property)
+                  description: |
+                    Gets a `Booking Request` with standard Dry cargo which has not yet been confirmed. The `Booking` is in state `PENDING UPDATE` and requires some changes (specified in the `requestedChanges` property)
                   value:
                     carrierBookingRequestReference: cbrr-123
                     bookingStatus: PENDING UPDATE
@@ -1525,23 +1285,15 @@ paths:
                     requestedChanges:
                       - jsonPath: $.requestedEquipment.units
                         property: 'units'
-                        message: >-
-                          Not enough available "42GP" equipment. Please change
-                          to "22G1" instead
+                        message: |
+                          Not enough available "42GP" equipment. Please change to "22G1" instead
                 dryConfirmedExample:
                   summary: |
                     Gets a confirmed Standard dry cargo Booking
-                  description: >
-                    Gets a `Confirmed Booking` with standard Dry cargo. In this
-                    example the `Booking` has previously received an amendment
-                    which was confirmed (`amendedBookingStatus='AMENDMENT
-                    CONFIRMED'`)
+                  description: |
+                    Gets a `Confirmed Booking` with standard Dry cargo. In this example the `Booking` has previously received an amendment which was confirmed (`amendedBookingStatus='AMENDMENT CONFIRMED'`)
 
-
-                    As part of the confirmation the `Booking` is enriched with a
-                    `transportPlan`, `shipmentCutOffTimes`, `carrierClauses` and
-                    in this example also an `advanceManifestFiling` since the
-                    `Booking` is arriving in US.
+                    As part of the confirmation the `Booking` is enriched with a `transportPlan`, `shipmentCutOffTimes`, `carrierClauses` and in this example also an `advanceManifestFiling` since the `Booking` is arriving in US.
                   value:
                     carrierBookingRequestReference: cbrr-123
                     carrierBookingReference: cbr-987
@@ -1644,30 +1396,19 @@ paths:
                       - manifestTypeCode: ACE
                         countryCode: US
                     carrierClauses:
-                      - >-
-                        The date of shipment, the carrying vessel and the
-                        schedule are not guaranteed and are always subject to
-                        changes.
+                      - The date of shipment, the carrying vessel and theschedule are not guaranteed and are always subject tochanges.
                       - 'Operations such as lifting, stowage, drayage and customs declaration of containers are based on the description of the nature, quantity, measurement and weight declared by the Shipper. The Shipper shall be liable for any damage, loss, expense and fines incurred by Carrier XYZ or its agents due to incorrectness or incompleteness of such declaration.'
                       - 'Warranted shipper must fulfill the requirements of SOLAS regulations and the IMO guidelines regarding the Verified Gross Mass (VGM) of container carrying cargo (msc.1/circ.1474, 9 June 2014).'
                       - 'In accordance with SOLAS regulations and IMO guidelines regarding the VGM (verified gross mass), any expenses incurred because the VGM was submitted late or was not submitted at all will be charged back to the customer with an additional administration fee.'
         '404':
-          description: >
+          description: |
             In case the consumer is requesting the `Amended Booking` by calling:
-
                 GET /v2/bookings/{bookingReference}?amendedContent=true
                 
             but:
-
             - the `Booking` has not yet been confirmed
-
-            - the `Booking` has been confirmed but no amendment has yet been
-            provided by the consumer
-
-            - the provider has requested for a new amendment (**UseCase 6:
-            Request to amend confirmed Booking**) in which case the "old update"
-            is no longer accessable.
-
+            - the `Booking` has been confirmed but no amendment has yet been provided by the consumer
+            - the provider has requested for a new amendment (**UseCase 6: Request to amend confirmed Booking**) in which case the "old update" is no longer accessable.
 
             a `404` (Not Found) is returned.
           headers:
@@ -1681,13 +1422,10 @@ paths:
                 notFoundExample:
                   summary: |
                     Missing amended Booking
-                  description: >
-                    The `Amended Booking` response is requested - but no
-                    `Amended Booking` exists.
+                  description: |
+                    The `Amended Booking` response is requested - but no `Amended Booking` exists.
 
-
-                    **NB**: `errorCode` not yet standardized by DCSA. Value
-                    `7003` is just a "random example"
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
                     httpMethod: GET
                     requestUri: /v2/bookings/cbrr-123?amendedContent=true
@@ -1702,8 +1440,7 @@ paths:
                         errorCodeMessage: No amended booking available
         '500':
           description: >
-            In case a server error occurs in provider system a `500` (Internal
-            Server Error) is returned
+            In case a server error occurs in provider system a `500` (Internal Server Error) is returned
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -1715,23 +1452,17 @@ paths:
                 internalServerErrorExample:
                   summary: |
                     Internal Server Error while processing Booking request
-                  description: >
-                    An Internal Server Error has occurred - the consumer should
-                    contact {provider-support} and provide the
-                    `providerCorrelationReference` (in the example this is
-                    `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+                  description: |
+                    An Internal Server Error has occurred - the consumer should contact {provider-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
 
-
-                    **NB**: `errorCode` not yet standardized by DCSA. Value
-                    `7003` is just a "random example"
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
                     httpMethod: GET
                     requestUri: /v2/bookings/cbrr-123
                     statusCode: 500
                     statusCodeText: Internal Server Error
-                    statusCodeMessage: >-
-                      Internal Server Error occurred while processing Booking
-                      request
+                    statusCodeMessage: |
+                      Internal Server Error occurred while processing Booking request
                     providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
                     errorDateTime: '2023-04-13T07:41:00+08:30'
                     errors:
@@ -1752,97 +1483,68 @@ paths:
                 getError:
                   summary: |
                     GET non-existing Booking Request
-                  description: >
+                  description: |
                     Calling
-
                         GET /v2/bookings/cbrr-123
                         
                     results in an error as booking `cbrr-123` does not exist.
 
-
-                    **NB**: `errorCode` not yet standardized by DCSA. Value
-                    `7003` is just a "random example"
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
                     httpMethod: GET
                     requestUri: /v2/bookings/cbrr-123
                     statusCode: 404
                     statusCodeText: Not Found
-                    statusCodeMessage: >-
-                      The requested carrierBookingRequestReference does not
-                      exist
+                    statusCodeMessage: |
+                      The requested carrierBookingRequestReference does not exist
                     providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
                     errorDateTime: '2023-04-13T07:41:00+08:30'
                     errors:
                       - errorCode: 7003
                         errorCodeText: Non existent carrierBookingRequestReference
-                        errorCodeMessage: >-
-                          carrierBookingRequestReference `cbrr-123` does not
-                          exist
+                        errorCodeMessage: |
+                          carrierBookingRequestReference `cbrr-123` does not exist
     patch:
       tags:
         - Booking
       summary: |
         Cancels the Booking or cancels a Booking Amendment
       operationId: cancel-booking
-      description: >
-        A shipper initiated cancellation of the `Booking` or `Booking
-        Amendment`. This endPoint corresponds with **UseCase 11 - Cancel Booking
-        by shipper** or **UseCase 9 - Cancel amendment to confirmed Booking**.
-
+      description: |
+        A shipper initiated cancellation of the `Booking` or `Booking Amendment`. This endPoint corresponds with **UseCase 11 - Cancel Booking by shipper** or **UseCase 9 - Cancel amendment to confirmed Booking**.
 
         ## Precondition
-
         In order to cancel a `Booking`, the `bookingStatus` must be either
-
         - `RECEIVED`
-
         - `PENDING UPDATE`
-
         - `UPDATE RECEIVED`
-
         - `CONFIRMED`
-
         - `PENDING AMENDMENT`
 
-
-        In order to cancel a `Booking Amendment`, the status of the `Booking
-        Amendment` must be
-
+        In order to cancel a `Booking Amendment`, the status of the `Booking Amendment` must be
         - `AMENDMENT RECEIVED`
 
-
         ## Postcondition
+        The provider has received a cancellation from the consumer for a `Booking` or for a `Booking Amendment`.
 
-        The provider has received a cancellation from the consumer for a
-        `Booking` or for a `Booking Amendment`.
-
-
-        The consumer will receive a `200` (OK) if the payload schema-validates
-        or a `400` (Bad Request) if it does not.
-
+        The consumer will receive a `200` (OK) if the payload schema-validates or a `400` (Bad Request) if it does not.
 
         ## Flow
-
         The following occurs when a provider receives a cancellation request:
-
-        1. The payload is schema-validated. In case the payload **is invalid** a
-        `400` (Bad Request) is returned.
+        1. The payload is schema-validated. In case the payload **is invalid** a `400` (Bad Request) is returned.
 
            **The process stops here!**
         2. The payload is schema-valid which means:
-
            - all required properties are provided.
            - all values provided have correct data type.
         3. Depending on the paylod of the request - either:
-
            - the entire `Booking` is cancelled (including any ongoing amendment). This is the case when the payload contains `bookingStatus='CANCELLED'`.
            
              When cancelling a `Booking` the `amendedBookingStatus` is set to `AMENDMENT CANCELLED`
            - only the amendment to the `Booking` is cancelled (in this case the `Booking` continues and `bookingStatus` stays unchanged). This is the case when the payload contains `amendedBookingStatus='AMENDMENT CANCELLED'`.
              
              **If** no amendment is being requested prior to this call (`amendedBookingStatus` is **not** `AMENDMENT RECIEVED`) then a 404 (Not Found) is returned
-        4. All '*relevant*' subscribers will be notified via a [Booking
-        Notification](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG_NTF/2.0.0-Beta-2#/Notifications/booking-notifications).
+        4. All '*relevant*' subscribers will be notified via a [Booking Notification](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG_NTF/2.0.0-Beta-3#/Notifications/booking-notifications).
       parameters:
         - $ref: '#/components/parameters/bookingReferencePathParam'
         - $ref: '#/components/parameters/Api-Version-Major'
@@ -1858,12 +1560,8 @@ paths:
                     bookingStatus:
                       type: string
                       maxLength: 50
-                      description: >
-                        Setting the `bookingStatus` to `CANCELLED` cancels the
-                        entire `Booking` (also any ongoing amendment requests).
-                        The `Booking` will discontinue if the request is
-                        accepted by the provider.
-
+                      description: |
+                        Setting the `bookingStatus` to `CANCELLED` cancels the entire `Booking` (also any ongoing amendment requests). The `Booking` will discontinue if the request is accepted by the provider.
 
                         Only possible value to set is `CANCELLED`.
                       example: CANCELLED
@@ -1875,17 +1573,10 @@ paths:
                     amendedBookingStatus:
                       type: string
                       maxLength: 50
-                      description: >
-                        Setting the `amendedBookingStatus` to `AMENDMENT
-                        CANCELLED` **only** cancels the amendment to the
-                        `Booking`. 
+                      description: |
+                        Setting the `amendedBookingStatus` to `AMENDMENT CANCELLED` **only** cancels the amendment to the `Booking`. 
 
-
-                        It is a precondition that the `amendedBookingStatus`
-                        **is** `AMENDMENT RECEIVED` in order to cancel it. If
-                        this is not the case a `404` (Not Found) error response
-                        should be returned.
-
+                        It is a precondition that the `amendedBookingStatus` **is** `AMENDMENT RECEIVED` in order to cancel it. If this is not the case a `404` (Not Found) error response should be returned.
 
                         Only possible value to set is `AMENDMENT CANCELLED`.
                       example: AMENDMENT CANCELLED
@@ -1895,28 +1586,23 @@ paths:
                 reason:
                   type: string
                   maxLength: 5000
-                  description: >
-                    An optional property where a reason for cancelling the
-                    booking or the amendment can be given.
+                  description: |
+                    An optional property where a reason for cancelling the booking or the amendment can be given.
                   example: Booking cancelled due to internal problems
             examples:
               bookingCancelledExample:
                 summary: |
                   Entire Booking cancelled
-                description: >
-                  The consumer wants to cancel the entire `Booking`. This is
-                  done by setting the `bookingStatus` to `CANCELLED` and provide
-                  an optional `reason`.
+                description: |
+                  The consumer wants to cancel the entire `Booking`. This is done by setting the `bookingStatus` to `CANCELLED` and provide an optional `reason`.
                 value:
                   bookingStatus: CANCELLED
                   reason: Customer cancelled order
               amendmentCancelledExample:
                 summary: |
                   Amendment cancelled
-                description: >
-                  The consumer wants to **only** cancel the amendment (and keep
-                  the `Booking`). This is done by setting the
-                  `amendedBookingStatus` to `AMENDMENT CANCELLED`.
+                description: |
+                  The consumer wants to **only** cancel the amendment (and keep the `Booking`). This is done by setting the `amendedBookingStatus` to `AMENDMENT CANCELLED`.
                 value:
                   amendedBookingStatus: AMENDMENT CANCELLED
       responses:
@@ -1934,10 +1620,8 @@ paths:
                 bookingCancelledExample:
                   summary: |
                     Entire Booking cancelled
-                  description: >
-                    The consumer has requested that the entire `Booking` should
-                    be cancelled. `bookingStatus` is set to `CANCELLED` and
-                    `amendedBookingStatus` is set to `AMENDMENT CANCELLED`.
+                  description: |
+                    The consumer has requested that the entire `Booking` should be cancelled. `bookingStatus` is set to `CANCELLED` and `amendedBookingStatus` is set to `AMENDMENT CANCELLED`.
                   value:
                     carrierBookingRequestReference: cbrr-123
                     carrierBookingReference: cbr-987
@@ -1946,11 +1630,8 @@ paths:
                 amendmentCancelled1Example:
                   summary: |
                     Amendment cancelled on a confirmed Booking
-                  description: >
-                    The consumer has requested that the amendment to a confirmed
-                    `Booking` is to be cancelled. The status of the `Booking`
-                    stays as `CONFIRMED`. The `amendedBookingStatus` is set to
-                    `AMENDMENT CANCELLED`.
+                  description: |
+                    The consumer has requested that the amendment to a confirmed `Booking` is to be cancelled. The status of the `Booking` stays as `CONFIRMED`. The `amendedBookingStatus` is set to `AMENDMENT CANCELLED`.
                   value:
                     carrierBookingRequestReference: cbrr-123
                     carrierBookingReference: cbr-987
@@ -1959,21 +1640,16 @@ paths:
                 amendmentCancelled2Example:
                   summary: |
                     Amendment requested by provider cancelled by consumer
-                  description: >
-                    The consumer has requested that the amendment to a confirmed
-                    `Booking` is to be cancelled. The status of the `Booking`
-                    stays as `PENDING AMENDMENT`. The `amendedBookingStatus` is
-                    set to `AMENDMENT CANCELLED`.
+                  description: |
+                    The consumer has requested that the amendment to a confirmed `Booking` is to be cancelled. The status of the `Booking` stays as `PENDING AMENDMENT`. The `amendedBookingStatus` is set to `AMENDMENT CANCELLED`.
                   value:
                     carrierBookingRequestReference: cbrr-123
                     carrierBookingReference: cbr-987
                     bookingStatus: PENDING AMENDMENT
                     amendedBookingStatus: AMENDMENT CANCELLED
         '409':
-          description: >
-            In case the provider is processing an already updated Booking
-            request - it is possible for the provider to reject the cancellation
-            by returning a `409` (Conflict)
+          description: |
+            In case the provider is processing an already updated Booking request - it is possible for the provider to reject the cancellation by returning a `409` (Conflict)
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -1985,21 +1661,17 @@ paths:
                 conflictExample:
                   summary: |
                     Conflicting request
-                  description: >
-                    The provider is already processing a request and needs to
-                    finish this process.
+                  description: |
+                    The provider is already processing a request and needs to finish this process.
 
-
-                    **NB**: `errorCode` not yet standardized by DCSA. Value
-                    `7003` is just a "random example"
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
                     httpMethod: PATCH
                     requestUri: /v2/bookings/cbrr-123
                     statusCode: 409
                     statusCodeText: Conflict
-                    statusCodeMessage: >-
-                      Previous request is being processed. Please try again
-                      later
+                    statusCodeMessage: |
+                      Previous request is being processed. Please try again later
                     providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
                     errorDateTime: '2023-04-13T07:41:00+08:30'
                     errors:
