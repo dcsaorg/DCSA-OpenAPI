@@ -9,7 +9,97 @@ Publications related to the Booking API:
 
 <a name="v200B2"></a>[Release v2.0.0 Beta 2 (12 April 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0-Beta-2)
 ---
-To be updated...
+Beta 2 release of the DCSA OpenAPI definitions for Booking 2.0.0.
+## Business changes:
+This is a list of high-level business changes:
+- `DocumentParties` structure has been changed so it no longer is a "one-size fits all" solution.
+- `[Origin|Destination]ChargesPaymentTerms` have been updated to allow a differentiation between `port`, `haulage` and `other` payment codes (`PRE` or `COL`).
+- longer `vesselName` and `vesselIMONumber` allowed
+## Technical changes:
+This is a list of high-level technical changes:
+- The API is now developed using ShopLight instead of SwaggerHub-editor. This means that we are no longer using Domains but now have everything defined inline.
+- As a new principle:
+  - no $ref pointing outside the yaml file
+  - all `simpleTypes` are now specified "inline" in objects
+  - all `objects` are now PascalCased and have a `title` property set with a presentable version of the object name in Title Case (all representations of snake_case or Pascal_Snake_Case have been removed)
+- all strings having a pattern that matches `^\S+(\s+\S+)*$` have been changed to `\S(?:.*\S)?$` in order to prevent [Catastrophic Backtracking](https://www.regular-expressions.info/catastrophic.html)
+- `additionalProperties= false` have been added to the `UNLocationLocation` in order to prevent schema errors when `UNLocation` is used together with a `FacilityLocation` in a `oneOf` construction (prevents schema error: _should be valid to one and only one schema, but 2 are valid_)
+## List of detailed changes
+- API description has been updated with new link to Information Model and Interface documents. Link to the Stats API has been updated
+- all endPoint examples have been updated to reflect changes
+- `RequestedChange` object has split the `field` property into 2 properties: `property` and `jsonPath` in order to align with the `DetailedError` object
+- fixed some typos in the `ErrorResponse` descriptions
+- `Address` object
+  - no longer has a `name` property
+  - `country` property has been changed to `countryCode`
+  - `floot` example changed to `2nd`
+  - no required properties in the object
+- `UNLocationLocation` interface has `additionalProperties= false` in order to prevent schema violations when included in a `oneOf` construction together with a `FacilityLocation` in properties defining a location
+- `CreateBooking` object has the following changes:
+  - `title` changed from `Booking` --> `Create Booking`
+  - `documentParties` is now a required property
+  - `originChargesPaymentTermCode` and `destinationChargesPaymentTermCode` has changed from being a string to being a structure with the following properties: `haulageChargesPaymentTermCode`, `portChargesPaymentTermCode` and `otherChargesPaymentTermCode` which can all be either Prepaid (`PRE`) or Collect ( `COL`). Both properties have also been renamed to `originChargesPaymentTerm` and `destinationChargesPaymentTerm` (so the name no longer ends with `Code`)
+  - `vessel` object has been updated so
+    - `name` (vesselName) has maxLength changed from `35` --> `50`
+    - `vesselIMONumber` has maxLength changed from `7` --> `8`, `minLength=7` has been added and the pattern has been changed to `^\\d{7,8}$`
+  - `universalServiceReference` added a `minLength` of 8 (as the `universalServiceReference` must be exactly 8 characters long)
+  - `universalExportVoyageReference` added a `minLength` and `maxLength` to both 5 characters (as `minLength` must be exactly 5 characters long)
+  - `declaredValueCurrency` added a `minLength` of 3 (as the `declaredValueCurrency` must be exactly 3 characters long)
+  - `exportDeclarationReference` and `importLicenseReference` descriptions no longer require any conditions
+  - `invoicePayableAt` structure changed - it is no longer a `oneOf` between a `UNLocationLocation` and an `AddressLocation`. `invoicePayableAt` is now an object consisting of a single property: `UNLocationCode` which is required
+  - `placeOfBLIssue` structure changed to a more simple structure. It is now a `oneOf` between a `UNLocationCode` and a `countryCode`
+  - `documentParties` structure changed - it is no longer a list of `DocumentParties` but an object containing a required `bookingAgent` and optional `shipper`, `consignee`, `serviceContractOwner`, `carrierBookingOffice` and `other` documentParties
+  - added a `minItems` of 1 on `ShipmentLocations` as it is a required property
+  - added a `minItems` of 1 on `RequestedEquipments` as it is a required property
+- `UpdateBooking` object has the same changes as `CreateBooking` except:
+  - `title` changed from `Booking` --> `Update Booking`
+- `Booking` (used for the GET request) object has the same changes as `CreateBooking` except:
+  - `title` statys as `Booking`
+  - `confirmedEquipments` description updated
+  - `transportPlan` description updated
+  - `shipmentCutOffTimes` description updated
+- `ActiveReeferSettings_BKG` and `ActiveReeferSettings` consolidated into a single object called `ActiveReeferSettings`
+- new `PartyAddress` object created where
+  - all properties are optional
+  - `UNLocationCode` is added
+  - `country` is now a `countryCode`
+- `DocumentParty` has been renamed to `OtherDocumentParty` and
+  - `isToBeNotified` has been removed
+  - `partyFunction` has been reduced to only contain:
+    - DDR (Consignor's freight forwarder)
+    - DDS (Consignee's freight forwarder)
+    - COW (Invoice payer on behalf of the consignor (shipper))
+    - COX (Invoice payer on behalf of the consignee)
+    - N1 (First Notify Party)
+    - N2 (Second Notify Party)
+    - NI (Other Notify Party)
+- added 5 new "Document Party" objects: `BookingAgent`, `Shipper`, `Consignee`, `ServiceContractOwner` and `CarrierBookingOffice` to be used in the new `documentParies` structure
+- `Party` now uses the `PartyAddress` object (instad of the `Address` object)
+- `IdentifyingCode` structure has the following changes:
+  - `codeListProvider` has changed `maxLength` from 5 --> 100
+  - `codeListProvider` has a new list of allowed values: `WAVE` (Wave), `CARX` (CargoX), `ESSD` (EssDOCS), `IDT` (ICE Digital Trade), `BOLE` (Bolero), `EDOX` (EdoxOnline), `IQAX` (IQAX), `SECR` (Secro), `TRGO` (TradeGO), `ETEU` (eTEU), `GSBN` (Global Shipping Business Network), `WISE` (WiseTech), `GLEIF` (Global Legal Entity Identifier Foundation), `W3C` (World Wide Web Consortium), `DNB` (Dun and Bradstreet), `FMC` (Federal Maritime Commission), `DCSA` (Digitial Container Shipping Association) and `ZZZ` (Mutually defined)
+  - `codeListProvider` example updated
+  - `codeListName` description changed
+- `RequestedEquipment_CAR` renamed to `RequestedEquipmentCarrier`
+- `RequestedEquipment_SHI` renamed to `RequestedEquipmentShipper`
+- Fixed conditional requirement on `cargoGrossVolumeUnit` description
+- `Commodity_CONF` renamed to `CommodityCarrier`
+- `packageCode` `minLendth` and `maxLength` set to 2 in order to allow exactly 2 characters
+- `imoPackagingCode` `minLendth` and `maxLength` set to 1 and 5 in order to allow strings of length 1-5
+- `dangerousGoods` `minLength` property removed as it was wrongly specified
+- `DangerousGoods_BGK` and `DangerousGoods` have been merged into `DangerousGoods`
+- `codedVariantList` `minLendth` and `maxLength` set to 4 in order to allow exactly 4 characters
+- `subsidiaryRisk[1|2]` `minLendth` and `maxLength` set to 1 and 3 in order to allow strings of length 1-3
+- `volume` property of DG now has both properties (`value` and `unit`) as required properties
+- `unNumber` and `naNumber` `minLendth` and `maxLength` set to 4 in order to allow exactly 4 characters
+- `vesselName` changed `maxLength` from 35 --> 50
+- `vesselIMONumber` changed `maxLength` from 7 --> 8 and added a `minLength` of 7
+- `universalServiceReference` `minLendth` set to 8 in order to allow exactly 8 characters
+- `universalImportVoyageReference` and `universalExportVoyageReference` `minLendth` and `maxLength` set to 5 in order to allow exactly 5 characters
+- `LoadLocation` and `DischargeLocation` have `title` property with a Title Case version of the object name
+- `AdvanceManifestFiling_BKG` renamed to `AdvanceManifestFiling`
+- `currencyCode` `minLendth` set to 3 in order to allow exactly 3 characters
+- Fixed wrong required `bookingStatus` on the root level on the Patch endPoint
 
 <a name="v200B1"></a>[Release v2.0.0 Beta 1 (28 December 2023)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0-Beta-1)
 ---
