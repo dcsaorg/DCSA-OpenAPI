@@ -62,7 +62,7 @@ paths:
     post:
       tags:
         - Start envelope transfer
-      operationId: post-evenlopes
+      operationId: post-envelopes
       summary: Start the eBL envelope transfer
       description: |
         Start the eBL envelope transfer.
@@ -77,7 +77,7 @@ paths:
       responses:
         '200':
           description: |
-            The Receiving platform either accepts the envelope transfer immedidately (if there are no additional documents to be transferred, or if it concludes that it is already in the possesion of all the additional documents mentioned in the [`EnvelopeManifest`](#/EnvelopeManifest)), or concludes that in has previously accepted the envelope transfer with the same contents.
+            The Receiving platform either accepts the envelope transfer immediately (if there are no additional documents to be transferred, or if it concludes that it is already in the possesion of all the additional documents mentioned in the [`EnvelopeManifest`](#/EnvelopeManifest)), or concludes that in has previously accepted the envelope transfer with the same contents.
 
             The signed response [`EnvelopeTransferFinishedResponseSignedContent`](#/EnvelopeTransferFinishedResponseSignedContent) JWS-signed payload must contain [`EnvelopeTransferFinishedResponse.responseCode`](#/EnvelopeTransferFinishedResponse) that signals the accepted envelope transfer (`RECE` or `DUPE`).
           headers:
@@ -136,7 +136,7 @@ paths:
       operationId: put-additional-documents
       summary: Transfer additional document associated with the eBL envelope transfer
       description: |
-        Transfer **additional document** associated with an eBL envelope transfer. The transfered document should be either one of the **supporting documents** from the [`EnvelopeManifest.supportingDocuments`](#/EnvelopeManifest) list, or **eBLVisualisationByCarrier document** if attribute [`EnvelopeManifest.eBLVisualisationByCarrier`](#/EnvelopeManifest) was defined.
+        Transfer **additional document** associated with an eBL envelope transfer. The transferred document should be either one of the **supporting documents** from the [`EnvelopeManifest.supportingDocuments`](#/EnvelopeManifest) list, or **eBLVisualisationByCarrier document** if attribute [`EnvelopeManifest.eBLVisualisationByCarrier`](#/EnvelopeManifest) was defined.
 
         The `requestBody` should contain the document being transferred. It is recommended to use the `application/json` media type for the `requestBody`. The media type provided in the initial `ISSU` (Issuance) transaction is the one that will be associated with the transferred additional document in the end.
 
@@ -145,7 +145,7 @@ paths:
          
         Furthermore, the receiving platform should compute the SHA-256 checksum of the transferred additional document, and verify that it matches the value of `documentChecksum` URL path parameter. The SHA-256 checksum MUST be calculated based on the deserialized payload.
 
-        If all the above mentioned verifications have been successfull, the receiving platform can conclude that the additional document was transferred successfully.
+        If all the above mentioned verifications have been successfully, the receiving platform can conclude that the additional document was transferred successfully.
       parameters:
         - $ref: '#/components/parameters/envelopeReference'
         - $ref: '#/components/parameters/documentChecksum'
@@ -266,7 +266,7 @@ paths:
           description: |
             Request failed for the unexpected reason. The unsigned response contains all the error details.
 
-            The sending platform shoud retry to finish the envelope transfer until it gets the signed response [`EnvelopeTransferFinishedResponseSignedContent`](#/EnvelopeTransferFinishedResponseSignedContent) with the JWS-signed payload [`EnvelopeTransferFinishedResponse.responseCode`](#/EnvelopeTransferFinishedResponse) attribute value providing the information whether the receiving platform has accepted or rejected the envelope transfer.  
+            The sending platform should retry to finish the envelope transfer until it gets the signed response [`EnvelopeTransferFinishedResponseSignedContent`](#/EnvelopeTransferFinishedResponseSignedContent) with the JWS-signed payload [`EnvelopeTransferFinishedResponse.responseCode`](#/EnvelopeTransferFinishedResponse) attribute value providing the information whether the receiving platform has accepted or rejected the envelope transfer.  
 
             In the rare corner cases, the unsigned `error` response could come from middleware and hide a true envelope transfer acceptance/rejection message. The sending platform will be liable if they act on an unsigned reponse that does *not* match the actions of the receiving platform.       
           headers:
@@ -459,7 +459,7 @@ components:
           minLength: 64
           maxLength: 64
           pattern: '^[0-9a-f]+$'
-          # TODO: Verify and if necessary update the example, or remove it alltogether
+          # TODO: Verify and if necessary update the example, or remove it altogether
           example: 20a0257b313ae08417e07f6555c4ec829a512c083f3ead16b41158018a22abe9
           description: |
             This attribute should contain the checksum of the last [`EnvelopeTransferChainEntrySignedContent`](#/EnvelopeTransferChainEntrySignedContent) entry in the [`EblEnvelope.envelopeTransferChain[]`](#/EblEnvelope) list. The checksum is computed using SHA-256 hash algorithm according to [RFC 6234](https://datatracker.ietf.org/doc/html/rfc6234).
@@ -483,7 +483,7 @@ components:
       pattern: '^([a-zA-Z0-9_=]+)\.([a-zA-Z0-9_=]+)\.([a-zA-Z0-9_\-\+\/=]+)$'
       description: |
         JWS content with compact serialization according to [RFC 7515](https://datatracker.ietf.org/doc/html/rfc7515#section-7.1). JWS-signed payload is defined in schema [EnvelopeManifest](#/EnvelopeManifest).
-      # TODO: Verify and if necessary update the example, or remove it alltogether
+      # TODO: Verify and if necessary update the example, or remove it altogether
       example: eyJhbGciOiJSUzI1NiIsImtpZCI6IlVhRVdLNmt2ZkRITzNZT2NwUGl2M1RCT2JQTzk2SFZhR2U0czFhUUxBZU0ifQ.eyJkb2N1bWVudEhhc2giOiI4ZGM5OWQ4YWM5MjIyNDBjNTVjMDM4NDVmNDlkZWY2NDE4NzE0NjY1MWJhZTRmOWE2MzEzMTI3N2NmMDBkOWRmIiwicHJldmlvdXNFbnZlbG9wZUhhc2giOm51bGwsInRyYW5zYWN0aW9ucyI6W3siYWN0aW9uIjoiSVNTVSIsImNvbW1lbnRzIjoiVGhlIEIvTCBoYXMgYmVlbiBpc3N1ZWQuIiwidGltZXN0YW1wIjoxNjU4Mzg1MTY2MzAyNDQyMjAwLCJpc1RvT3JkZXIiOnRydWUsInBsYXRmb3JtSG9zdCI6ImxvY2FsaG9zdDo4NDQzIiwidHJhbnNmZXJlZSI6IjQzNTQ5ODUwMjQ4QGxvY2FsaG9zdDo4NDQzIn1dfQ.c4SJ9-61fE6RmeIuZ3EI-TSM0M6qXuOudtr3YhpDjqVMaYk_RYpaWYvw75ssTbjgGFKTBKCy5lpmOfb8Fq--Qu2k0MWbH6qdX5jTYwl0DX946RQg-hnmVTg9np3bmqVeKqKURyV-UUdG-KK_XCGzPZ-lZkeUlpMcIthQFs0pCODR9GPytv7ZXLPZFOmHM9fn3FD2yRqVhQzcs7HdcxMjCx6hkBW8Z-jW4qteVy2_E9uqjkKwlu_cQLoY83Z0mcjn0PZNQvKF10x7q1_Jjf_Su19UigTUu3pFMrzo4iPS_jcrFoIb3TSZNSzbgAwtujSBFOufPDyEmxlx1sH0ZowMvA
     EnvelopeTransferChainEntry:
       type: object
@@ -525,7 +525,7 @@ components:
           maxLength: 64
           pattern: '^[0-9a-f]+$'
           nullable: true
-          # TODO: Verify and if necessary update the example, or remove it alltogether
+          # TODO: Verify and if necessary update the example, or remove it altogether
           example: 20a0257b313ae08417e07f6555c4ec829a512c083f3ead16b41158018a22abe9
           description: |
             This attribute should *not* be defined for the first entry in the [`EblEnvelope.envelopeTransferChain[]`](#/EblEnvelope) list. For all other entries after the first entry in the [`EblEnvelope.envelopeTransferChain[]`](#/EblEnvelope) list, this attribute **must** be defined and contain the checksum of the previous [`EnvelopeTransferChainEntrySignedContent`](#/EnvelopeTransferChainEntrySignedContent) entry in the [`EblEnvelope.envelopeTransferChain[]`](#/EblEnvelope) list. This attribute can be used to track signed envelope transfers between platforms (for details check description of [`EblEnvelope.envelopeTransferChain[]`](#/EblEnvelope)).
@@ -578,7 +578,7 @@ components:
           minLength: 64
           maxLength: 64
           pattern: '^[0-9a-f]+$'
-          # TODO: Verify and if necessary update the example, or remove it alltogether
+          # TODO: Verify and if necessary update the example, or remove it altogether
           example: 20a0257b313ae08417e07f6555c4ec829a512c083f3ead16b41158018a22abe9
           description: |
             This attribute should contain the checksum of the last [`EnvelopeTransferChainEntrySignedContent`](#/EnvelopeTransferChainEntrySignedContent) entry in the [`EblEnvelope.envelopeTransferChain[]`](#/EblEnvelope) list received. The checksum is computed using SHA-256 hash algorithm according to [RFC 6234](https://datatracker.ietf.org/doc/html/rfc6234).
@@ -598,7 +598,7 @@ components:
       required:
         - lastEnvelopeTransferChainEntrySignedContentChecksum
         - responseCode
-      # TODO: Verify and if necessary update the example, or remove it alltogether
+      # TODO: Verify and if necessary update the example, or remove it altogether
       example:
         lastEnvelopeTransferChainEntrySignedContentChecksum: d56a93a7e9f86a2d895df818e0440bdca6ffe03246e2fee14131f2e66c84c75a
         responseCode: RECE
@@ -610,7 +610,7 @@ components:
           pattern: '^[0-9a-f]+$'
           description: |
             This attribute should contain the checksum of the last [`EnvelopeTransferChainEntrySignedContent`](#/EnvelopeTransferChainEntrySignedContent) entry in the [`EblEnvelope.envelopeTransferChain[]`](#/EblEnvelope) list received. The checksum is computed using SHA-256 hash algorithm according to [RFC 6234](https://datatracker.ietf.org/doc/html/rfc6234).
-          # TODO: Verify and if necessary update the example, or remove it alltogether
+          # TODO: Verify and if necessary update the example, or remove it altogether
           example: 20a0257b313ae08417e07f6555c4ec829a512c083f3ead16b41158018a22abe9
         responseCode:
           type: string
@@ -688,7 +688,7 @@ components:
       pattern: '^([a-zA-Z0-9_=]+)\.([a-zA-Z0-9_=]+)\.([a-zA-Z0-9_\-\+\/=]*)$'
       description: |
         JWS content with compact serialization according to [RFC 7515](https://datatracker.ietf.org/doc/html/rfc7515#section-7.1). JWS-signed payload is defined in schema [EnvelopeTransferFinishedResponse](#/EnvelopeTransferFinishedResponse).
-      # TODO: Verify and if necessary update the example, or remove it alltogether
+      # TODO: Verify and if necessary update the example, or remove it altogether
       example: eyJhbGciOiJSUzI1NiIsImtpZCI6IlVhRVdLNmt2ZkRITzNZT2NwUGl2M1RCT2JQTzk2SFZhR2U0czFhUUxBZU0ifQ.eyJyZXNwb25zZVRvRW52ZWxvcGVIYXNoIjoiZDU2YTkzYTdlOWY4NmEyZDg5NWRmODE4ZTA0NDBiZGNhNmZmZTAzMjQ2ZTJmZWUxNDEzMWYyZTY2Yzg0Yzc1YSIsInJlc3BvbnNlQ29kZSI6IlJFQ1YifQ.P2_evKyvHH25BrvW4eIxp7xo9S73oK90QomKEjZDrn3AX8drv7aeVrNYYPPh4vqK78fTVair-0Ww9G7czX9Q3xlATTPlTQrNPuThh_-nPOvNDqHBwZuq_nop6lQwIS210OQa__C4z-oGvO8m56pfXvpgfTIC9nesnIuNFtrdr1lU81q4ZQnnZI0GvWaB_4Q320PoAXmKN4EwjY5gTqdKMAvz9a5PNnWfGPkIrM-CBm_MNLpl9NAcpJONRdwI9i9zTi42NZCUnbowHuHnYNuz3WfWzVA43U4IdEBDU6XeIem0Zm331KlBAukOhZiyN8Bp7ZK7XGx50a6XcY3190lX5Q
     DocumentMetadata:
       type: object
@@ -855,7 +855,7 @@ components:
             - `W3C` (World Wide Web Consortium)
             - `DNB` (Dun and Bradstreet)
             - `FMC` (Federal Maritime Commission)
-            - `DCSA` (Digitial Container Shipping Association)
+            - `DCSA` (Digital Container Shipping Association)
             - `ZZZ` (Mutually defined)
 
           example: W3C
@@ -871,7 +871,7 @@ components:
           description: |
             The name of the code list, code generation mechanism or code authority for the `partyCode`. Example values could be:
 
-            - `DID` (Decenbtralized Identifier) for `codeListProvider` `W3C`
+            - `DID` (Decentralized Identifier) for `codeListProvider` `W3C`
             - `LEI` (Legal Entity Identifier) for `codeListProvider` `GLEIF`
             - `DUNS` (Data Universal Numbering System) for `codeListProvider` `DNB`
 
@@ -946,7 +946,7 @@ components:
           pattern: ^\S(?:.*\S)?$
           maxLength: 100
           description: |
-            The identifier for a `Shipping Istructions` provided by the carrier for system purposes.
+            The identifier for a `Shipping Instructions` provided by the carrier for system purposes.
           example: e0559d83-00e2-438e-afd9-fdd610c1a008
         transportDocumentStatus:
           type: string
