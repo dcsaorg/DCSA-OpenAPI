@@ -15,6 +15,8 @@ This is a list of high-level business changes:
 - `DocumentParties` structure has been changed so it no longer is a "one-size fits all" solution.
 - `[Origin|Destination]ChargesPaymentTerms` have been updated to allow a differentiation between `port`, `haulage` and `other` payment codes (`PRE` or `COL`).
 - longer `vesselName` and `vesselIMONumber` allowed
+- `codeListProvider` list cleaned up and all SP (Solution Providers) have been added
+- `UNLocationCode` added as a property on Party-addresses
 ## Technical changes:
 This is a list of high-level technical changes:
 - The API is now developed using ShopLight instead of SwaggerHub-editor. This means that we are no longer using Domains but now have everything defined inline.
