@@ -86,21 +86,21 @@ This is a list of high-level technical changes:
 - `RequestedEquipment_SHI` renamed to `RequestedEquipmentShipper`
 - Fixed conditional requirement on `cargoGrossVolumeUnit` description
 - `Commodity_CONF` renamed to `CommodityCarrier`
-- `packageCode` `minLendth` and `maxLength` set to 2 in order to allow exactly 2 characters
-- `imoPackagingCode` `minLendth` and `maxLength` set to 1 and 5 in order to allow strings of length 1-5
+- `packageCode` `minLength` and `maxLength` set to 2 in order to allow exactly 2 characters
+- `imoPackagingCode` `minLength` and `maxLength` set to 1 and 5 in order to allow strings of length 1-5
 - `dangerousGoods` `minLength` property removed as it was wrongly specified
 - `DangerousGoods_BGK` and `DangerousGoods` have been merged into `DangerousGoods`
-- `codedVariantList` `minLendth` and `maxLength` set to 4 in order to allow exactly 4 characters
-- `subsidiaryRisk[1|2]` `minLendth` and `maxLength` set to 1 and 3 in order to allow strings of length 1-3
+- `codedVariantList` `minLength` and `maxLength` set to 4 in order to allow exactly 4 characters
+- `subsidiaryRisk[1|2]` `minLength` and `maxLength` set to 1 and 3 in order to allow strings of length 1-3
 - `volume` property of DG now has both properties (`value` and `unit`) as required properties
-- `unNumber` and `naNumber` `minLendth` and `maxLength` set to 4 in order to allow exactly 4 characters
+- `unNumber` and `naNumber` `minLength` and `maxLength` set to 4 in order to allow exactly 4 characters
 - `vesselName` changed `maxLength` from 35 --> 50
 - `vesselIMONumber` changed `maxLength` from 7 --> 8 and added a `minLength` of 7
-- `universalServiceReference` `minLendth` set to 8 in order to allow exactly 8 characters
-- `universalImportVoyageReference` and `universalExportVoyageReference` `minLendth` and `maxLength` set to 5 in order to allow exactly 5 characters
+- `universalServiceReference` `minLength` set to 8 in order to allow exactly 8 characters
+- `universalImportVoyageReference` and `universalExportVoyageReference` `minLength` and `maxLength` set to 5 in order to allow exactly 5 characters
 - `LoadLocation` and `DischargeLocation` have `title` property with a Title Case version of the object name
 - `AdvanceManifestFiling_BKG` renamed to `AdvanceManifestFiling`
-- `currencyCode` `minLendth` set to 3 in order to allow exactly 3 characters
+- `currencyCode` `minLength` set to 3 in order to allow exactly 3 characters
 - Fixed wrong required `bookingStatus` on the root level on the Patch endPoint
 
 <a name="v200B1"></a>[Release v2.0.0 Beta 1 (28 December 2023)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0-Beta-1)
