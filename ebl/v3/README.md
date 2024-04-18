@@ -117,7 +117,8 @@ This is a list of high-level technical changes:
 - `type` property removed from the `Seal` object
 - `PHY` (Phytosanitary) removed as a `sealSource`
 - `AdvanceManifestFiling_BKG` and `AdvanceManifestFiling_EBL` consolidated into one object called `AdvanceManifestFiling` and example modified
-<a name="TransportDocumentv300B2"></a>- `TransportDocument` has the following changes:
+<a name="TransportDocumentv300B2"></a>## Transport Document changes
+- `TransportDocument` has the following changes:
   - all strings pattern matching `^\S+(\s+\S+)*$` have been changed to `\S(?:.*\S)?$` in order to prevent [Catastrophic Backtracking](https://www.regular-expressions.info/catastrophic.html)
   - `originChargesPaymentTermCode` and `destinationChargesPaymentTermCode` have been removed
   - `declaredValueCurrency` added a `minLength` of 3 (as the `declaredValueCurrency` must be exactly 3 characters long)
