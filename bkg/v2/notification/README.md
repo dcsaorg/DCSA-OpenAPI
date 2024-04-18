@@ -10,7 +10,8 @@ Publications related to the Booking Notification API:
 <a name="v200B2"></a>[Release v2.0.0 Beta 2 (12 April 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG_NTF/2.0.0-Beta-2)
 ---
 - Minor details to the API description have been updated.
-- `subscriptionReference` has been added to the metadata section
+- `subscriptionReference` has been added to the metadata section on both `ShippingInstructionsNotification` and `TransportDocumentNotification`
+- `shippingInstructionsReference` and `transportDocumentReference` patterns changed form `^\S+(\s+\S+)*$` to `\S(?:.*\S)?$` in order to prevent [Catastrophic Backtracking](https://www.regular-expressions.info/catastrophic.html)
 
 <a name="v200B1"></a>[Release v2.0.0 Beta 1 (28 December 2023)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG_NTF/2.0.0-Beta-1)
 ---
