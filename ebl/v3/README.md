@@ -136,7 +136,7 @@ This is a list of high-level technical changes:
   - `universalExportVoyageReference` `minLength` and `maxLength` set to 5 in order to allow exactly 5 characters
 - `title` property on `PlaceOfReceipt`, `PortOfLoading`, `PortOfDischarge`, `PlaceOfDelivery` and `OnwardInlandRouting` added
   - `currencyCode` `minLength` set to 3 in order to allow exactly 3 characters
-  - **PLUS** changes listed in the objects defined above that the `TransportDocument` links to
+- **PLUS** changes listed in the objects defined above that the `TransportDocument` links to
 
 <a name="v300B1"></a>[Release v3.0.0 Beta 1 (28 December 2023)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.0-Beta-1)
 ---
