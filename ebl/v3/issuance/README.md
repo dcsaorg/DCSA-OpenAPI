@@ -14,6 +14,7 @@ Beta 2 release of the DCSA OpenAPI definitions for Bill of Lading Issuance 3.0.0
 ## Business changes:
 This is a list of high-level business changes:
 - `TransportDocument` has been updated - please check here for a list of changes: [Transport Document v3.0.0-Beta-2](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/ebl/v3#transport-document-changes)
+- `IssueToParty` object has been aligned with EBL
 ## Technical changes:
 This is a list of high-level technical changes:
 - The API is now developed using ShopLight instead of SwaggerHub-editor. This means that we are no longer using Domains but now have everything defined inline.
