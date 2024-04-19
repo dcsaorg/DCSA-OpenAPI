@@ -13,7 +13,7 @@ Publications related to the Bill of Lading Surrender API:
 Beta 2 release of the DCSA OpenAPI definitions for Bill of Lading Surrender 3.0.0-Beta-2
 ## Business changes:
 This is a list of high-level business changes:
-- 
+- all `Party` objects (`TransactionParty` and `SurrenderRequestBy`) have been aligned with EBL 3.0.0 Beta 2
 ## Technical changes:
 This is a list of high-level technical changes:
 - The API is now developed using ShopLight instead of SwaggerHub-editor. This means that we are no longer using Domains but now have everything defined inline.
