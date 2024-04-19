@@ -13,7 +13,7 @@ Publications related to the Bill of Lading Issuance API:
 Beta 2 release of the DCSA OpenAPI definitions for Bill of Lading Issuance 3.0.0-Beta-2
 ## Business changes:
 This is a list of high-level business changes:
-- `TransportDocument` has been updated - please check here for a list of changes: [Transport Document v3.0.0-Beta-2](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/ebl/v3#transport-document-changes)
+- `TransportDocument` has been updated - please check here for a list of changes: [Transport Document v3.0.0-Beta-2](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/ebl/v3#TransportDocumentv300B2)
 ## Technical changes:
 This is a list of high-level technical changes:
 - The API is now developed using ShopLight instead of SwaggerHub-editor. This means that we are no longer using Domains but now have everything defined inline.
@@ -28,7 +28,7 @@ This is a list of high-level technical changes:
 - `operationId` property added to all endPoints
 - using updated `ErrorResponse` object when responding to a `409`
 - `default` error now returns an updated `error` object
-- `title` property added to `IssuanceRequest` and `TransportDocument` has been updated - se [Transport Document of EBL 3.0.0-Beta-2](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/ebl/v3#transport-document-changes) for changes
+- `title` property added to `IssuanceRequest` and `TransportDocument` has been updated - se [Transport Document of EBL 3.0.0-Beta-2](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/ebl/v3#TransportDocumentv300B2) for changes
 - `IssueToParty` has the following changes:
   - `title` property added
   - `legalName` changed to `partyName` to align with EBL
