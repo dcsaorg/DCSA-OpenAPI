@@ -10,7 +10,34 @@ Publications related to the Bill of Lading Surrender API:
 
 <a name="v300B2"></a>[Release v3.0.0 Beta 2 (12 April 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR/3.0.0-Beta-2)
 ---
-To be updated...
+Beta 2 release of the DCSA OpenAPI definitions for Bill of Lading Surrender 3.0.0-Beta-2
+## Business changes:
+This is a list of high-level business changes:
+- 
+## Technical changes:
+This is a list of high-level technical changes:
+- The API is now developed using ShopLight instead of SwaggerHub-editor. This means that we are no longer using Domains but now have everything defined inline.
+- As a new principle:
+  - no $ref pointing outside the yaml file
+  - all `simpleTypes` are now specified "inline" in objects
+  - all `objects` are now PascalCased and have a `title` property set with a presentable version of the object name in Title Case (all representations of snake_case or Pascal_Snake_Case have been removed)
+- all strings having a pattern that matches `^\S+(\s+\S+)*$` have been changed to `\S(?:.*\S)?$` in order to prevent [Catastrophic Backtracking](https://www.regular-expressions.info/catastrophic.html)
+## List of detailed changes
+- API description has been updated with new links (including Stats API). A link to this ChangeLog has been added
+- `tags` section has been added
+- `operationId` property added to all endPoints
+- `default` error now returns `ErrorResponse` (an updated `error` object)
+- `API-Version` header is now defined inline
+- `API-Version-Major` parameter is now defined inline
+- `TransactionParty` object update so it is aligned with the EBL `Party` object
+- `SurrenderRequestedBy` object created and is aligned with the EBL `Party` object
+- `SurrenderRequestAcknowledgement` object now has all properties defined inline
+- `surrenderRequestDetails` object updated with the following:
+  - all properties defined inline
+  - `surrenderRequestBy` references `SurrenderRequestedBy` object
+- `IdentifyingCode` object added
+- `TaxLegalReference` object added
+- `ErrorResponse` object added
 
 <a name="v300B1"></a>[Release v3.0.0 Beta 1 (28 December 2023)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR/3.0.0-Beta-1)
 ---
