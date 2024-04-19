@@ -38,8 +38,8 @@ This is a list of high-level technical changes:
   - `partyCodes` renamed to `identifyingCodes` in order to align with EBL with the following changes:
     - `codeListProvider` is no longer an `Enum` but a String with `maxLength` 100 and description updated with all possible values
     - `codeListName` description changed to align with new `codeListProvider`
-  - `TaxLegalReference` object added
-  - `TransportDocument` object is now included as part of the spec (and no longer a $ref to a Domain defined on SwaggerHub)
+- `TaxLegalReference` object added
+- `TransportDocument` object is now included as part of the spec (and no longer a $ref to a Domain defined on SwaggerHub)
 <a name="v300B1"></a>[Release v3.0.0 Beta 1 (28 December 2023)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS/3.0.0-Beta-1)
 ---
 Initial release of the DCSA OpenAPI definitions for Bill of Lading Issuance 3.0.0-Beta-1.
