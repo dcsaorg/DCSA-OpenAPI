@@ -10,8 +10,35 @@ Publications related to the Bill of Lading Issuance API:
 
 <a name="v300B2"></a>[Release v3.0.0 Beta 2 (12 April 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS/3.0.0-Beta-2)
 ---
-To be updated...
-
+Beta 2 release of the DCSA OpenAPI definitions for Bill of Lading Issuance 3.0.0-Beta-2
+## Business changes:
+This is a list of high-level business changes:
+- `TransportDocument` has been updated - please check here for a list of changes: [Transport Document v3.0.0-Beta-2](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/ebl/v3#transport-document-changes)
+## Technical changes:
+This is a list of high-level technical changes:
+- The API is now developed using ShopLight instead of SwaggerHub-editor. This means that we are no longer using Domains but now have everything defined inline.
+- As a new principle:
+  - no $ref pointing outside the yaml file
+  - all `simpleTypes` are now specified "inline" in objects
+  - all `objects` are now PascalCased and have a `title` property set with a presentable version of the object name in Title Case (all representations of snake_case or Pascal_Snake_Case have been removed)
+- all strings having a pattern that matches `^\S+(\s+\S+)*$` have been changed to `\S(?:.*\S)?$` in order to prevent [Catastrophic Backtracking](https://www.regular-expressions.info/catastrophic.html)
+## List of detailed changes
+- API description has been updated with new links (including Stats API). A link to this ChangeLog has been added
+- `tags` section has been added
+- `operationId` property added to all endPoints
+- using updated `ErrorResponse` object when responding to a `409`
+- `default` error now returns an updated `error` object
+- `title` property added to `IssuanceRequest` and `TransportDocument` has been updated - se [Transport Document of EBL 3.0.0-Beta-2](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/ebl/v3#transport-document-changes) for changes
+- `IssueToParty` has the following changes:
+  - `title` property added
+  - `legalName` changed to `partyName` to align with EBL
+  - `registrationNumber`, `locationOfRegistration` and `taxReference` have been consolidated into `TaxLegalReferences`
+  - `sendToPlatform` description updated to include all allowed values
+  - `partyCodes` renamed to `identifyingCodes` in order to align with EBL with the following changes:
+    - `codeListProvider` is no longer an `Enum` but a String with `maxLength` 100 and description updated with all possible values
+    - `codeListName` description changed to align with new `codeListProvider`
+  - `TaxLegalReference` object added
+  - `TransportDocument` object is now included as part of the spec (and no longer a $ref to a Domain defined on SwaggerHub)
 <a name="v300B1"></a>[Release v3.0.0 Beta 1 (28 December 2023)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS/3.0.0-Beta-1)
 ---
 Initial release of the DCSA OpenAPI definitions for Bill of Lading Issuance 3.0.0-Beta-1.
