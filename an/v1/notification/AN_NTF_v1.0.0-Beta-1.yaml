@@ -1,6 +1,4 @@
-openapi: 3.0.0
-x-stoplight:
-  id: m7pgcqwk42kbf
+openapi: 3.0.3
 info:
   version: 1.0.0-Beta-1
   title: DCSA OpenAPI specification for Arrival Notice Notifications
@@ -12,9 +10,12 @@ info:
     Subscribing to notification is done outside scope of this API.
 
     ### Stats API
-    The Stats API offers crucial statistical information for both API providers and consumers to enhance their services and helps DCSA to understand and scale the ecosystem. We expect you to invoke the Stats API for every request made to this API. Further details can be found [here](https://developer.dcsa.org/#/http/guides/api-guides/stats-api)
+    The Stats API offers crucial statistical information for both API providers and consumers to enhance their services and helps DCSA to understand and scale the ecosystem. We expect you to invoke the Stats API for every request made to this API. Further details can be found [here](https://labs.dcsa.org/#/http/guides/api-guides/stats-api/introduction)
 
     For a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/an/notification/v1#v100B1). Please also [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments.
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
   contact:
     name: Digital Container Shipping Association (DCSA)
     url: 'https://dcsa.org'
@@ -50,7 +51,7 @@ paths:
             schema:
               $ref: '#/components/schemas/ArrivalNoticeNotification'
             examples:
-              receivedExample:
+              notifyExample:
                 summary: |
                   Arrival Notice received
                 description: |
@@ -62,10 +63,36 @@ paths:
                   type: org.dcsa.arrival-notice-notification.v1
                   time: '2018-04-05T17:31:00Z'
                   datacontenttype: application/json
+                  subscriptionReference: AN001
                   data:
-                    arrivalNoticeReference: 24595eb0-5cfc-4381-9c3a-cedc1975e9aa
-                    carrierBookingReference: HHL987
                     transportDocumentReference: HHL123
+                    portOfDischarge:
+                      locationType: UNLO
+                      UNLocationCode: DEHAM
+                    etaAtPortOfDischargeDate: '2024-07-01'
+              notifyExample2:
+                summary: |
+                  Arrival Notice received going to Hannover as Place of Delivery
+                description: |
+                  A notification explaining that an `Arrival Notice` has been created in provider system. This `Arrival Notice` also has `Place of Delivery` information.
+                value:
+                  specversion: '1.0'
+                  id: 3cecb101-7a1a-43a4-9d62-e88a131651e2
+                  source: 'https://member.com/'
+                  type: org.dcsa.arrival-notice-notification.v1
+                  time: '2018-04-05T17:31:00Z'
+                  datacontenttype: application/json
+                  subscriptionReference: AN001
+                  data:
+                    transportDocumentReference: HHL123
+                    portOfDischarge:
+                      locationType: UNLO
+                      UNLocationCode: DEHAM
+                    etaAtPortOfDischargeDate: '2024-07-01'
+                    placeOfDelivery:
+                      locationType: UNLO
+                      UNLocationCode: DEHAJ
+                    etaAtPlaceOfDeliveryDate: '2024-07-01'
       responses:
         '204':
           description: |
@@ -79,14 +106,10 @@ paths:
                 example: 1.0.0-Beta-1
       servers:
         - url: 'http://localhost:3000'
-      x-stoplight:
-        id: 8qnfcuf7ka477
 components:
   schemas:
     ArrivalNoticeNotification:
       type: object
-      x-stoplight:
-        id: okd2c3sti7b4k
       title: Arrival Notice Notification
       description: |
         `CloudEvent` specific properties for the `Notification`.
@@ -144,38 +167,47 @@ components:
           enum:
             - application/json
           example: application/json
+        subscriptionReference:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 100
+          description: >
+            The reference of the subscription that has triggered this event
+          example: '30675492-50ff-4e17-a7df-7a487a8ad343'
         data:
           type: object
           description: |
             `Arrival Notice` specific properties for the `Notification`
           properties:
-            arrivalNoticeReference:
-              type: string
-              pattern: ^\S+(\s+\S+)*$
-              maxLength: 100
-              description: |
-                A set of unique characters provided by carrier to identify an `Arrival Notice`
-              example: 24595eb0-5cfc-4381-9c3a-cedc1975e9aa
-            carrierBookingReference:
-              type: string
-              pattern: ^\S+(\s+\S+)*$
-              maxLength: 35
-              description: |
-                The `carrierBookingReference` if know. Often this will not be known until the booking has been confirmed. Is available during a booking amendment.
-
-                **Conditional:** `carrierBookingRequestReference` and/or `carrierBookingReference` is required to provide
-              example: ABC709951
             transportDocumentReference:
               type: string
-              pattern: ^\S+(\s+\S+)*$
+              pattern: ^\S(?:.*\S)?$
               maxLength: 20
               description: |
                 A unique number allocated by the shipping line to the transport document and the main number used for the tracking of the status of the shipment.
               example: HHL71800000
+            portOfDischarge:
+              $ref: '#/components/schemas/PortOfDischarge'
+            etaAtPortOfDischargeDate:
+              type: string
+              format: date
+              description: |
+                The expected date of arrival of the vessel at the `Port of Discharge`.
+              example: '2024-04-22'
+            placeOfDelivery:
+              $ref: '#/components/schemas/PlaceOfDelivery'
+            etaAtPlaceOfDeliveryDate:
+              type: string
+              format: date
+              description: |
+                The expected date of arrival of the shipment at `Place of Delivery`.
+
+                **Condition:** Mandatory if provided as part of the `TransportDocument`
+              example: '2024-04-22'
           required:
-            - arrivalNoticeReference
-            - carrierBookingReference
             - transportDocumentReference
+            - portOfDischarge
+            - etaAtPortOfDischargeDate
       required:
         - specversion
         - id
@@ -183,4 +215,270 @@ components:
         - type
         - time
         - datacontenttype
+        - subscriptionReference
         - data
+
+    PortOfDischarge:
+      title: Port of Discharge
+      description: |
+        General purpose object to capture `Port of Discharge` location specified as: the location where the cargo is discharged from the last sea-going vessel.
+
+        The location can be specified in **one** of the following ways: `UN Location Code` or `City and Country`.
+      example:
+        locationName: Hamburg
+        locationType: UNLO
+        UNLocationCode: DEHAM
+      oneOf:
+        - $ref: '#/components/schemas/CityLocation'
+        - $ref: '#/components/schemas/UNLocationLocation'
+      discriminator:
+        propertyName: locationType
+        mapping:
+          CITY: '#/components/schemas/CityLocation'
+          UNLO: '#/components/schemas/UNLocationLocation'
+    PlaceOfDelivery:
+      title: Place of Delivery
+      description: |
+        General purpose object to capture `Place of Delivery` location specified as: the location where the cargo is handed over to the consignee, or his agent, by the shipping line and where responsibility of the shipping line ceases.
+
+        **Condition:** Mandatory if provided as part of the `TransportDocument`
+
+        The location can be specified in **one** of the following ways: `UN Location Code`, `Facility` or an `Address`.
+      example:
+        locationName: Hamburg
+        locationType: UNLO
+        UNLocationCode: DEHAM
+      oneOf:
+        - $ref: '#/components/schemas/AddressLocation'
+        - $ref: '#/components/schemas/FacilityLocation'
+        - $ref: '#/components/schemas/UNLocationLocation'
+      discriminator:
+        propertyName: locationType
+        mapping:
+          ADDR: '#/components/schemas/AddressLocation'
+          FACI: '#/components/schemas/FacilityLocation'
+          UNLO: '#/components/schemas/UNLocationLocation'
+
+    ############################
+    # Address Location Interface
+    ############################
+    AddressLocation:
+      title: Address Location
+      type: object
+      description: An interface used to express a location using an `Address` object.
+      properties:
+        locationName:
+          type: string
+          description: The name of the location.
+          example: Port of Amsterdam
+          maxLength: 100
+        locationType:
+          type: string
+          maxLength: 4
+          description: Discriminator used to identify this as an `Address` location interface.
+          example: ADDR
+        address:
+          $ref: '#/components/schemas/Address'
+      required:
+        - locationType
+        - address
+    Address:
+      type: object
+      title: Address
+      description: |
+        An object for storing address related information
+      properties:
+        street:
+          type: string
+          maxLength: 100
+          description: The name of the street of the party’s address.
+          example: Ruijggoordweg
+        streetNumber:
+          type: string
+          maxLength: 50
+          description: The number of the street of the party’s address.
+          example: '100'
+        floor:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 50
+          description: |
+            The floor of the party’s street number.
+          example: N/A
+        postCode:
+          type: string
+          maxLength: 50
+          description: The post code of the party’s address.
+          example: 1047 HM
+        city:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 65
+          description: |
+            The city name of the party’s address.
+          example: Amsterdam
+        stateRegion:
+          type: string
+          maxLength: 65
+          description: The state/region of the party’s address.
+          nullable: true
+          example: North Holland
+        countryCode:
+          type: string
+          pattern: '^[A-Z]{2}$'
+          minLength: 2
+          maxLength: 2
+          description: |
+            The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+          example: NL
+
+    #########################
+    # City Location Interface
+    #########################
+    CityLocation:
+      type: object
+      title: City Location
+      description: |
+        An interface used to express a location using a `City`, `state/region` and `country`
+      properties:
+        locationName:
+          type: string
+          description: The name of the location.
+          pattern: ^\S(?:.*\S)?$
+          example: Port of Amsterdam
+          maxLength: 100
+        locationType:
+          type: string
+          description: |
+            Discriminator used to identify this as a `City Location` interface
+          example: CITY
+        city:
+          type: object
+          description: |
+            An object for storing city, state/region and coutry related information
+          properties:
+            city:
+              type: string
+              pattern: ^\S(?:.*\S)?$
+              maxLength: 65
+              description: |
+                The city name of the party’s address.
+              example: Amsterdam
+            stateRegion:
+              type: string
+              maxLength: 65
+              description: |
+                The state/region of the party’s address.
+              nullable: true
+              example: North Holland
+            countryCode:
+              type: string
+              pattern: '^[A-Z]{2}$'
+              minLength: 2
+              maxLength: 2
+              description: |
+                The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+              example: NL
+          required:
+            - city
+            - country
+      required:
+        - locationType
+        - city
+
+    #############################
+    # Facility Location Interface
+    #############################
+    FacilityLocation:
+      type: object
+      title: Facility Location
+      description: |
+        An interface used to express a location using a `Facility`. The facility can either be expressed using a `BIC` code or a `SMDG` code. The `facilityCode` does not contain the `UNLocationCode` - this should be provided in the `UnLocationCode` attribute.
+      properties:
+        locationName:
+          type: string
+          description: The name of the location.
+          pattern: ^\S(?:.*\S)?$
+          example: Port of Amsterdam
+          maxLength: 100
+        locationType:
+          type: string
+          maxLength: 4
+          description: |
+            Discriminator used to identify this as a `Facility Location` interface
+          example: FACI
+        UNLocationCode:
+          type: string
+          pattern: '^[A-Z]{2}[A-Z2-9]{3}$'
+          minLength: 5
+          maxLength: 5
+          example: NLAMS
+          description: |-
+            The UN Location code specifying where the place is located. The pattern used must be
+            
+            - 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+            - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used
+            
+            More info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)
+            
+            This field is **conditionally mandatory** depending on the value of the `facilityCodeListProvider` field.
+        facilityCode:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 6
+          description: |-
+            The code used for identifying the specific facility. This code does not include the UN Location Code.
+            The definition of the code depends on the `facilityCodeListProvider`. As code list providers maintain multiple codeLists the following codeList is used:
+            - for `SMDG` - the codeList used is the [SMDG Terminal Code List](https://smdg.org/wp-content/uploads/Codelists/Terminals/SMDG-Terminal-Code-List-v20210401.xlsx)  - for `BIC` - the codeList used is the [BIC Facility Codes](https://www.bic-code.org/facility-codes/)
+          nullable: false
+          example: ADT
+        facilityCodeListProvider:
+          type: string
+          description: |
+            The provider used for identifying the facility Code. Some facility codes are only defined in combination with an `UN Location Code`
+            - `BIC` (Requires a UN Location Code) - `SMDG` (Requires a UN Location Code)
+          enum:
+            - BIC
+            - SMDG
+          example: SMDG
+      required:
+        - locationType
+        - facilityCode
+        - facilityCodeListProvider
+
+    ###############################
+    # UNLocation Location Interface
+    ###############################
+    UNLocationLocation:
+      title: UNLocation Location
+      type: object
+      description: An interface used to express a location using a `Un Location Code`.
+      additionalProperties: false
+      properties:
+        locationName:
+          type: string
+          description: The name of the location.
+          pattern: ^\S(?:.*\S)?$
+          example: Port of Amsterdam
+          maxLength: 100
+        locationType:
+          type: string
+          maxLength: 4
+          description: Discriminator used to identify this as a `UNLocation` location interface.
+          example: UNLO
+        UNLocationCode:
+          type: string
+          pattern: '^[A-Z]{2}[A-Z2-9]{3}$'
+          minLength: 5
+          maxLength: 5
+          example: NLAMS
+          description: |-
+            The UN Location code specifying where the place is located. The pattern used must be
+
+            - 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+            - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used
+
+            More info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)
+      required:
+        - locationType
+        - UNLocationCode
