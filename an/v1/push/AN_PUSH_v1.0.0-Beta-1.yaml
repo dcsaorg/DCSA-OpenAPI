@@ -1,0 +1,102 @@
+openapi: 3.0.3
+info:
+  version: 1.0.0-Beta-1
+  title: DCSA OpenAPI specification for pushing Arrival Notice Event Stats Transfer
+  description: |
+    API specification issued by DCSA.org.
+
+    Arrival Notice Push for [DCSA OpenAPI specification for Arrival Notice](https://app.swaggerhub.com/apis/dcsaorg/DCSA_AN/1.0.0-Beta-1) is a full Event State Transfer. The `POST` endPoint of the consumer is called whenever an `Arrival Notice` that is being subscribed to is created.
+
+    Subscribing to events is done outside scope of this API.
+
+    ### Stats API
+    The Stats API offers crucial statistical information for both API providers and consumers to enhance their services and helps DCSA to understand and scale the ecosystem. We expect you to invoke the Stats API for every request made to this API. Further details can be found [here](https://labs.dcsa.org/#/http/guides/api-guides/stats-api/introduction)
+
+    For a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/v1/an/push#v100B1). Please also [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments.
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+  contact:
+    name: Digital Container Shipping Association (DCSA)
+    url: 'https://dcsa.org'
+    email: info@dcsa.org
+tags:
+  - name: Event State Transfer
+    description: Event State Transfer operations
+servers:
+  - url: 'http://localhost:9000'
+paths:
+  /v1/arrival-notice-push:
+    post:
+      tags:
+        - Event State Transfer
+      summary: Send a new Arrival Notice
+      operationId: arrival-notice-push
+      description: |
+        Sends an [`Arrival Notice`](#/ArrivalNotice). This endPoint is called whenever an `Arrival Notice` that a cosumer has subscribed to is created.
+      parameters:
+        - name: API-Version
+          in: header
+          description: |
+            An API-Version header **MUST** be provided to the request (mandatory). The header **MUST** be a [SemVer](https://semver.org/) specifying the provider (the calling party) API version.
+          required: true
+          schema:
+            type: string
+            example: 1.0.0-Beta-1
+        - in: header
+          name: subscriptionReference
+          required: true
+          description: |
+            The reference of the subscription triggering the event being sent
+          schema:
+            type: string
+            pattern: ^\S(?:.*\S)?$
+            maxLength: 100
+            description: |
+              The reference of the subscription that has triggered this event
+            example: '30675492-50ff-4e17-a7df-7a487a8ad343'
+      requestBody:
+        description: |
+          The payload used to send an [`Arrival Notice`](#/ArrivalNotice)
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArrivalNotice'
+            examples:
+              pushExample:
+                summary: |
+                  Arrival Notice received
+                description: |
+                  An `Arrival Notice` is being sent to consumer.
+                value:
+                  transportDocumentReference: HHL123
+      responses:
+        '204':
+          description: |
+            No Content
+          headers:
+            API-Version:
+              description: |
+                [SemVer](https://semver.org/) used to indicate the version of the consumer (the responding party). This is optional to provide.
+              schema:
+                type: string
+                example: 1.0.0-Beta-1
+      servers:
+        - url: 'http://localhost:3000'
+components:
+  schemas:
+    ArrivalNotice:
+      type: object
+      title: Arrival Notice
+      description: |
+        `Arrival Notice` is being sent.
+      properties:
+        transportDocumentReference:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 20
+          description: |
+            A unique number allocated by the shipping line to the transport document and the main number used for the tracking of the status of the shipment.
+          example: HHL71800000
+      required:
+        - transportDocumentReference
