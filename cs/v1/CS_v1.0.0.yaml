@@ -1,0 +1,884 @@
+openapi: 3.0.3
+x-stoplight:
+  id: eok4umquikhny
+info:
+  title: DCSA OpenAPI specification for Commercial Schedules
+  version: 1.0.0-Beta-1
+  description: |
+    API specification issued by DCSA.org
+
+    This API supports Commercial Schedules (CS) in the context of: point-to-point routings, port schedules, and vessel schedules. 
+
+    **Commercial schedules - point-to-point routings**: provides the product offering of single or multiple estimated end-to-end route options for a shipment in the pre-booking phase. This includes point-to-point specification of all transport legs, estimated timings, estimated schedules and interdependencies between transport legs.
+     
+    **Commercial schedules – port schedules**: provides, for a required specific port and starting date, the set of all vessels arriving and departing from the port with the corresponding estimated timestamps.
+     
+    **Commercial schedules – vessel schedules**: provides, for a required specific service and/or voyage and/or vessel and/or location, the timetable of estimated departure and arrival times for each port call on the rotation of the vessel(s).
+
+    The Interface Standards for CS and other documentation can be found on the [DCSA Website](https://dcsa.org/standards/commercial-schedules/).
+
+    For explanation to specific values or objects please refer to the [Information Model](https://dcsa.org/wp-content/uploads/2024/01/DCSA-Information-Model-2023.Q4.pdf).
+
+    **Stats API**
+
+    The Stats API offers crucial statistical information for both API providers and consumers to enhance their services and helps DCSA to understand and scale the ecosystem. We expect you to invoke the Stats API for every request made to the Commercial Schedule API. Further details can be found [here](https://developer.dcsa.org/#/http/guides/api-guides/stats-api).
+
+    For a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/cs/v1#v100B1). Please also [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments.
+  license:
+    url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
+    name: Apache 2.0
+  contact:
+    name: Digital Container Shipping Association (DCSA)
+    url: 'https://dcsa.org/'
+    email: info@dcsa.org
+servers:
+  - url: 'http://localhost:3000'
+paths:
+  /v1/point-to-point-routes:
+    get:
+      summary: Point to Point Routing
+      tags:
+        - Point To Point
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PointToPoint'
+              examples: {}
+          headers:
+            API-Version:
+              $ref: ../../models/CommonComponents.yaml#/components/headers/API-Version
+        '400':
+          description: Bad Request
+          headers:
+            API-Version:
+              $ref: ../../models/CommonComponents.yaml#/components/headers/API-Version
+          content:
+            application/json:
+              schema:
+                $ref: ../../models/ErrorResponse.yaml
+              examples:
+                Example 1:
+                  value:
+                    httpMethod: GET
+                    requestUri: 'https://dcsa.org/cs/v1/point-to-point'
+                    statusCode: 400
+                    statusCodeText: Bad Request
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2019-11-12T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7005
+                        property: placeOfDelivery
+                        value: SG
+                        errorCodeText: invalidQuery
+                        errorCodeMessage: PlaceOfDelivery does not exist
+        '500':
+          description: Internal Server Error
+          headers:
+            API-Version:
+              $ref: ../../models/CommonComponents.yaml#/components/headers/API-Version
+          content:
+            application/json:
+              schema:
+                $ref: ../../models/ErrorResponse.yaml
+              examples:
+                Example 1:
+                  value:
+                    httpMethod: GET
+                    requestUri: 'https://dcsa.org/cs/v1/point-to-point'
+                    statusCode: 500
+                    statusCodeText: Internal Server Error
+                    statusCodeMessage: Unable to process request
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2019-11-12T07:41:00+08:30'
+                    errors: []
+      operationId: get-v1-point-to-point
+      parameters:
+        - schema:
+            type: string
+            pattern: '^[A-Z]{2}[A-Z2-9]{3}$'
+            minLength: 5
+            maxLength: 5
+            example: NLAMS
+          in: query
+          name: placeOfReceipt
+          description: The `UNLocationCode` specifying where the place is located.
+          required: true
+        - schema:
+            type: string
+            pattern: '^[A-Z]{2}[A-Z2-9]{3}$'
+            minLength: 5
+            maxLength: 5
+            example: NLAMS
+          in: query
+          name: placeOfDelivery
+          description: The `UNLocationCode` specifying where the place is located.
+          required: true
+        - schema:
+            type: string
+            format: date
+            example: '2021-04-01'
+            pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'
+          in: query
+          name: departureDate
+          description: 'The date of departure of the routings in the response `:gte` (≥ Greater than or equal) OR `:lte` (≤ Less than or equal) `departureDate:gte=2021-04-01`'
+        - schema:
+            type: string
+            format: date
+            example: '2021-04-01'
+            pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'
+          in: query
+          name: arrivalDate
+          description: 'The data of arrival of the routings in the response `:gte` (≥ Greater than or equal) OR `:lte` (≤ Less than or equal) `arrivalDate:gte=2021-04-01`'
+        - schema:
+            type: integer
+            example: 1
+            format: int32
+            minimum: 0
+          in: query
+          name: maxTranshipment
+          description: 'Specifies the maximum number of transhipments that can have the proposed routings in the response. By default, transhipments are allowed and the responses can have either direct routings or routings with transhipment. The default value of maximum transhipments is defined by the carrier for when the consumer does not provide a value. If the user sets the number of transhipments to 0, only direct routings can be returned in the response. '
+        - $ref: ../../models/CommonComponents.yaml#/components/parameters/Limit
+        - schema:
+            type: string
+            enum:
+              - CY
+              - SD
+              - CFS
+            maxLength: 3
+            example: CY
+          in: query
+          name: receiptTypeAtOrigin
+          description: Indicates the type of service offered at Origin. Options are defined in the `Receipt/Delivery` entity.  - CY(Container yard (incl. rail ramp))  - SD (Store Door)  - CFS (Container Freight Station)
+        - schema:
+            type: string
+            enum:
+              - CY
+              - SD
+              - CFS
+            maxLength: 3
+            example: CY
+          in: query
+          name: deliveryTypeAtDestination
+          description: Indicates the type of service offered at Destination. Options are defined in the `Receipt/Delivery` entity.  - CY(Container yard (incl. rail ramp))  - SD (Store Door)  - CFS (Container Freight Station)
+        - $ref: ../../models/CommonComponents.yaml#/components/parameters/APIVersionMajor
+      description: Provides the product offering of single or multiple estimated end-to-end route options for a shipment in the pre-booking phase.
+      x-stoplight:
+        id: ibt5y7c4xqfp8
+  /v1/port-schedules:
+    get:
+      summary: Port Schedule
+      tags:
+        - Port Schedule
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PortSchedule'
+          headers:
+            API-Version:
+              $ref: ../../models/CommonComponents.yaml#/components/headers/API-Version
+        '400':
+          description: Bad Request
+          headers:
+            API-Version:
+              $ref: ../../models/CommonComponents.yaml#/components/headers/API-Version
+          content:
+            application/json:
+              schema:
+                $ref: ../../models/ErrorResponse.yaml
+              examples:
+                Example 1:
+                  value:
+                    httpMethod: GET
+                    requestUri: 'https://dcsa.org/cs/v1/port-schedule'
+                    statusCode: 400
+                    statusCodeText: Bad Request
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2019-11-12T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7005
+                        property: port
+                        value: SG
+                        errorCodeText: invalidQuery
+                        errorCodeMessage: Port does not exist
+        '500':
+          description: Internal Server Error
+          headers:
+            API-Version:
+              $ref: ../../models/CommonComponents.yaml#/components/headers/API-Version
+          content:
+            application/json:
+              schema:
+                $ref: ../../models/ErrorResponse.yaml
+              examples:
+                Example 1:
+                  value:
+                    httpMethod: GET
+                    requestUri: 'https://dcsa.org/cs/v1/port-schedule'
+                    statusCode: 500
+                    statusCodeText: Internal Server Error
+                    statusCodeMessage: Cannot process request.
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2019-11-12T07:41:00+08:30'
+                    errors: []
+      operationId: get-v1-port-schedules
+      description: 'Provides, for a required specific port and starting date, the set of all vessels arriving and departing from the port with the corresponding estimated timestamps.'
+      parameters:
+        - schema:
+            type: string
+            maxLength: 5
+            example: NLAMS
+            pattern: '^[A-Z]{2}[A-Z2-9]{3}$'
+            minLength: 5
+          in: query
+          name: port
+          description: The UN Location code specifying where the place is located.
+          required: true
+        - schema:
+            type: string
+            format: date
+            pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'
+            example: '2023-07-01'
+          in: query
+          name: date
+          description: The date since when the estimated arrival and departures of vessels in a given port is required
+          required: true
+        - $ref: ../../models/CommonComponents.yaml#/components/parameters/APIVersionMajor
+      x-stoplight:
+        id: qgasqkwxqdf20
+    parameters: []
+  /v1/vessel-schedules:
+    get:
+      summary: Vessel Schedule
+      tags:
+        - Vessel Schedule
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ServiceSchedule'
+          headers:
+            API-Version:
+              $ref: ../../models/CommonComponents.yaml#/components/headers/API-Version
+        '400':
+          description: Bad Request
+          headers:
+            API-Version:
+              $ref: ../../models/CommonComponents.yaml#/components/headers/API-Version
+          content:
+            application/json:
+              schema:
+                $ref: ../../models/ErrorResponse.yaml
+              examples:
+                Example 1:
+                  value:
+                    httpMethod: GET
+                    requestUri: 'https://dcsa.org/cs/v1/vessel-schedule'
+                    statusCode: 400
+                    statusCodeText: Bad Request
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2019-11-12T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7007
+                        property: UNLocationCode
+                        value: NA
+                        errorCodeText: invalidQuery
+                        errorCodeMessage: UNLocationCode does not exist
+        '500':
+          description: Internal Server Error
+          headers:
+            API-Version:
+              $ref: ../../models/CommonComponents.yaml#/components/headers/API-Version
+          content:
+            application/json:
+              schema:
+                $ref: ../../models/ErrorResponse.yaml
+              examples:
+                Example 1:
+                  value:
+                    httpMethod: GET
+                    requestUri: 'https://dcsa.org/cs/v1/vessel-schedule'
+                    statusCode: 500
+                    statusCodeText: Internal Server Error
+                    statusCodeMessage: Cannot process request.
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2019-11-12T07:41:00+08:30'
+                    errors: []
+      operationId: get-v1-vessel-schedule
+      x-stoplight:
+        id: 66z7va8arml1z
+      parameters:
+        - schema:
+            type: string
+            maxLength: 7
+            pattern: '^\d{7}$'
+            example: '9321483'
+          in: query
+          name: vesselIMONumber
+          description: The identifier of a vessel. The result will only return schedules including the vessel with the specified `IMO number`.  It is not a requirement for dummy vessels to have an `IMO Number`.
+        - schema:
+            type: string
+            maxLength: 35
+            example: King of the Seas
+          in: query
+          name: vesselName
+          description: The name of a vessel. The result will only return schedules including the vessel with the specified name.  Be aware that the vesselName is not unique and might match multiple vessels.
+        - schema:
+            type: string
+            maxLength: 11
+            example: FE1
+          in: query
+          name: carrierServiceCode
+          description: The carrier specific service code to filter by. The result will only return schedules including the service code.
+        - schema:
+            type: string
+            pattern: '^SR\d{5}[A-Z]$'
+            maxLength: 8
+            example: SR12345A
+          in: query
+          name: universalServiceReference
+          description: The Universal Service Reference (USR) as defined by DCSA to filter by.
+        - schema:
+            type: string
+            maxLength: 50
+            example: 2103S
+          in: query
+          name: carrierVoyageNumber
+          description: The carrier specific identifier of a Voyage - can be both `importVoyageNumber` and `exportVoyageNumber`. The result will only return schedules including the Ports where `carrierVoyageNumber` is either `carrierImportVoyageNumber` or `carrierExportVoyageNumber`.
+        - schema:
+            type: string
+            pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
+            maxLength: 5
+            example: 2201N
+          in: query
+          name: universalVoyageReference
+          description: The Universal Reference of a Voyage - can be both `importUniversalVoyageReference` and `exportUniversalVoyageReference`. The result will only return schedules including the Ports where `universalVoyageReference` is either `importUniversalVoyageReference` or `exportUniversalVoyageReference`.
+        - schema:
+            type: string
+            pattern: '^[A-Z]{2}[A-Z2-9]{3}$'
+            minLength: 5
+            maxLength: 5
+            example: NLAMS
+          in: query
+          name: UNLocationCode
+          description: The UN Location Code specifying where a port is located.  Specifying this filter will only return schedules including entire Voyages related to this particular UN Location Code.
+        - schema:
+            type: string
+            maxLength: 6
+            example: APM
+          in: query
+          name: facilitySMDGCode
+          description: The facilitySMDGCode specifying a specific facility (using SMDG Code). Be aware that the `facilitySMDGCode` does not contain a `UNLocationCode` - this must be specified in the `UNLocationCode` filter.  Specifying this filter will only return schedules including entire Voyages related to this particular `facilitySMDGCode`.
+        - schema:
+            type: string
+            format: date
+            example: '2020-04-06'
+          in: query
+          name: startDate
+          description: |
+            The start date of the period for which schedule information is requested. If a date of any Timestamp (ATA, ETA or PTA) inside a PortCall matches a date on or after (≥) the `startDate` the entire Voyage (import- and export-Voyage) matching the PortCall will be included in the result. All matching is done towards local Date at the place of the port call.
+            If this filter is not provided the default value is `3 months` prior to request time.  The value is populated in `ISO 8601` date format.
+        - schema:
+            type: string
+            format: date
+            example: '2020-04-10'
+          in: query
+          name: endDate
+          description: |
+            The end date of the period for which schedule information is requested. If a date of any Timestamp (ATA, ETA or PTA) inside a PortCall matches a date on or before (≤) the `endDate` the entire Voyage(import- and export-Voyage) matching the PortCall will be included in the result. All matching is done towards local Date at the place of the port call.  
+            If this filter is not provided the default value is `6 months` after request time.  The value is populated in `ISO 8601` date format.
+        - $ref: ../../models/CommonComponents.yaml#/components/parameters/APIVersionMajor
+      description: |-
+        Provides, for a required specific service and/or voyage and/or vessel and/or location, the timetable of estimated departure and arrival times for each port call on the rotation of the vessel(s). 
+
+        The number of schedules in the list can be narrowed down by providing filter parameters. The resulting payload will always include the entire voyage(s) being matched.
+    parameters: []
+components:
+  schemas:
+    Place:
+      title: Place
+      type: object
+      description: The Location specifying where the place is located.
+      properties:
+        facilityTypeCode:
+          description: |
+            The code to identify the specific type of facility. The code indicates which role the facility plays during the transportCall.
+            - BORD (Border)
+            - CLOC (Customer Location)
+            - COFS (Container Freight Station)
+            - OFFD (Off Dock Storage)
+            - DEPO (Depot)
+            - INTE (Inland Terminal)
+            - POTE (Port Terminal)
+            - PBPL (Pilot Boarding Place)
+            - BRTH (Berth)
+            - RAMP (Ramp)
+            - WAYP (Waypoint)
+          example: POTE
+          type: string
+        location:
+          oneOf:
+            - $ref: ../../models/UnLocationLocation.yaml
+            - $ref: ../../models/FacilitySMDGLocation.yaml
+            - $ref: ../../models/AddressLocation.yaml
+        dateTime:
+          type: string
+          format: date-time
+          example: '2019-08-24T14:15:22Z'
+          x-stoplight:
+            id: tfufl59x6te0n
+      required:
+        - facilityTypeCode
+        - location
+        - dateTime
+      x-stoplight:
+        id: 6qncmwke0iqvq
+    PointToPoint:
+      title: Point To Point
+      x-stoplight:
+        id: x1x7ae0q7kym3
+      type: object
+      description: ''
+      properties:
+        placeOfReceipt:
+          $ref: '#/components/schemas/Place'
+        placeOfDelivery:
+          $ref: '#/components/schemas/Place'
+        transitTime:
+          type: integer
+          x-stoplight:
+            id: n94kpnvpk6zsn
+          description: The estimated total time in **days** that it takes a shipment to move from place of receipt to place of delivery. Transit time includes stop-over time during transshipments and waiting time at connection points.
+          format: int64
+          example: 10
+        legs:
+          x-stoplight:
+            id: w4k1wtp4z5j6i
+          type: array
+          items:
+            $ref: '#/components/schemas/Leg'
+      required:
+        - placeOfReceipt
+        - placeOfDelivery
+        - legs
+    Leg:
+      title: Leg
+      x-stoplight:
+        id: itbpqbyi0so58
+      type: object
+      properties:
+        sequenceNumber:
+          type: integer
+          x-stoplight:
+            id: 4z9lhffp3cyjs
+          format: int64
+          description: Sequence number of the leg.
+        modeOfTransport:
+          x-stoplight:
+            id: 9atywo7bqza4b
+          type: string
+          enum:
+            - VESSEL
+            - BARGE
+            - TRUCK
+            - RAIL
+          description: The mode of transport as defined by DCSA.
+        vesselOperatorSMDGLinerCode:
+          type: string
+          x-stoplight:
+            id: p7rb8ih6ttymi
+          description: The carrier who is in charge of the vessel operation based on the SMDG code.
+          maxLength: 10
+          example: HLC
+        vesselIMONumber:
+          type: string
+          x-stoplight:
+            id: o2ovfknig1oap
+          description: "The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd's register code, which does not change during the lifetime of the vessel\r\n\r\nCondition: If the vessel is not dummy, there needs to be an IMO. If the vessel is dummy, the IMO is optional."
+          example: '9321483'
+          pattern: '^\d{7}$'
+          maxLength: 7
+        vesselName:
+          type: string
+          x-stoplight:
+            id: xfeizdvobewab
+          description: The name of the Vessel given by the Vessel Operator and registered with IMO.
+          example: King of the Seas
+          maxLength: 35
+        carrierServiceName:
+          type: string
+          x-stoplight:
+            id: 4f73nmpx0tgcd
+          description: The name of the service.
+          maxLength: 50
+          example: Great Lion Service
+        universalServiceReference:
+          type: string
+          x-stoplight:
+            id: v00rf5pn6sfs3
+          description: 'A global unique service reference, as per DCSA standard, agreed by VSA partners for the service. The service reference must match the regular expression pattern: SR\d{5}[A-Z]. The letters SR followed by 5 digits, followed by a checksum-character as a capital letter from A to Z.'
+          example: SR12345A
+          pattern: '^SR\d{5}[A-Z]$'
+          maxLength: 8
+        carrierServiceCode:
+          type: string
+          x-stoplight:
+            id: 6ejiom7wmncco
+          description: The carrier-specific code of the service for which the schedule details are published.
+          maxLength: 11
+          example: FE1
+        universalImportVoyageReference:
+          type: string
+          x-stoplight:
+            id: 6dyfm23y5ct2x
+          description: 'A global unique voyage reference for the import Voyage, as per DCSA standard, agreed by VSA partners for the voyage.'
+          pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
+          example: 2103N
+        universalExportVoyageReference:
+          type: string
+          x-stoplight:
+            id: ns0d83qpotc73
+          description: 'A global unique voyage reference for the export Voyage, as per DCSA standard, agreed by VSA partners for the voyage.'
+          pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
+          example: 2103N
+        carrierImportVoyageNumber:
+          type: string
+          x-stoplight:
+            id: e9np9hrh7c934
+          maxLength: 50
+          example: 2103S
+          description: The identifier of an import voyage. The carrier-specific identifier of the import Voyage.
+        carrierExportVoyageNumber:
+          type: string
+          x-stoplight:
+            id: 5u650xz8q6zfm
+          example: 2103N
+          maxLength: 50
+          description: The identifier of an export voyage. The carrier-specific identifier of the export Voyage.
+        departure:
+          $ref: '#/components/schemas/Place'
+        arrival:
+          $ref: '#/components/schemas/Place'
+      required:
+        - departure
+        - arrival
+      description: Leg of the Point-to-Point routing. The object "Legs" can be conformed by as many legs as needed and this legs must be identified with a sequence number.
+    PortSchedule:
+      title: Port Schedule
+      type: object
+      properties:
+        location:
+          x-stoplight:
+            id: ksjcrliv4kobm
+          oneOf:
+            - $ref: ../../models/UnLocationLocation.yaml
+            - $ref: ../../models/FacilitySMDGLocation.yaml
+        vesselSchedules:
+          type: array
+          x-stoplight:
+            id: oqtnha66e947j
+          minItems: 0
+          items:
+            $ref: '#/components/schemas/Schedule'
+      required:
+        - location
+      x-stoplight:
+        id: mgxbp9alny3q0
+    Schedule:
+      title: Schedule
+      x-stoplight:
+        id: czyyep580i801
+      type: object
+      properties:
+        carrierServiceName:
+          type: string
+          x-stoplight:
+            id: g8e6j84n6mcw8
+          description: The name of the service.
+          maxLength: 50
+          example: Great Lion Service
+        carrierServiceCode:
+          type: string
+          x-stoplight:
+            id: ys8adwf0o370o
+          description: The carrier-specific code of the service for which the schedule details are published.
+          maxLength: 11
+          example: FE1
+        universalServiceReference:
+          type: string
+          x-stoplight:
+            id: 18655doinhur2
+          description: 'A global unique service reference, as per DCSA standard, agreed by VSA partners for the service. The service reference must match the regular expression pattern: SR\d{5}[A-Z]. The letters SR followed by 5 digits, followed by a checksum-character as a capital letter from A to Z.'
+          example: SR12345A
+          pattern: '^SR\d{5}[A-Z]$'
+          maxLength: 8
+        vesselIMONumber:
+          type: string
+          x-stoplight:
+            id: emnq4ndujb496
+          description: "The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd's register code, which does not change during the lifetime of the vessel\r\n\r\nCondition: If the vessel is not dummy, there needs to be an IMO. If the vessel is dummy, the IMO is optional."
+          example: '9321483'
+          pattern: '^\d{7}$'
+          maxLength: 7
+        vesselName:
+          type: string
+          x-stoplight:
+            id: yrtql880q13gj
+          description: The name of the Vessel given by the Vessel Operator and registered with IMO.
+          example: King of the Seas
+          maxLength: 35
+        isDummyVessel:
+          type: boolean
+          x-stoplight:
+            id: 018smkza52uel
+          description: Is this a dummy vessel. In case no vessel has been asigned yet - this property can be set to `true` indicating that the vesselIMONumber does not exist.
+        carrierImportVoyageNumber:
+          type: string
+          x-stoplight:
+            id: g5k2j8ieu07oq
+          maxLength: 50
+          example: 2103S
+          description: The identifier of an import voyage. The carrier-specific identifier of the import Voyage.
+        carrierExportVoyageNumber:
+          type: string
+          x-stoplight:
+            id: dj9o6n46dqdas
+          example: 2103N
+          maxLength: 50
+          description: The identifier of an export voyage. The carrier-specific identifier of the export Voyage.
+        universalImportVoyageReference:
+          type: string
+          x-stoplight:
+            id: 6lhyeoynmhgm7
+          description: 'A global unique voyage reference for the import Voyage, as per DCSA standard, agreed by VSA partners for the voyage.'
+          pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
+          example: 2103N
+        universalExportVoyageReference:
+          type: string
+          x-stoplight:
+            id: a41ztcfgnzf22
+          description: 'A global unique voyage reference for the export Voyage, as per DCSA standard, agreed by VSA partners for the voyage.'
+          pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
+          example: 2103N
+        timestamp:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/Timestamp'
+      required:
+        - carrierServiceName
+        - carrierServiceCode
+        - isDummyVessel
+        - carrierImportVoyageNumber
+        - carrierExportVoyageNumber
+        - timestamp
+    TransportCall:
+      title: Transport Call
+      x-stoplight:
+        id: 5yngetqks8kzg
+      type: object
+      x-internal: false
+      properties:
+        portVisitReference:
+          type: string
+          x-stoplight:
+            id: cd5lalxkwxmp2
+          description: The unique reference that can be used to link different `transportCallReferences` to the same port visit. The reference is provided by the port to uniquely identify a port call.
+          maxLength: 50
+          example: NLRTM1234589
+        transportCallReference:
+          type: string
+          x-stoplight:
+            id: qcmcz7jjht5mh
+          maxLength: 100
+          description: 'The unique reference for a transport call. It’s the vessel operator’s responsibility to provide the Transport Call Reference, other parties are obliged to pick it up and use it. It can take the form of Port Call References as defined in OVS Definitions Document, or alternatively a reference as defined by the vessel operator.'
+          example: SR11111X-9321483-2107W-NLRTM-HPD2-1-1
+        carrierImportVoyageNumber:
+          type: string
+          x-stoplight:
+            id: 4x4hvlsau7ue4
+          maxLength: 50
+          example: 2103N
+          description: The identifier of an import voyage. The carrier-specific identifier of the import Voyage.
+        carrierExportVoyageNumber:
+          type: string
+          x-stoplight:
+            id: jvibcpyoy1a3i
+          maxLength: 50
+          example: 2103S
+          description: The identifier of an export voyage. The carrier-specific identifier of the export Voyage.
+        universalImportVoyageReference:
+          type: string
+          x-stoplight:
+            id: gxutqo82oej8i
+          pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
+          example: 2103N
+          description: 'A global unique voyage reference for the import Voyage, as per DCSA standard, agreed by VSA partners for the voyage.'
+          maxLength: 5
+        universalExportVoyageReference:
+          type: string
+          x-stoplight:
+            id: qi9m0kpgyredl
+          pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
+          example: 2103N
+          maxLength: 5
+        location:
+          x-stoplight:
+            id: d7jg2e23zhjnb
+          oneOf:
+            - $ref: ../../models/UnLocationLocation.yaml
+            - $ref: ../../models/FacilitySMDGLocation.yaml
+            - $ref: ../../models/AddressLocation.yaml
+          description: 'General purpose object to capture location-related data, the location can be specified in one of the following ways: `UN Location Code`, a `Facility` or an `Address`.'
+        timestamp:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/Timestamp'
+      required:
+        - transportCallReference
+        - carrierImportVoyageNumber
+        - timestamp
+    Timestamp:
+      title: Timestamp
+      x-stoplight:
+        id: e4yk36lhezhkc
+      type: object
+      properties:
+        eventTypeCode:
+          x-stoplight:
+            id: 1wp4wgtbaiqrs
+          enum:
+            - ARRI
+            - DEPA
+          description: "Identifier for type of transportEvent\r\n\r\n- ARRI (Arrived)\r\n- DEPA (Departed)"
+        eventClassifierCode:
+          x-stoplight:
+            id: 7zogujur5x685
+          enum:
+            - PLN
+            - EST
+            - ACT
+          description: |
+            Code for the event classifier. Values can vary depending on eventType.
+
+            Possible values are:
+            - ACT (Actual)
+            - EST (Estimated)
+            - PLN (Planned)
+        eventDateTime:
+          type: string
+          x-stoplight:
+            id: 8o5gse4ovp1ah
+          format: date-time
+          description: Time in the timestamp
+          example: '2025-01-14T09:21:00+01:00'
+      required:
+        - eventTypeCode
+        - eventClassifierCode
+        - eventDateTime
+    VesselSchedule:
+      title: Vessel Schedule
+      x-stoplight:
+        id: vr44dj2pekyyg
+      type: object
+      properties:
+        vesselOperatorSMDGLinerCode:
+          type: string
+          x-stoplight:
+            id: dore13e0yltxc
+          maxLength: 10
+          example: HLC
+          description: The carrier who is in charge of the vessel operation based on the `SMDG code`.
+        vesselIMONumber:
+          type: string
+          x-stoplight:
+            id: tx0a6mhyaohct
+          description: "The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd's register code, which does not change during the lifetime of the vessel\r\n\r\nCondition: If the vessel is not dummy, there needs to be an IMO. If the vessel is dummy, the IMO is optional."
+          pattern: '^\d{7}$'
+          maxLength: 7
+          example: '9321483'
+        vesselName:
+          type: string
+          x-stoplight:
+            id: sjxoamy8akix5
+          description: The name of the Vessel given by the Vessel Operator and registered with IMO.
+          maxLength: 35
+          example: King of the Seas
+        vesselCallSign:
+          type: string
+          x-stoplight:
+            id: 4vw8dszljv2x7
+          maxLength: 10
+          example: NCVV
+          description: 'A unique alphanumeric identity that belongs to the vessel and is assigned by the International Telecommunication Union (ITU). It consists of a threeletter alphanumeric prefix that indicates nationality, followed by one to four characters to identify the individual vessel. For instance, vessels registered under Denmark are assigned the prefix ranges 5PA-5QZ, OUAOZZ, and XPA-XPZ. The Call Sign changes whenever a vessel changes its flag.'
+        isDummyVessel:
+          type: boolean
+          x-stoplight:
+            id: furrqtk4xkza1
+          description: Is this a dummy vessel. In case no vessel has been asigned yet - this property can be set to `true` indicating that the vesselIMONumber does not exist.
+        transportCalls:
+          type: array
+          x-stoplight:
+            id: bf4cuvo4d89vq
+          items:
+            $ref: '#/components/schemas/TransportCall'
+      required:
+        - isDummyVessel
+    ServiceSchedule:
+      title: Service Schedule
+      x-stoplight:
+        id: 6vm6xmsvjsk2r
+      type: object
+      properties:
+        carrierServiceName:
+          type: string
+          x-stoplight:
+            id: 2b1m51pfjlvu6
+          description: The name of the service.
+          maxLength: 50
+          example: Great Lion Service
+        carrierServiceCode:
+          type: string
+          x-stoplight:
+            id: 6iw2bwqz9fi1y
+          maxLength: 11
+          example: FE1
+          description: The carrier-specific code of the service for which the schedule details are published.
+        universalServiceReference:
+          type: string
+          x-stoplight:
+            id: l8yh5dy09liba
+          pattern: '^SR\d{5}[A-Z]$'
+          maxLength: 8
+          example: SR12345A
+          description: 'A global unique service reference, as per DCSA standard, agreed by VSA partners for the service.'
+        vesselSchedules:
+          type: array
+          x-stoplight:
+            id: lrom88da9uo6f
+          items:
+            $ref: '#/components/schemas/VesselSchedule'
+      required:
+        - carrierServiceName
+        - vesselSchedules
+tags:
+  - name: Point To Point
+    description: ' '
+  - name: Port Schedule
+    description: ' '
+  - name: Vessel Schedule
+    description: ' '
