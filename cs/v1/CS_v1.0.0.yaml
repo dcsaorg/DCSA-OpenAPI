@@ -455,6 +455,12 @@ components:
       title: Place
       type: object
       description: The Location specifying where the place is located.
+      x-stoplight:
+        id: 6qncmwke0iqvq
+      required:
+        - facilityTypeCode
+        - location
+        - dateTime
       properties:
         facilityTypeCode:
           description: |
@@ -474,21 +480,15 @@ components:
           type: string
         location:
           oneOf:
-            - $ref: ../../models/UnLocationLocation.yaml
-            - $ref: ../../models/FacilitySMDGLocation.yaml
-            - $ref: ../../models/AddressLocation.yaml
+            - $ref: '#/components/schemas/UNLocationLocation'
+            - $ref: '#/components/schemas/FacilitySMDGLocation'
+            - $ref: '#/components/schemas/AddressLocation'
         dateTime:
           type: string
           format: date-time
           example: '2019-08-24T14:15:22Z'
           x-stoplight:
             id: tfufl59x6te0n
-      required:
-        - facilityTypeCode
-        - location
-        - dateTime
-      x-stoplight:
-        id: 6qncmwke0iqvq
     PointToPoint:
       title: Point To Point
       x-stoplight:
@@ -628,13 +628,17 @@ components:
     PortSchedule:
       title: Port Schedule
       type: object
+      x-stoplight:
+        id: mgxbp9alny3q0
+      required:
+        - location
       properties:
         location:
           x-stoplight:
             id: ksjcrliv4kobm
           oneOf:
-            - $ref: ../../models/UnLocationLocation.yaml
-            - $ref: ../../models/FacilitySMDGLocation.yaml
+            - $ref: '#/components/schemas/UNLocationLocation'
+            - $ref: '#/components/schemas/FacilitySMDGLocation'
         vesselSchedules:
           type: array
           x-stoplight:
@@ -642,10 +646,6 @@ components:
           minItems: 0
           items:
             $ref: '#/components/schemas/Schedule'
-      required:
-        - location
-      x-stoplight:
-        id: mgxbp9alny3q0
     Schedule:
       title: Schedule
       x-stoplight:
@@ -815,9 +815,9 @@ components:
           x-stoplight:
             id: d7jg2e23zhjnb
           oneOf:
-            - $ref: ../../models/UnLocationLocation.yaml
-            - $ref: ../../models/FacilitySMDGLocation.yaml
-            - $ref: ../../models/AddressLocation.yaml
+            - $ref: '#/components/schemas/UNLocationLocation'
+            - $ref: '#/components/schemas/FacilitySMDGLocation'
+            - $ref: '#/components/schemas/AddressLocation'
           description: 'General purpose object to capture location-related data, the location can be specified in one of the following ways: `UN Location Code`, a `Facility` or an `Address`.'
         timestamps:
           type: array
@@ -980,6 +980,277 @@ components:
           format: date-time
           description: Actual cut-off time.
           example: '2019-11-12T07:41:00-08:30'
+    AddressLocation:
+      title: AddressLocation
+      x-stoplight:
+        id: m8siaz93if4cf
+      type: object
+      description: An interface used to express a location using an `Address` object.
+      required:
+        - locationType
+        - address
+      properties:
+        locationName:
+          type: string
+          x-stoplight:
+            id: 1qntskkr8v0h5
+          example: Port of Amsterdam
+          description: The name of the location.
+          maxLength: 100
+        locationType:
+          type: string
+          maxLength: 4
+          description: Discriminator used to identify this as an `Address` location interface.
+          example: ADDR
+        address:
+          type: object
+          description: An object for storing address related information.
+          required:
+            - name
+          properties:
+            name:
+              type: string
+              x-stoplight:
+                id: 744uqr5dx9rfn
+              description: Name of the address.
+              example: John
+              maxLength: 100
+            street:
+              type: string
+              x-stoplight:
+                id: ba6frq15mh2t8
+              example: Ruijggoordweg
+              maxLength: 100
+            streetNumber:
+              type: string
+              x-stoplight:
+                id: 1jiv2010jnttw
+              example: '100'
+              maxLength: 50
+            floor:
+              type: string
+              x-stoplight:
+                id: gcvknia354jrg
+              example: N/A
+              maxLength: 50
+            postCode:
+              type: string
+              x-stoplight:
+                id: 4wlkf4w5um9j3
+              example: 1047 HM
+              maxLength: 50
+            city:
+              type: string
+              x-stoplight:
+                id: snavpzoxpl48e
+              example: Amsterdam
+              maxLength: 65
+            stateRegion:
+              type: string
+              x-stoplight:
+                id: 3k7wb2fib7401
+              example: North Holland
+              maxLength: 65
+            country:
+              type: string
+              x-stoplight:
+                id: enhizhmuskzj6
+              maxLength: 75
+    FacilitySMDGLocation:
+      title: Facility SMDG Location
+      x-stoplight:
+        id: wjfsbdac9a7nz
+      type: object
+      description: An interface used to express a location using a `Facility` by the `SMDG` code list. The `facilitySMDGCode` does not contain the `UNLocationCode` - this should be provided in the `UnLocationCode` attribute.
+      required:
+        - locationType
+        - UNLocationCode
+        - facilitySMDGCode
+      properties:
+        locationName:
+          type: string
+          x-stoplight:
+            id: p82efb2odh99y
+          description: The name of the location.
+          example: Port of Amsterdam
+          maxLength: 100
+        locationType:
+          type: string
+          x-stoplight:
+            id: wvrz1c6visndu
+          example: FACS
+          description: Discriminator used to identify this as a `Facility Location` interface only using `SMDG` code list.
+          maxLength: 4
+        UNLocationCode:
+          type: string
+          x-stoplight:
+            id: 7kpvxrrdljsb5
+          example: NLAMS
+          pattern: '^[A-Z]{2}[A-Z2-9]{3}$'
+          minLength: 5
+          maxLength: 5
+          description: "The UN Location code specifying where the place is located. The pattern used must be\r\n\r\n - 2 characters for the country code using [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)\r\n - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used\r\n\r\nMore info can be found here: [UN/LOCODE](https://en.wikipedia.org/wiki/UN/LOCODE)"
+        facilitySMDGCode:
+          type: string
+          x-stoplight:
+            id: yndr8amfy18nr
+          example: ACT
+          description: "The code used for identifying the specific facility. This code does not include the UN Location Code.\r\n\r\nThe codeList used by SMDG is the [SMDG Terminal Code List](https://smdg.org/wp-content/uploads/Codelists/Terminals/SMDG-Terminal-Code-List-v20210401.xlsx)"
+          maxLength: 6
+    UNLocationLocation:
+      title: UNLocation Location
+      x-stoplight:
+        id: inxjf3adrpkge
+      type: object
+      description: An interface used to express a location using a `Un Location Code`.
+      additionalProperties: false
+      required:
+        - locationType
+        - UNLocationCode
+      properties:
+        locationName:
+          type: string
+          x-stoplight:
+            id: uwy2d1d9tkdku
+          description: The name of the location.
+          example: Port of Amsterdam
+          pattern: ^\S+(\s+\S+)*$
+        locationType:
+          type: string
+          x-stoplight:
+            id: 9gk73d2za4g0r
+          description: Discriminator used to identify this as a `UNLocation` location interface.
+          example: UNLO
+          maxLength: 4
+        UNLocationCode:
+          type: string
+          x-stoplight:
+            id: bnpig7p7mrk8l
+          description: "The UN Location code specifying where the place is located. The pattern used must be\r\n\r\n - 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)\r\n - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used\r\n\r\nMore info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)"
+          pattern: '^[A-Z]{2}[A-Z2-9]{3}$'
+          example: NLAMS
+          minLength: 5
+          maxLength: 5
+    ErrorResponse:
+      title: ErrorResponse
+      x-stoplight:
+        id: ecq5zj4a4hkgf
+      type: object
+      required:
+        - httpMethod
+        - requestUri
+        - statusCode
+        - statusCodeText
+        - errorDateTime
+        - errors
+      properties:
+        httpMethod:
+          x-stoplight:
+            id: nqesjdkli0n88
+          enum:
+            - GET
+            - HEAD
+            - POST
+            - PUT
+            - DELETE
+            - OPTION
+            - PATCH
+          description: 'The HTTP method used to make the request e.g. `GET`, `POST`, etc'
+        requestUri:
+          type: string
+          x-stoplight:
+            id: cq9morjalvdbp
+          description: The URI that was requested.
+          example: /v1/events
+        statusCode:
+          type: integer
+          x-stoplight:
+            id: g4hqmafsodfk2
+          description: The HTTP status code returned.
+          format: int32
+          example: 400
+        statusCodeText:
+          type: string
+          x-stoplight:
+            id: 4g9ee4lnm8ndr
+          description: A standard short description corresponding to the HTTP status code.
+          example: Bad Request
+        statusCodeMessage:
+          type: string
+          x-stoplight:
+            id: y37oiw30a34xl
+          description: A long description corresponding to the HTTP status code with additional information.
+          example: The supplied data could not be accepted
+        providerCorrelationReference:
+          type: string
+          x-stoplight:
+            id: cpmumeeur0y7q
+          description: A unique identifier to the HTTP request within the scope of the API provider.
+          example: 4426d965-0dd8-4005-8c63-dc68b01c4962
+        errorDateTime:
+          type: string
+          x-stoplight:
+            id: agsssg0w9gjxz
+          description: 'The DateTime corresponding to the error occuring. Must be formatted using [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format.'
+          example: '2019-11-12T07:41:00+08:30'
+          format: date-time
+        errors:
+          type: array
+          x-stoplight:
+            id: co6hcjekwf6np
+          description: An array of errors provding more detail about the root cause.
+          items:
+            x-stoplight:
+              id: dxtftzqn6ycvr
+            type: object
+            required:
+              - errorCodeText
+              - erorCodeMessage
+            properties:
+              errorCode:
+                type: integer
+                x-stoplight:
+                  id: is3ylfiqln8p3
+                format: int32
+                description: "The detailed error code returned.\r\n\r\n  - `7000-7999` Technical error codes\r\n  - `8000-8999` Functional error codes\r\n  - `9000-9999` API provider-specific error codes            \r\n\r\n[Error codes as specified by DCSA](https://dcsa.atlassian.net/wiki/spaces/DTG/pages/197132308/Standard+Error+Codes)."
+                example: 7003
+                minimum: 7000
+                maximum: 9999
+              property:
+                type: string
+                x-stoplight:
+                  id: s9a1zlfgp6om9
+                description: The name of the property causing the error.
+                example: facilityCode
+                maxLength: 100
+              value:
+                type: string
+                x-stoplight:
+                  id: 36k41nfzpwgml
+                description: The value of the property causing the error serialised as a string exactly as in the original request.
+                example: SG SIN WHS
+                maxLength: 500
+              jsonPath:
+                type: string
+                x-stoplight:
+                  id: ycejgchx3nykr
+                description: 'A path to the property causing the error, formatted according to [JSONpath](https://github.com/json-path/JsonPath).'
+                example: $.location.facilityCode
+                maxLength: 500
+              errorCodeText:
+                type: string
+                x-stoplight:
+                  id: 6ls1lmfv1s7pt
+                description: A standard short description corresponding to the `errorCode`.
+                example: invalidData
+                maxLength: 100
+              erorCodeMessage:
+                type: string
+                x-stoplight:
+                  id: nxpiv3cjm85pa
+                description: A long description corresponding to the `errorCode` with additional information.
+                example: Spaces not allowed in facility code
+                maxLength: 200
 tags:
   - name: Point To Point
     description: ' '
