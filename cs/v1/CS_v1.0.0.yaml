@@ -51,12 +51,20 @@ paths:
               examples: {}
           headers:
             API-Version:
-              $ref: ../../models/CommonComponents.yaml#/components/headers/API-Version
+              schema:
+                type: string
+                example: 1.0.0
+              description: |
+                SemVer used to indicate the version of the contract (API version) returned.
         '400':
           description: Bad Request
           headers:
             API-Version:
-              $ref: ../../models/CommonComponents.yaml#/components/headers/API-Version
+              schema:
+                type: string
+                example: 1.0.0
+              description: |
+                SemVer used to indicate the version of the contract (API version) returned.
           content:
             application/json:
               schema:
@@ -80,7 +88,11 @@ paths:
           description: Internal Server Error
           headers:
             API-Version:
-              $ref: ../../models/CommonComponents.yaml#/components/headers/API-Version
+              schema:
+                type: string
+                example: 1.0.0
+              description: |
+                SemVer used to indicate the version of the contract (API version) returned.
           content:
             application/json:
               schema:
@@ -164,7 +176,6 @@ paths:
           in: query
           name: deliveryTypeAtDestination
           description: Indicates the type of service offered at Destination. Options are defined in the `Receipt/Delivery` entity.  - CY(Container yard (incl. rail ramp))  - SD (Store Door)  - CFS (Container Freight Station)
-        - $ref: ../../models/CommonComponents.yaml#/components/parameters/APIVersionMajor
         - schema:
             type: integer
             format: int32
@@ -179,6 +190,7 @@ paths:
           in: query
           name: cursor
           description: 'A server generated value to specify a specific point in a collection result, used for pagination.'
+        - $ref: '#/components/parameters/Api-Version-Major'
       description: Provides the product offering of single or multiple estimated end-to-end route options for a shipment in the pre-booking phase.
       x-stoplight:
         id: ibt5y7c4xqfp8
@@ -198,12 +210,20 @@ paths:
                   $ref: '#/components/schemas/PortSchedule'
           headers:
             API-Version:
-              $ref: ../../models/CommonComponents.yaml#/components/headers/API-Version
+              schema:
+                type: string
+                example: 1.0.0
+              description: |
+                SemVer used to indicate the version of the contract (API version) returned.
         '400':
           description: Bad Request
           headers:
             API-Version:
-              $ref: ../../models/CommonComponents.yaml#/components/headers/API-Version
+              schema:
+                type: string
+                example: 1.0.0
+              description: |
+                SemVer used to indicate the version of the contract (API version) returned.
           content:
             application/json:
               schema:
@@ -227,7 +247,11 @@ paths:
           description: Internal Server Error
           headers:
             API-Version:
-              $ref: ../../models/CommonComponents.yaml#/components/headers/API-Version
+              schema:
+                type: string
+                example: 1.0.0
+              description: |
+                SemVer used to indicate the version of the contract (API version) returned.
           content:
             application/json:
               schema:
@@ -265,7 +289,7 @@ paths:
           name: date
           description: The date since when the estimated arrival and departures of vessels in a given port is required
           required: true
-        - $ref: ../../models/CommonComponents.yaml#/components/parameters/APIVersionMajor
+        - $ref: '#/components/parameters/Api-Version-Major'
         - schema:
             type: integer
             format: int32
@@ -300,12 +324,20 @@ paths:
                   $ref: '#/components/schemas/ServiceSchedule'
           headers:
             API-Version:
-              $ref: ../../models/CommonComponents.yaml#/components/headers/API-Version
+              schema:
+                type: string
+                example: 1.0.0
+              description: |
+                SemVer used to indicate the version of the contract (API version) returned.
         '400':
           description: Bad Request
           headers:
             API-Version:
-              $ref: ../../models/CommonComponents.yaml#/components/headers/API-Version
+              schema:
+                type: string
+                example: 1.0.0
+              description: |
+                SemVer used to indicate the version of the contract (API version) returned.
           content:
             application/json:
               schema:
@@ -329,7 +361,11 @@ paths:
           description: Internal Server Error
           headers:
             API-Version:
-              $ref: ../../models/CommonComponents.yaml#/components/headers/API-Version
+              schema:
+                type: string
+                example: 1.0.0
+              description: |
+                SemVer used to indicate the version of the contract (API version) returned.
           content:
             application/json:
               schema:
@@ -351,15 +387,16 @@ paths:
       parameters:
         - schema:
             type: string
-            maxLength: 7
+            minLength: 7
+            maxLength: 8
             pattern: '^\d{7,8}$'
             example: '9321483'
           in: query
           name: vesselIMONumber
-          description: The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd&apos;s register code, which does not change during the lifetime of the vessel.
+          description: 'The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd&apos;s register code, which does not change during the lifetime of the vessel.'
         - schema:
             type: string
-            maxLength: 35
+            maxLength: 50
             example: King of the Seas
           in: query
           name: vesselName
@@ -428,7 +465,6 @@ paths:
           description: |
             The end date of the period for which schedule information is requested. If a date of any Timestamp (ATA, ETA or PTA) inside a PortCall matches a date on or before (≤) the `endDate` the entire Voyage(import- and export-Voyage) matching the PortCall will be included in the result. All matching is done towards local Date at the place of the port call.  
             If this filter is not provided the default value is `6 months` after request time.  The value is populated in `ISO 8601` date format.
-        - $ref: ../../models/CommonComponents.yaml#/components/parameters/APIVersionMajor
         - schema:
             type: integer
             format: int32
@@ -444,6 +480,7 @@ paths:
           in: query
           name: cursor
           description: 'A server generated value to specify a specific point in a collection result, used for pagination.'
+        - $ref: '#/components/parameters/Api-Version-Major'
       description: |-
         Provides, for a required specific service and/or voyage and/or vessel and/or location, the timetable of estimated departure and arrival times for each port call on the rotation of the vessel(s). 
 
@@ -483,6 +520,12 @@ components:
             - $ref: '#/components/schemas/UNLocationLocation'
             - $ref: '#/components/schemas/FacilitySMDGLocation'
             - $ref: '#/components/schemas/AddressLocation'
+          discriminator:
+            propertyName: locationType
+            mapping:
+              ADDR: '#/components/schemas/AddressLocation'
+              FACS: '#/components/schemas/FacilitySMDGLocation'
+              UNLO: '#/components/schemas/UNLocationLocation'
         dateTime:
           type: string
           format: date-time
@@ -570,9 +613,9 @@ components:
           x-stoplight:
             id: xfeizdvobewab
           description: The name of the Vessel given by the Vessel Operator and registered with IMO.
-          example: 'King of the Seas'
+          example: King of the Seas
           maxLength: 50
-          pattern: ^\S(?:.*\S)?$
+          pattern: '^\S(?:.*\S)?$'
         carrierServiceName:
           type: string
           x-stoplight:
@@ -641,11 +684,16 @@ components:
           oneOf:
             - $ref: '#/components/schemas/UNLocationLocation'
             - $ref: '#/components/schemas/FacilitySMDGLocation'
+          discriminator:
+            propertyName: locationType
+            mapping:
+              FACS: '#/components/schemas/FacilitySMDGLocation'
+              UNLO: '#/components/schemas/UNLocationLocation'
         vesselSchedules:
           type: array
           x-stoplight:
             id: oqtnha66e947j
-          minItems: 0
+          minItems: 1
           items:
             $ref: '#/components/schemas/Schedule'
     Schedule:
@@ -698,7 +746,7 @@ components:
             id: yrtql880q13gj
           description: The name of the Vessel given by the Vessel Operator and registered with IMO.
           example: King of the Seas
-          maxLength: 35
+          maxLength: 50
         isDummyVessel:
           type: boolean
           x-stoplight:
@@ -822,6 +870,12 @@ components:
             - $ref: '#/components/schemas/FacilitySMDGLocation'
             - $ref: '#/components/schemas/AddressLocation'
           description: 'General purpose object to capture location-related data, the location can be specified in one of the following ways: `UN Location Code`, a `Facility` or an `Address`.'
+          discriminator:
+            propertyName: locationType
+            mapping:
+              ADDR: '#/components/schemas/AddressLocation'
+              FACS: '#/components/schemas/FacilitySMDGLocation'
+              UNLO: '#/components/schemas/UNLocationLocation'
         timestamps:
           type: array
           minItems: 1
@@ -901,7 +955,7 @@ components:
           x-stoplight:
             id: sjxoamy8akix5
           description: The name of the Vessel given by the Vessel Operator and registered with IMO.
-          maxLength: 35
+          maxLength: 50
           example: King of the Seas
         vesselCallSign:
           type: string
@@ -999,6 +1053,7 @@ components:
           x-stoplight:
             id: 1qntskkr8v0h5
           example: Port of Amsterdam
+          pattern: ^\S(?:.*\S)?$
           description: The name of the location.
           maxLength: 100
         locationType:
@@ -1009,16 +1064,7 @@ components:
         address:
           type: object
           description: An object for storing address related information.
-          required:
-            - name
           properties:
-            name:
-              type: string
-              x-stoplight:
-                id: 744uqr5dx9rfn
-              description: Name of the address.
-              example: John
-              maxLength: 100
             street:
               type: string
               x-stoplight:
@@ -1055,11 +1101,14 @@ components:
                 id: 3k7wb2fib7401
               example: North Holland
               maxLength: 65
-            country:
+            countryCode:
               type: string
-              x-stoplight:
-                id: enhizhmuskzj6
-              maxLength: 75
+              pattern: '^[A-Z]{2}$'
+              minLength: 2
+              maxLength: 2
+              description: |
+                The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+              example: NL
     FacilitySMDGLocation:
       title: Facility SMDG Location
       x-stoplight:
@@ -1077,6 +1126,7 @@ components:
             id: p82efb2odh99y
           description: The name of the location.
           example: Port of Amsterdam
+          pattern: ^\S(?:.*\S)?$
           maxLength: 100
         locationType:
           type: string
@@ -1118,7 +1168,7 @@ components:
             id: uwy2d1d9tkdku
           description: The name of the location.
           example: Port of Amsterdam
-          pattern: ^\S+(\s+\S+)*$
+          pattern: ^\S(?:.*\S)?$
         locationType:
           type: string
           x-stoplight:
@@ -1136,7 +1186,7 @@ components:
           minLength: 5
           maxLength: 5
     ErrorResponse:
-      title: ErrorResponse
+      title: Error Response
       x-stoplight:
         id: ecq5zj4a4hkgf
       type: object
@@ -1205,6 +1255,7 @@ components:
           x-stoplight:
             id: co6hcjekwf6np
           description: An array of errors provding more detail about the root cause.
+          minItems: 1
           items:
             x-stoplight:
               id: dxtftzqn6ycvr
@@ -1257,6 +1308,16 @@ components:
                 description: A long description corresponding to the `errorCode` with additional information.
                 example: Spaces not allowed in facility code
                 maxLength: 200
+  parameters:
+    Api-Version-Major:
+      in: header
+      name: API-Version
+      required: false
+      schema:
+        type: string
+        example: '2'
+      description: |
+        An API-Version header **MAY** be added to the request (optional); if added it **MUST** only contain **MAJOR** version. API-Version header **MUST** be aligned with the URI version.
 tags:
   - name: Point To Point
     description: ' '
