@@ -1,0 +1,1970 @@
+openapi: 3.0.0
+x-stoplight:
+  id: dvjqx44e5ilne
+info:
+  title: DCSA OpenAPI specification for Track & Trace
+  version: 2.2.0
+  description: "Managing and sending Shipment-, Transport- and Equipment-events and subscriptions for Track & Trace (T&T). API specification issued by DCSA.org.\r\n\r\nFor explanation to specific values or objects please refer to the [Information Model v3.3](https://dcsa-website.cdn.prismic.io/dcsa-website/65b0a8e4615e73009ec3def6_202108_DCSA_P1_Information-Model-v3.3_TNT22_Final.pdf)\r\n\r\nPolling can be done on the **GET /v2/events** endPoint. It is also possible to setup a subscription on the **/v2/event-subscriptions** endPoints in order to use the push model. Here events are pushed as they occur.\r\n\r\nFor a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/tnt/v2#v220)\r\n"
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+  contact:
+    name: Digital Container Shipping Association (DCSA)
+    url: 'https://dcsa.org'
+    email: info@dcsa.org
+servers:
+  - url: 'http://localhost:3000'
+paths:
+  /v2/events:
+    get:
+      summary: Find events
+      tags: []
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  anyOf:
+                    - items:
+                        $ref: '#/components/schemas/TransportEvent'
+                    - x-stoplight:
+                        id: e1q5zdtdkmynx
+                      items:
+                        $ref: '#/components/schemas/ShipmentEvent'
+                    - x-stoplight:
+                        id: dbdim3jxk031r
+                      items:
+                        $ref: '#/components/schemas/EquipmentEvent'
+          headers:
+            API-Version:
+              schema:
+                type: string
+                example: 1.0.0
+              description: SemVer used to indicate the version of the contract (API version) returned.
+            Current-Page:
+              schema:
+                type: string
+                example: fE9mZnNldHw9MCZsaW1pdD01
+              description: A link to the current page.
+            Next-Page:
+              schema:
+                type: string
+                example: fE9mZnNldHw9NSZsaW1pdD01
+              description: A link to the next page. Next-Page header link MAY be omitted if the current page is the last page.
+            Prev-Page:
+              schema:
+                type: string
+                example: fE9mZnNldHw9MCZsaW1pdD01
+              description: A link to the previous page. Previous-Page header link MAY be omitted if the current page is the first page.
+            Last-Page:
+              schema:
+                type: string
+                example: fE9mZnNldHw9NTkmbGltaXQ9NQ==
+              description: A link to the last page. Last-Page header link MAY be omitted if the current page is the last page.
+            First-Page:
+              schema:
+                type: string
+                example: fE9mZnNldHw9NjAmbGltaXQ9NQ==
+              description: A link to thefirst page. First-Page header link MAY be omitted if current page is the first page.
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              schema:
+                type: string
+                example: 1.0.0
+              description: SemVer used to indicate the version of the contract (API version) returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      operationId: get-v2-events
+      x-stoplight:
+        id: 1sr5r7sai6wkd
+      description: "Returns all events filtered by the queryParameters.\r\n\r\n**NB**: It is possible to combine queryParameters. When combining queryParameters be aware that it is also possible to make combinations that are mutual contradicting.\r\n\r\nExample: shipmentEventTypeCode=DRFT and equipmentEventTypeCode=GTIN\r\n\r\nSince there is no event that can be a ShipmentEvent and an EquipmentEvent at the same time **this will return an empty list!**"
+      parameters:
+        - schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - SHIPMENT
+                - TRANSPORT
+                - EQUIPMENT
+          in: query
+          name: eventType
+          description: |
+            The type of event(s) to filter by. Possible values are
+
+            - SHIPMENT (Shipment events)
+            - TRANSPORT (Transport events)
+            - EQUIPMENT (Equipment events)
+
+            It is possible to select multiple values by comma (,) separating them. For multiple values the OR-operator is used. For example eventType=SHIPMENT,EQUIPMENT matches both Shipment- and Equipment-events.
+
+            Default value is all event types.
+        - schema:
+            default:
+              - RECE
+            type: array
+            items:
+              enum:
+                - RECE
+                - DRFT
+                - PENA
+                - PENU
+                - REJE
+                - APPR
+                - ISSU
+                - SURR
+                - SUBM
+                - VOID
+                - CONF
+                - REQS
+                - CMPL
+                - HOLD
+                - RELS
+          in: query
+          name: shipmentEventTypeCode
+          description: |
+            The status of the document in the process to filter by. Possible values are
+            - RECE (Received)
+            - DRFT (Drafted)
+            - PENA (Pending Approval)
+            - PENU (Pending Update)
+            - REJE (Rejected)
+            - APPR (Approved)
+            - ISSU (Issued)
+            - SURR (Surrendered)
+            - SUBM (Submitted)
+            - VOID (Void)
+            - CONF (Confirmed)
+            - REQS (Requested)
+            - CMPL (Completed)
+            - HOLD (On Hold)
+            - RELS (Released)
+
+            It is possible to select multiple values by comma (,) separating them. For multiple values the OR-operator is used. For example <i>shipmentEventTypeCode=RECE,DRFT</i>  Matches <b>both</b> Received (RECE) and Drafted (DRFT) shipment events.
+
+            Default is all shipmentEventTypeCodes.
+
+            This filter is only relevant when filtering on ShipmentEvents
+          example:
+            - RECE
+            - DRFT
+          style: form
+        - name: documentTypeCode
+          in: query
+          description: |
+            The documentTypeCode to filter by. Possible values are
+            - CBR (Carrier Booking Request Reference)
+            - BKG (Booking)
+            - SHI (Shipping Instruction)
+            - SRM (Shipment Release Message)
+            - TRD (Transport Document)
+            - ARN (Arrival Notice)
+            - VGM (Verified Gross Mass)
+            - CAS (Cargo Survey)
+            - CUS (Customs Inspection)
+            - DGD (Dangerous Goods Declaration)
+            - OOG (Out of Gauge)
+
+            It is possible to select multiple values by comma (,) separating them. For multiple values the OR-operator is used. For example <i>documentTypeCode=SHI,TRD</i> Matches <b>both</b> ShippingInstruction (SHI) and TransportDocument (TRD) shipment events.
+
+            Default is all documentTypeCodes.
+
+            This filter is only relevant when filtering on ShipmentEvents
+          style: form
+          schema:
+            type: array
+            default:
+              - CBR
+              - BKG
+              - SHI
+              - SRM
+              - TRD
+              - ARN
+              - VGM
+              - CAS
+              - CUS
+              - DGD
+              - OOG
+            items:
+              type: string
+              enum:
+                - CBR
+                - BKG
+                - SHI
+                - SRM
+                - TRD
+                - ARN
+                - VGM
+                - CAS
+                - CUS
+                - DGD
+                - OOG
+        - schema:
+            type: string
+            maxLength: 35
+            example: ABC709951
+          in: query
+          name: carrierBookingReference
+          description: |
+            A set of unique characters provided by carrier to identify a booking.  
+            Specifying this filter will only return events related to this particular carrierBookingReference.
+        - schema:
+            type: string
+          in: query
+          name: bookingReference
+          description: Deprecated - use carrierBookingReference instead.
+          deprecated: true
+        - schema:
+            type: string
+            format: uuid
+          in: query
+          name: transportDocumentID
+          description: |
+            A unique id to identify a transport document.  
+            Deprecated - use transportDocumentReference instead transportDocumentReference
+          deprecated: true
+        - schema:
+            type: string
+            maxLength: 20
+          in: query
+          name: transportDocumentReference
+          description: |
+            A unique number reference allocated by the shipping line to the transport document and the main number used for the tracking of the status of the shipment.  
+            Specifying this filter will only return events related to this particular transportDocumentReference.
+        - schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - ARRI
+                - DEPA
+            default:
+              - ARRI
+              - DEPA
+            example:
+              - ARRI
+              - DEPA
+          in: query
+          name: transportEventTypeCode
+          description: |
+            Identifier for type of Transport event to filter by
+            - ARRI (Arrived)
+            - DEPA (Departed)
+
+            It is possible to select multiple values by comma (,) separating them. For multiple values the OR-operator is used. For example <i>transportEventTypeCode=ARRI,DEPA</i> matches <b>both</b> Arrived (ARRI) and Departed (DEPA) transport events.
+
+            Default is all transportEventTypeCodes.
+
+            This filter is only relevant when filtering on TransportEvents
+          style: form
+        - schema:
+            type: string
+            format: uuid
+            example: 9679a405-3316-42a5-8533-aba000f5689c
+          in: query
+          name: scheduleID
+          description: |
+            ID uniquely identifying a schedule, to filter events by.  
+            This filter was added by mistake and is thus deprecated.
+          deprecated: true
+        - schema:
+            type: string
+            maxLength: 100
+            example: 123e4567-e89b-12d3-a456-426614174000
+          in: query
+          name: transportCallID
+          description: |
+            ID uniquely identifying a transport call, to filter events by.  
+            Specifying this filter will only return events related to this particular transportCallID
+        - schema:
+            type: string
+            example: '9321483'
+            maxLength: 7
+          in: query
+          name: vesselIMONumber
+          description: |
+            The identifier of vessel for which schedule details are published. 
+            Depending on schedule type, this may not be available yet.  Specifying this filter will only return events related to this particular vesselIMONumber.
+        - schema:
+            type: string
+            example: 2103S
+            maxLength: 50
+          in: query
+          name: carrierVoyageNumber
+          description: |
+            Filter on the vessel operator-specific identifier of the Voyage.  
+            Specifying this filter will only return events related to this particular carrierVoyageNumber.  
+            **Deprecated**: Use exportVoyageNumber instead
+          deprecated: true
+        - schema:
+            type: string
+            example: 2103S
+            maxLength: 50
+          in: query
+          name: exportVoyageNumber
+          description: |
+            Filter on the vessel operator-specific identifier of the export Voyage.  
+            Specifying this filter will only return events related to this particular exportVoyageNumber.
+        - schema:
+            type: string
+            example: FE1
+            maxLength: 5
+          in: query
+          name: carrierServiceCode
+          description: |
+            Filter on the carrier specific identifier of the service.  
+            Specifying this filter will only return events related to this particular carrierServiceCode
+        - schema:
+            type: string
+            example: FRPAR
+            maxLength: 5
+          in: query
+          name: UNLocationCode
+          description: |
+            The UN Location code specifying where the place is located.  
+            Specifying this filter will only return events related to this particular UN Location code.
+        - name: equipmentEventTypeCode
+          in: query
+          description: |
+            Unique identifier for equipmentEventTypeCode.
+            - LOAD (Loaded)
+            - DISC (Discharged)
+            - GTIN (Gated in)
+            - GTOT (Gated out)
+            - STUF (Stuffed)
+            - STRP (Stripped)
+            - PICK (Pick-up)
+            - DROP (Drop-off)
+            - INSP (Inspected)
+            - RSEA (Resealed)
+            - RMVD (Removed)
+
+            It is possible to select multiple values by comma (,) separating them. For multiple values the OR-operator is used. For example <i>equipmentEventTypeCode=GTIN,GTOT</i> matches <b>both</b> Gated in (GTIN) and Gated out (GTOT) equipment events.
+
+            Default is all equipmentEventTypeCodes.
+
+            This filter is only relevant when filtering on EquipmentEvents
+          schema:
+            default:
+              - LOAD
+              - DISC
+              - GTIN
+              - GTOT
+              - STUF
+              - STRP
+              - PICK
+              - DROP
+              - INSP
+              - RSEA
+              - RMVD
+            type: array
+            items:
+              type: string
+              enum:
+                - LOAD
+                - DISC
+                - GTIN
+                - GTOT
+                - STUF
+                - STRP
+                - PICK
+                - DROP
+                - INSP
+                - RSEA
+                - RMVD
+              example: GTIN
+        - schema:
+            type: string
+            example: APZU4812090
+            maxLength: 15
+          in: query
+          name: equipmentReference
+          description: 'Will filter by the unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.  Specifying this filter will only return events related to this particular equipmentReference'
+        - schema:
+            type: string
+          in: query
+          name: eventCreatedDateTime
+          description: |
+            Limit the result based on the creating date of the event. It is possible to use operators on this query parameter. This is done by adding a colon followed by an operator at the end of the queryParameterName (before the =)  eventCreatedDateTime:gte=2021-04-01T14:12:56+01:00  would result in all events created ≥ 2021-04-01T14:12:56+01:00
+            The following operators are supported
+            - &#58;gte (&#8805; Greater than or equal)
+            - &#58;gt (&#62; Greater than)
+            - &#58;lte (&#8804; Less than or equal)
+            - &#58;lt (&#60; Less tha)
+            - &#58;eq (&#61; Equal to)
+            If no operator is provided, a <b>strictlt equal</b> is used (this is equivalent to <b>&#58;eq</b> operator).
+          example: '2021-04-01T14:12:56+01:00'
+        - schema:
+            type: string
+            minLength: 1
+            default: '100'
+            example: '100'
+          in: query
+          name: limit
+          description: Maximum number of items to return.
+        - schema:
+            type: string
+            example: fE9mZnNldHw9MTAmbGltaXQ9MTA=
+          in: query
+          name: cursor
+          description: 'A server generated value to specify a specific point in a collection result, used for pagination.'
+        - schema:
+            type: string
+            example: 'carrierBookingReference:DESC'
+          in: query
+          name: sort
+          description: 'A comma-separated list of field names to define the sort order. Field names should be suffixed by a (:) followed by either the keyword ASC (for ascending order) or DESC (for descening order) to specify direction. :ASC may be omitted, in which case ascending order will be used.'
+        - schema:
+            type: string
+            example: '2'
+          in: header
+          name: API-Version
+          description: An API-Version header MAY be added to the request (optional); if added it MUST only contain MAJOR version. API-Version header MUST be aligned with the URI version.
+  '/v2/events/{eventID}':
+    parameters:
+      - schema:
+          type: string
+        name: eventID
+        in: path
+        required: true
+    get:
+      summary: Find events by eventID
+      tags: []
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ShipmentEvent'
+                  - $ref: '#/components/schemas/TransportEvent'
+                  - $ref: '#/components/schemas/EquipmentEvent'
+          headers:
+            API-Version:
+              schema:
+                type: string
+                example: 1.0.0
+              description: SemVer used to indicate the version of the contract (API version) returned.
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          headers:
+            API-Version:
+              schema:
+                type: string
+                example: 1.0.0
+              description: SemVer used to indicate the version of the contract (API version) returned.
+      operationId: get-v2-events-eventID
+      x-stoplight:
+        id: lxwljku8j2a8s
+      deprecated: true
+      description: Returns event with the specified eventID.
+      parameters:
+        - schema:
+            type: string
+            example: 123e4567-e89b-12d3-a456-426614174000
+            format: uuid
+          in: query
+          name: eventID
+          description: The ID of the event to receive
+          deprecated: true
+          required: true
+  /v2/event-subscriptions:
+    get:
+      summary: Receive a list of your active subscriptions
+      tags: []
+      responses:
+        '200':
+          description: Returns a list of subscriptions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Subscription'
+          headers:
+            API-Version:
+              schema:
+                type: string
+                example: 1.0.0
+              description: SemVer used to indicate the version of the contract (API version) returned.
+            Current-Page:
+              schema:
+                type: string
+                example: fE9mZnNldHw9MCZsaW1pdD01
+              description: A link to the current page.
+            Next-Page:
+              schema:
+                type: string
+                example: fE9mZnNldHw9NSZsaW1pdD01
+              description: A link to the next page. Next-Page header link MAY be omitted if the current page is the last page.
+            Prev-Page:
+              schema:
+                type: string
+                example: fE9mZnNldHw9MCZsaW1pdD01
+              description: A link to the previous page. Previous-Page header link MAY be omitted if the current page is the first page.
+            Last-Page:
+              schema:
+                type: string
+                example: fE9mZnNldHw9NTkmbGltaXQ9NQ==
+              description: A link to the last page. Last-Page header link MAY be omitted if the current page is the last page.
+            First-Page:
+              schema:
+                type: string
+                example: fE9mZnNldHw9NjAmbGltaXQ9NQ==
+              description: A link to thefirst page. First-Page header link MAY be omitted if current page is the first page.
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          headers:
+            API-Version:
+              schema:
+                type: string
+                example: 1.0.0
+              description: SemVer used to indicate the version of the contract (API version) returned.
+      operationId: get-v2-event-subscriptions
+      x-stoplight:
+        id: zbok2dnko7lud
+      parameters:
+        - schema:
+            type: integer
+            default: 100
+            example: 100
+            minLength: 1
+            format: int32
+            minimum: 1
+          in: query
+          name: limit
+          description: Maximum number of items to return.
+        - schema:
+            type: string
+            example: fE9mZnNldHw9MTAmbGltaXQ9MTA=
+          in: query
+          name: cursor
+          description: 'A server generated value to specify a specific point in a collection result, used for pagination.'
+        - schema:
+            type: string
+            example: 'carrierBookingReference:DESC'
+          in: query
+          name: sort
+          description: 'A comma-separated list of field names to define the sort order. Field names should be suffixed by a (:) followed by either the keyword ASC (for ascending order) or DESC (for descening order) to specify direction. **:ASC** may be omitted, in which case ascending order will be used.'
+        - schema:
+            type: string
+            example: '1'
+          in: header
+          name: API-Version
+          description: An API-Version header MAY be added to the request (optional); if added it MUST only contain MAJOR version. API-Version header MUST be aligned with the URI version.
+    post:
+      summary: Create a subscription
+      tags: []
+      responses:
+        '201':
+          description: Subscription created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+          headers:
+            API-Version:
+              schema:
+                type: string
+                example: 1.0.0
+              description: SemVer used to indicate the version of the contract (API version) returned.
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          headers:
+            API-Version:
+              schema:
+                type: string
+                example: 1.0.0
+              description: SemVer used to indicate the version of the contract (API version) returned.
+      operationId: post-v2-event-subscriptions
+      x-stoplight:
+        id: 5cal5eua9uzil
+      requestBody:
+        description: "Parameters used to configure the subscription. It is possible to only receive cirtain types of events by adding filter values to the subscription.\r\n\r\nAll values in the subscription body except: callback, secret and subscriptionID will be used as filters. All filters specified must be filfilled in order to match an Event. A logical AND is used between filters. So\r\n\r\nshipmentEventTypeCode=DRFT&carrierBookingReference=ABC123123\r\n\r\nmeans that the events matched must both be Draft (shipmentEventTypeCode=DRFT) and be connected to carrierBookingReference ABC123123 (carrierBookingReference=ABC123123)\r\n\r\nFilters that are specified as (comma separated) lists use logical OR between list values. So\r\n\r\neventType=SHIPMENT,TRANSPORT\r\n\r\nmeans that both Shipment- and Transport-events will be matched by this subscription."
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SunscriptionBodyWithSecret'
+      parameters:
+        - schema:
+            type: string
+            example: '1'
+          in: header
+          name: API-Version
+          description: An API-Version header MAY be added to the request (optional); if added it MUST only contain MAJOR version. API-Version header MUST be aligned with the URI version.
+  '/v2/event-subscriptions/{subscriptionID}':
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: subscriptionID
+        in: path
+        required: true
+        description: The universal unique ID of the subscription.
+        example: 23e4567e-89b1-12d3-a456-426614174000
+    get:
+      summary: Find a subscription by subscription ID
+      tags: []
+      responses:
+        '200':
+          description: Subscription returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              schema:
+                type: string
+                example: 1.0.0
+              description: SemVer used to indicate the version of the contract (API version) returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      operationId: get-v2-event-subscriptions-subscriptionID
+      x-stoplight:
+        id: 3ui740g2l6s7r
+      parameters:
+        - schema:
+            type: string
+            example: '1'
+          in: header
+          name: API-Version
+          description: An API-Version header MAY be added to the request (optional); if added it MUST only contain MAJOR version. API-Version header MUST be aligned with the URI version.
+    delete:
+      summary: Stop a subscription using the subscription ID
+      tags: []
+      responses:
+        '204':
+          description: Subscription stopped
+          headers:
+            API-Version:
+              schema:
+                type: string
+                example: 1.0.0
+              description: SemVer used to indicate the version of the contract (API version) returned.
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              schema:
+                type: string
+                example: 1.0.0
+              description: SemVer used to indicate the version of the contract (API version) returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      operationId: delete-v2-event-subscriptions-subscriptionID
+      x-stoplight:
+        id: g8kgcoipyychb
+      parameters:
+        - schema:
+            type: string
+            example: '1'
+          in: header
+          description: An API-Version header MAY be added to the request (optional); if added it MUST only contain MAJOR version. API-Version header MUST be aligned with the URI version.
+          name: API-Version
+    put:
+      summary: Alter a subscription
+      tags: []
+      responses:
+        '200':
+          description: Subscription updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+          headers:
+            API-Version:
+              schema:
+                type: string
+                example: 1.0.0
+              description: SemVer used to indicate the version of the contract (API version) returned.
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              schema:
+                type: string
+                example: 1.0.0
+              description: "\t SemVer used to indicate the version of the contract (API version) returned."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      operationId: put-v2-event-subscriptions-subscriptionID
+      x-stoplight:
+        id: 0ybsyjbu3178f
+      parameters:
+        - schema:
+            type: string
+            example: '1'
+          in: header
+          name: API-Version
+          description: An API-Version header MAY be added to the request (optional); if added it MUST only contain MAJOR version. API-Version header MUST be aligned with the URI version.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Subscription'
+  '/v2/event-subscriptions/{subscriptionID}/secret':
+    parameters:
+      - schema:
+          type: string
+        name: subscriptionID
+        in: path
+        required: true
+        description: The universal unique ID of the subscription.
+        example: 123e4567-e89b-12d3-a456-426614174000
+    put:
+      summary: ' Resets the Secret on an existing subscription'
+      tags: []
+      responses:
+        '204':
+          description: Secret updated
+          headers:
+            API-Version:
+              schema:
+                type: string
+                example: 1.0.0
+              description: SemVer used to indicate the version of the contract (API version) returned.
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              schema:
+                type: string
+                example: 1.0.0
+              description: SemVer used to indicate the version of the contract (API version) returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      operationId: put-v2-event-subscriptions-subscriptionID-secret
+      x-stoplight:
+        id: 2b6un2omzjhbi
+      parameters:
+        - schema:
+            type: string
+            example: '1'
+          in: header
+          name: API-Version
+          description: ' string (header) An API-Version header MAY be added to the request (optional); if added it MUST only contain MAJOR version. API-Version header MUST be aligned with the URI version.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                secret:
+                  type: string
+                  x-stoplight:
+                    id: zmhqtx318of0w
+                  description: A Base64 encoded secret shared between the Publisher and the Subscriber. It is used to compute the contents of the Notification-Signature header.
+                  example: MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDM2NTc4NjIzODk3NDY5MDgyNzM0OTg3MTIzNzg2NA==
+                  format: byte
+components:
+  schemas:
+    TransportEvent:
+      title: TransportEvent
+      x-stoplight:
+        id: wg5qkdqlx7rrg
+      type: object
+      description: The transport event entity is a specialization of the event entity to support specification of data that only applies to a transport event.
+      required:
+        - eventCreatedDateTime
+        - eventType
+        - eventClassifierCode
+        - eventDateTime
+        - transportEventTypeCode
+        - transportCall
+      properties:
+        eventID:
+          type: string
+          x-stoplight:
+            id: dvn8b1eqme4g5
+          description: "The unique identifier for the event (the message - not the source).\r\n\r\n**NB**: This field should be considered Metadata."
+          format: uuid
+          example: 3cecb101-7a1a-43a4-9d62-e88a131651e2
+        eventCreatedDateTime:
+          type: string
+          x-stoplight:
+            id: 3wdiofyxoxsvl
+          description: "he timestamp of when the event was created.\r\n\r\n**NB**: This field should be considered Metadata."
+          format: date-time
+          example: '2021-01-09T14:12:56+01:00'
+        eventType:
+          x-stoplight:
+            id: 4h6214lw8724h
+          description: "The Event Type of the object - to be used as a discriminator.\r\n\r\n**NB**: This field should be considered Metadata."
+          example: TRANSPORT
+          type: string
+          enum:
+            - TRANSPORT
+        eventClassifierCode:
+          type: string
+          x-stoplight:
+            id: n7n8m68s06jo9
+          example: ACT
+          description: "Code for the event classifier can be\r\n\r\n- ACT (Actual)\r\n- PLN (Planned)\r\n- EST (Estimated)"
+          enum:
+            - ACT
+            - PLN
+            - EST
+        eventDateTime:
+          type: string
+          x-stoplight:
+            id: dsod3t9i58p2b
+          description: 'The local date and time, where the event took place or when the event will take place, in ISO 8601 format.'
+          format: date-time
+          example: '2019-11-12T07:41:00+08:30'
+        transportEventTypeCode:
+          type: string
+          x-stoplight:
+            id: d6jh762ajq96u
+          description: "Identifier for type of Transport event\r\n\r\n- ARRI (Arrived)\r\n- DEPA (Departed)\r\nMore details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/transporteventtypecodes.csv)"
+          enum:
+            - ARRI
+            - DEPA
+        delayReasonCode:
+          type: string
+          x-stoplight:
+            id: 6ke98nys40kuu
+          description: 'Reason code for the delay. The SMDG-Delay-Reason-Codes are used for this attribute. The code list can be found at http://www.smdg.org/smdg-code-lists/'
+          example: WEA
+          maxLength: 3
+        vesselScheduleChangeRemark:
+          type: string
+          x-stoplight:
+            id: bqcro0xspk75a
+          deprecated: true
+          example: Bad weather
+          maxLength: 250
+          description: "Free text information provided by the vessel operator regarding the reasons for the change in schedule and/or plans to mitigate schedule slippage.\r\n\r\n**Deprecated** - use changeRemark instead."
+        changeRemark:
+          type: string
+          x-stoplight:
+            id: t7bi3cl1y1nzg
+          example: Bad weather
+          maxLength: 250
+          description: Free text information provided by the vessel operator regarding the reasons for the change in schedule and/or plans to mitigate schedule slippage.
+        transportCallID:
+          type: string
+          x-stoplight:
+            id: i38depn2t9hzq
+          deprecated: true
+          maxLength: 100
+          example: 123e4567-e89b-12d3-a456-426614174000
+          description: "The unique identifier for a transport call.\r\n\r\n**Deprecated** - not needed as the TransportCall object is included."
+        transportCall:
+          $ref: '#/components/schemas/TransportCall'
+        eventTypeCode:
+          type: string
+          x-stoplight:
+            id: siyngrnolmnv8
+          deprecated: true
+          example: ARRI
+          maxLength: 4
+          description: "Unique identifier for Event Type Code, for transport events this is either\r\n\r\n- ARRI (Arrival)\r\n- DEPA (Departure)\r\n\r\n**Deprecated** - use transportEventTypeCode instead"
+          enum:
+            - ARRI
+            - DEPA
+        documentReferences:
+          x-stoplight:
+            id: za3zukcy1cn38
+          type: array
+          items:
+            $ref: '#/components/schemas/DocumentReference'
+        references:
+          x-stoplight:
+            id: 0rd5q7dteh6ng
+          type: array
+          items:
+            $ref: '#/components/schemas/Reference'
+    ShipmentEvent:
+      title: ShipmentEvent
+      x-stoplight:
+        id: 6k15tohe4h56f
+      type: object
+      description: The shipment event entity is a specialization of the event entity to support specification of data that only applies to a shipment event.
+      required:
+        - eventCreatedDateTime
+        - eventType
+        - eventClassifierCode
+        - eventDateTime
+        - shipmentEventTypeCode
+        - documentID
+        - documentTypeCode
+      properties:
+        eventID:
+          type: string
+          x-stoplight:
+            id: e452jbu5qjlle
+          description: "The unique identifier for the event (the message - not the source).\r\n\r\n**NB**: This field should be considered Metadata."
+          format: uuid
+          example: 3cecb101-7a1a-43a4-9d62-e88a131651e2
+        eventCreatedDateTime:
+          type: string
+          x-stoplight:
+            id: l87iuu24ql8wj
+          description: "The timestamp of when the event was created.\r\n\r\n**NB**: This field should be considered Metadata."
+          example: '2021-01-09T14:12:56+01:00'
+          format: date-time
+        eventType:
+          type: string
+          x-stoplight:
+            id: l1z07cqwkkb4r
+          description: "The Event Type of the object - to be used as a discriminator.\r\n\r\n**NB**: This field should be considered Metadata."
+          example: SHIPMENT
+          enum:
+            - SHIPMENT
+        eventClassifierCode:
+          type: string
+          x-stoplight:
+            id: dr4whrg81nlts
+          description: "Code for the event classifier can be\r\n\r\n- ACT (Actual)\r\n- PLN (Planned)\r\n- EST (Estimated)"
+          example: ACT
+          enum:
+            - ACT
+            - PLN
+            - EST
+        eventDateTime:
+          type: string
+          x-stoplight:
+            id: vzwi1n16owsa1
+          description: Value for eventDateTime must be the same value as eventCreatedDateTime.
+          example: '2019-11-12T07:41:00+08:30'
+        shipmentEventTypeCode:
+          type: string
+          x-stoplight:
+            id: w4i1fufsd8ojw
+          description: "The status of the document in the process. Possible values are\r\n\r\n- RECE (Received)\r\n- DRFT (Drafted)\r\n- PENA (Pending Approval)\r\n- PENU (Pending Update)\r\n- REJE (Rejected)\r\n- APPR (Approved)\r\n- ISSU (Issued)\r\n- SURR (Surrendered)\r\n- SUBM (Submitted)\r\n- VOID (Void)\r\n- CONF (Confirmed)\r\n- REQS (Requested)\r\n- CMPL (Completed)\r\n- HOLD (On Hold)\r\n- RELS (Released)\r\n\r\nMore details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/shipmenteventtypecodes.csv)"
+          enum:
+            - RECE
+            - DRFT
+            - PENA
+            - PENU
+            - REJE
+            - APPR
+            - ISSU
+            - SURR
+            - SUBM
+            - VOID
+            - CONF
+            - REQS
+            - CMPL
+            - HOLD
+            - RELS
+          example: DRFT
+        documentID:
+          type: string
+          x-stoplight:
+            id: w1027m3wbvr99
+          description: The id of the object defined by the documentTypeCode.
+          example: the-id-of-the-documentTypeCode
+        documentTypeCode:
+          type: string
+          x-stoplight:
+            id: 1vpixh6s2ba8a
+          description: "The code to identify the type of information documentID points to. Can be one of the following values\r\n\r\n- CBR (Carrier Booking Request Reference)\r\n- BKG (Booking)\r\n- SHI (Shipping Instruction)\r\n- SRM (Shipment Release Message)\r\n- TRD (Transport Document)\r\n- ARN (Arrival Notice)\r\n- VGM (Verified Gross Mass)\r\n- CAS (Cargo Survey)\r\n- CUS (Customs Inspection)\r\n- DGD (Dangerous Goods Declaration)\r\n- OOG (Out of Gauge)\r\n\r\nMore details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/documenttypecodes.csv)"
+          example: SHI
+          maxLength: 3
+          enum:
+            - CBR
+            - BKG
+            - SHI
+            - SRM
+            - TRD
+            - ARN
+            - VGM
+            - CAS
+            - CUS
+            - DGD
+            - OOG
+        shipmentInformationTypeCode:
+          type: string
+          x-stoplight:
+            id: rzwj7jnaiwxic
+          maxLength: 3
+          deprecated: true
+          example: SHI
+          description: "The code to identify the type of information documentID points to. Can be one of the following values\r\n\r\n- BOK (Booking - deprecated use BKG instead)\r\n- BKG (Booking)\r\n- SHI (Shipping Instruction)\r\n- VGM (Verified Gross Mass)\r\n- SRM (Shipment Release Message)\r\n- TRD (Transport Document)\r\n- ARN (Arrival Notice)\r\n\r\n**Deprecated** - use documentTypeCode instead."
+          enum:
+            - BOK
+            - BKG
+            - SHI
+            - VGM
+            - SRM
+            - TRD
+            - ARN
+        reason:
+          type: string
+          x-stoplight:
+            id: p2sdzyibeh1zr
+          description: Reason field in a Shipment event. This field can be used to explain why a specific event has been sent.
+          example: The following attributes are missing...
+        eventTypeCode:
+          type: string
+          x-stoplight:
+            id: npb3u57jh1kgu
+          description: "Unique identifier for Event Type Code. For shipment events this can be\r\n\r\n- RECE (Received)\r\n- CONF (Confirmed)\r\n- ISSU (Issued)\r\n- APPR (Approved)\r\n- SUBM (Submitted)\r\n- SURR (Surrendered)\r\n- REJE (Rejected)\r\n- PENA (Pending approval)\r\n\r\n**Deprecated** - use shipmentEventTypeCode instead."
+          maxLength: 4
+          example: RECE
+          deprecated: true
+          enum:
+            - RECE
+            - CONF
+            - ISSU
+            - APPR
+            - SUBM
+            - SURR
+            - REJE
+            - PENA
+        shipmentID:
+          type: string
+          x-stoplight:
+            id: cfx4yrgbsutgb
+          description: "ID uniquely identifying a shipment.\r\n\r\n**Deprecated** - this is replaced by documentID which can contain different values depending on the value of the documentTypeCode field."
+          example: c32d56f3-a4a5-4964-bb49-abd168b06160
+          format: uuid
+          deprecated: true
+        references:
+          type: array
+          x-stoplight:
+            id: m216pk4vu6kfg
+          items:
+            $ref: '#/components/schemas/Reference'
+    EquipmentEvent:
+      title: EquipmentEvent
+      x-stoplight:
+        id: h63grgdm5j5c8
+      type: object
+      description: "\t\nThe equipment event entity is a specialization of the event entity to support specification of data that only applies to an equipment event."
+      required:
+        - eventCreatedDateTime
+        - eventType
+        - eventClassifierCode
+        - eventDateTime
+        - equipmentEventTypeCode
+        - emptyIndicatorCode
+      properties:
+        eventID:
+          type: string
+          x-stoplight:
+            id: osmeye0zviil6
+          format: uuid
+          example: 3cecb101-7a1a-43a4-9d62-e88a131651e2
+          description: "The unique identifier for the event (the message - not the source).\r\n\r\n**NB**: This field should be considered Metadata."
+        eventCreatedDateTime:
+          type: string
+          x-stoplight:
+            id: l4kkcn4yih1uo
+          format: date-time
+          description: "The timestamp of when the event was created.\r\n\r\n**NB**: This field should be considered Metadata."
+        eventType:
+          type: string
+          x-stoplight:
+            id: lu463pucv7vqh
+          description: "The Event Type of the object - to be used as a discriminator.\r\n\r\n**NB**: This field should be considered Metadata."
+          example: EQUIPMENT
+          enum:
+            - EQUIPMENT
+        eventClassifierCode:
+          type: string
+          x-stoplight:
+            id: t9srpq8i7cv8m
+          description: "Code for the event classifier can be\r\n\r\n- PLN (Planned)\r\n- ACT (Actual)\r\n- EST (Estimated)"
+          example: EST
+          enum:
+            - ACT
+            - PLN
+            - EST
+        eventDateTime:
+          type: string
+          x-stoplight:
+            id: lptvbpzuo3sm9
+          description: 'The local date and time, where the event took place or when the event will take place, in ISO 8601 format.'
+          example: '2019-11-12T07:41:00+08:30'
+        equipmentEventTypeCode:
+          type: string
+          x-stoplight:
+            id: kubrjmwg2cbr7
+          description: "Unique identifier for equipmentEventTypeCode.\r\n\r\n- LOAD (Loaded)\r\n- DISC (Discharged)\r\n- GTIN (Gated in)\r\n- GTOT (Gated out)\r\n- STUF (Stuffed)\r\n- STRP (Stripped)\r\n- PICK (Pick-up)\r\n- DROP (Drop-off)\r\n- INSP (Inspected)\r\n- RSEA (Resealed)\r\n- RMVD (Removed)\r\n\r\nMore details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/equipmenteventtypecodes.csv)"
+          example: LOAD
+          enum:
+            - LOAD
+            - DISC
+            - GTIN
+            - GTOT
+            - STUF
+            - STRP
+            - PICK
+            - DROP
+            - INSP
+            - RSEA
+            - RMVD
+        equipmentReference:
+          type: string
+          x-stoplight:
+            id: 64iaxk6aio6su
+          description: 'The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible. According to ISO 6346, a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit). If a container does not comply with ISO 6346, it is suggested to follow Recommendation #2 “Container with non-ISO identification” from SMDG.'
+          example: APZU4812090
+          maxLength: 15
+        ISOEquipmentCode:
+          type: string
+          x-stoplight:
+            id: j0vzeochobszg
+          description: Unique code for the different equipment size/type used for transporting commodities. The code is a concatenation of ISO Equipment Size Code and ISO Equipment Type Code A and follows the ISO 6346 standard.
+          example: 22GP
+          maxLength: 4
+        emptyIndicatorCode:
+          type: string
+          x-stoplight:
+            id: 86hvkwa8b0x0d
+          description: Code to denote whether the equipment is empty or laden.
+          example: EMPTY
+          enum:
+            - EMPTY
+            - LADEN
+        eventLocation:
+          $ref: '#/components/schemas/Location'
+        transportCallID:
+          type: string
+          x-stoplight:
+            id: 37ssni48yd7fm
+          deprecated: true
+          description: "The unique identifier for a transport call\r\n\r\n**Deprecated** - not needed as the TransportCall object is include."
+          example: 123e4567-e89b-12d3-a456-426614174000
+          maxLength: 100
+        transportCall:
+          $ref: '#/components/schemas/TransportCall'
+        documentReferences:
+          type: array
+          x-stoplight:
+            id: 9vy7vh2u43fgm
+          items:
+            $ref: '#/components/schemas/DocumentReference'
+        references:
+          type: array
+          x-stoplight:
+            id: 5n95diww06b72
+          items:
+            $ref: '#/components/schemas/Reference'
+        seals:
+          type: array
+          x-stoplight:
+            id: ewc0lhhkwe2mw
+          items:
+            $ref: '#/components/schemas/Seal'
+        eventTypeCode:
+          type: string
+          x-stoplight:
+            id: 8px75gcy3lb8p
+          description: "Unique identifier for Event Type Code, for transport events this is either\r\n\r\n- LOAD (Loaded)\r\n- DISC (Discharged)\r\n- GTIN (Gated in)\r\n- GTOT (Gated out)\r\n- STUF (Stuffed)\r\n- STRP (Stripped)\r\n\r\n**Deprecated** - use equipmentEventTypeCode instead"
+          example: LOAD
+          maxLength: 4
+          deprecated: true
+          enum:
+            - LOAD
+            - DISC
+            - GTIN
+            - GTOT
+            - STUF
+            - STRP
+    TransportCall:
+      title: TransportCall
+      x-stoplight:
+        id: fiv1xlvvrw691
+      type: object
+      required:
+        - transportCallID
+        - modeOfTransport
+      properties:
+        transportCallID:
+          type: string
+          x-stoplight:
+            id: kilmk8l4drzi9
+          description: The unique identifier for a transport call.
+          example: 123e4567-e89b-12d3-a456-426614174000
+          maxLength: 100
+        carrierServiceCode:
+          type: string
+          x-stoplight:
+            id: kxa6bj6ldp48a
+          description: The code of the service for which the schedule details are published.
+          example: FE1
+          maxLength: 5
+        carrierVoyageNumber:
+          type: string
+          x-stoplight:
+            id: l746p0f5lxfi2
+          deprecated: true
+          example: 2103S
+          maxLength: 50
+          description: "The vessel operator-specific identifier of the Voyage.\r\n\r\nIn case there are multiple voyages the export voyage is chosen."
+        exportVoyageNumber:
+          type: string
+          x-stoplight:
+            id: w299z50swxive
+          description: The vessel operator-specific identifier of the export Voyage.
+          maxLength: 5
+          example: FRPAR
+        importVoyageNumber:
+          type: string
+          x-stoplight:
+            id: f3odfu66e6tep
+          description: The vessel operator-specific identifier of the import Voyage.
+          example: 2103N
+          maxLength: 50
+        transportCallSequenceNumber:
+          type: string
+          x-stoplight:
+            id: kp6f1oibn9c94
+          description: Transport operator's key that uniquely identifies each individual call. This key is essential to distinguish between two separate calls at the same location within one voyage.
+          example: '2'
+        UNLocationCode:
+          type: string
+          x-stoplight:
+            id: bore3bptjj5rl
+          maxLength: 5
+          example: FRPAR
+          description: The UN Location code specifying where the place is located.
+        facilityCode:
+          type: string
+          x-stoplight:
+            id: yicwiihrdnbjg
+          description: The code used for identifying the specific facility. This code does not include the UN Location Code.
+          example: ADT
+          maxLength: 6
+          nullable: false
+        facilityCodeListProvider:
+          type: string
+          x-stoplight:
+            id: ttil32etddult
+          description: The provider used for identifying the facility Code.
+          example: SMDG
+          enum:
+            - SMDG
+            - BIC
+        facilityTypeCode:
+          type: string
+          x-stoplight:
+            id: 5knzcvj7rbes8
+          example: POTE
+          description: "A specialized version of the facilityCode to be used in TransportCalls. The code to identify the specific type of facility.\r\n\r\n- BOCR (Border crossing)\r\n- CLOC (Customer location)\r\n- COFS (Container freight station)\r\n- COYA (Deprecated - use OFFD intead)\r\n- OFFD (Off dock storage)\r\n- DEPO (Depot)\r\n- INTE (Inland terminal)\r\n- POTE (Port terminal)\r\n- RAMP (Ramp)"
+          enum:
+            - BOCR
+            - CLOC
+            - COFS
+            - COYA
+            - OFFD
+            - DEPO
+            - INTE
+            - POTE
+            - RAMP
+        otherFacility:
+          type: string
+          x-stoplight:
+            id: jw4v4uozsqtjz
+          description: An alternative way to capture the facility when no standardized DCSA facility code can be found.
+          maxLength: 50
+          example: Depot location or address
+        modeOfTransport:
+          type: string
+          x-stoplight:
+            id: dvxissq2822sc
+          description: The mode of transport as defined by DCSA.
+          enum:
+            - VESSEL
+            - RAIL
+            - TRUCK
+            - BARGE
+        location:
+          $ref: '#/components/schemas/Location'
+        vessel:
+          type: string
+          x-stoplight:
+            id: 8bh77wkprtafh
+    Reference:
+      title: Reference
+      x-stoplight:
+        id: ghzix70rblmo0
+      type: object
+      description: "\t\nReferences provided by the shipper or freight forwarder at the time of booking or at the time of providing shipping instruction. Carriers share it back when providing track and trace event updates, some are also printed on the B/L. Customers can use these references to track shipments in their internal systems."
+      required:
+        - referenceType
+        - referenceValue
+      properties:
+        referenceType:
+          type: string
+          x-stoplight:
+            id: az91x4huaqaqw
+          description: "The reference type codes defined by DCSA.\r\n\r\n- FF (Freight Forwarder’s Reference)\r\n- SI (Shipper’s Reference)\r\n- PO (Purchase Order Reference)\r\n- CR (Customer’s Reference)\r\n- AAO (Consignee’s Reference)\r\n- EQ (Equipment Reference)"
+          example: FF
+          enum:
+            - FF
+            - SI
+            - PO
+            - CR
+            - AAO
+            - EQ
+        referenceValue:
+          type: string
+          x-stoplight:
+            id: pwr4uxjz8j7or
+          description: The actual value of the reference.
+          maxLength: 100
+    Vessel:
+      title: Vessel
+      x-stoplight:
+        id: 4xz5wnmj7zic0
+      type: object
+      description: "\t\nDescribes a floating, sea going structure (mother vessels and feeder vessels) with either an internal or external mode of propulsion designed for the transport of cargo and/or passengers. Ocean vessels are uniquely identified by an IMO number consisting of 7 digits, or alternatively by their AIS signal with an MMSI number."
+      required:
+        - vesselIMONumber
+      properties:
+        vesselIMONumber:
+          type: string
+          x-stoplight:
+            id: uacqqiu55xeja
+          description: 'The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd''s register code, which does not change during the lifetime of the vessel.'
+          example: '9321483'
+          maxLength: 7
+        vesselName:
+          type: string
+          x-stoplight:
+            id: sae2hqwk47jvn
+          description: The name of the Vessel given by the Vessel Operator and registered with IMO.
+          maxLength: 35
+          example: King of the Seas
+        vesselFlag:
+          type: string
+          x-stoplight:
+            id: krwdeahoifyns
+          description: The flag of the nation whose laws the vessel is registered under. This is the ISO 3166 two-letter country code.
+          example: DE
+          maxLength: 2
+        vesselCallSignNumber:
+          type: string
+          x-stoplight:
+            id: cl7owizp710o2
+          description: 'A unique alphanumeric identity that belongs to the vessel and is assigned by the International Telecommunication Union (ITU). It consists of a threeletter alphanumeric prefix that indicates nationality, followed by one to four characters to identify the individual vessel. For instance, vessels registered under Denmark are assigned the prefix ranges 5PA-5QZ, OUAOZZ, and XPA-XPZ. The Call Sign changes whenever a vessel changes its flag.'
+          example: NCVV
+          maxLength: 10
+        vesselOperatorCarrierCode:
+          type: string
+          x-stoplight:
+            id: lib78vbyl5tjr
+          description: The carrier who is in charge of the vessel operation based on either the SMDG or SCAC code lists.
+          maxLength: 10
+          example: MAEU
+          nullable: false
+        vesselOperatorCarrierCodeListProvider:
+          type: string
+          x-stoplight:
+            id: fb6tm23lyqqaj
+          description: Identifies the code list provider used for the operator and partner carriercodes.
+          example: NMFTA
+          nullable: false
+          enum:
+            - SMDG
+            - NMFTA
+    Location:
+      title: Location
+      x-stoplight:
+        id: ls5w2jytfzvo5
+      type: object
+      description: "\t\nLocation of the facility. Can often be omitted when it is just repeating the contents of the UNLocationCode field."
+      properties:
+        locationName:
+          type: string
+          x-stoplight:
+            id: z73b9oxrlz1u0
+          description: The name of the location.
+          maxLength: 100
+          example: Eiffel Tower
+        latitude:
+          type: string
+          x-stoplight:
+            id: tywt3ximo9rli
+          description: Geographic coordinate that specifies the north–south position of a point on the Earth's surface.
+          example: '48.8585500'
+          maxLength: 10
+        longitude:
+          type: string
+          x-stoplight:
+            id: 58syf03ebljc4
+          description: Geographic coordinate that specifies the east–west position of a point on the Earth's surface.
+          example: '2.294492036'
+          maxLength: 11
+        UNLocationCode:
+          type: string
+          x-stoplight:
+            id: ivgqrwm0p7xzl
+          description: The UN Location code specifying where the place is located.
+          example: FRPAR
+          maxLength: 5
+        facilityCode:
+          type: string
+          x-stoplight:
+            id: 8kgves0mrqxiz
+          description: The code used for identifying the specific facility. This code does not include the UN Location Code.
+          example: ADT
+          maxLength: 6
+        facilityCodeListProvider:
+          type: string
+          x-stoplight:
+            id: ikhscm43amwhh
+          description: The provider used for identifying the facility Code.
+          example: SMDG
+          enum:
+            - SMDG
+            - BIC
+        address:
+          $ref: '#/components/schemas/Address'
+    Address:
+      title: Address
+      x-stoplight:
+        id: 91zstl2wk79sh
+      type: object
+      description: "\t\nAddress related information."
+      properties:
+        name:
+          type: string
+          x-stoplight:
+            id: t2o6wpwquuk65
+          description: Name of the address.
+          example: Henrik
+          maxLength: 100
+        street:
+          type: string
+          x-stoplight:
+            id: 0z4vq2689z7k3
+          description: The name of the street of the party’s address.
+          example: Kronprincessegade
+          maxLength: 100
+        streetNumber:
+          type: string
+          x-stoplight:
+            id: jc4bsqwlm2i1r
+          description: The number of the street of the party’s address.
+          example: '54'
+          maxLength: 50
+        floor:
+          type: string
+          x-stoplight:
+            id: 5so5cxd9f70dg
+          description: The floor of the party’s street number.
+          example: 5. sal
+          maxLength: 50
+        postCode:
+          type: string
+          x-stoplight:
+            id: 5a9o88im9m6q5
+          description: The post code of the party’s address.
+          example: '1306'
+          maxLength: 10
+        city:
+          type: string
+          x-stoplight:
+            id: gndqjje7x94y1
+          description: The city name of the party’s address.
+          example: København
+          maxLength: 65
+        stateRegion:
+          type: string
+          x-stoplight:
+            id: zrciidsi6a2av
+          description: The state/region of the party’s address.
+          maxLength: 65
+          example: N/A
+        country:
+          type: string
+          x-stoplight:
+            id: gxqzzrbog4gtu
+          description: The country of the party’s address.
+          example: Denmark
+          maxLength: 75
+    DocumentReference:
+      title: DocumentReference
+      x-stoplight:
+        id: a2eh8cggmz2i5
+      type: object
+      description: An optional list of key-value (documentReferenceType-documentReferenceValue) pairs representing links to objects relevant to the event. The documentReferenceType-field is used to describe where the documentReferenceValue-field is pointing to.
+      properties:
+        documentReferenceType:
+          type: string
+          x-stoplight:
+            id: spt02mtugqsdv
+          description: "\r\nDescribes where the documentReferenceValue is pointing to."
+          example: BKG (Booking)
+          enum:
+            - BKG (Booking)
+            - TRD (Transport Document)
+        documentReferenceValue:
+          type: string
+          x-stoplight:
+            id: 1m78a9hdfc5ma
+          description: The value of the identifier the documentReferenceType is describing.
+          example: 123e4567-e89b-12d3-a456-426614174000
+    Seal:
+      title: Seal
+      x-stoplight:
+        id: ft6t8ytxxiynj
+      type: object
+      description: "\t\nAddresses the seal-related information associated with the shipment equipment. A seal is put on a shipment equipment once it is loaded. This seal is meant to stay on until the shipment equipment reaches its final destination."
+      required:
+        - sealNumber
+        - sealType
+      properties:
+        sealNumber:
+          type: string
+          x-stoplight:
+            id: bj7ab2ddblprw
+          description: Identifies a seal affixed to the container.
+          maxLength: 15
+        sealSource:
+          type: string
+          x-stoplight:
+            id: kw5iiurwr5mm2
+          description: "The source of the seal, namely who has affixed the seal. This attribute links to the Seal Source ID defined in the Seal Source reference data entity.\r\n\r\n- CAR (Carrier)\r\n- SHI (Shipper)\r\n- PHY (Phytosanitary)\r\n- VET (Veterinary)\r\n- CUS (Customs)"
+          example: CUS
+          enum:
+            - CAR
+            - SHI
+            - PHY
+            - VET
+            - CUS
+        sealType:
+          type: string
+          x-stoplight:
+            id: 5j2c2v2c19i9f
+          description: "The type of seal. This attribute links to the Seal Type ID defined in the Seal Type reference data entity.\r\n\r\n- KLP (Keyless padlock)\r\n- BLT (Bolt)\r\n- WIR (Wire)"
+          example: WIR
+          enum:
+            - KLP
+            - BLT
+            - WIR
+    Error:
+      title: Error
+      x-stoplight:
+        id: uer6895l068qz
+      type: object
+      required:
+        - httpMethod
+        - requestUri
+        - statusCode
+        - statusCodeText
+        - errorDateTime
+      properties:
+        httpMethod:
+          type: string
+          x-stoplight:
+            id: 74lzcfgt7g8lq
+          description: The HTTP request method type.
+          example: GET
+        requestUri:
+          type: string
+          x-stoplight:
+            id: i4wi7x7unwnzc
+          description: The request URI.
+          example: 'https://dcsa.org/dcsa/tnt/v2/events'
+        errors:
+          type: array
+          x-stoplight:
+            id: h8xzforas0rop
+          items:
+            $ref: '#/components/schemas/SubError'
+        statusCode:
+          type: integer
+          x-stoplight:
+            id: 46qxljgybmuvv
+          description: The HTTP status code.
+          example: 400
+        statusCodeText:
+          type: string
+          x-stoplight:
+            id: 3mjn7hee2ug7m
+          description: The textual representation of the response status.
+          example: Bad Request
+        errorDateTime:
+          type: string
+          x-stoplight:
+            id: ganrwvugsvi35
+          description: The date and time (in ISO 8601 format) the error occurred.
+          example: '2019-11-12T07:41:00+08:30'
+          format: date-time
+    SubError:
+      title: SubError
+      x-stoplight:
+        id: app82h8veh0iz
+      type: object
+      required:
+        - reason
+        - message
+      properties:
+        reason:
+          type: string
+          x-stoplight:
+            id: my78i6cw7n60b
+          description: High level error message.
+          example: invalidQuery
+        message:
+          type: string
+          x-stoplight:
+            id: xa8z0knkliybh
+          description: Detailed error message.
+          example: The request did not contain one of the three required query parameters.
+    SubscriptionBody:
+      title: Subscription
+      x-stoplight:
+        id: e5kiyu3pkweo1
+      type: object
+      required:
+        - callbackUrl
+      properties:
+        callbackUrl:
+          type: string
+          x-stoplight:
+            id: bd62k9fwffwlp
+          description: The endPoint where a Carrier whould send back events to the Shipper. The callback can contain query parameters uniquely identifying the originator of the events.
+          example: 'https://myserver.com/send/callback/here?shipperRef=123456'
+          format: uri
+        eventType:
+          type: array
+          x-stoplight:
+            id: 182gd95s0nukp
+          items:
+            type: string
+            $ref: '#/components/schemas/EventType'
+        shipmentEventTypeCode:
+          type: array
+          x-stoplight:
+            id: qva8fx65w090v
+          example:
+            - RECE
+            - DRFT
+          items:
+            $ref: '#/components/schemas/ShipmentEventTypeCode'
+        documentTypeCode:
+          type: array
+          x-stoplight:
+            id: 9a05jrj60xmuz
+          description: "List of documentTypeCode to filter by. If multiple values are selected - the OR-operator will be used.\r\n\r\nDefault is none as it will not filter on documentTypeCode if not specified."
+          example:
+            - SHI
+            - TRD
+          items:
+            $ref: '#/components/schemas/DocumentTypeCode'
+        carrierBookingReference:
+          type: string
+          x-stoplight:
+            id: 4pp4sn2aucq9s
+          description: ' set of unique characters provided by carrier to identify a booking.'
+          example: ABC709951
+          maxLength: 35
+        bookingReference:
+          type: string
+          x-stoplight:
+            id: 8pqfiygskzpmt
+          description: "The identifier for a shipment, which is issued by and unique within each of the carriers.\r\n\r\n**Deprecated** - use carrierBookingReference instead."
+          deprecated: true
+          example: ABC709951
+          maxLength: 35
+        transportDocumentID:
+          type: string
+          x-stoplight:
+            id: 8621pk1zvyf8z
+          description: "Uniquely identify a transport document.\r\n\r\n**Deprecated** - use transportDocumentReference instead."
+          format: uuid
+          deprecated: true
+        transportDocumentReference:
+          type: string
+          x-stoplight:
+            id: j79laxdrs0xxr
+          maxLength: 20
+          description: A unique number allocated by the shipping line to the transport document and the main number used for the tracking of the status of the shipment.
+        transportDocumentTypeCode:
+          type: array
+          x-stoplight:
+            id: 9stxb1xm49c6z
+          description: "List of transportDocumentType to filter by. If multiple values are selected - the OR-operator will be used.\r\n\r\nDefault is none as it will not filter on transportDocumentType if not specified.\r\n\r\n**Deprecated**: Not to be used any more."
+          deprecated: true
+          items:
+            x-stoplight:
+              id: 9686vakqvuryp
+            enum:
+              - BOL
+              - SWB
+        transportEventTypeCode:
+          type: array
+          x-stoplight:
+            id: ea8l4v6z7qk4p
+          description: "List of transportEventTypeCode to filter by. If multiple values are selected - the OR-operator will be used.\r\n\r\nDefault is none as it will not filter on transportEventTypeCode if not specified."
+          items:
+            $ref: '#/components/schemas/TransportEventTypeCode'
+        scheduleID:
+          type: string
+          x-stoplight:
+            id: hyfud0jc3zbm6
+          deprecated: true
+          format: uuid
+          description: "ID uniquely identifying a schedul.\r\n\r\n**Deprecated** as this was added by mistake."
+        transportCallID:
+          type: string
+          x-stoplight:
+            id: sq5xr6xvblzj1
+          description: The unique identifier for a transport call.
+          example: 123e4567-e89b-12d3-a456-426614174000
+          maxLength: 100
+        vesselIMONumber:
+          type: string
+          x-stoplight:
+            id: 4pzgus7y1ychu
+          description: 'The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd''s register code, which does not change during the lifetime of the vessel.'
+          example: '9321483'
+          maxLength: 7
+        carrierVoyageNumber:
+          type: string
+          x-stoplight:
+            id: mhaow489ppvm8
+          description: The vessel operator-specific identifier of the Voyage.
+          example: 2103S
+          maxLength: 50
+          deprecated: true
+        exportVoyageNumber:
+          type: string
+          x-stoplight:
+            id: g80ogczbaz43o
+          description: The vessel operator-specific identifier of the export Voyage.
+          example: 2103S
+          maxLength: 50
+        carrierServiceCode:
+          type: string
+          x-stoplight:
+            id: hdfrx91co91gz
+          description: The code of the service for which the schedule details are published.
+          example: FE1
+          maxLength: 5
+        UNLocationCode:
+          type: string
+          x-stoplight:
+            id: x8tfa9us5okhk
+          description: The UN Location code specifying where the place is located.
+          example: FRPAR
+          maxLength: 5
+        equipmentEventTypeCode:
+          type: array
+          x-stoplight:
+            id: fggq2jtezezyy
+          items:
+            $ref: '#/components/schemas/EquipmentEventTypeCode'
+        equipmentReference:
+          type: string
+          x-stoplight:
+            id: ezzgk6kktm52i
+          description: 'The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible. According to ISO 6346, a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit). If a container does not comply with ISO 6346, it is suggested to follow Recommendation #2 “Container with non-ISO identification” from SMDG.'
+          example: APZU4812090
+          maxLength: 15
+    Subscription:
+      title: Subscriptionn
+      x-stoplight:
+        id: 9k2fwmxqe1ho6
+      allOf:
+        - type: object
+          properties:
+            subscriptionID:
+              type: string
+              description: The carrier issues a unique ID to the shipper or consignee for that subscription.
+              example: 8fbdc2d8-57c8-48b9-a04b-18fd8ec1d809
+              format: uuid
+        - $ref: '#/components/schemas/SubscriptionBody'
+    ShipmentEventTypeCode:
+      title: ShipmentEventTypeCode
+      x-stoplight:
+        id: 6f9r35u4o5rrv
+      type: string
+      description: |
+        The status of the document in the process. Possible values are
+        - RECE (Received)
+        - DRFT (Drafted)
+        - PENA (Pending Approval)
+        - PENU (Pending Update)
+        - REJE (Rejected)
+        - APPR (Approved)
+        - ISSU (Issued)
+        - SURR (Surrendered)
+        - SUBM (Submitted)
+        - VOID (Void)
+        - CONF (Confirmed)
+        - REQS (Requested)
+        - CMPL (Completed)
+        - HOLD (On Hold)
+        - RELS (Released)
+
+        More details can be found on <a href="https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/shipmenteventtypecodes.csv">GitHub</a>
+      enum:
+        - RECE
+        - DRFT
+        - PENA
+        - PENU
+        - REJE
+        - APPR
+        - ISSU
+        - SURR
+        - SUBM
+        - VOID
+        - CONF
+        - REQS
+        - CMPL
+        - HOLD
+        - RELS
+      example: DRFT
+    DocumentTypeCode:
+      title: DocumentTypeCode
+      x-stoplight:
+        id: n0b50jkkgv9wq
+      type: string
+      description: |-
+        The code to identify the type of information documentID points to. Can be one of the following values 
+        - CBR (Carrier Booking Request Reference) 
+        - BKG (Booking) - SHI (Shipping Instruction) 
+        - SRM (Shipment Release Message) 
+        - TRD (Transport Document) 
+        - ARN (Arrival Notice) 
+        - VGM (Verified Gross Mass) 
+        - CAS (Cargo Survey) 
+        - CUS (Customs Inspection) 
+        - DGD (Dangerous Goods Declaration) 
+        - OOG (Out of Gauge)
+
+        More details can be found on <a href="https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/documenttypecodes.csv">GitHub</a>
+      example: SHI
+      enum:
+        - CBR
+        - BKG
+        - SHI
+        - SRM
+        - TRD
+        - ARN
+        - VGM
+        - CAS
+        - CUS
+        - DGD
+        - OOG
+    SunscriptionBodyWithSecret:
+      title: SunscriptionBodyWithSecret
+      x-stoplight:
+        id: bcisr6k4u6kiv
+      allOf:
+        - $ref: '#/components/schemas/SubscriptionBody'
+        - type: object
+          required:
+            - secret
+          properties:
+            secret:
+              type: string
+              x-stoplight:
+                id: j3fui5h5entn1
+              description: A shared secret shared between the Publisher and the Subscriber. It is used to compute the contents of the Notification-Signature header. Only valid in POST calls - anywhere else must be omitted!
+              format: byte
+              example: MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDM2NTc4NjIzODk3NDY5MDgyNzM0OTg3MTIzNzg2NA==
+    EquipmentEventTypeCode:
+      title: EquipmentEventTypeCode
+      x-stoplight:
+        id: nuofgxpncb024
+      type: string
+      description: |-
+        List of equipmentEventTypeCode to filter by. If multiple values are selected - the OR-operator will be used.
+
+        Default is none as it will not filter on equipmentEventTypeCode if not specified.
+
+        Unique identifier for equipmentEventTypeCode.
+
+        - LOAD (Loaded)
+        - DISC (Discharged)
+        - GTIN (Gated in)
+        - GTOT (Gated out)
+        - STUF (Stuffed)
+        - STRP (Stripped)
+        - PICK (Pick-up)
+        - DROP (Drop-off)
+        - INSP (Inspected)
+        - RSEA (Resealed)
+        - RMVD (Removed)
+
+        More details can be found on <a href="https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/equipmenteventtypecodes.csv">GitHub</a>
+      enum:
+        - LOAD
+        - DISC
+        - GTIN
+        - GTOT
+        - STUF
+        - STRP
+        - PICK
+        - DROP
+        - INSP
+        - RSEA
+        - RMVD
+    TransportEventTypeCode:
+      title: TransportEventTypeCode
+      x-stoplight:
+        id: rlrwrg6oheht3
+      type: string
+      description: |-
+        List of transportEventTypeCode to filter by. If multiple values are selected - the OR-operator will be used.
+
+        Default is none as it will not filter on transportEventTypeCode if not specified.
+
+        Identifier for type of Transport event
+
+        - ARRI (Arrived)
+        - DEPA (Departed)
+
+        More details can be found on <a href="https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/transporteventtypecodes.csv">Github</a>
+      enum:
+        - ARRI
+        - DEPA
+    EventType:
+      title: EventType
+      x-stoplight:
+        id: kkrdmo4sskqel
+      type: string
+      description: |
+        List the evenType to filter by. If multiple values are selected - the OR-operator will be used.
+
+        Possible values are
+        - SHIPMENT (Shipment events)
+        - TRANSPORT (Transport events)
+        - EQUIPMENT (Equipment events)
+
+        Default is none as it will not filter on eventType if not specified.
+      enum:
+        - SHIPMENT
+        - TRANSPORT
+        - EQUIPMENT
