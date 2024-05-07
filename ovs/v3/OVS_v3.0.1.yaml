@@ -175,6 +175,12 @@ paths:
           in: header
           name: API-Version
           description: An API-Version header **MAY** be added to the request (optional); if added it **MUST** only contain **MAJOR** version. API-Version header **MUST** be aligned with the URI version.
+        - schema:
+            type: string
+            example: fE9mZnNldHw9MTAmbGltaXQ9MTA=
+          in: query
+          name: cursor
+          description: 'A server generated value to specify a specific point in a collection result, used for pagination.'
 components:
   schemas:
     ServiceSchedule:
@@ -323,6 +329,12 @@ components:
             - $ref: '#/components/schemas/UNLocationLocation'
             - $ref: '#/components/schemas/FacilitySMDGLocation'
             - $ref: '#/components/schemas/AddressLocation'
+          discriminator:
+            propertyName: locationType
+            mapping:
+              ADDR: '#/components/schemas/AddressLocation'
+              FACS: '#/components/schemas/FacilitySMDGLocation'
+              UNLO: '#/components/schemas/UNLocationLocation'
         statusCode:
           type: string
           x-stoplight:
@@ -482,6 +494,7 @@ components:
         id: 6kargcv7aoll8
       type: object
       description: An interface used to express a location using a `Un Location Code`.
+      additionalProperties: false
       required:
         - locationType
         - UNLocationCode
