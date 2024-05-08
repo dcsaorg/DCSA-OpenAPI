@@ -51,12 +51,20 @@ paths:
               examples: {}
           headers:
             API-Version:
-              $ref: ../../models/CommonComponents.yaml#/components/headers/API-Version
+              schema:
+                type: string
+                example: 1.0.0
+              description: |
+                SemVer used to indicate the version of the contract (API version) returned
         '400':
           description: Bad Request
           headers:
             API-Version:
-              $ref: ../../models/CommonComponents.yaml#/components/headers/API-Version
+              schema:
+                type: string
+                example: 1.0.0
+              description: |
+                SemVer used to indicate the version of the contract (API version) returned.
           content:
             application/json:
               schema:
@@ -80,7 +88,11 @@ paths:
           description: Internal Server Error
           headers:
             API-Version:
-              $ref: ../../models/CommonComponents.yaml#/components/headers/API-Version
+              schema:
+                type: string
+                example: 1.0.0
+              description: |
+                SemVer used to indicate the version of the contract (API version) returned.
           content:
             application/json:
               schema:
@@ -120,28 +132,26 @@ paths:
           required: true
         - schema:
             type: string
-            format: date-time
-            example: '2021-04-01T14:12:56-01:00'
+            format: date
+            example: '2021-04-01'
           in: query
-          name: departureDateTime
-          description: |
-            `:gte` (≥ Greater than or equal) OR `:lte` (≤ Less than or equal)\
-            `departureDateTime:gte=2021-04-01T14:12:56-01:00`
+          name: departureDate
+          description: 'The date of departure of the routings in the response `:gte` (≥ Greater than or equal) OR `:lte` (≤ Less than or equal) `departureDate:gte=2021-04-01`'
         - schema:
             type: string
-            format: date-time
-            example: '2021-04-01T14:12:56-01:00'
+            format: date
+            example: '2021-04-01'
           in: query
-          name: arrivalDateTime
-          description: |
-            `:gte` (≥ Greater than or equal) OR `:lte` (≤ Less than or equal) \
-            `arrivalDateTime:gte=2021-04-01T14:12:56-01:00`
+          name: arrivalDate
+          description: 'The data of arrival of the routings in the response `:gte` (≥ Greater than or equal) OR `:lte` (≤ Less than or equal) `arrivalDate:gte=2021-04-01`'
         - schema:
-            type: boolean
-            example: false
+            type: integer
+            example: 1
+            format: int32
+            minimum: 0
           in: query
-          name: isTranshipment
-          description: 'Specifies wheter the proposed routing can have a transhipmentin or not. By default is TRUE and responses can have either direct routings or routings with transhipment. If FALSE, only direct routings can be proposed in the response. Transhipment: A terminal operation whereby containers or cargo are transferred from one vessel to another to reach their final destination, compared to a direct service from the load port of origin to the discharge port of destination.'
+          name: maxTranshipment
+          description: 'Specifies the maximum number of transhipments that can have the proposed routings in the response. By default, transhipments are allowed and the responses can have either direct routings or routings with transhipment. The default value of maximum transhipments is defined by the carrier for when the consumer does not provide a value. If the user sets the number of transhipments to 0, only direct routings can be returned in the response.'
         - schema:
             type: string
             enum:
@@ -152,7 +162,11 @@ paths:
             example: CY
           in: query
           name: receiptTypeAtOrigin
-          description: Indicates the type of service offered at Origin. Options are defined in the `Receipt/Delivery` entity.  - CY(Container yard (incl. rail ramp))  - SD (Store Door)  - CFS (Container Freight Station)
+          description: |
+            Indicates the type of service offered at Origin. Options are defined in the `Receipt/Delivery` entity.  
+              - `CY` (Container yard (incl. rail ramp))  
+              - `SD` (Store Door)  
+              - `CFS` (Container Freight Station)
         - schema:
             type: string
             enum:
@@ -163,8 +177,27 @@ paths:
             example: CY
           in: query
           name: deliveryTypeAtDestination
-          description: Indicates the type of service offered at Destination. Options are defined in the `Receipt/Delivery` entity.  - CY(Container yard (incl. rail ramp))  - SD (Store Door)  - CFS (Container Freight Station)
-        - $ref: ../../models/CommonComponents.yaml#/components/parameters/APIVersionMajor
+          description: |
+            Indicates the type of service offered at Destination. Options are defined in the `Receipt/Delivery` entity.  
+              - `CY` (Container yard (incl. rail ramp))  
+              - `SD` (Store Door)  
+              - `CFS` (Container Freight Station)
+        - schema:
+            type: integer
+            format: int32
+            default: 100
+            example: 100
+            minimum: 1
+          in: query
+          name: limit
+          description: Maximum number of items to return.
+        - schema:
+            type: string
+            maxLength: 1024
+          in: query
+          name: cursor
+          description: 'A server generated value to specify a specific point in a collection result, used for pagination.'
+        - $ref: '#/components/parameters/Api-Version-Major'
       description: Provides the product offering of single or multiple estimated end-to-end route options for a shipment in the pre-booking phase.
       x-stoplight:
         id: ibt5y7c4xqfp8
@@ -184,12 +217,20 @@ paths:
                   $ref: '#/components/schemas/PortSchedule'
           headers:
             API-Version:
-              $ref: ../../models/CommonComponents.yaml#/components/headers/API-Version
+              schema:
+                type: string
+                example: 1.0.0
+              description: |
+                SemVer used to indicate the version of the contract (API version) returned.
         '400':
           description: Bad Request
           headers:
             API-Version:
-              $ref: ../../models/CommonComponents.yaml#/components/headers/API-Version
+              schema:
+                type: string
+                example: 1.0.0
+              description: |
+                SemVer used to indicate the version of the contract (API version) returned.
           content:
             application/json:
               schema:
@@ -213,7 +254,11 @@ paths:
           description: Internal Server Error
           headers:
             API-Version:
-              $ref: ../../models/CommonComponents.yaml#/components/headers/API-Version
+              schema:
+                type: string
+                example: 1.0.0
+              description: |
+                SemVer used to indicate the version of the contract (API version) returned.
           content:
             application/json:
               schema:
@@ -251,7 +296,23 @@ paths:
           name: date
           description: The date since when the estimated arrival and departures of vessels in a given port is required
           required: true
-        - $ref: ../../models/CommonComponents.yaml#/components/parameters/APIVersionMajor
+        - $ref: '#/components/parameters/Api-Version-Major'
+        - schema:
+            type: integer
+            format: int32
+            default: 100
+            example: 100
+            minimum: 1
+          in: query
+          name: limit
+          description: Maximum number of items to return.
+        - schema:
+            type: string
+            example: fE9mZnNldHw9MTAmbGltaXQ9MTA=
+            maxLength: 1024
+          in: query
+          name: cursor
+          description: 'A server generated value to specify a specific point in a collection result, used for pagination.'
       x-stoplight:
         id: qgasqkwxqdf20
     parameters: []
@@ -271,12 +332,20 @@ paths:
                   $ref: '#/components/schemas/ServiceSchedule'
           headers:
             API-Version:
-              $ref: ../../models/CommonComponents.yaml#/components/headers/API-Version
+              schema:
+                type: string
+                example: 1.0.0
+              description: |
+                SemVer used to indicate the version of the contract (API version) returned.
         '400':
           description: Bad Request
           headers:
             API-Version:
-              $ref: ../../models/CommonComponents.yaml#/components/headers/API-Version
+              schema:
+                type: string
+                example: 1.0.0
+              description: |
+                SemVer used to indicate the version of the contract (API version) returned.
           content:
             application/json:
               schema:
@@ -300,7 +369,11 @@ paths:
           description: Internal Server Error
           headers:
             API-Version:
-              $ref: ../../models/CommonComponents.yaml#/components/headers/API-Version
+              schema:
+                type: string
+                example: 1.0.0
+              description: |
+                SemVer used to indicate the version of the contract (API version) returned.
           content:
             application/json:
               schema:
@@ -322,15 +395,16 @@ paths:
       parameters:
         - schema:
             type: string
-            maxLength: 7
-            pattern: '^\d{7}$'
+            minLength: 7
+            maxLength: 8
+            pattern: '^\d{7,8}$'
             example: '9321483'
           in: query
           name: vesselIMONumber
-          description: The identifier of a vessel. The result will only return schedules including the vessel with the specified `IMO number`.  It is not a requirement for dummy vessels to have an `IMO Number`.
+          description: 'The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd&apos;s register code, which does not change during the lifetime of the vessel.'
         - schema:
             type: string
-            maxLength: 35
+            maxLength: 50
             example: King of the Seas
           in: query
           name: vesselName
@@ -383,6 +457,13 @@ paths:
           description: The facilitySMDGCode specifying a specific facility (using SMDG Code). Be aware that the `facilitySMDGCode` does not contain a `UNLocationCode` - this must be specified in the `UNLocationCode` filter.  Specifying this filter will only return schedules including entire Voyages related to this particular `facilitySMDGCode`.
         - schema:
             type: string
+            example: MAEU
+            maxLength: 10
+          in: query
+          name: vesselOperatorCarrierCode
+          description: The carrier who is in charge of the vessel operation based on either the SMDG or SCAC code lists.
+        - schema:
+            type: string
             format: date
             example: '2020-04-06'
           in: query
@@ -399,7 +480,23 @@ paths:
           description: |
             The end date of the period for which schedule information is requested. If a date of any Timestamp (ATA, ETA or PTA) inside a PortCall matches a date on or before (≤) the `endDate` the entire Voyage(import- and export-Voyage) matching the PortCall will be included in the result. All matching is done towards local Date at the place of the port call.  
             If this filter is not provided the default value is `6 months` after request time.  The value is populated in `ISO 8601` date format.
-        - $ref: ../../models/CommonComponents.yaml#/components/parameters/APIVersionMajor
+        - schema:
+            type: integer
+            format: int32
+            default: 100
+            example: 100
+            minimum: 1
+          in: query
+          name: limit
+          description: Maximum number of items to return.
+        - schema:
+            type: string
+            example: fE9mZnNldHw9MTAmbGltaXQ9MTA=
+            maxLength: 1024
+          in: query
+          name: cursor
+          description: 'A server generated value to specify a specific point in a collection result, used for pagination.'
+        - $ref: '#/components/parameters/Api-Version-Major'
       description: |-
         Provides, for a required specific service and/or voyage and/or vessel and/or location, the timetable of estimated departure and arrival times for each port call on the rotation of the vessel(s). 
 
@@ -411,51 +508,67 @@ components:
       title: Place
       type: object
       description: The Location specifying where the place is located.
+      x-stoplight:
+        id: 6qncmwke0iqvq
+      required:
+        - facilityTypeCode
+        - location
+        - dateTime
       properties:
         facilityTypeCode:
           description: |
             The code to identify the specific type of facility. The code indicates which role the facility plays during the transportCall.
-            - BORD (Border)
-            - CLOC (Customer Location)
-            - COFS (Container Freight Station)
-            - OFFD (Off Dock Storage)
-            - DEPO (Depot)
-            - INTE (Inland Terminal)
-            - POTE (Port Terminal)
-            - PBPL (Pilot Boarding Place)
-            - BRTH (Berth)
-            - RAMP (Ramp)
-            - WAYP (Waypoint)
+            - `BORD` (Border)
+            - `CLOC` (Customer Location)
+            - `COFS` (Container Freight Station)
+            - `OFFD` (Off Dock Storage)
+            - `DEPO` (Depot)
+            - `INTE` (Inland Terminal)
+            - `POTE` (Port Terminal)
+            - `PBPL` (Pilot Boarding Place)
+            - `BRTH` (Berth)
+            - `RAMP  (Ramp)
+            - `WAYP` (Waypoint)
           example: POTE
           type: string
         location:
           oneOf:
-            - $ref: ../../models/UnLocationLocation.yaml
-            - $ref: ../../models/FacilitySMDGLocation.yaml
-            - $ref: ../../models/AddressLocation.yaml
+            - $ref: '#/components/schemas/UNLocationLocation'
+            - $ref: '#/components/schemas/FacilitySMDGLocation'
+            - $ref: '#/components/schemas/AddressLocation'
+          discriminator:
+            propertyName: locationType
+            mapping:
+              ADDR: '#/components/schemas/AddressLocation'
+              FACS: '#/components/schemas/FacilitySMDGLocation'
+              UNLO: '#/components/schemas/UNLocationLocation'
         dateTime:
           type: string
           format: date-time
           example: '2019-08-24T14:15:22Z'
           x-stoplight:
             id: tfufl59x6te0n
-      required:
-        - facilityTypeCode
-        - location
-        - dateTime
-      x-stoplight:
-        id: 6qncmwke0iqvq
     PointToPoint:
       title: Point To Point
       x-stoplight:
         id: x1x7ae0q7kym3
       type: object
-      description: ''
+      required:
+        - placeOfReceipt
+        - placeOfDelivery
+        - legs
       properties:
         placeOfReceipt:
           $ref: '#/components/schemas/Place'
         placeOfDelivery:
           $ref: '#/components/schemas/Place'
+        cutOffTimes:
+          type: array
+          description: A list of cut-offs times provided by the carrier when available. A cut-off time indicates the latest deadline within which a task must be completed.
+          x-stoplight:
+            id: ey85uy7hk8gp5
+          items:
+            $ref: '#/components/schemas/CutOffTime'
         transitTime:
           type: integer
           x-stoplight:
@@ -467,17 +580,18 @@ components:
           x-stoplight:
             id: w4k1wtp4z5j6i
           type: array
+          minItems: 1
           items:
             $ref: '#/components/schemas/Leg'
-      required:
-        - placeOfReceipt
-        - placeOfDelivery
-        - legs
     Leg:
       title: Leg
       x-stoplight:
         id: itbpqbyi0so58
       type: object
+      description: Leg of the Point-to-Point routing. The object "Legs" can be conformed by as many legs as needed and this legs must be identified with a sequence number.
+      required:
+        - departure
+        - arrival
       properties:
         sequenceNumber:
           type: integer
@@ -495,28 +609,39 @@ components:
             - TRUCK
             - RAIL
           description: The mode of transport as defined by DCSA.
-        vesselOperatorSMDGLinerCode:
+        vesselOperatorCarrierCode:
           type: string
           x-stoplight:
-            id: p7rb8ih6ttymi
-          description: The carrier who is in charge of the vessel operation based on the SMDG code.
+            id: vsirzc1w4gbqt
+          description: The carrier who is in charge of the vessel operation based on either the SMDG or SCAC code lists.
+          example: MAEU
           maxLength: 10
-          example: HLC
+        vesselOperatorCarrierCodeListProvider:
+          type: string
+          x-stoplight:
+            id: vj9suv2w0l5j4
+          description: Identifies the code list provider used for the operator and partner carriercodes.
+          example: NMFTA
+          enum:
+            - SMDG
+            - NMFTA
         vesselIMONumber:
           type: string
           x-stoplight:
             id: o2ovfknig1oap
-          description: "The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd's register code, which does not change during the lifetime of the vessel\r\n\r\nCondition: If the vessel is not dummy, there needs to be an IMO. If the vessel is dummy, the IMO is optional."
+          description: 'The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd&apos;s register code, which does not change during the lifetime of the vessel.'
           example: '9321483'
-          pattern: '^\d{7}$'
-          maxLength: 7
+          pattern: '^\d{7,8}$'
+          minLength: 7
+          maxLength: 8
         vesselName:
           type: string
           x-stoplight:
             id: xfeizdvobewab
           description: The name of the Vessel given by the Vessel Operator and registered with IMO.
           example: King of the Seas
-          maxLength: 35
+          maxLength: 50
+          pattern: '^\S(?:.*\S)?$'
         carrierServiceName:
           type: string
           x-stoplight:
@@ -571,36 +696,44 @@ components:
           $ref: '#/components/schemas/Place'
         arrival:
           $ref: '#/components/schemas/Place'
-      required:
-        - departure
-        - arrival
-      description: Leg of the Point-to-Point routing. The object "Legs" can be conformed by as many legs as needed and this legs must be identified with a sequence number.
     PortSchedule:
       title: Port Schedule
       type: object
+      x-stoplight:
+        id: mgxbp9alny3q0
+      required:
+        - location
       properties:
         location:
           x-stoplight:
             id: ksjcrliv4kobm
           oneOf:
-            - $ref: ../../models/UnLocationLocation.yaml
-            - $ref: ../../models/FacilitySMDGLocation.yaml
+            - $ref: '#/components/schemas/UNLocationLocation'
+            - $ref: '#/components/schemas/FacilitySMDGLocation'
+          discriminator:
+            propertyName: locationType
+            mapping:
+              FACS: '#/components/schemas/FacilitySMDGLocation'
+              UNLO: '#/components/schemas/UNLocationLocation'
         vesselSchedules:
           type: array
           x-stoplight:
             id: oqtnha66e947j
-          minItems: 0
+          minItems: 1
           items:
             $ref: '#/components/schemas/Schedule'
-      required:
-        - location
-      x-stoplight:
-        id: mgxbp9alny3q0
     Schedule:
       title: Schedule
       x-stoplight:
         id: czyyep580i801
       type: object
+      required:
+        - carrierServiceName
+        - carrierServiceCode
+        - isDummyVessel
+        - carrierImportVoyageNumber
+        - carrierExportVoyageNumber
+        - timestamps
       properties:
         carrierServiceName:
           type: string
@@ -627,18 +760,19 @@ components:
         vesselIMONumber:
           type: string
           x-stoplight:
-            id: emnq4ndujb496
-          description: "The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd's register code, which does not change during the lifetime of the vessel\r\n\r\nCondition: If the vessel is not dummy, there needs to be an IMO. If the vessel is dummy, the IMO is optional."
+            id: o2ovfknig1oap
+          description: 'The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd&apos;s register code, which does not change during the lifetime of the vessel.'
           example: '9321483'
-          pattern: '^\d{7}$'
-          maxLength: 7
+          pattern: '^\d{7,8}$'
+          minLength: 7
+          maxLength: 8
         vesselName:
           type: string
           x-stoplight:
             id: yrtql880q13gj
           description: The name of the Vessel given by the Vessel Operator and registered with IMO.
           example: King of the Seas
-          maxLength: 35
+          maxLength: 50
         isDummyVessel:
           type: boolean
           x-stoplight:
@@ -672,24 +806,44 @@ components:
           description: 'A global unique voyage reference for the export Voyage, as per DCSA standard, agreed by VSA partners for the voyage.'
           pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
           example: 2103N
-        timestamp:
+        vesselOperatorCarrierCode:
+          type: string
+          x-stoplight:
+            id: vsirzc1w4gbqt
+          description: The carrier who is in charge of the vessel operation based on either the SMDG or SCAC code lists.
+          example: MAEU
+          maxLength: 10
+        vesselOperatorCarrierCodeListProvider:
+          type: string
+          x-stoplight:
+            id: vj9suv2w0l5j4
+          description: Identifies the code list provider used for the operator and partner carriercodes.
+          example: NMFTA
+          enum:
+            - SMDG
+            - NMFTA
+        timestamps:
           type: array
           minItems: 1
           items:
             $ref: '#/components/schemas/Timestamp'
-      required:
-        - carrierServiceName
-        - carrierServiceCode
-        - isDummyVessel
-        - carrierImportVoyageNumber
-        - carrierExportVoyageNumber
-        - timestamp
+        cutOffTimes:
+          type: array
+          description: A list of cut-offs times provided by the carrier when available. A cut-off time indicates the latest deadline within which a task must be completed.
+          x-stoplight:
+            id: o9trzt2y251mw
+          items:
+            $ref: '#/components/schemas/CutOffTime'
     TransportCall:
       title: Transport Call
       x-stoplight:
         id: 5yngetqks8kzg
       type: object
       x-internal: false
+      required:
+        - transportCallReference
+        - carrierImportVoyageNumber
+        - timestamps
       properties:
         portVisitReference:
           type: string
@@ -738,19 +892,21 @@ components:
           x-stoplight:
             id: d7jg2e23zhjnb
           oneOf:
-            - $ref: ../../models/UnLocationLocation.yaml
-            - $ref: ../../models/FacilitySMDGLocation.yaml
-            - $ref: ../../models/AddressLocation.yaml
+            - $ref: '#/components/schemas/UNLocationLocation'
+            - $ref: '#/components/schemas/FacilitySMDGLocation'
+            - $ref: '#/components/schemas/AddressLocation'
           description: 'General purpose object to capture location-related data, the location can be specified in one of the following ways: `UN Location Code`, a `Facility` or an `Address`.'
-        timestamp:
+          discriminator:
+            propertyName: locationType
+            mapping:
+              ADDR: '#/components/schemas/AddressLocation'
+              FACS: '#/components/schemas/FacilitySMDGLocation'
+              UNLO: '#/components/schemas/UNLocationLocation'
+        timestamps:
           type: array
           minItems: 1
           items:
             $ref: '#/components/schemas/Timestamp'
-      required:
-        - transportCallReference
-        - carrierImportVoyageNumber
-        - timestamp
     Timestamp:
       title: Timestamp
       x-stoplight:
@@ -795,27 +951,37 @@ components:
         id: vr44dj2pekyyg
       type: object
       properties:
-        vesselOperatorSMDGLinerCode:
+        vesselOperatorCarrierCode:
           type: string
           x-stoplight:
-            id: dore13e0yltxc
+            id: vsirzc1w4gbqt
+          description: The carrier who is in charge of the vessel operation based on either the SMDG or SCAC code lists.
+          example: MAEU
           maxLength: 10
-          example: HLC
-          description: The carrier who is in charge of the vessel operation based on the `SMDG code`.
+        vesselOperatorCarrierCodeListProvider:
+          type: string
+          x-stoplight:
+            id: vj9suv2w0l5j4
+          description: Identifies the code list provider used for the operator and partner carriercodes.
+          example: NMFTA
+          enum:
+            - SMDG
+            - NMFTA
         vesselIMONumber:
           type: string
           x-stoplight:
-            id: tx0a6mhyaohct
-          description: "The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd's register code, which does not change during the lifetime of the vessel\r\n\r\nCondition: If the vessel is not dummy, there needs to be an IMO. If the vessel is dummy, the IMO is optional."
-          pattern: '^\d{7}$'
-          maxLength: 7
+            id: o2ovfknig1oap
+          description: 'The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd&apos;s register code, which does not change during the lifetime of the vessel.'
           example: '9321483'
+          pattern: '^\d{7,8}$'
+          minLength: 7
+          maxLength: 8
         vesselName:
           type: string
           x-stoplight:
             id: sjxoamy8akix5
           description: The name of the Vessel given by the Vessel Operator and registered with IMO.
-          maxLength: 35
+          maxLength: 50
           example: King of the Seas
         vesselCallSign:
           type: string
@@ -874,6 +1040,310 @@ components:
       required:
         - carrierServiceName
         - vesselSchedules
+    CutOffTime:
+      title: CutOffTime
+      x-stoplight:
+        id: 0s6yu6v21mabq
+      type: object
+      description: Cut Off Times.
+      required:
+        - cutOffDateTimeCode
+        - cutOffDateTime
+      properties:
+        cutOffDateTimeCode:
+          type: string
+          x-stoplight:
+            id: 6kxo2zw6m656u
+          description: "Code for the cut-off time. Possible values are:\r\n- `DCO` (Documentation cut-off)\r\n- `VCO` (VGM cut-off)\r\n- `FCO` (FCL delivery cut-off)\r\n- `LCO` (LCL delivery cut-off)\r\n- `PCO` (Port cut-off)\r\n- `ECP` (Empty container pick-up date and time)\r\n- `EFC` (Earliest full-container delivery date)\r\n- `RCO` (Reefer cut-off)\r\n- `DGC` (Dangerous Goods cut-off)\r\n- `OBC` (OOG/BB cut-off)\r\n- `TCO` (Transhipment cut-off)\r\n- `STA` (Standard booking acceptance)\r\n- `SPA` (Special booking acceptance)\r\n- `CUA` (Customs Acceptance)\r\n- `AFC` (Advanced filling cut-off)\r\n\r\n**LCL Condition** : Only applicable when the `Receipt Type at Origin` is `CFS`.\r\n\r\nMore details can be found on [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/reference-data/CutOffDateTimeCodeList-CS_v1.0.0.csv)"
+          maxLength: 3
+          example: DCO
+        cutOffDateTime:
+          type: string
+          x-stoplight:
+            id: ovjrw1tb3wbdx
+          format: date-time
+          description: Actual cut-off time.
+          example: '2019-11-12T07:41:00-08:30'
+    AddressLocation:
+      title: AddressLocation
+      x-stoplight:
+        id: m8siaz93if4cf
+      type: object
+      description: An interface used to express a location using an `Address` object.
+      required:
+        - locationType
+        - address
+      properties:
+        locationName:
+          type: string
+          x-stoplight:
+            id: 1qntskkr8v0h5
+          example: Port of Amsterdam
+          pattern: '^\S(?:.*\S)?$'
+          description: The name of the location.
+          maxLength: 100
+        locationType:
+          type: string
+          maxLength: 4
+          description: Discriminator used to identify this as an `Address` location interface.
+          example: ADDR
+        address:
+          type: object
+          description: An object for storing address related information.
+          properties:
+            street:
+              type: string
+              x-stoplight:
+                id: ba6frq15mh2t8
+              example: Ruijggoordweg
+              maxLength: 100
+            streetNumber:
+              type: string
+              x-stoplight:
+                id: 1jiv2010jnttw
+              example: '100'
+              maxLength: 50
+            floor:
+              type: string
+              x-stoplight:
+                id: gcvknia354jrg
+              example: N/A
+              maxLength: 50
+            postCode:
+              type: string
+              x-stoplight:
+                id: 4wlkf4w5um9j3
+              example: 1047 HM
+              maxLength: 50
+            city:
+              type: string
+              x-stoplight:
+                id: snavpzoxpl48e
+              example: Amsterdam
+              maxLength: 65
+            stateRegion:
+              type: string
+              x-stoplight:
+                id: 3k7wb2fib7401
+              example: North Holland
+              maxLength: 65
+            countryCode:
+              type: string
+              pattern: '^[A-Z]{2}$'
+              minLength: 2
+              maxLength: 2
+              description: |
+                The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+              example: NL
+    FacilitySMDGLocation:
+      title: Facility SMDG Location
+      x-stoplight:
+        id: wjfsbdac9a7nz
+      type: object
+      description: An interface used to express a location using a `Facility` by the `SMDG` code list. The `facilitySMDGCode` does not contain the `UNLocationCode` - this should be provided in the `UnLocationCode` attribute.
+      required:
+        - locationType
+        - UNLocationCode
+        - facilitySMDGCode
+      properties:
+        locationName:
+          type: string
+          x-stoplight:
+            id: p82efb2odh99y
+          description: The name of the location.
+          example: Port of Amsterdam
+          pattern: '^\S(?:.*\S)?$'
+          maxLength: 100
+        locationType:
+          type: string
+          x-stoplight:
+            id: wvrz1c6visndu
+          example: FACS
+          description: Discriminator used to identify this as a `Facility Location` interface only using `SMDG` code list.
+          maxLength: 4
+        UNLocationCode:
+          type: string
+          x-stoplight:
+            id: 7kpvxrrdljsb5
+          example: NLAMS
+          pattern: '^[A-Z]{2}[A-Z2-9]{3}$'
+          minLength: 5
+          maxLength: 5
+          description: "The UN Location code specifying where the place is located. The pattern used must be\r\n\r\n - 2 characters for the country code using [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)\r\n - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used\r\n\r\nMore info can be found here: [UN/LOCODE](https://en.wikipedia.org/wiki/UN/LOCODE)"
+        facilitySMDGCode:
+          type: string
+          x-stoplight:
+            id: yndr8amfy18nr
+          example: ACT
+          description: "The code used for identifying the specific facility. This code does not include the UN Location Code.\r\n\r\nThe codeList used by SMDG is the [SMDG Terminal Code List](https://smdg.org/wp-content/uploads/Codelists/Terminals/SMDG-Terminal-Code-List-v20210401.xlsx)"
+          maxLength: 6
+    UNLocationLocation:
+      title: UNLocation Location
+      x-stoplight:
+        id: inxjf3adrpkge
+      type: object
+      description: An interface used to express a location using a `Un Location Code`.
+      additionalProperties: false
+      required:
+        - locationType
+        - UNLocationCode
+      properties:
+        locationName:
+          type: string
+          x-stoplight:
+            id: uwy2d1d9tkdku
+          description: The name of the location.
+          example: Port of Amsterdam
+          pattern: '^\S(?:.*\S)?$'
+        locationType:
+          type: string
+          x-stoplight:
+            id: 9gk73d2za4g0r
+          description: Discriminator used to identify this as a `UNLocation` location interface.
+          example: UNLO
+          maxLength: 4
+        UNLocationCode:
+          type: string
+          x-stoplight:
+            id: bnpig7p7mrk8l
+          description: "The UN Location code specifying where the place is located. The pattern used must be\r\n\r\n - 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)\r\n - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used\r\n\r\nMore info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)"
+          pattern: '^[A-Z]{2}[A-Z2-9]{3}$'
+          example: NLAMS
+          minLength: 5
+          maxLength: 5
+    ErrorResponse:
+      title: Error Response
+      x-stoplight:
+        id: ecq5zj4a4hkgf
+      type: object
+      required:
+        - httpMethod
+        - requestUri
+        - statusCode
+        - statusCodeText
+        - errorDateTime
+        - errors
+      properties:
+        httpMethod:
+          type: string
+          example: POST
+          x-stoplight:
+            id: nqesjdkli0n88
+          enum:
+            - GET
+            - HEAD
+            - POST
+            - PUT
+            - DELETE
+            - OPTION
+            - PATCH
+          description: 'The HTTP method used to make the request e.g. `GET`, `POST`, etc'
+        requestUri:
+          type: string
+          x-stoplight:
+            id: cq9morjalvdbp
+          description: The URI that was requested.
+          example: /v1/events
+        statusCode:
+          type: integer
+          x-stoplight:
+            id: g4hqmafsodfk2
+          description: The HTTP status code returned.
+          format: int32
+          example: 400
+        statusCodeText:
+          type: string
+          x-stoplight:
+            id: 4g9ee4lnm8ndr
+          description: A standard short description corresponding to the HTTP status code.
+          example: Bad Request
+        statusCodeMessage:
+          type: string
+          x-stoplight:
+            id: y37oiw30a34xl
+          description: A long description corresponding to the HTTP status code with additional information.
+          example: The supplied data could not be accepted
+        providerCorrelationReference:
+          type: string
+          x-stoplight:
+            id: cpmumeeur0y7q
+          description: A unique identifier to the HTTP request within the scope of the API provider.
+          example: 4426d965-0dd8-4005-8c63-dc68b01c4962
+        errorDateTime:
+          type: string
+          x-stoplight:
+            id: agsssg0w9gjxz
+          description: 'The DateTime corresponding to the error occuring. Must be formatted using [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format.'
+          example: '2019-11-12T07:41:00+08:30'
+          format: date-time
+        errors:
+          type: array
+          x-stoplight:
+            id: co6hcjekwf6np
+          description: An array of errors provding more detail about the root cause.
+          minItems: 1
+          items:
+            x-stoplight:
+              id: dxtftzqn6ycvr
+            type: object
+            required:
+              - errorCodeText
+              - errorCodeMessage
+            properties:
+              errorCode:
+                type: integer
+                x-stoplight:
+                  id: is3ylfiqln8p3
+                format: int32
+                description: "The detailed error code returned.\r\n\r\n  - `7000-7999` Technical error codes\r\n  - `8000-8999` Functional error codes\r\n  - `9000-9999` API provider-specific error codes            \r\n\r\n[Error codes as specified by DCSA](https://dcsa.atlassian.net/wiki/spaces/DTG/pages/197132308/Standard+Error+Codes)."
+                example: 7003
+                minimum: 7000
+                maximum: 9999
+              property:
+                type: string
+                x-stoplight:
+                  id: s9a1zlfgp6om9
+                description: The name of the property causing the error.
+                example: facilityCode
+                maxLength: 100
+              value:
+                type: string
+                x-stoplight:
+                  id: 36k41nfzpwgml
+                description: The value of the property causing the error serialised as a string exactly as in the original request.
+                example: SG SIN WHS
+                maxLength: 500
+              jsonPath:
+                type: string
+                x-stoplight:
+                  id: ycejgchx3nykr
+                description: 'A path to the property causing the error, formatted according to [JSONpath](https://github.com/json-path/JsonPath).'
+                example: $.location.facilityCode
+                maxLength: 500
+              errorCodeText:
+                type: string
+                x-stoplight:
+                  id: 6ls1lmfv1s7pt
+                description: A standard short description corresponding to the `errorCode`.
+                example: invalidData
+                maxLength: 100
+              errorCodeMessage:
+                type: string
+                x-stoplight:
+                  id: nxpiv3cjm85pa
+                description: A long description corresponding to the `errorCode` with additional information.
+                example: Spaces not allowed in facility code
+                maxLength: 200
+  parameters:
+    Api-Version-Major:
+      in: header
+      name: API-Version
+      required: false
+      schema:
+        type: string
+        example: '1'
+      description: |
+        An API-Version header **MAY** be added to the request (optional); if added it **MUST** only contain **MAJOR** version. API-Version header **MUST** be aligned with the URI version.
 tags:
   - name: Point To Point
     description: ' '
