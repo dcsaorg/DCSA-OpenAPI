@@ -1921,6 +1921,11 @@ components:
 
             `isToOrder` must be `false` if `transportDocumentTypeCode='SWB'` (Sea Waybill).
           example: false
+        isCarriersAgentAtDestinationRequired:
+          type: boolean
+          description: |
+            Indicates whether the Carrier's agent at destination name, address and contact details should be included in the `Transport Document`.
+          example: false
         numberOfCopiesWithCharges:
           type: integer
           format: int32
@@ -2130,6 +2135,7 @@ components:
         - documentParties
         - consignmentItems
         - utilizedTransportEquipments
+
     UpdateShippingInstructions:
       description: |
         The `Shipping Instructions` to update.
@@ -2276,6 +2282,11 @@ components:
             Indicates whether the B/L is issued `to order` or not. If `true`, the B/L is considered negotiable and an Endorsee party can be defined in the Document parties. If no Endorsee is defined, the B/L is blank endorsed. If `false`, the B/L is considered non-negotiable (also referred to as `straight`).
 
             `isToOrder` must be `false` if `transportDocumentTypeCode='SWB'` (Sea Waybill).
+          example: false
+        isCarriersAgentAtDestinationRequired:
+          type: boolean
+          description: |
+            Indicates whether the Carrier's agent at destination name, address and contact details should be included in the `Transport Document`.
           example: false
         numberOfCopiesWithCharges:
           type: integer
@@ -2487,6 +2498,7 @@ components:
         - documentParties
         - consignmentItems
         - utilizedTransportEquipments
+
     ShippingInstructions:
       description: |
         The `Shipping Instructions` as provided by the Shipper.
@@ -2659,6 +2671,11 @@ components:
             Indicates whether the B/L is issued `to order` or not. If `true`, the B/L is considered negotiable and an Endorsee party can be defined in the Document parties. If no Endorsee is defined, the B/L is blank endorsed. If `false`, the B/L is considered non-negotiable (also referred to as `straight`).
 
             `isToOrder` must be `false` if `transportDocumentTypeCode='SWB'` (Sea Waybill).
+          example: false
+        isCarriersAgentAtDestinationRequired:
+          type: boolean
+          description: |
+            Indicates whether the Carrier's agent at destination name, address and contact details should be included in the `Transport Document`.
           example: false
         numberOfCopiesWithCharges:
           type: integer
@@ -3614,6 +3631,32 @@ components:
             $ref: '#/components/schemas/PartyContactDetail'
       required:
         - partyName
+
+    CarriersAgentAtDestination:
+      type: object
+      title: Carrier's agent at destination
+      description: |
+        The party on the import side assigned by the carrier to whom the customer need to reach out to for cargo release.
+      properties:
+        partyName:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 100
+          description: |
+            Name of the party.
+          example: IKEA Denmark
+        address:
+          $ref: '#/components/schemas/PartyAddress'
+        partyContactDetails:
+          type: array
+          description: |
+            A list of contact details
+          items:
+            $ref: '#/components/schemas/PartyContactDetail'
+      required:
+        - partyName
+        - address
+        - partyContactDetails
 
     Party:
       type: object
@@ -5490,6 +5533,8 @@ components:
               $ref: '#/components/schemas/Consignee'
             endorsee:
               $ref: '#/components/schemas/Endorsee'
+            carriersAgentAtDestination:
+              $ref: '#/components/schemas/CarriersAgentAtDestination'
             other:
               type: array
               description: A list of document parties that can be optionally provided in the `Shipping Instructions` and `Transport Document`.
