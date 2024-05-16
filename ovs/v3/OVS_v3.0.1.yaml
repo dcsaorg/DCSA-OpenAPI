@@ -3,7 +3,7 @@ x-stoplight:
   id: 5tss29aou6fln
 info:
   title: Operational Vessel Schedules
-  version: 3.0.0
+  version: 3.0.1
   description: "API specification issued by DCSA.org\r\n\r\nThis API supports <b>OVS</b> (Operational Vessel Schedules)\r\n\r\nThe Interface Standards for OVS and other documentation can be found on the [DCSA Website](https://dcsa.org/standards/operational-vessel-schedules/).\r\n\r\nFor explanation to specific values or objects please refer to the [Information Model](https://dcsa.org/wp-content/uploads/2024/01/DCSA-Information-Model-2023.Q4.pdf).\r\n\r\n### Stats API\r\nThe Stats API offers crucial statistical information for both API providers and consumers to enhance their services and helps DCSA to understand and scale the ecosystem. We expect you to invoke the Stats API for every request made to the Operational Vessel Schedules API. Further details can be found [here](https://developer.dcsa.org/#/http/guides/api-guides/stats-api)\r\n\r\nFor a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/ovs/v3#v300). Please [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new)"
   contact:
     name: Digital Container Shipping Association (DCSA)
@@ -31,16 +31,24 @@ paths:
                   $ref: '#/components/schemas/ServiceSchedule'
           headers:
             API-Version:
-              $ref: ../../models/CommonComponents.yaml#/components/headers/API-Version
+              schema:
+                type: string
+                example: 3.0.1
+              description: |
+                SemVer used to indicate the version of the contract (API version) returned.
         '400':
           description: Bad Request
           headers:
             API-Version:
-              $ref: ../../models/CommonComponents.yaml#/components/headers/API-Version
+              schema:
+                type: string
+                example: 3.0.1
+              description: |
+                SemVer used to indicate the version of the contract (API version) returned.
           content:
             application/json:
               schema:
-                $ref: ../../models/ErrorResponse.yaml
+                $ref: '#/components/schemas/ErrorResponse'
               examples:
                 Example 1:
                   value:
@@ -55,16 +63,20 @@ paths:
                         property: UNLocationCode
                         value: NA
                         errorCodeText: invalidQuery
-                        erorCodeMessage: UNLocationCode does not exist
+                        errorCodeMessage: UNLocationCode does not exist
         '500':
           description: Internal Server Error
           headers:
             API-Version:
-              $ref: ../../models/CommonComponents.yaml#/components/headers/API-Version
+              schema:
+                type: string
+                example: 3.0.1
+              description: |
+                SemVer used to indicate the version of the contract (API version) returned.
           content:
             application/json:
               schema:
-                $ref: ../../models/ErrorResponse.yaml
+                $ref: '#/components/schemas/ErrorResponse'
               examples:
                 Example 1:
                   value:
@@ -75,7 +87,10 @@ paths:
                     statusCodeMessage: Cannot process request.
                     providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
                     errorDateTime: '2019-11-12T07:41:00+08:30'
-                    errors: []
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: Internal Error occurred
+                        errorCodeMessage: Internal Error occurred
       operationId: get-v3-service-schedules
       x-stoplight:
         id: ayt6fods2x81e
@@ -175,6 +190,13 @@ paths:
           in: header
           name: API-Version
           description: An API-Version header **MAY** be added to the request (optional); if added it **MUST** only contain **MAJOR** version. API-Version header **MUST** be aligned with the URI version.
+        - schema:
+            type: string
+            example: fE9mZnNldHw9MTAmbGltaXQ9MTA=
+            maxLength: 1024
+          in: query
+          name: cursor
+          description: 'A server generated value to specify a specific point in a collection result, used for pagination.'
 components:
   schemas:
     ServiceSchedule:
@@ -323,6 +345,12 @@ components:
             - $ref: '#/components/schemas/UNLocationLocation'
             - $ref: '#/components/schemas/FacilitySMDGLocation'
             - $ref: '#/components/schemas/AddressLocation'
+          discriminator:
+            propertyName: locationType
+            mapping:
+              UNLO: '#/components/schemas/UNLocationLocation'
+              FACS: '#/components/schemas/FacilitySMDGLocation'
+              ADDR: '#/components/schemas/AddressLocation'
         statusCode:
           type: string
           x-stoplight:
@@ -482,6 +510,7 @@ components:
         id: 6kargcv7aoll8
       type: object
       description: An interface used to express a location using a `Un Location Code`.
+      additionalProperties: false
       required:
         - locationType
         - UNLocationCode
@@ -551,6 +580,126 @@ components:
           description: "The code used for identifying the specific facility. This code does not include the UN Location Code.\r\n\r\nThe codeList used by SMDG is the [SMDG Terminal Code List](https://smdg.org/wp-content/uploads/Codelists/Terminals/SMDG-Terminal-Code-List-v20210401.xlsx)"
           example: ACT
           maxLength: 6
+    ErrorResponse:
+      title: ErrorResponse
+      x-stoplight:
+        id: 7ure8v8mm64hq
+      type: object
+      description: Unexpected error
+      required:
+        - httpMethod
+        - requestUri
+        - statusCode
+        - statusCodeText
+        - errorDateTime
+        - errors
+      properties:
+        httpMethod:
+          description: |
+            The HTTP method used to make the request e.g. `GET`, `POST`, etc
+          type: string
+          example: POST
+          enum:
+            - GET
+            - HEAD
+            - POST
+            - PUT
+            - DELETE
+            - OPTION
+            - PATCH
+        requestUri:
+          description: |
+            The URI that was requested.
+          type: string
+          example: /v1/events
+        statusCode:
+          description: |
+            The HTTP status code returned.
+          type: integer
+          format: int32
+          example: 400
+        statusCodeText:
+          description: |
+            A standard short description corresponding to the HTTP status code.
+          type: string
+          maxLength: 50
+          example: Bad Request
+        statusCodeMessage:
+          description: |
+            A long description corresponding to the HTTP status code with additional information.
+          type: string
+          maxLength: 200
+          example: The supplied data could not be accepted
+        providerCorrelationReference:
+          description: |
+            A unique identifier to the HTTP request within the scope of the API provider.
+          type: string
+          maxLength: 100
+          example: 4426d965-0dd8-4005-8c63-dc68b01c4962
+        errorDateTime:
+          description: |
+            The DateTime corresponding to the error occuring. Must be formatted using [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format.
+          type: string
+          format: date-time
+          example: '2019-11-12T07:41:00+08:30'
+        errors:
+          type: array
+          description: |
+            An array of errors provding more detail about the root cause.
+          minItems: 1
+          items:
+            type: object
+            title: Detailed Error
+            required:
+              - errorCodeText
+              - errorCodeMessage
+            properties:
+              errorCode:
+                type: integer
+                format: int32
+                description: |
+                  The detailed error code returned.
+
+                    - `7000-7999` Technical error codes
+                    - `8000-8999` Functional error codes
+                    - `9000-9999` API provider-specific error codes            
+
+                  [Error codes as specified by DCSA](https://dcsa.atlassian.net/wiki/spaces/DTG/pages/197132308/Standard+Error+Codes).
+                minimum: 7000
+                maximum: 9999
+                example: 7003
+              property:
+                type: string
+                maxLength: 100
+                description: |
+                  The name of the property causing the error.
+                example: facilityCode
+              value:
+                type: string
+                maxLength: 500
+                description: |
+                  The value of the property causing the error serialised as a string exactly as in the original request.
+                example: SG SIN WHS
+              jsonPath:
+                type: string
+                maxLength: 500
+                description: |
+                  A path to the property causing the error, formatted according to [JSONpath](https://github.com/json-path/JsonPath).
+                example: $.location.facilityCode
+              errorCodeText:
+                description: |
+                  A standard short description corresponding to the `errorCode`.
+                type: string
+                maxLength: 100
+                example: invalidData
+              errorCodeMessage:
+                type: string
+                maxLength: 200
+                description: |
+                  A long description corresponding to the `errorCode` with additional information.
+                example: Spaces not allowed in facility code
+                x-stoplight:
+                  id: 8ezdxxx1b7e0k
 tags:
   - name: Operational Vessel Schedules
     description: ' '
