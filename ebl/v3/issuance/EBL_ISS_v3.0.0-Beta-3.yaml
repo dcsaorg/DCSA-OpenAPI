@@ -261,7 +261,7 @@ components:
           example: Globeteam
         sendToPlatform:
           type: string
-          pattern: \S+
+          pattern: ^\S+$
           maxLength: 4
           description: |
             The EBL platform of the transaction party. 
@@ -506,6 +506,7 @@ components:
             maxLength: 35
             description: |
               A line of the address to be displayed on the transport document.
+            example: 'Strawinskylaan 4117'
         displayedNameForPortOfLoad:
           description: |
             The name to be used in order to specify how the `Port of Load` should be displayed on the transport document to match the name and/or address provided on the letter of credit.
@@ -516,6 +517,7 @@ components:
             maxLength: 35
             description: |
               A line of the address to be displayed on the transport document.
+            example: 'Strawinskylaan 4117'
         displayedNameForPortOfDischarge:
           description: |
             The name to be used in order to specify how the `Port of Discharge` should be displayed on the transport document to match the name and/or address provided on the letter of credit.
@@ -526,6 +528,7 @@ components:
             maxLength: 35
             description: |
               A line of the address to be displayed on the transport document.
+            example: 'Strawinskylaan 4117'
         displayedNameForPlaceOfDelivery:
           description: |
             The name to be used in order to specify how the `Place of Delivery` should be displayed on the transport document to match the name and/or address provided on the letter of credit.
@@ -536,6 +539,7 @@ components:
             maxLength: 35
             description: |
               A line of the address to be displayed on the transport document.
+            example: 'Strawinskylaan 4117'
         shippedOnBoardDate:
           type: string
           format: date
@@ -551,6 +555,7 @@ components:
           maxLength: 50000
           description: |
             Carrier terms and conditions of transport.
+          example: Any reference in...
         receiptTypeAtOrigin:
           type: string
           maxLength: 3
@@ -690,6 +695,7 @@ components:
         # New values compared to SI - END
         placeOfIssue:
           type: object
+          title: Place of Issue
           description: |
             An object to capture where the original Transport Document (`Bill of Lading`) will be issued.
 
@@ -728,6 +734,7 @@ components:
                 - countryCode
         invoicePayableAt:
           type: object
+          title: Invoice Payable At
           description: |
             Location where payment of ocean freight and charges for the main transport will take place by the customer.
 
@@ -771,6 +778,7 @@ components:
             $ref: '#/components/schemas/PartyContactDetail'
         documentParties:
           type: object
+          title: Document Parties
           description: |
             All `Parties` with associated roles.
           properties:
@@ -1244,6 +1252,7 @@ components:
           maxLength: 250
           description: |
             The recognized chemical or biological name or other name currently used for the referenced dangerous goods as described in chapter 3.1.2.8 of the IMDG Code.
+          example: 'xylene and benzene'
         imoClass:
           type: string
           maxLength: 4
@@ -1404,6 +1413,7 @@ components:
           example: A
         grossWeight:
           type: object
+          title: Gross Weight
           description: |
             Total weight of the goods carried, including packaging.
           properties:
@@ -1431,6 +1441,7 @@ components:
             - unit
         netWeight:
           type: object
+          title: Net Weight
           description: |
             Total weight of the goods carried, excluding packaging.
           properties:
@@ -1458,6 +1469,7 @@ components:
             - unit
         netExplosiveContent:
           type: object
+          title: Net Explosive Content
           description: |
             The total weight of the explosive substances, without the packaging’s, casings, etc.
           properties:
@@ -1489,6 +1501,7 @@ components:
             - unit
         volume:
           type: object
+          title: Volume
           description: |
             The volume of the referenced dangerous goods.
 
@@ -1587,6 +1600,7 @@ components:
         - phone
     Limits:
       type: object
+      title: Limits
       description: |
         Limits for the `Dangerous Goods`. The same `Temperature Unit` needs to apply to all attributes in this structure.
       properties:
@@ -1690,6 +1704,7 @@ components:
     ###########
     Equipment:
       type: object
+      title: Equipment
       description: |
         Used for storing cargo in/on during transport. The equipment size/type is defined by the ISO 6346 code. The most common equipment size/type is 20'/40'/45' DRY Freight Container, but several different versions exist.
       properties:
@@ -1738,6 +1753,7 @@ components:
     ######
     Seal:
       type: object
+      title: Seal
       description: |
         Addresses the seal-related information associated with the shipment equipment. A seal is put on a shipment equipment once it is loaded. This `Seal` is meant to stay on until the shipment equipment reaches its final destination.
       properties:
@@ -1867,17 +1883,20 @@ components:
     ############
     Transports:
       type: object
+      title: Transports
       properties:
         plannedArrivalDate:
           type: string
           format: date
           description: |
             The planned date of arrival.
+          example: '2024-06-07'
         plannedDepartureDate:
           type: string
           format: date
           description: |
             The planned date of departure.
+          example: '2024-06-03'
         preCarriageBy:
           type: string
           maxLength: 50
@@ -1908,50 +1927,56 @@ components:
           $ref: '#/components/schemas/PlaceOfDelivery'
         onwardInlandRouting:
           $ref: '#/components/schemas/OnwardInlandRouting'
-        vesselVoyage:
+        vesselVoyages:
           type: array
           minItems: 1
           description: |
             Allow the possibility to include multiple vessels/voyages in the `Transport Document` (e.g. the first sea going vessel and the mother vessel). At least one is mandatory to provide.
           items:
-            type: object
-            description: 'Vessel and export voyage'
-            properties:
-              vesselName:
-                type: string
-                pattern: ^\S(?:.*\S)?$
-                maxLength: 50
-                description: |
-                  The name of the first sea going Vessel on board which the cargo is loaded or intended to be loaded
-                example: King of the Seas
-              carrierExportVoyageNumber:
-                type: string
-                pattern: ^\S(?:.*\S)?$
-                maxLength: 50
-                example: 2103S
-                description: |
-                  The identifier of an export voyage. The carrier-specific identifier of the export Voyage.
-              universalExportVoyageReference:
-                type: string
-                pattern: ^\d{2}[0-9A-Z]{2}[NEWSR]$
-                minLength: 5
-                maxLength: 5
-                description: |
-                  A global unique voyage reference for the export Voyage, as per DCSA standard, agreed by VSA partners for the voyage. The voyage reference must match the regular expression pattern: `\d{2}[0-9A-Z]{2}[NEWSR]`
-                  - `2 digits` for the year
-                  - `2 alphanumeric characters` for the sequence number of the voyage
-                  - `1 character` for the direction/haul (`N`orth, `E`ast, `W`est, `S`outh or `R`oundtrip).
-                example: 2103N
-            required:
-              - vesselName
-              - carrierExportVoyageNumber
+            $ref: '#/components/schemas/VesselVoyage'
       required:
         - plannedArrivalDate
         - plannedDepartureDate
         - portOfLoading
         - portOfDischarge
         - vesselVoyage
+
+    VesselVoyage:
+      type: object
+      title: Vessel/Voyage
+      description: 'Vessel and export voyage'
+      properties:
+        vesselName:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 50
+          description: |
+            The name of the first sea going Vessel on board which the cargo is loaded or intended to be loaded
+          example: King of the Seas
+        carrierExportVoyageNumber:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 50
+          example: 2103S
+          description: |
+            The identifier of an export voyage. The carrier-specific identifier of the export Voyage.
+        universalExportVoyageReference:
+          type: string
+          pattern: ^\d{2}[0-9A-Z]{2}[NEWSR]$
+          minLength: 5
+          maxLength: 5
+          description: |
+            A global unique voyage reference for the export Voyage, as per DCSA standard, agreed by VSA partners for the voyage. The voyage reference must match the regular expression pattern: `\d{2}[0-9A-Z]{2}[NEWSR]`
+            - `2 digits` for the year
+            - `2 alphanumeric characters` for the sequence number of the voyage
+            - `1 character` for the direction/haul (`N`orth, `E`ast, `W`est, `S`outh or `R`oundtrip).
+          example: 2103N
+      required:
+        - vesselName
+        - carrierExportVoyageNumber
     PlaceOfReceipt:
+      type: object
+      title: Place of Receipt
       description: |
         General purpose object to capture `Place of Receipt` location specified as: the location where the cargo is handed over by the shipper, or his agent, to the shipping line. This indicates the point at which the shipping line takes on responsibility for carriage of the container.
 
@@ -1973,6 +1998,8 @@ components:
           FACI: '#/components/schemas/FacilityLocation'
           UNLO: '#/components/schemas/UNLocationLocation'
     PortOfLoading:
+      type: object
+      title: Port of Loading
       description: |
         General purpose object to capture `Port of Loading` location specified as: the location where the cargo is loaded onto a first sea-going vessel for water transportation.
 
@@ -1990,6 +2017,8 @@ components:
           CITY: '#/components/schemas/CityLocation'
           UNLO: '#/components/schemas/UNLocationLocation'
     PortOfDischarge:
+      type: object
+      title: Port of Discharge
       description: |
         General purpose object to capture `Port of Discharge` location specified as: the location where the cargo is discharged from the last sea-going vessel.
 
@@ -2007,6 +2036,8 @@ components:
           CITY: '#/components/schemas/CityLocation'
           UNLO: '#/components/schemas/UNLocationLocation'
     PlaceOfDelivery:
+      type: object
+      title: Place of Delivery
       description: |
         General purpose object to capture `Place of Delivery` location specified as: the location where the cargo is handed over to the consignee, or his agent, by the shipping line and where responsibility of the shipping line ceases.
 
@@ -2028,6 +2059,8 @@ components:
           FACI: '#/components/schemas/FacilityLocation'
           UNLO: '#/components/schemas/UNLocationLocation'
     OnwardInlandRouting:
+      type: object
+      title: Onward Inland Routing
       description: |
         General purpose object to capture `Onward Inland Routing` location specified as the end location of the inland movement that takes place after the container(s) being delivered to the port of discharge/place of delivery for account and risk of merchant (merchant haulage).
 
@@ -2052,6 +2085,7 @@ components:
     ########
     Charge:
       type: object
+      title: Charge
       description: |
         Addresses the monetary value of freight and other service charges for a `Booking`.
       properties:
@@ -2213,6 +2247,7 @@ components:
           maxLength: 100
         locationType:
           type: string
+          maxLength: 4
           description: |
             Discriminator used to identify this as a `City Location` interface
           example: CITY
@@ -2592,7 +2627,7 @@ components:
 
     CarriersAgentAtDestination:
       type: object
-      title: Carrier's agent at destination
+      title: Carrier's Agent At Destination
       description: |
         The party on the import side assigned by the carrier to whom the customer need to reach out to for cargo release.
       properties:
