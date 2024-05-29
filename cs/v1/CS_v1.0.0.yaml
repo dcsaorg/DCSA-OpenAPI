@@ -106,7 +106,7 @@ paths:
                     statusCodeMessage: Unable to process request
                     providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
                     errorDateTime: '2019-11-12T07:41:00+08:30'
-                    errors: 
+                    errors:
                       - errorCode: 7007
                         property: UNLocationCode
                         value: NA
@@ -275,7 +275,7 @@ paths:
                     statusCodeMessage: Cannot process request.
                     providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
                     errorDateTime: '2019-11-12T07:41:00+08:30'
-                    errors: 
+                    errors:
                       - errorCode: 7007
                         property: UNLocationCode
                         value: NA
@@ -393,7 +393,7 @@ paths:
                     statusCodeMessage: Cannot process request.
                     providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
                     errorDateTime: '2019-11-12T07:41:00+08:30'
-                    errors: 
+                    errors:
                       - errorCode: 7007
                         property: UNLocationCode
                         value: NA
@@ -544,7 +544,7 @@ components:
         location:
           oneOf:
             - $ref: '#/components/schemas/UNLocationLocation'
-            - $ref: '#/components/schemas/FacilitySMDGLocation'
+            - $ref: '#/components/schemas/FacilityLocation'
             - $ref: '#/components/schemas/AddressLocation'
           discriminator:
             propertyName: locationType
@@ -558,7 +558,7 @@ components:
           example: '2025-01-14T09:21:00+01:00'
           x-stoplight:
             id: tfufl59x6te0n
-          description: 'The local date and time, when the event will take place, in ISO 8601 format.'
+          description: 'The local date and time, when the event will take place, in ISO 8601 format specifying the offset.'
     PointToPoint:
       title: Point To Point
       x-stoplight:
@@ -855,6 +855,10 @@ components:
       x-stoplight:
         id: e4yk36lhezhkc
       type: object
+      required:
+        - eventTypeCode
+        - eventClassifierCode
+        - eventDateTime
       properties:
         eventTypeCode:
           type: string
@@ -884,12 +888,8 @@ components:
           x-stoplight:
             id: 8o5gse4ovp1ah
           format: date-time
-          description: Time in the timestamp
+          description: 'The local date and time, when the event takes place, in ISO 8601 format specifying the offset.'
           example: '2025-01-14T09:21:00+01:00'
-      required:
-        - eventTypeCode
-        - eventClassifierCode
-        - eventDateTime
     VesselSchedule:
       title: Vessel Schedule
       x-stoplight:
@@ -1013,7 +1013,7 @@ components:
           x-stoplight:
             id: ovjrw1tb3wbdx
           format: date-time
-          description: Estimated cut-off time in local time.
+          description: Estimated cut-off time expressed in local time with offset following ISO 8601 format.
           example: '2019-11-12T07:41:00-08:30'
     AddressLocation:
       title: Address Location
@@ -1628,6 +1628,58 @@ components:
             - BARGE_RAIL
             - MULTIMODAL
           description: "The mode of transport as defined by DCSA. For the Combined Transport mode this needs to be one of the below options.\r\n\r\n- `RAIL_TRUCK` (When rail and truck are expected to be the mode of transport in a leg of a proposed routing)\r\n- `BARGE_TRUCK`(When barge and truck are expected to be the mode of transport in a leg of a proposed routing)\r\n- `BARGE_RAIL`(When barge and rail are expected to be the mode of transport in a leg of a proposed routing)\r\n- `MULTIMODAL`(When mode of transport is not really defined or unknown at this stage)"
+    FacilityLocation:
+      title: Facility Location
+      x-stoplight:
+        id: fdthl51lfua69
+      type: object
+      description: An interface used to express a location using a `Facility`. The facility can either be expressed using a `BIC` code or a `SMDG` code. The `facilityCode` does not contain the `UNLocationCode` - this should be provided in the `UnLocationCode` attribute.
+      required:
+        - locationType
+        - facilityCode
+        - facilityCodeListProvider
+      properties:
+        locationName:
+          type: string
+          x-stoplight:
+            id: 27p6ac23wmtzl
+          description: The name of the location.
+          maxLength: 100
+          example: Port of Amsterdam
+          pattern: ^\S(?:.*\S)?$
+        locationType:
+          type: string
+          x-stoplight:
+            id: 8t44xbssgpqh9
+          description: "Discriminator used to identify this as a `Facility Location` interface\r\n"
+          example: FACI
+          maxLength: 4
+        UNLocationCode:
+          type: string
+          x-stoplight:
+            id: d95pya16idz2r
+          description: "The UN Location code specifying where the place is located. The pattern used must be\r\n\r\n - 2 characters for the country code using [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)\r\n - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used\r\n\r\nMore info can be found here: [UN/LOCODE](https://en.wikipedia.org/wiki/UN/LOCODE)\r\n"
+          pattern: ^[A-Z]{2}[A-Z2-9]{3}$
+          minLength: 5
+          maxLength: 5
+          example: NLAMS
+        facilityCode:
+          type: string
+          x-stoplight:
+            id: abysguo4vk2jk
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 6
+          example: ADT
+          description: "The code used for identifying the specific facility. This code does not include the UN Location Code.The definition of the code depends on the `facilityCodeListProvider`. As code list providers maintain multiple codeLists the following codeList is used:\r\n\r\n- for `SMDG` - the codeList used is the [SMDG Terminal Code List](https://smdg.org/wp-content/uploads/Codelists/Terminals/SMDG-Terminal-Code-List-v20210401.xlsx)\r\n- for `BIC`  - the codeList used is the [BIC Facility Codes](https://www.bic-code.org/facility-codes/)"
+        facilityCodeListProvider:
+          type: string
+          x-stoplight:
+            id: xyxh36yan7cl2
+          description: "The provider used for identifying the facility Code. Some facility codes are only defined in combination with an `UN Location Code`.\r\n- `BIC` (Requires a UN Location Code) \r\n- `SMDG` (Requires a UN Location Code)"
+          enum:
+            - BIC
+            - SMDG
+          example: SMDG
   parameters:
     Api-Version-Major:
       in: header
