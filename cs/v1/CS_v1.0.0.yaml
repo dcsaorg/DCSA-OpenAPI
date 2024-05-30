@@ -1,6 +1,4 @@
 openapi: 3.0.3
-x-stoplight:
-  id: eok4umquikhny
 info:
   title: DCSA OpenAPI specification for Commercial Schedules
   version: 1.0.0
@@ -518,8 +516,6 @@ components:
       title: Place
       type: object
       description: The Location specifying where the place is located.
-      x-stoplight:
-        id: 6qncmwke0iqvq
       required:
         - facilityTypeCode
         - location
@@ -556,13 +552,9 @@ components:
           type: string
           format: date-time
           example: '2025-01-14T09:21:00+01:00'
-          x-stoplight:
-            id: tfufl59x6te0n
           description: 'The local date and time, when the event will take place, in ISO 8601 format specifying the offset.'
     PointToPoint:
       title: Point To Point
-      x-stoplight:
-        id: x1x7ae0q7kym3
       type: object
       required:
         - placeOfReceipt
@@ -576,65 +568,29 @@ components:
         cutOffTimes:
           type: array
           description: A list of cut-offs times provided by the carrier when available. A cut-off time indicates the latest deadline within which a task must be completed.
-          x-stoplight:
-            id: ey85uy7hk8gp5
           items:
             $ref: '#/components/schemas/CutOffTime'
         transitTime:
           type: integer
-          x-stoplight:
-            id: n94kpnvpk6zsn
           description: The estimated total time in **days** that it takes a shipment to move from place of receipt to place of delivery. Transit time includes stop-over time during transshipments and waiting time at connection points.
           format: int64
           example: 10
         legs:
-          x-stoplight:
-            id: w4k1wtp4z5j6i
           type: array
           minItems: 1
           items:
             $ref: '#/components/schemas/Leg'
-    Leg:
-      title: Leg
-      x-stoplight:
-        id: itbpqbyi0so58
-      type: object
-      description: Leg of the Point-to-Point routing. The object "Legs" can be conformed by as many legs as needed and this legs must be identified with a sequence number.
-      required:
-        - departure
-        - arrival
-      properties:
-        sequenceNumber:
-          type: integer
-          x-stoplight:
-            id: 4z9lhffp3cyjs
-          format: int64
-          description: Sequence number of the leg.
-        modeOfTransport:
-          x-stoplight:
-            id: 9atywo7bqza4b
-          description: The mode of transport as defined by DCSA.
-          oneOf:
-            - $ref: '#/components/schemas/VesselTransport'
-            - $ref: '#/components/schemas/BargeTransport'
-            - $ref: '#/components/schemas/RailTransport'
-            - $ref: '#/components/schemas/TruckTransport'
-            - $ref: '#/components/schemas/CombinedTransport'
-        departure:
-          $ref: '#/components/schemas/Place'
-        arrival:
-          $ref: '#/components/schemas/Place'
+        legsx:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegX'
     PortSchedule:
       title: Port Schedule
       type: object
-      x-stoplight:
-        id: mgxbp9alny3q0
       required:
         - location
       properties:
         location:
-          x-stoplight:
-            id: ksjcrliv4kobm
           oneOf:
             - $ref: '#/components/schemas/UNLocationLocation'
             - $ref: '#/components/schemas/FacilitySMDGLocation'
@@ -645,15 +601,11 @@ components:
               UNLO: '#/components/schemas/UNLocationLocation'
         vesselSchedules:
           type: array
-          x-stoplight:
-            id: oqtnha66e947j
           minItems: 1
           items:
             $ref: '#/components/schemas/Schedule'
     Schedule:
       title: Schedule
-      x-stoplight:
-        id: czyyep580i801
       type: object
       required:
         - carrierServiceName
@@ -665,23 +617,17 @@ components:
       properties:
         carrierServiceName:
           type: string
-          x-stoplight:
-            id: g8e6j84n6mcw8
           description: The name of the service.
           maxLength: 50
           example: Great Lion Service
         carrierServiceCode:
           type: string
-          x-stoplight:
-            id: ys8adwf0o370o
           description: The carrier-specific code of the service for which the schedule details are published.
           maxLength: 11
           example: FE1
           pattern: ^\S(?:.*\S)?$
         universalServiceReference:
           type: string
-          x-stoplight:
-            id: 18655doinhur2
           description: 'A global unique service reference, as per DCSA standard, agreed by VSA partners for the service. The service reference must match the regular expression pattern: SR\d{5}[A-Z]. The letters SR followed by 5 digits, followed by a checksum-character as a capital letter from A to Z.'
           example: SR12345A
           pattern: ^SR\d{5}[A-Z]$
@@ -689,8 +635,6 @@ components:
           minLength: 8
         vesselIMONumber:
           type: string
-          x-stoplight:
-            id: o2ovfknig1oap
           description: 'The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd&apos;s register code, which does not change during the lifetime of the vessel.'
           example: '9321483'
           pattern: ^\d{7,8}$
@@ -698,44 +642,34 @@ components:
           maxLength: 8
         MMSINumber:
           type: string
-          description: Maritime Mobile Service Identities (MMSIs) are nine-digit numbers used by maritime digital selective calling (DSC), automatic identification systems (AIS) and certain other equipment to uniquely identify a ship or a coast radio station. 
+          description: 'Maritime Mobile Service Identities (MMSIs) are nine-digit numbers used by maritime digital selective calling (DSC), automatic identification systems (AIS) and certain other equipment to uniquely identify a ship or a coast radio station.'
           pattern: ^\d{9}$
           minLength: 9
           maxLength: 9
           example: '278111222'
         vesselName:
           type: string
-          x-stoplight:
-            id: yrtql880q13gj
           description: The name of the Vessel given by the Vessel Operator and registered with IMO.
           example: King of the Seas
           maxLength: 50
           pattern: ^\S(?:.*\S)?$
         isDummyVessel:
           type: boolean
-          x-stoplight:
-            id: 018smkza52uel
           description: Is this a dummy vessel. In case no vessel has been asigned yet - this property can be set to `true` indicating that the vesselIMONumber does not exist.
         carrierImportVoyageNumber:
           type: string
-          x-stoplight:
-            id: g5k2j8ieu07oq
           maxLength: 50
           pattern: ^\S(?:.*\S)?$
           example: 2103S
           description: The identifier of an import voyage. The carrier-specific identifier of the import Voyage.
         carrierExportVoyageNumber:
           type: string
-          x-stoplight:
-            id: dj9o6n46dqdas
           example: 2103N
           maxLength: 50
           pattern: ^\S(?:.*\S)?$
           description: The identifier of an export voyage. The carrier-specific identifier of the export Voyage.
         universalImportVoyageReference:
           type: string
-          x-stoplight:
-            id: 6lhyeoynmhgm7
           description: 'A global unique voyage reference for the import Voyage, as per DCSA standard, agreed by VSA partners for the voyage.'
           pattern: ^\d{2}[0-9A-Z]{2}[NEWSR]$
           example: 2103N
@@ -743,8 +677,6 @@ components:
           maxLength: 5
         universalExportVoyageReference:
           type: string
-          x-stoplight:
-            id: a41ztcfgnzf22
           description: 'A global unique voyage reference for the export Voyage, as per DCSA standard, agreed by VSA partners for the voyage.'
           pattern: ^\d{2}[0-9A-Z]{2}[NEWSR]$
           example: 2103N
@@ -752,15 +684,11 @@ components:
           maxLength: 5
         vesselOperatorCarrierCode:
           type: string
-          x-stoplight:
-            id: vsirzc1w4gbqt
           description: The carrier who is in charge of the vessel operation based on either the SMDG or SCAC code lists.
           example: MAEU
           maxLength: 10
         vesselOperatorCarrierCodeListProvider:
           type: string
-          x-stoplight:
-            id: vj9suv2w0l5j4
           description: Identifies the code list provider used for the operator and partner carriercodes.
           example: NMFTA
           enum:
@@ -774,14 +702,10 @@ components:
         cutOffTimes:
           type: array
           description: A list of cut-offs times provided by the carrier when available. A cut-off time indicates the latest deadline within which a task must be completed.
-          x-stoplight:
-            id: o9trzt2y251mw
           items:
             $ref: '#/components/schemas/CutOffTime'
     TransportCall:
       title: Transport Call
-      x-stoplight:
-        id: 5yngetqks8kzg
       type: object
       x-internal: false
       required:
@@ -791,15 +715,11 @@ components:
       properties:
         portVisitReference:
           type: string
-          x-stoplight:
-            id: cd5lalxkwxmp2
           description: The unique reference that can be used to link different `transportCallReferences` to the same port visit. The reference is provided by the port to uniquely identify a port call.
           maxLength: 50
           example: NLRTM1234589
         transportCallReference:
           type: string
-          x-stoplight:
-            id: qcmcz7jjht5mh
           maxLength: 100
           description: 'The unique reference for a transport call. It’s the vessel operator’s responsibility to provide the Transport Call Reference, other parties are obliged to pick it up and use it. It can take the form of Port Call References as defined in OVS Definitions Document, or alternatively a reference as defined by the vessel operator.'
           example: SR11111X-9321483-2107W-NLRTM-HPD2-1-1
@@ -817,24 +737,18 @@ components:
             - NMFTA
         carrierImportVoyageNumber:
           type: string
-          x-stoplight:
-            id: 4x4hvlsau7ue4
           maxLength: 50
           pattern: ^\S(?:.*\S)?$
           example: 2103N
           description: The identifier of an import voyage. The carrier-specific identifier of the import Voyage.
         carrierExportVoyageNumber:
           type: string
-          x-stoplight:
-            id: jvibcpyoy1a3i
           maxLength: 50
           pattern: ^\S(?:.*\S)?$
           example: 2103S
           description: The identifier of an export voyage. The carrier-specific identifier of the export Voyage.
         universalImportVoyageReference:
           type: string
-          x-stoplight:
-            id: gxutqo82oej8i
           pattern: ^\d{2}[0-9A-Z]{2}[NEWSR]$
           example: 2103N
           description: 'A global unique voyage reference for the import Voyage, as per DCSA standard, agreed by VSA partners for the voyage.'
@@ -842,8 +756,6 @@ components:
           minLength: 5
         universalExportVoyageReference:
           type: string
-          x-stoplight:
-            id: qi9m0kpgyredl
           pattern: ^\d{2}[0-9A-Z]{2}[NEWSR]$
           example: 2103N
           maxLength: 5
@@ -851,8 +763,6 @@ components:
         location:
           title: Location
           type: object
-          x-stoplight:
-            id: d7jg2e23zhjnb
           oneOf:
             - $ref: '#/components/schemas/UNLocationLocation'
             - $ref: '#/components/schemas/FacilitySMDGLocation'
@@ -871,8 +781,6 @@ components:
             $ref: '#/components/schemas/Timestamp'
     Timestamp:
       title: Timestamp
-      x-stoplight:
-        id: e4yk36lhezhkc
       type: object
       required:
         - eventTypeCode
@@ -881,16 +789,12 @@ components:
       properties:
         eventTypeCode:
           type: string
-          x-stoplight:
-            id: 1wp4wgtbaiqrs
           enum:
             - ARRI
             - DEPA
           description: "Identifier for type of transportEvent\r\n\r\n- ARRI (Arrived)\r\n- DEPA (Departed)"
         eventClassifierCode:
           type: string
-          x-stoplight:
-            id: 7zogujur5x685
           enum:
             - PLN
             - EST
@@ -904,104 +808,27 @@ components:
             - PLN (Planned)
         eventDateTime:
           type: string
-          x-stoplight:
-            id: 8o5gse4ovp1ah
           format: date-time
           description: 'The local date and time, when the event takes place, in ISO 8601 format specifying the offset.'
           example: '2025-01-14T09:21:00+01:00'
-    VesselSchedule:
-      title: Vessel Schedule
-      x-stoplight:
-        id: vr44dj2pekyyg
-      type: object
-      properties:
-        vesselOperatorCarrierCode:
-          type: string
-          x-stoplight:
-            id: vsirzc1w4gbqt
-          description: The carrier who is in charge of the vessel operation based on either the SMDG or SCAC code lists.
-          example: MAEU
-          maxLength: 10
-        vesselOperatorCarrierCodeListProvider:
-          type: string
-          x-stoplight:
-            id: vj9suv2w0l5j4
-          description: Identifies the code list provider used for the operator and partner carriercodes.
-          example: NMFTA
-          enum:
-            - SMDG
-            - NMFTA
-        vesselIMONumber:
-          type: string
-          x-stoplight:
-            id: o2ovfknig1oap
-          description: 'The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd&apos;s register code, which does not change during the lifetime of the vessel.'
-          example: '9321483'
-          pattern: ^\d{7,8}$
-          minLength: 7
-          maxLength: 8
-        MMSINumber:
-          type: string
-          description: Maritime Mobile Service Identities (MMSIs) are nine-digit numbers used by maritime digital selective calling (DSC), automatic identification systems (AIS) and certain other equipment to uniquely identify a ship or a coast radio station. 
-          pattern: ^\d{9}$
-          minLength: 9
-          maxLength: 9
-          example: '278111222'
-        vesselName:
-          type: string
-          x-stoplight:
-            id: sjxoamy8akix5
-          description: The name of the Vessel given by the Vessel Operator and registered with IMO.
-          maxLength: 50
-          pattern: ^\S(?:.*\S)?$
-          example: King of the Seas
-        vesselCallSign:
-          type: string
-          x-stoplight:
-            id: 4vw8dszljv2x7
-          maxLength: 10
-          example: NCVV
-          pattern: ^\S+(\s+\S+)*$
-          description: 'A unique alphanumeric identity that belongs to the vessel and is assigned by the International Telecommunication Union (ITU). It consists of a threeletter alphanumeric prefix that indicates nationality, followed by one to four characters to identify the individual vessel. For instance, vessels registered under Denmark are assigned the prefix ranges 5PA-5QZ, OUAOZZ, and XPA-XPZ. The Call Sign changes whenever a vessel changes its flag.'
-        isDummyVessel:
-          type: boolean
-          x-stoplight:
-            id: furrqtk4xkza1
-          description: Is this a dummy vessel. In case no vessel has been asigned yet - this property can be set to `true` indicating that the vesselIMONumber does not exist.
-        transportCalls:
-          type: array
-          x-stoplight:
-            id: bf4cuvo4d89vq
-          items:
-            $ref: '#/components/schemas/TransportCall'
-      required:
-        - isDummyVessel
     ServiceSchedule:
       title: Service Schedule
-      x-stoplight:
-        id: 6vm6xmsvjsk2r
       type: object
       properties:
         carrierServiceName:
           type: string
-          x-stoplight:
-            id: 2b1m51pfjlvu6
           description: The name of the service.
           maxLength: 50
           pattern: ^\S(?:.*\S)?$
           example: Great Lion Service
         carrierServiceCode:
           type: string
-          x-stoplight:
-            id: 6iw2bwqz9fi1y
           maxLength: 11
           example: FE1
           pattern: ^\S(?:.*\S)?$
           description: The carrier-specific code of the service for which the schedule details are published.
         universalServiceReference:
           type: string
-          x-stoplight:
-            id: l8yh5dy09liba
           pattern: ^SR\d{5}[A-Z]$
           maxLength: 8
           minLength: 8
@@ -1010,17 +837,64 @@ components:
         vesselSchedules:
           type: array
           minItems: 1
-          x-stoplight:
-            id: lrom88da9uo6f
           items:
             $ref: '#/components/schemas/VesselSchedule'
       required:
         - carrierServiceName
         - vesselSchedules
+    VesselSchedule:
+      title: Vessel Schedule
+      type: object
+      properties:
+        vesselOperatorCarrierCode:
+          type: string
+          description: The carrier who is in charge of the vessel operation based on either the SMDG or SCAC code lists.
+          example: MAEU
+          maxLength: 10
+        vesselOperatorCarrierCodeListProvider:
+          type: string
+          description: Identifies the code list provider used for the operator and partner carriercodes.
+          example: NMFTA
+          enum:
+            - SMDG
+            - NMFTA
+        vesselIMONumber:
+          type: string
+          description: 'The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd&apos;s register code, which does not change during the lifetime of the vessel.'
+          example: '9321483'
+          pattern: ^\d{7,8}$
+          minLength: 7
+          maxLength: 8
+        MMSINumber:
+          type: string
+          description: 'Maritime Mobile Service Identities (MMSIs) are nine-digit numbers used by maritime digital selective calling (DSC), automatic identification systems (AIS) and certain other equipment to uniquely identify a ship or a coast radio station.'
+          pattern: ^\d{9}$
+          minLength: 9
+          maxLength: 9
+          example: '278111222'
+        vesselName:
+          type: string
+          description: The name of the Vessel given by the Vessel Operator and registered with IMO.
+          maxLength: 50
+          pattern: ^\S(?:.*\S)?$
+          example: King of the Seas
+        vesselCallSign:
+          type: string
+          maxLength: 10
+          example: NCVV
+          pattern: ^\S+(\s+\S+)*$
+          description: 'A unique alphanumeric identity that belongs to the vessel and is assigned by the International Telecommunication Union (ITU). It consists of a threeletter alphanumeric prefix that indicates nationality, followed by one to four characters to identify the individual vessel. For instance, vessels registered under Denmark are assigned the prefix ranges 5PA-5QZ, OUAOZZ, and XPA-XPZ. The Call Sign changes whenever a vessel changes its flag.'
+        isDummyVessel:
+          type: boolean
+          description: Is this a dummy vessel. In case no vessel has been asigned yet - this property can be set to `true` indicating that the vesselIMONumber does not exist.
+        transportCalls:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransportCall'
+      required:
+        - isDummyVessel
     CutOffTime:
       title: Cut-Off Time
-      x-stoplight:
-        id: 0s6yu6v21mabq
       type: object
       description: Cut Off Times.
       required:
@@ -1029,22 +903,16 @@ components:
       properties:
         cutOffDateTimeCode:
           type: string
-          x-stoplight:
-            id: 6kxo2zw6m656u
           description: "Code for the cut-off time. Possible values are:\r\n- `DCO` (Documentation cut-off)\r\n- `VCO` (VGM cut-off)\r\n- `FCO` (FCL delivery cut-off)\r\n- `LCO` (LCL delivery cut-off)\r\n- `PCO` (Port cut-off)\r\n- `ECP` (Empty container pick-up date and time)\r\n- `EFC` (Earliest full-container delivery date)\r\n- `RCO` (Reefer cut-off)\r\n- `DGC` (Dangerous Goods cut-off)\r\n- `OBC` (OOG/BB cut-off)\r\n- `TCO` (Transhipment cut-off)\r\n- `STA` (Standard booking acceptance)\r\n- `SPA` (Special booking acceptance)\r\n- `CUA` (Customs Acceptance)\r\n- `AFC` (Advanced filling cut-off)\r\n\r\n**LCL Condition** : Only applicable when the `Receipt Type at Origin` is `CFS`.\r\n\r\nMore details can be found on [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/reference-data/CutOffDateTimeCodeList-CS_v1.0.0.csv)"
           maxLength: 3
           example: DCO
         cutOffDateTime:
           type: string
-          x-stoplight:
-            id: ovjrw1tb3wbdx
           format: date-time
           description: Estimated cut-off time expressed in local time with offset following ISO 8601 format.
           example: '2019-11-12T07:41:00-08:30'
     AddressLocation:
       title: Address Location
-      x-stoplight:
-        id: m8siaz93if4cf
       description: An interface used to express a location using an `Address` object.
       required:
         - locationType
@@ -1052,8 +920,6 @@ components:
       properties:
         locationName:
           type: string
-          x-stoplight:
-            id: 1qntskkr8v0h5
           example: Port of Amsterdam
           pattern: ^\S(?:.*\S)?$
           description: The name of the location.
@@ -1069,39 +935,27 @@ components:
           properties:
             street:
               type: string
-              x-stoplight:
-                id: ba6frq15mh2t8
               example: Ruijggoordweg
               maxLength: 100
             streetNumber:
               type: string
-              x-stoplight:
-                id: 1jiv2010jnttw
               example: '100'
               maxLength: 50
             floor:
               type: string
-              x-stoplight:
-                id: gcvknia354jrg
               example: N/A
               pattern: ^\S(?:.*\S)?$
               maxLength: 50
             postCode:
               type: string
-              x-stoplight:
-                id: 4wlkf4w5um9j3
               example: 1047 HM
               maxLength: 10
             city:
               type: string
-              x-stoplight:
-                id: snavpzoxpl48e
               example: Amsterdam
               maxLength: 65
             stateRegion:
               type: string
-              x-stoplight:
-                id: 3k7wb2fib7401
               example: North Holland
               maxLength: 65
             countryCode:
@@ -1114,8 +968,6 @@ components:
               example: NL
     FacilitySMDGLocation:
       title: Facility SMDG Location
-      x-stoplight:
-        id: wjfsbdac9a7nz
       type: object
       description: An interface used to express a location using a `Facility` by the `SMDG` code list. The `facilitySMDGCode` does not contain the `UNLocationCode` - this should be provided in the `UnLocationCode` attribute.
       required:
@@ -1125,23 +977,17 @@ components:
       properties:
         locationName:
           type: string
-          x-stoplight:
-            id: p82efb2odh99y
           description: The name of the location.
           example: Port of Amsterdam
           pattern: ^\S(?:.*\S)?$
           maxLength: 100
         locationType:
           type: string
-          x-stoplight:
-            id: wvrz1c6visndu
           example: FACS
           description: Discriminator used to identify this as a `Facility Location` interface only using `SMDG` code list.
           maxLength: 4
         UNLocationCode:
           type: string
-          x-stoplight:
-            id: 7kpvxrrdljsb5
           example: NLAMS
           pattern: ^[A-Z]{2}[A-Z2-9]{3}$
           minLength: 5
@@ -1149,15 +995,11 @@ components:
           description: "The UN Location code specifying where the place is located. The pattern used must be\r\n\r\n - 2 characters for the country code using [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)\r\n - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used\r\n\r\nMore info can be found here: [UN/LOCODE](https://en.wikipedia.org/wiki/UN/LOCODE)"
         facilitySMDGCode:
           type: string
-          x-stoplight:
-            id: yndr8amfy18nr
           example: ACT
           description: "The code used for identifying the specific facility. This code does not include the UN Location Code.\r\n\r\nThe codeList used by SMDG is the [SMDG Terminal Code List](https://smdg.org/wp-content/uploads/Codelists/Terminals/SMDG-Terminal-Code-List-v20210401.xlsx)"
           maxLength: 6
     UNLocationLocation:
       title: UNLocation Location
-      x-stoplight:
-        id: inxjf3adrpkge
       type: object
       description: An interface used to express a location using a `Un Location Code`.
       additionalProperties: false
@@ -1167,23 +1009,17 @@ components:
       properties:
         locationName:
           type: string
-          x-stoplight:
-            id: uwy2d1d9tkdku
           description: The name of the location.
           example: Port of Amsterdam
           pattern: ^\S(?:.*\S)?$
           maxLength: 100
         locationType:
           type: string
-          x-stoplight:
-            id: 9gk73d2za4g0r
           description: Discriminator used to identify this as a `UNLocation` location interface.
           example: UNLO
           maxLength: 4
         UNLocationCode:
           type: string
-          x-stoplight:
-            id: bnpig7p7mrk8l
           description: "The UN Location code specifying where the place is located. The pattern used must be\r\n\r\n - 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)\r\n - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used\r\n\r\nMore info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)"
           pattern: ^[A-Z]{2}[A-Z2-9]{3}$
           example: NLAMS
@@ -1191,8 +1027,6 @@ components:
           maxLength: 5
     ErrorResponse:
       title: Error Response
-      x-stoplight:
-        id: ecq5zj4a4hkgf
       type: object
       required:
         - httpMethod
@@ -1205,8 +1039,6 @@ components:
         httpMethod:
           type: string
           example: POST
-          x-stoplight:
-            id: nqesjdkli0n88
           enum:
             - GET
             - HEAD
@@ -1218,55 +1050,39 @@ components:
           description: 'The HTTP method used to make the request e.g. `GET`, `POST`, etc'
         requestUri:
           type: string
-          x-stoplight:
-            id: cq9morjalvdbp
           description: The URI that was requested.
           example: /v1/events
         statusCode:
           type: integer
-          x-stoplight:
-            id: g4hqmafsodfk2
           description: The HTTP status code returned.
           format: int32
           maxLength: 50
           example: 400
         statusCodeText:
           type: string
-          x-stoplight:
-            id: 4g9ee4lnm8ndr
           description: A standard short description corresponding to the HTTP status code.
           example: Bad Request
         statusCodeMessage:
           type: string
-          x-stoplight:
-            id: y37oiw30a34xl
           description: A long description corresponding to the HTTP status code with additional information.
           maxLength: 200
           example: The supplied data could not be accepted
         providerCorrelationReference:
           type: string
-          x-stoplight:
-            id: cpmumeeur0y7q
           description: A unique identifier to the HTTP request within the scope of the API provider.
           maxLength: 100
           example: 4426d965-0dd8-4005-8c63-dc68b01c4962
         errorDateTime:
           type: string
-          x-stoplight:
-            id: agsssg0w9gjxz
           description: 'The DateTime corresponding to the error occuring. Must be formatted using [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format.'
           example: '2019-11-12T07:41:00Z'
           format: date-time
         errors:
           type: array
-          x-stoplight:
-            id: co6hcjekwf6np
           description: An array of errors provding more detail about the root cause.
           minItems: 1
           items:
             title: Detailed Error
-            x-stoplight:
-              id: dxtftzqn6ycvr
             type: object
             required:
               - errorCodeText
@@ -1274,8 +1090,6 @@ components:
             properties:
               errorCode:
                 type: integer
-                x-stoplight:
-                  id: is3ylfiqln8p3
                 format: int32
                 description: "The detailed error code returned.\r\n\r\n  - `7000-7999` Technical error codes\r\n  - `8000-8999` Functional error codes\r\n  - `9000-9999` API provider-specific error codes            \r\n\r\n[Error codes as specified by DCSA](https://dcsa.atlassian.net/wiki/spaces/DTG/pages/197132308/Standard+Error+Codes)."
                 example: 7003
@@ -1283,49 +1097,35 @@ components:
                 maximum: 9999
               property:
                 type: string
-                x-stoplight:
-                  id: s9a1zlfgp6om9
                 description: The name of the property causing the error.
                 example: facilityCode
                 maxLength: 100
               value:
                 type: string
-                x-stoplight:
-                  id: 36k41nfzpwgml
                 description: The value of the property causing the error serialised as a string exactly as in the original request.
                 example: SG SIN WHS
                 maxLength: 500
               jsonPath:
                 type: string
-                x-stoplight:
-                  id: ycejgchx3nykr
                 description: 'A path to the property causing the error, formatted according to [JSONpath](https://github.com/json-path/JsonPath).'
                 example: $.location.facilityCode
                 maxLength: 500
               errorCodeText:
                 type: string
-                x-stoplight:
-                  id: 6ls1lmfv1s7pt
                 description: A standard short description corresponding to the `errorCode`.
                 example: invalidData
                 maxLength: 100
               errorCodeMessage:
                 type: string
-                x-stoplight:
-                  id: nxpiv3cjm85pa
                 description: A long description corresponding to the `errorCode` with additional information.
                 example: Spaces not allowed in facility code
                 maxLength: 200
     Vessel:
       title: Vessel
-      x-stoplight:
-        id: tt806i006zzws
       type: object
       properties:
         vesselIMONumber:
           type: string
-          x-stoplight:
-            id: fjb48b1pidv2f
           description: 'The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd&apos;s register code, which does not change during the lifetime of the vessel.'
           example: '9321483'
           pattern: ^\d{7,8}$
@@ -1333,23 +1133,19 @@ components:
           maxLength: 8
         MMSINumber:
           type: string
-          description: Maritime Mobile Service Identities (MMSIs) are nine-digit numbers used by maritime digital selective calling (DSC), automatic identification systems (AIS) and certain other equipment to uniquely identify a ship or a coast radio station. 
+          description: 'Maritime Mobile Service Identities (MMSIs) are nine-digit numbers used by maritime digital selective calling (DSC), automatic identification systems (AIS) and certain other equipment to uniquely identify a ship or a coast radio station.'
           pattern: ^\d{9}$
           minLength: 9
           maxLength: 9
           example: '278111222'
         name:
           type: string
-          x-stoplight:
-            id: wlbieahe635gh
           description: The name of the Vessel given by the Vessel Operator and registered with IMO.
           example: King of the Seas
           maxLength: 50
           pattern: ^\S(?:.*\S)?$
         flag:
           type: string
-          x-stoplight:
-            id: 2c0eed5qm8kfl
           description: The flag of the nation whose laws the vessel is registered under. This is the ISO 3166 two-letter country code.
           pattern: ^[A-Z]{2}$
           maxLength: 2
@@ -1357,23 +1153,17 @@ components:
           example: DE
         callSign:
           type: string
-          x-stoplight:
-            id: 5e5uf8amgm69h
           description: 'A unique alphanumeric identity that belongs to the vessel and is assigned by the International Telecommunication Union (ITU). It consists of a threeletter alphanumeric prefix that indicates nationality, followed by one to four characters to identify the individual vessel. For instance, vessels registered under Denmark are assigned the prefix ranges 5PA-5QZ, OUAOZZ, and XPA-XPZ. The Call Sign changes whenever a vessel changes its flag.'
           pattern: ^\S+(\s+\S+)*$
           example: NCVV
           maxLength: 10
         operatorCarrierCode:
           type: string
-          x-stoplight:
-            id: gt79tns823d8t
           description: The carrier who is in charge of the vessel operation based on either the SMDG or SCAC code lists.
           example: MAEU
           maxLength: 10
         operatorCarrierCodeListProvider:
           type: string
-          x-stoplight:
-            id: q8osthxexfjaz
           description: Identifies the code list provider used for the operator and partner carriercodes.
           example: NMFTA
           enum:
@@ -1381,8 +1171,6 @@ components:
             - NMFTA
     Barge:
       title: Barge
-      x-stoplight:
-        id: gvyiv98c0lpg0
       type: object
       properties:
         vesselIMONumber:
@@ -1394,7 +1182,7 @@ components:
           maxLength: 8
         MMSINumber:
           type: string
-          description: Maritime Mobile Service Identities (MMSIs) are nine-digit numbers used by maritime digital selective calling (DSC), automatic identification systems (AIS) and certain other equipment to uniquely identify a ship or a coast radio station. 
+          description: 'Maritime Mobile Service Identities (MMSIs) are nine-digit numbers used by maritime digital selective calling (DSC), automatic identification systems (AIS) and certain other equipment to uniquely identify a ship or a coast radio station.'
           pattern: ^\d{9}$
           minLength: 9
           maxLength: 9
@@ -1432,120 +1220,43 @@ components:
             - NMFTA
     RailTransport:
       title: Rail Transport
-      x-stoplight:
-        id: 1i5n35w6cdkbh
       type: object
       description: Transport mode Rail.
-      required:
-        - modeOfTransportType
-      properties:
-        modeOfTransportType:
-          x-stoplight:
-            id: 1xzl152c5xhau
-          enum:
-            - RAIL
-          description: The mode of transport as defined by DCSA. For the Rail Transport mode this needs to be RAIL.
-        railCar:
-          type: string
-          x-stoplight:
-            id: v8mz0l0o5azun
-          description: 'A railcar is a type of railway vehicle that is designed to transport freight or passengers on a railway track. They are also known as rail vehicles, railcars, or rolling stock. Railcars can be powered by an on-board locomotive or they can be pulled by a separate locomotive.'
-          maxLength: 50
-        railService:
-          type: string
-          x-stoplight:
-            id: rfpg5ypsa1xl8
-          description: A rail service number is a unique identifying number assigned to a specific rail service or train.
-          maxLength: 50
-        departureID:
-          type: string
-          x-stoplight:
-            id: jhyomow1zzwnp
-          description: A departure ID (also known as a departure reference number) is a unique identifying number or code that is assigned to a specific departure of a rail.
-          maxLength: 100
     VesselTransport:
       title: Vessel Transport
-      x-stoplight:
-        id: ztf6lvsjuqg9r
       type: object
-      description: Transport mode Vessel.
-      required:
-        - modeOfTransportType
+      description: The vessel transport mode details whne the mode of Transport is Vessel.
       properties:
-        modeOfTransportType:
-          x-stoplight:
-            id: n3xtv20owr5ax
-          enum:
-            - VESSEL
-          description: The mode of transport as defined by DCSA. For the Vessel Transport mode this needs to be VESSEL.
         portVisitReference:
           type: string
-          x-stoplight:
-            id: sw0d6j8jtkzwu
           example: NLAMS1234589
           maxLength: 50
           description: The unique reference that can be used to link different `transportCallReferences` to the same port visit. The reference is provided by the port to uniquely identify a port call.
         transportCallReference:
           type: string
-          x-stoplight:
-            id: sebuy5vg09ly5
           example: SR11111X-9321483-2107W-NLAMS-ACT-1-1
           maxLength: 100
           description: 'The unique reference for a transport call. It’s the vessel operator’s responsibility to provide the Transport Call Reference, other parties are obliged to pick it up and use it. It can take the form of Port Call References as defined in OVS Definitions Document, or alternatively a reference as defined by the vessel operator.'
-        carrierServiceName:
-          type: string
-          x-stoplight:
-            id: hu04q8zvlf66f
-          description: The name of the service.
-          maxLength: 50
-          pattern: ^\S(?:.*\S)?$
-          example: Great Lion Service
-        carrierServiceCode:
-          type: string
-          x-stoplight:
-            id: f3d7w4eea8clq
-          example: FE1
-          description: The Carrier specific code of the service for which the schedule details are published.
-          maxLength: 11
-          pattern: ^\S(?:.*\S)?$
+        serviceCarriers:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServiceCarrier'
         universalServiceReference:
           type: string
-          x-stoplight:
-            id: yjaqq2bmymnm1
           description: 'A global unique service reference, as per DCSA standard, agreed by VSA partners for the service. The service reference must match the regular expression pattern: SR\d{5}[A-Z]. The letters SR followed by 5 digits, followed by a checksum-character as a capital letter from A to Z.'
           example: SR12345A
           pattern: ^SR\d{5}[A-Z]$
           maxLength: 8
           minLength: 8
-        carrierExportVoyageNumber:
-          type: string
-          x-stoplight:
-            id: ah9ausfz1zqnz
-          example: 2103N
-          maxLength: 50
-          pattern: ^\S(?:.*\S)?$
-          description: The identifier of an export voyage. The carrier-specific identifier of the export Voyage.
         universalExportVoyageReference:
           type: string
-          x-stoplight:
-            id: hxinj5cv4nt6h
           description: 'A global unique voyage reference for the export Voyage, as per DCSA standard, agreed by VSA partners for the voyage.'
           pattern: ^\d{2}[0-9A-Z]{2}[NEWSR]$
           minLength: 5
           maxLength: 5
           example: 2103N
-        carrierImportVoyageNumber:
-          type: string
-          x-stoplight:
-            id: xglpcq7gbmdo8
-          maxLength: 50
-          pattern: ^\S(?:.*\S)?$
-          example: 2103S
-          description: The identifier of an import voyage. The carrier-specific identifier of the import Voyage.
         universalImportVoyageReference:
           type: string
-          x-stoplight:
-            id: 1nm9llr3napxi
           description: 'A global unique voyage reference for the import Voyage, as per DCSA standard, agreed by VSA partners for the voyage.'
           pattern: ^\d{2}[0-9A-Z]{2}[NEWSR]$
           minLength: 5
@@ -1555,14 +1266,102 @@ components:
           $ref: '#/components/schemas/Vessel'
     BargeTransport:
       title: Barge Transport
-      x-stoplight:
-        id: i76bnx3fr61wu
+      type: object
+      description: The Barge transport mode details when the mode of transport is barge.
+      properties:
+        portVisitReference:
+          type: string
+          example: NLAMS1234589
+          maxLength: 50
+          description: The unique reference that can be used to link different `transportCallReferences` to the same port visit. The reference is provided by the port to uniquely identify a port call.
+        transportCallReference:
+          type: string
+          example: SR11111X-9321483-2107W-NLAMS-ACT-1-1
+          maxLength: 100
+          description: 'The unique reference for a transport call. It’s the vessel operator’s responsibility to provide the Transport Call Reference, other parties are obliged to pick it up and use it. It can take the form of Port Call References as defined in OVS Definitions Document, or alternatively a reference as defined by the vessel operator.'
+        serviceCarriers:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServiceCarrier'
+        universalServiceReference:
+          type: string
+          description: 'A global unique service reference, as per DCSA standard, agreed by VSA partners for the service. The service reference must match the regular expression pattern: SR\d{5}[A-Z]. The letters SR followed by 5 digits, followed by a checksum-character as a capital letter from A to Z.'
+          example: SR12345A
+          pattern: ^SR\d{5}[A-Z]$
+          maxLength: 8
+          minLength: 8
+        universalExportVoyageReference:
+          type: string
+          description: 'A global unique voyage reference for the export Voyage, as per DCSA standard, agreed by VSA partners for the voyage.'
+          pattern: ^\d{2}[0-9A-Z]{2}[NEWSR]$
+          minLength: 5
+          maxLength: 5
+          example: 2103N
+        universalImportVoyageReference:
+          type: string
+          description: 'A global unique voyage reference for the import Voyage, as per DCSA standard, agreed by VSA partners for the voyage.'
+          pattern: ^\d{2}[0-9A-Z]{2}[NEWSR]$
+          minLength: 5
+          maxLength: 5
+          example: 2103N
+        barge:
+          $ref: '#/components/schemas/Barge'
+    VesselTransportX:
+      title: Vessel Transport
+      type: object
+      description: Transport mode Vessel.
+      required:
+        - modeOfTransport
+      properties:
+        modeOfTransport:
+          enum:
+            - VESSEL
+          description: The mode of transport as defined by DCSA. For the Vessel Transport mode this needs to be VESSEL.
+        portVisitReference:
+          type: string
+          example: NLAMS1234589
+          maxLength: 50
+          description: The unique reference that can be used to link different `transportCallReferences` to the same port visit. The reference is provided by the port to uniquely identify a port call.
+        transportCallReference:
+          type: string
+          example: SR11111X-9321483-2107W-NLAMS-ACT-1-1
+          maxLength: 100
+          description: 'The unique reference for a transport call. It’s the vessel operator’s responsibility to provide the Transport Call Reference, other parties are obliged to pick it up and use it. It can take the form of Port Call References as defined in OVS Definitions Document, or alternatively a reference as defined by the vessel operator.'
+        serviceCarriers:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServiceCarrier'
+        universalServiceReference:
+          type: string
+          description: 'A global unique service reference, as per DCSA standard, agreed by VSA partners for the service. The service reference must match the regular expression pattern: SR\d{5}[A-Z]. The letters SR followed by 5 digits, followed by a checksum-character as a capital letter from A to Z.'
+          example: SR12345A
+          pattern: ^SR\d{5}[A-Z]$
+          maxLength: 8
+          minLength: 8
+        universalExportVoyageReference:
+          type: string
+          description: 'A global unique voyage reference for the export Voyage, as per DCSA standard, agreed by VSA partners for the voyage.'
+          pattern: ^\d{2}[0-9A-Z]{2}[NEWSR]$
+          minLength: 5
+          maxLength: 5
+          example: 2103N
+        universalImportVoyageReference:
+          type: string
+          description: 'A global unique voyage reference for the import Voyage, as per DCSA standard, agreed by VSA partners for the voyage.'
+          pattern: ^\d{2}[0-9A-Z]{2}[NEWSR]$
+          minLength: 5
+          maxLength: 5
+          example: 2103N
+        vessel:
+          $ref: '#/components/schemas/Vessel'
+    BargeTransportX:
+      title: Barge Transport
       type: object
       description: Transport mode Barge.
       required:
-        - modeOfTransportType
+        - modeOfTransport
       properties:
-        modeOfTransportType:
+        modeOfTransport:
           enum:
             - BARGE
           description: The mode of transport as defined by DCSA. For the Barge Transport mode this needs to be BARGE.
@@ -1576,18 +1375,10 @@ components:
           example: SR11111X-9321483-2107W-NLAMS-ACT-1-1
           maxLength: 100
           description: 'The unique reference for a transport call. It’s the vessel operator’s responsibility to provide the Transport Call Reference, other parties are obliged to pick it up and use it. It can take the form of Port Call References as defined in OVS Definitions Document, or alternatively a reference as defined by the vessel operator.'
-        carrierServiceName:
-          type: string
-          description: The name of the service.
-          maxLength: 50
-          pattern: ^\S(?:.*\S)?$
-          example: Great Lion Service
-        carrierServiceCode:
-          type: string
-          example: FE1
-          description: The Carrier specific code of the service for which the schedule details are published.
-          maxLength: 11
-          pattern: ^\S(?:.*\S)?$
+        serviceCarriers:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServiceCarrier'
         universalServiceReference:
           type: string
           description: 'A global unique service reference, as per DCSA standard, agreed by VSA partners for the service. The service reference must match the regular expression pattern: SR\d{5}[A-Z]. The letters SR followed by 5 digits, followed by a checksum-character as a capital letter from A to Z.'
@@ -1595,12 +1386,6 @@ components:
           pattern: ^SR\d{5}[A-Z]$
           maxLength: 8
           minLength: 8
-        carrierExportVoyageNumber:
-          type: string
-          example: 2103N
-          maxLength: 50
-          pattern: ^\S(?:.*\S)?$
-          description: The identifier of an export voyage. The carrier-specific identifier of the export Voyage.
         universalExportVoyageReference:
           type: string
           description: 'A global unique voyage reference for the export Voyage, as per DCSA standard, agreed by VSA partners for the voyage.'
@@ -1608,12 +1393,6 @@ components:
           minLength: 5
           maxLength: 5
           example: 2103N
-        carrierImportVoyageNumber:
-          type: string
-          maxLength: 50
-          example: 2103S
-          pattern: ^\S(?:.*\S)?$
-          description: The identifier of an import voyage. The carrier-specific identifier of the import Voyage.
         universalImportVoyageReference:
           type: string
           description: 'A global unique voyage reference for the import Voyage, as per DCSA standard, agreed by VSA partners for the voyage.'
@@ -1625,53 +1404,26 @@ components:
           $ref: '#/components/schemas/Barge'
     TruckTransport:
       title: Truck Transport
-      x-stoplight:
-        id: wk5bv2x6qf7r8
       type: object
       description: Transport mode Truck.
-      required:
-        - modeOfTransportType
-      properties:
-        modeOfTransportType:
-          x-stoplight:
-            id: zta37a83ipubo
-          enum:
-            - TRUCK
-          description: The mode of transport as defined by DCSA. For the Truck Transport mode this needs to be TRUCK.
-        licensePlate:
-          type: string
-          x-stoplight:
-            id: 70ltreyqhy5tu
-          description: 'A license plate is a tag that is attached to a vehicle and displays a unique number or code assigned to the vehicle. The format, design, and issuing authority for license plates vary by country, state, and province.'
-          maxLength: 15
-        chasisLicensePlate:
-          type: string
-          x-stoplight:
-            id: yl83mtk9qd9j7
-          description: A chassis number is a unique identifying number or code assigned to the chassis of a vehicle.It may also be referred to as a "vehicle identification number" (VIN) or "frame number.
-          maxLength: 15
-    CombinedTransport:
-      title: Combined Transport
-      x-stoplight:
-        id: 9epz3n74vupyr
+    OtherTransport:
+      title: Other Transport
       type: object
-      description: Combined Transport mode.
+      description: Other Transport modes.
       required:
-        - modeOfTransportType
+        - modeOfTransport
       properties:
-        modeOfTransportType:
-          x-stoplight:
-            id: qezsxdt0llmco
+        modeOfTransport:
           enum:
             - RAIL_TRUCK
             - BARGE_TRUCK
             - BARGE_RAIL
             - MULTIMODAL
-          description: "The mode of transport as defined by DCSA. For the Combined Transport mode this needs to be one of the below options.\r\n\r\n- `RAIL_TRUCK` (When rail and truck are expected to be the mode of transport in a leg of a proposed routing)\r\n- `BARGE_TRUCK`(When barge and truck are expected to be the mode of transport in a leg of a proposed routing)\r\n- `BARGE_RAIL`(When barge and rail are expected to be the mode of transport in a leg of a proposed routing)\r\n- `MULTIMODAL`(When mode of transport is not really defined or unknown at this stage)"
+            - RAIL
+            - TRUCK
+          description: "The mode of transport as defined by DCSA. The Other Transport mode needs to be one of the below options.\r\n- `RAIL` (When the transport mode is Rail)\r\n- `TRUCK` (When the transport mode is Truck)\r\n- `RAIL_TRUCK` (When rail and truck are expected to be the mode of transport in a leg of a proposed routing)\r\n- `BARGE_TRUCK`(When barge and truck are expected to be the mode of transport in a leg of a proposed routing)\r\n- `BARGE_RAIL`(When barge and rail are expected to be the mode of transport in a leg of a proposed routing)\r\n- `MULTIMODAL`(When mode of transport is not really defined or unknown at this stage)"
     FacilityLocation:
       title: Facility Location
-      x-stoplight:
-        id: fdthl51lfua69
       type: object
       description: An interface used to express a location using a `Facility`. The facility can either be expressed using a `BIC` code or a `SMDG` code. The `facilityCode` does not contain the `UNLocationCode` - this should be provided in the `UnLocationCode` attribute.
       required:
@@ -1681,23 +1433,17 @@ components:
       properties:
         locationName:
           type: string
-          x-stoplight:
-            id: 27p6ac23wmtzl
           description: The name of the location.
           maxLength: 100
           example: Port of Amsterdam
           pattern: ^\S(?:.*\S)?$
         locationType:
           type: string
-          x-stoplight:
-            id: 8t44xbssgpqh9
           description: "Discriminator used to identify this as a `Facility Location` interface\r\n"
           example: FACI
           maxLength: 4
         UNLocationCode:
           type: string
-          x-stoplight:
-            id: d95pya16idz2r
           description: "The UN Location code specifying where the place is located. The pattern used must be\r\n\r\n - 2 characters for the country code using [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)\r\n - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used\r\n\r\nMore info can be found here: [UN/LOCODE](https://en.wikipedia.org/wiki/UN/LOCODE)\r\n"
           pattern: ^[A-Z]{2}[A-Z2-9]{3}$
           minLength: 5
@@ -1705,21 +1451,111 @@ components:
           example: NLAMS
         facilityCode:
           type: string
-          x-stoplight:
-            id: abysguo4vk2jk
           pattern: ^\S(?:.*\S)?$
           maxLength: 6
           example: ADT
           description: "The code used for identifying the specific facility. This code does not include the UN Location Code.The definition of the code depends on the `facilityCodeListProvider`. As code list providers maintain multiple codeLists the following codeList is used:\r\n\r\n- for `SMDG` - the codeList used is the [SMDG Terminal Code List](https://smdg.org/wp-content/uploads/Codelists/Terminals/SMDG-Terminal-Code-List-v20210401.xlsx)\r\n- for `BIC`  - the codeList used is the [BIC Facility Codes](https://www.bic-code.org/facility-codes/)"
         facilityCodeListProvider:
           type: string
-          x-stoplight:
-            id: xyxh36yan7cl2
           description: "The provider used for identifying the facility Code. Some facility codes are only defined in combination with an `UN Location Code`.\r\n- `BIC` (Requires a UN Location Code) \r\n- `SMDG` (Requires a UN Location Code)"
           enum:
             - BIC
             - SMDG
           example: SMDG
+    ServiceCarrier:
+      title: ServiceCarrier
+      type: object
+      description: The details of the carrier that operates the routing.
+      properties:
+        carrierCode:
+          type: string
+          description: The carrier code based on either the SMDG or SCAC code lists.
+          maxLength: 10
+          example: MAEU
+        carrierCodeListProvider:
+          type: string
+          description: Identifies the code list provider used for the carriercodes.
+          example: NMFTA
+          enum:
+            - SMDG
+            - NMFTA
+        carrierServiceName:
+          type: string
+          description: The name of the service.
+          maxLength: 50
+          example: Great Lion Service
+        carrierServiceCode:
+          type: string
+          description: The carrier-specific code of the service for which the schedule details are published.
+          maxLength: 11
+          example: FE1
+          pattern: ^\S(?:.*\S)?$
+        carrierImportVoyageNumber:
+          type: string
+          maxLength: 50
+          pattern: ^\S(?:.*\S)?$
+          example: 2103S
+          description: The identifier of an import voyage. The carrier-specific identifier of the import Voyage.
+        carrierExportVoyageNumber:
+          type: string
+          example: 2103N
+          maxLength: 50
+          pattern: ^\S(?:.*\S)?$
+          description: The identifier of an export voyage. The carrier-specific identifier of the export Voyage.
+    Leg:
+      title: Leg
+      type: object
+      description: |-
+        Leg of the Point-to-Point routing. The object "Legs" can be conformed by as many legs as needed and these legs must be identified with a sequence number. The mode of transport of the leg can be identified with a single or multiple properties.
+        If a single mode of transport is expected:
+        - only a VESSEL, use vesselTransport
+        - only a BARGE, use barteTransport.
+        - only a TRUCK, use truckTransport (empty)
+        - only a RAIL, use railTransport (empty)
+        If combined modes of transport are expected:
+        - RAIL/TRUCK, use railTransport and truckTransport (empty)
+        - BARGE/TRUCK, use bargeTransport and truckTransport (empty)
+        - BARGE/RAIL, use bargeTransport and railTransport (empty)
+        - MULTIMODAL, use combination of 3 or 4, or none. (empty)
+      properties:
+        sequenceNumber:
+          type: integer
+          format: int64
+          description: Sequence number of the leg.
+        departure:
+          $ref: '#/components/schemas/Place'
+        arrival:
+          $ref: '#/components/schemas/Place'
+        vesselTransport:
+          $ref: '#/components/schemas/VesselTransport'
+        bargeTransport:
+          $ref: '#/components/schemas/BargeTransport'
+        railTransport:
+          $ref: '#/components/schemas/RailTransport'
+        truckTransport:
+          $ref: '#/components/schemas/TruckTransport'
+    LegX:
+      title: LegX
+      type: object
+      description: Leg of the Point-to-Point routing. The object "Legs" can be conformed by as many legs as needed and this legs must be identified with a sequence number.
+      required:
+        - departure
+        - arrival
+      properties:
+        sequenceNumber:
+          type: integer
+          format: int64
+          description: Sequence number of the leg.
+        transport:
+          description: The mode of transport as defined by DCSA.
+          oneOf:
+            - $ref: '#/components/schemas/VesselTransportX'
+            - $ref: '#/components/schemas/BargeTransportX'
+            - $ref: '#/components/schemas/OtherTransport'
+        departure:
+          $ref: '#/components/schemas/Place'
+        arrival:
+          $ref: '#/components/schemas/Place'
   parameters:
     Api-Version-Major:
       in: header
