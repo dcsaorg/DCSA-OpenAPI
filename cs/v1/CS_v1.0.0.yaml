@@ -138,14 +138,23 @@ paths:
             example: '2021-04-01'
           in: query
           name: departureDate
-          description: 'The date of departure of the routings in the response `:gte` (≥ Greater than or equal) OR `:lte` (≤ Less than or equal) `departureDate:gte=2021-04-01`'
+          description: |
+            'The date of departure of the routings in the response `:gte` (≥ Greater than or equal) OR `:lte` (≤ Less than or equal) `departureDate:gte=2021-04-01`.
+              #### Ranges
+              In order to `specify a range` the query parameter needs to be used twice with different operators. If multiple operators are used with this query parameter a logical `AND` is to be used between the operators.
+              So for the following filter:`departureDate:gte=2021-04-01 & departureDate:lte=2021-04-03` will result in routings within the 2 days range (48 hours) specified. The routings matched **MUST** be available on or after (`≥`) 2021-04-01 `AND` on or before (`≤`) 2021-04-03 if no operator is provided, a **strictly equal** is used (this is equivalent to `:eq` operator).'
+                
         - schema:
             type: string
             format: date
             example: '2021-04-01'
           in: query
           name: arrivalDate
-          description: 'The data of arrival of the routings in the response `:gte` (≥ Greater than or equal) OR `:lte` (≤ Less than or equal) `arrivalDate:gte=2021-04-01`'
+          description: |
+            'The data of arrival of the routings in the response `:gte` (≥ Greater than or equal) OR `:lte` (≤ Less than or equal) `arrivalDate:gte=2021-04-01`'
+              #### Ranges
+              In order to `specify a range` the query parameter needs to be used twice with different operators. If multiple operators are used with this query parameter a logical `AND` is to be used between the operators.
+              So for the following filter:`arrivalDate:gte=2021-04-01 & arrivalDate:lte=2021-04-03` will result in routings within the 2 days range (48 hours) specified. The routings matched **MUST** be available on or after (`≥`) 2021-04-01 `AND` on or before (`≤`) 2021-04-03 if no operator is provided, a **strictly equal** is used (this is equivalent to `:eq` operator).
         - schema:
             type: integer
             example: 1
@@ -533,9 +542,10 @@ components:
             - `POTE` (Port Terminal)
             - `PBPL` (Pilot Boarding Place)
             - `BRTH` (Berth)
-            - `RAMP`  (Ramp)
+            - `RAMP` (Ramp)
             - `WAYP` (Waypoint)
           example: POTE
+          maxLength: 4
           type: string
         location:
           oneOf:
@@ -574,9 +584,10 @@ components:
             - `POTE` (Port Terminal)
             - `PBPL` (Pilot Boarding Place)
             - `BRTH` (Berth)
-            - `RAMP`  (Ramp)
+            - `RAMP` (Ramp)
             - `WAYP` (Waypoint)
           example: POTE
+          maxLength: 4
           type: string
         location:
           oneOf:
@@ -594,8 +605,10 @@ components:
           format: date-time
           example: '2025-01-14T09:21:00+01:00'
           description: 'The local date and time, when the event will take place, in ISO 8601 format specifying the offset.'
-    Arrival:
+    PlaceOfArrival:
       title: Place of Arrival
+      x-stoplight:
+        id: 68c22a3f58a88
       type: object
       description: The Location specifying where the place of arrival is located.
       required:
@@ -615,9 +628,10 @@ components:
             - `POTE` (Port Terminal)
             - `PBPL` (Pilot Boarding Place)
             - `BRTH` (Berth)
-            - `RAMP`  (Ramp)
+            - `RAMP` (Ramp)
             - `WAYP` (Waypoint)
           example: POTE
+          maxLength: 4
           type: string
         location:
           oneOf:
@@ -635,8 +649,10 @@ components:
           format: date-time
           example: '2025-01-14T09:21:00+01:00'
           description: 'The local date and time, when the event will take place, in ISO 8601 format specifying the offset.'
-    Departure:
+    PlaceOfDeparture:
       title: Place Of Departure
+      x-stoplight:
+        id: d35bf9f499975
       type: object
       description: The Location specifying where the place of departure is located.
       required:
@@ -656,9 +672,10 @@ components:
             - `POTE` (Port Terminal)
             - `PBPL` (Pilot Boarding Place)
             - `BRTH` (Berth)
-            - `RAMP`  (Ramp)
+            - `RAMP` (Ramp)
             - `WAYP` (Waypoint)
           example: POTE
+          maxLength: 4
           type: string
         location:
           oneOf:
@@ -706,6 +723,7 @@ components:
             $ref: '#/components/schemas/Leg'
         legsx:
           type: array
+          minItems: 1
           items:
             $ref: '#/components/schemas/LegX'
     PortSchedule:
@@ -725,18 +743,13 @@ components:
               UNLO: '#/components/schemas/UNLocationLocation'
         vesselSchedules:
           type: array
-          minItems: 1
           items:
             $ref: '#/components/schemas/Schedule'
     Schedule:
       title: Schedule
       type: object
       required:
-        - carrierServiceName
-        - carrierServiceCode
         - isDummyVessel
-        - carrierImportVoyageNumber
-        - carrierExportVoyageNumber
         - timestamps
       properties:
         universalServiceReference:
@@ -749,7 +762,7 @@ components:
         serviceCarriers:
           type: array
           items:
-            $ref: '#/components/schemas/ServiceCarrier'
+            $ref: '#/components/schemas/ServiceCarrierSchedules'
         vesselIMONumber:
           type: string
           description: 'The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd&apos;s register code, which does not change during the lifetime of the vessel.'
@@ -907,9 +920,9 @@ components:
             Code for the event classifier. Values can vary depending on eventType.
 
             Possible values are:
-            - ACT (Actual)
-            - EST (Estimated)
-            - PLN (Planned)
+            - `ACT` (Actual)
+            - `EST` (Estimated)
+            - `PLN` (Planned)
         eventDateTime:
           type: string
           format: date-time
@@ -1612,6 +1625,51 @@ components:
           maxLength: 50
           pattern: ^\S(?:.*\S)?$
           description: The identifier of an export voyage. The carrier-specific identifier of the export Voyage.
+    ServiceCarrierSchedules:
+      title: Service Carrier Schedules
+      type: object
+      required:
+        - carrierServiceName
+        - carrierServiceCode
+        - carrierImportVoyageNumber
+        - carrierExportVoyageNumber
+      description: The details of the carrier that operates the routing.
+      properties:
+        carrierCode:
+          type: string
+          description: The carrier code based on either the SMDG or SCAC code lists.
+          maxLength: 10
+          example: MAEU
+        carrierCodeListProvider:
+          type: string
+          description: Identifies the code list provider used for the carriercodes.
+          example: NMFTA
+          enum:
+            - SMDG
+            - NMFTA
+        carrierServiceName:
+          type: string
+          description: The name of the service.
+          maxLength: 50
+          example: Great Lion Service
+        carrierServiceCode:
+          type: string
+          description: The carrier-specific code of the service for which the schedule details are published.
+          maxLength: 11
+          example: FE1
+          pattern: ^\S(?:.*\S)?$
+        carrierImportVoyageNumber:
+          type: string
+          maxLength: 50
+          pattern: ^\S(?:.*\S)?$
+          example: 2103S
+          description: The identifier of an import voyage. The carrier-specific identifier of the import Voyage.
+        carrierExportVoyageNumber:
+          type: string
+          example: 2103N
+          maxLength: 50
+          pattern: ^\S(?:.*\S)?$
+          description: The identifier of an export voyage. The carrier-specific identifier of the export Voyage.
     Leg:
       title: Leg
       type: object
@@ -1633,9 +1691,9 @@ components:
           format: int32
           description: Sequence number of the leg.
         departure:
-          $ref: '#/components/schemas/Departure'
+          $ref: '#/components/schemas/PlaceOfDeparture'
         arrival:
-          $ref: '#/components/schemas/Arrival'
+          $ref: '#/components/schemas/PlaceOfArrival'
         vesselTransport:
           $ref: '#/components/schemas/VesselTransport'
         bargeTransport:
@@ -1666,9 +1724,9 @@ components:
             - $ref: '#/components/schemas/BargeTransportX'
             - $ref: '#/components/schemas/OtherTransport'
         departure:
-          $ref: '#/components/schemas/Departure'
+          $ref: '#/components/schemas/PlaceOfDeparture'
         arrival:
-          $ref: '#/components/schemas/Arrival'
+          $ref: '#/components/schemas/PlaceOfArrival'
   parameters:
     Api-Version-Major:
       in: header
