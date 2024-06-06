@@ -1,9 +1,9 @@
 openapi: 3.0.3
 servers:
   - description: SwaggerHub API Auto Mocking
-    url: 'https://virtserver.swaggerhub.com/dcsaorg/DCSA_EBL_PINT/3.0.0-Beta-2'
+    url: 'https://virtserver.swaggerhub.com/dcsaorg/DCSA_EBL_PINT/3.0.0-Beta-3'
 info:
-  version: 3.0.0-Beta-2
+  version: 3.0.0-Beta-3
   title: DCSA eBL Platform Interoperability API
   description: |
     <h1>DCSA OpenAPI specification for electronic Bill of Lading (eBL) Platform Interoperability (PINT) standard </h1>
@@ -281,7 +281,7 @@ components:
     API-Version:
       schema:
         type: string
-        example: 3.0.0-Beta-2
+        example: 3.0.0-Beta-3
       description: |
         SemVer used to indicate the version of the contract (API version) returned.
   schemas:
@@ -294,7 +294,7 @@ components:
       maxLength: 64
       minLength: 64
       description: |
-        The checksum of the document computed using SHA-256 hash algorithm according to [RFC 6234](https://datatracker.ietf.org/doc/html/rfc6234).
+        The checksum of the document computed using SHA-256 hash algorithm according to [RFC 6234](https://datatracker.ietf.org/doc/html/rfc6234).  The transport document must be in the [RFC 8785](https://datatracker.ietf.org/doc/html/rfc8785) canonical form before the checksum is computed.
       example: 76a7d14c83d7268d643ae7345c448de60701f955d264a743e6928a0b8268b24f
     ##############
     # Objects 
@@ -485,6 +485,37 @@ components:
         JWS content with compact serialization according to [RFC 7515](https://datatracker.ietf.org/doc/html/rfc7515#section-7.1). JWS-signed payload is defined in schema [EnvelopeManifest](#/EnvelopeManifest).
       # TODO: Verify and if necessary update the example, or remove it altogether
       example: eyJhbGciOiJSUzI1NiIsImtpZCI6IlVhRVdLNmt2ZkRITzNZT2NwUGl2M1RCT2JQTzk2SFZhR2U0czFhUUxBZU0ifQ.eyJkb2N1bWVudEhhc2giOiI4ZGM5OWQ4YWM5MjIyNDBjNTVjMDM4NDVmNDlkZWY2NDE4NzE0NjY1MWJhZTRmOWE2MzEzMTI3N2NmMDBkOWRmIiwicHJldmlvdXNFbnZlbG9wZUhhc2giOm51bGwsInRyYW5zYWN0aW9ucyI6W3siYWN0aW9uIjoiSVNTVSIsImNvbW1lbnRzIjoiVGhlIEIvTCBoYXMgYmVlbiBpc3N1ZWQuIiwidGltZXN0YW1wIjoxNjU4Mzg1MTY2MzAyNDQyMjAwLCJpc1RvT3JkZXIiOnRydWUsInBsYXRmb3JtSG9zdCI6ImxvY2FsaG9zdDo4NDQzIiwidHJhbnNmZXJlZSI6IjQzNTQ5ODUwMjQ4QGxvY2FsaG9zdDo4NDQzIn1dfQ.c4SJ9-61fE6RmeIuZ3EI-TSM0M6qXuOudtr3YhpDjqVMaYk_RYpaWYvw75ssTbjgGFKTBKCy5lpmOfb8Fq--Qu2k0MWbH6qdX5jTYwl0DX946RQg-hnmVTg9np3bmqVeKqKURyV-UUdG-KK_XCGzPZ-lZkeUlpMcIthQFs0pCODR9GPytv7ZXLPZFOmHM9fn3FD2yRqVhQzcs7HdcxMjCx6hkBW8Z-jW4qteVy2_E9uqjkKwlu_cQLoY83Z0mcjn0PZNQvKF10x7q1_Jjf_Su19UigTUu3pFMrzo4iPS_jcrFoIb3TSZNSzbgAwtujSBFOufPDyEmxlx1sH0ZowMvA
+    IssuanceManifest:
+      properties:
+        documentChecksum:
+          type: string
+          pattern: ^[0-9a-f]+$
+          maxLength: 64
+          minLength: 64
+          description: |
+            The checksum of the transport document computed using SHA-256 hash algorithm according to [RFC 6234](https://datatracker.ietf.org/doc/html/rfc6234). The transport document must be in the [RFC 8785](https://datatracker.ietf.org/doc/html/rfc8785) canonical form before the checksum is computed.
+          example: 76a7d14c83d7268d643ae7345c448de60701f955d264a743e6928a0b8268b24f
+        eBLVisualisationByCarrier:
+          type: string
+          pattern: ^[0-9a-f]+$
+          maxLength: 64
+          minLength: 64
+          description: |
+            The checksum of the document computed using SHA-256 hash algorithm according to [RFC 6234](https://datatracker.ietf.org/doc/html/rfc6234). The checksum is computed on the `content` field in its decoded form.
+          example: 76a7d14c83d7268d643ae7345c448de60701f955d264a743e6928a0b8268b24f
+        issueToChecksum:
+          type: string
+          pattern: ^[0-9a-f]+$
+          maxLength: 64
+          minLength: 64
+          description: |
+            The checksum of the `issueTo` attribute computed using SHA-256 hash algorithm according to [RFC 6234](https://datatracker.ietf.org/doc/html/rfc6234). The value must be in the [RFC 8785](https://datatracker.ietf.org/doc/html/rfc8785) canonical form before the checksum is computed.
+          example: 76a7d14c83d7268d643ae7345c448de60701f955d264a743e6928a0b8268b24f
+      description: |
+        Checksums of the carrier provided documents from the issuance time.
+      required:
+        - documentChecksum
+        - issueToChecksum
     EnvelopeTransferChainEntry:
       type: object
       properties:
@@ -508,7 +539,7 @@ components:
             - `TRAC` (TRACE Original)
             - `BRIT` (BRITC eBL)
             
-            Must be a code this list [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/reference-data/eblsolutionproviders-v3.0.0-Beta-2.csv).
+            Must be a code this list [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/reference-data/eblsolutionproviders-v3.0.0-Beta-3.csv).
           example: BOLE
         transportDocumentChecksum:
           type: string
@@ -540,6 +571,15 @@ components:
             actual type: [`DocumentMetadata`](#\DocumentMetadata)
 
             This attribute is used to transfer metadata of the **'Digital copy of the original physical B/L document' document** a.k.a. **eBLVisualisationByCarrier document**. If this attribute is defined with the initial eBL envelope transfer(in the first `EnvelopeTransferChainEntrySignedContent` entry in the [`EblEnvelope.envelopeTransferChain[]`](#/EblEnvelope) list), eBLVisualisationByCarrier document **must** be transferred with every subsequent envelope transfer for the lifetime of the eBL document. Also, eBLVisualisationByCarrier document must be unchanged between different envelope transfers for the lifetime of the eBL document (in other words, for each `EnvelopeTransferChainEntrySignedContent` entry in the [`EblEnvelope.envelopeTransferChain[]`](#/EblEnvelope) list, JWS-signed payload `EnvelopeTransferChainEntry.eBLVisualisationByCarrier` attribute must have the identical value).
+        IssuanceManifestSignedContent:
+          type: string
+          pattern: '^([a-zA-Z0-9_=]+)\.([a-zA-Z0-9_=]+)\.([a-zA-Z0-9_\-\+\/=]+)$'
+          description: |
+            JWS content with compact serialization according to [RFC 7515](https://datatracker.ietf.org/doc/html/rfc7515#section-7.1). JWS-signed payload is defined in schema [IssuanceManifest](#/IssuanceManifest).
+
+            The field is conditional and must be provided in the first EnvelopeTransferChainEntry. The value must be signed by the carrier.
+          # TODO: Update example
+          example: eyJhbGciOiJSUzI1NiIsImtpZCI6IlVhRVdLNmt2ZkRITzNZT2NwUGl2M1RCT2JQTzk2SFZhR2U0czFhUUxBZU0ifQ.eyJkb2N1bWVudEhhc2giOiI4ZGM5OWQ4YWM5MjIyNDBjNTVjMDM4NDVmNDlkZWY2NDE4NzE0NjY1MWJhZTRmOWE2MzEzMTI3N2NmMDBkOWRmIiwicHJldmlvdXNFbnZlbG9wZUhhc2giOm51bGwsInRyYW5zYWN0aW9ucyI6W3siYWN0aW9uIjoiSVNTVSIsImNvbW1lbnRzIjoiVGhlIEIvTCBoYXMgYmVlbiBpc3N1ZWQuIiwidGltZXN0YW1wIjoxNjU4Mzg1MTY2MzAyNDQyMjAwLCJpc1RvT3JkZXIiOnRydWUsInBsYXRmb3JtSG9zdCI6ImxvY2FsaG9zdDo4NDQzIiwidHJhbnNmZXJlZSI6IjQzNTQ5ODUwMjQ4QGxvY2FsaG9zdDo4NDQzIn1dfQ.c4SJ9-61fE6RmeIuZ3EI-TSM0M6qXuOudtr3YhpDjqVMaYk_RYpaWYvw75ssTbjgGFKTBKCy5lpmOfb8Fq--Qu2k0MWbH6qdX5jTYwl0DX946RQg-hnmVTg9np3bmqVeKqKURyV-UUdG-KK_XCGzPZ-lZkeUlpMcIthQFs0pCODR9GPytv7ZXLPZFOmHM9fn3FD2yRqVhQzcs7HdcxMjCx6hkBW8Z-jW4qteVy2_E9uqjkKwlu_cQLoY83Z0mcjn0PZNQvKF10x7q1_Jjf_Su19UigTUu3pFMrzo4iPS_jcrFoIb3TSZNSzbgAwtujSBFOufPDyEmxlx1sH0ZowMvA
         transactions:
           type: array
           items:
@@ -819,7 +859,7 @@ components:
             - `TRAC` (TRACE Original)
             - `BRIT` (BRITC eBL)
             
-            Must be a code this list [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/reference-data/eblsolutionproviders-v3.0.0-Beta-2.csv).
+            Must be a code this list [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/reference-data/eblsolutionproviders-v3.0.0-Beta-3.csv).
           example: BOLE
         identifyingCodes:
           type: array
