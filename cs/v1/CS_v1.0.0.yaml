@@ -607,8 +607,6 @@ components:
           description: 'The local date and time, when the event will take place, in ISO 8601 format specifying the offset.'
     PlaceOfArrival:
       title: Place of Arrival
-      x-stoplight:
-        id: 68c22a3f58a88
       type: object
       description: The Location specifying where the place of arrival is located.
       required:
@@ -651,8 +649,6 @@ components:
           description: 'The local date and time, when the event will take place, in ISO 8601 format specifying the offset.'
     PlaceOfDeparture:
       title: Place Of Departure
-      x-stoplight:
-        id: d35bf9f499975
       type: object
       description: The Location specifying where the place of departure is located.
       required:
@@ -700,7 +696,6 @@ components:
         - placeOfReceipt
         - placeOfDelivery
         - legs
-        - legsx
       properties:
         placeOfReceipt:
           $ref: '#/components/schemas/PlaceOfReceipt'
@@ -711,6 +706,12 @@ components:
           description: A list of cut-offs times provided by the carrier when available. A cut-off time indicates the latest deadline within which a task must be completed.
           items:
             $ref: '#/components/schemas/CutOffTime'
+        solutionNumber:
+          type: integer
+          format: int32
+          minimum: 1
+          example: 1
+          description: 'Solution number, starting with 1. Used to group and identify similar or same routings in the response as per the carrier commercial definitions.'
         transitTime:
           type: integer
           description: The estimated total time in **days** that it takes a shipment to move from place of receipt to place of delivery. Transit time includes stop-over time during transshipments and waiting time at connection points.
@@ -721,11 +722,6 @@ components:
           minItems: 1
           items:
             $ref: '#/components/schemas/Leg'
-        legsx:
-          type: array
-          minItems: 1
-          items:
-            $ref: '#/components/schemas/LegX'
     PortSchedule:
       title: Port Schedule
       type: object
@@ -760,11 +756,11 @@ components:
           pattern: ^SR\d{5}[A-Z]$
           maxLength: 8
           minLength: 8
-        serviceCarriers:
+        servicePartners:
           type: array
           minItems: 1
           items:
-            $ref: '#/components/schemas/ServiceCarrierSchedules'
+            $ref: '#/components/schemas/ServicePartnerSchedules'
         vesselIMONumber:
           type: string
           description: 'The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd&apos;s register code, which does not change during the lifetime of the vessel.'
@@ -842,18 +838,6 @@ components:
           maxLength: 100
           description: 'The unique reference for a transport call. It’s the vessel operator’s responsibility to provide the Transport Call Reference, other parties are obliged to pick it up and use it. It can take the form of Port Call References as defined in OVS Definitions Document, or alternatively a reference as defined by the vessel operator.'
           example: SR11111X-9321483-2107W-NLRTM-HPD2-1-1
-        providerCarrierCode:
-          type: string
-          maxLength: 10
-          description: Provider of the data. Aggregators can use it to specify the source of the information for the specific transport call if they are aggregating different sources.
-          example: MAEU
-        providerCarrierCodeListProvider:
-          type: string
-          description: Identifies the code list provider used for the operator and partner carriercodes.
-          example: NMFTA
-          enum:
-            - SMDG
-            - NMFTA
         carrierImportVoyageNumber:
           type: string
           maxLength: 50
@@ -881,7 +865,6 @@ components:
           minLength: 5
         location:
           title: Location
-          type: object
           oneOf:
             - $ref: '#/components/schemas/UNLocationLocation'
             - $ref: '#/components/schemas/FacilitySMDGLocation'
@@ -893,6 +876,7 @@ components:
               ADDR: '#/components/schemas/AddressLocation'
               FACS: '#/components/schemas/FacilitySMDGLocation'
               UNLO: '#/components/schemas/UNLocationLocation'
+          type: object
         timestamps:
           type: array
           minItems: 1
@@ -1340,15 +1324,18 @@ components:
           enum:
             - SMDG
             - NMFTA
-    RailTransport:
-      title: Rail Transport
-      type: object
-      description: Transport mode Rail.
     VesselTransport:
       title: Vessel Transport
       type: object
-      description: The vessel transport mode details whne the mode of Transport is Vessel.
+      description: Transport mode Vessel.
+      required:
+        - modeOfTransport
       properties:
+        modeOfTransport:
+          type: string
+          enum:
+            - VESSEL
+          description: The mode of transport as defined by DCSA. For the Vessel Transport mode this needs to be VESSEL.
         portVisitReference:
           type: string
           example: NLAMS1234589
@@ -1359,10 +1346,10 @@ components:
           example: SR11111X-9321483-2107W-NLAMS-ACT-1-1
           maxLength: 100
           description: 'The unique reference for a transport call. It’s the vessel operator’s responsibility to provide the Transport Call Reference, other parties are obliged to pick it up and use it. It can take the form of Port Call References as defined in OVS Definitions Document, or alternatively a reference as defined by the vessel operator.'
-        serviceCarriers:
+        servicePartners:
           type: array
           items:
-            $ref: '#/components/schemas/ServiceCarrier'
+            $ref: '#/components/schemas/ServicePartners'
         universalServiceReference:
           type: string
           description: 'A global unique service reference, as per DCSA standard, agreed by VSA partners for the service. The service reference must match the regular expression pattern: SR\d{5}[A-Z]. The letters SR followed by 5 digits, followed by a checksum-character as a capital letter from A to Z.'
@@ -1389,97 +1376,6 @@ components:
     BargeTransport:
       title: Barge Transport
       type: object
-      description: The Barge transport mode details when the mode of transport is barge.
-      properties:
-        portVisitReference:
-          type: string
-          example: NLAMS1234589
-          maxLength: 50
-          description: The unique reference that can be used to link different `transportCallReferences` to the same port visit. The reference is provided by the port to uniquely identify a port call.
-        transportCallReference:
-          type: string
-          example: SR11111X-9321483-2107W-NLAMS-ACT-1-1
-          maxLength: 100
-          description: 'The unique reference for a transport call. It’s the vessel operator’s responsibility to provide the Transport Call Reference, other parties are obliged to pick it up and use it. It can take the form of Port Call References as defined in OVS Definitions Document, or alternatively a reference as defined by the vessel operator.'
-        serviceCarriers:
-          type: array
-          items:
-            $ref: '#/components/schemas/ServiceCarrier'
-        universalServiceReference:
-          type: string
-          description: 'A global unique service reference, as per DCSA standard, agreed by VSA partners for the service. The service reference must match the regular expression pattern: SR\d{5}[A-Z]. The letters SR followed by 5 digits, followed by a checksum-character as a capital letter from A to Z.'
-          example: SR12345A
-          pattern: ^SR\d{5}[A-Z]$
-          maxLength: 8
-          minLength: 8
-        universalExportVoyageReference:
-          type: string
-          description: 'A global unique voyage reference for the export Voyage, as per DCSA standard, agreed by VSA partners for the voyage.'
-          pattern: ^\d{2}[0-9A-Z]{2}[NEWSR]$
-          minLength: 5
-          maxLength: 5
-          example: 2103N
-        universalImportVoyageReference:
-          type: string
-          description: 'A global unique voyage reference for the import Voyage, as per DCSA standard, agreed by VSA partners for the voyage.'
-          pattern: ^\d{2}[0-9A-Z]{2}[NEWSR]$
-          minLength: 5
-          maxLength: 5
-          example: 2103N
-        barge:
-          $ref: '#/components/schemas/Barge'
-    VesselTransportX:
-      title: Vessel Transport
-      type: object
-      description: Transport mode Vessel.
-      required:
-        - modeOfTransport
-      properties:
-        modeOfTransport:
-          type: string
-          enum:
-            - VESSEL
-          description: The mode of transport as defined by DCSA. For the Vessel Transport mode this needs to be VESSEL.
-        portVisitReference:
-          type: string
-          example: NLAMS1234589
-          maxLength: 50
-          description: The unique reference that can be used to link different `transportCallReferences` to the same port visit. The reference is provided by the port to uniquely identify a port call.
-        transportCallReference:
-          type: string
-          example: SR11111X-9321483-2107W-NLAMS-ACT-1-1
-          maxLength: 100
-          description: 'The unique reference for a transport call. It’s the vessel operator’s responsibility to provide the Transport Call Reference, other parties are obliged to pick it up and use it. It can take the form of Port Call References as defined in OVS Definitions Document, or alternatively a reference as defined by the vessel operator.'
-        serviceCarriers:
-          type: array
-          items:
-            $ref: '#/components/schemas/ServiceCarrier'
-        universalServiceReference:
-          type: string
-          description: 'A global unique service reference, as per DCSA standard, agreed by VSA partners for the service. The service reference must match the regular expression pattern: SR\d{5}[A-Z]. The letters SR followed by 5 digits, followed by a checksum-character as a capital letter from A to Z.'
-          example: SR12345A
-          pattern: ^SR\d{5}[A-Z]$
-          maxLength: 8
-          minLength: 8
-        universalExportVoyageReference:
-          type: string
-          description: 'A global unique voyage reference for the export Voyage, as per DCSA standard, agreed by VSA partners for the voyage.'
-          pattern: ^\d{2}[0-9A-Z]{2}[NEWSR]$
-          minLength: 5
-          maxLength: 5
-          example: 2103N
-        universalImportVoyageReference:
-          type: string
-          description: 'A global unique voyage reference for the import Voyage, as per DCSA standard, agreed by VSA partners for the voyage.'
-          pattern: ^\d{2}[0-9A-Z]{2}[NEWSR]$
-          minLength: 5
-          maxLength: 5
-          example: 2103N
-        vessel:
-          $ref: '#/components/schemas/Vessel'
-    BargeTransportX:
-      title: Barge Transport
-      type: object
       description: Transport mode Barge.
       required:
         - modeOfTransport
@@ -1499,10 +1395,10 @@ components:
           example: SR11111X-9321483-2107W-NLAMS-ACT-1-1
           maxLength: 100
           description: 'The unique reference for a transport call. It’s the vessel operator’s responsibility to provide the Transport Call Reference, other parties are obliged to pick it up and use it. It can take the form of Port Call References as defined in OVS Definitions Document, or alternatively a reference as defined by the vessel operator.'
-        serviceCarriers:
+        servicePartners:
           type: array
           items:
-            $ref: '#/components/schemas/ServiceCarrier'
+            $ref: '#/components/schemas/ServicePartners'
         universalServiceReference:
           type: string
           description: 'A global unique service reference, as per DCSA standard, agreed by VSA partners for the service. The service reference must match the regular expression pattern: SR\d{5}[A-Z]. The letters SR followed by 5 digits, followed by a checksum-character as a capital letter from A to Z.'
@@ -1526,10 +1422,6 @@ components:
           example: 2103N
         barge:
           $ref: '#/components/schemas/Barge'
-    TruckTransport:
-      title: Truck Transport
-      type: object
-      description: Transport mode Truck.
     OtherTransport:
       title: Other Transport
       type: object
@@ -1587,10 +1479,10 @@ components:
             - BIC
             - SMDG
           example: SMDG
-    ServiceCarrier:
-      title: ServiceCarrier
+    ServicePartners:
+      title: Service Partners
       type: object
-      description: The details of the carrier that operates the routing.
+      description: The service code and voyage number as identified by the carriers that are partners in the service.
       properties:
         carrierCode:
           type: string
@@ -1627,15 +1519,15 @@ components:
           maxLength: 50
           pattern: ^\S(?:.*\S)?$
           description: The identifier of an export voyage. The carrier-specific identifier of the export Voyage.
-    ServiceCarrierSchedules:
-      title: Service Carrier Schedules
+    ServicePartnerSchedules:
+      title: Service Partner Schedules
       type: object
       required:
         - carrierServiceName
         - carrierServiceCode
         - carrierImportVoyageNumber
         - carrierExportVoyageNumber
-      description: The details of the carrier that operates the routing.
+      description: The service code and voyage number as identified by the carriers that are partners in the service.
       properties:
         carrierCode:
           type: string
@@ -1675,41 +1567,6 @@ components:
     Leg:
       title: Leg
       type: object
-      description: |-
-        Leg of the Point-to-Point routing. The object "Legs" can be conformed by as many legs as needed and these legs must be identified with a sequence number. The mode of transport of the leg can be identified with a single or multiple properties.
-        If a single mode of transport is expected:
-        - only a VESSEL, use vesselTransport
-        - only a BARGE, use barteTransport.
-        - only a TRUCK, use truckTransport (empty)
-        - only a RAIL, use railTransport (empty)
-        If combined modes of transport are expected:
-        - RAIL/TRUCK, use railTransport and truckTransport (empty)
-        - BARGE/TRUCK, use bargeTransport and truckTransport (empty)
-        - BARGE/RAIL, use bargeTransport and railTransport (empty)
-        - MULTIMODAL, use combination of 3 or 4, or none. (empty)
-      properties:
-        sequenceNumber:
-          type: integer
-          format: int32
-          description: Sequence number of the leg.
-        departure:
-          $ref: '#/components/schemas/PlaceOfDeparture'
-        arrival:
-          $ref: '#/components/schemas/PlaceOfArrival'
-        vesselTransport:
-          $ref: '#/components/schemas/VesselTransport'
-        bargeTransport:
-          $ref: '#/components/schemas/BargeTransport'
-        railTransport:
-          $ref: '#/components/schemas/RailTransport'
-        truckTransport:
-          $ref: '#/components/schemas/TruckTransport'
-      required:
-        - departure
-        - arrival
-    LegX:
-      title: LegX
-      type: object
       description: Leg of the Point-to-Point routing. The object "Legs" can be conformed by as many legs as needed and this legs must be identified with a sequence number.
       required:
         - departure
@@ -1722,8 +1579,8 @@ components:
         transport:
           description: The mode of transport as defined by DCSA.
           oneOf:
-            - $ref: '#/components/schemas/VesselTransportX'
-            - $ref: '#/components/schemas/BargeTransportX'
+            - $ref: '#/components/schemas/VesselTransport'
+            - $ref: '#/components/schemas/BargeTransport'
             - $ref: '#/components/schemas/OtherTransport'
         departure:
           $ref: '#/components/schemas/PlaceOfDeparture'
