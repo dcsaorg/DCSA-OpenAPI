@@ -4138,7 +4138,7 @@ components:
             - FTQ
           example: MTQ
         outerPackaging:
-          $ref: '#/components/schemas/OuterPackagingCarrier'
+          $ref: '#/components/schemas/OuterPackaging'
         customsReferences:
           type: array
           description: |
@@ -4258,12 +4258,22 @@ components:
       required:
         - numberOfPackages
         - description
-    OuterPackagingCarrier:
+    OuterPackaging:
       type: object
-      title: Outer Packaging (Carrier)
+      title: Outer Packaging
       description: |
         Object for outer packaging/overpack specification. Examples of overpacks are a number of packages stacked on to a pallet and secured by strapping or placed in a protective outer packaging such as a box or crate to form one unit for the convenience of handling and stowage during transport.
       properties:
+        packageCode:
+          type: string
+          pattern: ^[A-Z0-9]{2}$
+          minLength: 2
+          maxLength: 2
+          description: |
+            A code identifying the outer packaging/overpack. `PackageCode` must follow the codes specified in [Recommendation N°21 - Revision 12  Annexes V and VI](https://unece.org/sites/default/files/2021-06/rec21_Rev12e_Annex-V-VI_2021.xls)
+
+            **Condition:** only applicable to dangerous goods if the `IMO packaging code` is not available.
+          example: 5H
         imoPackagingCode:
           type: string
           pattern: ^[A-Z0-9]{1,5}$
@@ -4274,14 +4284,29 @@ components:
 
             **Condition:** only applicable to dangerous goods if specified in the IMO IMDG code amendment version 41-22. If not available, the package code as per UN recommendation 21 should be used.
           example: 1A2
+        numberOfPackages:
+          type: integer
+          format: int32
+          minimum: 1
+          # Extended description of numberOfPackages compared to DCSA_DOMAIN description
+          description: |
+            Specifies the number of outer packagings/overpacks associated with this `Cargo Item`.
+          example: 18
+        description:
+          type: string
+          maxLength: 100
+          description: |
+            Description of the outer packaging/overpack.
+          example: 'Drum, steel'
         dangerousGoods:
           type: array
           description: |
             A list of `Dangerous Goods`
           items:
             $ref: '#/components/schemas/DangerousGoods'
-      allOf:
-        - $ref: '#/components/schemas/OuterPackagingShipper'
+      required:
+        - numberOfPackages
+        - description
 
     #################
     # Dangerous Goods
