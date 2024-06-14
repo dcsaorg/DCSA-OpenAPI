@@ -167,8 +167,9 @@ paths:
                       units: 3
                       commodities:
                         - commodityType: 'Dry cargo, Freight all kinds'
-                          cargoGrossWeight: 36000
-                          cargoGrossWeightUnit: KGM
+                          cargoGrossWeight:
+                            value: 36000
+                            unit: KGM
               reeferExample:
                 summary: |
                   Reefer cargo Booking (Apple Juice)
@@ -246,8 +247,9 @@ paths:
                         - commodityType: Apple juice
                           HSCodes:
                             - '20097919'
-                          cargoGrossWeight: 36000
-                          cargoGrossWeightUnit: KGM
+                          cargoGrossWeight:
+                            value: 36000
+                            unit: KGM
               norExample:
                 summary: |
                   Standard dry cargo Booking using a Reefer Container
@@ -317,8 +319,9 @@ paths:
                       units: 3
                       commodities:
                         - commodityType: 'Dry cargo, Freight all kinds'
-                          cargoGrossWeight: 36000
-                          cargoGrossWeightUnit: KGM
+                          cargoGrossWeight:
+                            value: 36000
+                            unit: KGM
               dgExample:
                 summary: |
                   Dangerous Goods (DG) cargo Booking
@@ -388,8 +391,9 @@ paths:
                         - commodityType: 'Environmentally hazardous substance, liquid, N.O.S (Propiconazole)'
                           HSCodes:
                             - '293499'
-                          cargoGrossWeight: 36000
-                          cargoGrossWeightUnit: KGM
+                          cargoGrossWeight:
+                            value: 36000
+                            unit: KGM
                           outerPackaging:
                             imoPackagingCode: 3A1
                             numberOfPackages: 100
@@ -734,8 +738,9 @@ paths:
                       units: 3
                       commodities:
                         - commodityType: 'Dry cargo, Freight all kinds'
-                          cargoGrossWeight: 36000
-                          cargoGrossWeightUnit: KGM
+                          cargoGrossWeight:
+                            value: 36000
+                            unit: KGM
               reeferExample:
                 summary: |
                   Reefer cargo Booking (Apple Juice)
@@ -815,8 +820,9 @@ paths:
                         - commodityType: Apple juice
                           HSCodes:
                             - '20097919'
-                          cargoGrossWeight: 36000
-                          cargoGrossWeightUnit: KGM
+                          cargoGrossWeight:
+                            value: 36000
+                            unit: KGM
               norExample:
                 summary: |
                   Standard dry cargo Booking using a Reefer Container
@@ -886,8 +892,9 @@ paths:
                       units: 3
                       commodities:
                         - commodityType: 'Dry cargo, Freight all kinds'
-                          cargoGrossWeight: 36000
-                          cargoGrossWeightUnit: KGM
+                          cargoGrossWeight:
+                            value: 36000
+                            unit: KGM
               dgExample:
                 summary: |
                   Dangerous Goods (DG) cargo Booking
@@ -960,8 +967,9 @@ paths:
                         - commodityType: 'Environmentally hazardous substance, liquid, N.O.S (Propiconazole)'
                           HSCodes:
                             - '293499'
-                          cargoGrossWeight: 36000
-                          cargoGrossWeightUnit: KGM
+                          cargoGrossWeight:
+                            value: 36000
+                            unit: KGM
                           outerPackaging:
                             imoPackagingCode: 3A1
                             numberOfPackages: 100
@@ -1277,8 +1285,9 @@ paths:
                         units: 3
                         commodities:
                           - commodityType: 'Dry cargo, Freight all kinds'
-                            cargoGrossWeight: 36000
-                            cargoGrossWeightUnit: KGM
+                            cargoGrossWeight:
+                              value: 36000
+                              unit: KGM
                     requestedChanges:
                       - jsonPath: $.requestedEquipment.units
                         property: 'units'
@@ -1359,8 +1368,9 @@ paths:
                         units: 3
                         commodities:
                           - commodityType: 'Dry cargo, Freight all kinds'
-                            cargoGrossWeight: 36000
-                            cargoGrossWeightUnit: KGM
+                            cargoGrossWeight:
+                              value: 36000
+                              unit: KGM
                     confirmedEquipments:
                       - ISOEquipmentCode: 42GP
                         units: 3
@@ -4535,23 +4545,32 @@ components:
       title: Shipper owned Equipment
       properties:
         tareWeight:
-          type: number
-          format: float
-          minimum: 0
-          exclusiveMinimum: true
+          type: object
+          title: Tare Weight
           description: |
             The weight of an empty container (gross container weight).
-          example: 4800
-        tareWeightUnit:
-          type: string
-          description: |
-            The unit of measure which can be expressed in imperial or metric terms
-            - `KGM` (Kilograms)
-            - `LBR` (Pounds)
-          enum:
-            - KGM
-            - LBR
-          example: KGM
+          properties:
+            value:
+              type: number
+              format: float
+              minimum: 0
+              exclusiveMinimum: true
+              description: |
+                The weight of an empty container (gross container weight).
+              example: 4800
+            unit:
+              type: string
+              description: |
+                The unit of measure which can be expressed in imperial or metric terms
+                - `KGM` (Kilograms)
+                - `LBR` (Pounds)
+              enum:
+                - KGM
+                - LBR
+              example: KGM
+          required:
+            - value
+            - unit
         isShipperOwned:
           type: boolean
           description: |
@@ -4559,7 +4578,6 @@ components:
           example: true
       required:
         - tareWeight
-        - tareWeightUnit
         - isShipperOwned
     CocEquipment:
       type: object
@@ -4606,44 +4624,59 @@ components:
               This standard is based on the 2022 revision.
             example: '851713'
         cargoGrossWeight:
-          type: number
-          format: float
-          example: 36000
-          minimum: 0
-          exclusiveMinimum: true
+          type: object
+          title: Cargo Gross Weight
           description: |
-            The estimated grand total gross weight of the cargo, including packaging items being carried, which can be expressed in imperial or metric terms, as provided by the shipper.
-        cargoGrossWeightUnit:
-          type: string
-          description: |
-            The unit of measure which can be expressed in imperial or metric terms
-            - `KGM` (Kilograms)
-            - `LBR` (Pounds)
-          enum:
-            - KGM
-            - LBR
-          example: KGM
+            The estimated grand total gross weight of the cargo, including packaging items being carried, which can be expressed in imperial or metric terms, as provided by the shipper
+          properties:
+            value:
+              type: number
+              format: float
+              example: 36000
+              minimum: 0
+              exclusiveMinimum: true
+              description: |
+                The estimated grand total gross weight of the cargo, which can be expressed in imperial or metric terms, as provided by the shipper.
+            unit:
+              type: string
+              description: |
+                The unit of measure which can be expressed in imperial or metric terms
+                - `KGM` (Kilograms)
+                - `LBR` (Pounds)
+              enum:
+                - KGM
+                - LBR
+              example: KGM
+          required:
+            - value
+            - unit
         cargoGrossVolume:
-          type: number
-          format: float
-          example: 360
-          minimum: 0
-          exclusiveMinimum: true
+          type: object
+          title: Cargo Gross Volume
           description: |
             The grand total volume of the commodity
-        cargoGrossVolumeUnit:
-          type: string
-          description: |
-            The unit of measure which can be expressed in either imperial or metric terms
-            
-            - `FTQ` (Cubic foot)
-            - `MTQ` (Cubic meter)
-
-            **Condition:** If the `cargoGrossVolume` is populated then the `cargoGrossVolumeUnit` is required
-          enum:
-            - MTQ
-            - FTQ
-          example: MTQ
+          properties:
+            value:
+              type: number
+              format: float
+              example: 360
+              minimum: 0
+              exclusiveMinimum: true
+              description: |
+                The grand total volume of the commodity
+            unit:
+              type: string
+              description: |
+                The unit of measure which can be expressed in imperial or metric terms
+                - `FTQ` (Cubic foot)
+                - `MTQ` (Cubic meter)
+              enum:
+                - MTQ
+                - FTQ
+              example: MTQ
+          required:
+            - value
+            - unit
         exportLicenseIssueDate:
           type: string
           format: date
@@ -4669,7 +4702,6 @@ components:
       required:
         - commodityType
         - cargoGrossWeight
-        - cargoGrossWeightUnit
     CommodityCarrier:
       type: object
       title: Commodity (Carrier)
@@ -4709,44 +4741,59 @@ components:
               This standard is based on the 2022 revision.
             example: '851713'
         cargoGrossWeight:
-          type: number
-          format: float
-          example: 36000
-          minimum: 0
-          exclusiveMinimum: true
+          type: object
+          title: Cargo Gross Weight
           description: |
-            The estimated grand total gross weight of the cargo, including packaging items being carried, which can be expressed in imperial or metric terms, as provided by the shipper.
-        cargoGrossWeightUnit:
-          type: string
-          description: |
-            The unit of measure which can be expressed in imperial or metric terms
-            - `KGM` (Kilograms)
-            - `LBR` (Pounds)
-          enum:
-            - KGM
-            - LBR
-          example: KGM
+            The estimated grand total gross weight of the cargo, including packaging items being carried, which can be expressed in imperial or metric terms, as provided by the shipper
+          properties:
+            value:
+              type: number
+              format: float
+              example: 36000
+              minimum: 0
+              exclusiveMinimum: true
+              description: |
+                The estimated grand total gross weight of the cargo, which can be expressed in imperial or metric terms, as provided by the shipper.
+            unit:
+              type: string
+              description: |
+                The unit of measure which can be expressed in imperial or metric terms
+                - `KGM` (Kilograms)
+                - `LBR` (Pounds)
+              enum:
+                - KGM
+                - LBR
+              example: KGM
+          required:
+            - value
+            - unit
         cargoGrossVolume:
-          type: number
-          format: float
-          example: 360
-          minimum: 0
-          exclusiveMinimum: true
+          type: object
+          title: Cargo Gross Volume
           description: |
             The grand total volume of the commodity
-        cargoGrossVolumeUnit:
-          type: string
-          description: |
-            The unit of measure which can be expressed in either imperial or metric terms
-            
-            - `FTQ` (Cubic foot)
-            - `MTQ` (Cubic meter)
-
-            **Condition:** If the `cargoGrossVolume` is populated then the `cargoGrossVolumeUnit` is required
-          enum:
-            - MTQ
-            - FTQ
-          example: MTQ
+          properties:
+            value:
+              type: number
+              format: float
+              example: 360
+              minimum: 0
+              exclusiveMinimum: true
+              description: |
+                The grand total volume of the commodity
+            unit:
+              type: string
+              description: |
+                The unit of measure which can be expressed in imperial or metric terms
+                - `FTQ` (Cubic foot)
+                - `MTQ` (Cubic meter)
+              enum:
+                - MTQ
+                - FTQ
+              example: MTQ
+          required:
+            - value
+            - unit
         exportLicenseIssueDate:
           type: string
           format: date
@@ -4772,7 +4819,6 @@ components:
       required:
         - commodityType
         - cargoGrossWeight
-        - cargoGrossWeightUnit
 
     #################
     # Outer Packaging
