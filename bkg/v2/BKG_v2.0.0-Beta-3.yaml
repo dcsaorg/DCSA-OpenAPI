@@ -4685,8 +4685,94 @@ components:
 
             **Conditional:** Mandatory to provide for `CONFIRMED` bookings
           example: COM-001
-      allOf:
-        - $ref: '#/components/schemas/Commodity'
+        commodityType:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 550
+          description: |
+            High-level description of goods to be shipped which allow the carrier to confirm acceptance and commercial terms. To be replaced by "description of goods" upon submission of `Shipping Instructions`
+          example: Mobile phones
+        HSCodes:
+          type: array
+          description: |
+            A list of `HS Codes` that apply to this `commodity`
+          items:
+            type: string
+            pattern: ^\d{6,10}$
+            minLength: 6
+            maxLength: 10
+            description: |
+              Used by customs to classify the product being shipped. The type of HS code depends on country and customs requirements. The code must be at least 6 and at most 10 digits.
+
+              More information can be found here: [HS Nomenclature 2022 edition](https://www.wcoomd.org/en/topics/nomenclature/instrument-and-tools/hs-nomenclature-2022-edition/hs-nomenclature-2022-edition.aspx).
+
+              This standard is based on the 2022 revision.
+            example: '851713'
+        cargoGrossWeight:
+          type: number
+          format: float
+          example: 36000
+          minimum: 0
+          exclusiveMinimum: true
+          description: |
+            The estimated grand total gross weight of the cargo, including packaging items being carried, which can be expressed in imperial or metric terms, as provided by the shipper.
+        cargoGrossWeightUnit:
+          type: string
+          description: |
+            The unit of measure which can be expressed in imperial or metric terms
+            - `KGM` (Kilograms)
+            - `LBR` (Pounds)
+          enum:
+            - KGM
+            - LBR
+          example: KGM
+        cargoGrossVolume:
+          type: number
+          format: float
+          example: 360
+          minimum: 0
+          exclusiveMinimum: true
+          description: |
+            The grand total volume of the commodity
+        cargoGrossVolumeUnit:
+          type: string
+          description: |
+            The unit of measure which can be expressed in either imperial or metric terms
+            
+            - `FTQ` (Cubic foot)
+            - `MTQ` (Cubic meter)
+
+            **Condition:** If the `cargoGrossVolume` is populated then the `cargoGrossVolumeUnit` is required
+          enum:
+            - MTQ
+            - FTQ
+          example: MTQ
+        exportLicenseIssueDate:
+          type: string
+          format: date
+          description: |
+            Issue date of the export license applicable to the booking. Mandatory to provide in booking request for specific commodities
+          example: '2021-05-14'
+        exportLicenseExpiryDate:
+          type: string
+          format: date
+          description: |
+            Expiry date of the export license applicable to the booking.
+
+            Mandatory to provide in booking request for specific commodities.
+          example: '2021-05-21'
+        outerPackaging:
+          $ref: '#/components/schemas/OuterPackaging'
+        references:
+          type: array
+          description: |
+            A list of `References`
+          items:
+            $ref: '#/components/schemas/Reference'
+      required:
+        - commodityType
+        - cargoGrossWeight
+        - cargoGrossWeightUnit
 
     #################
     # Outer Packaging
