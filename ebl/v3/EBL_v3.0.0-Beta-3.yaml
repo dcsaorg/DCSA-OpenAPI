@@ -5001,8 +5001,44 @@ components:
       title: Equipment (Required Properties)
       description: |
         Used for storing cargo in/on during transport. The equipment size/type is defined by the ISO 6346 code. The most common equipment size/type is 20'/40'/45' DRY Freight Container, but several different versions exist.
-      allOf:
-        - $ref: '#/components/schemas/Equipment'
+      properties:
+        equipmentReference:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 11
+          description: |
+            The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.
+            According to [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346), a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit).
+
+            If a container does not comply with [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346), it is suggested to follow [Recommendation #2: Containers with non-ISO identification](https://smdg.org/documents/smdg-recommendations) from SMDG.
+          example: APZU4812090
+        ISOEquipmentCode:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 4
+          description: |
+            Unique code for the different equipment size and type used to transport commodities. The code can refer to either the ISO size type (e.g. 22G1) or the ISO type group (e.g. 22GP) following the [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346) standard.
+          example: 22GP
+        tareWeight:
+          type: number
+          format: float
+          minimum: 0
+          exclusiveMinimum: true
+          description: |
+            The weight of an empty container (gross container weight).
+          example: 4800
+        weightUnit:
+          type: string
+          description: |
+            The unit of measure which can be expressed in imperial or metric terms
+            - `KGM` (Kilograms)
+            - `LBR` (Pounds)
+
+            **Condition:** Mandatory to provide if `tareWeight` is provided
+          enum:
+            - KGM
+            - LBR
+          example: KGM
       required:
         - equipmentReference
         - ISOEquipmentCode
