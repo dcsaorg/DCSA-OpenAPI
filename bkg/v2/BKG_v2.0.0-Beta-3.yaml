@@ -3544,7 +3544,7 @@ components:
 
             **Example:** 2 x 20' containing 50% shoes and 50% t-shirts can be requested within the same Requested Equipment object only if each 20' will contain 50% shoes and 50% t-shirts. If 1 x 20' will contain 100% shoes and the other 20' will be 100% t-shirts, 2 separate Requested Equipment objects must be defined.
           items:
-            $ref: '#/components/schemas/RequestedEquipmentCarrier'
+            $ref: '#/components/schemas/RequestedEquipment'
         confirmedEquipments:
           type: array
           description: |
@@ -4141,13 +4141,6 @@ components:
           example: IKEA Denmark
         address:
           $ref: '#/components/schemas/PartyAddress'
-        partyContactDetails:
-          type: array
-          minItems: 1
-          description: |
-            A list of contact details
-          items:
-            $ref: '#/components/schemas/PartyContactDetail'
         identifyingCodes:
           type: array
           items:
@@ -4158,6 +4151,13 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/TaxLegalReference'
+        partyContactDetails:
+          type: array
+          minItems: 1
+          description: |
+            A list of contact details
+          items:
+            $ref: '#/components/schemas/PartyContactDetail'
       required:
         - partyName
 
@@ -4446,6 +4446,12 @@ components:
             A list of `References`
           items:
             $ref: '#/components/schemas/Reference'
+        commodities:
+          type: array
+          description: |
+            A list of `Commodities`
+          items:
+            $ref: '#/components/schemas/CommodityCarrier'
       oneOf:
         - $ref: '#/components/schemas/SocEquipment'
         - $ref: '#/components/schemas/CocEquipment'
@@ -4457,34 +4463,73 @@ components:
       required:
         - ISOEquipmentCode
         - units
-    RequestedEquipmentCarrier:
-      type: object
-      title: Requested Equipment (Carrier)
-      description: |
-        If needed - it is **only** possible to specify a single Reefer setting. If multiple settings are required for the same `equipmentSizeType` then multiple `requestedEquipment` should be specified (one for each Reefer setting).
-      properties:
-        commodities:
-          type: array
-          description: |
-            A list of `Commodities`
-          items:
-            $ref: '#/components/schemas/CommodityCarrier'
-      allOf:
-        - $ref: '#/components/schemas/RequestedEquipment'
     RequestedEquipmentShipper:
       type: object
       title: Requested Equipment (Shipper)
       description: |
         If needed - it is **only** possible to specify a single Reefer setting. If multiple settings are required for the same `equipmentSizeType` then multiple `requestedEquipment` should be specified (one for each Reefer setting).
       properties:
+        ISOEquipmentCode:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 4
+          description: |
+            Unique code for the different equipment size and type used to transport commodities. The code can refer to either the ISO size type (e.g. 22G1) or the ISO type group (e.g. 22GP) following the [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346) standard.
+          example: 22RT
+        units:
+          type: integer
+          format: int32
+          minimum: 1
+          description: |
+            Number of requested equipment units.
+          example: 3
+        equipmentReferences:
+          description: |
+            A list of equipments to be used by the shipper if known at the time of booking
+          type: array
+          items:
+            type: string
+            pattern: ^\S(?:.*\S)?$
+            maxLength: 11
+            description: |
+              The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.
+
+              According to [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346), a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit).
+
+              If a container does not comply with [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346), it is suggested to follow [Recommendation #2: Containers with non-ISO identification](https://smdg.org/documents/smdg-recommendations) from SMDG.
+            example: APZU4812090
+        isNonOperatingReefer:
+          type: boolean
+          description: |
+            If the equipment is a Reefer Container then setting this attribute will indicate that the container should be treated as a `DRY` container.
+
+            **Condition:** Only applicable if `ISOEquipmentCode` shows a Reefer type.
+          example: false
+        activeReeferSettings:
+          $ref: '#/components/schemas/ActiveReeferSettings'
+        references:
+          type: array
+          description: |
+            A list of `References`
+          items:
+            $ref: '#/components/schemas/Reference'
         commodities:
           type: array
           description: |
             A list of `Commodities`
           items:
             $ref: '#/components/schemas/Commodity'
-      allOf:
-        - $ref: '#/components/schemas/RequestedEquipment'
+      oneOf:
+        - $ref: '#/components/schemas/SocEquipment'
+        - $ref: '#/components/schemas/CocEquipment'
+      discriminator:
+        propertyName: isShipperOwned
+        mapping:
+          'true': '#/components/schemas/SocEquipment'
+          'false': '#/components/schemas/CocEquipment'
+      required:
+        - ISOEquipmentCode
+        - units
     SocEquipment:
       type: object
       title: Shipper owned Equipment
@@ -4640,8 +4685,94 @@ components:
 
             **Conditional:** Mandatory to provide for `CONFIRMED` bookings
           example: COM-001
-      allOf:
-        - $ref: '#/components/schemas/Commodity'
+        commodityType:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 550
+          description: |
+            High-level description of goods to be shipped which allow the carrier to confirm acceptance and commercial terms. To be replaced by "description of goods" upon submission of `Shipping Instructions`
+          example: Mobile phones
+        HSCodes:
+          type: array
+          description: |
+            A list of `HS Codes` that apply to this `commodity`
+          items:
+            type: string
+            pattern: ^\d{6,10}$
+            minLength: 6
+            maxLength: 10
+            description: |
+              Used by customs to classify the product being shipped. The type of HS code depends on country and customs requirements. The code must be at least 6 and at most 10 digits.
+
+              More information can be found here: [HS Nomenclature 2022 edition](https://www.wcoomd.org/en/topics/nomenclature/instrument-and-tools/hs-nomenclature-2022-edition/hs-nomenclature-2022-edition.aspx).
+
+              This standard is based on the 2022 revision.
+            example: '851713'
+        cargoGrossWeight:
+          type: number
+          format: float
+          example: 36000
+          minimum: 0
+          exclusiveMinimum: true
+          description: |
+            The estimated grand total gross weight of the cargo, including packaging items being carried, which can be expressed in imperial or metric terms, as provided by the shipper.
+        cargoGrossWeightUnit:
+          type: string
+          description: |
+            The unit of measure which can be expressed in imperial or metric terms
+            - `KGM` (Kilograms)
+            - `LBR` (Pounds)
+          enum:
+            - KGM
+            - LBR
+          example: KGM
+        cargoGrossVolume:
+          type: number
+          format: float
+          example: 360
+          minimum: 0
+          exclusiveMinimum: true
+          description: |
+            The grand total volume of the commodity
+        cargoGrossVolumeUnit:
+          type: string
+          description: |
+            The unit of measure which can be expressed in either imperial or metric terms
+            
+            - `FTQ` (Cubic foot)
+            - `MTQ` (Cubic meter)
+
+            **Condition:** If the `cargoGrossVolume` is populated then the `cargoGrossVolumeUnit` is required
+          enum:
+            - MTQ
+            - FTQ
+          example: MTQ
+        exportLicenseIssueDate:
+          type: string
+          format: date
+          description: |
+            Issue date of the export license applicable to the booking. Mandatory to provide in booking request for specific commodities
+          example: '2021-05-14'
+        exportLicenseExpiryDate:
+          type: string
+          format: date
+          description: |
+            Expiry date of the export license applicable to the booking.
+
+            Mandatory to provide in booking request for specific commodities.
+          example: '2021-05-21'
+        outerPackaging:
+          $ref: '#/components/schemas/OuterPackaging'
+        references:
+          type: array
+          description: |
+            A list of `References`
+          items:
+            $ref: '#/components/schemas/Reference'
+      required:
+        - commodityType
+        - cargoGrossWeight
+        - cargoGrossWeightUnit
 
     #################
     # Outer Packaging

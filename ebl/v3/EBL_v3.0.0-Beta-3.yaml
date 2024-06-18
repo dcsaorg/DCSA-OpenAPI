@@ -3973,6 +3973,13 @@ components:
             description: |
               The identifying details of a package or the actual markings that appear on the package(s). This information is provided by the customer.
             example: Made in China
+        cargoItems:
+          type: array
+          minItems: 1
+          description: |
+            A list of all `cargoItems`
+          items:
+            $ref: '#/components/schemas/CargoItem'
         references:
           type: array
           description: |
@@ -3989,22 +3996,6 @@ components:
         - carrierBookingReference
         - descriptionOfGoods
         - HSCodes
-    ConsignmentItemCarrier:
-      type: object
-      title: Consignment Item (Carrier)
-      description: |
-        Defines a list of `CargoItems` belonging together and the associated `Booking`. A `ConsignmentItem` can be split across multiple containers (`UtilizedTransportEquipment`) by referencing multiple `CargoItems`
-      properties:
-        cargoItems:
-          type: array
-          minItems: 1
-          description: |
-            A list of all `cargoItems`
-          items:
-            $ref: '#/components/schemas/CargoItemCarrier'
-      allOf:
-        - $ref: '#/components/schemas/ConsignmentItem'
-      required:
         - cargoItems
     ConsignmentItemShipper:
       type: object
@@ -4012,6 +4003,25 @@ components:
       description: |
         Defines a list of `CargoItems` belonging together and the associated `Booking`. A `ConsignmentItem` can be split across multiple containers (`UtilizedTransportEquipment`) by referencing multiple `CargoItems`
       properties:
+        carrierBookingReference:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 35
+          # Extended description of carrierBookingReference compared to DCSA_DOMAIN description
+          description: |
+            The associated booking number provided by the carrier for this `Consignment Item`.
+
+            When multiple `carrierBookingReferences` are used then the bookings referred to must all contain the same:
+            - transportPlan
+            - shipmentLocations
+            - receiptTypeAtOrigin
+            - deliveryTypeAtDestination
+            - cargoMovementTypeAtOrigin
+            - cargoMovementTypeAtDestination
+            - serviceContractReference
+            - termsAndConditions
+            - Place of B/L Issue (if provided)
+          example: ABC709951
         commoditySubreference:
           type: string
           maxLength: 100
@@ -4019,6 +4029,39 @@ components:
           description: |
             A unique reference to the commodity object assigned by the carrier in the booking confirmation. The reference must be provided by the shipper as part of the `Shipping Instructions` for the carrier to link this consignment item to the commodity. A commodity reference is only unique in the context of a booking.
           example: COM-001
+        descriptionOfGoods:
+          type: string
+          maxLength: 5000
+          pattern: ^\S(?:.*\S)?$
+          description: The cargo description are details which accurately and properly describe the cargo being shipped in the container(s) as provided by the shipper.
+          example: blue shoes size 47
+        HSCodes:
+          type: array
+          minItems: 1
+          description: |
+            A list of `HS Codes` that apply to this `consignmentItem`
+          items:
+            type: string
+            pattern: ^\d{6,10}$
+            minLength: 6
+            maxLength: 10
+            description: |
+              Used by customs to classify the product being shipped. The type of HS code depends on country and customs requirements. The code must be at least 6 and at most 10 digits.
+
+              More information can be found here: [HS Nomenclature 2022 edition](https://www.wcoomd.org/en/topics/nomenclature/instrument-and-tools/hs-nomenclature-2022-edition/hs-nomenclature-2022-edition.aspx ).
+
+              This standard is based on the 2022 revision.
+            example: '851713'
+        shippingMarks:
+          type: array
+          description: |
+            A list of the `ShippingMarks` applicable to this `consignmentItem`
+          items:
+            type: string
+            maxLength: 500
+            description: |
+              The identifying details of a package or the actual markings that appear on the package(s). This information is provided by the customer.
+            example: Made in China
         cargoItems:
           type: array
           minItems: 1
@@ -4026,11 +4069,24 @@ components:
             A list of all `cargoItems`
           items:
             $ref: '#/components/schemas/CargoItemShipper'
-      allOf:
-        - $ref: '#/components/schemas/ConsignmentItem'
+        references:
+          type: array
+          description: |
+            A list of `References`
+          items:
+            $ref: '#/components/schemas/Reference'
+        customsReferences:
+          type: array
+          description: |
+            A list of `Customs references`
+          items:
+            $ref: '#/components/schemas/CustomsReference'
       required:
-        - cargoItems
+        - carrierBookingReference
         - commoditySubreference
+        - descriptionOfGoods
+        - HSCodes
+        - cargoItems
 
     ##################
     # Customs Reference
@@ -4083,9 +4139,9 @@ components:
     ############
     # Cargo Item
     ############
-    CargoItemCarrier:
+    CargoItem:
       type: object
-      title: Cargo Item (Carrier)
+      title: Cargo Item
       description: |
         A `cargoItem` is the smallest unit used by stuffing. A `cargoItem` cannot be split across containers.
       properties:
@@ -4138,7 +4194,7 @@ components:
             - FTQ
           example: MTQ
         outerPackaging:
-          $ref: '#/components/schemas/OuterPackagingCarrier'
+          $ref: '#/components/schemas/OuterPackaging'
         customsReferences:
           type: array
           description: |
@@ -4258,12 +4314,22 @@ components:
       required:
         - numberOfPackages
         - description
-    OuterPackagingCarrier:
+    OuterPackaging:
       type: object
-      title: Outer Packaging (Carrier)
+      title: Outer Packaging
       description: |
         Object for outer packaging/overpack specification. Examples of overpacks are a number of packages stacked on to a pallet and secured by strapping or placed in a protective outer packaging such as a box or crate to form one unit for the convenience of handling and stowage during transport.
       properties:
+        packageCode:
+          type: string
+          pattern: ^[A-Z0-9]{2}$
+          minLength: 2
+          maxLength: 2
+          description: |
+            A code identifying the outer packaging/overpack. `PackageCode` must follow the codes specified in [Recommendation N°21 - Revision 12  Annexes V and VI](https://unece.org/sites/default/files/2021-06/rec21_Rev12e_Annex-V-VI_2021.xls)
+
+            **Condition:** only applicable to dangerous goods if the `IMO packaging code` is not available.
+          example: 5H
         imoPackagingCode:
           type: string
           pattern: ^[A-Z0-9]{1,5}$
@@ -4274,14 +4340,29 @@ components:
 
             **Condition:** only applicable to dangerous goods if specified in the IMO IMDG code amendment version 41-22. If not available, the package code as per UN recommendation 21 should be used.
           example: 1A2
+        numberOfPackages:
+          type: integer
+          format: int32
+          minimum: 1
+          # Extended description of numberOfPackages compared to DCSA_DOMAIN description
+          description: |
+            Specifies the number of outer packagings/overpacks associated with this `Cargo Item`.
+          example: 18
+        description:
+          type: string
+          maxLength: 100
+          description: |
+            Description of the outer packaging/overpack.
+          example: 'Drum, steel'
         dangerousGoods:
           type: array
           description: |
             A list of `Dangerous Goods`
           items:
             $ref: '#/components/schemas/DangerousGoods'
-      allOf:
-        - $ref: '#/components/schemas/OuterPackagingShipper'
+      required:
+        - numberOfPackages
+        - description
 
     #################
     # Dangerous Goods
@@ -4746,9 +4827,9 @@ components:
     # Utilized Transport Equipment
     ##############################
     # Calculated fields have been removed
-    UtilizedTransportEquipmentCarrier:
+    UtilizedTransportEquipment:
       type: object
-      title: Utilized Transport Equipment (Carrier)
+      title: Utilized Transport Equipment
       description: |
         Specifies the container (`equipment`), the total `weight`, total `volume`, possible `ActiveReeferSettings`, `seals` and `references`
       properties:
@@ -4768,6 +4849,16 @@ components:
           example: false
         activeReeferSettings:
           $ref: '#/components/schemas/ActiveReeferSettings'
+        shippingMarks:
+          type: array
+          description: |
+            A list of the `ShippingMarks` applicable to this `consignmentItem`
+          items:
+            type: string
+            maxLength: 500
+            description: |
+              The identifying details of a package or the actual markings that appear on the package(s). This information is provided by the customer.
+            example: Made in China
         seals:
           type: array
           minItems: 1
@@ -4797,6 +4888,16 @@ components:
       description: |
         Specifies the container (`Equipment`), `Seals` and `References`
       properties:
+        shippingMarks:
+          type: array
+          description: |
+            A list of the `ShippingMarks` applicable to this `consignmentItem`
+          items:
+            type: string
+            maxLength: 500
+            description: |
+              The identifying details of a package or the actual markings that appear on the package(s). This information is provided by the customer.
+            example: Made in China
         seals:
           type: array
           minItems: 1
@@ -4920,8 +5021,44 @@ components:
       title: Equipment (Required Properties)
       description: |
         Used for storing cargo in/on during transport. The equipment size/type is defined by the ISO 6346 code. The most common equipment size/type is 20'/40'/45' DRY Freight Container, but several different versions exist.
-      allOf:
-        - $ref: '#/components/schemas/Equipment'
+      properties:
+        equipmentReference:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 11
+          description: |
+            The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.
+            According to [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346), a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit).
+
+            If a container does not comply with [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346), it is suggested to follow [Recommendation #2: Containers with non-ISO identification](https://smdg.org/documents/smdg-recommendations) from SMDG.
+          example: APZU4812090
+        ISOEquipmentCode:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 4
+          description: |
+            Unique code for the different equipment size and type used to transport commodities. The code can refer to either the ISO size type (e.g. 22G1) or the ISO type group (e.g. 22GP) following the [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346) standard.
+          example: 22GP
+        tareWeight:
+          type: number
+          format: float
+          minimum: 0
+          exclusiveMinimum: true
+          description: |
+            The weight of an empty container (gross container weight).
+          example: 4800
+        weightUnit:
+          type: string
+          description: |
+            The unit of measure which can be expressed in imperial or metric terms
+            - `KGM` (Kilograms)
+            - `LBR` (Pounds)
+
+            **Condition:** Mandatory to provide if `tareWeight` is provided
+          enum:
+            - KGM
+            - LBR
+          example: KGM
       required:
         - equipmentReference
         - ISOEquipmentCode
@@ -5592,7 +5729,7 @@ components:
           description: |
             A list of `ConsignmentItems`
           items:
-            $ref: '#/components/schemas/ConsignmentItemCarrier'
+            $ref: '#/components/schemas/ConsignmentItem'
         # Includes calculated fields!
         utilizedTransportEquipments:
           type: array
@@ -5600,7 +5737,7 @@ components:
           description: |
             A list of `Utilized Transport Equipments` describing the equipment being used.
           items:
-            $ref: '#/components/schemas/UtilizedTransportEquipmentCarrier'
+            $ref: '#/components/schemas/UtilizedTransportEquipment'
         references:
           type: array
           description: |
