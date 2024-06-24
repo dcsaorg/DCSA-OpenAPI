@@ -725,9 +725,9 @@ components:
       title: Schedule
       type: object
       required:
+        - servicePartners
         - isDummyVessel
         - timestamps
-        - servicePartners
       properties:
         universalServiceReference:
           type: string
@@ -741,26 +741,8 @@ components:
           minItems: 1
           items:
             $ref: '#/components/schemas/ServicePartnerSchedules'
-        vesselIMONumber:
-          type: string
-          description: 'The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd&apos;s register code, which does not change during the lifetime of the vessel.'
-          example: '9321483'
-          pattern: ^\d{7,8}$
-          minLength: 7
-          maxLength: 8
-        MMSINumber:
-          type: string
-          description: 'Maritime Mobile Service Identities (MMSIs) are nine-digit numbers used by maritime digital selective calling (DSC), automatic identification systems (AIS) and certain other equipment to uniquely identify a ship or a coast radio station.'
-          pattern: ^\d{9}$
-          minLength: 9
-          maxLength: 9
-          example: '278111222'
-        vesselName:
-          type: string
-          description: The name of the Vessel given by the Vessel Operator and registered with IMO.
-          example: King of the Seas
-          maxLength: 50
-          pattern: ^\S(?:.*\S)?$
+        vessel:
+          $ref: '#/components/schemas/Vessel'
         isDummyVessel:
           type: boolean
           description: Is this a dummy vessel. In case no vessel has been asigned yet - this property can be set to `true` indicating that the vesselIMONumber does not exist.
@@ -778,18 +760,6 @@ components:
           example: 2103N
           minLength: 5
           maxLength: 5
-        vesselOperatorCarrierCode:
-          type: string
-          description: The carrier who is in charge of the vessel operation based on either the SMDG or SCAC code lists.
-          example: MAEU
-          maxLength: 10
-        vesselOperatorCarrierCodeListProvider:
-          type: string
-          description: Identifies the code list provider used for the operator and partner carriercodes.
-          example: NMFTA
-          enum:
-            - SMDG
-            - NMFTA
         timestamps:
           type: array
           minItems: 1
@@ -843,6 +813,12 @@ components:
           example: 2103N
           maxLength: 5
           minLength: 5
+        cutOffTimes:
+          x-stoplight:
+            id: qusc8hmz2yg8v
+          type: array
+          items:
+            $ref: '#/components/schemas/CutOffTime'
         location:
           $ref: '#/components/schemas/TransportCallLocation'
         timestamps:
@@ -918,48 +894,10 @@ components:
       title: Vessel Schedule
       type: object
       required:
-        - vesselOperatorCarrierCode
-        - vesselOperatorCarrierCodeListProvider
         - isDummyVessel
       properties:
-        vesselOperatorCarrierCode:
-          type: string
-          description: The carrier who is in charge of the vessel operation based on either the SMDG or SCAC code lists.
-          example: MAEU
-          maxLength: 10
-        vesselOperatorCarrierCodeListProvider:
-          type: string
-          description: Identifies the code list provider used for the operator and partner carriercodes.
-          example: NMFTA
-          enum:
-            - SMDG
-            - NMFTA
-        vesselIMONumber:
-          type: string
-          description: 'The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd&apos;s register code, which does not change during the lifetime of the vessel.'
-          example: '9321483'
-          pattern: ^\d{7,8}$
-          minLength: 7
-          maxLength: 8
-        MMSINumber:
-          type: string
-          description: 'Maritime Mobile Service Identities (MMSIs) are nine-digit numbers used by maritime digital selective calling (DSC), automatic identification systems (AIS) and certain other equipment to uniquely identify a ship or a coast radio station.'
-          pattern: ^\d{9}$
-          minLength: 9
-          maxLength: 9
-          example: '278111222'
-        vesselName:
-          type: string
-          description: The name of the Vessel given by the Vessel Operator and registered with IMO.
-          maxLength: 50
-          pattern: ^\S(?:.*\S)?$
-          example: King of the Seas
-        vesselCallSign:
-          type: string
-          maxLength: 10
-          example: NCVV
-          pattern: ^\S(?:.*\S)?$
-          description: 'A unique alphanumeric identity that belongs to the vessel and is assigned by the International Telecommunication Union (ITU). It consists of a threeletter alphanumeric prefix that indicates nationality, followed by one to four characters to identify the individual vessel. For instance, vessels registered under Denmark are assigned the prefix ranges 5PA-5QZ, OUAOZZ, and XPA-XPZ. The Call Sign changes whenever a vessel changes its flag.'
+        vessel:
+          $ref: '#/components/schemas/Vessel'
         isDummyVessel:
           type: boolean
           description: Is this a dummy vessel. In case no vessel has been asigned yet - this property can be set to `true` indicating that the vesselIMONumber does not exist.
