@@ -7,6 +7,10 @@ Publications related to the Booking API:
 - [Booking Process](https://dcsa.org/standards/booking-process/) contains documents and publications
 - [Booking Notification](./notification/) maintained here on GitHub
 
+<a name="v200"></a>[Release v2.0.0 (...)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0)
+---
+This is a moving target and will be updated as soon as the version is published
+
 <a name="v200S20240614"></a>[Release v2.0.0 Snapshot 20240614 (28 June 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0-Snapshot-20240614)
 ---
 Snapshot as of 14 of June 2024 for Booking 2.0.0
