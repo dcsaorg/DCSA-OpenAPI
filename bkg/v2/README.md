@@ -7,6 +7,32 @@ Publications related to the Booking API:
 - [Booking Process](https://dcsa.org/standards/booking-process/) contains documents and publications
 - [Booking Notification](./notification/) maintained here on GitHub
 
+<a name="v200S20240614"></a>[Release v2.0.0 Snapshot 20240614 (28 June 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0-Snapshot-20240614)
+---
+Snapshot of 14 of June 2024 for Booking 2.0.0
+## Major changes
+- `pattern: ^\S(?:.*\S)?$` has been added to the `locationName` of the `AddressLocation` interface
+- `street`, `streetNumber`, `city` and `countryCode` are now required properties on the `AddressLocation` interface
+- `street`, `streetNumber`, `city` and `countryCode` are now required properties on the `PartyAddress` object
+- `TRAC` (TRACE Original) and `BRIT` (BRITC eBL) added as values for `codeListProvider` in `IdentifyingCode` object
+- `eventDateTime` removed from the `ShipmentLocation` object
+- in `DangerousGoods` the following has changed:
+  - `netWeight` property must now be >= 0
+  - `netExplosiveContent` property must now be >= 0
+  - `netExplosiveContent` unit now also allow: `LBR` (Pounds) and `ONZ` (Ounce)
+  - `volume` property object must now be >= 0
+- typo fixed in `carrierServiceCode` --> `carrierSerivceCode` in the `Transport` object
+
+## Object changes
+- `RequestedEquipmentCarrier` renamed to `RequestedEquipment` and modified to include everything that was in the `RequestedEquipmentCarrier` (no use of `allOf` any more)
+- `RequestedEquipmentShipper` modified so it no longer needs a `allOf`
+- `CommodityCarrier` modified so it no longer needs a `allOf`
+
+## Minor changes
+- Many description changes
+- Title properties were added on all objects
+- Some examples have been updated/added
+
 <a name="v200B2"></a>[Release v2.0.0 Beta 2 (12 April 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0-Beta-2)
 ---
 Beta 2 release of the DCSA OpenAPI definitions for Booking 2.0.0.
