@@ -9,7 +9,7 @@ Publications related to the Booking API:
 
 <a name="v200S20240614"></a>[Release v2.0.0 Snapshot 20240614 (28 June 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0-Snapshot-20240614)
 ---
-Snapshot of 14 of June 2024 for Booking 2.0.0
+Snapshot as of 14 of June 2024 for Booking 2.0.0
 ## Major changes
 - `pattern: ^\S(?:.*\S)?$` has been added to the `locationName` of the `AddressLocation` interface
 - `street`, `streetNumber`, `city` and `countryCode` are now required properties on the `AddressLocation` interface
