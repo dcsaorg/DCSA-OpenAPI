@@ -3,15 +3,25 @@ info:
   title: DCSA OpenAPI specification for Commercial Schedules
   version: 1.0.0
   description: |
-    API specification issued by DCSA.org
+    API specification issued by [Digital Container Shipping Association (DCSA)](https://dcsa.org/).
 
-    This API supports Commercial Schedules (CS) in the context of: point-to-point routings, port schedules, and vessel schedules. 
+    The Commercial Schedules API offers BCOs, LSPs, and Solution Platforms three different methods and endpoints to access schedules from carriers based on their specific needs: Point-to-Point Routings, Port Schedules, and Vessel Schedules. 
 
     **Commercial schedules - point-to-point routings**: provides the product offering of single or multiple estimated end-to-end route options for a shipment in the pre-booking phase. This includes point-to-point specification of all transport legs, estimated timings, estimated schedules and interdependencies between transport legs.
      
     **Commercial schedules – port schedules**: provides, for a required specific port and starting date, the set of all vessels arriving and departing from the port with the corresponding estimated timestamps.
      
     **Commercial schedules – vessel schedules**: provides, for a required specific service and/or voyage and/or vessel and/or location, the timetable of estimated departure and arrival times for each port call on the rotation of the vessel(s).
+
+    **All use cases mentioned in this API specification refer to use cases defined in the Commercial Schedules Interface Standard.**
+
+    The Commercial Schedules endpoints can be implemented independently:
+
+    `1. GET /v1/point-to-point-routes # For Point to Point Routings`
+
+    `2. GET /v1/port-schedules # For Port Schedules`
+
+    `3. GET /v1/vessel-schedules # For Vessel Schedules`
 
     Visit the [DCSA Website](https://dcsa.org/standards/commercial-schedules/) to find other documentation related to the standard publication (i.e. Interface Standard, Information Model).
 
@@ -21,6 +31,9 @@ info:
     The Stats API offers crucial statistical information for both API providers and consumers to enhance their services and helps DCSA to understand and scale the ecosystem. We expect you to invoke the Stats API for every request made to the Commercial Schedule API. Further details can be found [here](https://labs.dcsa.org/#/http/guides/api-guides/stats-api/introduction).
 
     For a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/cs/v1#v100B1). Please also [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments.
+
+    [Digital Container Shipping Association (DCSA) - Website](https://dcsa.org/)
+
   license:
     url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
     name: Apache 2.0
@@ -136,44 +149,45 @@ paths:
             format: date
             example: '2021-04-01'
           in: query
-          name: departureDate
+          name: departureStartDate
           description: |
-            Limit the result based on the departureDate. It is possible to use operators on this query parameter. This is done by adding a colon (:) followed by an operator at the end of the queryParameterName (before the equal (`=`)).
-            `departureDate:gte=2021-04-01` would result in all the routings for which the departureDate is ≥ 2021-04-01.
-            The following operators are supported
-              - `:gte` (≥ Greater than or equal)
-              - `:gt` (> Greater than)
-              - `:lte` (≤ Less than or equal)
-              - `:lt` (< Less than)
-              - `:eq`(= Equal to)
-              
-              A no operator in the case of a single date indicates that the `departureDate` is greater than or equal to the provided date.
-              #### Ranges
-              In order to `specify a range` the query parameter needs to be used twice with different operators. If multiple operators are used with this query parameter a logical `AND` is to be used between the operators.
-              So for the following filter:`departureDate:gte=2021-04-01 & departureDate:lte=2021-04-03` will result in routings within the 2 days range (48 hours) specified. The routings matched **MUST** be available on or after (`≥`) 2021-04-01 `AND` on or before (`≤`) 2021-04-03.
-              A no operator here indicates that the `departureDate` would be greater than or equal to the first date and lesser than or equal to the second date following the `&` operator.
-                
+            Limit the result based on the earliest departureDate. 
+            - If provided without departureEndDate, returns all routings with departures from the specified departureStartDate onwards.
+            - If provided with departureEndDate, returns all routings with departures within the specified date range, inclusive of both dates.
+            - If the same date is provided for both departureStartDate and departureEndDate, returns all routings with departures on that specific date.
+        - schema:
+            type: string
+            format: date
+            example: '2021-05-01'
+          in: query
+          name: departureEndDate
+          description: |
+            Limit the result based on the latest departureDate. 
+            - If provided without departureStartDate, returns all routings with departures up to the specified departureEndDate.
+            - If provided with departureStartDate, returns all routings with departures within the specified date range, inclusive of both dates.
+            - If the same date is provided for both departureStartDate and departureEndDate, returns all routings with departures on that specific date.    
         - schema:
             type: string
             format: date
             example: '2021-04-01'
           in: query
-          name: arrivalDate
+          name: arrivalStartDate
           description: |
-            Limit the result based on the arrivalDate. It is possible to use operators on this query parameter. This is done by adding a colon (:) followed by an operator at the end of the queryParameterName (before the equal (`=`)).
-            `arrivalDate:lte=2021-04-01` would result in all the routings for which the arrivalDate is ≤ 2021-04-01.
-            The following operators are supported
-              - `:gte` (≥ Greater than or equal)
-              - `:gt` (> Greater than)
-              - `:lte` (≤ Less than or equal)
-              - `:lt` (< Less than)
-              - `:eq`(= Equal to)
-
-              A no operator in the case of a single date indicates that the `arrivalDate` is lesser than or equal to the provided date.
-              #### Ranges
-              In order to `specify a range` the query parameter needs to be used twice with different operators. If multiple operators are used with this query parameter a logical `AND` is to be used between the operators.
-              So for the following filter:`arrivalDate:gte=2021-04-01 & arrivalDate:lte=2021-04-03` will result in routings within the 2 days range (48 hours) specified. The routings matched **MUST** be available on or after (`≥`) 2021-04-01 `AND` on or before (`≤`) 2021-04-03.
-              A no operator here indicates that the `arrivalDate` would be greater than or equal to the first date and lesser than or equal to the second date following the `&` operator.
+            Limit the result based on the earliest arrivalDate.
+            - If provided without arrivalEndDate, returns all routings with arrivals from the specified arrivalStartDate.
+            - If provided with arrivalEndDate, returns all routings with arrivals within the specified date range, inclusive of both dates.
+            - If the same date is provided for both arrivalStartDate and arrivalEndDate, returns all routings with arrivals on that specific date.
+        - schema:
+            type: string
+            format: date
+            example: '2021-05-01'
+          in: query
+          name: arrivalEndDate
+          description: |
+            Limit the result based on the latest arrivalDate.
+            - If provided without arrivalStartDate, returns all routings with arrivals up to the specified arrivalEndDate.
+            - If provided with arrivalStartDate, returns all routings with arrivals within the specified date range, inclusive of both dates.
+            - If the same date is provided for both arrivalStartDate and arrivalEndDate, returns all routings with arrivals on that specific date.
         - schema:
             type: integer
             example: 1
@@ -193,7 +207,7 @@ paths:
           in: query
           name: receiptTypeAtOrigin
           description: |
-            Indicates the type of service offered at Origin. Options are defined in the `Receipt/Delivery` entity.  
+            Indicates the type of service offered at Origin.
               - `CY` (Container yard (incl. rail ramp))  
               - `SD` (Store Door)  
               - `CFS` (Container Freight Station)
@@ -208,7 +222,7 @@ paths:
           in: query
           name: deliveryTypeAtDestination
           description: |
-            Indicates the type of service offered at Destination. Options are defined in the `Receipt/Delivery` entity.  
+            Indicates the type of service offered at Destination. 
               - `CY` (Container yard (incl. rail ramp))  
               - `SD` (Store Door)  
               - `CFS` (Container Freight Station)
@@ -228,7 +242,15 @@ paths:
           name: cursor
           description: 'A server generated value to specify a specific point in a collection result, used for pagination.'
         - $ref: '#/components/parameters/Api-Version-Major'
-      description: Provides the product offering of single or multiple estimated end-to-end route options for a shipment in the pre-booking phase.
+      description: |
+        Provides the product offering of single or multiple estimated end-to-end route options for a shipment in the pre-booking phase. This includes point-to-point specification of all transport legs, estimated timings, estimated schedules and interdependencies between transport legs.
+
+        The list of solutions returned in the response can be tailored to a specific need by combining available query parameters.
+
+        The minimum required query parameters are `placeOfReceipt` and `placeOfDelivery`. If no further query parameters are used to tailor the response, the provider of the GET endpoint will return their best suggestions in the response. 
+
+        The `GET /v1/point-to-point-routes` endpoint can be implemented independently of having implemented the `GET /v1/port-schedules`  and `GET /v1/vessel-schedules`  endpoints.
+  
   /v1/port-schedules:
     get:
       summary: Port Schedule
@@ -308,7 +330,16 @@ paths:
                         errorCodeText: invalidQuery
                         errorCodeMessage: UNLocationCode does not exist
       operationId: get-v1-port-schedules
-      description: 'Provides, for a required specific port and starting date, the set of all vessels arriving and departing from the port with the corresponding estimated timestamps.'
+      description: |
+        Provides, for a required specific port and starting date, the set of all vessels arriving and departing from the port with the corresponding estimated timestamps.
+
+        The port must be identified by its UN Location Code. 
+
+        The required query parameters are `UNLocationCode` and `date`. 
+
+        If the requested port (identified with UNLocationCode) has multiple terminals (identified with facilitySMDGCode), the response will include a sorted list that provides all the arrivals and departures of the vessels for each terminal of the port (UNLocationCode). 
+
+        The `GET /v1/port-schedules` endpoint can be implemented independently of having implemented the  `GET /v1/point-to-point-routes`  and `GET /v1/vessel-schedules`  endpoints. 
       parameters:
         - schema:
             type: string
@@ -317,8 +348,8 @@ paths:
             pattern: ^[A-Z]{2}[A-Z2-9]{3}$
             minLength: 5
           in: query
-          name: port
-          description: The UN Location code specifying where the place is located.
+          name: UNLocationCode
+          description: The UN Location code specifying where the place is located. Specifying this filter will only return the set of all vessels arriving and departing from the port and its terminals with the corresponding estimated.
           required: true
         - schema:
             type: string
@@ -327,7 +358,7 @@ paths:
             example: '2023-07-01'
           in: query
           name: date
-          description: The date since when the estimated arrival and departures of vessels in a given port is required
+          description: The date since when the estimated arrival and departures of vessels in a given port is required.
           required: true
         - $ref: '#/components/parameters/Api-Version-Major'
         - schema:
@@ -533,10 +564,36 @@ paths:
           name: cursor
           description: 'A server generated value to specify a specific point in a collection result, used for pagination.'
         - $ref: '#/components/parameters/Api-Version-Major'
-      description: |-
-        Provides, for a required specific service and/or voyage and/or vessel and/or location, the timetable of estimated departure and arrival times for each port call on the rotation of the vessel(s). 
+      description: |
+        Provides, for a required specific service and/or voyage and/or vessel and/or location, the timetable of estimated departure and arrival times for each port call on the rotation of the vessel(s).
 
-        The number of schedules in the list can be narrowed down by providing filter parameters. The resulting payload will always include the entire voyage(s) being matched.
+        The list of schedules returned in the response can be tailored to specific needs by combining available query parameters. 
+
+        Examples of typical query parameters and expected payload returned in the response: 
+
+        - a) `carrierServiceCode`: Get all vessels and their full voyages within a service   
+
+        - b) `carrierServiceCode` **&** `carrierVoyageNumber`: Get a specific full voyage within a service
+
+        - c) `carrierServiceCode` **&** `vesselIMONumber`: Get a specific vessel’s full voyages within a service. 
+
+        - d) `vesselIMONumber`: Get all full voyages for a specific vessel across all the services in which it is involved.
+
+        - e) `UNLocationCode`: Get all vessels and their full voyages where the specific UNLocationCode is involved
+
+        - f) `UNLocationCode` **&** `facilitySMDGCode`: Get all vessels and their full voyages where the specific UNLocationCode and facilitySMDGCode is involved
+
+        Other combinations using `vesselName`, `universalServiceReference`, `universalVoyageReference`, `vesselOperatorCarrierCode`, `startDate`, `endDate` are possible. 
+
+        The resulting payload returned in the responses will always include **entire voyage(s) being matched**. This means that even though a filter only matches a single `Port` (UNLocationCode) in a `Voyage` or a single `Timestamp` within a `Port` in a `Voyage` - **the entire Voyage matched** is returned. If the `carrierImportVoyageNumber` of the `Port` differs from the `carrierExportVoyageNumber` of the `Port` then the **entire Voyage** for both these Voyage numbers are included. An example of this is when `&UNLocationCode=DEHAM` is used as a filter parameter. In this case **entire Voyages** would be listed where `DEHAM` is a `Port`.
+
+        Be aware that it is possible to specify filters that are mutually exclusive resulting in an empty response list. An example of this could be when both using `vesselIMONumber` and `vesselName` filters at the same time: &vesselIMONumber=9321483&vesselName=King of the Seas. If no `Vessel` exists where `vesselIMONumber` is **9321483** and `vesselName` is **King of the Seas** then the result will be an empty list. 
+
+        If no `startDate` filter is provided, then **3 months** before the request date should be used as default. If no `endDate` filter is provided, then **6 months** after the request date should be used as default. The endpoint provider can customize these based on their business definitions and inform the consumers what to expect in a response when these filters are not used. 
+
+        The `GET /v1/vessel-schedules` endpoint can be implemented independently of having implemented the  `GET /v1/point-to-point-routes`  and `GET /v1/port-schedules`  endpoints. 
+
+        **IMPORTANT**: This endpoint is for carriers to make available vessel schedules to BCO, LSP, and Solution Platforms, with a commercial purpose; this is out of the boundaries of their vessel schedules alignment with other carriers and terminals for operational purposes for which the Operational Vessel Schedules [API](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS/3.0.0) is used between carriers, and carriers and terminals. 
     parameters: []
 components:
   schemas:
@@ -725,9 +782,9 @@ components:
       title: Schedule
       type: object
       required:
+        - servicePartners
         - isDummyVessel
         - timestamps
-        - servicePartners
       properties:
         universalServiceReference:
           type: string
@@ -741,26 +798,8 @@ components:
           minItems: 1
           items:
             $ref: '#/components/schemas/ServicePartnerSchedules'
-        vesselIMONumber:
-          type: string
-          description: 'The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd&apos;s register code, which does not change during the lifetime of the vessel.'
-          example: '9321483'
-          pattern: ^\d{7,8}$
-          minLength: 7
-          maxLength: 8
-        MMSINumber:
-          type: string
-          description: 'Maritime Mobile Service Identities (MMSIs) are nine-digit numbers used by maritime digital selective calling (DSC), automatic identification systems (AIS) and certain other equipment to uniquely identify a ship or a coast radio station.'
-          pattern: ^\d{9}$
-          minLength: 9
-          maxLength: 9
-          example: '278111222'
-        vesselName:
-          type: string
-          description: The name of the Vessel given by the Vessel Operator and registered with IMO.
-          example: King of the Seas
-          maxLength: 50
-          pattern: ^\S(?:.*\S)?$
+        vessel:
+          $ref: '#/components/schemas/Vessel'
         isDummyVessel:
           type: boolean
           description: Is this a dummy vessel. In case no vessel has been asigned yet - this property can be set to `true` indicating that the vesselIMONumber does not exist.
@@ -778,18 +817,6 @@ components:
           example: 2103N
           minLength: 5
           maxLength: 5
-        vesselOperatorCarrierCode:
-          type: string
-          description: The carrier who is in charge of the vessel operation based on either the SMDG or SCAC code lists.
-          example: MAEU
-          maxLength: 10
-        vesselOperatorCarrierCodeListProvider:
-          type: string
-          description: Identifies the code list provider used for the operator and partner carriercodes.
-          example: NMFTA
-          enum:
-            - SMDG
-            - NMFTA
         timestamps:
           type: array
           minItems: 1
@@ -843,6 +870,10 @@ components:
           example: 2103N
           maxLength: 5
           minLength: 5
+        cutOffTimes:
+          type: array
+          items:
+            $ref: '#/components/schemas/CutOffTime'
         location:
           $ref: '#/components/schemas/TransportCallLocation'
         timestamps:
@@ -918,48 +949,10 @@ components:
       title: Vessel Schedule
       type: object
       required:
-        - vesselOperatorCarrierCode
-        - vesselOperatorCarrierCodeListProvider
         - isDummyVessel
       properties:
-        vesselOperatorCarrierCode:
-          type: string
-          description: The carrier who is in charge of the vessel operation based on either the SMDG or SCAC code lists.
-          example: MAEU
-          maxLength: 10
-        vesselOperatorCarrierCodeListProvider:
-          type: string
-          description: Identifies the code list provider used for the operator and partner carriercodes.
-          example: NMFTA
-          enum:
-            - SMDG
-            - NMFTA
-        vesselIMONumber:
-          type: string
-          description: 'The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd&apos;s register code, which does not change during the lifetime of the vessel.'
-          example: '9321483'
-          pattern: ^\d{7,8}$
-          minLength: 7
-          maxLength: 8
-        MMSINumber:
-          type: string
-          description: 'Maritime Mobile Service Identities (MMSIs) are nine-digit numbers used by maritime digital selective calling (DSC), automatic identification systems (AIS) and certain other equipment to uniquely identify a ship or a coast radio station.'
-          pattern: ^\d{9}$
-          minLength: 9
-          maxLength: 9
-          example: '278111222'
-        vesselName:
-          type: string
-          description: The name of the Vessel given by the Vessel Operator and registered with IMO.
-          maxLength: 50
-          pattern: ^\S(?:.*\S)?$
-          example: King of the Seas
-        vesselCallSign:
-          type: string
-          maxLength: 10
-          example: NCVV
-          pattern: ^\S(?:.*\S)?$
-          description: 'A unique alphanumeric identity that belongs to the vessel and is assigned by the International Telecommunication Union (ITU). It consists of a threeletter alphanumeric prefix that indicates nationality, followed by one to four characters to identify the individual vessel. For instance, vessels registered under Denmark are assigned the prefix ranges 5PA-5QZ, OUAOZZ, and XPA-XPZ. The Call Sign changes whenever a vessel changes its flag.'
+        vessel:
+          $ref: '#/components/schemas/Vessel'
         isDummyVessel:
           type: boolean
           description: Is this a dummy vessel. In case no vessel has been asigned yet - this property can be set to `true` indicating that the vesselIMONumber does not exist.
@@ -1203,7 +1196,7 @@ components:
         callSign:
           type: string
           description: 'A unique alphanumeric identity that belongs to the vessel and is assigned by the International Telecommunication Union (ITU). It consists of a threeletter alphanumeric prefix that indicates nationality, followed by one to four characters to identify the individual vessel. For instance, vessels registered under Denmark are assigned the prefix ranges 5PA-5QZ, OUAOZZ, and XPA-XPZ. The Call Sign changes whenever a vessel changes its flag.'
-          pattern: ^\S+(\s+\S+)*$
+          pattern: ^\S(?:.*\S)?$
           example: NCVV
           maxLength: 10
         operatorCarrierCode:
