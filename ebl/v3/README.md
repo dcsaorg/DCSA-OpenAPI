@@ -11,6 +11,56 @@ Publications related to the Bill of Lading API:
 - [Bill of Lading Surrender](./surrender/) maintained here on GitHub
 - [Bill of Lading Surrender Response](./surrender_response/) maintained here on GitHub
 
+<a name="v300"></a>[Release v3.0.0 (...)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.0)
+---
+This is a moving target and will be updated as soon as the version is published
+
+<a name="v300B20240614"></a>[Release v3.0.0 Beta 20240614 (28 June 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.0-Beta-20240614)
+---
+Snapshot as of 14 of June 2024 for EBL 3.0.0 Beta.
+## Major changes
+- `sendToPlatform` updated:
+  - `pattern: ^\S+$` added
+  - 2 new values have been added `TRAC` (TRACE Original) and `BRIT` (BRITC eBL)
+- boolean property `isCarriersAgentAtDestinationRequired` added to SI
+- `minItems=1` added when providing the `displayedNameForPlaceOfReceipt`, `displayedNameForPortOfLoad`, `displayedNameForPlaceOfDelivery` and `displayedNameForPortOfDischarge`
+- `pattern: ^\S(?:.*\S)?$` has been added to the `locationName` of the `AddressLocation` interface
+- Follow changes has been done on the `Address` object
+  - `name` property removed
+  - for `postCode`: `maxLength` changed from 50 --> 10
+  - `nullable=true` removed on `stateRegion`
+  - `street`, `streetNumber` and `city` have been added asrequired properties (`name` has been removed)
+- `CityLocation` interface has the following changes:
+  - `maxLength: 4` added to `locationType`
+  - `nullable=true` removed on `stateRegion`
+  - wronly defined `country` has been changed to `countryCode` as a required property
+- in `PartyAddress` object:
+  - `postCode` `maxlength` has been changed from 50 --> 10
+  - `nullable=true` removed from `stateRegion`
+- `CarriersAgentAtDestination` added as a `Document Party`
+- `TRAC` (TRACE Original) and `BRIT` (BRITC eBL) added as values for `codeListProvider` in `IdentifyingCode` object
+- in `DangerousGoods` the following has changed:
+  - `netWeight` property must now be >= 0
+  - `netExplosiveContent` property must now be >= 0
+  - `netExplosiveContent` unit now also allow: `LBR` (Pounds) and `ONZ` (Ounce)
+  - `volume` property object must now be >= 0
+  - `ShippingMarks` added to `UtilizedTransportEquipment` and `UtilizedTransportEquipmentShipper`
+  - `vesselVoyage` renamed to `vesselVoyages` in the `Transports` object
+
+## Object changes
+- `ConsignmentItemCarrier` renamed to `ConsignmentItem` and updated to no longer need an `allOf`
+- `ConsignmentItemShipper` updated to no longer need an `allOf`
+- `CargoItemCarrier` renamed to `CargoItem`
+- `OuterPackagingCarrier` renamed to `OuterPackaging`
+- `UtilizedTransportEquipmentCarrier` renamed to `UtilizedTransportEquipment`
+- `VesselVoyage` created instead of having as inline object
+
+##Minor changes
+- example changes for endPoints: typo `UNCO` --> `UNLO`
+- `title` property added to all objects (`title` property removed on the `reason` property)
+- examples added/updated where needed
+- descriptions updated
+
 <a name="v300B2"></a>[Release v3.0.0 Beta 2 (12 April 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.0-Beta-2)
 ---
 Beta 2 release of the DCSA OpenAPI definitions for EBL 3.0.0.
