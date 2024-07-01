@@ -37,6 +37,10 @@ Snapshot as of 14 of June 2024 for Booking 2.0.0 Beta
 - Title properties were added on all objects
 - Some examples have been updated/added
 
+<a name="v200B3"></a>[Release v2.0.0 Beta 3 (...)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0-Beta-3)
+---
+Going forward Beta 3 will not be updated any more. The new way of working will be that we update the final v2.0.0 continuously. Every once in a while we release "Snapshots". An example of this is the [Snapshot of 14 June 2024](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/bkg/v2#v200B20240614) just above.
+
 <a name="v200B2"></a>[Release v2.0.0 Beta 2 (12 April 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0-Beta-2)
 ---
 Beta 2 release of the DCSA OpenAPI definitions for Booking 2.0.0.

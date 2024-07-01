@@ -61,6 +61,10 @@ Snapshot as of 14 of June 2024 for EBL 3.0.0 Beta.
 - examples added/updated where needed
 - descriptions updated
 
+<a name="v300B3"></a>[Release v3.0.0 Beta 3 (...)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.0-Beta-3)
+---
+Going forward Beta 3 will not be updated any more. The new way of working will be that we update the final v3.0.0 continuously. Every once in a while we release "Snapshots". An example of this is the [Snapshot of 14 June 2024](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/ebl/v3#v300B20240614) just above.
+
 <a name="v300B2"></a>[Release v3.0.0 Beta 2 (12 April 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.0-Beta-2)
 ---
 Beta 2 release of the DCSA OpenAPI definitions for EBL 3.0.0.
