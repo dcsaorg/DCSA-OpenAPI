@@ -3,7 +3,7 @@ servers:
   - description: SwaggerHub API Auto Mocking
     url: 'https://virtserver.swaggerhub.com/dcsaorg/DCSA_EBL_PINT/3.0.0-Beta-2'
 info:
-  version: 3.0.0-Beta-3
+  version: 3.0.0
   title: DCSA eBL Platform Interoperability API
   description: |
     <h1>DCSA OpenAPI specification for electronic Bill of Lading (eBL) Platform Interoperability (PINT) standard </h1>
@@ -41,7 +41,7 @@ info:
     ### Stats API
     The Stats API offers crucial statistical information for both API providers and consumers to enhance their services and helps DCSA to understand and scale the ecosystem. We expect you to invoke the Stats API for every request made to this API. Further details can be found [here](https://labs.dcsa.org/#/http/guides/api-guides/stats-api/introduction)
 
-    For a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/pint/v3#v300B3).
+    For a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/pint/v3#v300).
     Please [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments.
   license:
     name: Apache 2.0
@@ -490,7 +490,7 @@ components:
       properties:
         eblPlatform:
           type: string
-          pattern: \S+
+          pattern: ^\S+$
           maxLength: 4
           description: |
             The EBL platform of the transaction party. 
@@ -697,6 +697,7 @@ components:
       properties:
         name:
           type: string
+          pattern: ^\S(?:.*\S)?$
           example: Carrier rendered copy of the original B/L document.pdf
         size:
           type: number
@@ -759,6 +760,7 @@ components:
             - RESA
             - SACC
             - SREJ
+          example: ISSU
         actor:
           $ref: '#/components/schemas/TransactionParty'
         recipient:
@@ -779,6 +781,7 @@ components:
           example: SWTP
         comments:
           type: string
+          pattern: ^\S(?:.*\S)?$
           description: Free text comment for the party receiving the transaction.
           maxLength: 255
           example: The B/L has been issued.
@@ -1448,18 +1451,12 @@ components:
           maxLength: 3
           description: |
             The reference type codes defined by DCSA. Possible values are:
-            - `FF` (Freight Forwarder’s Reference)
-            - `SI` (Shipper’s Reference)
-            - `SPO` (Shippers Purchase Order Reference)
-            - `CPO` (Consignees Purchase Order Reference)
             - `CR` (Customer’s Reference)
-            - `AAO` (Consignee’s Reference)
             - `ECR` (Empty container release reference)
             - `CSI` (Customer shipment ID)
-            - `BPR` (Booking party reference number)
             - `BID` (Booking Request ID)
             - `SAC` (Shipping Agency Code)
-          example: FF
+          example: CR
         value:
           type: string
           maxLength: 100
@@ -3069,6 +3066,20 @@ components:
             A list of contact details
           items:
             $ref: '#/components/schemas/PartyContactDetail'
+        shippersReference:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 100
+          description: |
+            A reference linked to the `Shipper`.
+          example: HHL007
+        shippersPurchaseOrderReference:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 100
+          description: |
+            A reference linked to the `Shipper Purchase Order`.
+          example: HHL007
       required:
         - partyName
 
@@ -3119,6 +3130,20 @@ components:
             A list of contact details
           items:
             $ref: '#/components/schemas/PartyContactDetail'
+        consigneesReference:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 100
+          description: |
+            A reference linked to the `Consignee`.
+          example: HHL007
+        consigneesPurchaseOrderReference:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 100
+          description: |
+            A reference linked to the `Consignee Purchase Order`.
+          example: HHL007
       required:
         - partyName
 
@@ -3229,6 +3254,13 @@ components:
             A list of contact details
           items:
             $ref: '#/components/schemas/PartyContactDetail'
+        reference:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 100
+          description: |
+            A reference linked to the `Party`.
+          example: HHL007
       required:
         - partyName
 

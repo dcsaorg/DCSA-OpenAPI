@@ -1,6 +1,8 @@
 openapi: 3.0.3
+x-stoplight:
+  id: bab40b12b4322
 info:
-  version: 3.0.0-Beta-2
+  version: 3.0.0
   title: DCSA EBL Surrender API
   description: |
     This API is intended as an API between a carrier (the server) and a EBL Solution Platform (the client).
@@ -21,7 +23,7 @@ info:
     ### Stats API
     The Stats API offers crucial statistical information for both API providers and consumers to enhance their services and helps DCSA to understand and scale the ecosystem. We expect you to invoke the Stats API for every request made to this API. Further details can be found [here](https://labs.dcsa.org/#/http/guides/api-guides/stats-api/introduction)
 
-    For a changelog, please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/ebl/v3/surrender#v300B3). Please [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments.
+    For a changelog, please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/ebl/v3/surrender#v300). Please [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments.
   license:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
@@ -78,6 +80,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+      x-stoplight:
+        id: 770o3gd3clyqm
 components:
   headers:
     API-Version:
@@ -103,6 +107,9 @@ components:
       description: Refers to a company or a legal entity.
       properties:
         eblPlatform:
+          type: string
+          pattern: ^\S+$
+          maxLength: 4
           description: |
             The EBL platform of the transaction party. The value **MUST** be one of:
             - `WAVE` (Wave)
@@ -117,14 +124,12 @@ components:
             - `ETEU` (eTEU)
             - `TRAC` (TRACE Original)
             - `BRIT` (BRITC eBL)
-            
+
             Must be a code this list [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/reference-data/eblsolutionproviders-v3.0.0-Beta-2.csv).
-          type: string
-          pattern: \S+
-          maxLength: 4
+          example: WAVE
         partyName:
           type: string
-          pattern: ^\S(?:.*\S)?$
+          pattern: '^\S(?:.*\S)?$'
           maxLength: 100
           description: |
             Name of the party.
@@ -142,6 +147,8 @@ components:
       required:
         - partyName
         - eblPlatform
+      x-stoplight:
+        id: xraettrgxbo2a
     SurrenderRequestedBy:
       type: object
       title: Surrender Requested By
@@ -150,7 +157,17 @@ components:
 
         The EBL platform has verified that the party submitting the surrender request was in possion of the EBL and was entitled to perform the surrender ([see description of surrenderRequestDetails](#/components/schemas/surrenderRequestDetails)).
       properties:
+        partyName:
+          type: string
+          pattern: '^\S(?:.*\S)?$'
+          maxLength: 100
+          description: |
+            Name of the party.
+          example: Globeteam
         eblPlatform:
+          type: string
+          pattern: ^\S+$
+          maxLength: 4
           description: |
             The EBL platform of the transaction party. The value **MUST** be one of:
             - `WAVE` (Wave)
@@ -165,18 +182,9 @@ components:
             - `ETEU` (eTEU)
             - `TRAC` (TRACE Original)
             - `BRIT` (BRITC eBL)
-            
+
             Must be a code this list [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/reference-data/eblsolutionproviders-v3.0.0-Beta-2.csv).
-          type: string
-          pattern: \S+
-          maxLength: 4
-        partyName:
-          type: string
-          pattern: ^\S(?:.*\S)?$
-          maxLength: 100
-          description: |
-            Name of the party.
-          example: Globeteam
+          example: WAVE
         identifyingCodes:
           type: array
           items:
@@ -188,15 +196,19 @@ components:
           items:
             $ref: '#/components/schemas/TaxLegalReference'
       required:
-        - eblPlatform
         - partyName
+        - eblPlatform
+      x-stoplight:
+        id: sswx7bcwj2dhs
     EndorsementChainLink:
       type: object
+      title: Endorsement Chain Link
       properties:
         actionDateTime:
           type: string
           format: date-time
           description: Date time when the action occured.
+          example: '2024-07-01T08:00:00+08:30'
         actor:
           $ref: '#/components/schemas/TransactionParty'
         recipient:
@@ -207,25 +219,30 @@ components:
         - actionDateTime
         - actor
         - recipient
+      x-stoplight:
+        id: i0pnuzyrycm50
     SurrenderRequestAcknowledgement:
       type: object
       properties:
         surrenderRequestReference:
           type: string
           maxLength: 100
-          pattern: ^\S(?:.*\S)?$
+          pattern: '^\S(?:.*\S)?$'
           description: |
             A server defined reference for a concrete surrender request. Surrender request references MUST NOT be reused.
           example: Z12345
         transportDocumentReference:
           type: string
-          pattern: ^\S(?:.*\S)?$
+          pattern: '^\S(?:.*\S)?$'
           maxLength: 20
           description: |
             A unique number allocated by the shipping line to the transport document and the main number used for the tracking of the status of the shipment.
           example: HHL71800000
+      x-stoplight:
+        id: x2tygr63zeg4a
     SurrenderRequestDetails:
       type: object
+      title: Surrender Request Details
       description: |
         A concrete surrender request related to a transport document.
 
@@ -241,13 +258,13 @@ components:
         surrenderRequestReference:
           type: string
           maxLength: 100
-          pattern: ^\S(?:.*\S)?$
+          pattern: '^\S(?:.*\S)?$'
           description: |
             A server defined reference for a concrete surrender request. Surrender request references MUST NOT be reused.
           example: Z12345
         transportDocumentReference:
           type: string
-          pattern: ^\S(?:.*\S)?$
+          pattern: '^\S(?:.*\S)?$'
           maxLength: 20
           description: |
             A unique number allocated by the shipping line to the transport document and the main number used for the tracking of the status of the shipment.
@@ -269,12 +286,11 @@ components:
         reason:
           type: string
           maxLength: 4
-          description: |
-            A code defined by DCSA indicating the reason for requesting a surrender for amendment. Possible values are:
-            -	`SWTP` (Switch to paper)
+          description: "A code defined by DCSA indicating the reason for requesting a surrender for amendment. Possible values are:\n-\t`SWTP` (Switch to paper)\n"
           example: SWTP
         comments:
           type: string
+          pattern: ^\S(?:.*\S)?$
           maxLength: 255
           description: Optional free text comment associated with the surrender request transaction.
           example: As requested...
@@ -294,7 +310,8 @@ components:
         - transportDocumentReference
         - surrenderRequestedBy
         - surrenderRequestCode
-
+      x-stoplight:
+        id: eau2707luiotq
     IdentifyingCode:
       type: object
       title: Identifying Code
@@ -332,6 +349,8 @@ components:
           maxLength: 100
           example: MSK
         codeListName:
+          type: string
+          maxLength: 100
           description: |
             The name of the code list, code generation mechanism or code authority for the `partyCode`. Example values could be:
             - `DID` (Decentralized Identifier) for `codeListProvider` `W3C`
@@ -341,6 +360,8 @@ components:
       required:
         - codeListProvider
         - partyCode
+      x-stoplight:
+        id: hnqoqomrolcrz
     TaxLegalReference:
       type: object
       title: Tax & Legal Reference
@@ -362,14 +383,14 @@ components:
       properties:
         type:
           type: string
-          pattern: ^\S(?:.*\S)?$
+          pattern: '^\S(?:.*\S)?$'
           maxLength: 50
           description: |
             The reference type code as defined by the relevant tax and/or legal authority.
           example: PAN
         countryCode:
           type: string
-          pattern: ^[A-Z]{2}$
+          pattern: '^[A-Z]{2}$'
           minLength: 2
           maxLength: 2
           description: |
@@ -377,7 +398,7 @@ components:
           example: DK
         value:
           type: string
-          pattern: ^\S(?:.*\S)?$
+          pattern: '^\S(?:.*\S)?$'
           maxLength: 100
           description: |
             The value of the `taxLegalReference`
@@ -386,10 +407,11 @@ components:
         - type
         - countryCode
         - value
-
-    #################
-    # Error Responses
-    #################
+      x-stoplight:
+        id: uuvf09kafdh6p
+      #################
+      # Error Responses
+      #################
     ErrorResponse:
       title: Error Response
       type: object
@@ -506,3 +528,5 @@ components:
         - statusCodeText
         - errorDateTime
         - errors
+      x-stoplight:
+        id: qyxi5rvxyfsy1
