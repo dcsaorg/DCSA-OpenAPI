@@ -32,8 +32,6 @@ info:
 
     For a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/cs/v1#v100B1). Please also [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments.
 
-    [Digital Container Shipping Association (DCSA) - Website](https://dcsa.org/)
-
   license:
     url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
     name: Apache 2.0
@@ -250,7 +248,6 @@ paths:
         The minimum required query parameters are `placeOfReceipt` and `placeOfDelivery`. If no further query parameters are used to tailor the response, the provider of the GET endpoint will return their best suggestions in the response. 
 
         The `GET /v1/point-to-point-routes` endpoint can be implemented independently of having implemented the `GET /v1/port-schedules`  and `GET /v1/vessel-schedules`  endpoints.
-  
   /v1/port-schedules:
     get:
       summary: Port Schedule
@@ -1075,44 +1072,7 @@ components:
           description: An array of errors provding more detail about the root cause.
           minItems: 1
           items:
-            title: Detailed Error
-            type: object
-            required:
-              - errorCodeText
-              - errorCodeMessage
-            properties:
-              errorCode:
-                type: integer
-                format: int32
-                description: "The detailed error code returned.\r\n\r\n  - `7000-7999` Technical error codes\r\n  - `8000-8999` Functional error codes\r\n  - `9000-9999` API provider-specific error codes            \r\n\r\n[Error codes as specified by DCSA](https://dcsa.atlassian.net/wiki/spaces/DTG/pages/197132308/Standard+Error+Codes)."
-                example: 7003
-                minimum: 7000
-                maximum: 9999
-              property:
-                type: string
-                description: The name of the property causing the error.
-                example: facilityCode
-                maxLength: 100
-              value:
-                type: string
-                description: The value of the property causing the error serialised as a string exactly as in the original request.
-                example: SG SIN WHS
-                maxLength: 500
-              jsonPath:
-                type: string
-                description: 'A path to the property causing the error, formatted according to [JSONpath](https://github.com/json-path/JsonPath).'
-                example: $.location.facilityCode
-                maxLength: 500
-              errorCodeText:
-                type: string
-                description: A standard short description corresponding to the `errorCode`.
-                example: invalidData
-                maxLength: 100
-              errorCodeMessage:
-                type: string
-                description: A long description corresponding to the `errorCode` with additional information.
-                example: Spaces not allowed in facility code
-                maxLength: 200
+            $ref: '#/components/schemas/DetailedError'
     Vessel:
       title: Vessel
       type: object
@@ -1540,6 +1500,46 @@ components:
           example: ACT
           description: "The code used for identifying the specific facility. This code does not include the UN Location Code.\r\n\r\nThe codeList used by SMDG is the [SMDG Terminal Code List](https://smdg.org/wp-content/uploads/Codelists/Terminals/SMDG-Terminal-Code-List-v20210401.xlsx)"
           maxLength: 6
+    DetailedError:
+      title: Detailed Error
+      type: object
+      description: A detailed description of what has caused the error.
+      required:
+        - errorCodeText
+        - errorCodeMessage
+      properties:
+        errorCode:
+          type: integer
+          format: int32
+          description: "The detailed error code returned.\r\n\r\n  - `7000-7999` Technical error codes\r\n  - `8000-8999` Functional error codes\r\n  - `9000-9999` API provider-specific error codes            \r\n\r\n[Error codes as specified by DCSA](https://dcsa.atlassian.net/wiki/spaces/DTG/pages/197132308/Standard+Error+Codes)."
+          example: 7003
+          minimum: 7000
+          maximum: 9999
+        property:
+          type: string
+          description: The name of the property causing the error.
+          example: facilityCode
+          maxLength: 100
+        value:
+          type: string
+          description: The value of the property causing the error serialised as a string exactly as in the original request.
+          example: SG SIN WHS
+          maxLength: 500
+        jsonPath:
+          type: string
+          description: 'A path to the property causing the error, formatted according to [JSONpath](https://github.com/json-path/JsonPath).'
+          example: $.location.facilityCode
+          maxLength: 500
+        errorCodeText:
+          type: string
+          description: A standard short description corresponding to the `errorCode`.
+          example: invalidData
+          maxLength: 100
+        errorCodeMessage:
+          type: string
+          description: A long description corresponding to the `errorCode` with additional information.
+          example: Spaces not allowed in facility code
+          maxLength: 200
   parameters:
     Api-Version-Major:
       in: header
