@@ -1263,12 +1263,10 @@ paths:
                     shipmentLocations:
                       - location:
                           locationName: Bremerhaven
-                          locationType: UNLO
                           UNLocationCode: DEBRV
                         locationTypeCode: POL
                       - location:
                           locationName: Norfolk
-                          locationType: UNLO
                           UNLocationCode: USORF
                         locationTypeCode: POD
                     requestedEquipments:
@@ -1345,12 +1343,10 @@ paths:
                     shipmentLocations:
                       - location:
                           locationName: Bremerhaven
-                          locationType: UNLO
                           UNLocationCode: DEBRV
                         locationTypeCode: POL
                       - location:
                           locationName: Norfolk
-                          locationType: UNLO
                           UNLocationCode: USORF
                         locationTypeCode: POD
                     requestedEquipments:
@@ -1887,31 +1883,9 @@ components:
         - errorCodeText
         - errorCodeMessage
 
-    ############################
-    # Address Location Interface
-    ############################
-    AddressLocation:
-      title: Address Location
-      type: object
-      description: An interface used to express a location using an `Address` object.
-      properties:
-        locationName:
-          type: string
-          pattern: ^\S(?:.*\S)?$
-          description: The name of the location.
-          example: Port of Amsterdam
-          maxLength: 100
-        locationType:
-          type: string
-          maxLength: 4
-          description: |
-            Discriminator used to identify this as an `Address` location interface.
-          example: ADDR
-        address:
-          $ref: '#/components/schemas/Address'
-      required:
-        - locationType
-        - address
+    ##################
+    # Address Location
+    ##################
     Address:
       type: object
       title: Address
@@ -1965,40 +1939,15 @@ components:
         - city
         - countryCode
 
-    #############################
-    # FAcility Location Interface
-    #############################
-    FacilityLocation:
-      title: Facility Location
+    ###################
+    # Facility Location
+    ###################
+    Facility:
+      title: Facility
       type: object
       description: |
-        An interface used to express a location using a `Facility`. The facility can either be expressed using a `BIC` code or a `SMDG` code. The `facilityCode` does not contain the `UNLocationCode` - this should be provided in the `UnLocationCode` attribute.
+        An object used to express a location using a `Facility`. The facility can either be expressed using a `BIC` code or a `SMDG` code. The `facilityCode` does not contain the `UNLocationCode` - this should be provided in the `UnLocationCode` attribute.
       properties:
-        locationName:
-          type: string
-          description: The name of the location.
-          pattern: ^\S(?:.*\S)?$
-          example: Port of Amsterdam
-          maxLength: 100
-        locationType:
-          type: string
-          maxLength: 4
-          description: |
-            Discriminator used to identify this as a `Facility Location` interface
-          example: FACI
-        UNLocationCode:
-          type: string
-          pattern: ^[A-Z]{2}[A-Z2-9]{3}$
-          minLength: 5
-          maxLength: 5
-          example: NLAMS
-          description: |
-            The UN Location code specifying where the place is located. The pattern used must be
-
-            - 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
-            - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used
-
-            More info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)
         facilityCode:
           type: string
           pattern: ^\S(?:.*\S)?$
@@ -2022,47 +1971,31 @@ components:
             - SMDG
           example: SMDG
       required:
-        - locationType
         - facilityCode
         - facilityCodeListProvider
 
-    ###############################
-    # UNLocation Location Interface
-    ###############################
-    UNLocationLocation:
-      title: UNLocation Location
+    #########################
+    # Geo Coordinate Location
+    #########################
+    GeoCoordinate:
       type: object
-      description: An interface used to express a location using a `Un Location Code`.
-      additionalProperties: false
+      title: Geo Coordinate
+      description: |
+        An object used to express a location using `latitude` and `longitude`.
       properties:
-        locationName:
+        latitude:
           type: string
-          description: The name of the location.
-          pattern: ^\S(?:.*\S)?$
-          example: Port of Amsterdam
-          maxLength: 100
-        locationType:
+          description: Geographic coordinate that specifies the north–south position of a point on the Earth's surface.
+          maxLength: 10
+          example: '48.8585500'
+        longitude:
           type: string
-          maxLength: 4
-          description: |
-            Discriminator used to identify this as a `UNLocation` location interface.
-          example: UNLO
-        UNLocationCode:
-          type: string
-          pattern: ^[A-Z]{2}[A-Z2-9]{3}$
-          minLength: 5
-          maxLength: 5
-          example: NLAMS
-          description: |
-            The UN Location code specifying where the place is located. The pattern used must be
-
-            - 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
-            - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used
-
-            More info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)
+          description: Geographic coordinate that specifies the east–west position of a point on the Earth's surface.
+          maxLength: 11
+          example: '2.294492036'
       required:
-        - locationType
-        - UNLocationCode
+        - latitude
+        - longitude
 
     ################
     # Create Booking
@@ -4421,28 +4354,7 @@ components:
         Maps the relationship between `Shipment` and `Location`, e.g., the `Place of Receipt` and the `Place of Delivery` for a specific shipment. This is a reusable object between `Booking` and `Transport Document`
       properties:
         location:
-          type: object
-          title: Location
-          description: |
-            General purpose object to capture the location in the `ShipmentLocation`.
-
-            The location can be specified in **one** of the following ways: `UN Location Code`, `Facility` or an `Address`.
-          example:
-            locationName: CMP Container Terminal Copenhagen
-            locationType: FACI
-            UNLocationCode: DKCPH
-            facilityCode: CMPDK
-            facilityCodeListProvider: SMDG
-          oneOf:
-            - $ref: '#/components/schemas/AddressLocation'
-            - $ref: '#/components/schemas/FacilityLocation'
-            - $ref: '#/components/schemas/UNLocationLocation'
-          discriminator:
-            propertyName: locationType
-            mapping:
-              ADDR: '#/components/schemas/AddressLocation'
-              FACI: '#/components/schemas/FacilityLocation'
-              UNLO: '#/components/schemas/UNLocationLocation'
+          $ref: '#/components/schemas/Location'
         locationTypeCode:
           type: string
           maxLength: 3
@@ -4464,6 +4376,50 @@ components:
       required:
         - location
         - locationTypeCode
+
+    Location:
+      type: object
+      title: Location
+      description: |
+        The location can be specified using **any** of the nested structures:
+        - `address` (used to specify the location via an Address)
+        - `UNLocationCode`
+        - `facility` (used to specify a location using a `facilityCode` and a 'facilityCodeListProvider')
+        - `geoCoordinate` (used to specify a location using `latitude` and `longitude`)
+
+        It is expected that if a location is specified in multiple ways (both as an `Address` and as a `Facility`) that both ways point to the same location.
+      example:
+        locationName: CMP Container Terminal Copenhagen
+        UNLocationCode: DKCPH
+        facility:
+          facilityCode: CMPDK
+          facilityCodeListProvider: SMDG
+      properties:
+        locationName:
+          type: string
+          description: The name of the location.
+          pattern: ^\S(?:.*\S)?$
+          example: Port of Amsterdam
+          maxLength: 100
+        address:
+          $ref: '#/components/schemas/Address'
+        facility:
+          $ref: '#/components/schemas/Facility'
+        UNLocationCode:
+          type: string
+          pattern: ^[A-Z]{2}[A-Z2-9]{3}$
+          minLength: 5
+          maxLength: 5
+          description: |
+            The UN Location code specifying where the place is located. The pattern used must be
+
+            - 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+            - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used
+
+            More info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)
+          example: NLAMS
+        geoCoordinate:
+          $ref: '#/components/schemas/GeoCoordinate'
 
     ######################
     # Requested Equipments
@@ -5535,20 +5491,34 @@ components:
         The location can be specified in **one** of the following ways: `UN Location Code`, `Facility` or an `Address`.
       example:
         locationName: Shanghai Shengdong International Container Terminal
-        locationType: FACI
         UNLocationCode: CNSGH
-        facilityCode: SHENG
-        facilityCodeListProvider: SMDG
-      oneOf:
-        - $ref: '#/components/schemas/AddressLocation'
-        - $ref: '#/components/schemas/UNLocationLocation'
-        - $ref: '#/components/schemas/FacilityLocation'
-      discriminator:
-        propertyName: locationType
-        mapping:
-          ADDR: '#/components/schemas/AddressLocation'
-          FACI: '#/components/schemas/FacilityLocation'
-          UNLO: '#/components/schemas/UNLocationLocation'
+        facility:
+          facilityCode: SHENG
+          facilityCodeListProvider: SMDG
+      properties:
+        locationName:
+          type: string
+          description: The name of the location.
+          pattern: ^\S(?:.*\S)?$
+          example: Port of Amsterdam
+          maxLength: 100
+        address:
+          $ref: '#/components/schemas/Address'
+        facility:
+          $ref: '#/components/schemas/Facility'
+        UNLocationCode:
+          type: string
+          pattern: ^[A-Z]{2}[A-Z2-9]{3}$
+          minLength: 5
+          maxLength: 5
+          description: |
+            The UN Location code specifying where the place is located. The pattern used must be
+
+            - 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+            - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used
+
+            More info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)
+          example: NLAMS
     DischargeLocation:
       type: object
       title: Discharge Location
@@ -5558,20 +5528,34 @@ components:
         The location can be specified in **one** of the following ways: `UN Location Code`, `Facility` or an `Address`.
       example:
         locationName: Transnet Port Terminals Cape Town
-        locationType: FACI
         UNLocationCode: ZACPT
-        facilityCode: TNCT
-        facilityCodeListProvider: SMDG
-      oneOf:
-        - $ref: '#/components/schemas/AddressLocation'
-        - $ref: '#/components/schemas/UNLocationLocation'
-        - $ref: '#/components/schemas/FacilityLocation'
-      discriminator:
-        propertyName: locationType
-        mapping:
-          ADDR: '#/components/schemas/AddressLocation'
-          FACI: '#/components/schemas/FacilityLocation'
-          UNLO: '#/components/schemas/UNLocationLocation'
+        facility:
+          facilityCode: TNCT
+          facilityCodeListProvider: SMDG
+      properties:
+        locationName:
+          type: string
+          description: The name of the location.
+          pattern: ^\S(?:.*\S)?$
+          example: Port of Amsterdam
+          maxLength: 100
+        address:
+          $ref: '#/components/schemas/Address'
+        facility:
+          $ref: '#/components/schemas/Facility'
+        UNLocationCode:
+          type: string
+          pattern: ^[A-Z]{2}[A-Z2-9]{3}$
+          minLength: 5
+          maxLength: 5
+          description: |
+            The UN Location code specifying where the place is located. The pattern used must be
+
+            - 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+            - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used
+
+            More info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)
+          example: NLAMS
 
     ########################
     # Shipment Cut-off times
