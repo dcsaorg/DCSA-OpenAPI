@@ -205,7 +205,7 @@ paths:
           in: query
           name: receiptTypeAtOrigin
           description: |
-            Indicates the type of service offered at Origin.
+            Indicates the type of service offered at Origin. **Carriers can choose to define a default value when the consumer does not provide it.**
               - `CY` (Container yard (incl. rail ramp))  
               - `SD` (Store Door)  
               - `CFS` (Container Freight Station)
@@ -220,7 +220,7 @@ paths:
           in: query
           name: deliveryTypeAtDestination
           description: |
-            Indicates the type of service offered at Destination. 
+            Indicates the type of service offered at Destination. **Carriers can choose to define a default value when the consumer does not provide it.**
               - `CY` (Container yard (incl. rail ramp))  
               - `SD` (Store Door)  
               - `CFS` (Container Freight Station)
@@ -629,7 +629,7 @@ components:
           example: '2025-01-14T09:21:00+01:00'
           description: 'The local date and time, when the event will take place, in ISO 8601 format specifying the offset.'
     PlaceOfDelivery:
-      title: Place Of Delivery
+      title: Place of Delivery
       type: object
       description: |
         The Location specifying where the place of delivery is located.
@@ -697,7 +697,7 @@ components:
           example: '2025-01-14T09:21:00+01:00'
           description: 'The local date and time, when the event will take place, in ISO 8601 format specifying the offset.'
     PlaceOfDeparture:
-      title: Place Of Departure
+      title: Place of Departure
       type: object
       description: |
         The Location specifying where the place of departure is located.
@@ -731,7 +731,7 @@ components:
           example: '2025-01-14T09:21:00+01:00'
           description: 'The local date and time, when the event will take place, in ISO 8601 format specifying the offset.'
     PointToPoint:
-      title: Point To Point
+      title: Point to Point
       type: object
       required:
         - placeOfReceipt
@@ -742,6 +742,32 @@ components:
           $ref: '#/components/schemas/PlaceOfReceipt'
         placeOfDelivery:
           $ref: '#/components/schemas/PlaceOfDelivery'
+        receiptTypeAtOrigin:
+          type: string
+          maxLength: 3
+          description: |
+            Indicates the type of service offered at `Origin`. The options are:
+            - `CY` (Container yard (incl. rail ramp))
+            - `SD` (Store Door)
+            - `CFS` (Container Freight Station)
+          enum:
+            - CY
+            - SD
+            - CFS
+          example: CY
+        deliveryTypeAtDestination:
+          type: string
+          maxLength: 3
+          description: |
+            Indicates the type of service offered at `Destination`. The options are:
+            - `CY` (Container yard (incl. rail ramp))
+            - `SD` (Store Door)
+            - `CFS` (Container Freight Station)
+          enum:
+            - CY
+            - SD
+            - CFS
+          example: CY
         cutOffTimes:
           type: array
           description: A list of cut-offs times provided by the carrier when available. A cut-off time indicates the latest deadline within which a task must be completed.
@@ -1052,6 +1078,7 @@ components:
           type: string
           description: A standard short description corresponding to the HTTP status code.
           example: Bad Request
+          maxLength: 50
         statusCodeMessage:
           type: string
           description: A long description corresponding to the HTTP status code with additional information.
@@ -1180,9 +1207,9 @@ components:
       properties:
         modeOfTransport:
           type: string
+          description: The mode of transport as defined by DCSA. For the Vessel Transport mode this needs to be VESSEL.
           enum:
             - VESSEL
-          description: The mode of transport as defined by DCSA. For the Vessel Transport mode this needs to be VESSEL.
         portVisitReference:
           type: string
           example: NLAMS1234589
@@ -1229,9 +1256,9 @@ components:
       properties:
         modeOfTransport:
           type: string
+          description: The mode of transport as defined by DCSA. For the Barge Transport mode this needs to be BARGE.
           enum:
             - BARGE
-          description: The mode of transport as defined by DCSA. For the Barge Transport mode this needs to be BARGE.
         portVisitReference:
           type: string
           example: NLAMS1234589
@@ -1273,19 +1300,27 @@ components:
       title: Other Transport
       type: object
       description: Other Transport modes.
+      additionalProperties: false
       required:
         - modeOfTransport
       properties:
         modeOfTransport:
           type: string
+          description: |
+            The mode of transport as defined by DCSA. The allowed values for the Other Transport mode are:
+            - `RAIL` (When the transport mode is Rail)
+            - `TRUCK`(When the transport mode is Truck)
+            - `RAIL_TRUCK`(When rail and truck are expected to be the mode of transport in a leg of a proposed routing)
+            - `BARGE_TRUCK`(When barge and truck are expected to be the mode of transport in a leg of a proposed routing)
+            - `BARGE_RAIL`(When barge and rail are expected to be the mode of transport in a leg of a proposed routing)
+            - `MULTIMODAL`(When mode of transport is not really defined or unknown at this stage)
           enum:
-            - RAIL_TRUCK
-            - BARGE_TRUCK
-            - BARGE_RAIL
-            - MULTIMODAL
-            - RAIL
-            - TRUCK
-          description: "The mode of transport as defined by DCSA. The Other Transport mode needs to be one of the below options.\r\n- `RAIL` (When the transport mode is Rail)\r\n- `TRUCK` (When the transport mode is Truck)\r\n- `RAIL_TRUCK` (When rail and truck are expected to be the mode of transport in a leg of a proposed routing)\r\n- `BARGE_TRUCK`(When barge and truck are expected to be the mode of transport in a leg of a proposed routing)\r\n- `BARGE_RAIL`(When barge and rail are expected to be the mode of transport in a leg of a proposed routing)\r\n- `MULTIMODAL`(When mode of transport is not really defined or unknown at this stage)"
+          - RAIL_TRUCK
+          - BARGE_TRUCK
+          - BARGE_RAIL
+          - MULTIMODAL
+          - RAIL
+          - TRUCK
     FacilityLocation:
       title: Facility Location
       type: object
@@ -1315,7 +1350,8 @@ components:
         carrierCode:
           type: string
           description: The carrier code based on either the SMDG or SCAC code lists.
-          maxLength: 10
+          maxLength: 4
+          pattern: ^\S+$
           example: MAEU
         carrierCodeListProvider:
           type: string
@@ -1361,7 +1397,8 @@ components:
         carrierCode:
           type: string
           description: The carrier code based on either the SMDG or SCAC code lists.
-          maxLength: 10
+          maxLength: 4
+          pattern: ^\S+$
           example: MAEU
         carrierCodeListProvider:
           type: string
