@@ -5,7 +5,7 @@ info:
   description: |
     API specification issued by DCSA.org.
 
-    For explanation of specific values or objects please refer to the [Information Model v2024.Q1](https://dcsa-website.cdn.prismic.io/dcsa-website/ZhlC9TjCgu4jzyW5_20240402-DCSA-Information-Model-2024.Q1-ReleaseCandidate_01.pdf). This API specification does not define the allowable updates and their timing in accordance with the established business rules. Refer to the [DCSA Interface Standard for the Bill of Lading 3.0 Beta 2](https://dcsa.org/standards/bill-of-lading/documentation-bill-of-lading-3-beta-2) to address this. **All use cases mentioned in this API specification refer to use cases defined in the eBL IFS**.
+    For explanation of specific values or objects please refer to the [Information Model v2024.Q1](https://dcsa-website.cdn.prismic.io/dcsa-website/ZhlC9TjCgu4jzyW5_20240402-DCSA-Information-Model-2024.Q1-ReleaseCandidate_01.pdf). This API specification does not define the allowable updates and their timing in accordance with the established business rules. Refer to the [DCSA Interface Standard for the Bill of Lading 3.0](https://dcsa.org/standards/bill-of-lading/documentation-bill-of-lading-3) to address this. **All use cases mentioned in this API specification refer to use cases defined in the eBL IFS**.
 
     All other documents related to the Electronic Bill of Lading publication can be found [here](https://dcsa.org/standards/ebill-of-lading/)
 
@@ -16,8 +16,22 @@ info:
 
     in order to poll information about status changes.
 
-    ### Notifications
-    It is possible to have notifications pushed to you whenever the provider needs input and/or a state change. The format of the notification is defined by the [Electronic Bill of Lading Notification API](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_NTF/3.0.0-Beta-2). Signing up for notifications is defined outside the scope of this API specification.
+    ### Notifications (Implemented by consumer)
+    It is possible to have notifications pushed to you whenever the provider needs input and/or a state change. The format of the notification is defined by the [Shipping Instructions Notification endPoint](#/ShippingInstructionsNotification) or the [Transport Document Notification endPoint](#/TransportDocumentNotification).
+
+        POST /v3/shipping-instructions-notifications
+        POST /v3/transport-document-notifications
+
+    for "shallow" notifications - and
+
+        POST /v3/shipping-instructions-full-notifications
+        POST /v3/transport-document-full-notifications
+
+    for full state transfer.
+
+    Signing up for notifications is defined outside the scope of this API specification.
+
+    All of these endPoint is to be implemented by the consumers of the `Shipping Instructions API` and `Transport Document API` in order to have push events.
 
     ### Stats API
     The Stats API offers crucial statistical information for both API providers and consumers to enhance their services and helps DCSA to understand and scale the ecosystem. We expect you to invoke the Stats API for every request made to the Electronic Bill of Lading API. Further details can be found [here](https://labs.dcsa.org/#/http/guides/api-guides/stats-api/introduction)
@@ -82,7 +96,7 @@ paths:
               shippingInstructionsStatus: 'RECEIVED'
             }
             ```
-        4. All '_relevant_' subscribers will be notified via a [Shipping Instructions Notification](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_NTF/3.0.0-Beta-2#/Notifications/shipping-instructions-notifications).
+        4. All '_relevant_' subscribers will be notified via a [Shipping Instructions Notification](#/ShippingInstructionsNotification).
 
         For `POST` `Shipping Instructions` the process ends here. The `Shipping Instructions`
 
@@ -329,7 +343,7 @@ paths:
                 updateShippingInstructionsStatus: 'UPDATE RECEIVED'
               }
               ```
-        4. All '_relevant_' subscribers will be notified via a [Shipping Instructions Notification](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_NTF/3.0.0-Beta-2#/Notifications/shipping-instructions-notifications).
+        4. All '_relevant_' subscribers will be notified via a [Shipping Instructions Notification](#/ShippingInstructionsNotification).
 
         For `PUT` `Shipping Instructions` the process ends here. The `Updated Shipping Instructions`
 
@@ -909,7 +923,7 @@ paths:
            **The process stops here!**
         2. The payload is schema-valid
         3. The `updatedShippingInstructionsStatus` is set to `UPDATE CANCELLED`.
-        4. All '_relevant_' subscribers will be notified via a [Shipping Instructions Notification](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_NTF/3.0.0-Beta-2#/Notifications/shipping-instructions-notifications).
+        4. All '_relevant_' subscribers will be notified via a [Shipping Instructions Notification](#/ShippingInstructionsNotification).
       requestBody:
         description: |
           Cancel the `Update Shipping Instructions`
@@ -1577,7 +1591,7 @@ paths:
            **The process stops here!**
         2. The payload is schema-valid
         3. The `transportDocumentStatus` is set to `APPROVED`.
-        4. All '_relevant_' subscribers will be notified via a [Transport Document Notification](https://app.swaggerhub.com/apis/dcsaorg/DCSA_EBL_NTF/3.0.0-Beta-2#/Notifications/transport-document-notifications).
+        4. All '_relevant_' subscribers will be notified via a [Transport Document Notification](#/TransportDocumentNotification).
 
         The provider wil now start asynchronous processing. Once processed, the new status of the `Transport Document` (`ISSUED`) will be communicated via a `Transport Document Notification`. In case the consumer does not subscribe to notifications it is necessary for the consumer to poll on the
 
@@ -2354,7 +2368,6 @@ paths:
                       - errorCode: 7003
                         errorCodeText: Max Notifications reached
                         errorCodeMessage: A maximum of 10 Notifications can be created per hour
-asdfasdf
 components:
   headers:
     API-Version:
