@@ -5,7 +5,7 @@ info:
   description: |
     API specification issued by DCSA.org.
 
-    For explanation of specific values or objects please refer to the [Information Model v2024.Q1](https://dcsa-website.cdn.prismic.io/dcsa-website/ZhlC9TjCgu4jzyW5_20240402-DCSA-Information-Model-2024.Q1-ReleaseCandidate_01.pdf). This API specification does not define the allowable updates and their timing in accordance with the established business rules. Refer to the [DCSA Interface Standard for the Bill of Lading 3.0 Beta 2](https://dcsa.org/standards/bill-of-lading/documentation-bill-of-lading-3-beta-2) to address this. **All use cases mentioned in this API specification refer to use cases defined in the eBL IFS**.
+    For explanation of specific values or objects please refer to the [Information Model v2024.Q1](https://dcsa-website.cdn.prismic.io/dcsa-website/ZhlC9TjCgu4jzyW5_20240402-DCSA-Information-Model-2024.Q1-ReleaseCandidate_01.pdf). This API specification does not define the allowable updates and their timing in accordance with the established business rules. Refer to the [DCSA Interface Standard for the Bill of Lading 3.0](https://dcsa.org/standards/bill-of-lading/documentation-bill-of-lading-3) to address this. **All use cases mentioned in this API specification refer to use cases defined in the eBL IFS**.
 
     All other documents related to the Electronic Bill of Lading publication can be found [here](https://dcsa.org/standards/ebill-of-lading/)
 
@@ -16,8 +16,17 @@ info:
 
     in order to poll information about status changes.
 
-    ### Notifications
-    It is possible to have notifications pushed to you whenever the provider needs input and/or a state change. The format of the notification is defined by the [Electronic Bill of Lading Notification API](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_NTF/3.0.0-Beta-2). Signing up for notifications is defined outside the scope of this API specification.
+    ### Notifications (Implemented by consumer)
+    It is possible to have notifications pushed to you whenever the provider needs input and/or a state change. The format of the notification is defined by the [Shipping Instructions Notification endPoint](#/ShippingInstructionsNotification) or the [Transport Document Notification endPoint](#/TransportDocumentNotification).
+
+        POST /v3/shipping-instructions-notifications
+        POST /v3/transport-document-notifications
+
+    The endPoints support both a lightweight Notification and a full State transfer. How much data is sent via this Notification depends on what kind of Notification is being subscribed to.
+
+    Signing up for notifications is defined outside the scope of this API specification.
+
+    All of these endPoint is to be implemented by the consumers of the `Shipping Instructions API` and `Transport Document API` in order to receive push events.
 
     ### Stats API
     The Stats API offers crucial statistical information for both API providers and consumers to enhance their services and helps DCSA to understand and scale the ecosystem. We expect you to invoke the Stats API for every request made to the Electronic Bill of Lading API. Further details can be found [here](https://labs.dcsa.org/#/http/guides/api-guides/stats-api/introduction)
@@ -33,10 +42,12 @@ info:
 tags:
   - name: Shipping Instructions
     description: |
-      The Shipping Instructions
+      The Shipping Instructions endPoints to be implemented by **providers** of the Bill of Lading API
   - name: Transport Document
     description: |
-      The Transport Document
+      The Transport Document endPoints to be implemented by **providers** of the Bill of Lading API
+  - name: Notifications
+    description: The Notifications to be implemented by the **consumers** of the Bill of Lading API
 paths:
   ##############################
   # Shipping Instructions Request
@@ -80,7 +91,7 @@ paths:
               shippingInstructionsStatus: 'RECEIVED'
             }
             ```
-        4. All '_relevant_' subscribers will be notified via a [Shipping Instructions Notification](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_NTF/3.0.0-Beta-2#/Notifications/shipping-instructions-notifications).
+        4. All '_relevant_' subscribers will be notified via a [Shipping Instructions Notification](#/ShippingInstructionsNotification).
 
         For `POST` `Shipping Instructions` the process ends here. The `Shipping Instructions`
 
@@ -324,16 +335,16 @@ paths:
               {
                 shippingInstructionsReference: 'si-123',
                 shippingInstructionsStatus: 'PENDING UPDATE',
-                updateShippingInstructionsStatus: 'UPDATE RECEIVED'
+                updatedShippingInstructionsStatus: 'UPDATE RECEIVED'
               }
               ```
-        4. All '_relevant_' subscribers will be notified via a [Shipping Instructions Notification](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_NTF/3.0.0-Beta-2#/Notifications/shipping-instructions-notifications).
+        4. All '_relevant_' subscribers will be notified via a [Shipping Instructions Notification](#/ShippingInstructionsNotification).
 
         For `PUT` `Shipping Instructions` the process ends here. The `Updated Shipping Instructions`
 
           - is now stored in the provider system
           - a `200` (OK) response is sent to the consumer with the status of the `Shipping Instructions` and the `Updated Shipping Instructions` with one of the following combinations (depending on the use case):
-            - `shippingInstructionsStatus='RECEIVED'` and `updateShippingInstructionsStatus='UPDATE RECEIVED'` (if endPoint used to make an update to a Submitted Shipping Instructions - **UseCase 1 - Submit Shipping Instructions**)
+            - `shippingInstructionsStatus='RECEIVED'` and `updatedShippingInstructionsStatus='UPDATE RECEIVED'` (if endPoint used to make an update to a Submitted Shipping Instructions - **UseCase 1 - Submit Shipping Instructions**)
             - `shippingInstructionsStatus='PENDING UPDATE'` and `updatedShippingInstructionsStatus='UPDATE RECEIVED'` (if endPoint used as a response to **UseCase 2 - Request to update Shipping Instructions**)
           - awaits further processing by the provider
           - '_relevant_' subscribers have been notified.
@@ -408,7 +419,7 @@ paths:
         '200':
           description: |
             The `Updated Shipping Instructions` has been successfully stored in the provider system with one of the following combinations (depending on the use case):
-            - `shippingInstructionsStatus='RECEIVED'` and `updateShippingInstructionsStatus='UPDATE RECEIVED'` (if endPoint is used to make an update to a Submitted Shipping Instructions - **UseCase 1 - Submit Shipping Instructions**)
+            - `shippingInstructionsStatus='RECEIVED'` and `updatedShippingInstructionsStatus='UPDATE RECEIVED'` (if endPoint is used to make an update to a Submitted Shipping Instructions - **UseCase 1 - Submit Shipping Instructions**)
             - `shippingInstructionsStatus='PENDING UPDATE'` and `updatedShippingInstructionsStatus='UPDATE RECEIVED'` (if endPoint is used as a response to **UseCase 2 - Request to update Shipping Instructions**)
 
             The status of the `Updated Shipping Instructions` can be monitored on the
@@ -907,7 +918,7 @@ paths:
            **The process stops here!**
         2. The payload is schema-valid
         3. The `updatedShippingInstructionsStatus` is set to `UPDATE CANCELLED`.
-        4. All '_relevant_' subscribers will be notified via a [Shipping Instructions Notification](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_NTF/3.0.0-Beta-2#/Notifications/shipping-instructions-notifications).
+        4. All '_relevant_' subscribers will be notified via a [Shipping Instructions Notification](#/ShippingInstructionsNotification).
       requestBody:
         description: |
           Cancel the `Update Shipping Instructions`
@@ -1575,7 +1586,7 @@ paths:
            **The process stops here!**
         2. The payload is schema-valid
         3. The `transportDocumentStatus` is set to `APPROVED`.
-        4. All '_relevant_' subscribers will be notified via a [Transport Document Notification](https://app.swaggerhub.com/apis/dcsaorg/DCSA_EBL_NTF/3.0.0-Beta-2#/Notifications/transport-document-notifications).
+        4. All '_relevant_' subscribers will be notified via a [Transport Document Notification](#/TransportDocumentNotification).
 
         The provider wil now start asynchronous processing. Once processed, the new status of the `Transport Document` (`ISSUED`) will be communicated via a `Transport Document Notification`. In case the consumer does not subscribe to notifications it is necessary for the consumer to poll on the
 
@@ -1726,6 +1737,722 @@ paths:
                       - errorCode: 7003
                         errorCodeText: Non existent transportDocumentReference
                         errorCodeMessage: transportDocumentReference `td-987` does not exist
+  /v3/shipping-instructions-notifications:
+    post:
+      tags:
+        - Notifications
+      summary: Send a new Shipping Instructions Notification
+      operationId: shipping-instructions-notifications
+      description: |
+        Creates a new [`Shipping Instructions Notification`](#/ShippingInstructionsNotification). This endPoint is called whenever a `Shipping Instructions` that a cosumer has subscribed to changes state or is updated.
+
+        **This endPoint is to be implemented by a consumer of the EBL API in order to receive Notifications**
+      parameters:
+        - $ref: '#/components/parameters/Api-Version-Major'
+      requestBody:
+        description: |
+          The payload used to create a [`Shipping Instructions Notification`](#/ShippingInstructionsNotification)
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShippingInstructionsNotification'
+            examples:
+              receivedLightweightExample:
+                summary: |
+                  Shipping Instructions request received (Lightweight)
+                description: |
+                  A lightweight notification explaining that a new `Shipping Instructions` has been received and stored in provider system (`shippingInstructionsStatus='RECEIVED'`).
+                value:
+                  specversion: '1.0'
+                  id: 3cecb101-7a1a-43a4-9d62-e88a131651e2
+                  source: 'https://member.com/'
+                  type: org.dcsa.shipping-instructions.v3
+                  time: '2018-04-05T17:31:00Z'
+                  datacontenttype: application/json
+                  subscriptionReference: SI001
+                  data:
+                    shippingInstructionsStatus: RECEIVED
+                    shippingInstructionsReference: e0559d83-00e2-438e-afd9-fdd610c1a008
+              receivedFullStateTransferExample:
+                summary: |
+                  Shipping Instructions request received (Full State Transfer)
+                description: |
+                  A full state transfer notification explaining that a new `Shipping Instructions` has been received and stored in provider system (`shippingInstructionsStatus='RECEIVED'`).
+                value:
+                  specversion: '1.0'
+                  id: 3cecb101-7a1a-43a4-9d62-e88a131651e2
+                  source: 'https://member.com/'
+                  type: org.dcsa.shipping-instructions.v3
+                  time: '2018-04-05T17:31:00Z'
+                  datacontenttype: application/json
+                  subscriptionReference: SI001
+                  data:
+                    shippingInstructionsStatus: RECEIVED
+                    shippingInstructionsReference: e0559d83-00e2-438e-afd9-fdd610c1a008
+                    shippingInstructions:
+                      shippingInstructionsReference: e0559d83-00e2-438e-afd9-fdd610c1a008
+                      shippingInstructionsStatus: RECEIVED
+                      transportDocumentTypeCode: BOL
+                      isShippedOnBoardType: true
+                      freightPaymentTermCode: PRE
+                      isElectronic: true
+                      isToOrder: true
+                      invoicePayableAt:
+                        UNLocationCode: DKAAR
+                      partyContactDetails:
+                        - name: DCSA test person
+                          email: no-reply@dcsa.example.org
+                      documentParties:
+                        shipper:
+                          partyName: DCSA CTK
+                          displayedAddress:
+                            - Strawinskylaan 4117
+                          partyContactDetails:
+                            - name: DCSA test person
+                              email: no-reply@dcsa.example.org
+                      consignmentItems:
+                        - carrierBookingReference: CBR_123_REGULAR
+                          weight: 12000
+                          weightUnit: KGM
+                          descriptionOfGoods: 'Shoes - black'
+                          HSCodes:
+                            - '640510'
+                          commoditySubreference: RegSubRef001
+                          cargoItems:
+                            - equipmentReference: NARU3472484
+                              weight: 12000
+                              weightUnit: KGM
+                              outerPackaging:
+                                numberOfPackages: 400
+                                packageCode: 4G
+                                description: Fibreboard boxes
+                      utilizedTransportEquipments:
+                        - isShipperOwned: false
+                          seals:
+                            - number: DCSA-CTK-1234
+                          equipmentReference: NARU3472484
+              declinedLightweightExample:
+                summary: |
+                  Shipping Instructions update declined (Lightweight)
+                description: |
+                  A lightweight notification explaining that an update to a `Shipping Instructions`, that was pending an update by the consumer (`shippingInstructionsStatus='PENDING UPDATE'`), has been declined (`updatedShippingInstructionsStatus='UPDATE DECLINED'`)
+                value:
+                  specversion: '1.0'
+                  id: 3cecb101-7a1a-43a4-9d62-e88a131651e2
+                  source: 'https://member.com/'
+                  type: org.dcsa.shipping-instructions.v3
+                  time: '2018-04-05T17:31:00Z'
+                  datacontenttype: application/json
+                  subscriptionReference: SI001
+                  data:
+                    shippingInstructionsStatus: PENDING UPDATE
+                    updatedShippingInstructionsStatus: UPDATE DECLINED
+                    shippingInstructionsReference: e0559d83-00e2-438e-afd9-fdd610c1a008
+              declinedFullStateTransferExample:
+                summary: |
+                  Shipping Instructions update declined (Full State Transfer)
+                description: |
+                  A full state transfer notification explaining that an update to a `Shipping Instructions`, that was pending an update by the consumer (`shippingInstructionsStatus='PENDING UPDATE'`), has been declined (`updatedShippingInstructionsStatus='UPDATE DECLINED'`)
+
+                  The example shows an original `ShippingInstructions` with a wrong weight on `consignmentItem` and `cargoItem`. The updated weight is also wrong!
+                value:
+                  specversion: '1.0'
+                  id: 3cecb101-7a1a-43a4-9d62-e88a131651e2
+                  source: 'https://member.com/'
+                  type: org.dcsa.shipping-instructions.v3
+                  time: '2018-04-05T17:31:00Z'
+                  datacontenttype: application/json
+                  subscriptionReference: SI001
+                  data:
+                    shippingInstructionsStatus: PENDING UPDATE
+                    updatedShippingInstructionsStatus: UPDATE DECLINED
+                    shippingInstructionsReference: e0559d83-00e2-438e-afd9-fdd610c1a008
+                    shippingInstructions:
+                      shippingInstructionsReference: e0559d83-00e2-438e-afd9-fdd610c1a008
+                      shippingInstructionsStatus: PENDING UPDATE
+                      updatedShippingInstructionsStatus: UPDATE DECLINED
+                      transportDocumentTypeCode: BOL
+                      isShippedOnBoardType: true
+                      freightPaymentTermCode: PRE
+                      isElectronic: true
+                      isToOrder: true
+                      invoicePayableAt:
+                        UNLocationCode: DKAAR
+                      partyContactDetails:
+                        - name: DCSA test person
+                          email: no-reply@dcsa.example.org
+                      documentParties:
+                        shipper:
+                          partyName: DCSA CTK
+                          displayedAddress:
+                            - Strawinskylaan 4117
+                          partyContactDetails:
+                            - name: DCSA test person
+                              email: no-reply@dcsa.example.org
+                      consignmentItems:
+                        - carrierBookingReference: CBR_123_REGULAR
+                          weight: 12
+                          weightUnit: KGM
+                          descriptionOfGoods: 'Shoes - black'
+                          HSCodes:
+                            - '640510'
+                          commoditySubreference: RegSubRef001
+                          cargoItems:
+                            - equipmentReference: NARU3472484
+                              weight: 12
+                              weightUnit: KGM
+                              outerPackaging:
+                                numberOfPackages: 400
+                                packageCode: 4G
+                                description: Fibreboard boxes
+                      utilizedTransportEquipments:
+                        - isShipperOwned: false
+                          seals:
+                            - number: DCSA-CTK-1234
+                          equipmentReference: NARU3472484
+                    updatedShippingInstructions:
+                      shippingInstructionsReference: e0559d83-00e2-438e-afd9-fdd610c1a008
+                      shippingInstructionsStatus: PENDING UPDATE
+                      updatedShippingInstructionsStatus: UPDATE DECLINED
+                      transportDocumentTypeCode: BOL
+                      isShippedOnBoardType: true
+                      freightPaymentTermCode: PRE
+                      isElectronic: true
+                      isToOrder: true
+                      invoicePayableAt:
+                        UNLocationCode: DKAAR
+                      partyContactDetails:
+                        - name: DCSA test person
+                          email: no-reply@dcsa.example.org
+                      documentParties:
+                        shipper:
+                          partyName: DCSA CTK
+                          displayedAddress:
+                            - Strawinskylaan 4117
+                          partyContactDetails:
+                            - name: DCSA test person
+                              email: no-reply@dcsa.example.org
+                      consignmentItems:
+                        - carrierBookingReference: CBR_123_REGULAR
+                          weight: 120000
+                          weightUnit: KGM
+                          descriptionOfGoods: 'Shoes - black'
+                          HSCodes:
+                            - '640510'
+                          commoditySubreference: RegSubRef001
+                          cargoItems:
+                            - equipmentReference: NARU3472484
+                              weight: 120000
+                              weightUnit: KGM
+                              outerPackaging:
+                                numberOfPackages: 400
+                                packageCode: 4G
+                                description: Fibreboard boxes
+                      utilizedTransportEquipments:
+                        - isShipperOwned: false
+                          seals:
+                            - number: DCSA-CTK-1234
+                          equipmentReference: NARU3472484
+      responses:
+        '204':
+          description: |
+            No Content
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+        '400':
+          description: |
+            In case the `Notification` does not schema validate a `400` (Bad Request) is returned
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                badRequestExample:
+                  summary: |
+                    Shipping Instructions missing shippingInstructionsReference
+                  description: |
+                    `shippingInstructionsReference` is a mandatory property in the `Notification`. This is an example of how the error object would look in case this property is missing
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
+                  value:
+                    httpMethod: POST
+                    requestUri: /v3/shipping-instructions-notifications
+                    statusCode: 400
+                    statusCodeText: Bad Request
+                    statusCodeMessage: |
+                      shippingInstructionsReference not found - mandatory to provide in a Notification
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2023-04-13T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7003
+                        property: shippingInstructionsReference
+                        errorCodeText: mandatory property missing
+                        errorCodeMessage: |
+                          shippingInstructionsReference must be provided as part of a Notification
+        '500':
+          description: |
+            In case a server error occurs in provider system a `500` (Internal Server Error) is returned
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                internalServerErrorExample:
+                  summary: |
+                    Internal Server Error while processing Notification
+                  description: |
+                    An Internal Server Error has occurred - the consumer should contact {provider-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
+                  value:
+                    httpMethod: POST
+                    requestUri: /v3/shipping-instructions-notifications
+                    statusCode: 500
+                    statusCodeText: Internal Server Error
+                    statusCodeMessage: |
+                      Internal Server Error occurred while processing Shipping Instructions
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2023-04-13T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: Internal Error occurred
+                        errorCodeMessage: Internal Error occurred
+        default:
+          description: |
+            For other errors the error object should be populated with relevant information
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                tooManyRequestsExample:
+                  summary: |
+                    Making too many Notifications
+                  description: |
+                    Calling the endPoint
+
+                        POST /v3/shipping-instructions-notifications
+
+                    too many times within a timeperiod.
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
+                  value:
+                    httpMethod: POST
+                    requestUri: /v3/shipping-instructions-notifications
+                    statusCode: 429
+                    statusCodeText: Too Many Requests
+                    statusCodeMessage: |
+                      Too many request to create a Notification has been requested. Please try again in 1 hour
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2023-04-13T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: Max Notifications reached
+                        errorCodeMessage: A maximum of 10 Notifications can be created per hour
+  /v3/transport-document-notifications:
+    post:
+      tags:
+        - Notifications
+      summary: Send a new Transport Document Notification
+      operationId: transport-document-notifications
+      description: |
+        Creates a new [`Transport Document Notification`](#/TransportDocumentNotification). This endPoint is called whenever a `Transport Document` that a cosumer has subscribed to changes state or is updated.
+
+        **This endPoint is to be implemented by a consumer of the EBL API in order to receive Notifications**
+      parameters:
+        - $ref: '#/components/parameters/Api-Version-Major'
+      requestBody:
+        description: |
+          The payload used to create a [`Transport Document Notification`](#/TransportDocumentNotification)
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransportDocumentNotification'
+            examples:
+              draftLightweightExample:
+                summary: |
+                  Transport Document Draft created (Lightweight)
+                description: |
+                  A lightweight notification explaining that a new `Draft Transport Document` has been created and stored in provider system (`transportDocumentStatus='DRAFT'`).
+                value:
+                  specversion: '1.0'
+                  id: 3cecb101-7a1a-43a4-9d62-e88a131651e2
+                  source: 'https://member.com/'
+                  type: org.dcsa.transport-document.v3
+                  time: '2018-04-05T17:31:00Z'
+                  datacontenttype: application/json
+                  subscriptionReference: EBL001
+                  data:
+                    transportDocumentStatus: DRAFT
+                    transportDocumentReference: HHL71800000
+              draftFullStateTransferExample:
+                summary: |
+                  Transport Document Draft created (Full State Transfer)
+                description: |
+                  A full state transfer notification explaining that a new `Draft Transport Document` has been created and stored in provider system (`transportDocumentStatus='DRAFT'`).
+                value:
+                  specversion: '1.0'
+                  id: 3cecb101-7a1a-43a4-9d62-e88a131651e2
+                  source: 'https://member.com/'
+                  type: org.dcsa.transport-document.v3
+                  time: '2018-04-05T17:31:00Z'
+                  datacontenttype: application/json
+                  subscriptionReference: EBL001
+                  data:
+                    transportDocumentStatus: DRAFT
+                    transportDocumentReference: HHL71800000
+                    transportDocument:
+                      transportDocumentReference: HHL71800000
+                      shippingInstructionsReference: fc5009a7-25ad-4bb0-9892-4e2dea6bcdd9
+                      transportDocumentStatus: DRAFT
+                      transportDocumentTypeCode: BOL
+                      isShippedOnBoardType: true
+                      freightPaymentTermCode: PRE
+                      isElectronic: true
+                      isToOrder: true
+                      shippedOnBoardDate: '2023-12-20'
+                      termsAndConditions: |
+                        You agree that this transport document exist is name only for the sake of
+                        testing your conformance with the DCSA EBL API. This transport document is NOT backed
+                        by a real shipment with ANY carrier and NONE of the requested services will be
+                        carried out in real life.
+
+                        Unless required by applicable law or agreed to in writing, DCSA provides
+                        this JSON data on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
+                        ANY KIND, either express or implied, including, without limitation, any
+                        warranties or conditions of TITLE, NON-INFRINGEMENT, MERCHANTABILITY,
+                        or FITNESS FOR A PARTICULAR PURPOSE. You are solely responsible for
+                        determining the appropriateness of using or redistributing this JSON
+                        data and assume any risks associated with Your usage of this data.
+
+                        In no event and under no legal theory, whether in tort (including negligence),
+                        contract, or otherwise, unless required by applicable law (such as deliberate
+                        and grossly negligent acts) or agreed to in writing, shall DCSA be liable to
+                        You for damages, including any direct, indirect, special, incidental, or
+                        consequential damages of any character arising as a result of this terms or conditions
+                        or out of the use or inability to use the provided JSON data (including but not limited
+                        to damages for loss of goodwill, work stoppage, computer failure or malfunction, or any
+                        and all other commercial damages or losses), even if DCSA has been advised of the
+                        possibility of such damages.
+                      receiptTypeAtOrigin: CY
+                      deliveryTypeAtDestination: CY
+                      cargoMovementTypeAtOrigin: FCL
+                      cargoMovementTypeAtDestination: FCL
+                      serviceContractReference: SCR-1234-REGULAR
+                      carrierCode: MSC
+                      carrierCodeListProvider: SMDG
+                      issuingParty:
+                        partyName: Mediterranean Shipping Company
+                        address:
+                          street: Chemin Rieu
+                          streetNumber: 12-14
+                          city: Geneva
+                          countryCode: CH
+                        identifyingCodes:
+                          - codeListProvider: SMDG
+                            codeListName: LCL
+                            partyCode: MSC
+                      transports:
+                        plannedDepartureDate: '2023-12-20'
+                        plannedArrivalDate: '2023-12-22'
+                        portOfLoading:
+                          UNLocationCode: DKAAR
+                        portOfDischarge:
+                          UNLocationCode: DEBRV
+                        vesselVoyages:
+                          - vesselName: MSC Gülsün
+                            carrierExportVoyageNumber: 402E
+                      charges:
+                        - chargeName: Fictive transport document fee
+                          currencyAmount: 1
+                          currencyCode: EUR
+                          paymentTermCode: COL
+                          calculationBasis: Per transport document
+                          unitPrice: 1
+                          quantity: 1
+                      invoicePayableAt:
+                        UNLocationCode: DKAAR
+                      partyContactDetails:
+                        - name: DCSA test person
+                          email: no-reply@dcsa.example.org
+                      documentParties:
+                        shipper:
+                          partyName: DCSA CTK
+                          displayedAddress:
+                            - Strawinskylaan 4117
+                          partyContactDetails:
+                            - name: DCSA test person
+                              email: no-reply@dcsa.example.org
+                      consignmentItems:
+                        - carrierBookingReference: CBR_123_REGULAR
+                          descriptionOfGoods: 'Shoes - black'
+                          HSCodes:
+                            - '640510'
+                          cargoItems:
+                            - equipmentReference: NARU3472484
+                              weight: 12000
+                              weightUnit: KGM
+                              outerPackaging:
+                                numberOfPackages: 400
+                                packageCode: 4G
+                                description: Fibreboard boxes
+                      utilizedTransportEquipments:
+                        - isShipperOwned: false
+                          seals:
+                            - number: DCSA-CTK-1234
+                          equipment:
+                            ISOEquipmentCode: 22G1
+                            equipmentReference: NARU3472484
+              issuedLightweightExample:
+                summary: |
+                  Transport Document has been issued (Lightweight)
+                description: |
+                  A lightweight notification explaining that a `Transport Document` has been issued (`transportDocumentStatus='ISSUED'`)
+                value:
+                  specversion: '1.0'
+                  id: 3cecb101-7a1a-43a4-9d62-e88a131651e2
+                  source: 'https://member.com/'
+                  type: org.dcsa.transport-document.v3
+                  time: '2018-04-05T17:31:00Z'
+                  datacontenttype: application/json
+                  subscriptionReference: EBL001
+                  data:
+                    transportDocumentStatus: ISSUED
+                    transportDocumentReference: HHL71800000
+              issuedFullStateTransferExample:
+                summary: |
+                  Transport Document has been issued (Full State Transfer)
+                description: |
+                  A full state transfer notification explaining that a `Transport Document` has been issued (`transportDocumentStatus='ISSUED'`)
+                value:
+                  specversion: '1.0'
+                  id: 3cecb101-7a1a-43a4-9d62-e88a131651e2
+                  source: 'https://member.com/'
+                  type: org.dcsa.transport-document.v3
+                  time: '2018-04-05T17:31:00Z'
+                  datacontenttype: application/json
+                  subscriptionReference: EBL001
+                  data:
+                    transportDocumentStatus: ISSUED
+                    transportDocumentReference: HHL71800000
+                    transportDocument:
+                      transportDocumentReference: HHL71800000
+                      shippingInstructionsReference: fc5009a7-25ad-4bb0-9892-4e2dea6bcdd9
+                      transportDocumentStatus: ISSUED
+                      transportDocumentTypeCode: BOL
+                      isShippedOnBoardType: true
+                      freightPaymentTermCode: PRE
+                      isElectronic: true
+                      isToOrder: true
+                      shippedOnBoardDate: '2023-12-20'
+                      termsAndConditions: |
+                        You agree that this transport document exist is name only for the sake of
+                        testing your conformance with the DCSA EBL API. This transport document is NOT backed
+                        by a real shipment with ANY carrier and NONE of the requested services will be
+                        carried out in real life.
+
+                        Unless required by applicable law or agreed to in writing, DCSA provides
+                        this JSON data on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
+                        ANY KIND, either express or implied, including, without limitation, any
+                        warranties or conditions of TITLE, NON-INFRINGEMENT, MERCHANTABILITY,
+                        or FITNESS FOR A PARTICULAR PURPOSE. You are solely responsible for
+                        determining the appropriateness of using or redistributing this JSON
+                        data and assume any risks associated with Your usage of this data.
+
+                        In no event and under no legal theory, whether in tort (including negligence),
+                        contract, or otherwise, unless required by applicable law (such as deliberate
+                        and grossly negligent acts) or agreed to in writing, shall DCSA be liable to
+                        You for damages, including any direct, indirect, special, incidental, or
+                        consequential damages of any character arising as a result of this terms or conditions
+                        or out of the use or inability to use the provided JSON data (including but not limited
+                        to damages for loss of goodwill, work stoppage, computer failure or malfunction, or any
+                        and all other commercial damages or losses), even if DCSA has been advised of the
+                        possibility of such damages.
+                      receiptTypeAtOrigin: CY
+                      deliveryTypeAtDestination: CY
+                      cargoMovementTypeAtOrigin: FCL
+                      cargoMovementTypeAtDestination: FCL
+                      serviceContractReference: SCR-1234-REGULAR
+                      carrierCode: MSC
+                      carrierCodeListProvider: SMDG
+                      issuingParty:
+                        partyName: Mediterranean Shipping Company
+                        address:
+                          street: Chemin Rieu
+                          streetNumber: 12-14
+                          city: Geneva
+                          countryCode: CH
+                        identifyingCodes:
+                          - codeListProvider: SMDG
+                            codeListName: LCL
+                            partyCode: MSC
+                      transports:
+                        plannedDepartureDate: '2023-12-20'
+                        plannedArrivalDate: '2023-12-22'
+                        portOfLoading:
+                          UNLocationCode: DKAAR
+                        portOfDischarge:
+                          UNLocationCode: DEBRV
+                        vesselVoyages:
+                          - vesselName: MSC Gülsün
+                            carrierExportVoyageNumber: 402E
+                      charges:
+                        - chargeName: Fictive transport document fee
+                          currencyAmount: 1
+                          currencyCode: EUR
+                          paymentTermCode: COL
+                          calculationBasis: Per transport document
+                          unitPrice: 1
+                          quantity: 1
+                      invoicePayableAt:
+                        UNLocationCode: DKAAR
+                      partyContactDetails:
+                        - name: DCSA test person
+                          email: no-reply@dcsa.example.org
+                      documentParties:
+                        shipper:
+                          partyName: DCSA CTK
+                          displayedAddress:
+                            - Strawinskylaan 4117
+                          partyContactDetails:
+                            - name: DCSA test person
+                              email: no-reply@dcsa.example.org
+                      consignmentItems:
+                        - carrierBookingReference: CBR_123_REGULAR
+                          descriptionOfGoods: 'Shoes - black'
+                          HSCodes:
+                            - '640510'
+                          cargoItems:
+                            - equipmentReference: NARU3472484
+                              weight: 12000
+                              weightUnit: KGM
+                              outerPackaging:
+                                numberOfPackages: 400
+                                packageCode: 4G
+                                description: Fibreboard boxes
+                      utilizedTransportEquipments:
+                        - isShipperOwned: false
+                          seals:
+                            - number: DCSA-CTK-1234
+                          equipment:
+                            ISOEquipmentCode: 22G1
+                            equipmentReference: NARU3472484
+      responses:
+        '204':
+          description: |
+            No Content
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+        '400':
+          description: |
+            In case the `Notification` does not schema validate a `400` (Bad Request) is returned
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                badRequestExample:
+                  summary: |
+                    Transport Document missing transportDocumentReference
+                  description: |
+                    `transportDocumentReference` is a mandatory property in the `Notification`. This is an example of how the error object would look in case this property is missing
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
+                  value:
+                    httpMethod: POST
+                    requestUri: /v3/transport-document-notifications
+                    statusCode: 400
+                    statusCodeText: Bad Request
+                    statusCodeMessage: |
+                      transportDocumentReference not found - mandatory to provide in a Notification
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2023-04-13T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7003
+                        property: transportDocumentReference
+                        errorCodeText: mandatory property missing
+                        errorCodeMessage: |
+                          transportDocumentReference must be provided as part of a Notification
+        '500':
+          description: |
+            In case a server error occurs in provider system a `500` (Internal Server Error) is returned
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                internalServerErrorExample:
+                  summary: |
+                    Internal Server Error while processing Notification
+                  description: |
+                    An Internal Server Error has occurred - the consumer should contact {provider-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
+                  value:
+                    httpMethod: POST
+                    requestUri: /v3/transport-document-notifications
+                    statusCode: 500
+                    statusCodeText: Internal Server Error
+                    statusCodeMessage: |
+                      Internal Server Error occurred while processing Transport Document
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2023-04-13T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: Internal Error occurred
+                        errorCodeMessage: Internal Error occurred
+        default:
+          description: |
+            For other errors the error object should be populated with relevant information
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                tooManyRequestsExample:
+                  summary: |
+                    Making too many Notifications
+                  description: |
+                    Calling the endPoint
+
+                        POST /v3/transport-document-notifications
+
+                    too many times within a timeperiod.
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
+                  value:
+                    httpMethod: POST
+                    requestUri: /v3/transport-document-notifications
+                    statusCode: 429
+                    statusCodeText: Too Many Requests
+                    statusCodeMessage: |
+                      Too many request to create a Notification has been requested. Please try again in 1 hour
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2023-04-13T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: Max Notifications reached
+                        errorCodeMessage: A maximum of 10 Notifications can be created per hour
 components:
   headers:
     API-Version:
@@ -1772,6 +2499,1529 @@ components:
         default: false
         example: false
   schemas:
+    ShippingInstructionsNotification:
+      type: object
+      title: Shipping Instructions Notification
+      description: |
+        `CloudEvent` specific properties for the `Notification`.
+      properties:
+        specversion:
+          type: string
+          description: |
+            The version of the CloudEvents specification which the event uses. This enables the interpretation of the context. Compliant event producers MUST use a value of `1.0` when referring to this version of the specification.
+
+            Currently, this attribute will only have the 'major' and 'minor' version numbers included in it. This allows for 'patch' changes to the specification to be made without changing this property's value in the serialization. Note: for 'release candidate' releases a suffix might be used for testing purposes.
+          enum:
+            - '1.0'
+          example: '1.0'
+        id:
+          type: string
+          maxLength: 100
+          description: |
+            Identifies the event. Producers MUST ensure that `source` + `id` is unique for each distinct event. If a duplicate event is re-sent (e.g. due to a network error) it MAY have the same `id`. Consumers MAY assume that Events with identical `source` and `id` are duplicates.
+          example: 3cecb101-7a1a-43a4-9d62-e88a131651e2
+        source:
+          type: string
+          maxLength: 4096
+          description: |
+            Identifies the context in which an event happened. Often this will include information such as the type of the event source, the organization publishing the event or the process that produced the event. The exact syntax and semantics behind the data encoded in the URI is defined by the event producer.
+
+            Producers MUST ensure that `source` + `id` is unique for each distinct event.
+
+            An application MAY assign a unique `source` to each distinct producer, which makes it easy to produce unique IDs since no other producer will have the same source. The application MAY use UUIDs, URNs, DNS authorities or an application-specific scheme to create unique `source` identifiers.
+
+            A source MAY include more than one producer. In that case the producers MUST collaborate to ensure that `source` + `id` is unique for each distinct event.
+          example: 'https://member.com/'
+        type:
+          type: string
+          description: |
+            This attribute contains a value describing the type of event related to the originating occurrence. Often this attribute is used for routing, observability, policy enforcement, etc. The format of this is producer defined and might include information such as the version of the type - see [Versioning of CloudEvents in the Primer](https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/primer.md#versioning-of-cloudevents) for more information.
+          enum:
+            - org.dcsa.shipping-instructions.v3
+          example: org.dcsa.shipping-instructions.v3
+        time:
+          type: string
+          format: date-time
+          description: |
+            Timestamp of when the occurrence happened. If the time of the occurrence cannot be determined then this attribute MAY be set to some other time (such as the current time) by the CloudEvents producer, however all producers for the same `source` MUST be consistent in this respect. In other words, either they all use the actual time of the occurrence or they all use the same algorithm to determine the value used.
+          example: '2018-04-05T17:31:00Z'
+        datacontenttype:
+          type: string
+          description: |
+            Content type of `data` value. This attribute enables `data` to carry any type of content, whereby format and encoding might differ from that of the chosen event format. For example, an event rendered using the [JSON envelope](formats/json-format.md#3-envelope) format might carry an XML payload in `data`, and the consumer is informed by this attribute being set to "application/xml". The rules for how `data` content is rendered for different `datacontenttype` values are defined in the event format specifications; for example, the JSON event format defines the relationship in [section 3.1](formats/json-format.md#31-handling-of-data).
+
+            For some binary mode protocol bindings, this field is directly mapped to the respective protocol's content-type metadata property. Normative rules for the binary mode and the content-type metadata mapping can be found in the respective protocol.
+
+            In some event formats the `datacontenttype` attribute MAY be omitted. For example, if a JSON format event has no `datacontenttype` attribute, then it is implied that the `data` is a JSON value conforming to the "application/json" media type. In other words: a JSON-format event with no `datacontenttype` is exactly equivalent to one with `datacontenttype="application/json"`.
+
+            When translating an event message with no `datacontenttype` attribute to a different format or protocol binding, the target `datacontenttype` SHOULD be set explicitly to the implied `datacontenttype` of the source.
+          enum:
+            - application/json
+          example: application/json
+        subscriptionReference:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 100
+          description: |
+            The reference of the subscription that has triggered this event
+          example: '30675492-50ff-4e17-a7df-7a487a8ad343'
+        data:
+          type: object
+          description: |
+            `Shipping Instructions` specific properties for the `Notification`
+          properties:
+            shippingInstructionsStatus:
+              type: string
+              maxLength: 50
+              description: |
+                The status of the `Shipping Instructions`. Possible values are:
+
+                - `RECEIVED` (Shipping Instructions has been received)
+                - `PENDING UPDATE` (An update is required to the Shipping Instructions)
+                - `COMPLETED` (The Shipping Instructions can no longer be modified - the related Transport Document has been surrendered for delivery)
+
+                More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/eblstatuses.csv).
+              example: RECEIVED
+            updatedShippingInstructionsStatus:
+              type: string
+              maxLength: 50
+              description: |
+                The status of latest update to the `Shipping Instructions`. If no update has been requested - then this property is empty. Possible values are:
+
+                - `UPDATE RECEIVED` (An update to a Shipping Instructions has been recieved and is awaiting to be processed)
+                - `UPDATE CONFIRMED` (Update is confirmed)
+                - `UPDATE CANCELLED` (An update to a Shipping Instructions is discontinued by consumer)
+                - `UPDATE DECLINED` (An update to a Shipping Instructions is discontinued by provider)
+
+                More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/eblstatuses.csv).
+              example: UPDATE RECEIVED
+            shippingInstructionsReference:
+              type: string
+              pattern: ^\S(?:.*\S)?$
+              maxLength: 100
+              description: |
+                The identifier for a `Shipping Instructions` provided by the carrier for system purposes.
+
+                **Condition:** `shippingInstructionsReference` and/or `transportDocumentReference` is required to provide
+              example: e0559d83-00e2-438e-afd9-fdd610c1a008
+            transportDocumentReference:
+              type: string
+              pattern: ^\S(?:.*\S)?$
+              maxLength: 20
+              description: |
+                A unique number allocated by the shipping line to the transport document and the main number used for the tracking of the status of the shipment.
+
+                **Condition:** `shippingInstructionsReference` and/or `transportDocumentReference` is required to provide
+              example: HHL71800000
+            reason:
+              type: string
+              maxLength: 5000
+              description: |
+                This property can be used to explain `shippingInstructionsStatus`.
+              example: Selected vessel is overbooked - please update VesselName
+            shippingInstructions:
+              type: object
+              title: Shipping Instructions
+              description: |
+                This property contains the shippingInstructions in case the subscriber is subscribing to the `Full State Transfer` of the Shipping Instructions.
+
+                In case the subscriber does not subscribe to the `Full State Transfer` of the Shipping Instructions then the content in this property can be ignored.
+              properties:
+                shippingInstructionsReference:
+                  type: string
+                  pattern: ^\S(?:.*\S)?$
+                  maxLength: 100
+                  description: |
+                    The identifier for a `Shipping Instructions` provided by the carrier for system purposes.
+                  example: e0559d83-00e2-438e-afd9-fdd610c1a008
+                transportDocumentReference:
+                  type: string
+                  pattern: ^\S(?:.*\S)?$
+                  maxLength: 20
+                  description: |
+                    A unique number allocated by the shipping line to the transport document and the main number used for the tracking of the status of the shipment.
+                  example: HHL71800000
+                shippingInstructionsStatus:
+                  type: string
+                  maxLength: 50
+                  description: |
+                    The status of the `Shipping Instructions`. Possible values are:
+                    - `RECEIVED` (Shipping Instructions has been received)
+                    - `PENDING UPDATE` (An update is required to the Shipping Instructions)
+                    - `COMPLETED` (The Shipping Instructions can no longer be modified - the related Transport Document has been surrendered for delivery)
+                  example: RECEIVED
+                updatedShippingInstructionsStatus:
+                  type: string
+                  maxLength: 50
+                  description: |
+                    The status of the latest update to the `Shipping Instructions`. If no update has been requested - then this field is empty. Possible values are:
+                    - `UPDATE RECEIVED` (An update to a Shipping Instructions is waiting to be processed)
+                    - `UPDATE CONFIRMED` (An update to a Shipping Instructions has been confirmed)
+                    - `UPDATE CANCELLED` (An update to a Shipping Instructions is discontinued by consumer)
+                    - `UPDATE DECLINED` (An update to a Shipping Instructions is discontinued by provider)
+                  example: UPDATE RECEIVED
+                transportDocumentTypeCode:
+                  type: string
+                  description: |
+                    Specifies the type of the transport document
+                    - `BOL` (Bill of Lading)
+                    - `SWB` (Sea Waybill)
+                  enum:
+                    - BOL
+                    - SWB
+                  example: SWB
+                isShippedOnBoardType:
+                  type: boolean
+                  description: |
+                    Specifies whether the Transport Document is a received for shipment, or shipped on board.
+                  example: true
+                freightPaymentTermCode:
+                  type: string
+                  description: |
+                    An indicator of whether freight and ancillary fees for the main transport are prepaid (`PRE`) or collect (`COL`). When prepaid the charges are the responsibility of the shipper or the Invoice payer on behalf of the shipper (if provided). When collect, the charges are the responsibility of the consignee or the Invoice payer on behalf of the consignee (if provided).
+
+                    - `PRE` (Prepaid)
+                    - `COL` (Collect)
+                  enum:
+                    - PRE
+                    - COL
+                  example: PRE
+                originChargesPaymentTerm:
+                  type: object
+                  title: Origin Charges Payment Term
+                  description: |
+                    An indicator of whether origin charges are prepaid (`PRE`) or collect (`COL`). When prepaid, the charges are the responsibility of the shipper or the Invoice payer on behalf of the shipper (if provided). When collect, the charges are the responsibility of the consignee or the Invoice payer on behalf of the consignee (if provided).
+                  properties:
+                    haulageChargesPaymentTermCode:
+                      type: string
+                      description: |
+                        An indicator of whether the costs for inland transportation to the port, when applicable, are prepaid (`PRE`) or collect (`COL`).
+
+                        - `PRE` (Prepaid)
+                        - `COL` (Collect)
+                      enum:
+                        - PRE
+                        - COL
+                      example: PRE
+                    portChargesPaymentTermCode:
+                      type: string
+                      description: |
+                        An indicator of whether the origin port charges are prepaid (`PRE`) or collect (`COL`).
+
+                        - `PRE` (Prepaid)
+                        - `COL` (Collect)
+                      enum:
+                        - PRE
+                        - COL
+                      example: PRE
+                    otherChargesPaymentTermCode:
+                      type: string
+                      enum:
+                        - PRE
+                        - COL
+                      description: |
+                        An indicator of whether origin charges (excluding port and haulage) are prepaid (`PRE`) or collect (`COL`).
+
+                        - `PRE` (Prepaid)
+                        - `COL` (Collect)
+                      example: PRE
+                destinationChargesPaymentTerm:
+                  type: object
+                  title: Destination Charges Payment Term
+                  description: |
+                    An indicator of whether destination charges are prepaid (`PRE`) or collect (`COL`). When prepaid, the charges are the responsibility of the shipper or the Invoice payer on behalf of the shipper (if provided). When collect, the charges are the responsibility of the consignee or the Invoice payer on behalf of the consignee (if provided).
+                  properties:
+                    haulageChargesPaymentTermCode:
+                      type: string
+                      description: |
+                        An indicator of whether the costs for inland transportation to the port, when applicable, are prepaid (`PRE`) or collect (`COL`).
+
+                        - `PRE` (Prepaid)
+                        - `COL` (Collect)
+                      enum:
+                        - PRE
+                        - COL
+                      example: PRE
+                    portChargesPaymentTermCode:
+                      type: string
+                      description: |
+                        An indicator of whether the destination port charges are prepaid (`PRE`) or collect (`COL`).
+
+                        - `PRE` (Prepaid)
+                        - `COL` (Collect)
+                      enum:
+                        - PRE
+                        - COL
+                      example: PRE
+                    otherChargesPaymentTermCode:
+                      type: string
+                      enum:
+                        - PRE
+                        - COL
+                      description: |
+                        An indicator of whether destination charges (excluding port and haulage) are prepaid (`PRE`) or collect (`COL`).
+
+                        - `PRE` (Prepaid)
+                        - `COL` (Collect)
+                      example: PRE
+                isElectronic:
+                  type: boolean
+                  description: |
+                    An indicator whether the transport document is electronically transferred.
+                  example: true
+                sendToPlatform:
+                  type: string
+                  maxLength: 4
+                  pattern: ^\S+$
+                  description: |
+                    Indicates the shipper’s platform on which the eBL should be issued. The value **MUST** be one of:
+                    - `WAVE` (Wave)
+                    - `CARX` (CargoX)
+                    - `ESSD` (EssDOCS)
+                    - `IDT` (ICE Digital Trade)
+                    - `BOLE` (Bolero)
+                    - `EDOX` (EdoxOnline)
+                    - `IQAX` (IQAX)
+                    - `SECR` (Secro)
+                    - `TRGO` (TradeGO)
+                    - `ETEU` (eTEU)
+                    - `TRAC` (TRACE Original)
+                    - `BRIT` (BRITC eBL)
+
+                    **Condition:** Mandatory for electronic Bill of Lading (`isElectronic=true`).
+                    
+                    Must be a code this list [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/reference-data/eblsolutionproviders-v3.0.0-Beta-2.csv).
+                  example: WAVE
+                isToOrder:
+                  type: boolean
+                  description: |
+                    Indicates whether the B/L is issued `to order` or not. If `true`, the B/L is considered negotiable and an Endorsee party can be defined in the Document parties. If no Endorsee is defined, the B/L is blank endorsed. If `false`, the B/L is considered non-negotiable (also referred to as `straight`).
+
+                    `isToOrder` must be `false` if `transportDocumentTypeCode='SWB'` (Sea Waybill).
+                  example: false
+                isCarriersAgentAtDestinationRequired:
+                  type: boolean
+                  description: |
+                    Indicates whether the Carrier's agent at destination name, address and contact details should be included in the `Transport Document`.
+                  example: false
+                numberOfCopiesWithCharges:
+                  type: integer
+                  format: int32
+                  minimum: 0
+                  description: The requested number of copies of the Transport document to be issued by the carrier including charges. Only applicable for physical (paper) documents
+                  example: 2
+                numberOfCopiesWithoutCharges:
+                  type: integer
+                  format: int32
+                  minimum: 0
+                  description: The requested number of copies of the Transport document to be issued by the carrier **NOT** including charges. Only applicable for physical (paper) documents
+                  example: 2
+                numberOfOriginalsWithCharges:
+                  type: integer
+                  format: int32
+                  minimum: 0
+                  description: |
+                    Number of originals of the bill of lading that has been requested by the customer with charges. Only applicable for physical documents.
+                  example: 1
+                numberOfOriginalsWithoutCharges:
+                  type: integer
+                  format: int32
+                  minimum: 0
+                  description: |
+                    Number of originals of the bill of lading that has been requested by the customer without charges. Only applicable for physical documents.
+                  example: 1
+                displayedNameForPlaceOfReceipt:
+                  description: |
+                    The name to be used in order to specify how the `Place of Receipt` should be displayed on the transport document to match the name and/or address provided on the letter of credit.
+                  type: array
+                  maxItems: 5
+                  items:
+                    type: string
+                    maxLength: 35
+                    description: |
+                      A line of the address to be displayed on the transport document.
+                    example: 'Strawinskylaan 4117'
+                displayedNameForPortOfLoad:
+                  description: |
+                    The name to be used in order to specify how the `Port of Load` should be displayed on the transport document to match the name and/or address provided on the letter of credit.
+                  type: array
+                  maxItems: 5
+                  items:
+                    type: string
+                    maxLength: 35
+                    description: |
+                      A line of the address to be displayed on the transport document.
+                    example: 'Strawinskylaan 4117'
+                displayedNameForPortOfDischarge:
+                  description: |
+                    The name to be used in order to specify how the `Port of Discharge` should be displayed on the transport document to match the name and/or address provided on the letter of credit.
+                  type: array
+                  maxItems: 5
+                  items:
+                    type: string
+                    maxLength: 35
+                    description: |
+                      A line of the address to be displayed on the transport document.
+                    example: 'Strawinskylaan 4117'
+                displayedNameForPlaceOfDelivery:
+                  description: |
+                    The name to be used in order to specify how the `Place of Delivery` should be displayed on the transport document to match the name and/or address provided on the letter of credit.
+                  type: array
+                  maxItems: 5
+                  items:
+                    type: string
+                    maxLength: 35
+                    description: |
+                      A line of the address to be displayed on the transport document.
+                    example: 'Strawinskylaan 4117'
+                placeOfIssue:
+                  type: object
+                  title: Place of Issue
+                  description: |
+                    An object to capture where the original Transport Document (`Bill of Lading`) will be issued.
+
+                    The location can be specified either as a `UN Location Code` or as a `CountryCode`.
+                  oneOf:
+                    - type: object
+                      title: UN Location Code
+                      properties:
+                        UNLocationCode:
+                          type: string
+                          pattern: ^[A-Z]{2}[A-Z2-9]{3}$
+                          minLength: 5
+                          maxLength: 5
+                          description: |-
+                            The UN Location code specifying where the place is located. The pattern used must be
+                            
+                            - 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+                            - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used
+                            
+                            More info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)
+                          example: NLAMS
+                      required:
+                        - UNLocationCode
+                    - type: object
+                      title: Country Code
+                      properties:
+                        countryCode:
+                          type: string
+                          pattern: ^[A-Z]{2}$
+                          minLength: 2
+                          maxLength: 2
+                          description: |
+                            The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+                          example: NL
+                      required:
+                        - countryCode
+                invoicePayableAt:
+                  type: object
+                  title: Invoice Payable At
+                  description: |
+                    Location where payment of ocean freight and charges for the main transport will take place by the customer.
+
+                    The location must be provided as a `UN Location Code`
+                  properties:
+                    UNLocationCode:
+                      type: string
+                      pattern: ^[A-Z]{2}[A-Z2-9]{3}$
+                      minLength: 5
+                      maxLength: 5
+                      description: |-
+                        The UN Location code specifying where the place is located. The pattern used must be
+                        
+                        - 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+                        - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used
+                        
+                        More info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)
+                      example: NLAMS
+                  required:
+                    - UNLocationCode
+                partyContactDetails:
+                  type: array
+                  minItems: 1
+                  description: |
+                    The contact details of the person(s) to contact in relation to the **Transport Document** (changes, notifications etc.) 
+                  items:
+                    $ref: '#/components/schemas/PartyContactDetail'
+                documentParties:
+                  type: object
+                  title: Document Parties
+                  description: |
+                    All `Parties` with associated roles.
+                  properties:
+                    shipper:
+                      $ref: '#/components/schemas/Shipper'
+                    consignee:
+                      $ref: '#/components/schemas/Consignee'
+                    endorsee:
+                      $ref: '#/components/schemas/Endorsee'
+                    other:
+                      type: array
+                      description: A list of document parties that can be optionally provided in the `Shipping Instructions` and `Transport Document`.
+                      items:
+                        $ref: '#/components/schemas/OtherDocumentParty'
+                  required:
+                    - shipper
+                consignmentItems:
+                  type: array
+                  minItems: 1
+                  description: |
+                    A list of `ConsignmentItems`
+                  items:
+                    $ref: '#/components/schemas/ConsignmentItemShipper'
+                utilizedTransportEquipments:
+                  type: array
+                  minItems: 1
+                  description: |
+                    A list of `Utilized Transport Equipments` describing the equipment being used.
+                  items:
+                    $ref: '#/components/schemas/UtilizedTransportEquipmentShipper'
+                references:
+                  type: array
+                  description: |
+                    A list of `References`
+                  items:
+                    $ref: '#/components/schemas/Reference'
+                customsReferences:
+                  type: array
+                  description: |
+                    A list of `Customs references`
+                  items:
+                    $ref: '#/components/schemas/CustomsReference'
+                advanceManifestFilings:
+                  type: array
+                  description: |
+                    A list of `Advance Manifest Filings` specified by the Shipper to indicate whom is to do the Filing
+                  items:
+                    $ref: '#/components/schemas/AdvanceManifestFiling'
+                requestedCarrierCertificates:
+                  type: array
+                  description: |
+                    Certificate(s) requested by the Shipper for the Carrier to include as part of the shipment documentation pack
+                  items:
+                    $ref: '#/components/schemas/RequestedCarrierCertificate'
+                requestedCarrierClauses:
+                  type: array
+                  description: |
+                    Clauses requested by the Shipper for the Carrier to include in the `Transport Document` `Carrier clauses`
+                  items:
+                    $ref: '#/components/schemas/RequestedCarrierClause'
+                requestedChanges:
+                  type: array
+                  description: |
+                    A list of changes requirested by the carrier to the document in order for it to be accepted.
+                  items:
+                    $ref: '#/components/schemas/RequestedChange'
+                reason:
+                  type: string
+                  maxLength: 5000
+                  description: |
+                    This field can be used to explain `shippingInstructionsStatus` and/or `updatedShippingInstructionsStatus`.
+                  example: Rejected because of of wrong equipmentReference
+              required:
+                - shippingInstructionsStatus
+                - transportDocumentTypeCode
+                - isShippedOnBoardType
+                - isElectronic
+                - isToOrder
+                - freightPaymentTermCode
+                - partyContactDetails
+                - documentParties
+                - consignmentItems
+                - utilizedTransportEquipments
+            updatedShippingInstructions:
+              type: object
+              title: Updated Shipping Instructions
+              description: |
+                This property contains the updated shipping instructions in case:
+                  - an update is currently active
+                  - the subscriber is subscribing to the `Full State Transfer` of the Shipping Instructions
+
+                In case the subscriber does not subscribe to the `Full State Transfer` of the Shipping Instructions or no update is active - then the content in this property can be ignored.
+              properties:
+                shippingInstructionsReference:
+                  type: string
+                  pattern: ^\S(?:.*\S)?$
+                  maxLength: 100
+                  description: |
+                    The identifier for a `Shipping Instructions` provided by the carrier for system purposes.
+                  example: e0559d83-00e2-438e-afd9-fdd610c1a008
+                transportDocumentReference:
+                  type: string
+                  pattern: ^\S(?:.*\S)?$
+                  maxLength: 20
+                  description: |
+                    A unique number allocated by the shipping line to the transport document and the main number used for the tracking of the status of the shipment.
+                  example: HHL71800000
+                shippingInstructionsStatus:
+                  type: string
+                  maxLength: 50
+                  description: |
+                    The status of the `Shipping Instructions`. Possible values are:
+                    - `RECEIVED` (Shipping Instructions has been received)
+                    - `PENDING UPDATE` (An update is required to the Shipping Instructions)
+                    - `COMPLETED` (The Shipping Instructions can no longer be modified - the related Transport Document has been surrendered for delivery)
+                  example: RECEIVED
+                updatedShippingInstructionsStatus:
+                  type: string
+                  maxLength: 50
+                  description: |
+                    The status of the latest update to the `Shipping Instructions`. If no update has been requested - then this field is empty. Possible values are:
+                    - `UPDATE RECEIVED` (An update to a Shipping Instructions is waiting to be processed)
+                    - `UPDATE CONFIRMED` (An update to a Shipping Instructions has been confirmed)
+                    - `UPDATE CANCELLED` (An update to a Shipping Instructions is discontinued by consumer)
+                    - `UPDATE DECLINED` (An update to a Shipping Instructions is discontinued by provider)
+                  example: UPDATE RECEIVED
+                transportDocumentTypeCode:
+                  type: string
+                  description: |
+                    Specifies the type of the transport document
+                    - `BOL` (Bill of Lading)
+                    - `SWB` (Sea Waybill)
+                  enum:
+                    - BOL
+                    - SWB
+                  example: SWB
+                isShippedOnBoardType:
+                  type: boolean
+                  description: |
+                    Specifies whether the Transport Document is a received for shipment, or shipped on board.
+                  example: true
+                freightPaymentTermCode:
+                  type: string
+                  description: |
+                    An indicator of whether freight and ancillary fees for the main transport are prepaid (`PRE`) or collect (`COL`). When prepaid the charges are the responsibility of the shipper or the Invoice payer on behalf of the shipper (if provided). When collect, the charges are the responsibility of the consignee or the Invoice payer on behalf of the consignee (if provided).
+
+                    - `PRE` (Prepaid)
+                    - `COL` (Collect)
+                  enum:
+                    - PRE
+                    - COL
+                  example: PRE
+                originChargesPaymentTerm:
+                  type: object
+                  title: Origin Charges Payment Term
+                  description: |
+                    An indicator of whether origin charges are prepaid (`PRE`) or collect (`COL`). When prepaid, the charges are the responsibility of the shipper or the Invoice payer on behalf of the shipper (if provided). When collect, the charges are the responsibility of the consignee or the Invoice payer on behalf of the consignee (if provided).
+                  properties:
+                    haulageChargesPaymentTermCode:
+                      type: string
+                      description: |
+                        An indicator of whether the costs for inland transportation to the port, when applicable, are prepaid (`PRE`) or collect (`COL`).
+
+                        - `PRE` (Prepaid)
+                        - `COL` (Collect)
+                      enum:
+                        - PRE
+                        - COL
+                      example: PRE
+                    portChargesPaymentTermCode:
+                      type: string
+                      description: |
+                        An indicator of whether the origin port charges are prepaid (`PRE`) or collect (`COL`).
+
+                        - `PRE` (Prepaid)
+                        - `COL` (Collect)
+                      enum:
+                        - PRE
+                        - COL
+                      example: PRE
+                    otherChargesPaymentTermCode:
+                      type: string
+                      enum:
+                        - PRE
+                        - COL
+                      description: |
+                        An indicator of whether origin charges (excluding port and haulage) are prepaid (`PRE`) or collect (`COL`).
+
+                        - `PRE` (Prepaid)
+                        - `COL` (Collect)
+                      example: PRE
+                destinationChargesPaymentTerm:
+                  type: object
+                  title: Destination Charges Payment Term
+                  description: |
+                    An indicator of whether destination charges are prepaid (`PRE`) or collect (`COL`). When prepaid, the charges are the responsibility of the shipper or the Invoice payer on behalf of the shipper (if provided). When collect, the charges are the responsibility of the consignee or the Invoice payer on behalf of the consignee (if provided).
+                  properties:
+                    haulageChargesPaymentTermCode:
+                      type: string
+                      description: |
+                        An indicator of whether the costs for inland transportation to the port, when applicable, are prepaid (`PRE`) or collect (`COL`).
+
+                        - `PRE` (Prepaid)
+                        - `COL` (Collect)
+                      enum:
+                        - PRE
+                        - COL
+                      example: PRE
+                    portChargesPaymentTermCode:
+                      type: string
+                      description: |
+                        An indicator of whether the destination port charges are prepaid (`PRE`) or collect (`COL`).
+
+                        - `PRE` (Prepaid)
+                        - `COL` (Collect)
+                      enum:
+                        - PRE
+                        - COL
+                      example: PRE
+                    otherChargesPaymentTermCode:
+                      type: string
+                      enum:
+                        - PRE
+                        - COL
+                      description: |
+                        An indicator of whether destination charges (excluding port and haulage) are prepaid (`PRE`) or collect (`COL`).
+
+                        - `PRE` (Prepaid)
+                        - `COL` (Collect)
+                      example: PRE
+                isElectronic:
+                  type: boolean
+                  description: |
+                    An indicator whether the transport document is electronically transferred.
+                  example: true
+                sendToPlatform:
+                  type: string
+                  maxLength: 4
+                  pattern: ^\S+$
+                  description: |
+                    Indicates the shipper’s platform on which the eBL should be issued. The value **MUST** be one of:
+                    - `WAVE` (Wave)
+                    - `CARX` (CargoX)
+                    - `ESSD` (EssDOCS)
+                    - `IDT` (ICE Digital Trade)
+                    - `BOLE` (Bolero)
+                    - `EDOX` (EdoxOnline)
+                    - `IQAX` (IQAX)
+                    - `SECR` (Secro)
+                    - `TRGO` (TradeGO)
+                    - `ETEU` (eTEU)
+                    - `TRAC` (TRACE Original)
+                    - `BRIT` (BRITC eBL)
+
+                    **Condition:** Mandatory for electronic Bill of Lading (`isElectronic=true`).
+                    
+                    Must be a code this list [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/reference-data/eblsolutionproviders-v3.0.0-Beta-2.csv).
+                  example: WAVE
+                isToOrder:
+                  type: boolean
+                  description: |
+                    Indicates whether the B/L is issued `to order` or not. If `true`, the B/L is considered negotiable and an Endorsee party can be defined in the Document parties. If no Endorsee is defined, the B/L is blank endorsed. If `false`, the B/L is considered non-negotiable (also referred to as `straight`).
+
+                    `isToOrder` must be `false` if `transportDocumentTypeCode='SWB'` (Sea Waybill).
+                  example: false
+                isCarriersAgentAtDestinationRequired:
+                  type: boolean
+                  description: |
+                    Indicates whether the Carrier's agent at destination name, address and contact details should be included in the `Transport Document`.
+                  example: false
+                numberOfCopiesWithCharges:
+                  type: integer
+                  format: int32
+                  minimum: 0
+                  description: The requested number of copies of the Transport document to be issued by the carrier including charges. Only applicable for physical (paper) documents
+                  example: 2
+                numberOfCopiesWithoutCharges:
+                  type: integer
+                  format: int32
+                  minimum: 0
+                  description: The requested number of copies of the Transport document to be issued by the carrier **NOT** including charges. Only applicable for physical (paper) documents
+                  example: 2
+                numberOfOriginalsWithCharges:
+                  type: integer
+                  format: int32
+                  minimum: 0
+                  description: |
+                    Number of originals of the bill of lading that has been requested by the customer with charges. Only applicable for physical documents.
+                  example: 1
+                numberOfOriginalsWithoutCharges:
+                  type: integer
+                  format: int32
+                  minimum: 0
+                  description: |
+                    Number of originals of the bill of lading that has been requested by the customer without charges. Only applicable for physical documents.
+                  example: 1
+                displayedNameForPlaceOfReceipt:
+                  description: |
+                    The name to be used in order to specify how the `Place of Receipt` should be displayed on the transport document to match the name and/or address provided on the letter of credit.
+                  type: array
+                  maxItems: 5
+                  items:
+                    type: string
+                    maxLength: 35
+                    description: |
+                      A line of the address to be displayed on the transport document.
+                    example: 'Strawinskylaan 4117'
+                displayedNameForPortOfLoad:
+                  description: |
+                    The name to be used in order to specify how the `Port of Load` should be displayed on the transport document to match the name and/or address provided on the letter of credit.
+                  type: array
+                  maxItems: 5
+                  items:
+                    type: string
+                    maxLength: 35
+                    description: |
+                      A line of the address to be displayed on the transport document.
+                    example: 'Strawinskylaan 4117'
+                displayedNameForPortOfDischarge:
+                  description: |
+                    The name to be used in order to specify how the `Port of Discharge` should be displayed on the transport document to match the name and/or address provided on the letter of credit.
+                  type: array
+                  maxItems: 5
+                  items:
+                    type: string
+                    maxLength: 35
+                    description: |
+                      A line of the address to be displayed on the transport document.
+                    example: 'Strawinskylaan 4117'
+                displayedNameForPlaceOfDelivery:
+                  description: |
+                    The name to be used in order to specify how the `Place of Delivery` should be displayed on the transport document to match the name and/or address provided on the letter of credit.
+                  type: array
+                  maxItems: 5
+                  items:
+                    type: string
+                    maxLength: 35
+                    description: |
+                      A line of the address to be displayed on the transport document.
+                    example: 'Strawinskylaan 4117'
+                placeOfIssue:
+                  type: object
+                  title: Place of Issue
+                  description: |
+                    An object to capture where the original Transport Document (`Bill of Lading`) will be issued.
+
+                    The location can be specified either as a `UN Location Code` or as a `CountryCode`.
+                  oneOf:
+                    - type: object
+                      title: UN Location Code
+                      properties:
+                        UNLocationCode:
+                          type: string
+                          pattern: ^[A-Z]{2}[A-Z2-9]{3}$
+                          minLength: 5
+                          maxLength: 5
+                          description: |-
+                            The UN Location code specifying where the place is located. The pattern used must be
+                            
+                            - 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+                            - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used
+                            
+                            More info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)
+                          example: NLAMS
+                      required:
+                        - UNLocationCode
+                    - type: object
+                      title: Country Code
+                      properties:
+                        countryCode:
+                          type: string
+                          pattern: ^[A-Z]{2}$
+                          minLength: 2
+                          maxLength: 2
+                          description: |
+                            The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+                          example: NL
+                      required:
+                        - countryCode
+                invoicePayableAt:
+                  type: object
+                  title: Invoice Payable At
+                  description: |
+                    Location where payment of ocean freight and charges for the main transport will take place by the customer.
+
+                    The location must be provided as a `UN Location Code`
+                  properties:
+                    UNLocationCode:
+                      type: string
+                      pattern: ^[A-Z]{2}[A-Z2-9]{3}$
+                      minLength: 5
+                      maxLength: 5
+                      description: |-
+                        The UN Location code specifying where the place is located. The pattern used must be
+                        
+                        - 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+                        - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used
+                        
+                        More info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)
+                      example: NLAMS
+                  required:
+                    - UNLocationCode
+                partyContactDetails:
+                  type: array
+                  minItems: 1
+                  description: |
+                    The contact details of the person(s) to contact in relation to the **Transport Document** (changes, notifications etc.) 
+                  items:
+                    $ref: '#/components/schemas/PartyContactDetail'
+                documentParties:
+                  type: object
+                  title: Document Parties
+                  description: |
+                    All `Parties` with associated roles.
+                  properties:
+                    shipper:
+                      $ref: '#/components/schemas/Shipper'
+                    consignee:
+                      $ref: '#/components/schemas/Consignee'
+                    endorsee:
+                      $ref: '#/components/schemas/Endorsee'
+                    other:
+                      type: array
+                      description: A list of document parties that can be optionally provided in the `Shipping Instructions` and `Transport Document`.
+                      items:
+                        $ref: '#/components/schemas/OtherDocumentParty'
+                  required:
+                    - shipper
+                consignmentItems:
+                  type: array
+                  minItems: 1
+                  description: |
+                    A list of `ConsignmentItems`
+                  items:
+                    $ref: '#/components/schemas/ConsignmentItemShipper'
+                utilizedTransportEquipments:
+                  type: array
+                  minItems: 1
+                  description: |
+                    A list of `Utilized Transport Equipments` describing the equipment being used.
+                  items:
+                    $ref: '#/components/schemas/UtilizedTransportEquipmentShipper'
+                references:
+                  type: array
+                  description: |
+                    A list of `References`
+                  items:
+                    $ref: '#/components/schemas/Reference'
+                customsReferences:
+                  type: array
+                  description: |
+                    A list of `Customs references`
+                  items:
+                    $ref: '#/components/schemas/CustomsReference'
+                advanceManifestFilings:
+                  type: array
+                  description: |
+                    A list of `Advance Manifest Filings` specified by the Shipper to indicate whom is to do the Filing
+                  items:
+                    $ref: '#/components/schemas/AdvanceManifestFiling'
+                requestedCarrierCertificates:
+                  type: array
+                  description: |
+                    Certificate(s) requested by the Shipper for the Carrier to include as part of the shipment documentation pack
+                  items:
+                    $ref: '#/components/schemas/RequestedCarrierCertificate'
+                requestedCarrierClauses:
+                  type: array
+                  description: |
+                    Clauses requested by the Shipper for the Carrier to include in the `Transport Document` `Carrier clauses`
+                  items:
+                    $ref: '#/components/schemas/RequestedCarrierClause'
+                requestedChanges:
+                  type: array
+                  description: |
+                    A list of changes requirested by the carrier to the document in order for it to be accepted.
+                  items:
+                    $ref: '#/components/schemas/RequestedChange'
+                reason:
+                  type: string
+                  maxLength: 5000
+                  description: |
+                    This field can be used to explain `shippingInstructionsStatus` and/or `updatedShippingInstructionsStatus`.
+                  example: Rejected because of of wrong equipmentReference
+              required:
+                - shippingInstructionsStatus
+                - transportDocumentTypeCode
+                - isShippedOnBoardType
+                - isElectronic
+                - isToOrder
+                - freightPaymentTermCode
+                - partyContactDetails
+                - documentParties
+                - consignmentItems
+                - utilizedTransportEquipments
+          required:
+            - shippingInstructionsStatus
+      required:
+        - specversion
+        - id
+        - source
+        - type
+        - time
+        - datacontenttype
+        - subscriptionReference
+        - data
+    TransportDocumentNotification:
+      type: object
+      title: Transport Document Notification
+      description: |
+        `CloudEvent` specific properties for the `Notification`.
+      properties:
+        specversion:
+          type: string
+          description: |
+            The version of the CloudEvents specification which the event uses. This enables the interpretation of the context. Compliant event producers MUST use a value of `1.0` when referring to this version of the specification.
+
+            Currently, this attribute will only have the 'major' and 'minor' version numbers included in it. This allows for 'patch' changes to the specification to be made without changing this property's value in the serialization. Note: for 'release candidate' releases a suffix might be used for testing purposes.
+          enum:
+            - '1.0'
+          example: '1.0'
+        id:
+          type: string
+          maxLength: 100
+          description: |
+            Identifies the event. Producers MUST ensure that `source` + `id` is unique for each distinct event. If a duplicate event is re-sent (e.g. due to a network error) it MAY have the same `id`. Consumers MAY assume that Events with identical `source` and `id` are duplicates.
+          example: 3cecb101-7a1a-43a4-9d62-e88a131651e2
+        source:
+          type: string
+          maxLength: 4096
+          description: |
+            Identifies the context in which an event happened. Often this will include information such as the type of the event source, the organization publishing the event or the process that produced the event. The exact syntax and semantics behind the data encoded in the URI is defined by the event producer.
+
+            Producers MUST ensure that `source` + `id` is unique for each distinct event.
+
+            An application MAY assign a unique `source` to each distinct producer, which makes it easy to produce unique IDs since no other producer will have the same source. The application MAY use UUIDs, URNs, DNS authorities or an application-specific scheme to create unique `source` identifiers.
+
+            A source MAY include more than one producer. In that case the producers MUST collaborate to ensure that `source` + `id` is unique for each distinct event.
+          example: 'https://member.com/'
+        type:
+          type: string
+          description: |
+            This attribute contains a value describing the type of event related to the originating occurrence. Often this attribute is used for routing, observability, policy enforcement, etc. The format of this is producer defined and might include information such as the version of the type - see [Versioning of CloudEvents in the Primer](https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/primer.md#versioning-of-cloudevents) for more information.
+          enum:
+            - org.dcsa.transport-document.v3
+          example: org.dcsa.transport-document.v3
+        time:
+          type: string
+          format: date-time
+          description: |
+            Timestamp of when the occurrence happened. If the time of the occurrence cannot be determined then this attribute MAY be set to some other time (such as the current time) by the CloudEvents producer, however all producers for the same `source` MUST be consistent in this respect. In other words, either they all use the actual time of the occurrence or they all use the same algorithm to determine the value used.
+          example: '2018-04-05T17:31:00Z'
+        datacontenttype:
+          type: string
+          description: |
+            Content type of `data` value. This attribute enables `data` to carry any type of content, whereby format and encoding might differ from that of the chosen event format. For example, an event rendered using the [JSON envelope](formats/json-format.md#3-envelope) format might carry an XML payload in `data`, and the consumer is informed by this attribute being set to "application/xml". The rules for how `data` content is rendered for different `datacontenttype` values are defined in the event format specifications; for example, the JSON event format defines the relationship in [section 3.1](formats/json-format.md#31-handling-of-data).
+
+            For some binary mode protocol bindings, this field is directly mapped to the respective protocol's content-type metadata property. Normative rules for the binary mode and the content-type metadata mapping can be found in the respective protocol.
+
+            In some event formats the `datacontenttype` attribute MAY be omitted. For example, if a JSON format event has no`datacontenttype` attribute, then it is implied that the `data` is a JSON value conforming to the "application/json" media type. In other words: a JSON-format event with no `datacontenttype` is exactly equivalent to one with `datacontenttype="application/json"`.
+
+            When translating an event message with no `datacontenttype` attribute to a different format or protocol binding, the target `datacontenttype` SHOULD be set explicitly to the implied `datacontenttype` of the source.
+          enum:
+            - application/json
+          example: application/json
+        subscriptionReference:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 100
+          description: |
+            The reference of the subscription that has triggered this event
+          example: '30675492-50ff-4e17-a7df-7a487a8ad343'
+        data:
+          type: object
+          description: |
+            `Transport Document` specific properties for the `Notification`
+          properties:
+            transportDocumentStatus:
+              type: string
+              maxLength: 50
+              description: |
+                The status of the `Transport Document`. Possible values are:
+
+                - `DRAFT` (Transport Document is Drafted)
+                - `APPROVED` (Transport Document has been Approved by consumer)
+                - `ISSUED` (Transport Document has been Issued by provider)
+                - `PENDING SURRENDER FOR AMENDMENT` (Transport Document is Pending for Surrender for an Amendment)
+                - `SURRENDER FOR AMENDMENT` (Transport Document Surrendered for an Amendment)
+                - `VOID` (the Transport Document has been Voided)
+                - `PENDING SURRENDER FOR DELIVERY` (Transport Document pending surrender for Delivery)
+                - `SURRENDERED FOR DELIVERY` (Transport Document surrendered for Delivery)
+
+                More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/eblstatuses.csv).
+              example: DRAFT
+            shippingInstructionsReference:
+              type: string
+              pattern: ^\S(?:.*\S)?$
+              maxLength: 100
+              description: |
+                The identifier for a `Shipping Instructions` provided by the carrier for system purposes.
+              example: e0559d83-00e2-438e-afd9-fdd610c1a008
+            transportDocumentReference:
+              type: string
+              pattern: ^\S(?:.*\S)?$
+              maxLength: 20
+              description: |
+                A unique number allocated by the shipping line to the transport document and the main number used for the tracking of the status of the shipment.
+              example: HHL71800000
+            reason:
+              type: string
+              maxLength: 5000
+              description: |
+                This property can be used to explain Transport Document Status.
+              example: Voided because a new Transport Document has been issued
+            transportDocument:
+              type: object
+              title: Transport Document
+              description: |
+                This property contains the transportDocument in case the subscriber is subscribing to the `Full State Transfer` of the Transport Document.
+
+                In case the subscriber does not subscribe to the `Full State Transfer` of the Transport Document then the content in this property can be ignored.
+              properties:
+                transportDocumentReference:
+                  type: string
+                  pattern: ^\S(?:.*\S)?$
+                  maxLength: 20
+                  description: |
+                    A unique number allocated by the shipping line to the transport document and the main number used for the tracking of the status of the shipment.
+                  example: HHL71800000
+                shippingInstructionsReference:
+                  type: string
+                  pattern: ^\S(?:.*\S)?$
+                  maxLength: 100
+                  description: |
+                    The identifier for a `Shipping Instructions` provided by the carrier for system purposes.
+                  example: e0559d83-00e2-438e-afd9-fdd610c1a008
+                transportDocumentStatus:
+                  type: string
+                  maxLength: 50
+                  description: |
+                    The status of the `Transport Document`. Possible values are:
+                    - DRAFT
+                    - APPROVED
+                    - ISSUED
+                    - PENDING SURRENDER FOR AMENDMENT
+                    - SURRENDER FOR AMENDMENT
+                    - PENDING SURRENDER FOR DELIVERY
+                    - SURRENDER FOR DELIVERY
+                    - VOIDED
+                  example: DRAFT
+                transportDocumentTypeCode:
+                  type: string
+                  description: |
+                    Specifies the type of the transport document
+                    - `BOL` (Bill of Lading)
+                    - `SWB` (Sea Waybill)
+                  enum:
+                    - BOL
+                    - SWB
+                  example: SWB
+                isShippedOnBoardType:
+                  type: boolean
+                  description: |
+                    Specifies whether the Transport Document is a received for shipment, or shipped on board.
+                  example: true
+                freightPaymentTermCode:
+                  type: string
+                  description: |
+                    An indicator of whether freight and ancillary fees for the main transport are prepaid (`PRE`) or collect (`COL`). When prepaid the charges are the responsibility of the shipper or the Invoice payer on behalf of the shipper (if provided). When collect, the charges are the responsibility of the consignee or the Invoice payer on behalf of the consignee (if provided).
+
+                    - `PRE` (Prepaid)
+                    - `COL` (Collect)
+                  enum:
+                    - PRE
+                    - COL
+                  example: PRE
+                isElectronic:
+                  type: boolean
+                  description: |
+                    An indicator whether the transport document is electronically transferred.
+                  example: true
+                isToOrder:
+                  type: boolean
+                  description: |
+                    Indicates whether the B/L is issued `to order` or not. If `true`, the B/L is considered negotiable and an Endorsee party can be defined in the Document parties. If no Endorsee is defined, the B/L is blank endorsed. If `false`, the B/L is considered non-negotiable (also referred to as `straight`).
+
+                    `isToOrder` must be `false` if `transportDocumentTypeCode='SWB'` (Sea Waybill).
+                  example: false
+                numberOfCopiesWithCharges:
+                  type: integer
+                  format: int32
+                  minimum: 0
+                  description: The requested number of copies of the Transport document to be issued by the carrier including charges. Only applicable for physical (paper) documents
+                  example: 2
+                numberOfCopiesWithoutCharges:
+                  type: integer
+                  format: int32
+                  minimum: 0
+                  description: The requested number of copies of the Transport document to be issued by the carrier **NOT** including charges. Only applicable for physical (paper) documents
+                  example: 2
+                numberOfOriginalsWithCharges:
+                  type: integer
+                  format: int32
+                  minimum: 0
+                  description: |
+                    Number of originals of the bill of lading that has been requested by the customer with charges. Only applicable for physical documents.
+                  example: 1
+                numberOfOriginalsWithoutCharges:
+                  type: integer
+                  format: int32
+                  minimum: 0
+                  description: |
+                    Number of originals of the bill of lading that has been requested by the customer without charges. Only applicable for physical documents.
+                  example: 1
+                displayedNameForPlaceOfReceipt:
+                  description: |
+                    The name to be used in order to specify how the `Place of Receipt` should be displayed on the transport document to match the name and/or address provided on the letter of credit.
+                  type: array
+                  maxItems: 5
+                  items:
+                    type: string
+                    maxLength: 35
+                    description: |
+                      A line of the address to be displayed on the transport document.
+                    example: 'Strawinskylaan 4117'
+                displayedNameForPortOfLoad:
+                  description: |
+                    The name to be used in order to specify how the `Port of Load` should be displayed on the transport document to match the name and/or address provided on the letter of credit.
+                  type: array
+                  maxItems: 5
+                  items:
+                    type: string
+                    maxLength: 35
+                    description: |
+                      A line of the address to be displayed on the transport document.
+                    example: 'Strawinskylaan 4117'
+                displayedNameForPortOfDischarge:
+                  description: |
+                    The name to be used in order to specify how the `Port of Discharge` should be displayed on the transport document to match the name and/or address provided on the letter of credit.
+                  type: array
+                  maxItems: 5
+                  items:
+                    type: string
+                    maxLength: 35
+                    description: |
+                      A line of the address to be displayed on the transport document.
+                    example: 'Strawinskylaan 4117'
+                displayedNameForPlaceOfDelivery:
+                  description: |
+                    The name to be used in order to specify how the `Place of Delivery` should be displayed on the transport document to match the name and/or address provided on the letter of credit.
+                  type: array
+                  maxItems: 5
+                  items:
+                    type: string
+                    maxLength: 35
+                    description: |
+                      A line of the address to be displayed on the transport document.
+                    example: 'Strawinskylaan 4117'
+                shippedOnBoardDate:
+                  type: string
+                  format: date
+                  description: |
+                    Date when the last container that is linked to the transport document is physically loaded onboard the vessel indicated on the transport document.
+
+                    When provided on a transport document, the transportDocument is a `Shipped On Board` B/L.
+
+                    Exactly one of `shippedOnBoard` and `receiveForShipmentDate` must be provided on an issued B/L.
+                  example: '2020-12-12'
+                termsAndConditions:
+                  type: string
+                  maxLength: 50000
+                  description: |
+                    Carrier terms and conditions of transport.
+                  example: Any reference in...
+                receiptTypeAtOrigin:
+                  type: string
+                  maxLength: 3
+                  description: |
+                    Indicates the type of service offered at `Origin`. The options are:
+                    - `CY` (Container yard (incl. rail ramp))
+                    - `SD` (Store Door)
+                    - `CFS` (Container Freight Station)
+                  enum:
+                    - CY
+                    - SD
+                    - CFS
+                  example: CY
+                deliveryTypeAtDestination:
+                  type: string
+                  maxLength: 3
+                  description: |
+                    Indicates the type of service offered at `Destination`. The options are:
+
+                    - `CY` (Container yard (incl. rail ramp))
+                    - `SD` (Store Door)
+                    - `CFS` (Container Freight Station)
+                  enum:
+                    - CY
+                    - SD
+                    - CFS
+                  example: CY
+                cargoMovementTypeAtOrigin:
+                  type: string
+                  maxLength: 3
+                  description: |
+                    Refers to the shipment term at the **loading** of the cargo into the container. Possible values are:
+
+                    - `FCL` (Full Container Load)
+                    - `LCL` (Less than Container Load)
+                  example: FCL
+                cargoMovementTypeAtDestination:
+                  type: string
+                  maxLength: 3
+                  description: |
+                    Refers to the shipment term at the **unloading** of the cargo out of the container. Possible values are:
+
+                    - `FCL` (Full Container Load)
+                    - `LCL` (Less than Container Load)
+                  example: FCL
+                issueDate:
+                  type: string
+                  format: date
+                  description: |
+                    Local date when the transport document has been issued.
+
+                    Can be omitted on draft transport documents, but must be provided when the document has been issued.
+                  example: '2020-12-12'
+                receivedForShipmentDate:
+                  type: string
+                  format: date
+                  description: |
+                    Date when the last container linked to the transport document is physically in the terminal (customers cleared against the intended vessel).
+
+                    When provided on a transport document, the transportDocument is a `Received For Shipment` B/L.
+
+                    Exactly one of `shippedOnBoard` and `receiveForShipmentDate` must be provided on an issued B/L.
+                  example: '2020-12-12'
+                serviceContractReference:
+                  type: string
+                  maxLength: 30
+                  description: |
+                    Reference number for agreement between shipper and carrier, which optionally includes a certain minimum quantity commitment (usually referred as “MQC”) of cargo that the shipper commits to over a fixed period, and the carrier commits to a certain rate or rate schedule.
+                  example: HHL51800000
+                contractQuotationReference:
+                  type: string
+                  pattern: ^\S(?:.*\S)?$
+                  maxLength: 35
+                  description: |
+                    Information provided by the shipper to identify whether pricing for the shipment has been agreed via a contract or a quotation reference.
+                  example: HHL1401
+                declaredValue:
+                  type: number
+                  format: float
+                  minimum: 0
+                  description: |
+                    The value of the cargo that the shipper declares to avoid the carrier's limitation of liability and "Ad Valorem" freight, i.e. freight which is calculated based on the value of the goods declared by the shipper.
+                  example: 1231.1
+                declaredValueCurrency:
+                  type: string
+                  pattern: ^[A-Z]{3}$
+                  minLength: 3
+                  maxLength: 3
+                  description: |
+                    The currency used for the declared value, using the 3-character code defined by [ISO 4217](https://en.wikipedia.org/wiki/ISO_4217).
+                  example: DKK
+                carrierCode:
+                  type: string
+                  pattern: ^\S+$
+                  maxLength: 4
+                  description: |
+                    The `NMFTA` or `SMDG` code of the issuing carrier of the `Transport Document`
+                  example: MMCU
+                carrierCodeListProvider:
+                  type: string
+                  description: |
+                    The code list provider for the carrier code. Possible values are:
+                    - `SMDG` (Ship Message Design Group)
+                    - `NMFTA` (National Motor Freight Traffic Association) _includes SPLC (Standard Point Location Code)_
+                  enum:
+                    - SMDG
+                    - NMFTA
+                  example: NMFTA
+                issuingParty:
+                  $ref: '#/components/schemas/IssuingParty'
+                carrierClauses:
+                  type: array
+                  description: |
+                    Additional clauses for a specific shipment added by the carrier to the Bill of Lading, subject to local rules / guidelines or certain mandatory information required to be shared with the customer.
+                  items:
+                    type: string
+                    pattern: ^\S(?:.*\S)?$
+                    maxLength: 20000
+                    description: |
+                      The content of the clause.
+                    example: It is not allowed to...
+                numberOfRiderPages:
+                  type: integer
+                  format: int32
+                  minimum: 0
+                  description: |
+                    The number of additional pages required to contain the goods description on a transport document. Only applicable for physical transport documents.
+                  example: 2
+                transports:
+                  $ref: '#/components/schemas/Transports'
+                charges:
+                  type: array
+                  description: |
+                    A list of `Charges`
+                  items:
+                    $ref: '#/components/schemas/Charge'
+                # New values compared to SI - END
+                placeOfIssue:
+                  type: object
+                  title: Place of Issue
+                  description: |
+                    An object to capture where the original Transport Document (`Bill of Lading`) will be issued.
+
+                    The location can be specified either as a `UN Location Code` or as a `CountryCode`.
+                  oneOf:
+                    - type: object
+                      title: UN Location Code
+                      properties:
+                        UNLocationCode:
+                          type: string
+                          pattern: ^[A-Z]{2}[A-Z2-9]{3}$
+                          minLength: 5
+                          maxLength: 5
+                          description: |-
+                            The UN Location code specifying where the place is located. The pattern used must be
+
+                            - 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+                            - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used
+
+                            More info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)
+                          example: NLAMS
+                      required:
+                        - UNLocationCode
+                    - type: object
+                      title: Country Code
+                      properties:
+                        countryCode:
+                          type: string
+                          pattern: ^[A-Z]{2}$
+                          minLength: 2
+                          maxLength: 2
+                          description: |
+                            The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+                          example: NL
+                      required:
+                        - countryCode
+                invoicePayableAt:
+                  type: object
+                  title: Invoice Payable At
+                  description: |
+                    Location where payment of ocean freight and charges for the main transport will take place by the customer.
+
+                    The location can be provided as a `UN Location Code` or as a fallback - a `freeText` field
+                  oneOf:
+                    - type: object
+                      title: UN Location Code
+                      properties:
+                        UNLocationCode:
+                          type: string
+                          pattern: ^[A-Z]{2}[A-Z2-9]{3}$
+                          minLength: 5
+                          maxLength: 5
+                          description: |-
+                            The UN Location code specifying where the place is located. The pattern used must be
+
+                            - 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+                            - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used
+
+                            More info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)
+                          example: NLAMS
+                      required:
+                        - UNLocationCode
+                    - type: object
+                      title: Free text
+                      properties:
+                        freeText:
+                          type: string
+                          maxLength: 35
+                          description: |
+                            The name of the location where payment will be rendered by the customer.
+                          example: DCSA Headquarters
+                      required:
+                        - freeText
+                partyContactDetails:
+                  type: array
+                  minItems: 1
+                  description: |
+                    The contact details of the person(s) to contact in relation to the **Transport Document** (changes, notifications etc.) 
+                  items:
+                    $ref: '#/components/schemas/PartyContactDetail'
+                documentParties:
+                  type: object
+                  title: Document Parties
+                  description: |
+                    All `Parties` with associated roles.
+                  properties:
+                    shipper:
+                      $ref: '#/components/schemas/Shipper'
+                    consignee:
+                      $ref: '#/components/schemas/Consignee'
+                    endorsee:
+                      $ref: '#/components/schemas/Endorsee'
+                    carriersAgentAtDestination:
+                      $ref: '#/components/schemas/CarriersAgentAtDestination'
+                    other:
+                      type: array
+                      description: A list of document parties that can be optionally provided in the `Shipping Instructions` and `Transport Document`.
+                      items:
+                        $ref: '#/components/schemas/OtherDocumentParty'
+                  required:
+                    - shipper
+                consignmentItems:
+                  type: array
+                  minItems: 1
+                  description: |
+                    A list of `ConsignmentItems`
+                  items:
+                    $ref: '#/components/schemas/ConsignmentItem'
+                # Includes calculated fields!
+                utilizedTransportEquipments:
+                  type: array
+                  minItems: 1
+                  description: |
+                    A list of `Utilized Transport Equipments` describing the equipment being used.
+                  items:
+                    $ref: '#/components/schemas/UtilizedTransportEquipment'
+                references:
+                  type: array
+                  description: |
+                    A list of `References`
+                  items:
+                    $ref: '#/components/schemas/Reference'
+                customsReferences:
+                  type: array
+                  description: |
+                    A list of `Customs references`
+                  items:
+                    $ref: '#/components/schemas/CustomsReference'
+              required:
+                - transportDocumentReference
+                - transportDocumentStatus
+                - transportDocumentTypeCode
+                - isShippedOnBoardType
+                - isElectronic
+                - isToOrder
+                - invoicePayableAt
+                - partyContactDetails
+                - documentParties
+                - consignmentItems
+                - utilizedTransportEquipments
+                - termsAndConditions
+                - receiptTypeAtOrigin
+                - deliveryTypeAtDestination
+                - cargoMovementTypeAtOrigin
+                - cargoMovementTypeAtDestination
+                - carrierCode
+                - carrierCodeListProvider
+                - issuingParty
+                - transports
+          required:
+            - transportDocumentStatus
+            - transportDocumentReference
+      required:
+        - specversion
+        - id
+        - source
+        - type
+        - time
+        - datacontenttype
+        - subscriptionReference
+        - data
+
     ##############################
     # Create Shipping Instructions    
     ##############################

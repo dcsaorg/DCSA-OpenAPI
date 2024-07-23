@@ -5,7 +5,7 @@ info:
   description: |
     API specification issued by DCSA.org.
 
-    For explanation of specific values or objects please refer to the [Information Model 2024.Q1](https://dcsa-website.cdn.prismic.io/dcsa-website/ZhlC9TjCgu4jzyW5_20240402-DCSA-Information-Model-2024.Q1-ReleaseCandidate_01.pdf). This API specification does not define the allowable updates and their timing in accordance with the established business rules. Refer to the [DCSA Interface Standard for the Booking process 2.0 Beta 3](https://dcsa.org/standards/booking/documentation-booking-2-beta-3) to address this. **All use cases mentioned in this API specification refer to use cases defined in this Booking IFS**.
+    For explanation of specific values or objects please refer to the [Information Model 2024.Q1](https://dcsa-website.cdn.prismic.io/dcsa-website/ZhlC9TjCgu4jzyW5_20240402-DCSA-Information-Model-2024.Q1-ReleaseCandidate_01.pdf). This API specification does not define the allowable updates and their timing in accordance with the established business rules. Refer to the [DCSA Interface Standard for the Booking process 2.0](https://dcsa.org/standards/booking/documentation-booking-2) to address this. **All use cases mentioned in this API specification refer to use cases defined in this Booking IFS**.
 
     All other documents related to the Booking publication can be found [here](https://dcsa.org/standards/booking-process/)
 
@@ -13,10 +13,18 @@ info:
 
         GET /v2/bookings/{bookingReference}
 
-    in order to poll information about status changes.
+    in order to poll information about status changes. All `/v2/bookings` endPoints must be implmented by the provider.
 
-    ### Notifications
-    It is possible to have notifications pushed to you whenever the provider needs input and/or a state change. The format of the notification is defined by the [Booking Notification API](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG_NTF/2.0.0-Beta-3). Signing up for notifications is defined outside the scope of this API specification.
+    ### Notifications (Implemented by consumer)
+    It is possible to have notifications pushed to you whenever the provider needs input and/or a state change. The format of the notification is defined by the [Booking Notification endPoint](#/BookingNotification).
+
+        POST /v2/booking-notifications
+
+    The endPoints support both a **Lightweight Notification** and a **Full State Transfer**. How much data is sent via this Notification endPoint depends on what kind of Notification is being subscribed to.
+
+    Signing up for notifications is defined outside the scope of this API specification.
+
+    This endPoint is to be implemented by the consumers of the `Booking API` in order to recieve push events.
 
     ### Stats API
     The Stats API offers crucial statistical information for both API providers and consumers to enhance their services and helps DCSA to understand and scale the ecosystem. We expect you to invoke the Stats API for every request made to the Booking API. Further details can be found [here](https://labs.dcsa.org/#/http/guides/api-guides/stats-api/introduction)
@@ -32,7 +40,9 @@ info:
 security: []
 tags:
   - name: Booking
-    description: The Booking
+    description: Booking endPoints to be implemented by **providers** of the Booking API
+  - name: Notifications
+    description: Notifications to be implemented by the **consumers** of the Booking API
 paths:
   /v2/bookings:
     post:
@@ -77,7 +87,7 @@ paths:
               bookingStatus: 'RECEIVED'
             }
             ```
-        4. All '_relevant_' subscribers will be notified via a [Booking Notification](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG_NTF/2.0.0-Beta-3#/Notifications/booking-notifications).
+        4. All '_relevant_' subscribers will be notified via a [Booking Notification](#/BookingNotification).
 
         For `POST` `Booking Request` the process ends here. The `Booking Request`
           - is now stored in the provider system
@@ -625,7 +635,7 @@ paths:
                 amendedBookingStatus: 'AMENDMENT RECEIVED'
               }
               ```
-        4. All '_relevant_' subscribers will be notified via a [Booking Notification](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG_NTF/2.0.0-Beta-3#/Notifications/booking-notifications).
+        4. All '_relevant_' subscribers will be notified via a [Booking Notification](#/BookingNotification).
 
         For `PUT` `Booking Request` the process ends here. The `Booking Request`
           - is now stored in the provider system
@@ -1519,7 +1529,7 @@ paths:
            - only the amendment to the `Booking` is cancelled (in this case the `Booking` continues and `bookingStatus` stays unchanged). This is the case when the payload contains `amendedBookingStatus='AMENDMENT CANCELLED'`.
              
              **If** no amendment is being requested prior to this call (`amendedBookingStatus` is **not** `AMENDMENT RECIEVED`) then a 404 (Not Found) is returned
-        4. All '*relevant*' subscribers will be notified via a [Booking Notification](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG_NTF/2.0.0-Beta-3#/Notifications/booking-notifications).
+        4. All '*relevant*' subscribers will be notified via a [Booking Notification](#/BookingNotification).
       parameters:
         - $ref: '#/components/parameters/bookingReferencePathParam'
         - $ref: '#/components/parameters/Api-Version-Major'
@@ -1662,12 +1672,443 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /v2/booking-notifications:
+    post:
+      tags:
+        - Notifications
+      summary: Send a new Booking Notification
+      operationId: booking-notifications
+      description: |
+        Creates a new [`Booking Notification`](#/BookingNotification). This endPoint is called whenever a `Booking` that a consumer has subscribed to changes state or is updated.
+
+        **This endPoint is to be implemented by a consumer of the Booking API in order to receive Notifications**
+      parameters:
+        - $ref: '#/components/parameters/Api-Version-Major'
+      requestBody:
+        description: |
+          The payload used to create a [`Booking Notification`](#/BookingNotification)
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingNotification'
+            examples:
+              receivedLightweightExample:
+                summary: |
+                  Booking request received (Lightweight)
+                description: |
+                  A lightweight notification explaining that a `Booking Request` has been received and stored in provider system (`bookingStatus='RECEIVED'`).
+                value:
+                  specversion: '1.0'
+                  id: 3cecb101-7a1a-43a4-9d62-e88a131651e2
+                  source: 'https://member.com/'
+                  type: org.dcsa.booking.v2
+                  time: '2018-04-05T17:31:00Z'
+                  datacontenttype: application/json
+                  subscriptionReference: BKG001
+                  data:
+                    bookingStatus: RECEIVED
+                    carrierBookingRequestReference: 24595eb0-5cfc-4381-9c3a-cedc1975e9aa
+              receivedFullStateTransferExample:
+                summary: |
+                  Booking request received (Full State Transfer)
+                description: |
+                  A full state transfer notification explaining that a `Booking Request` has been received and stored in provider system (`bookingStatus='RECEIVED'`).
+                value:
+                  specversion: '1.0'
+                  id: 3cecb101-7a1a-43a4-9d62-e88a131651e2
+                  source: 'https://member.com/'
+                  type: org.dcsa.booking.v2
+                  time: '2018-04-05T17:31:00Z'
+                  datacontenttype: application/json
+                  subscriptionReference: BKG001
+                  data:
+                    bookingStatus: RECEIVED
+                    carrierBookingRequestReference: 24595eb0-5cfc-4381-9c3a-cedc1975e9aa
+                    booking:
+                      carrierBookingRequestReference: 24595eb0-5cfc-4381-9c3a-cedc1975e9aa
+                      bookingStatus: RECEIVED
+                      receiptTypeAtOrigin: CY
+                      deliveryTypeAtDestination: CY
+                      cargoMovementTypeAtOrigin: FCL
+                      cargoMovementTypeAtDestination: FCL
+                      serviceContractReference: HHL51800000
+                      freightPaymentTermCode: PRE
+                      originChargesPaymentTerm:
+                        haulageChargesPaymentTermCode: PRE
+                        portChargesPaymentTermCode: PRE
+                      destinationChargesPaymentTerm:
+                        haulageChargesPaymentTermCode: COL
+                        portChargesPaymentTermCode: PRE
+                        otherChargesPaymentTermCode: PRE
+                      contractQuotationReference: HHL1401
+                      vessel:
+                        name: MAERSK IOWA
+                        vesselIMONumber: '9298686'
+                      carrierServiceCode: TA1
+                      carrierExportVoyageNumber: 403W
+                      isPartialLoadAllowed: false
+                      isExportDeclarationRequired: false
+                      isImportLicenseRequired: false
+                      expectedDepartureDate: '2024-01-20'
+                      incoTerms: EXW
+                      communicationChannelCode: AO
+                      isEquipmentSubstitutionAllowed: false
+                      references:
+                        - type: CR
+                          value: KN-00103004
+                      documentParties:
+                        bookingAgent:
+                          partyName: KN Bremerhaven
+                          address:
+                            name: Kuehne + Nagel (AG & Co.) KG
+                            street: Amerikaring
+                            streetNumber: '40'
+                            postCode: '27568'
+                            city: Bremerhaven
+                            countryCode: DE
+                          partyContactDetails:
+                            - name: Export operations department
+                              phone: +49 471 945410
+                      partyContactDetails:
+                        - name: Diane
+                          phone: +49 471 945410
+                      shipmentLocations:
+                        - location:
+                            locationName: Bremerhaven
+                            UNLocationCode: DEBRV
+                          locationTypeCode: POL
+                        - location:
+                            locationName: Norfolk
+                            UNLocationCode: USORF
+                          locationTypeCode: POD
+                      requestedEquipments:
+                        - isShipperOwned: false
+                          ISOEquipmentCode: 42GP
+                          units: 3
+                          commodities:
+                            - commodityType: 'Dry cargo, Freight all kinds'
+                              cargoGrossWeight: 36000
+                              cargoGrossWeightUnit: KGM
+              declinedLightweightExample:
+                summary: |
+                  Booking amendment declined (Lightweight)
+                description: |
+                  A lightweight notification explaining that an amendment to a `Booking` has been declined (`amendedBookingStatus='AMENDMENT DECLINED'`)
+                value:
+                  specversion: '1.0'
+                  id: 3cecb101-7a1a-43a4-9d62-e88a131651e2
+                  source: 'https://member.com/'
+                  type: org.dcsa.booking.v2
+                  time: '2018-04-05T17:31:00Z'
+                  datacontenttype: application/json
+                  subscriptionReference: BKG001
+                  data:
+                    bookingStatus: CONFIRMED
+                    amendedBookingStatus: AMENDMENT DECLINED
+                    carrierBookingRequestReference: 24595eb0-5cfc-4381-9c3a-cedc1975e9aa
+                    carrierBookingReference: ABC709951
+                    reason: Declined because of no equipment availability
+              declinedFullStateTransferExample:
+                summary: |
+                  Booking amendment declined (Full State Transfer)
+                description: |
+                  A full state transfer notification explaining that an amendment to a `Booking` has been declined (`amendedBookingStatus='AMENDMENT DECLINED'`). The notification both contains the Booking from before the amendment (in the `booking` property) it also contains the amended booking (in the `amendedBooking` property).
+                value:
+                  specversion: '1.0'
+                  id: 3cecb101-7a1a-43a4-9d62-e88a131651e2
+                  source: 'https://member.com/'
+                  type: org.dcsa.booking.v2
+                  time: '2018-04-05T17:31:00Z'
+                  datacontenttype: application/json
+                  subscriptionReference: BKG001
+                  data:
+                    bookingStatus: CONFIRMED
+                    amendedBookingStatus: AMENDMENT DECLINED
+                    carrierBookingRequestReference: 24595eb0-5cfc-4381-9c3a-cedc1975e9aa
+                    carrierBookingReference: ABC709951
+                    reason: Declined because of no equipment availability
+                    booking:
+                      carrierBookingRequestReference: 24595eb0-5cfc-4381-9c3a-cedc1975e9aa
+                      carrierBookingReference: ABC709951
+                      bookingStatus: CONFIRMED
+                      amendedBookingStatus: AMENDMENT DECLINED
+                      receiptTypeAtOrigin: CY
+                      deliveryTypeAtDestination: CY
+                      cargoMovementTypeAtOrigin: FCL
+                      cargoMovementTypeAtDestination: FCL
+                      serviceContractReference: HHL51800000
+                      freightPaymentTermCode: PRE
+                      originChargesPaymentTerm:
+                        haulageChargesPaymentTermCode: PRE
+                        portChargesPaymentTermCode: PRE
+                        otherChargesPaymentTermCode: COL
+                      destinationChargesPaymentTerm:
+                        haulageChargesPaymentTermCode: COL
+                        portChargesPaymentTermCode: PRE
+                        otherChargesPaymentTermCode: COL
+                      contractQuotationReference: HHL1401
+                      vessel:
+                        name: MAERSK IOWA
+                        vesselIMONumber: '9298686'
+                      carrierServiceCode: TA1
+                      carrierExportVoyageNumber: 403W
+                      isPartialLoadAllowed: false
+                      isExportDeclarationRequired: false
+                      isImportLicenseRequired: false
+                      expectedDepartureDate: '2024-01-20'
+                      incoTerms: EXW
+                      communicationChannelCode: AO
+                      isEquipmentSubstitutionAllowed: false
+                      references:
+                        - type: CR
+                          value: KN-00103004
+                      documentParties:
+                        bookingAgent:
+                          partyName: KN Bremerhaven
+                          address:
+                            name: Kuehne + Nagel (AG & Co.) KG
+                            street: Amerikaring
+                            streetNumber: '40'
+                            postCode: '27568'
+                            city: Bremerhaven
+                            countryCode: DE
+                          partyContactDetails:
+                            - name: Export operations department
+                              phone: +49 471 945410
+                      partyContactDetails:
+                        - name: Diane
+                          phone: +49 471 945410
+                      shipmentLocations:
+                        - location:
+                            locationName: Bremerhaven
+                            UNLocationCode: DEBRV
+                          locationTypeCode: POL
+                        - location:
+                            locationName: Norfolk
+                            UNLocationCode: USORF
+                          locationTypeCode: POD
+                      requestedEquipments:
+                        - isShipperOwned: false
+                          ISOEquipmentCode: 42GP
+                          units: 3
+                          commodities:
+                            - commodityType: 'Dry cargo, Freight all kinds'
+                              cargoGrossWeight: 36000
+                              cargoGrossWeightUnit: KGM
+                      confirmedEquipments:
+                        - ISOEquipmentCode: 42GP
+                          units: 3
+                      transportPlan:
+                        - transportPlanStage: MNC
+                          transportPlanStageSequenceNumber: 1
+                          loadLocation:
+                            locationName: Bremerhaven
+                            UNLocationCode: DEBRV
+                          dischargeLocation:
+                            locationName: Norfolk
+                            UNLocationCode: USORF
+                          plannedDepartureDate: '2024-01-20'
+                          plannedArrivalDate: '2024-01-31'
+                          modeOfTransport: VESSEL
+                          vesselName: MAERSK IOWA
+                          vesselIMONumber: '9298686'
+                          carrierServiceCode: TA1
+                          carrierExportVoyageNumber: 403W
+                      shipmentCutOffTimes:
+                        - cutOffDateTimeCode: DCO
+                          cutOffDateTime: '2024-01-17T22:30:00.000'
+                        - cutOffDateTimeCode: VCO
+                          cutOffDateTime: '2024-01-18T22:30:00.000'
+                        - cutOffDateTimeCode: FCO
+                          cutOffDateTime: '2024-01-19T13:30:00.000'
+                      advanceManifestFilings:
+                        - manifestTypeCode: ACE
+                          countryCode: US
+                      carrierClauses:
+                        - The date of shipment, the carrying vessel and theschedule are not guaranteed and are always subject tochanges.
+                        - 'Operations such as lifting, stowage, drayage and customs declaration of containers are based on the description of the nature, quantity, measurement and weight declared by the Shipper. The Shipper shall be liable for any damage, loss, expense and fines incurred by Carrier XYZ or its agents due to incorrectness or incompleteness of such declaration.'
+                        - 'Warranted shipper must fulfill the requirements of SOLAS regulations and the IMO guidelines regarding the Verified Gross Mass (VGM) of container carrying cargo (msc.1/circ.1474, 9 June 2014).'
+                        - 'In accordance with SOLAS regulations and IMO guidelines regarding the VGM (verified gross mass), any expenses incurred because the VGM was submitted late or was not submitted at all will be charged back to the customer with an additional administration fee.'
+                    amendedBooking:
+                      carrierBookingRequestReference: 24595eb0-5cfc-4381-9c3a-cedc1975e9aa
+                      carrierBookingReference: ABC709951
+                      bookingStatus: CONFIRMED
+                      amendedBookingStatus: AMENDMENT DECLINED
+                      receiptTypeAtOrigin: CY
+                      deliveryTypeAtDestination: CY
+                      cargoMovementTypeAtOrigin: FCL
+                      cargoMovementTypeAtDestination: FCL
+                      serviceContractReference: HHL51800000
+                      freightPaymentTermCode: PRE
+                      originChargesPaymentTerm:
+                        haulageChargesPaymentTermCode: PRE
+                        portChargesPaymentTermCode: PRE
+                        otherChargesPaymentTermCode: COL
+                      destinationChargesPaymentTerm:
+                        haulageChargesPaymentTermCode: COL
+                        portChargesPaymentTermCode: PRE
+                        otherChargesPaymentTermCode: COL
+                      contractQuotationReference: HHL1401
+                      vessel:
+                        name: MAERSK IOWA
+                        vesselIMONumber: '9298686'
+                      carrierServiceCode: TA1
+                      carrierExportVoyageNumber: 403W
+                      isPartialLoadAllowed: false
+                      isExportDeclarationRequired: false
+                      isImportLicenseRequired: false
+                      expectedDepartureDate: '2024-01-20'
+                      incoTerms: EXW
+                      communicationChannelCode: AO
+                      isEquipmentSubstitutionAllowed: false
+                      references:
+                        - type: CR
+                          value: KN-00103004
+                      documentParties:
+                        bookingAgent:
+                          partyName: KN Bremerhaven
+                          address:
+                            name: Kuehne + Nagel (AG & Co.) KG
+                            street: Amerikaring
+                            streetNumber: '40'
+                            postCode: '27568'
+                            city: Bremerhaven
+                            countryCode: DE
+                          partyContactDetails:
+                            - name: Export operations department
+                              phone: +49 471 945410
+                      partyContactDetails:
+                        - name: Diane
+                          phone: +49 471 945410
+                      shipmentLocations:
+                        - location:
+                            locationName: Bremerhaven
+                            UNLocationCode: DEBRV
+                          locationTypeCode: POL
+                        - location:
+                            locationName: Norfolk
+                            UNLocationCode: USORF
+                          locationTypeCode: POD
+                      requestedEquipments:
+                        - isShipperOwned: false
+                          ISOEquipmentCode: 42GP
+                          units: 30
+                          commodities:
+                            - commodityType: 'Dry cargo, Freight all kinds'
+                              cargoGrossWeight: 36000
+                              cargoGrossWeightUnit: KGM
+      responses:
+        '204':
+          description: |
+            No Content
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+        '400':
+          description: |
+            In case the `Notification` does not schema validate a `400` (Bad Request) is returned
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                badRequestExample:
+                  summary: |
+                    Booking missing carrierBookingReference or carrierBookingRequestReference
+                  description: |
+                    `carrierBookingReference` or `carrierBookingRequestReference` is a conditionary property in the `Notification` (at least one of them must be present). This is an example of how the error object would look in case this property is missing
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
+                  value:
+                    httpMethod: POST
+                    requestUri: /v2/booking-notifications
+                    statusCode: 400
+                    statusCodeText: Bad Request
+                    statusCodeMessage: |
+                      carrierBookingReference or carrierBookingRequestReference not found - one of them is a mandatory to provide in a Notification
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2023-04-13T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7003
+                        property: carrierBookingReference or carrierBookingRequestReference
+                        errorCodeText: mandatory property missing
+                        errorCodeMessage: |
+                          carrierBookingReference or carrierBookingRequestReference must be provided as part of a Notification
+        '500':
+          description: |
+            In case a server error occurs in provider system a `500` (Internal Server Error) is returned
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                internalServerErrorExample:
+                  summary: |
+                    Internal Server Error while processing Notification
+                  description: |
+                    An Internal Server Error has occurred - the consumer should contact {provider-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
+                  value:
+                    httpMethod: POST
+                    requestUri: /v2/booking-notifications
+                    statusCode: 500
+                    statusCodeText: Internal Server Error
+                    statusCodeMessage: |
+                      Internal Server Error occurred while processing Booking request
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2023-04-13T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: Internal Error occurred
+                        errorCodeMessage: Internal Error occurred
+        default:
+          description: |
+            For other errors the error object should be populated with relevant information
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                tooManyRequestsExample:
+                  summary: |
+                    Making too many Notifications
+                  description: |
+                    Calling the endPoint
+
+                        POST /v2/booking-notifications
+
+                    too many times within a timeperiod.
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
+                  value:
+                    httpMethod: POST
+                    requestUri: /v2/booking-notifications
+                    statusCode: 429
+                    statusCodeText: Too Many Requests
+                    statusCodeMessage: |
+                      Too many request to create a Notification has been requested. Please try again in 1 hour
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2023-04-13T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: Max Notifications reached
+                        errorCodeMessage: A maximum of 10 Notifications can be created per hour
 components:
   headers:
     API-Version:
       schema:
         type: string
-        example: 2.0.0-Beta-2
+        example: 2.0.0
       description: |
         SemVer used to indicate the version of the contract (API version) returned.
   parameters:
@@ -1709,7 +2150,1316 @@ components:
         example: CBR001
       required: true
   schemas:
+    ######################
+    # Booking Notification
+    ######################
+    BookingNotification:
+      type: object
+      title: Booking Notification
+      description: |
+        `CloudEvent` specific properties for the `Notification`.
+      properties:
+        specversion:
+          type: string
+          description: |
+            The version of the CloudEvents specification which the event uses. This enables the interpretation of the context. Compliant event producers MUST use a value of `1.0` when referring to this version of the specification.
 
+            Currently, this attribute will only have the 'major' and 'minor' version numbers included in it. This allows for 'patch' changes to the specification to be made without changing this property's value in the serialization. Note: for 'release candidate' releases a suffix might be used for testing purposes.
+          enum:
+            - '1.0'
+          example: '1.0'
+        id:
+          type: string
+          maxLength: 100
+          description: |
+            Identifies the event. Producers MUST ensure that `source` + `id` is unique for each distinct event. If a duplicate event is re-sent (e.g. due to a network error) it MAY have the same `id`. Consumers MAY assume that Events with identical `source` and `id` are duplicates.
+          example: 3cecb101-7a1a-43a4-9d62-e88a131651e2
+        source:
+          type: string
+          maxLength: 4096
+          description: |
+            Identifies the context in which an event happened. Often this will include information such as the type of the event source, the organization publishing the event or the process that produced the event. The exact syntax and semantics behind the data encoded in the URI is defined by the event producer.
+
+            Producers MUST ensure that `source` + `id` is unique for each distinct event.
+
+            An application MAY assign a unique `source` to each distinct producer, which makes it easy to produce unique IDs since no other producer will have the same source. The application MAY use UUIDs, URNs, DNS authorities or an application-specific scheme to create unique `source` identifiers.
+
+            A source MAY include more than one producer. In that case the producers MUST collaborate to ensure that `source` + `id` is unique for each distinct event.
+          example: 'https://member.com/'
+        type:
+          type: string
+          description: |
+            This attribute contains a value describing the type of event related to the originating occurrence. Often this attribute is used for routing, observability, policy enforcement, etc. The format of this is producer defined and might include information such as the version of the type - see [Versioning of CloudEvents in the Primer](https://github.com/cloudevents/spec/blob/v1.0.2/cloudevents/primer.md#versioning-of-cloudevents) for more information.
+          enum:
+            - org.dcsa.booking.v2
+          example: org.dcsa.booking.v2
+        time:
+          type: string
+          format: date-time
+          description: |
+            Timestamp of when the occurrence happened. If the time of the occurrence cannot be determined then this attribute MAY be set to some other time (such as the current time) by the CloudEvents producer, however all producers for the same `source` MUST be consistent in this respect. In other words, either they all use the actual time of the occurrence or they all use the same algorithm to determine the value used.
+          example: '2018-04-05T17:31:00Z'
+        datacontenttype:
+          type: string
+          description: |
+            Content type of `data` value. This attribute enables `data` to carry any type of content, whereby format and encoding might differ from that of the chosen event format. For example, an event rendered using the [JSON envelope](formats/json-format.md#3-envelope) format might carry an XML payload in `data`, and the consumer is informed by this attribute being set to "application/xml". The rules for how `data` content is rendered for different `datacontenttype` values are defined in the event format specifications; for example, the JSON event format defines the relationship in [section 3.1](formats/json-format.md#31-handling-of-data).
+
+            For some binary mode protocol bindings, this field is directly mapped to the respective protocol's content-type metadata property. Normative rules for the binary mode and the content-type metadata mapping can be found in the respective protocol.
+
+            In some event formats the `datacontenttype` attribute MAY be omitted. For example, if a JSON format event has no `datacontenttype` attribute, then it is implied that the `data` is a JSON value conforming to the "application/json" media type. In other words: a JSON-format event with no `datacontenttype` is exactly equivalent to one with `datacontenttype="application/json"`.
+
+            When translating an event message with no `datacontenttype` attribute to a different format or protocol binding, the target `datacontenttype` SHOULD be set explicitly to the implied `datacontenttype` of the source.
+          enum:
+            - application/json
+          example: application/json
+        subscriptionReference:
+          type: string
+          pattern: '^\S(?:.*\S)?$'
+          maxLength: 100
+          description: |
+            The reference of the subscription that has triggered this event
+          example: 30675492-50ff-4e17-a7df-7a487a8ad343
+        data:
+          type: object
+          description: |
+            `Booking` specific properties for the `Notification`
+          properties:
+            bookingStatus:
+              type: string
+              maxLength: 50
+              description: |
+                The status of the `Booking`. Possible values are:
+
+                - `RECEIVED` (Booking request has been received)
+                - `PENDING UPDATE` (An update is required to the Booking)
+                - `UPDATE RECEIVED` (An update has been received and is awaiting to be processed)
+                - `CONFIRMED` (Booking has been Confirmed)
+                - `PENDING AMENDMENT` (An amendment is required to the Booking)
+                - `REJECTED` (Booking discontinued by carrier before it has been Confirmed)
+                - `DECLINED` (Booking discontinued by carrier after it has been Confirmed)
+                - `CANCELLED` (Booking discontinued by consumer)
+                - `COMPLETED` (The Transport Document this Booking is connected to has been Surrendered for Delivery)
+
+                More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/bookingstatuses.csv).
+              example: RECEIVED
+            amendedBookingStatus:
+              type: string
+              maxLength: 50
+              description: |
+                The status of latest amendment added to the `Booking`. If no amendment has been requested - then this property is empty. Possible values are:
+
+                - `AMENDMENT RECEIVED` (An amendment has been received and is awaiting to be processed)
+                - `AMENDMENT CONFIRMED` (Amendment is confirmed)
+                - `AMENDMENT DECLINED` (Amendment discontinued by provider)
+                - `AMENDMENT CANCELLED` (Amendment discontinued by consumer)
+
+                More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/bookingstatuses.csv).
+              example: AMENDMENT RECEIVED
+            carrierBookingRequestReference:
+              type: string
+              pattern: '^\S(?:.*\S)?$'
+              maxLength: 100
+              description: |
+                A reference to the booking during the booking request phase.
+
+                **Condition:** `carrierBookingRequestReference` and/or `carrierBookingReference` is required to provide
+              example: 24595eb0-5cfc-4381-9c3a-cedc1975e9aa
+            carrierBookingReference:
+              type: string
+              pattern: '^\S(?:.*\S)?$'
+              maxLength: 35
+              description: |
+                The `carrierBookingReference` if know. Often this will not be known until the booking has been confirmed. Is available during a booking amendment.
+
+                **Condition:** `carrierBookingRequestReference` and/or `carrierBookingReference` is required to provide
+              example: ABC709951
+            reason:
+              type: string
+              maxLength: 5000
+              description: |
+                This property can be used to explain `bookingStatus`.
+              example: Rejected because of strike...
+            booking:
+              type: object
+              title: Booking
+              description: |
+                This property contains the booking in case the subscriber is subscribing to the `Full State Transfer` of the Booking.
+
+                In case the subscriber does not subscribe to the `Full State Transfer` of the Booking then the content in this property can be ignored.
+              properties:
+                carrierBookingRequestReference:
+                  type: string
+                  pattern: ^\S(?:.*\S)?$
+                  maxLength: 100
+                  description: |
+                    A reference to the booking during the booking request phase.
+
+                    **Condition:** `carrierBookingRequestReference` and/or `carrierBookingReference` must be provided
+                  example: 24595eb0-5cfc-4381-9c3a-cedc1975e9aa
+                carrierBookingReference:
+                  type: string
+                  pattern: ^\S(?:.*\S)?$
+                  maxLength: 35
+                  description: |
+                    The `carrierBookingReference` if know. Often this will not be known until the booking has been confirmed. Is available during a booking amendment.
+
+                    **Condition:** `carrierBookingRequestReference` and/or `carrierBookingReference` must be provided
+                  example: ABC709951
+                bookingStatus:
+                  type: string
+                  maxLength: 50
+                  description: |
+                    The status of the `Booking`. Possible values are:
+                    - `RECEIVED` (Booking request has been received)
+                    - `PENDING UPDATE` (An update is required to the Booking)
+                    - `UPDATE RECEIVED` (An update has been received and is awaiting to be processed)
+                    - `CONFIRMED` (Booking has been Confirmed)
+                    - `PENDING AMENDMENT` (An amendment is required to the Booking)
+                    - `REJECTED` (Booking discontinued by carrier before it has been Confirmed)
+                    - `DECLINED` (Booking discontinued by carrier after it has been Confirmed)
+                    - `CANCELLED` (Booking discontinued by consumer)
+                    - `COMPLETED` (The Transport Document this Booking is connected to has been Surrendered for Delivery)
+                  example: RECEIVED
+                amendedBookingStatus:
+                  type: string
+                  maxLength: 50
+                  description: |
+                    The status of latest amendment added to the `Booking`. If no amendment has been requested - then this field is empty. Possible values are:
+                    - `AMENDMENT RECEIVED` (An amendment has been received and is awaiting to be processed)
+                    - `AMENDMENT CONFIRMED` (Amendment is confirmed)
+                    - `AMENDMENT DECLINED` (Amendment discontinued by provider)
+                    - `AMENDMENT CANCELLED` (Amendment discontinued by consumer)
+                  example: AMENDMENT RECEIVED
+                receiptTypeAtOrigin:
+                  type: string
+                  maxLength: 3
+                  description: |
+                    Indicates the type of service offered at `Origin`. The options are:
+                    - `CY` (Container yard (incl. rail ramp))
+                    - `SD` (Store Door)
+                    - `CFS` (Container Freight Station)
+                  enum:
+                    - CY
+                    - SD
+                    - CFS
+                  example: CY
+                deliveryTypeAtDestination:
+                  type: string
+                  maxLength: 3
+                  description: |
+                    Indicates the type of service offered at `Destination`. The options are:
+                    - `CY` (Container yard (incl. rail ramp))
+                    - `SD` (Store Door)
+                    - `CFS` (Container Freight Station)
+                  enum:
+                    - CY
+                    - SD
+                    - CFS
+                  example: CY
+                cargoMovementTypeAtOrigin:
+                  type: string
+                  maxLength: 3
+                  description: |
+                    Refers to the shipment term at the **loading** of the cargo into the container. Possible values are:
+                    - `FCL` (Full Container Load)
+                    - `LCL` (Less than Container Load)
+                  example: FCL
+                cargoMovementTypeAtDestination:
+                  type: string
+                  maxLength: 3
+                  description: |
+                    Refers to the shipment term at the **unloading** of the cargo out of the container. Possible values are:
+                    - `FCL` (Full Container Load)
+                    - `LCL` (Less than Container Load)
+                  example: FCL
+                serviceContractReference:
+                  type: string
+                  maxLength: 30
+                  description: |
+                    Reference number for agreement between shipper and carrier, which optionally includes a certain minimum quantity commitment (usually referred as “MQC”) of cargo that the shipper commits to over a fixed period, and the carrier commits to a certain rate or rate schedule.
+                    
+                    **Condition:** Either a valid `serviceContractReference` or `contractQuotationReference` must be provided.
+                  example: HHL51800000
+                freightPaymentTermCode:
+                  type: string
+                  description: |
+                    An indicator of whether freight and ancillary fees for the main transport are prepaid (`PRE`) or collect (`COL`). When prepaid the charges are the responsibility of the shipper or the Invoice payer on behalf of the shipper (if provided). When collect, the charges are the responsibility of the consignee or the Invoice payer on behalf of the consignee (if provided).
+                    - `PRE` (Prepaid)
+                    - `COL` (Collect)
+                  enum:
+                    - PRE
+                    - COL
+                  example: PRE
+                originChargesPaymentTerm:
+                  type: object
+                  title: Origin Charges Payment Term
+                  description: |
+                    An indicator of whether origin charges are prepaid (`PRE`) or collect (`COL`). When prepaid, the charges are the responsibility of the shipper or the Invoice payer on behalf of the shipper (if provided). When collect, the charges are the responsibility of the consignee or the Invoice payer on behalf of the consignee (if provided).
+                  properties:
+                    haulageChargesPaymentTermCode:
+                      type: string
+                      description: |
+                        An indicator of whether the costs for inland transportation to the port, when applicable, are prepaid (`PRE`) or collect (`COL`).
+
+                        - `PRE` (Prepaid)
+                        - `COL` (Collect)
+                      enum:
+                        - PRE
+                        - COL
+                      example: PRE
+                    portChargesPaymentTermCode:
+                      type: string
+                      description: |
+                        An indicator of whether the origin port charges are prepaid (`PRE`) or collect (`COL`).
+
+                        - `PRE` (Prepaid)
+                        - `COL` (Collect)
+                      enum:
+                        - PRE
+                        - COL
+                      example: PRE
+                    otherChargesPaymentTermCode:
+                      type: string
+                      description: |
+                        An indicator of whether origin charges (excluding port and haulage) are prepaid (`PRE`) or collect (`COL`).
+
+                        - `PRE` (Prepaid)
+                        - `COL` (Collect)
+                      enum:
+                        - PRE
+                        - COL
+                      example: PRE
+                destinationChargesPaymentTerm:
+                  type: object
+                  title: Destination Charges Payment Term
+                  description: |
+                    An indicator of whether destination charges are prepaid (`PRE`) or collect (`COL`). When prepaid, the charges are the responsibility of the shipper or the Invoice payer on behalf of the shipper (if provided). When collect, the charges are the responsibility of the consignee or the Invoice payer on behalf of the consignee (if provided).
+                  properties:
+                    haulageChargesPaymentTermCode:
+                      type: string
+                      description: |
+                        An indicator of whether the costs for inland transportation to the port, when applicable, are prepaid (`PRE`) or collect (`COL`).
+
+                        - `PRE` (Prepaid)
+                        - `COL` (Collect)
+                      enum:
+                        - PRE
+                        - COL
+                      example: PRE
+                    portChargesPaymentTermCode:
+                      type: string
+                      description: |
+                        An indicator of whether the destination port charges are prepaid (`PRE`) or collect (`COL`).
+
+                        - `PRE` (Prepaid)
+                        - `COL` (Collect)
+                      enum:
+                        - PRE
+                        - COL
+                      example: PRE
+                    otherChargesPaymentTermCode:
+                      type: string
+                      description: |
+                        An indicator of whether destination charges (excluding port and haulage) are prepaid (`PRE`) or collect (`COL`).
+
+                        - `PRE` (Prepaid)
+                        - `COL` (Collect)
+                      enum:
+                        - PRE
+                        - COL
+                      example: PRE
+                contractQuotationReference:
+                  type: string
+                  pattern: ^\S(?:.*\S)?$
+                  maxLength: 35
+                  description: |
+                    Information provided by the shipper to identify whether pricing for the shipment has been agreed via a contract or a quotation reference.
+
+                    **Condition:** Either a valid `contractQuotationReference` or `serviceContractReference` must be provided.
+                  example: HHL1401
+                vessel:
+                  type: object
+                  title: Vessel
+                  description: |
+                    Vessels related to this booking request.
+                    
+                    **Condition:** Mandatory if `carrierExportVoyageNumber` is provided and `carrierServiceCode` or `carrierServiceName` are blank.
+                  required:
+                    - name
+                  properties:
+                    name:
+                      type: string
+                      pattern: ^\S(?:.*\S)?$
+                      maxLength: 50
+                      description: |
+                        The name of the Vessel given by the Vessel Operator and registered with IMO.
+                      example: King of the Seas
+                    vesselIMONumber:
+                      type: string
+                      pattern: ^\d{7,8}$
+                      minLength: 7
+                      maxLength: 8
+                      description: |
+                        The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd&apos;s register code, which does not change during the lifetime of the vessel
+                      example: '9321483'
+                carrierServiceName:
+                  type: string
+                  pattern: ^\S(?:.*\S)?$
+                  maxLength: 50
+                  description: |
+                    The name of a service as specified by the carrier.
+
+                    **Condition:** Mandatory if `carrierExportVoyageNumber` is provided and Vessel details or `carrierServiceCode` are blank
+                  example: Great Lion Service
+                carrierServiceCode:
+                  type: string
+                  pattern: ^\S(?:.*\S)?$
+                  maxLength: 11
+                  description: |
+                    The carrier specific code of the service for which the schedule details are published.
+
+                    **Condition:** Mandatory if `carrierExportVoyageNumber` is provided and Vessel details or `carrierServiceName` are blank
+                  example: FE1
+                universalServiceReference:
+                  type: string
+                  pattern: ^SR\d{5}[A-Z]$
+                  maxLength: 8
+                  minLength: 8
+                  description: |
+                    A global unique service reference, as per DCSA standard, agreed by VSA partners for the service. The service reference must match the regular expression pattern: `SR\d{5}[A-Z]`. The letters `SR` followed by `5 digits`, followed by a checksum-character as a capital letter from `A to Z`.
+                  example: SR12345A
+                carrierExportVoyageNumber:
+                  type: string
+                  pattern: ^\S(?:.*\S)?$
+                  maxLength: 50
+                  example: 2103S
+                  description: |
+                    The carrier specific identifier of the export Voyage.
+
+                    **Condition:** Mandatory if `expectedDepartureDate` or `expectedArrivalAtPlaceOfDeliveryStartDate` and `expectedArrivalAtPlaceOfDeliveryEndDate` is not provided.
+                universalExportVoyageReference:
+                  type: string
+                  pattern: ^\d{2}[0-9A-Z]{2}[NEWSR]$
+                  maxLength: 5
+                  minLength: 5
+                  description: |
+                    A global unique voyage reference for the export Voyage, as per DCSA standard, agreed by VSA partners for the voyage. The voyage reference must match the regular expression pattern: `\d{2}[0-9A-Z]{2}[NEWSR]`
+                    - `2 digits` for the year
+                    - `2 alphanumeric characters` for the sequence number of the voyage
+                    - `1 character` for the direction/haul (`N`orth, `E`ast, `W`est, `S`outh or `R`oundtrip).
+                  example: 2103N
+                declaredValue:
+                  type: number
+                  format: float
+                  minimum: 0
+                  description: |
+                    The value of the cargo that the shipper declares to avoid the carrier's limitation of liability and "Ad Valorem" freight, i.e. freight which is calculated based on the value of the goods declared by the shipper.
+                  example: 1231.1
+                declaredValueCurrency:
+                  type: string
+                  pattern: ^[A-Z]{3}$
+                  minLength: 3
+                  maxLength: 3
+                  description: |
+                    The currency used for the declared value, using the 3-character code defined by [ISO 4217](https://en.wikipedia.org/wiki/ISO_4217).
+                  example: DKK
+                isPartialLoadAllowed:
+                  type: boolean
+                  description: |
+                    Indication whether the shipper agrees to load part of the shipment in case where not all of the cargo is delivered within cut-off.
+                  example: true
+                isExportDeclarationRequired:
+                  type: boolean
+                  description: |
+                    Information provided by the shipper whether an export declaration is required for this particular shipment/commodity/destination.
+                  example: true
+                exportDeclarationReference:
+                  type: string
+                  pattern: ^\S(?:.*\S)?$
+                  maxLength: 35
+                  description: |
+                    A government document permitting designated goods to be shipped out of the country.  Reference number assigned by an issuing authority to an Export License. The export license must be valid at time of departure. Required if Export declaration required is `True`.
+                  example: ABC123123
+                isImportLicenseRequired:
+                  type: boolean
+                  description: |
+                    Information provided by the shipper whether an import permit or license is required for this particular shipment/commodity/destination.
+                  example: true
+                importLicenseReference:
+                  maxLength: 35
+                  pattern: '^\S(?:.*\S)?$'
+                  type: string
+                  description: |
+                    A certificate, issued by countries exercising import controls, that permits importation of the articles stated in the license. Reference number assigned by an issuing authority to an Import License. The import license number must be valid at time of arrival. Required if import license required is ‘True’.
+                  example: 'ABC123123'
+                expectedDepartureDate:
+                  type: string
+                  format: date
+                  description: |
+                    The date when the shipment is expected to be loaded on board a vessel as provided by the shipper or its agent.
+                    
+                    **Condition:** Mandatory if vessel/voyage/service details or `expectedArrivalAtPlaceOfDeliveryDate` is not provided.
+                  example: '2021-05-17'
+                expectedArrivalAtPlaceOfDeliveryStartDate:
+                  type: string
+                  format: date
+                  description: |
+                    The start date (provided as a range together with `expectedArrivalAtPlaceOfDeliveryEndDate`) for when the shipment is expected to arrive at `Place Of Delivery`.
+                    
+                    **Condition:** Mandatory if vessel/voyage/service details or `expectedDepartureDate` is not provided.
+                  example: '2021-05-17'
+                expectedArrivalAtPlaceOfDeliveryEndDate:
+                  type: string
+                  format: date
+                  description: |
+                    The end date (provided as a range together with `expectedArrivalAtPlaceOfDeliveryStartDate`) for when the shipment is expected to arrive at `Place Of Delivery`.
+                    
+                    **Condition:** Mandatory if vessel/voyage/service details or `expectedDepartureDate` is not provided.
+                  example: '2021-05-19'
+                transportDocumentTypeCode:
+                  type: string
+                  description: |
+                    Specifies the type of the `Transport Document`. Possible values are:
+                    - `BOL` (Bill of Lading)
+                    - `SWB` (Sea Waybill)
+                  enum:
+                    - BOL
+                    - SWB
+                  example: SWB
+                transportDocumentReference:
+                  type: string
+                  pattern: ^\S(?:.*\S)?$
+                  maxLength: 20
+                  description: |
+                    A unique reference allocated by the shipping line to the `Transport Document` that the booking concerns.
+                  example: reserved-HHL123
+                bookingChannelReference:
+                  type: string
+                  pattern: ^\S(?:.*\S)?$
+                  maxLength: 20
+                  description: |
+                    Identification number provided by the platform/channel used for booking request/confirmation, ex: Inttra booking reference, or GTNexus, other.
+                    
+                    **Condition:** a booking channel is being used
+                  example: Inttra reference
+                incoTerms:
+                  type: string
+                  maxLength: 3
+                  description: |
+                    Transport obligations, costs and risks as agreed between buyer and seller as defined by [ICC](https://iccwbo.org/business-solutions/incoterms-rules/). A list of possible values:
+                    - `EXW` (Ex-Works)
+                    - `FCA` (Free Carrier)
+                    - `FAS` (Free Alongside Ship)
+                    - `FOB` (Free On Board)
+                    - `CFR` (Cost and Freight)
+                    - `CIF` (Cost, Insurance and Freight)
+                    - `CPT` (Carriage Paid To)
+                    - `CIP` (Carriage And Insurance Paid To)
+                    - `DAP` (Delivered At Place)
+                    - `DPU` (Delivered At Place Unloaded)
+                    - `DDP` (Delivered Duty Paid)
+                  example: FCA
+                communicationChannelCode:
+                  type: string
+                  maxLength: 2
+                  description: |
+                    Specifying which communication channel is to be used for this booking e.g. Possible values are:
+                    - `EI` (EDI transmission)
+                    - `EM` (Email)
+                    - `AO` (API)
+                  example: AO
+                isEquipmentSubstitutionAllowed:
+                  type: boolean
+                  description: |
+                    Indicates if an alternate equipment type can be provided by the carrier.
+                  example: true
+                termsAndConditions:
+                  type: string
+                  maxLength: 50000
+                  description: |
+                    Carrier terms and conditions of transport.
+                  example: Any reference in...
+                invoicePayableAt:
+                  title: Invoice Payable At
+                  type: object
+                  description: |
+                    Location where payment of ocean freight and charges for the main transport will take place by the customer.
+
+                    The location must be provided as a `UN Location Code`
+                  properties:
+                    UNLocationCode:
+                      type: string
+                      pattern: ^[A-Z]{2}[A-Z2-9]{3}$
+                      minLength: 5
+                      maxLength: 5
+                      example: NLAMS
+                      description: |
+                        The UN Location code specifying where the place is located. The pattern used must be
+
+                        - 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+                        - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used
+
+                        More info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)
+                  required:
+                    - UNLocationCode
+                placeOfBLIssue:
+                  title: Place of B/L Issue
+                  type: object
+                  description: |
+                    An object to capture where the original Transport Document (`Bill of Lading`) will be issued.
+
+                    The location can be specified either as a `UN Location Code` or as a `CountryCode`.
+                  oneOf:
+                    - type: object
+                      title: UN Location Code
+                      properties:
+                        UNLocationCode:
+                          type: string
+                          pattern: ^[A-Z]{2}[A-Z2-9]{3}$
+                          minLength: 5
+                          maxLength: 5
+                          description: |
+                            The UN Location code specifying where the place is located. The pattern used must be
+                            
+                            - 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+                            - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used
+                            
+                            More info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)
+                          example: NLAMS
+                      required:
+                        - UNLocationCode
+                    - type: object
+                      title: Country Code
+                      properties:
+                        countryCode:
+                          type: string
+                          pattern: ^[A-Z]{2}$
+                          minLength: 2
+                          maxLength: 2
+                          description: |
+                            The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+                          example: DK
+                      required:
+                        - countryCode
+                references:
+                  type: array
+                  description: |
+                    A list of `References`
+                  items:
+                    $ref: '#/components/schemas/Reference'
+                documentParties:
+                  type: object
+                  title: Document Parties
+                  description: |
+                    All `Parties` with associated roles.
+                  properties:
+                    bookingAgent:
+                      $ref: '#/components/schemas/BookingAgent'
+                    shipper:
+                      $ref: '#/components/schemas/Shipper'
+                    consignee:
+                      $ref: '#/components/schemas/Consignee'
+                    serviceContractOwner:
+                      $ref: '#/components/schemas/ServiceContractOwner'
+                    carrierBookingOffice:
+                      $ref: '#/components/schemas/CarrierBookingOffice'
+                    other:
+                      type: array
+                      description: 'A list of document parties that can be optionally provided at booking stage.'
+                      items:
+                        $ref: '#/components/schemas/OtherDocumentParty'
+                partyContactDetails:
+                  type: array
+                  description: |
+                    The contact details of the person(s) to contact in relation to the **Booking** (changes, notifications etc.) 
+                  items:
+                    $ref: '#/components/schemas/PartyContactDetail'
+                shipmentLocations:
+                  type: array
+                  minItems: 1
+                  description: |
+                    A list of `Shipment Locations`
+                  items:
+                    $ref: '#/components/schemas/ShipmentLocation'
+                requestedEquipments:
+                  type: array
+                  minItems: 1
+                  description: |
+                    List of `Requested Equipments`. Multiple containers can be requested within the same booking. For each Requested Equipment object with 2 or more units, it is a condition that the commodity (or list of commodities) defined within the same Requested Equipment object is the same for each requested unit.
+
+                    **Example:** 2 x 20' containing 50% shoes and 50% t-shirts can be requested within the same Requested Equipment object only if each 20' will contain 50% shoes and 50% t-shirts. If 1 x 20' will contain 100% shoes and the other 20' will be 100% t-shirts, 2 separate Requested Equipment objects must be defined.
+                  items:
+                    $ref: '#/components/schemas/RequestedEquipment'
+                confirmedEquipments:
+                  type: array
+                  description: |
+                    A list of `Confirmed Equipments`
+
+                    **Condition:** Mandatory and non-empty for a `CONFIRMED` Booking
+                  items:
+                    $ref: '#/components/schemas/ConfirmedEquipment'
+                transportPlan:
+                  type: array
+                  description: |
+                    A list of `Transport` objects (legs) describing the entire transport plan including transshipments.
+
+                    **Condition:** Mandatory and non-empty for a `CONFIRMED` Booking
+                  items:
+                    $ref: '#/components/schemas/Transport'
+                shipmentCutOffTimes:
+                  type: array
+                  description: |
+                    A list of cut-off times provided by the carrier in the booking confirmation. A cut-off time indicates the latest deadline within which a task must be completed. The confirmed schedule cannot be guaranteed if a cut-off time is missed. Customs brokers may set additional cut-off times to receive the export customs documentation, which is not included in the shipment cut-off times of a carrier booking.
+
+                    **Condition:** Mandatory and non-empty for a `CONFIRMED` Booking
+                  items:
+                    $ref: '#/components/schemas/ShipmentCutOffTime'
+                advanceManifestFilings:
+                  type: array
+                  description: |
+                    A list of `Advance Manifest Filings` provided by the carrier
+                  items:
+                    $ref: '#/components/schemas/AdvanceManifestFiling'
+                charges:
+                  type: array
+                  description: |
+                    A list of `Charges`
+                  items:
+                    $ref: '#/components/schemas/Charge'
+                carrierClauses:
+                  type: array
+                  description: |
+                    Additional clauses for a specific shipment added by the carrier to the Bill of Lading, subject to local rules / guidelines or certain mandatory information required to be shared with the customer.
+                  items:
+                    type: string
+                    pattern: ^\S(?:.*\S)?$
+                    maxLength: 20000
+                    description: |
+                      The content of the clause.
+                    example: It is not allowed to...
+                requestedChanges:
+                  type: array
+                  description: |
+                    A list of changes requirested by the carrier to the document in order for it to be accepted.
+                  items:
+                    $ref: '#/components/schemas/RequestedChange'
+                reason:
+                  type: string
+                  maxLength: 5000
+                  description: |
+                    This field can be used to explain `bookingStatus` and/or `amendedBookingStatus`.
+                  example: Rejected because of strike...
+              required:
+                - bookingStatus
+                - receiptTypeAtOrigin
+                - deliveryTypeAtDestination
+                - cargoMovementTypeAtOrigin
+                - cargoMovementTypeAtDestination
+                - isPartialLoadAllowed
+                - isExportDeclarationRequired
+                - isImportLicenseRequired
+                - communicationChannelCode
+                - isEquipmentSubstitutionAllowed
+                - shipmentLocations
+                - requestedEquipments
+                - documentParties
+            amendedBooking:
+              type: object
+              title: Amended Booking
+              description: |
+                This property contains the amended booking in case:
+                  - an amendment is currently active
+                  - the subscriber is subscribing to the `Full State Transfer` of the Booking
+
+                In case the subscriber does not subscribe to the `Full State Transfer` of the Booking or no amendment is active - then the content in this property can be ignored.
+              properties:
+                carrierBookingRequestReference:
+                  type: string
+                  pattern: ^\S(?:.*\S)?$
+                  maxLength: 100
+                  description: |
+                    A reference to the booking during the booking request phase.
+
+                    **Condition:** `carrierBookingRequestReference` and/or `carrierBookingReference` must be provided
+                  example: 24595eb0-5cfc-4381-9c3a-cedc1975e9aa
+                carrierBookingReference:
+                  type: string
+                  pattern: ^\S(?:.*\S)?$
+                  maxLength: 35
+                  description: |
+                    The `carrierBookingReference` if know. Often this will not be known until the booking has been confirmed. Is available during a booking amendment.
+
+                    **Condition:** `carrierBookingRequestReference` and/or `carrierBookingReference` must be provided
+                  example: ABC709951
+                bookingStatus:
+                  type: string
+                  maxLength: 50
+                  description: |
+                    The status of the `Booking`. Possible values are:
+                    - `RECEIVED` (Booking request has been received)
+                    - `PENDING UPDATE` (An update is required to the Booking)
+                    - `UPDATE RECEIVED` (An update has been received and is awaiting to be processed)
+                    - `CONFIRMED` (Booking has been Confirmed)
+                    - `PENDING AMENDMENT` (An amendment is required to the Booking)
+                    - `REJECTED` (Booking discontinued by carrier before it has been Confirmed)
+                    - `DECLINED` (Booking discontinued by carrier after it has been Confirmed)
+                    - `CANCELLED` (Booking discontinued by consumer)
+                    - `COMPLETED` (The Transport Document this Booking is connected to has been Surrendered for Delivery)
+                  example: RECEIVED
+                amendedBookingStatus:
+                  type: string
+                  maxLength: 50
+                  description: |
+                    The status of latest amendment added to the `Booking`. If no amendment has been requested - then this field is empty. Possible values are:
+                    - `AMENDMENT RECEIVED` (An amendment has been received and is awaiting to be processed)
+                    - `AMENDMENT CONFIRMED` (Amendment is confirmed)
+                    - `AMENDMENT DECLINED` (Amendment discontinued by provider)
+                    - `AMENDMENT CANCELLED` (Amendment discontinued by consumer)
+                  example: AMENDMENT RECEIVED
+                receiptTypeAtOrigin:
+                  type: string
+                  maxLength: 3
+                  description: |
+                    Indicates the type of service offered at `Origin`. The options are:
+                    - `CY` (Container yard (incl. rail ramp))
+                    - `SD` (Store Door)
+                    - `CFS` (Container Freight Station)
+                  enum:
+                    - CY
+                    - SD
+                    - CFS
+                  example: CY
+                deliveryTypeAtDestination:
+                  type: string
+                  maxLength: 3
+                  description: |
+                    Indicates the type of service offered at `Destination`. The options are:
+                    - `CY` (Container yard (incl. rail ramp))
+                    - `SD` (Store Door)
+                    - `CFS` (Container Freight Station)
+                  enum:
+                    - CY
+                    - SD
+                    - CFS
+                  example: CY
+                cargoMovementTypeAtOrigin:
+                  type: string
+                  maxLength: 3
+                  description: |
+                    Refers to the shipment term at the **loading** of the cargo into the container. Possible values are:
+                    - `FCL` (Full Container Load)
+                    - `LCL` (Less than Container Load)
+                  example: FCL
+                cargoMovementTypeAtDestination:
+                  type: string
+                  maxLength: 3
+                  description: |
+                    Refers to the shipment term at the **unloading** of the cargo out of the container. Possible values are:
+                    - `FCL` (Full Container Load)
+                    - `LCL` (Less than Container Load)
+                  example: FCL
+                serviceContractReference:
+                  type: string
+                  maxLength: 30
+                  description: |
+                    Reference number for agreement between shipper and carrier, which optionally includes a certain minimum quantity commitment (usually referred as “MQC”) of cargo that the shipper commits to over a fixed period, and the carrier commits to a certain rate or rate schedule.
+                    
+                    **Condition:** Either a valid `serviceContractReference` or `contractQuotationReference` must be provided.
+                  example: HHL51800000
+                freightPaymentTermCode:
+                  type: string
+                  description: |
+                    An indicator of whether freight and ancillary fees for the main transport are prepaid (`PRE`) or collect (`COL`). When prepaid the charges are the responsibility of the shipper or the Invoice payer on behalf of the shipper (if provided). When collect, the charges are the responsibility of the consignee or the Invoice payer on behalf of the consignee (if provided).
+                    - `PRE` (Prepaid)
+                    - `COL` (Collect)
+                  enum:
+                    - PRE
+                    - COL
+                  example: PRE
+                originChargesPaymentTerm:
+                  type: object
+                  title: Origin Charges Payment Term
+                  description: |
+                    An indicator of whether origin charges are prepaid (`PRE`) or collect (`COL`). When prepaid, the charges are the responsibility of the shipper or the Invoice payer on behalf of the shipper (if provided). When collect, the charges are the responsibility of the consignee or the Invoice payer on behalf of the consignee (if provided).
+                  properties:
+                    haulageChargesPaymentTermCode:
+                      type: string
+                      description: |
+                        An indicator of whether the costs for inland transportation to the port, when applicable, are prepaid (`PRE`) or collect (`COL`).
+
+                        - `PRE` (Prepaid)
+                        - `COL` (Collect)
+                      enum:
+                        - PRE
+                        - COL
+                      example: PRE
+                    portChargesPaymentTermCode:
+                      type: string
+                      description: |
+                        An indicator of whether the origin port charges are prepaid (`PRE`) or collect (`COL`).
+
+                        - `PRE` (Prepaid)
+                        - `COL` (Collect)
+                      enum:
+                        - PRE
+                        - COL
+                      example: PRE
+                    otherChargesPaymentTermCode:
+                      type: string
+                      description: |
+                        An indicator of whether origin charges (excluding port and haulage) are prepaid (`PRE`) or collect (`COL`).
+
+                        - `PRE` (Prepaid)
+                        - `COL` (Collect)
+                      enum:
+                        - PRE
+                        - COL
+                      example: PRE
+                destinationChargesPaymentTerm:
+                  type: object
+                  title: Destination Charges Payment Term
+                  description: |
+                    An indicator of whether destination charges are prepaid (`PRE`) or collect (`COL`). When prepaid, the charges are the responsibility of the shipper or the Invoice payer on behalf of the shipper (if provided). When collect, the charges are the responsibility of the consignee or the Invoice payer on behalf of the consignee (if provided).
+                  properties:
+                    haulageChargesPaymentTermCode:
+                      type: string
+                      description: |
+                        An indicator of whether the costs for inland transportation to the port, when applicable, are prepaid (`PRE`) or collect (`COL`).
+
+                        - `PRE` (Prepaid)
+                        - `COL` (Collect)
+                      enum:
+                        - PRE
+                        - COL
+                      example: PRE
+                    portChargesPaymentTermCode:
+                      type: string
+                      description: |
+                        An indicator of whether the destination port charges are prepaid (`PRE`) or collect (`COL`).
+
+                        - `PRE` (Prepaid)
+                        - `COL` (Collect)
+                      enum:
+                        - PRE
+                        - COL
+                      example: PRE
+                    otherChargesPaymentTermCode:
+                      type: string
+                      description: |
+                        An indicator of whether destination charges (excluding port and haulage) are prepaid (`PRE`) or collect (`COL`).
+
+                        - `PRE` (Prepaid)
+                        - `COL` (Collect)
+                      enum:
+                        - PRE
+                        - COL
+                      example: PRE
+                contractQuotationReference:
+                  type: string
+                  pattern: ^\S(?:.*\S)?$
+                  maxLength: 35
+                  description: |
+                    Information provided by the shipper to identify whether pricing for the shipment has been agreed via a contract or a quotation reference.
+
+                    **Condition:** Either a valid `contractQuotationReference` or `serviceContractReference` must be provided.
+                  example: HHL1401
+                vessel:
+                  type: object
+                  title: Vessel
+                  description: |
+                    Vessels related to this booking request.
+                    
+                    **Condition:** Mandatory if `carrierExportVoyageNumber` is provided and `carrierServiceCode` or `carrierServiceName` are blank.
+                  required:
+                    - name
+                  properties:
+                    name:
+                      type: string
+                      pattern: ^\S(?:.*\S)?$
+                      maxLength: 50
+                      description: |
+                        The name of the Vessel given by the Vessel Operator and registered with IMO.
+                      example: King of the Seas
+                    vesselIMONumber:
+                      type: string
+                      pattern: ^\d{7,8}$
+                      minLength: 7
+                      maxLength: 8
+                      description: |
+                        The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd&apos;s register code, which does not change during the lifetime of the vessel
+                      example: '9321483'
+                carrierServiceName:
+                  type: string
+                  pattern: ^\S(?:.*\S)?$
+                  maxLength: 50
+                  description: |
+                    The name of a service as specified by the carrier.
+
+                    **Condition:** Mandatory if `carrierExportVoyageNumber` is provided and Vessel details or `carrierServiceCode` are blank
+                  example: Great Lion Service
+                carrierServiceCode:
+                  type: string
+                  pattern: ^\S(?:.*\S)?$
+                  maxLength: 11
+                  description: |
+                    The carrier specific code of the service for which the schedule details are published.
+
+                    **Condition:** Mandatory if `carrierExportVoyageNumber` is provided and Vessel details or `carrierServiceName` are blank
+                  example: FE1
+                universalServiceReference:
+                  type: string
+                  pattern: ^SR\d{5}[A-Z]$
+                  maxLength: 8
+                  minLength: 8
+                  description: |
+                    A global unique service reference, as per DCSA standard, agreed by VSA partners for the service. The service reference must match the regular expression pattern: `SR\d{5}[A-Z]`. The letters `SR` followed by `5 digits`, followed by a checksum-character as a capital letter from `A to Z`.
+                  example: SR12345A
+                carrierExportVoyageNumber:
+                  type: string
+                  pattern: ^\S(?:.*\S)?$
+                  maxLength: 50
+                  example: 2103S
+                  description: |
+                    The carrier specific identifier of the export Voyage.
+
+                    **Condition:** Mandatory if `expectedDepartureDate` or `expectedArrivalAtPlaceOfDeliveryStartDate` and `expectedArrivalAtPlaceOfDeliveryEndDate` is not provided.
+                universalExportVoyageReference:
+                  type: string
+                  pattern: ^\d{2}[0-9A-Z]{2}[NEWSR]$
+                  maxLength: 5
+                  minLength: 5
+                  description: |
+                    A global unique voyage reference for the export Voyage, as per DCSA standard, agreed by VSA partners for the voyage. The voyage reference must match the regular expression pattern: `\d{2}[0-9A-Z]{2}[NEWSR]`
+                    - `2 digits` for the year
+                    - `2 alphanumeric characters` for the sequence number of the voyage
+                    - `1 character` for the direction/haul (`N`orth, `E`ast, `W`est, `S`outh or `R`oundtrip).
+                  example: 2103N
+                declaredValue:
+                  type: number
+                  format: float
+                  minimum: 0
+                  description: |
+                    The value of the cargo that the shipper declares to avoid the carrier's limitation of liability and "Ad Valorem" freight, i.e. freight which is calculated based on the value of the goods declared by the shipper.
+                  example: 1231.1
+                declaredValueCurrency:
+                  type: string
+                  pattern: ^[A-Z]{3}$
+                  minLength: 3
+                  maxLength: 3
+                  description: |
+                    The currency used for the declared value, using the 3-character code defined by [ISO 4217](https://en.wikipedia.org/wiki/ISO_4217).
+                  example: DKK
+                isPartialLoadAllowed:
+                  type: boolean
+                  description: |
+                    Indication whether the shipper agrees to load part of the shipment in case where not all of the cargo is delivered within cut-off.
+                  example: true
+                isExportDeclarationRequired:
+                  type: boolean
+                  description: |
+                    Information provided by the shipper whether an export declaration is required for this particular shipment/commodity/destination.
+                  example: true
+                exportDeclarationReference:
+                  type: string
+                  pattern: ^\S(?:.*\S)?$
+                  maxLength: 35
+                  description: |
+                    A government document permitting designated goods to be shipped out of the country.  Reference number assigned by an issuing authority to an Export License. The export license must be valid at time of departure. Required if Export declaration required is `True`.
+                  example: ABC123123
+                isImportLicenseRequired:
+                  type: boolean
+                  description: |
+                    Information provided by the shipper whether an import permit or license is required for this particular shipment/commodity/destination.
+                  example: true
+                importLicenseReference:
+                  maxLength: 35
+                  pattern: '^\S(?:.*\S)?$'
+                  type: string
+                  description: |
+                    A certificate, issued by countries exercising import controls, that permits importation of the articles stated in the license. Reference number assigned by an issuing authority to an Import License. The import license number must be valid at time of arrival. Required if import license required is ‘True’.
+                  example: 'ABC123123'
+                expectedDepartureDate:
+                  type: string
+                  format: date
+                  description: |
+                    The date when the shipment is expected to be loaded on board a vessel as provided by the shipper or its agent.
+                    
+                    **Condition:** Mandatory if vessel/voyage/service details or `expectedArrivalAtPlaceOfDeliveryDate` is not provided.
+                  example: '2021-05-17'
+                expectedArrivalAtPlaceOfDeliveryStartDate:
+                  type: string
+                  format: date
+                  description: |
+                    The start date (provided as a range together with `expectedArrivalAtPlaceOfDeliveryEndDate`) for when the shipment is expected to arrive at `Place Of Delivery`.
+                    
+                    **Condition:** Mandatory if vessel/voyage/service details or `expectedDepartureDate` is not provided.
+                  example: '2021-05-17'
+                expectedArrivalAtPlaceOfDeliveryEndDate:
+                  type: string
+                  format: date
+                  description: |
+                    The end date (provided as a range together with `expectedArrivalAtPlaceOfDeliveryStartDate`) for when the shipment is expected to arrive at `Place Of Delivery`.
+                    
+                    **Condition:** Mandatory if vessel/voyage/service details or `expectedDepartureDate` is not provided.
+                  example: '2021-05-19'
+                transportDocumentTypeCode:
+                  type: string
+                  description: |
+                    Specifies the type of the `Transport Document`. Possible values are:
+                    - `BOL` (Bill of Lading)
+                    - `SWB` (Sea Waybill)
+                  enum:
+                    - BOL
+                    - SWB
+                  example: SWB
+                transportDocumentReference:
+                  type: string
+                  pattern: ^\S(?:.*\S)?$
+                  maxLength: 20
+                  description: |
+                    A unique reference allocated by the shipping line to the `Transport Document` that the booking concerns.
+                  example: reserved-HHL123
+                bookingChannelReference:
+                  type: string
+                  pattern: ^\S(?:.*\S)?$
+                  maxLength: 20
+                  description: |
+                    Identification number provided by the platform/channel used for booking request/confirmation, ex: Inttra booking reference, or GTNexus, other.
+                    
+                    **Condition:** a booking channel is being used
+                  example: Inttra reference
+                incoTerms:
+                  type: string
+                  maxLength: 3
+                  description: |
+                    Transport obligations, costs and risks as agreed between buyer and seller as defined by [ICC](https://iccwbo.org/business-solutions/incoterms-rules/). A list of possible values:
+                    - `EXW` (Ex-Works)
+                    - `FCA` (Free Carrier)
+                    - `FAS` (Free Alongside Ship)
+                    - `FOB` (Free On Board)
+                    - `CFR` (Cost and Freight)
+                    - `CIF` (Cost, Insurance and Freight)
+                    - `CPT` (Carriage Paid To)
+                    - `CIP` (Carriage And Insurance Paid To)
+                    - `DAP` (Delivered At Place)
+                    - `DPU` (Delivered At Place Unloaded)
+                    - `DDP` (Delivered Duty Paid)
+                  example: FCA
+                communicationChannelCode:
+                  type: string
+                  maxLength: 2
+                  description: |
+                    Specifying which communication channel is to be used for this booking e.g. Possible values are:
+                    - `EI` (EDI transmission)
+                    - `EM` (Email)
+                    - `AO` (API)
+                  example: AO
+                isEquipmentSubstitutionAllowed:
+                  type: boolean
+                  description: |
+                    Indicates if an alternate equipment type can be provided by the carrier.
+                  example: true
+                termsAndConditions:
+                  type: string
+                  maxLength: 50000
+                  description: |
+                    Carrier terms and conditions of transport.
+                  example: Any reference in...
+                invoicePayableAt:
+                  title: Invoice Payable At
+                  type: object
+                  description: |
+                    Location where payment of ocean freight and charges for the main transport will take place by the customer.
+
+                    The location must be provided as a `UN Location Code`
+                  properties:
+                    UNLocationCode:
+                      type: string
+                      pattern: ^[A-Z]{2}[A-Z2-9]{3}$
+                      minLength: 5
+                      maxLength: 5
+                      example: NLAMS
+                      description: |
+                        The UN Location code specifying where the place is located. The pattern used must be
+
+                        - 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+                        - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used
+
+                        More info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)
+                  required:
+                    - UNLocationCode
+                placeOfBLIssue:
+                  title: Place of B/L Issue
+                  type: object
+                  description: |
+                    An object to capture where the original Transport Document (`Bill of Lading`) will be issued.
+
+                    The location can be specified either as a `UN Location Code` or as a `CountryCode`.
+                  oneOf:
+                    - type: object
+                      title: UN Location Code
+                      properties:
+                        UNLocationCode:
+                          type: string
+                          pattern: ^[A-Z]{2}[A-Z2-9]{3}$
+                          minLength: 5
+                          maxLength: 5
+                          description: |
+                            The UN Location code specifying where the place is located. The pattern used must be
+                            
+                            - 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+                            - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used
+                            
+                            More info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)
+                          example: NLAMS
+                      required:
+                        - UNLocationCode
+                    - type: object
+                      title: Country Code
+                      properties:
+                        countryCode:
+                          type: string
+                          pattern: ^[A-Z]{2}$
+                          minLength: 2
+                          maxLength: 2
+                          description: |
+                            The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+                          example: DK
+                      required:
+                        - countryCode
+                references:
+                  type: array
+                  description: |
+                    A list of `References`
+                  items:
+                    $ref: '#/components/schemas/Reference'
+                documentParties:
+                  type: object
+                  title: Document Parties
+                  description: |
+                    All `Parties` with associated roles.
+                  properties:
+                    bookingAgent:
+                      $ref: '#/components/schemas/BookingAgent'
+                    shipper:
+                      $ref: '#/components/schemas/Shipper'
+                    consignee:
+                      $ref: '#/components/schemas/Consignee'
+                    serviceContractOwner:
+                      $ref: '#/components/schemas/ServiceContractOwner'
+                    carrierBookingOffice:
+                      $ref: '#/components/schemas/CarrierBookingOffice'
+                    other:
+                      type: array
+                      description: 'A list of document parties that can be optionally provided at booking stage.'
+                      items:
+                        $ref: '#/components/schemas/OtherDocumentParty'
+                partyContactDetails:
+                  type: array
+                  description: |
+                    The contact details of the person(s) to contact in relation to the **Booking** (changes, notifications etc.) 
+                  items:
+                    $ref: '#/components/schemas/PartyContactDetail'
+                shipmentLocations:
+                  type: array
+                  minItems: 1
+                  description: |
+                    A list of `Shipment Locations`
+                  items:
+                    $ref: '#/components/schemas/ShipmentLocation'
+                requestedEquipments:
+                  type: array
+                  minItems: 1
+                  description: |
+                    List of `Requested Equipments`. Multiple containers can be requested within the same booking. For each Requested Equipment object with 2 or more units, it is a condition that the commodity (or list of commodities) defined within the same Requested Equipment object is the same for each requested unit.
+
+                    **Example:** 2 x 20' containing 50% shoes and 50% t-shirts can be requested within the same Requested Equipment object only if each 20' will contain 50% shoes and 50% t-shirts. If 1 x 20' will contain 100% shoes and the other 20' will be 100% t-shirts, 2 separate Requested Equipment objects must be defined.
+                  items:
+                    $ref: '#/components/schemas/RequestedEquipment'
+                confirmedEquipments:
+                  type: array
+                  description: |
+                    A list of `Confirmed Equipments`
+
+                    **Condition:** Mandatory and non-empty for a `CONFIRMED` Booking
+                  items:
+                    $ref: '#/components/schemas/ConfirmedEquipment'
+                transportPlan:
+                  type: array
+                  description: |
+                    A list of `Transport` objects (legs) describing the entire transport plan including transshipments.
+
+                    **Condition:** Mandatory and non-empty for a `CONFIRMED` Booking
+                  items:
+                    $ref: '#/components/schemas/Transport'
+                shipmentCutOffTimes:
+                  type: array
+                  description: |
+                    A list of cut-off times provided by the carrier in the booking confirmation. A cut-off time indicates the latest deadline within which a task must be completed. The confirmed schedule cannot be guaranteed if a cut-off time is missed. Customs brokers may set additional cut-off times to receive the export customs documentation, which is not included in the shipment cut-off times of a carrier booking.
+
+                    **Condition:** Mandatory and non-empty for a `CONFIRMED` Booking
+                  items:
+                    $ref: '#/components/schemas/ShipmentCutOffTime'
+                advanceManifestFilings:
+                  type: array
+                  description: |
+                    A list of `Advance Manifest Filings` provided by the carrier
+                  items:
+                    $ref: '#/components/schemas/AdvanceManifestFiling'
+                charges:
+                  type: array
+                  description: |
+                    A list of `Charges`
+                  items:
+                    $ref: '#/components/schemas/Charge'
+                carrierClauses:
+                  type: array
+                  description: |
+                    Additional clauses for a specific shipment added by the carrier to the Bill of Lading, subject to local rules / guidelines or certain mandatory information required to be shared with the customer.
+                  items:
+                    type: string
+                    pattern: ^\S(?:.*\S)?$
+                    maxLength: 20000
+                    description: |
+                      The content of the clause.
+                    example: It is not allowed to...
+                requestedChanges:
+                  type: array
+                  description: |
+                    A list of changes requirested by the carrier to the document in order for it to be accepted.
+                  items:
+                    $ref: '#/components/schemas/RequestedChange'
+                reason:
+                  type: string
+                  maxLength: 5000
+                  description: |
+                    This field can be used to explain `bookingStatus` and/or `amendedBookingStatus`.
+                  example: Rejected because of strike...
+              required:
+                - bookingStatus
+                - receiptTypeAtOrigin
+                - deliveryTypeAtDestination
+                - cargoMovementTypeAtOrigin
+                - cargoMovementTypeAtDestination
+                - isPartialLoadAllowed
+                - isExportDeclarationRequired
+                - isImportLicenseRequired
+                - communicationChannelCode
+                - isEquipmentSubstitutionAllowed
+                - shipmentLocations
+                - requestedEquipments
+                - documentParties
+          required:
+            - bookingStatus
+      required:
+        - specversion
+        - id
+        - source
+        - type
+        - time
+        - datacontenttype
+        - subscriptionReference
+        - data
     ##################
     # Requested Change
     ##################
