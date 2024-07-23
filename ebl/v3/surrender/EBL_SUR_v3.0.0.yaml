@@ -13,7 +13,7 @@ info:
 
     1) The surrender request was submitted by the sole possessor of the EBL.
     2) Depending on the eBL type:
-       * For non-negoitable ("straight") eBLs, the surrender request was submitted by either the original shipper OR the consignee.
+       * For non-negotiable ("straight") eBLs, the surrender request was submitted by either the original shipper OR the consignee.
        * For negotiable eBLs with a named titleholder, the surrender request was submitted by the named titleholder.
        * For negotiable eBLs without a named titleholder / blank eBLs, possession is sufficient for the entity surrendering the eBL.
     3) The platform has the EBL in custody while the carrier is evaluating this surrender request. I.e., neither possession nor title holder changes can occur until the carrier responds to this surrender request.
@@ -59,7 +59,7 @@ paths:
             schema:
               $ref: '#/components/schemas/SurrenderRequestDetails'
       responses:
-        '202':
+        '204':
           description: |
             Submission registered successfully.
 
@@ -67,10 +67,6 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SurrenderRequestAcknowledgement'
         default:
           description: Error
           headers:
@@ -125,8 +121,8 @@ components:
             - `TRAC` (TRACE Original)
             - `BRIT` (BRITC eBL)
 
-            Must be a code this list [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/reference-data/eblsolutionproviders-v3.0.0-Beta-2.csv).
-          example: WAVE
+            Must be a code this list [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/reference-data/eblsolutionproviders-v3.0.0.csv).
+          example: BOLE
         partyName:
           type: string
           pattern: '^\S(?:.*\S)?$'
@@ -147,59 +143,6 @@ components:
       required:
         - partyName
         - eblPlatform
-      x-stoplight:
-        id: xraettrgxbo2a
-    SurrenderRequestedBy:
-      type: object
-      title: Surrender Requested By
-      description: |
-        The party that requested the surrender of the EBL.
-
-        The EBL platform has verified that the party submitting the surrender request was in possion of the EBL and was entitled to perform the surrender ([see description of surrenderRequestDetails](#/components/schemas/surrenderRequestDetails)).
-      properties:
-        partyName:
-          type: string
-          pattern: '^\S(?:.*\S)?$'
-          maxLength: 100
-          description: |
-            Name of the party.
-          example: Globeteam
-        eblPlatform:
-          type: string
-          pattern: ^\S+$
-          maxLength: 4
-          description: |
-            The EBL platform of the transaction party. The value **MUST** be one of:
-            - `WAVE` (Wave)
-            - `CARX` (CargoX)
-            - `ESSD` (EssDOCS)
-            - `IDT` (ICE Digital Trade)
-            - `BOLE` (Bolero)
-            - `EDOX` (EdoxOnline)
-            - `IQAX` (IQAX)
-            - `SECR` (Secro)
-            - `TRGO` (TradeGO)
-            - `ETEU` (eTEU)
-            - `TRAC` (TRACE Original)
-            - `BRIT` (BRITC eBL)
-
-            Must be a code this list [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/reference-data/eblsolutionproviders-v3.0.0-Beta-2.csv).
-          example: WAVE
-        identifyingCodes:
-          type: array
-          items:
-            $ref: '#/components/schemas/IdentifyingCode'
-        taxLegalReferences:
-          description: |
-            A list of `Tax References` for a `Party`
-          type: array
-          items:
-            $ref: '#/components/schemas/TaxLegalReference'
-      required:
-        - partyName
-        - eblPlatform
-      x-stoplight:
-        id: sswx7bcwj2dhs
     EndorsementChainLink:
       type: object
       title: Endorsement Chain Link
@@ -207,8 +150,20 @@ components:
         actionDateTime:
           type: string
           format: date-time
-          description: Date time when the action occured.
+          description: Date time when the action occurred.
           example: '2024-07-01T08:00:00+08:30'
+        actionCode:
+          type: string
+          maxLength: 50
+          description: |
+            The action performed by the party. This should be one of:
+            - `ISSUE` (The actor issued the document to the recipient)
+            - `ENDORSE` (The actor endorsed the document to the recipient)
+            - `SIGN` (The actor signed or performed an "assignment" to the recipient)
+            - `SURRENDER FOR DELIVERY` (The actor requested this surrender request for delivery to the recipient)
+            - `SURRENDER FOR AMENDMENT` (The actor requested this surrender request for amendment to the recipient)
+            Not all actions are applicable to all surrender requests.
+          example: ISSUE
         actor:
           $ref: '#/components/schemas/TransactionParty'
         recipient:
@@ -217,29 +172,9 @@ components:
         Entry in the endorsement chain.
       required:
         - actionDateTime
+        - actionCode
         - actor
         - recipient
-      x-stoplight:
-        id: i0pnuzyrycm50
-    SurrenderRequestAcknowledgement:
-      type: object
-      properties:
-        surrenderRequestReference:
-          type: string
-          maxLength: 100
-          pattern: '^\S(?:.*\S)?$'
-          description: |
-            A server defined reference for a concrete surrender request. Surrender request references MUST NOT be reused.
-          example: Z12345
-        transportDocumentReference:
-          type: string
-          pattern: '^\S(?:.*\S)?$'
-          maxLength: 20
-          description: |
-            A unique number allocated by the shipping line to the transport document and the main number used for the tracking of the status of the shipment.
-          example: HHL71800000
-      x-stoplight:
-        id: x2tygr63zeg4a
     SurrenderRequestDetails:
       type: object
       title: Surrender Request Details
@@ -250,7 +185,7 @@ components:
 
           1) The surrender request was submitted by the sole possessor of the EBL.
           2) Depending on the eBL type:
-           * For non-negoitable ("straight") eBLs, the surrender request was submitted by either the original shipper OR the consignee.
+           * For non-negotiable ("straight") eBLs, the surrender request was submitted by either the original shipper OR the consignee.
            * For negotiable eBLs with a named titleholder, the surrender request was submitted by the named titleholder.
            * For negotiable eBLs without a named titleholder / blank eBLs, possession is sufficient for the entity surrendering the eBL.
           3) The platform has the EBL in custody while the carrier is evaluating this surrender request. I.e., neither possession nor title holder changes can occur until the carrier responds to this surrender request.
@@ -283,7 +218,7 @@ components:
             - SREQ
             - AREQ
           example: SREQ
-        reason:
+        reasonCode:
           type: string
           maxLength: 4
           description: "A code defined by DCSA indicating the reason for requesting a surrender for amendment. Possible values are:\n-\t`SWTP` (Switch to paper)\n"
@@ -294,8 +229,6 @@ components:
           maxLength: 255
           description: Optional free text comment associated with the surrender request transaction.
           example: As requested...
-        surrenderRequestedBy:
-          $ref: '#/components/schemas/SurrenderRequestedBy'
         endorsementChain:
           type: array
           minItems: 0
