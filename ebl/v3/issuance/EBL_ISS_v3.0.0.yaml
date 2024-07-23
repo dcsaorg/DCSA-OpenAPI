@@ -8,9 +8,17 @@ info:
   title: |
     DCSA OpenAPI specification for Issuance an EBL to an EBL platform.
   description: |
-    This API is intended as an API between a carrier (the client) and a EBL Solution Platform (the server).
+    This API is intended as an API between a carrier and a EBL Solution Platform.
 
-    This API is a counter part to the [DCSA OpenAPI specification for responding to an issuance request](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS_RSP/3.0.0) API.
+    The EBL Solution Provider is to implement
+
+      /v3/ebl-issuance-requests
+
+    for the carrier to call and the carrier is to implement
+
+      /v3/ebl-issuance-responses
+
+    for the EBL Solution Provider to call.
 
     When the document is to be surrendered, it should happen via a version of the [DCSA EBL Surrender](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR/3.0.0) API.
 
@@ -30,7 +38,10 @@ info:
 tags:
   - name: Issuance EBL
     description: |
-      Issuance EBL
+      Issuance EBL **implemented** by EBL Solution Platform
+  - name: Issuance Response
+    description: |
+      Issuance Response **implemented** by carrier
 paths:
   /v3/ebl-issuance-requests:
     put:
@@ -40,6 +51,8 @@ paths:
       summary: Request issuance of an EBL
       description: |
         Submit a transport document (EBL) for issuance
+
+        **This endPoint is to be implemented by an EBL Solution Provider for the carrier to call**
       parameters:
         - $ref: '#/components/parameters/Api-Version-Major'
       requestBody:
@@ -78,6 +91,40 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /v3/ebl-issuance-responses:
+    post:
+      tags:
+        - Issue Response
+      operationId: create-ebl-issuance-response
+      summary: Respond to a transport document issuance request
+      description: |
+        Submit a response to a carrier issuance request.
+
+        **This endPoint is to be implemented by a carrier for the EBL Solution Provider to call**
+      parameters:
+        - $ref: '#/components/parameters/Api-Version-Major'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IssuanceResponse'
+      responses:
+        '204':
+          description: Carrier's acknowledgement of the Issuance Response
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+        default:
+          description: Request successful
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
 components:
   headers:
     API-Version:
@@ -2787,3 +2834,43 @@ components:
       required:
         - partyName
         - address
+
+    IssuanceResponse:
+      type: object
+      title: Issuance Response
+      properties:
+        transportDocumentReference:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 20
+          description: |
+            A unique number allocated by the shipping line to the transport document and the main number used for the tracking of the status of the shipment.
+          example: HHL71800000
+        issuanceResponseCode:
+          type: string
+          description: |
+            The platforms verdict on the issuance of the EBL  identified by the `transportDocumentReference`
+
+            Options are:
+              - `ISSU`: The document was successfully `ISSU` and successfully delivered to the initial possessor.
+              - `BREQ`: The platform reviewed the document and believe they cannot issue the document due to an error/issue with the content of the issuance request.
+              - `REFU`: The eBL issuance is rejected for a reason that the issuing eBL platform cannot resolve (for example when an Interoperable transfer fails, due to a reject of the receiving eBL platform via the `BENV` code from the interoperability standard). One reason could be that the `issueTo` referenced a valid eBL platform but the receiving platform did not recognise the recipient specified.
+
+            Regardless of the response code, the issuance request is now considered handled. In case of successful issuance, the platform will still have some responsiblity but that is covered by other processes and APIs (e.g., the DCSA_SUR API mentioned in the description of this API). In case of failed issuance, it is up to the carrier to resolve the issue and, if needed, submit a revised issuance request.
+          enum:
+            - ISSU
+            - BREQ
+            - REFU
+          example: ISSU
+        reason:
+          type: string
+          maxLength: 255
+          pattern: ^\S(?:.*\S)?$
+          description: |
+            Human readable description of the rationale for an unsuccessful issuance.
+
+            The `reason` should be omitted when the `issuanceResponseCode` is `ISSU`. If the platform for some reason chooses to deviate from this and provide the field anyway, they should use canned phrased like `Issued` that matches the meaning of the `issuanceResponseCode`.
+          example: 'Cannot get...'
+      required:
+        - transportDocumentReference
+        - issuanceResponseCode
