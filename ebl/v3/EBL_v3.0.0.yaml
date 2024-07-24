@@ -624,7 +624,7 @@ paths:
 
         If `updatedContent=true` is requested but no update has yet been provided by the consumer **or** the state of the "original" `Shipping Instructions` is `PENDING UPDATE`, then a `404` (Not Found) is returned.
 
-        If the provider is requesting some changes to the `Shipping Instructions` this will also be part of the "original" `Shipping Instructions` payload in the `requestedChanges` property. This property is **conditional** on the `shippingInstructionsStatus='PENDING UPDATE'`.
+        If the provider is requesting some changes to the `Shipping Instructions` this will also be part of the "original" `Shipping Instructions` payload in the `feedbacks` property. This property is **conditional** on the `shippingInstructionsStatus='PENDING UPDATE'`.
 
         In case no subscription (`Notification`) has been set up - it is possible to use this endPoint to poll on in order to detect if `shippingInstructionsStatus` and/or `updatedShippingInstructionsStatus` has changed.
       responses:
@@ -739,11 +739,19 @@ paths:
                         countryCode: US
                         advanceManifestFilingsHouseBLPerformedBy: SHIPPER
                         selfFilerCode: HHL007
-                    requestedChanges:
-                      - jsonPath: '$.advanceManifestFilings[0]'
-                        message: Not a legal combination of "manifestTypeCode" (AFR) and "countryCode" (US)
-                      - jsonPath: '$.advanceManifestFilings'
-                        message: Missing "ACI" filing required for import to US
+                    feedbacks:
+                      - severity: ERROR
+                        code: PROPERTY_VALUE_MUST_CHANGE
+                        message: |
+                          Not a legal combination of "manifestTypeCode" (AFR) and "countryCode" (US)
+                        jsonPath: '$.advanceManifestFilings[0]'
+                        property: 'advanceManifestFilings'
+                      - severity: ERROR
+                        code: PROPERTY_VALUE_MUST_CHANGE
+                        message: |
+                          Missing "ACI" filing required for import to US
+                        jsonPath: '$.advanceManifestFilings'
+                        property: 'advanceManifestFilings'
                 dgExample:
                   summary: |
                     Updated Shipping Instructions with DG cargo
@@ -3006,12 +3014,15 @@ components:
                     Clauses requested by the Shipper for the Carrier to include in the `Transport Document` `Carrier clauses`
                   items:
                     $ref: '#/components/schemas/RequestedCarrierClause'
-                requestedChanges:
+                feedbacks:
                   type: array
                   description: |
-                    A list of changes requirested by the carrier to the document in order for it to be accepted.
+                    A list of feedback provided by the carrier, to the document. Feedback includes information of:
+                    - unsupported properties
+                    - changed values
+                    - removed properties
                   items:
-                    $ref: '#/components/schemas/RequestedChange'
+                    $ref: '#/components/schemas/Feedback'
                 reason:
                   type: string
                   maxLength: 5000
@@ -3418,12 +3429,15 @@ components:
                     Clauses requested by the Shipper for the Carrier to include in the `Transport Document` `Carrier clauses`
                   items:
                     $ref: '#/components/schemas/RequestedCarrierClause'
-                requestedChanges:
+                feedbacks:
                   type: array
                   description: |
-                    A list of changes requirested by the carrier to the document in order for it to be accepted.
+                    A list of feedback provided by the carrier, to the document. Feedback includes information of:
+                    - unsupported properties
+                    - changed values
+                    - removed properties
                   items:
-                    $ref: '#/components/schemas/RequestedChange'
+                    $ref: '#/components/schemas/Feedback'
                 reason:
                   type: string
                   maxLength: 5000
@@ -5144,12 +5158,15 @@ components:
             Clauses requested by the Shipper for the Carrier to include in the `Transport Document` `Carrier clauses`
           items:
             $ref: '#/components/schemas/RequestedCarrierClause'
-        requestedChanges:
+        feedbacks:
           type: array
           description: |
-            A list of changes requirested by the carrier to the document in order for it to be accepted.
+            A list of feedback provided by the carrier, to the document. Feedback includes information of:
+            - unsupported properties
+            - changed values
+            - removed properties
           items:
-            $ref: '#/components/schemas/RequestedChange'
+            $ref: '#/components/schemas/Feedback'
         reason:
           type: string
           maxLength: 5000
@@ -5206,12 +5223,15 @@ components:
             - `UPDATE CANCELLED` (An update to a Shipping Instructions is discontinued by consumer)
             - `UPDATE DECLINED` (An update to a Shipping Instructions is discontinued by provider)
           example: UPDATE RECEIVED
-        requestedChanges:
+        feedbacks:
           type: array
           description: |
-            A list of changes requirested by the carrier to the document in order for it to be accepted.
+            A list of feedback provided by the carrier, to the document. Feedback includes information of:
+            - unsupported properties
+            - changed values
+            - removed properties
           items:
-            $ref: '#/components/schemas/RequestedChange'
+            $ref: '#/components/schemas/Feedback'
         reason:
           type: string
           maxLength: 5000
@@ -5264,40 +5284,60 @@ components:
       required:
         - shippingInstructionsStatus
 
-    ##################
-    # Requested Change
-    ##################
-    RequestedChange:
+    ##########
+    # Feedback
+    ##########
+    Feedback:
       type: object
-      title: Requested Change
+      title: Feedback
       description: |
-        A change required to the document in order for the carrier to accepted it
+        Document feedback provided. The following feedback can be provided:
+        - unsupported properties
+        - changed values
+        - removed properties
       properties:
-        #field:
-        #  type: string
-        #  maxLength: 500
-        #  description: |
-        #    The field that caused the error, e.g. a failed validation. The field can be expressed as a [JSONpath](https://github.com/json-path/JsonPath) using either the [DOT] Notation or the [Bracket] Notation.
-        #  example: $.location.facilityCode
-        property:
+        severity:
           type: string
-          maxLength: 100
+          maxLength: 50
           description: |
-            The name of the property causing the error.
-          example: 'facilityCode'
-        jsonPath:
+            The severity of the feedback. Possible values are:
+            - `INFO` (Information - "Your reefer container will use renewable energy", "This earlier / premium service is available")
+            - `WARN` (Warning - "I'm going to replace" / "Ignore this value" / "Use another value instead")
+            - `ERROR` (Error - "This must be changed!")
+          example: WARN
+        code:
           type: string
-          maxLength: 500
+          maxLength: 50
           description: |
-            A path to the property causing the error, formatted according to [JSONpath](https://github.com/json-path/JsonPath).
-          example: '$.location.facilityCode'
+            A code used to describe the feedback. Possible values are: {Descriptions for each pseudo-enum should be provided}
+            - `INFORMATIONAL_MESSAGE` (INFO - to be used when providing extra information) 
+            - `PROPERTY_WILL_BE_IGNORED` (WARN - to be used for unsupported properties/values)
+            - `PROPERTY_VALUE_MUST_CHANGE` (ERROR - to be used when a wrong property/value is provided)
+            - `PROPERTY_VALUE_HAS_BEEN_CHANGED` (WARN - when something has been auto-updated without consumer intervention)
+            - `PROPERTY_VALUE_MAY_CHANGE` (WARN - when something is likely to change in the future)
+            - `PROPERTY_HAS_BEEN_DELETED` (WARN - when something has been auto-deleted without consumer intervention)
+          example: PROPERTY_WILL_BE_IGNORED
         message:
           type: string
           maxLength: 500
           description: |
-            A description of the problem that needs attention.
+            A description with additional information.
           example: Spaces not allowed in facility code
+        jsonPath:
+            type: string
+            maxLength: 500
+            description: |
+              A path to the property, formatted according to [JSONpath](https://github.com/json-path/JsonPath).
+            example: $.location.facilityCode
+        property:
+            type: string
+            maxLength: 100
+            description: |
+              The name of the property causing the error/warning.
+            example: facilityCode
       required:
+        - severity
+        - code
         - message
 
     #################
