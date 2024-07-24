@@ -1183,7 +1183,7 @@ paths:
 
         If `amendedContent=true` is requested but no amendment has yet been provided by the consumer **or** the state of the "original" `Booking` is `PENDING AMENDMENT`, then a `404` (Not Found) is returned.
 
-        If the provider is requesting some changes to the `Booking` this will also be part of the "original" `Booking` payload in the `requestedChanges` property. This property is **conditional** on the `bookingStatus='PENDING UPDATE'` (in case the `Booking` has not yet been confirmed) or `bookingStatus='PENDING AMENDMENT'` (in case it is a confirmed `Booking`).
+        If the provider is requesting changes to the `Booking`, the `feedbacks` object is used to inform the consumer what needs to change.
 
         In case no subscription (`Notification`) has been set up - it is possible to use this endPoint to poll on in order to detect if `bookingStatus` and/or `amendedBookingStatus` has changed.
       parameters:
@@ -1205,7 +1205,7 @@ paths:
                   summary: |
                     Standard dry cargo Booking (not confirmed)
                   description: |
-                    Gets a `Booking Request` with standard Dry cargo which has not yet been confirmed. The `Booking` is in state `PENDING UPDATE` and requires some changes (specified in the `requestedChanges` property)
+                    Gets a `Booking Request` with standard Dry cargo which has not yet been confirmed. The `Booking` is in state `PENDING UPDATE` and requires some changes (specified in the `feedbacks` property)
                   value:
                     carrierBookingRequestReference: cbrr-123
                     bookingStatus: PENDING UPDATE
@@ -1271,11 +1271,13 @@ paths:
                           - commodityType: 'Dry cargo, Freight all kinds'
                             cargoGrossWeight: 36000
                             cargoGrossWeightUnit: KGM
-                    requestedChanges:
-                      - jsonPath: $.requestedEquipment.units
-                        property: 'units'
+                    feedbacks:
+                      - severity: ERROR
+                        code: PROPERTY_VALUE_MUST_CHANGE
                         message: |
                           Not enough available "42GP" equipment. Please change to "22G1" instead
+                        jsonPath: $.requestedEquipment.units
+                        property: 'units'
                 dryConfirmedExample:
                   summary: |
                     Gets a confirmed Standard dry cargo Booking
@@ -2837,12 +2839,18 @@ components:
                     description: |
                       The content of the clause.
                     example: It is not allowed to...
-                requestedChanges:
+                feedbacks:
                   type: array
                   description: |
-                    A list of changes requirested by the carrier to the document in order for it to be accepted.
+                    Feedback that can be provided includes, but is not limited to:
+                    - unsupported properties
+                    - changed values
+                    - removed properties
+                    - general information
+
+                    This property is **conditional** on the `bookingStatus='PENDING UPDATE'` (in case the `Booking` has not yet been confirmed) or `bookingStatus='PENDING AMENDMENT'` (in case it is a confirmed `Booking`).
                   items:
-                    $ref: '#/components/schemas/RequestedChange'
+                    $ref: '#/components/schemas/Feedback'
                 reason:
                   type: string
                   maxLength: 5000
@@ -3423,12 +3431,18 @@ components:
                     description: |
                       The content of the clause.
                     example: It is not allowed to...
-                requestedChanges:
+                feedbacks:
                   type: array
                   description: |
-                    A list of changes requirested by the carrier to the document in order for it to be accepted.
+                    Feedback that can be provided includes, but is not limited to:
+                    - unsupported properties
+                    - changed values
+                    - removed properties
+                    - general information
+
+                    This property is **conditional** on the `bookingStatus='PENDING UPDATE'` (in case the `Booking` has not yet been confirmed) or `bookingStatus='PENDING AMENDMENT'` (in case it is a confirmed `Booking`).
                   items:
-                    $ref: '#/components/schemas/RequestedChange'
+                    $ref: '#/components/schemas/Feedback'
                 reason:
                   type: string
                   maxLength: 5000
@@ -3460,34 +3474,62 @@ components:
         - datacontenttype
         - subscriptionReference
         - data
-    ##################
-    # Requested Change
-    ##################
-    RequestedChange:
+
+    ##########
+    # Feedback
+    ##########
+    Feedback:
       type: object
-      title: Requested Change
+      title: Feedback
       description: |
-        A change required to the document in order for the carrier to accepted it
+        Feedback that can be provided includes, but is not limited to:
+        - unsupported properties
+        - changed values
+        - removed properties
+        - general information
       properties:
-        property:
+        severity:
           type: string
-          maxLength: 100
+          maxLength: 50
           description: |
-            The name of the property causing the error.
-          example: 'facilityCode'
-        jsonPath:
+            The severity of the feedback. Possible values are:
+            - `INFO` (Information - "Your reefer container will use renewable energy", "This earlier / premium service is available")
+            - `WARN` (Warning - "I'm going to replace" / "Ignore this value" / "Use another value instead")
+            - `ERROR` (Error - "This must be changed!")
+          example: WARN
+        code:
           type: string
-          maxLength: 500
+          maxLength: 50
           description: |
-            A path to the property causing the error, formatted according to [JSONpath](https://github.com/json-path/JsonPath).
-          example: '$.location.facilityCode'
+            A code used to describe the feedback. Possible values are: {Descriptions for each pseudo-enum should be provided}
+            - `INFORMATIONAL_MESSAGE` (INFO - to be used when providing extra information) 
+            - `PROPERTY_WILL_BE_IGNORED` (WARN - to be used for unsupported properties/values)
+            - `PROPERTY_VALUE_MUST_CHANGE` (ERROR - to be used when a wrong property/value is provided)
+            - `PROPERTY_VALUE_HAS_BEEN_CHANGED` (WARN - when something has been auto-updated without consumer intervention)
+            - `PROPERTY_VALUE_MAY_CHANGE` (WARN - when something is likely to change in the future)
+            - `PROPERTY_HAS_BEEN_DELETED` (WARN - when something has been auto-deleted without consumer intervention)
+          example: PROPERTY_WILL_BE_IGNORED
         message:
           type: string
           maxLength: 500
           description: |
-            A description of the problem that needs attention.
+            A description with additional information.
           example: Spaces not allowed in facility code
+        jsonPath:
+            type: string
+            maxLength: 500
+            description: |
+              A path to the property, formatted according to [JSONpath](https://github.com/json-path/JsonPath).
+            example: $.location.facilityCode
+        property:
+            type: string
+            maxLength: 100
+            description: |
+              The name of the property causing the error/warning.
+            example: facilityCode
       required:
+        - severity
+        - code
         - message
 
     #################
@@ -5261,12 +5303,18 @@ components:
             description: |
               The content of the clause.
             example: It is not allowed to...
-        requestedChanges:
+        feedbacks:
           type: array
           description: |
-            A list of changes requirested by the carrier to the document in order for it to be accepted.
+            Feedback that can be provided includes, but is not limited to:
+            - unsupported properties
+            - changed values
+            - removed properties
+            - general information
+
+            This property is **conditional** on the `bookingStatus='PENDING UPDATE'` (in case the `Booking` has not yet been confirmed) or `bookingStatus='PENDING AMENDMENT'` (in case it is a confirmed `Booking`).
           items:
-            $ref: '#/components/schemas/RequestedChange'
+            $ref: '#/components/schemas/Feedback'
         reason:
           type: string
           maxLength: 5000
@@ -5342,12 +5390,18 @@ components:
             - `AMENDMENT DECLINED` (Amendment discontinued by provider)
             - `AMENDMENT CANCELLED` (Amendment discontinued by consumer)
           example: AMENDMENT RECEIVED
-        requestedChanges:
+        feedbacks:
           type: array
           description: |
-            A list of changes requirested by the carrier to the document in order for it to be accepted.
+            Feedback that can be provided includes, but is not limited to:
+            - unsupported properties
+            - changed values
+            - removed properties
+            - general information
+
+            This property is **conditional** on the `bookingStatus='PENDING UPDATE'` (in case the `Booking` has not yet been confirmed) or `bookingStatus='PENDING AMENDMENT'` (in case it is a confirmed `Booking`).
           items:
-            $ref: '#/components/schemas/RequestedChange'
+            $ref: '#/components/schemas/Feedback'
         reason:
           type: string
           maxLength: 5000
