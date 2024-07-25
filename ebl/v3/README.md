@@ -15,6 +15,15 @@ Publications related to the Bill of Lading API:
 ---
 This is a moving target and will be updated as soon as the version is published
 
+<a name="v300B20240726"></a>[Release v3.0.0 Beta 20240726 (26 of July 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.0-Beta-20240726)
+---
+Snapshot as of 26 of July 2024 for EBL 3.0.0 Beta.
+## Major changes
+- ...
+
+## Major changes
+- ...
+
 <a name="v300B20240614"></a>[Release v3.0.0 Beta 20240614 (28 June 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.0-Beta-20240614)
 ---
 Snapshot as of 14 of June 2024 for EBL 3.0.0 Beta.
