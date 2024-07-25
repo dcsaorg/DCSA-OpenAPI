@@ -8,6 +8,15 @@ Publications related to the Bill of Lading Issuance API:
 - [Bill of Lading](./../) maintained here on GitHub
 - [Bill of Lading Issuance Response](./../issuance_response/) maintained here on GitHub (the Issuance Response API linked to this API)
 
+<a name="v300B20240726"></a>[Release v3.0.0 Beta 20240726 (26 of July 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS/3.0.0-Beta-20240726)
+---
+Snapshot as of 26 of July 2024 for EBL Issuance 3.0.0 Beta.
+## Major changes
+- ...
+
+## Minor changes
+- ...
+
 <a name="v300B2"></a>[Release v3.0.0 Beta 2 (12 April 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS/3.0.0-Beta-2)
 ---
 Beta 2 release of the DCSA OpenAPI definitions for Bill of Lading Issuance 3.0.0-Beta-2
