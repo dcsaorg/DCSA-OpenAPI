@@ -11,11 +11,25 @@ Publications related to the Bill of Lading Issuance API:
 <a name="v300B20240726"></a>[Release v3.0.0 Beta 20240726 (26 of July 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS/3.0.0-Beta-20240726)
 ---
 Snapshot as of 26 of July 2024 for EBL Issuance 3.0.0 Beta.
-## Major changes
-- ...
+## Key changes
+- `Issuance Response` endPoint added
+- `Transport Document` updated
 
-## Minor changes
-- ...
+## Issuance changes
+- API description updated
+- Issuance Response endPoint added
+- `issuanceManifestSignedContent` added to `IssuanceRequest` object
+- `IssuanceManifest` object deleted
+
+## Transport Document changes
+- `placeOfIssue` no longer defined inline but via a $ref to `PlaceOfIssue` object
+- values removed from `type` in `reference` (`FF`, `SI`, `SPO`, `CPO`, `AAO`, `ECR`, `CSI`, `BPR`, `BID` and `SAC` all removed and `AKG` added)
+- `nationalCommodityCodes` added to `ConsignmentItem`
+- `NationalCommodityCode` object added
+- `woodDeclaration` added to `OuterPackaging`
+- fixed typo in required fields of `Transports` (`vesselVoyage` --> `vesselVoyages`)
+- `MULTIMODAL` added as a `Mode of Transport` to `preCarriageBy` and `onCarriageBy`
+- `PlaceOfReceipt`, `PortOfLoading`, `PortOfDischarge`, `PlaceOfDelivery` and `OnwardInlandRouting` objects changed from using a `oneOf` into an object where all location types are optional and can be used at the same time
 
 <a name="v300B2"></a>[Release v3.0.0 Beta 2 (12 April 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS/3.0.0-Beta-2)
 ---
