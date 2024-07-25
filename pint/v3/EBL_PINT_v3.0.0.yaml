@@ -14,7 +14,7 @@ info:
 
     In the most common scenario, the sending eBL platform executes the envelope transfer by:
     1. Initiating the envelope transfer using [**'Start envelope transfer'**](#/Start%20envelope%20transfer) endpoint
-    2. Transfering the additional documents (one at the time) using [**'Transfer additional document'**](#/Transfer%20additional%20document) endpoint
+    2. Transferring the additional documents (one at the time) using [**'Transfer additional document'**](#/Transfer%20additional%20document) endpoint
     3. Completing the envelope transfer using [**'Finish envelope transfer'**](#/Finish%20envelope%20transfer) endpoint
 
     <h2>The eBL document</h2>
@@ -121,7 +121,7 @@ paths:
 
             The sending platform is required to retry the envelope transfer until they get a signed response [`EnvelopeTransferFinishedResponseSignedContent`](#/EnvelopeTransferFinishedResponseSignedContent) with the JWS-signed payload [`EnvelopeTransferFinishedResponse.responseCode`](#/EnvelopeTransferFinishedResponse) attribute value providing the information whether the receiving platform has accepted or rejected the envelope transfer.  
 
-            In the rare corner cases, the unsigned `error` response could come from middleware and hide a true envelope transfer acceptance/rejection message. The sending platform will be liable if they act on an unsigned reponse that does *not* match the actions of the receiving platform.
+            In the rare corner cases, the unsigned `error` response could come from middleware and hide a true envelope transfer acceptance/rejection message. The sending platform will be liable if they act on an unsigned response that does *not* match the actions of the receiving platform.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -200,7 +200,7 @@ paths:
 
             The sending platform is required to retry the additional document transfer until they get a signed response [`EnvelopeTransferFinishedResponseSignedContent`](#/EnvelopeTransferFinishedResponseSignedContent) with the JWS-signed payload [`EnvelopeTransferFinishedResponse.responseCode`](#/EnvelopeTransferFinishedResponse) attribute value providing the information whether the receiving platform has accepted or rejected the envelope transfer.  
 
-            In the rare corner cases, the unsigned `error` response could come from middleware and hide a true envelope transfer acceptance/rejection message. The sending platform will be liable if they act on an unsigned reponse that does *not* match the actions of the receiving platform.
+            In the rare corner cases, the unsigned `error` response could come from middleware and hide a true envelope transfer acceptance/rejection message. The sending platform will be liable if they act on an unsigned response that does *not* match the actions of the receiving platform.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -219,7 +219,7 @@ paths:
 
         The sending platform believes all additional documents have been transferred and the envelope transfer can now be completed. 
 
-        Prior to acepting envelope transfer, the receiving platform should ensure that all supporting documents listed in the [`EnvelopeManifest.supportingDocument`](#/EnvelopeManifest) list have been successfully transferred, as well as eBLVisualisationByCarrier document if attribute [`EnvelopeManifest.eBLVisualisationByCarrier`](#/EnvelopeManifest) was defined. Otherwise, The receiving platform should reject the envelope transfer.
+        Prior to accepting envelope transfer, the receiving platform should ensure that all supporting documents listed in the [`EnvelopeManifest.supportingDocument`](#/EnvelopeManifest) list have been successfully transferred, as well as eBLVisualisationByCarrier document if attribute [`EnvelopeManifest.eBLVisualisationByCarrier`](#/EnvelopeManifest) was defined. Otherwise, The receiving platform should reject the envelope transfer.
       parameters:
         - $ref: '#/components/parameters/envelopeReference'
         - $ref: '#/components/parameters/Api-Version-Major'
@@ -268,7 +268,77 @@ paths:
 
             The sending platform should retry to finish the envelope transfer until it gets the signed response [`EnvelopeTransferFinishedResponseSignedContent`](#/EnvelopeTransferFinishedResponseSignedContent) with the JWS-signed payload [`EnvelopeTransferFinishedResponse.responseCode`](#/EnvelopeTransferFinishedResponse) attribute value providing the information whether the receiving platform has accepted or rejected the envelope transfer.  
 
-            In the rare corner cases, the unsigned `error` response could come from middleware and hide a true envelope transfer acceptance/rejection message. The sending platform will be liable if they act on an unsigned reponse that does *not* match the actions of the receiving platform.       
+            In the rare corner cases, the unsigned `error` response could come from middleware and hide a true envelope transfer acceptance/rejection message. The sending platform will be liable if they act on an unsigned response that does *not* match the actions of the receiving platform.
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v3/receiver-validation:
+    post:
+      tags:
+        - Receiver validation
+      operationId: post-receiver-validation
+      summary: Enable a user to validate the receiver
+      description: |
+        Request the name of a party given a party code. This enables the sending user to validate
+        the receiver information (similar how bank transfers enable users to conform the receiver
+        before confirming the transfer).
+
+        A successful response to this query asserts that the platform will accept an eBL for the
+        account or user denoted by the provided identifying code and that said account or user
+        is "active and able to accept interoperable eBLs" as defined by the platform hosting
+        the account or user.
+
+        The transfer can still be rejected due to an unknown user if the transfer has
+        multiple conflicting identifying codes. Platforms that supports using multiple identifying
+        codes when transferring an eBL will need to consider how they ensure they do not by accident
+        include conflicting codes.
+      parameters:
+        - $ref: '#/components/parameters/Api-Version-Major'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdentifyingCode'
+      responses:
+        '200':
+          description: |
+            On a successful match, this response includes the relevant information that should be displayed to the user
+            to help them assert they have the correct party.
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReceiverValidationResponse'
+        '404':
+          description: |
+            If the server cannot identify an account or user via the given party code, then it should use this
+            response code. This response is also applicable if the query matches multiple distinct accounts or
+            when the platform would reject a transfer request to said account or user.
+
+            Note this code is also used, if the client is using a code list provider that the server cannot
+            (or will not) support. As an example, platforms are not required to support codes issued by
+            other eBL platforms and can unconditionally reject lookup requests for them with this response.
+
+            The response is deliberately vague on negative results to limit data exposure by default. The
+            server may at its discretion include more details about the underlying issue in the response
+            body.
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        default:
+          description: |
+            Request failed for the unexpected reason. The unsigned response contains all the error details.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -444,6 +514,20 @@ components:
         - transportDocument
         - envelopeManifestSignedContent
         - envelopeTransferChain
+    ReceiverValidationResponse:
+      type: object
+      description: |
+        Response to a receiver validation response, where the party code could successfully identified.
+      properties:
+        partyName:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 100
+          description: |
+            Name of the party.
+          example: Globeteam
+      required:
+        - partyName
     EnvelopeManifest:
       type: object
       properties:
@@ -568,14 +652,7 @@ components:
             This attribute should *not* be defined for the first entry in the [`EblEnvelope.envelopeTransferChain[]`](#/EblEnvelope) list. For all other entries after the first entry in the [`EblEnvelope.envelopeTransferChain[]`](#/EblEnvelope) list, this attribute **must** be defined and contain the checksum of the previous [`EnvelopeTransferChainEntrySignedContent`](#/EnvelopeTransferChainEntrySignedContent) entry in the [`EblEnvelope.envelopeTransferChain[]`](#/EblEnvelope) list. This attribute can be used to track signed envelope transfers between platforms (for details check description of [`EblEnvelope.envelopeTransferChain[]`](#/EblEnvelope)).
 
             The checksum is computed over the entire [`EnvelopeTransferChainEntrySignedContent`](#/EnvelopeTransferChainEntrySignedContent) entry (JWS-signed payload is described in the `EnvelopeTransferChainEntry` schema). The checksum is computed using SHA-256 hash algorithm according to [RFC 6234](https://datatracker.ietf.org/doc/html/rfc6234).
-        eBLVisualisationByCarrier:
-          allOf:
-            - $ref: '#/components/schemas/DocumentMetadata'
-          description: |
-            actual type: [`DocumentMetadata`](#\DocumentMetadata)
-
-            This attribute is used to transfer metadata of the **'Digital copy of the original physical B/L document' document** a.k.a. **eBLVisualisationByCarrier document**. If this attribute is defined with the initial eBL envelope transfer(in the first `EnvelopeTransferChainEntrySignedContent` entry in the [`EblEnvelope.envelopeTransferChain[]`](#/EblEnvelope) list), eBLVisualisationByCarrier document **must** be transferred with every subsequent envelope transfer for the lifetime of the eBL document. Also, eBLVisualisationByCarrier document must be unchanged between different envelope transfers for the lifetime of the eBL document (in other words, for each `EnvelopeTransferChainEntrySignedContent` entry in the [`EblEnvelope.envelopeTransferChain[]`](#/EblEnvelope) list, JWS-signed payload `EnvelopeTransferChainEntry.eBLVisualisationByCarrier` attribute must have the identical value).
-        IssuanceManifestSignedContent:
+        issuanceManifestSignedContent:
           type: string
           pattern: ^([a-zA-Z0-9_=]+)\.([a-zA-Z0-9_=]+)\.([a-zA-Z0-9_\-\+\/=]+)$
           description: |
