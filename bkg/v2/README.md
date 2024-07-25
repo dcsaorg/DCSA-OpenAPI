@@ -14,6 +14,10 @@ This is a moving target and will be updated as soon as the version is published
 <a name="v200B20240726"></a>[Release v2.0.0 Beta 20240726 (26 July 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0-Beta-20240726)
 ---
 Snapshot as of 26 of July 2024 for Booking 2.0.0 Beta
+## Key changes
+- `Reciever validation` endPoint added
+- Transport Document updated
+
 ## EBL PINT changes
 - multiple description changes (typos)
 - Added `Reciever validation` endPoint
