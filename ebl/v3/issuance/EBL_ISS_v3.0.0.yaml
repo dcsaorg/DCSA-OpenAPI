@@ -1078,6 +1078,12 @@ components:
 
               This standard is based on the 2022 revision.
             example: '851713'
+        nationalCommodityCodes:
+          type: array
+          description: |
+            A list of `National Commodity Codes` that apply to this `commodity`
+          items:
+            $ref: '#/components/schemas/NationalCommodityCode'
         shippingMarks:
           type: array
           description: |
@@ -1112,6 +1118,64 @@ components:
         - descriptionOfGoods
         - HSCodes
         - cargoItems
+
+    #########################
+    # National Commodity Code
+    #########################
+    NationalCommodityCode:
+      type: object
+      title: National Commodity Code
+      description: |
+        The national commodity classification code linked to a country with a value.
+
+        An example could look like this:
+
+        | Type  | Country | Value |
+        |-------|:-------:|-------------|
+        |NCM|BR|['1515', '2106', '2507', '2512']|
+      properties:
+        type:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 10
+          description: |
+            The national commodity classification code, which can be one of the following values defined by DCSA:
+            - `NCM` (Nomenclatura Comum do Mercosul)
+            - `HTS` (Harmonized Tariff Schedule)
+            - `Schedule B` ( Schedule B)
+            - `TARIC` (Integrated Tariff of the European Communities)
+            - `CN` (Combined Noemclature)
+            - `CUS` (Customs Union and Statistics)
+          example: NCM
+        countryCode:
+          type: string
+          pattern: ^[A-Z]{2}$
+          minLength: 2
+          maxLength: 2
+          description: |
+            The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+          example: BR
+        values:
+          type: array
+          minItems: 1
+          description: |
+            A list of `national commodity codes` values.
+          items:
+            type: string
+            pattern: ^\S(?:.*\S)?$
+            maxLength: 10
+            description: |
+              The value of the `National Commodity Code`
+            example: '1515'
+          example:
+            - '1515'
+            - '2106'
+            - '2507'
+            - '2512'
+      required:
+        - type
+        - countryCode
+        - values
 
     ###################
     # Customs Reference
