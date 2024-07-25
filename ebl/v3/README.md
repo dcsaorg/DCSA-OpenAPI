@@ -5,11 +5,11 @@ The DCSA Bill of Lading API is specified on [**SwaggerHub**](https://app.swagger
 Publications related to the Bill of Lading API:
 - [Glossary of Terms](https://knowledge.dcsa.org/s/glossary) maintained on the [dcsa.org](https://dcsa.org) website
 - [Bill of Lading](https://dcsa.org/standards/ebill-of-lading/) maintained on the [dcsa.org](https://dcsa.org) website (contains documents and publications)
-- [Bill of Lading Notification](./notification/) maintained here on GitHub (**DEPRECATED - now included as part of EBL API)
+- [Bill of Lading Notification](./notification/) maintained here on GitHub (**DEPRECATED** - now included as part of EBL API)
 - [Bill of Lading Issuance](./issuance/) maintained here on GitHub
-- [Bill of Lading Issuance Response](./issuance_response/) maintained here on GitHub (**DEPRECATED - now included as part of EBL Issuance API)
+- [Bill of Lading Issuance Response](./issuance_response/) maintained here on GitHub (**DEPRECATED** - now included as part of EBL Issuance API)
 - [Bill of Lading Surrender](./surrender/) maintained here on GitHub
-- [Bill of Lading Surrender Response](./surrender_response/) maintained here on GitHub (**DEPRECATED - now included as part of EBL Surrender API)
+- [Bill of Lading Surrender Response](./surrender_response/) maintained here on GitHub (**DEPRECATED** - now included as part of EBL Surrender API)
 
 <a name="v300"></a>[Release v3.0.0 (...)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.0)
 ---
