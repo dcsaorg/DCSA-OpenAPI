@@ -11,11 +11,25 @@ Publications related to the Bill of Lading Surrender API:
 <a name="v300B20240726"></a>[Release v3.0.0 Beta 20240726 (26 of July 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR/3.0.0-Beta-20240726)
 ---
 Snapshot as of 26 of July 2024 for EBL Surrender 3.0.0 Beta.
-## Major changes
-- ...
+## Key changes
+- `Surrender Response` endPoint added
 
-## Minor changes
-- ...
+## Issuance changes
+- API description updated
+- `/v3/ebl-surrender-requests` responseCode changed from `202` --> `204`
+- Surrender Response endPoint added
+- `eblPlatform` pattern improved
+- `SurrenderRequestedBy` object removed
+- `EndorsementChainLink` added mandatory `actionCode` property
+- `SurrenderRequestAcknowledgement` object removed
+- `SurrenderRequestDetails` has the following changes
+  - `reason` renamed to `reasonCode` in
+  - pattern added to `comments`
+  - `title` added
+  - `surrenderRequestedBy` property added
+- `codeListName` in `IdentifyingCodes` now has a maxLength of 100 and is defined as type=string
+- `SurrenderRequestAnswer` object added
+- multiple typos in descriptions fixed
 
 <a name="v300B2"></a>[Release v3.0.0 Beta 2 (12 April 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR/3.0.0-Beta-2)
 ---
