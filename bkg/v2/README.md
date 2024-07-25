@@ -14,11 +14,31 @@ This is a moving target and will be updated as soon as the version is published
 <a name="v200B20240726"></a>[Release v2.0.0 Beta 20240726 (26 July 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0-Beta-20240726)
 ---
 Snapshot as of 26 of July 2024 for Booking 2.0.0 Beta
-## Major changes
-- ...
+## EBL PINT changes
+- multiple description changes (typos)
+- Added `Reciever validation` endPoint
+- `DocumentChecksum` description modified
+- `ReceiverValidationResponse` object added
+- `IssuanceManifest` object added
+- `EnvelopeTransferChainEntry` object modified
+  - `issuanceManifestSignedContent` added
+  - `eBLVisualisationByCarrier` removed
+  - no longer contains an `allOf`
+- `eblPlatform` pattern improved and description modified (link updated)
+- `name` in `DocumentMetadata` got a pattern
+- `Transaction` object modified
+  - example added to `action`
+  - pattern added to `comments`
 
-## Minor changes
-- ...
+## Transport Document changes
+- `placeOfIssue` no longer defined inline but via a $ref to `PlaceOfIssue` object
+- values removed from `type` in `reference` (`FF`, `SI`, `SPO`, `CPO`, `AAO`, `ECR`, `CSI`, `BPR`, `BID` and `SAC` all removed and `AKG` added)
+- `nationalCommodityCodes` added to `ConsignmentItem`
+- `NationalCommodityCode` object added
+- `woodDeclaration` added to `OuterPackaging`
+- fixed typo in required fields of `Transports` (`vesselVoyage` --> `vesselVoyages`)
+- `MULTIMODAL` added as a `Mode of Transport` to `preCarriageBy` and `onCarriageBy`
+- `PlaceOfReceipt`, `PortOfLoading`, `PortOfDischarge`, `PlaceOfDelivery` and `OnwardInlandRouting` objects changed from using a `oneOf` into an object where all location types are optional and can be used at the same time
 
 <a name="v200B20240614"></a>[Release v2.0.0 Beta 20240614 (28 June 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0-Beta-20240614)
 ---
@@ -35,6 +55,15 @@ Snapshot as of 14 of June 2024 for Booking 2.0.0 Beta
   - `netExplosiveContent` unit now also allow: `LBR` (Pounds) and `ONZ` (Ounce)
   - `volume` property object must now be >= 0
 - typo fixed in `carrierServiceCode` --> `carrierSerivceCode` in the `Transport` object
+- `AddressLocation` no longer needed because of new way of specifying locations
+- `streetNumber` no longer a required field in `Address` nor `PartyAddress` objects
+- `CityLocation` turned into a `City` object
+- `FacilityLocation` turned into a `Facility` object
+- `UnLocationLocation` object no longer needed because of new way of specifying locations
+- `GeoCoordinate` added as new object
+- `shippersReference` and `shippersPurchaseOrderReference` added to the `Shipper`-Party object
+- `consigneesReference` and `consigneesPurchaseOrderReference` added to the `Consignee`-Party object
+- `reference` added to the `Party` object
 
 ## Object changes
 - `RequestedEquipmentCarrier` renamed to `RequestedEquipment` and modified to include everything that was in the `RequestedEquipmentCarrier` (no use of `allOf` any more)
