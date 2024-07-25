@@ -21,7 +21,7 @@ Snapshot as of 26 of July 2024 for EBL 3.0.0 Beta.
 ## Major changes
 - ...
 
-## Major changes
+## Minor changes
 - ...
 
 <a name="v300B20240614"></a>[Release v3.0.0 Beta 20240614 (28 June 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.0-Beta-20240614)
