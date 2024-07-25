@@ -6263,7 +6263,6 @@ components:
             - `PDE` (Place of Delivery)
             - `PCF` (Pre-carriage From)
             - `OIR` (Onward In-land Routing)
-            - `DRL` (Depot release location)
             - `ORI` (Origin of goods)
             - `IEL` (Container intermediate export stop off location)
             - `PTP` (Prohibited transshipment port)
@@ -6351,6 +6350,14 @@ components:
           example: '2024-07-05T09:03:00-02:00'
         emptyContainerPositioningLocation:
           $ref: '#/components/schemas/EmptyContainerPositioningLocation'
+        emptyContainerPickupDateTime:
+          type: string
+          format: date-time
+          description: |
+            The date and time requested by the shipper for the pick-up of the empty container(s) at the `Empty Container Depot Release Location` (DRL), if provided.
+          example: '2024-07-05T09:03:00-02:00'
+        emptyContainerDepotReleaseLocation:
+          $ref: '#/components/schemas/EmptyContainerDepotReleaseLocation'
         equipmentReferences:
           description: |
             A list of equipments to be used by the shipper if known at the time of booking
@@ -6434,6 +6441,14 @@ components:
           example: '2024-07-05T09:03:00-02:00'
         emptyContainerPositioningLocation:
           $ref: '#/components/schemas/EmptyContainerPositioningLocation'
+        emptyContainerPickupDateTime:
+          type: string
+          format: date-time
+          description: |
+            The date and time requested by the shipper for the pick-up of the empty container(s) at the `Empty Container Depot Release Location` (DRL), if provided.
+          example: '2024-07-05T09:03:00-02:00'
+        emptyContainerDepotReleaseLocation:
+          $ref: '#/components/schemas/EmptyContainerDepotReleaseLocation'
         equipmentReferences:
           description: |
             A list of equipments to be used by the shipper if known at the time of booking
@@ -6540,7 +6555,7 @@ components:
         
         **Conditional:** Only applicable to carrier haulage service at origin (`Receipt type at origin = SD`).
 
-        The location can be specified in **any** of the following ways: `Address`, `Facility` or a `GeoCoordinate`.
+        The location can be specified in **any** of the following ways: `Address`, `Facility`, `UN Location Code` or a `GeoCoordinate`.
       example:
         locationName: Shanghai Shengdong International Container Terminal
         UNLocationCode: CNSGH
@@ -6558,6 +6573,61 @@ components:
           $ref: '#/components/schemas/Address'
         facility:
           $ref: '#/components/schemas/Facility'
+        UNLocationCode:
+          type: string
+          pattern: ^[A-Z]{2}[A-Z2-9]{3}$
+          minLength: 5
+          maxLength: 5
+          description: |
+            The UN Location code specifying where the place is located. The pattern used must be
+
+            - 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+            - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used
+
+            More info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)
+          example: NLAMS
+        geoCoordinate:
+          $ref: '#/components/schemas/GeoCoordinate'
+
+    EmptyContainerDepotReleaseLocation:
+      type: object
+      title: Empty Container Depot Release Location
+      description: |
+        An object to capture the `Empty Container Depot Release Location`.
+
+        The location of the Depot where the empty container(s) will be released from.
+        
+        The location can be specified in **any** of the following ways: `Address`, `Facility`, `UN Location Code` or a `GeoCoordinate`.
+      example:
+        locationName: Shanghai Shengdong International Container Terminal
+        UNLocationCode: CNSGH
+        facility:
+          facilityCode: SHENG
+          facilityCodeListProvider: SMDG
+      properties:
+        locationName:
+          type: string
+          description: The name of the location.
+          pattern: ^\S(?:.*\S)?$
+          example: Shanghai Shengdong International Container Terminal
+          maxLength: 100
+        address:
+          $ref: '#/components/schemas/Address'
+        facility:
+          $ref: '#/components/schemas/Facility'
+        UNLocationCode:
+          type: string
+          pattern: ^[A-Z]{2}[A-Z2-9]{3}$
+          minLength: 5
+          maxLength: 5
+          description: |
+            The UN Location code specifying where the place is located. The pattern used must be
+
+            - 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+            - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used
+
+            More info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)
+          example: NLAMS
         geoCoordinate:
           $ref: '#/components/schemas/GeoCoordinate'
 
@@ -7334,6 +7404,14 @@ components:
           example: '2024-07-05T09:03:00-02:00'
         emptyContainerPositioningLocation:
           $ref: '#/components/schemas/EmptyContainerPositioningLocation'
+        estimatedEmptyContainerPickupDateTime:
+          type: string
+          format: date-time
+          description: |
+            The date and time requested by the shipper for the pick-up of the empty container(s) at the `Empty Container Depot Release Location` (DRL), if provided.
+          example: '2024-07-05T09:03:00-02:00'
+        emptyContainerDepotReleaseLocation:
+          $ref: '#/components/schemas/EmptyContainerDepotReleaseLocation'
       required:
         - ISOEquipmentCode
         - units
@@ -7557,7 +7635,6 @@ components:
             - `VCO` (VGM cut-off)
             - `FCO` (FCL delivery cut-off)
             - `LCO` (LCL delivery cut-off) **Condition:** only when the `Receipt Type at Origin` is `CFS`
-            - `ECP` (Empty container pick-up date and time)
             - `EFC` (Earliest full-container delivery date)
           example: DCO
         cutOffDateTime:
