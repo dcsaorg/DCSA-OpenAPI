@@ -53,7 +53,7 @@ Snapshot as of 26 of July 2024 for Booking 2.0.0 Beta
 - `EmptyContainerPositioningLocation` and `EmptyContainerDepotReleaseLocation` objects added
 - `nationalCommodityCodes` and `customsReferences` added to `Commodity` and `commodityShipper`
 - `NationalCommodityCode` object added
-- `estimatedEmptyContainerPositioningDateTime`, `emptyContainerPositioningLocation`, `estimatedEmptyContainerPickupDateTime` and `emptyContainerDepotReleaseLocation` added to `ConfirmedEquipment`
+- `estimatedEmptyContainerPositioningDateTime`, `emptyContainerPositioningLocation`, `emptyContainerPickupDateTime` and `emptyContainerDepotReleaseLocation` added to `ConfirmedEquipment`
 - `LoadLocation`  and `DischargeLocation` objects modified to no longer use `oneOf`
 - `ECP` removed from `ShipmentCutOffTimeCode`
 - `documentParties` now has `bookingAgent` as a mandatorty property
