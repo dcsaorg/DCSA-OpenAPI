@@ -57,6 +57,7 @@ Snapshot as of 26 of July 2024 for Booking 2.0.0 Beta
 - `LoadLocation`  and `DischargeLocation` objects modified to no longer use `oneOf`
 - `ECP` removed from `ShipmentCutOffTimeCode`
 - `documentParties` now has `bookingAgent` as a mandatorty property
+- `MULTIMODAL` added as a `Mode of Transport` in the `Transport Plan`
 
 <a name="v200B20240614"></a>[Release v2.0.0 Beta 20240614 (28 June 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0-Beta-20240614)
 ---
