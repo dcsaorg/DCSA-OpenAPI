@@ -37,6 +37,7 @@ Snapshot as of 26 of July 2024 for EBL 3.0.0 Beta.
 - `ShippingInstructionsNotification` and `TransportDocumentNotification` objects added
 - in `CreateShippingInstructions`, `UpdateShippingInstructions`, `ShippingInstructions` and `TransportDocument` object the following changes have been done:
   - `placeOfIssue` is no longer defined inline but is now $ref a `PlaceOfIssue` object
+- in `CreateShippingInstructions`, `UpdateShippingInstructions` and `ShippingInstructions` object the following changes have been done:
   - `isCarriersAgentAtDestinationRequired` location in object moved
 - `requestedChanges` replaced by `feedbacks` for better "feedback" from provider --> consumer in the following objects: `ShippingInstructions` and `ShippingInstructionsRefStatus`
 - `RequestedChanges` object deleted
