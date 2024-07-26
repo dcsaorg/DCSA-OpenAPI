@@ -10,7 +10,7 @@ Publications related to the PINT API:
 Snapshot as of 26 of July 2024 for EBL Platform Interoperability 3.0.0 Beta.
 ## Key changes
 - `Reciever validation` endPoint added
-- Transport Document updated
+- `Transport Document` updated
 
 ## EBL PINT changes
 - multiple description changes (typos)
