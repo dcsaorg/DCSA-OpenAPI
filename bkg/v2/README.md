@@ -44,7 +44,7 @@ Snapshot as of 26 of July 2024 for Booking 2.0.0 Beta
 - `serviceContractOwnersReference` added to `ServiceContractOwner` object
 - `reference` added to `Party` object
 - `ReferenceShipper` object added to differentiate between references sent by consumer and references sent by provider
-- values removed from `type` in `reference` (`FF`, `SI`, `SPO`, `CPO`, `AAO`, `ECR`, `CSI`, `BPR`, `BID` and `SAC` all removed and `AKG` added)
+- references has been split into 2 objets: `Reference` and `ReferenceShipper`. Both objects now only allow: `CR`, `AKG` and `AEF`. `Reference` object (used in GET /bookings) also includes: `ECR`
 - `CustomsReference` object added
 - `ShipmentLocations` modified:
   - `DRL` removed
