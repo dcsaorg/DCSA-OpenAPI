@@ -30,6 +30,10 @@ Snapshot as of 26 of July 2024 for EBL Platform Interoperability 3.0.0 Beta.
 
 ## Transport Document changes
 - `placeOfIssue` no longer defined inline but via a $ref to `PlaceOfIssue` object
+- `streetNumber` is no longer a mandatory field in the `Address` nor `PartyAddress` objects
+- `shippersReference` and `shippersPurchaseOrderReference` added to `Shipper` object
+- `consigneesReference` and `consigneesPurchaseOrderReference` added to `Consignee` object
+- `reference` added to `Party` object
 - values removed from `type` in `reference` (`FF`, `SI`, `SPO`, `CPO`, `AAO`, `ECR`, `CSI`, `BPR`, `BID` and `SAC` all removed and `AKG` added)
 - `nationalCommodityCodes` added to `ConsignmentItem`
 - `NationalCommodityCode` object added
