@@ -15,6 +15,48 @@ This is a moving target and will be updated as soon as the version is published
 ---
 Snapshot as of 26 of July 2024 for Booking 2.0.0 Beta
 ## Key changes
+- Notification endPoints added (supporting both `Lightweight` and `Full State Transfer` Notifications)
+- `requestedChanges` replaced by `Feedback` object
+- locations no longer use `oneOf` but is now a set of optional properties
+
+## All changes
+- API description updated
+- endPoint examples updated
+- `/v3/booking-notifications` added to include:
+  - `Lightweight Notifications` for Booking
+  - `Full State Transfer Notifications` for Booking
+  - Notifications use the `CloudEvent` structure (and is merged from the deprecated [Booking Notification](./notification/) API)
+- `Booking Notification` object added
+- `requestedChanges` replaced by `feedbacks` for better "feedback" from provider --> consumer in the following objects: `Booking` and `BookingRefStatus`
+- `RequestedChanges` object deleted
+- `Feedback object` added
+- locations are handled differently going forward. Locations are no longer defined using a `oneOf` but rather via optional properties. This impacts:
+  - `AddressLocation` object deleted as it is no longer needed
+  - `FacilityLocation` renamed to `Facility` and modified to no longer have `locationType`
+  - `UnLocationLocation` object deleted as it is no longer needed
+  - `GeoCoordinate` object added
+- `streetNumber` is no longer a mandatory field in the `Address` nor `PartyAddress` objects
+- `placeOfBLIssue` no longer defined inline but references using a $ref
+- `customsReferences` added to `CreateBooking`, `UpdateBooking` and `Booking` objects
+- `bookingAgentsReference` added to `BookingAgent` object
+- `shippersReference` and `shippersPurchaseOrderReference` added to `Shipper` object
+- `consigneesReference` and `consigneesPurchaseOrderReference` added to `Consignee` object
+- `serviceContractOwnersReference` added to `ServiceContractOwner` object
+- `reference` added to `Party` object
+- `ReferenceShipper` object added to differentiate between references sent by consumer and references sent by provider
+- values removed from `type` in `reference` (`FF`, `SI`, `SPO`, `CPO`, `AAO`, `ECR`, `CSI`, `BPR`, `BID` and `SAC` all removed and `AKG` added)
+- `CustomsReference` object added
+- `ShipmentLocations` modified:
+  - `DRL` removed
+  - `location` object modified
+- `emptyContainerPositioningDateTime`, `emptyContainerPositioningLocation`, `emptyContainerPickupDateTime`, `emptyContainerDepotReleaseLocation` and `customsReferences` added to `RequestedEquipment` and `RequestedEquipmentShipper`
+- `EmptyContainerPositioningLocation` and `EmptyContainerDepotReleaseLocation` objects added
+- `nationalCommodityCodes` and `customsReferences` added to `Commodity` and `commodityShipper`
+- `NationalCommodityCode` object added
+- `estimatedEmptyContainerPositioningDateTime`, `emptyContainerPositioningLocation`, `estimatedEmptyContainerPickupDateTime` and `emptyContainerDepotReleaseLocation` added to `ConfirmedEquipment`
+- `LoadLocation`  and `DischargeLocation` objects modified to no longer use `oneOf`
+- `ECP` removed from `ShipmentCutOffTimeCode`
+- `documentParties` now has `bookingAgen` as a mandatorty property
 
 <a name="v200B20240614"></a>[Release v2.0.0 Beta 20240614 (28 June 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0-Beta-20240614)
 ---
