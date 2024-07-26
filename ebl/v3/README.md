@@ -18,11 +18,46 @@ This is a moving target and will be updated as soon as the version is published
 <a name="v300B20240726"></a>[Release v3.0.0 Beta 20240726 (26 of July 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.0-Beta-20240726)
 ---
 Snapshot as of 26 of July 2024 for EBL 3.0.0 Beta.
-## Major changes
-- ...
+## Key changes
+- Notification endPoints added (supporting both `Lightweight` and `Full State Transfer` Notifications)
+- `requestedChanges` replaced by `Feedback` object
+- locations no longer use `oneOf` but is now a set of optional properties
 
-## Minor changes
-- ...
+## All changes
+- API description updated
+- endPoint examples updated
+- `/v3/shipping-instructions-notifications` added to include:
+  - `Lightweight Notifications` for Shipping Instructions
+  - `Full State Transfer Notifications` for Shipping Instructions
+  - Notifications use the `CloudEvent` structure (and is merged from the deprecated [Bill of Lading Notification](./notification/) API)
+- `/v3/transport-document-notifications` added to include
+  - `Lightweight Notifications` for Transport Document
+  - `Full State Transfer Notifications` for Transport Document
+  - Notifications use the `CloudEvent` structure (and is merged from the deprecated [Bill of Lading Notification](./notification/) API)
+- `ShippingInstructionsNotification` and `TransportDocumentNotification` objects added
+- in `CreateShippingInstructions`, `UpdateShippingInstructions`, `ShippingInstructions` and `TransportDocument` object the following changes have been done:
+  - `placeOfIssue` is no longer defined inline but is now $ref a `PlaceOfIssue` object
+  - `isCarriersAgentAtDestinationRequired` location in object moved
+- `requestedChanges` replaced by `feedbacks` for better "feedback" from provider --> consumer in the following objects: `ShippingInstructions` and `ShippingInstructionsRefStatus`
+- `RequestedChanges` object deleted
+- `Feedback object` added
+- locations are handled differently going forward. Locations are no longer defined using a `oneOf` but rather via optional properties. This impacts:
+  - `AddressLocation` object deleted as it is no longer needed
+  - `CityLocation` renamed to `City` and modified to no longer have `locationType` nor a nested `City` object
+  - `FacilityLocation` renamed to `Facility` and modified to no longer have `locationType`
+  - `UnLocationLocation` object deleted as it is no longer needed
+  - `GeoCoordinate` object added
+- `streetNumber` is no longer a mandatory field in the `Address` nor `PartyAddress` objects
+- `shippersReference` and `shippersPurchaseOrderReference` added to `Shipper` object
+- `consigneesReference` and `consigneesPurchaseOrderReference` added to `Consignee` object
+- `reference` added to `Party` object
+- values removed from `type` in `reference` (`FF`, `SI`, `SPO`, `CPO`, `AAO`, `ECR`, `CSI`, `BPR`, `BID` and `SAC` all removed and `AKG` added)
+- `nationalCommodityCodes` added to `ConsignmentItem` and `ConsignmentItemShipper` objects
+- `NationalCommodityCode` object added
+- `woodDeclaration` added to `OuterPackaging` and `OuterPackagingShipper` objects
+- fixed typo in required fields of `Transports` (`vesselVoyage` --> `vesselVoyages`)
+- `MULTIMODAL` added as a `Mode of Transport` to `preCarriageBy` and `onCarriageBy`
+- `PlaceOfReceipt`, `PortOfLoading`, `PortOfDischarge`, `PlaceOfDelivery` and `OnwardInlandRouting` objects changed from using a `oneOf` into an object where all location types are optional and can be used at the same time
 
 <a name="v300B20240614"></a>[Release v3.0.0 Beta 20240614 (28 June 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.0-Beta-20240614)
 ---
