@@ -14,7 +14,7 @@ Snapshot as of 26 of July 2024 for EBL Surrender 3.0.0 Beta.
 ## Key changes
 - `Surrender Response` endPoint added
 
-## Issuance changes
+## Surrender changes
 - API description updated
 - `/v3/ebl-surrender-requests` responseCode changed from `202` --> `204`
 - Surrender Response endPoint added
