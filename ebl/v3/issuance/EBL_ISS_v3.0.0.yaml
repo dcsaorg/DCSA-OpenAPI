@@ -2919,6 +2919,29 @@ components:
         - partyName
         - address
 
+    IssuanceError:
+      type: object
+      title: Issuance Error
+      properties:
+        reason:
+          type: string
+          maxLength: 255
+          pattern: ^\S(?:.*\S)?$
+          description: |
+            Human readable description of the rationale for an unsuccessful issuance.
+
+            The `reason` should be omitted when the `issuanceResponseCode` is `ISSU`. If the platform for some reason chooses to deviate from this and provide the field anyway, they should use canned phrased like `Issued` that matches the meaning of the `issuanceResponseCode`.
+          example: 'Cannot get...'
+        errorCode:
+          type: string
+          maxLength: 50
+          pattern: ^\S+$
+          description: |
+            A vendor provided error code.
+
+            The meaning of each code is agreed bilaterally between the vendor.
+          example: 'ERR-1234'
+
     IssuanceResponse:
       type: object
       title: Issuance Response
@@ -2955,6 +2978,13 @@ components:
 
             The `reason` should be omitted when the `issuanceResponseCode` is `ISSU`. If the platform for some reason chooses to deviate from this and provide the field anyway, they should use canned phrased like `Issued` that matches the meaning of the `issuanceResponseCode`.
           example: 'Cannot get...'
+        errors:
+          type: array
+          description: |
+            A list of errors if the issuance failed for some reason.
+          maxItems: 255
+          items:
+            $ref: '#/components/schemas/IssuanceError'
       required:
         - transportDocumentReference
         - issuanceResponseCode
