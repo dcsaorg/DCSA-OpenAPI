@@ -9,12 +9,16 @@ info:
 
     All other documents related to the Electronic Bill of Lading publication can be found [here](https://dcsa.org/standards/ebill-of-lading/)
 
+    ### EBL (Implemented by provider)
+
     It is possible to use the eBL API as a standalone API. In that case use one of the poll endPoints:
 
         GET /v3/shipping-instructions/{documentReference}  # For Shipping Instructions status
         GET /v3/transport-documents/{transportDocumentReference}  # For Transport Document status
 
     in order to poll information about status changes.
+
+    **Note:** All `/v3/shipping-instructions` and `/v3/transport-documents` endPoints must be implmented by the provider.
 
     ### Notifications (Implemented by consumer)
     It is possible to have notifications pushed to you whenever the provider needs input and/or a state change. The format of the notification is defined by the [Shipping Instructions Notification endPoint](#/ShippingInstructionsNotification) or the [Transport Document Notification endPoint](#/TransportDocumentNotification).
@@ -26,7 +30,7 @@ info:
 
     Signing up for notifications is defined outside the scope of this API specification.
 
-    All of these endPoint is to be implemented by the consumers of the `Shipping Instructions API` and `Transport Document API` in order to receive push events.
+    **Note:** All of these endPoint is to be implemented by the consumers of the `Shipping Instructions API` and `Transport Document API` in order to receive push events.
 
     ### Stats API
     The Stats API offers crucial statistical information for both API providers and consumers to enhance their services and helps DCSA to understand and scale the ecosystem. We expect you to invoke the Stats API for every request made to the Electronic Bill of Lading API. Further details can be found [here](https://labs.dcsa.org/#/http/guides/api-guides/stats-api/introduction)
@@ -52,7 +56,7 @@ paths:
   ##############################
   # Shipping Instructions Request
   ##############################
-  /v3/shipping-instructions:
+  '/v3/shipping-instructions':
     post:
       tags:
         - Shipping Instructions
@@ -68,7 +72,7 @@ paths:
         ## Postcondition
         The provider has received the `Shipping Instructions`.
 
-        The consumer will receive a `201` (Created) if the payload schema validates or a `400` (Bad Request) if it does not.
+        The consumer will receive a `201` (Created) or a `202` (Accepted) if the payload schema validates or a `400` (Bad Request) if it does not.
 
         ## Flow
         The following occurs when a provider receives a `Shipping Instructions`:
@@ -80,32 +84,37 @@ paths:
             - all required properties are provided.
             - all values provided have correct data type.
 
-           A `shippingInstructionsReference` (as a reference to the `Shipping Instructions`) is created and stored along with the payload in the provider system.
+           A `shippingInstructionsReference` (as a reference to the `Shipping Instructions`) is created and linked to the payload in the provider system.
           
            **For the rest of this description and in all examples the value `si-123` will be used as `shippingInstructionsReference`**
 
-        3. A `201` (Created) response is returned with the following payload:
+        3. A `201` (Created) or `202` (Accepted) response is returned. A `201` should be returned if the consumer can `GET` the `Shipping Instructions` "shortly after submitting it". A `202` should be returned if the provider accepts the `Shipping Instructions` and a subsequent `GET` request is not possible until the `Shipping Instructions` has been processed. Both response payloads looks like this:
             ```
             {
               shippingInstructionsReference: 'si-123',
               shippingInstructionsStatus: 'RECEIVED'
             }
             ```
-        4. All '_relevant_' subscribers will be notified via a [Shipping Instructions Notification](#/ShippingInstructionsNotification).
+        4. If a `201` (Created) is returned - all '_relevant_' subscribers will be notified via a [Shipping Instructions Notification](#/ShippingInstructionsNotification). If a `202` (Accepted) is returned a [Shipping Instructions Notification](#/ShippingInstructionsNotification) will be sent once the payload has been processed
 
-        For `POST` `Shipping Instructions` the process ends here. The `Shipping Instructions`
-
-          - is now stored in the provider system
-          - has status `RECEIVED`
-          - awaits further processing by the provider
-          - a `201` (Created) response is sent to the consumer with a payload containing `documentStatus=RECEIVED`
-          - '_relevant_' subscribers have been notified.
+        For `POST` `Shipping Instructions` the process ends here.
+          - For response code `201` (Created) the `Shipping Instructions`:
+            - is now stored in the provider system
+            - has status `RECEIVED`
+            - awaits further processing by the provider
+            - a `201` (Created) response is sent to the consumer with a payload containing the `shippingInstructionsReference` and `documentStatus=RECEIVED`
+            - '_relevant_' subscribers have been notified.
+          - For response code `202` (Accepted) the `Shipping Instructions`:
+            - is now accepted in the provider system
+            - has status `RECEIVED` but the status cannot be queried (no `GET` request is possible until the `Shipping Instructions` is further processed in the provider system)
+            - a `202` (Accepted) response is sent to the consumer with a payload containing the `shippingInstructionsReference` and `documentStatus='RECEIVED'`
+            - awaits further processing by the provider
 
         The provider wil now start asynchronous processing. Once processed, the new status of the `Shipping Instructions` will be communicated via a `Shipping Instructions Notification`. In case the consumer does not subscribe to notifications it is necessary for the consumer to poll on the
 
             GET /v3/shipping-instructions/{documentReference}
             
-          endPoint to check if the `shippingInstructionsStatus` of the `Shipping Instructions` has changed.
+          endPoint to check if the `shippingInstructionsStatus` of the `Shipping Instructions` has changed. In case a `202` (Accepted) status was sent for the `POST` request - then the consumer will have to keep polling on the `GET` endPoint until a response is sent in order to know the status.
       parameters:
         - $ref: '#/components/parameters/Api-Version-Major'
       requestBody:
@@ -182,6 +191,25 @@ paths:
                   value:
                     shippingInstructionsReference: si-123
                     shippingInstructionsStatus: RECEIVED
+        '202':
+          description: |
+            The `Shipping Instructions` has been accepted by the provider. The status of the `Shipping Instructions` is now `RECEIVED` - it is not possible to call the `GET` endPoint until the `Shipping Instructions` is further processed in provider system. The consumer is now awaiting provider to process the `Shipping Instructions` asynchronously.
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShippingInstructionsRefStatus'
+              examples:
+                receExample:
+                  summary: |
+                    Shipping Instructions received
+                  description: |
+                    A `Shipping Instructions` has been received (`shippingInstructionsStatus='RECEIVED'`), schema validated and accepted by provider
+                  value:
+                    shippingInstructionsReference: si-123
+                    shippingInstructionsStatus: RECEIVED
         '400':
           description: |
             In case the `Shipping Instructions` does not schema validate a `400` (Bad Request) is returned
@@ -244,7 +272,8 @@ paths:
                         errorCodeText: Internal Error occurred
                         errorCodeMessage: Internal Error occurred
         default:
-          description: Unexpected error
+          description: |
+            For other errors the error object should be populated with relevant information
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -300,7 +329,7 @@ paths:
 
         The `Updated Shipping Instructions` and the "original" `Shipping Instructions` **co-exist** until a new update is submitted by the consumer (via **UseCase 3: Submit updated Shipping Instructions**) or until the provider requests an update (sets the `shippingInstructionsStatus='PENDING UPDATE'` via **UseCase 2: Request to update Shipping Instructions**). The `Updated Shipping Instructions` always represents the latest version of an update received by the provider.
 
-        The consumer will receive a `200` (OK) if the payload schema-validates or a `400` (Bad Request) if it does not.
+        The consumer will receive a `200` (OK) or a `202` (Accepted) if the payload schema-validates or a `400` (Bad Request) if it does not.
 
         ## Flow
         The following occurs when a provider receives an **update** to a `Shipping Instructions`
@@ -319,7 +348,7 @@ paths:
 
             - If `shippingInstructionsStatus` **is** `RECEIVED`, then this endPoint is being used in addition to **UseCase 1 - Submit Shipping Instructions**. In this case the consumer would like to make an update to an already sent `Shipping Instructions`. This is done via **UseCase 3 - Submit updated Shipping Instructions**. The `shippingInstructionsStatus` stays as `RECEIVED`, `updatedShippingInstructionsStatus` is set to `UPDATE RECEIVED`
             
-              A `200` (OK) response corresponding to the following payload is returned:
+              A `200` (OK) or `202` (Accepted) response is returned. A `200` should be returned if the consumer can `GET` the `Shipping Instructions` "shortly after updating it". A `202` should be returned if the provider accepts the `Shipping Instructions` update and a subsequent `GET` request is not possible until the `Shipping Instructions` update has been processed. Both response payloads looks like this:
               ```
               {
                 shippingInstructionsReference: 'si-123',
@@ -330,7 +359,7 @@ paths:
 
             - If `shippingInstructionsStatus` is `PENDING UPDATE`, then this endPoint is being used as a response to **UseCase 2 - Request to update Shipping Instructions** in this case the provider has requested an update to a `Shipping Instructions`. The `shippingInstructionsStatus` remains `PENDING UPDATE`, `updatedShippingInstructionsStatus` is set to `UPDATE RECEIVED`.
               
-              A `200` (OK) response corresponding to the following payload is returned:
+              A `200` (OK) or `202` (Accepted) response is returned. A `200` should be returned if the consumer can `GET` the `Shipping Instructions` "shortly after updating it". A `202` should be returned if the provider accepts the `Shipping Instructions` update and a subsequent `GET` request is not possible until the `Shipping Instructions` update has been processed. Both response payloads looks like this:
               ```
               {
                 shippingInstructionsReference: 'si-123',
@@ -338,28 +367,38 @@ paths:
                 updatedShippingInstructionsStatus: 'UPDATE RECEIVED'
               }
               ```
-        4. All '_relevant_' subscribers will be notified via a [Shipping Instructions Notification](#/ShippingInstructionsNotification).
+        4. If a `200` (OK) is returned - all '_relevant_' subscribers will be notified via a [Shipping Instructions Notification](#/ShippingInstructionsNotification). If a `202` (Accepted) is returned a [Shipping Instructions Notification](#/ShippingInstructionsNotification) will be sent once the payload has been processed
 
-        For `PUT` `Shipping Instructions` the process ends here. The `Updated Shipping Instructions`
+        For `PUT` `Shipping Instructions` the process ends here.
+          - For response code `200` (OK) the `Shipping Instructions`:
+            - is now stored in the provider system
+            - a `200` (OK) response is sent to the consumer with the status of the `Shipping Instructions` and the `Updated Shipping Instructions` with one of the following combinations (depending on the use case):
+              - `shippingInstructionsStatus='RECEIVED'` and `updatedShippingInstructionsStatus='UPDATE RECEIVED'` (if endPoint used to make an update to a Submitted Shipping Instructions - **UseCase 1 - Submit Shipping Instructions**)
+              - `shippingInstructionsStatus='PENDING UPDATE'` and `updatedShippingInstructionsStatus='UPDATE RECEIVED'` (if endPoint used as a response to **UseCase 2 - Request to update Shipping Instructions**)
 
-          - is now stored in the provider system
-          - a `200` (OK) response is sent to the consumer with the status of the `Shipping Instructions` and the `Updated Shipping Instructions` with one of the following combinations (depending on the use case):
-            - `shippingInstructionsStatus='RECEIVED'` and `updatedShippingInstructionsStatus='UPDATE RECEIVED'` (if endPoint used to make an update to a Submitted Shipping Instructions - **UseCase 1 - Submit Shipping Instructions**)
-            - `shippingInstructionsStatus='PENDING UPDATE'` and `updatedShippingInstructionsStatus='UPDATE RECEIVED'` (if endPoint used as a response to **UseCase 2 - Request to update Shipping Instructions**)
-          - awaits further processing by the provider
-          - '_relevant_' subscribers have been notified.
+              A subsequent `GET` request to the `Shipping Instructions` will fetch the status along with the `Shipping Instructions`
+            - awaits further processing by the provider
+            - '_relevant_' subscribers have been notified.
+          - For response code `202` (Accepted) the `Shipping Instructions`:
+            - is now accepted in the provider system
+            - a `202` (OK) response is sent to the consumer with the status of the `Shipping Instructions` and the `Updated Shipping Instructions` with one of the following combinations (depending on the use case):
+              - `shippingInstructionsStatus='RECEIVED'` and `updatedShippingInstructionsStatus='UPDATE RECEIVED'` (if endPoint used to make an update to a Submitted Shipping Instructions - **UseCase 1 - Submit Shipping Instructions**)
+              - `shippingInstructionsStatus='PENDING UPDATE'` and `updatedShippingInstructionsStatus='UPDATE RECEIVED'` (if endPoint used as a response to **UseCase 2 - Request to update Shipping Instructions**)
+              
+              Subsequent `GET` request will not be possible until the `Shipping Instructions` is further processed in the provider system
+            - awaits further processing by the provider
 
         The provider wil now start asynchronous processing. Once processed, the new status of the `Shipping Instructions` and `Updated Shipping Instructions` will be communicated via a `Shipping Instructions Notification`. In case the consumer does not subscribe to notifications it is necessary for the consumer to poll on the
 
             GET /v3/shipping-instructions/{documentReference}
             
-          endPoint to check if the `shippingInstructionsStatus` and `updatedShippingInstructionsStatus` of the `Shipping Instructions` has changed.
+          endPoint to check if the `shippingInstructionsStatus` and `updatedShippingInstructionsStatus` of the `Shipping Instructions` has changed. In case a `202` (Accepted) status was sent for the `PUT` request - then the consumer will have to keep polling on the `GET` endPoint until a response is sent in order to know the status.
           
           If the consumer wants to get the content of the `Update Shipping Instructions` provided via this `PUT` endPoint,  the `GET` endPoint needs to be used in combination with the `?updatedContent=true` queryParameter:
           
             GET /v3/shipping-instructions/{documentReference}?updatedContent=true
             
-          It is possible to `GET` the content of the `Updated Shipping Instructions` via the example above until either:
+          It is possible to `GET` the content of the `Updated Shipping Instructions` (except when response code is `202` (Accepted) as explained above) via the example above until either:
           - the provider requests for a new update (**UseCase 2: Request to update Shipping Instructions**) in which case the "old update" is no longer accessible
           - the consumer submits a new update (**UseCase 3: Submit updated Shipping Instructions**) in which case the "new update" provided **replaces** the "old update".
       requestBody:
@@ -476,6 +515,64 @@ paths:
                     transportDocumentReference: td-987
                     shippingInstructionsStatus: RECEIVED
                     updatedShippingInstructionsStatus: UPDATE RECEIVED
+        '202':
+          description: |
+            The `Updated Shipping Instructions` has been accepted by provider with one of the following combinations (depending on the use case):
+            - `shippingInstructionsStatus='RECEIVED'` and `updatedShippingInstructionsStatus='UPDATE RECEIVED'` (if endPoint is used to make an update to a Submitted Shipping Instructions - **UseCase 1 - Submit Shipping Instructions**)
+            - `shippingInstructionsStatus='PENDING UPDATE'` and `updatedShippingInstructionsStatus='UPDATE RECEIVED'` (if endPoint is used as a response to **UseCase 2 - Request to update Shipping Instructions**)
+
+            Once the provider has processed the `Shipping Instructions` update - the status of the `Shipping Instructions` can be monitored on the
+                GET /v3/shipping-instructions/{documentReference}
+
+            endPoint where the "original" `Shipping Instructions` is returned by the provider.
+
+            If the provider has not yet processed the `Shipping Instructions` - the `GET` endPoint will not return valid content. If the provider has finished processing the `Shipping Instructions`and the consumer wants to get the content of the `Updates Shipping Instructions` the `GET` endPoint needs to be used in combination with the  `?updatedContent=true` queryParameter:
+                GET /v3/shipping-instructions/{documentReference}?updatedContent=true
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShippingInstructionsRefStatus'
+              examples:
+                receivedExample:
+                  summary: |
+                    Shipping Instructions updated by consumer
+                  description: |
+                    An `Updated Shipping Instructions` received and accepted by provider, the `Updated Shipping Instructions` now awaits provider action.
+
+                        shippingInstructionsStatus='RECEIVED'
+                        updatedShippingInstructionsStatus='UPDATE RECEIVED'
+                  value:
+                    shippingInstructionsReference: si-123
+                    shippingInstructionsStatus: RECEIVED
+                    updatedShippingInstructionsStatus: UPDATE RECEIVED
+                pendingUpdateExample:
+                  summary: |
+                    Shipping Instructions updated because of consumer requirement
+                  description: |
+                    An updated `Shipping Instructions` received and accepted by provider as a response to a provider initiated update request (a response to **UseCase 2 - Request to update Shipping Instructions**). The `Updated Shipping Instructions` now awaits provider action
+
+                        shippingInstructionsStatus='PENDING UPDATE'
+                        updatedShippingInstructionsStatus='UPDATE RECEIVED'
+                  value:
+                    shippingInstructionsReference: si-123
+                    shippingInstructionsStatus: PENDING UPDATE
+                    updatedShippingInstructionsStatus: UPDATE RECEIVED
+                amendmentExample:
+                  summary: |
+                    Request amendment to Transport Document
+                  description: |
+                    An `Updated Shipping Instructions` received and accepted by provider as an amendment to a `Transport Document` with `transportDocumentReference='td-987'`. The `Updated Shipping Instructions` now awaits provider action
+
+                        shippingInstructionsStatus='RECEIVED'
+                        updatedShippingInstructionsStatus='UPDATE RECEIVED'
+                  value:
+                    shippingInstructionsReference: si-123
+                    transportDocumentReference: td-987
+                    shippingInstructionsStatus: RECEIVED
+                    updatedShippingInstructionsStatus: UPDATE RECEIVED
         '400':
           description: |
             In case the updated `Shipping Instructions` does not schema validate a `400` (Bad Request) is returned
@@ -507,6 +604,36 @@ paths:
                         property: isElectronic
                         errorCodeText: mandatory property missing
                         errorCodeMessage: isElectronic must be provided as part of a Shipping Instructions
+        '404':
+          description: |
+            In case the provider does not know about the `documentReference` used in the request (this could be because of a `POST` request that has not finished processing or simply because the resource does not exist) - it is possible for the provider to reject the requests by returning a `404` (Not Found)
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                conflictExample:
+                  summary: |
+                    Not found request
+                  description: |
+                    The provided `documentReference` could not be found. This can be because a `Post` request has not been finished processing or because the `documentReference` does not exist in the provider system.
+
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: PUT
+                    requestUri: /v3/shipping-instructions/si-123
+                    statusCode: 404
+                    statusCodeText: Not Found
+                    statusCodeMessage: shippingInstructionsReference not found
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2023-04-13T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: shippingInstructionsReference not found
+                        errorCodeMessage: The Shipping Instructions does not exist
         '409':
           description: |
             In case the provider is already processing the `Shipping Instructions` matching `shippingInstructionsReference='si-123'` or for any other reason cannot process the request, it is possible to reject the `PUT` request with a `409` (Conflict) response
@@ -626,7 +753,9 @@ paths:
 
         If the provider is requesting changes to the `Shipping Instructions`, the `feedbacks` object is used to inform the consumer what needs to change.
 
-        In case no subscription (`Notification`) has been set up - it is possible to use this endPoint to poll on in order to detect if `shippingInstructionsStatus` and/or `updatedShippingInstructionsStatus` has changed.
+        In case no subscription (`Notification`) has been set up - it is possible to use this endPoint to poll on in order to detect if `shippingInstructionsStatus` and/or `updatedShippingInstructionsStatus` has changed. In case a `202` (Accepted) status was sent in an earlier response (to a `PUT` or a `POST` request) - then the consumer will have to keep polling on the `GET` endPoint until a response is sent in order to know the status.
+
+        In case a previous request is being processed by the provider - a `202` (Accepted) with **no payload** can be used as a response until the processing is finished.
       responses:
         '200':
           description: |
@@ -806,9 +935,17 @@ paths:
                           equipmentReference: HLXU1234567
                           tareWeight: 2370
                           weightUnit: KGM
+        '202':
+          description: |
+            The `Shipping Instructions` is currently being processed by the provider. No payload is returned. A new `GET` request has to be made periodically to check if the provider has finished processing the `Shipping Instructions`.
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
         '404':
           description: |
             In case the consumer is requesting the content of the `UpdatedShipping Instructions`, and no update has yet been requested.
+
+            A `404` (Not Found) can also be sent in case the provider does not know of the `documentReference` used in the request (the resource does not exist)
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -817,7 +954,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
               examples:
-                notFoundExample:
+                notFoundUpdateExample:
                   summary: |
                     Shipping Instructions update not found
                   description: |
@@ -836,6 +973,25 @@ paths:
                       - errorCode: 7003
                         errorCodeText: Shipping Instructions does not contain an update
                         errorCodeMessage: The Shipping Instructions has not yet been updated - no update exists
+                notFoundExample:
+                  summary: |
+                    documentReference not found
+                  description: |
+                    The `documentReference` does not exist.
+
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: GET
+                    requestUri: /v3/shipping-instructions/si-123?updatedContent=true
+                    statusCode: 404
+                    statusCodeText: Not Found
+                    statusCodeMessage: documentReference not found
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2023-04-13T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: documentReference not found
+                        errorCodeMessage: The Shipping Instructions does not exist
         '500':
           description: |
             In case a server error occurs in provider system a `500` (Internal Server Error) is returned
@@ -867,7 +1023,8 @@ paths:
                         errorCodeText: Internal Error occurred
                         errorCodeMessage: Internal Error occurred
         default:
-          description: Unexpected error
+          description: |
+            For other errors the error object should be populated with relevant information
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -876,29 +1033,26 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
               examples:
-                getError:
+                tooManyRequestsExample:
                   summary: |
-                    GET non-existing Shipping Instructions
+                    Fetching too many `Transport Document` requests
                   description: |
-                    Calling
+                    Calling the endPoint `GET /v3/shipping-instructions/si-123` too many times within a timeperiod.
 
-                        GET /v3/shipping-instructions/si-123
-                        
-                    results in an error as `Shipping Instructions` `si-123` does not exist.
-
-                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
                     httpMethod: GET
                     requestUri: /v3/shipping-instructions/si-123
-                    statusCode: 404
-                    statusCodeText: Not Found
-                    statusCodeMessage: The requested shippingInstructionsReference does not exist
+                    statusCode: 429
+                    statusCodeText: Too Many Requests
+                    statusCodeMessage: |
+                      Too many request to fetch a Shipping Instructions has been requested. Please try again in 1 hour
                     providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
                     errorDateTime: '2023-04-13T07:41:00+08:30'
                     errors:
                       - errorCode: 7003
-                        errorCodeText: Non existent shippingInstructionsReference
-                        errorCodeMessage: shippingInstructionsReference `si-123` does not exist
+                        errorCodeText: Max Shipping Instructions requests reached
+                        errorCodeMessage: A maximum of 10 Shipping Instructions can be requested per hour
     patch:
       tags:
         - Shipping Instructions
@@ -917,7 +1071,7 @@ paths:
         ## Postcondition
         The provider has received a cancellation from the consumer for an `Updated Shipping Instructions` that is in state `UPDATE RECEIVED`.
 
-        The consumer will receive a `200` (OK) if the payload schema-validates or a `400` (Bad Request) if it does not.
+        The consumer will receive a `200` (OK) or a `202` (Accepted) if the payload schema-validates or a `400` (Bad Request) if it does not.
 
         ## Flow
         The following occurs when a provider receives a cancellation:
@@ -926,7 +1080,13 @@ paths:
            **The process stops here!**
         2. The payload is schema-valid
         3. The `updatedShippingInstructionsStatus` is set to `UPDATE CANCELLED`.
-        4. All '_relevant_' subscribers will be notified via a [Shipping Instructions Notification](#/ShippingInstructionsNotification).
+        4. If a `200` (OK) is returned - all '_relevant_' subscribers will be notified via a [Shipping Instructions Notification](#/ShippingInstructionsNotification). If a `202` (Accepted) is returned a [Shipping Instructions Notification](#/ShippingInstructionsNotification) will be sent once the payload has been processed
+
+        The provider wil now start asynchronous processing. Once processed, the new status of the `Shipping Instructions` and `Updated Shipping Instructions` will be communicated via a `Shipping Instructions Notification`. In case the consumer does not subscribe to notifications it is necessary for the consumer to poll on the
+
+            GET /v3/shipping-instructions/{documentReference}
+            
+          endPoint to check if the `shippingInstructionsStatus` and `updatedShippingInstructionsStatus` of the `Shipping Instructions` has changed. In case a `202` (Accepted) status was sent for the `PATCH` request - then the consumer will have to keep polling on the `GET` endPoint until a response is sent in order to know the status.
       requestBody:
         description: |
           Cancel the `Update Shipping Instructions`
@@ -956,6 +1116,36 @@ paths:
         '200':
           description: |
             The `Updated Shipping Instructions` is now cancelled. The `updatedShippingInstructionsStatus` is now `UPDATE CANCELLED`. The `shippingInstructionsStatus` is left unchanged.
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShippingInstructionsRefCancelStatus'
+              examples:
+                cancelUpdateExample:
+                  summary: |
+                    Cancel a Shipping Instructions update
+                  description: |
+                    Consumer wants to cancel an update provided to a `Shipping Instructions`. In this case the `shippingInstructionsStatus` stays as `RECEIVED` and the `updatedShippingInstructionsStatus` is set to `UPDATE CANCELLED`. An optional `reason` can be provided.
+                  value:
+                    shippingInstructionsReference: si-123
+                    shippingInstructionsStatus: RECEIVED
+                    updatedShippingInstructionsStatus: UPDATE CANCELLED
+                cancelRequestedUpdateExample:
+                  summary: |
+                    Cancel a Shipping Instructions update requested by provider
+                  description: |
+                    Consumer wants to cancel an update provided to a `Shipping Instructions`. The update was requested by the provider. The `shippingInstructionsStatus` stays as `PENDING UPDATE` and the `updatedShippingInstructionsStatus` is set to `UPDATE CANCELLED`. An optional `reason` can be provided.
+                  value:
+                    shippingInstructionsReference: si-123
+                    shippingInstructionsStatus: PENDING UPDATE
+                    updatedShippingInstructionsStatus: UPDATE CANCELLED
+                    reason: Wrong update provided
+        '202':
+          description: |
+            The cancellation of the `Updated Shipping Instructions` is accepted. The `updatedShippingInstructionsStatus` is now `UPDATE CANCELLED`. The `shippingInstructionsStatus` is left unchanged.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -1018,6 +1208,8 @@ paths:
         '404':
           description: |
             In case the consumer is trying to cancel a `Shipping Instructions` that does not have an ongoing update request, an `Updated Shipping Instructions` that is in state `UPDATE RECEIVED`.
+
+            A `404` (Not Found) can also be sent in case the provider does not know of the `documentReference` used in the request (the resource does not exist)
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -1106,7 +1298,8 @@ paths:
                         errorCodeText: Internal Error occurred
                         errorCodeMessage: Internal Error occurred
         default:
-          description: Unexpected error
+          description: |
+            For other errors the error object should be populated with relevant information
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -1115,29 +1308,26 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
               examples:
-                getError:
+                tooManyRequestsExample:
                   summary: |
-                    GET non-existing Shipping Instructions
+                    Patching the `Shipping Instructions` too many times
                   description: |
-                    Calling
+                    Calling the endPoint `PATCH /v3/shipping-instructions/si-123` too many times within a timeperiod.
 
-                        PATCH /v3/shipping-instructions/si-123
-                        
-                    results in an error as `Shipping Instructions` `si-123` does not exist.
-
-                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
                     httpMethod: PATCH
                     requestUri: /v3/shipping-instructions/si-123
-                    statusCode: 404
-                    statusCodeText: Not Found
-                    statusCodeMessage: The requested shippingInstructionsReference does not exist
+                    statusCode: 429
+                    statusCodeText: Too Many Requests
+                    statusCodeMessage: |
+                      Too many request to patch a Shipping Instructions has been requested. Please try again in 1 hour
                     providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
                     errorDateTime: '2023-04-13T07:41:00+08:30'
                     errors:
                       - errorCode: 7003
-                        errorCodeText: Non existent shippingInstructionsReference
-                        errorCodeMessage: shippingInstructionsReference `si-123` does not exist
+                        errorCodeText: Max Shipping Instructions requests reached
+                        errorCodeMessage: A maximum of 10 Shipping Instructions patches can be requested per hour
   '/v3/transport-documents/{transportDocumentReference}':
     get:
       tags:
@@ -1507,6 +1697,42 @@ paths:
                         equipment:
                           ISOEquipmentCode: 22GP
                           equipmentReference: HLXU1234567
+        '202':
+          description: |
+            The `Transport Document` is currently being processed by the provider. No payload is returned. A new `GET` request has to be made periodically to check if the provider has finished processing the `Transport Document`.
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+        '404':
+          description: |
+            In case the consumer is requesting a `transportDocumentReference` that does not exist.
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                notFoundExample:
+                  summary: |
+                    documentReference not found
+                  description: |
+                    The `transportDocumentReference` does not exist.
+
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: GET
+                    requestUri: /v3/transport-documents/td-987
+                    statusCode: 404
+                    statusCodeText: Not Found
+                    statusCodeMessage: documentReference not found
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2023-04-13T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: documentReference not found
+                        errorCodeMessage: The Transport Document does not exist
         '500':
           description: |
             In case a server error occurs in provider system a `500` (Internal Server Error) is returned
@@ -1538,7 +1764,8 @@ paths:
                         errorCodeText: Internal Error occurred
                         errorCodeMessage: Internal Error occurred
         default:
-          description: Unexpected error
+          description: |
+            For other errors the error object should be populated with relevant information
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -1547,29 +1774,26 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
               examples:
-                getError:
+                tooManyRequestsExample:
                   summary: |
-                    GET non-existing Transport Document
+                    Fetching too many `Transport Document` requests
                   description: |
-                    Calling
+                    Calling the endPoint `GET /v3/transport-documents/td-987` too many times within a timeperiod.
 
-                        GET /v3/transport-documents/td-987
-                        
-                    results in an error as `Transport Document` `td-987` does not exist.
-
-                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
                     httpMethod: GET
                     requestUri: /v3/transport-documents/td-987
-                    statusCode: 404
-                    statusCodeText: Not Found
-                    statusCodeMessage: The requested transportDocumentReference does not exist
+                    statusCode: 429
+                    statusCodeText: Too Many Requests
+                    statusCodeMessage: |
+                      Too many request to fetch a Transport Document has been requested. Please try again in 1 hour
                     providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
                     errorDateTime: '2023-04-13T07:41:00+08:30'
                     errors:
                       - errorCode: 7003
-                        errorCodeText: Non existent transportDocumentReference
-                        errorCodeMessage: transportDocumentReference `td-987` does not exist
+                        errorCodeText: Max Transport Document requests reached
+                        errorCodeMessage: A maximum of 10 Transport Document can be requested per hour
     patch:
       tags:
         - Transport Document
@@ -1585,7 +1809,7 @@ paths:
         ## Postcondition
         The provider has received an approval from the consumer for a `Transport Document` that is in state `DRAFT`.
 
-        The consumer will receive a `200` (OK) if the payload schema-validates or a `400` (Bad Request) if it does not.
+        The consumer will receive a `200` (OK) or a `202` (Accepted) if the payload schema-validates or a `400` (Bad Request) if it does not.
 
         ## Flow
         The following occurs when a provider receives an approval:
@@ -1594,13 +1818,13 @@ paths:
            **The process stops here!**
         2. The payload is schema-valid
         3. The `transportDocumentStatus` is set to `APPROVED`.
-        4. All '_relevant_' subscribers will be notified via a [Transport Document Notification](#/TransportDocumentNotification).
+        4. If a `200` (OK) is returned - all '_relevant_' subscribers will be notified via a [Transport Document Notification](#/TransportDocumentNotification). If a `202` (Accepted) is returned a [Transport Document Notification](#/TransportDocumentNotification) will be sent once the payload has been processed
 
         The provider wil now start asynchronous processing. Once processed, the new status of the `Transport Document` (`ISSUED`) will be communicated via a `Transport Document Notification`. In case the consumer does not subscribe to notifications it is necessary for the consumer to poll on the
 
             GET /v3/transport-documents/{transportDocumentReference}
 
-        endPoint to check if the `transportDocumentStatus` in the `Transport Document` has changed.
+        endPoint to check if the `transportDocumentStatus` in the `Transport Document` has changed. In case a `202` (Accepted) status was sent for the `PATCH` request - then the consumer will have to keep polling on the `GET` endPoint until a response is sent in order to know the status.
       parameters:
         - in: path
           name: transportDocumentReference
@@ -1631,6 +1855,25 @@ paths:
                 - transportDocumentStatus
       responses:
         '200':
+          description: |
+            The `Transport Document` has been successfully `APPROVED`
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransportDocumentRefStatus'
+              examples:
+                approveExample:
+                  summary: |
+                    Approve Draft Transport Document
+                  description: |
+                    Consumer approves the drafted `Transport Document`.
+                  value:
+                    transportDocumentReference: td-987
+                    transportDocumentStatus: APPROVED
+        '202':
           description: |
             The `Transport Document` has been successfully `APPROVED`
           headers:
@@ -1681,6 +1924,36 @@ paths:
                         value: ISSUE
                         errorCodeText: incorrect value
                         errorCodeMessage: 'Only APPROVED is an allowed value: ISSUE was inserted'
+        '404':
+          description: |
+            In case the consumer is requesting a `transportDocumentReference` that does not exist.
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                notFoundExample:
+                  summary: |
+                    documentReference not found
+                  description: |
+                    The `transportDocumentReference` does not exist.
+
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: PATCH
+                    requestUri: /v3/transport-documents/td-987
+                    statusCode: 404
+                    statusCodeText: Not Found
+                    statusCodeMessage: documentReference not found
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2023-04-13T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: documentReference not found
+                        errorCodeMessage: The Transport Document does not exist
         '500':
           description: |
             In case a server error occurs in provider system a `500` (Internal Server Error) is returned
@@ -1713,7 +1986,7 @@ paths:
                         errorCodeMessage: Internal Error occurred
         default:
           description: |
-            Unexpected error
+            For other errors the error object should be populated with relevant information
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -1722,29 +1995,26 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
               examples:
-                getError:
+                tooManyRequestsExample:
                   summary: |
-                    GET non-existing Transport Document
+                    Too many Patch `Transport Document` requests
                   description: |
-                    Calling
+                    Calling the endPoint `PATCH /v3/transport-documents/td-987` too many times within a timeperiod.
 
-                        PATCH /v3/transport-documents/td-987
-                        
-                    results in an error as `Transport Document` `td-987` does not exist.
-
-                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
                     httpMethod: PATCH
                     requestUri: /v3/transport-documents/td-987
-                    statusCode: 404
-                    statusCodeText: Not Found
-                    statusCodeMessage: The requested transportDocumentReference does not exist
+                    statusCode: 429
+                    statusCodeText: Too Many Requests
+                    statusCodeMessage: |
+                      Too many request to patch a Transport Document has been requested. Please try again in 1 hour
                     providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
                     errorDateTime: '2023-04-13T07:41:00+08:30'
                     errors:
                       - errorCode: 7003
-                        errorCodeText: Non existent transportDocumentReference
-                        errorCodeMessage: transportDocumentReference `td-987` does not exist
+                        errorCodeText: Max Transport Document requests reached
+                        errorCodeMessage: A maximum of 10 Transport Document can be patched per hour
   /v3/shipping-instructions-notifications:
     post:
       tags:
