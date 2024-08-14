@@ -89,8 +89,8 @@ Snapshot as of 14 of June 2024 for EBL 3.0.0 Beta.
   - `netExplosiveContent` property must now be >= 0
   - `netExplosiveContent` unit now also allow: `LBR` (Pounds) and `ONZ` (Ounce)
   - `volume` property object must now be >= 0
-  - `ShippingMarks` added to `UtilizedTransportEquipment` and `UtilizedTransportEquipmentShipper`
-  - `vesselVoyage` renamed to `vesselVoyages` in the `Transports` object
+- `ShippingMarks` added to `UtilizedTransportEquipment` and `UtilizedTransportEquipmentShipper`
+- `vesselVoyage` renamed to `vesselVoyages` in the `Transports` object
 
 ## Object changes
 - `ConsignmentItemCarrier` renamed to `ConsignmentItem` and updated to no longer need an `allOf`
