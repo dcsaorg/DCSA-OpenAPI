@@ -15,6 +15,32 @@ Publications related to the Bill of Lading API:
 ---
 This is a moving target and will be updated as soon as the version is published
 
+<a name="v300B20240816"></a>[Release v3.0.0 Beta 20240816 (16 of August 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.0-Beta-20240816)
+---
+Snapshot as of 16 of August 2024 for EBL 3.0.0 Beta.
+## Key changes
+- `202` response code added to all endPoints
+- maxLength of `value` property of all references changed from `100` --> `35` (in order to align with EDI)
+- `CustomReference` now allows a list of values
+
+## All changes
+- API description updated
+- all endPoint descriptions updated to support `202` response
+- `202` response code added to all endPoints
+- `404` (Not Found) added to `PUT` SI-endPoint, `GET` TD-endPoint and `PATCH` TD-endPoint
+- `declaredValue` description updated
+- `maxLength=100` changed to `maxLength=35` (in order to be EDI compatible):
+  - in `shippersReference` in `Shipper` party object
+  - in `shippersPurchaseOrderReference` in `Shipper` party object
+  - in `consigneesReference` in `Consignee` party object
+  - in `consigneesPurchaseOrderReference` in `Consignee` party object
+  - in `reference` in `Party` object
+  - in `value` in `TaxLegalReference` object
+  - in `value` in `Reference` and `ReferenceShipper` objects (which also has a `pattern` added)
+- `CustomReference` object has the following changes:
+  - `maxLength=100` changed to `maxLength=35` for the `value` property
+  - the `value` property has been renamed to `values` and is now a list of values instead of a single value
+
 <a name="v300B20240726"></a>[Release v3.0.0 Beta 20240726 (26 of July 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.0-Beta-20240726)
 ---
 Snapshot as of 26 of July 2024 for EBL 3.0.0 Beta.
