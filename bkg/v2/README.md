@@ -11,6 +11,40 @@ Publications related to the Booking API:
 ---
 This is a moving target and will be updated as soon as the version is published
 
+<a name="v200B20240816"></a>[Release v2.0.0 Beta 20240816 (16 August 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0-Beta-20240816)
+---
+Snapshot as of 16 of August 2024 for Booking 2.0.0 Beta
+## Key changes
+- `202` response code added to all endPoints
+- maxLength of `value` property of all references changed from `100` --> `35` (in order to align with EDI)
+- `CustomReference` now allows a list of values
+- support for multiple `ECP` (Empty Contianer Positioning) locations
+
+## All changes
+- API description updated
+- all endPoint descriptions updated to support `202` response
+- `202` response code added to all endPoints
+- `404` (Not Found) added to `PUT` and `PATCH` endPoints
+- `declaredValue` description updated
+- `carrierCode` and `carrierCodeListProvider` added to `CreateBooking`, `UpdateBooking` and `Booking` object. Also added to the `booking` and `amendedBooking` object in the Notification
+- `maxLength=100` changed to `maxLength=35` (in order to be EDI compatible):
+  - in `bookingAgentsReference` in `BookingAgent` party object
+  - in `shippersReference` in `Shipper` party object
+  - in `shippersPurchaseOrderReference` in `Shipper` party object
+  - in `consigneesReference` in `Consignee` party object
+  - in `consigneesPurchaseOrderReference` in `Consignee` party object
+  - in `serviceContractOwnersReference` in `ServiceContractOwner` party object
+  - in `reference` in `Party` object
+  - in `value` in `TaxLegalReference` object
+  - in `value` in `Reference` and `ReferenceShipper` objects
+- `CustomReference` object has the following changes:
+  - `maxLength=100` changed to `maxLength=35` for the `value` property
+  - the `value` property has been renamed to `values` and is now a list of values instead of a single value
+- `RequestedEquipment` and `RequestedEquipmentShipper` object structures changed and now allows for a list of `emptyContainerPositionings` instead of a single `emptyContainerPositioningLocation` together with an optional `emptyContainerPositioningDateTime`
+- `EmptyContainerPositioning` object added which consists of an `emptyContainerPositioningLocation` together with an optional `emptyContainerPositioningDateTime`
+- `EmptyContainerPositioningEstimated` object added which consists of an `emptyContainerPositioningLocation` together with an optional `estimatedEmptyContainerPositioningDateTime`
+- `ConfirmedEquipment` object structure changed and now allows for a list of `emptyContainerPositionings` instead of a single `emptyContainerPositioningLocation` together with an optional `estimatedEmptyContainerPositioningDateTime`
+
 <a name="v200B20240726"></a>[Release v2.0.0 Beta 20240726 (26 July 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0-Beta-20240726)
 ---
 Snapshot as of 26 of July 2024 for Booking 2.0.0 Beta
