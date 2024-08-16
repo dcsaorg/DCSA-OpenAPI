@@ -1,3 +1,5 @@
+## This API will be discontinued as it is now part of the [Bill of Lading Surrender](https://github.com/dcsaorg/DCSA-OpenAPI/edit/master/ebl/v3/surrender) API
+
 ### Bill of Lading Surrender Response (EBL_SUR_RSP) API
 
 The DCSA Bill of Lading Surrender Response API is specified on [**SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_EBL_SUR_RSP).
