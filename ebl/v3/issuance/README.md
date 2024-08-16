@@ -8,6 +8,37 @@ Publications related to the Bill of Lading Issuance API:
 - [Bill of Lading](./../) maintained here on GitHub
 - [Bill of Lading Issuance Response](./../issuance_response/) maintained here on GitHub (the Issuance Response API linked to this API)
 
+<a name="v300"></a>[Release v3.0.0 (...)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS/3.0.0)
+---
+This is a moving target and will be updated as soon as the version is published
+
+<a name="v300B20240816"></a>[Release v3.0.0 Beta 20240816 (16 of August 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS/3.0.0-Beta-20240816)
+---
+Snapshot as of 16 of August 2024 for EBL Issuance 3.0.0 Beta.
+## Key changes
+- `Transport Document` updated
+  - maxLength of `value` property of all references changed from `100` --> `35` (in order to align with EDI)
+  - `CustomReference` now allows a list of values
+- optional list of `errors` added to `IssuanceResponse`
+
+## Transport Document changes
+- `declaredValue` description updated
+- `maxLength=100` changed to `maxLength=35` (in order to be EDI compatible):
+  - in `reference` in `Party` object
+  - in `value` in `TaxLegalReference` object
+  - in `value` in `Reference` objects (which also has a `pattern` added)
+  - in `shippersReference` in `Shipper` party object
+  - in `shippersPurchaseOrderReference` in `Shipper` party object
+  - in `consigneesReference` in `Consignee` party object
+  - in `consigneesPurchaseOrderReference` in `Consignee` party object
+- `CustomReference` object has the following changes:
+  - `maxLength=100` changed to `maxLength=35` for the `value` property
+  - the `value` property has been renamed to `values` and is now a list of values instead of a single value
+
+## Issuance changes
+- `IssuanceResponse` has new optional `errors` array
+- `IssuanceError` object added
+
 <a name="v300B20240726"></a>[Release v3.0.0 Beta 20240726 (26 of July 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS/3.0.0-Beta-20240726)
 ---
 Snapshot as of 26 of July 2024 for EBL Issuance 3.0.0 Beta.
