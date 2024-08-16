@@ -5,6 +5,30 @@ The DCSA Platform Interoperability API is specified on [**SwaggerHub**](https://
 Publications related to the PINT API:
 - [Glossary of Terms](https://knowledge.dcsa.org/s/glossary) maintained on the [dcsa.org](https://dcsa.org) website
 
+<a name="v300"></a>[Release v3.0.0 (...)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_PINT/3.0.0)
+---
+This is a moving target and will be updated as soon as the version is published
+
+<a name="v300B20240816"></a>[Release v3.0.0 Beta 20240816 (16 of August 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_PINT/3.0.0-Beta-20240816)
+---
+Snapshot as of 16 of August 2024 for EBL Platform Interoperability 3.0.0 Beta.
+## Key changes
+- `Transport Document` updated
+
+## Transport Document changes
+- `declaredValue` description updated
+- `maxLength=100` changed to `maxLength=35` (in order to be EDI compatible):
+  - in `shippersReference` in `Shipper` party object
+  - in `shippersPurchaseOrderReference` in `Shipper` party object
+  - in `consigneesReference` in `Consignee` party object
+  - in `consigneesPurchaseOrderReference` in `Consignee` party object
+  - in `reference` in `Party` object
+  - in `value` in `TaxLegalReference` object
+  - in `value` in `Reference` object (which also has a `pattern` added)
+- `CustomReference` object has the following changes:
+  - `maxLength=100` changed to `maxLength=35` for the `value` property
+  - the `value` property has been renamed to `values` and is now a list of values instead of a single value
+
 <a name="v300B20240726"></a>[Release v3.0.0 Beta 20240726 (26 of July 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_PINT/3.0.0-Beta-20240726)
 ---
 Snapshot as of 26 of July 2024 for EBL Platform Interoperability 3.0.0 Beta.
