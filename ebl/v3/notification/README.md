@@ -1,5 +1,4 @@
-
-
+## This API will be discontinued as it is now part of the [Bill of Lading](https://github.com/dcsaorg/DCSA-OpenAPI/edit/master/ebl/v3) API
 
 ### Bill of Lading Notification (EBL_NTF) API
 
