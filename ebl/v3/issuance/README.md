@@ -66,6 +66,41 @@ Snapshot as of 26 of July 2024 for EBL Issuance 3.0.0 Beta.
 - `MULTIMODAL` added as a `Mode of Transport` to `preCarriageBy` and `onCarriageBy`
 - `PlaceOfReceipt`, `PortOfLoading`, `PortOfDischarge`, `PlaceOfDelivery` and `OnwardInlandRouting` objects changed from using a `oneOf` into an object where all location types are optional and can be used at the same time
 
+
+<a name="v300B20240614"></a>[Release v3.0.0 Beta 20240614 (28 of June 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS/3.0.0-Beta-20240614)
+---
+Snapshot as of 14 of June 2024 for EBL Issuance 3.0.0 Beta.
+## Key changes
+- `Transport Document` updated
+- `IssueToParty` updated
+
+## General changes
+- multiple examples added
+- multiple descriptions improved (typos) and multiple `patterns` improved
+
+## Issuance changes
+- improved pattern on `IssueToParty` and added 2 extra values: `TRAC` (TRACE Original) and `BRIT` (BRITC eBL)
+- `TRAC` (TRACE Original) and `BRIT` (BRITC eBL) added to `codeListProvider` in `IdentifyingCode`
+
+## Transport Document changes
+- `minItems=1` removed and examples added to `displayedNameFor***`
+- added `title` property multiple places
+- `carriersAgentAtDestination` added to the `DocumentParties`
+- missing condition added to `volumeUnit` in `CargoItem`
+- `minimum` and `exclusiveMinimum` added to `netWeight`, `netExplosiveContent` and `volume` properties in DG (Dangerous Goods)
+- `LBR` (Pounds) and `ONZ` (Ounce) added as allowed value in `unit` on `netExplosiveContent` in DG
+- `shippingMarks` added to `UtilizedTransportEquipment`
+- `vesselVoyage` renamed to `vesselVoyages` in the `Transports` object
+- missing `pattern` added to `locationName` in `AddressLocation` object
+- `name` property removed from the `Address` object
+- `postCode` maxLength changed from `50` --> `10` in `Address` and `PartyAddress` objects
+- `stateRegion` nullable removed in `AddressLocation`, `PartyAddress` and `CityLocation`
+- added, removed and fixed required fields in the `Address` object
+- missing `maxLength=4` on `locationType` in `CityLocation` object
+- fixed wrong required field `country` --> `countryCode` in `CityLocation` object
+- `facilityCode` nullable removed in `FacilityLocation`
+- `CarriersAgentAtDestination` object added
+
 <a name="v300B2"></a>[Release v3.0.0 Beta 2 (12 April 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS/3.0.0-Beta-2)
 ---
 Beta 2 release of the DCSA OpenAPI definitions for Bill of Lading Issuance 3.0.0-Beta-2
