@@ -1,3 +1,5 @@
+## This API will be discontinued as it is now part of the [Bill of Lading Issuance](https://github.com/dcsaorg/DCSA-OpenAPI/edit/master/ebl/v3/issuance) API
+
 ### Bill of Lading Issuance Response (EBL_ISS_RSP) API
 
 The DCSA Bill of Lading Issuance Response API is specified on [**SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_EBL_ISS_RSP).
