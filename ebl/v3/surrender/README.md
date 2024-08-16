@@ -41,6 +41,15 @@ Snapshot as of 26 of July 2024 for EBL Surrender 3.0.0 Beta.
 - `SurrenderRequestAnswer` object added
 - multiple typos in descriptions fixed
 
+<a name="v300B20240614"></a>[Release v3.0.0 Beta 20240614 (28 of June 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR/3.0.0-Beta-20240614)
+---
+Snapshot as of 14 of June 2024 for EBL Surrender 3.0.0 Beta.
+## Key changes
+- `TRAC` (TRACE Original) and `BRIT` (BRITC eBL) added as `eblPlatform` values in both `TransactionParty` and `SurrenderRequestBy` objects
+- `TRAC` (TRACE Original) and `BRIT` (BRITC eBL) added as `codeListProvider` values in `IdentifyingCode` object.
+- typo in `DCSA` value and `DID` descriptions fixed
+- `countryCode` pattern improved
+
 <a name="v300B2"></a>[Release v3.0.0 Beta 2 (12 April 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR/3.0.0-Beta-2)
 ---
 Beta 2 release of the DCSA OpenAPI definitions for Bill of Lading Surrender 3.0.0-Beta-2
