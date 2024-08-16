@@ -8,6 +8,16 @@ Publications related to the Bill of Lading Surrender API:
 - [Bill of Lading](./../) maintained here on GitHub
 - [Bill of Lading Surrender Response](./../surrender_response/) maintained here on GitHub (the Surrender Response API linked to this API)
 
+<a name="v300"></a>[Release v3.0.0 (...)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR/3.0.0)
+---
+This is a moving target and will be updated as soon as the version is published
+
+<a name="v300B20240816"></a>[Release v3.0.0 Beta 20240816 (16 of August 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR/3.0.0-Beta-20240816)
+---
+Snapshot as of 16 of August 2024 for EBL Surrender 3.0.0 Beta.
+## Key changes
+- maxLength of `value` property of `TaxLegalReference` all reference changed from `100` --> `35` (in order to align with EDI)
+
 <a name="v300B20240726"></a>[Release v3.0.0 Beta 20240726 (26 of July 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR/3.0.0-Beta-20240726)
 ---
 Snapshot as of 26 of July 2024 for EBL Surrender 3.0.0 Beta.
