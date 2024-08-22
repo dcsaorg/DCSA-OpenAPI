@@ -1946,6 +1946,38 @@ paths:
                     Amendment cancelled on a confirmed Booking
                   description: |
                     The consumer has requested that the amendment to a confirmed `Booking` is to be cancelled. The cancellation has been accepted and is now awaiting further processing by the provider
+        '400':
+          description: |
+            In case the Cancel payload does not schema validate a `400` (Bad Request) is returned
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                badRequestExample:
+                  summary: |
+                    Wrong `amendedBookingStatus`
+                  description: |
+                    `APPROVE` is not a possible value when PATCHING a `Booking`.
+
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: PATCH
+                    requestUri: /v2/bookings/cbrr-123
+                    statusCode: 400
+                    statusCodeText: Bad Request
+                    statusCodeMessage: APPROVE is not a valid status to set
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2023-10-03T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7003
+                        property: amendedBookingStatus
+                        value: APPROVE
+                        errorCodeText: incorrect value
+                        errorCodeMessage: 'Only AMENDMENT CANCELLED is an allowed value: APPROVE was inserted'
         '404':
           description: |
             In case the consumer is cancelling the `Amended Booking` by setting:
