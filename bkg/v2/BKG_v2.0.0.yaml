@@ -60,8 +60,6 @@ paths:
       description: |
         Creates a new booking request. This endPoint corresponds with **UseCase 1 - Submit booking request**.
 
-        **Needs to be updated**
-
         ## Precondition
         The consumer has information for a `Booking Request`
 
@@ -70,7 +68,41 @@ paths:
 
         The consumer will receive a `201` (Created) or a `202` (Accepted) if the request payload schema-validates or a `400` (Bad Request) if it does not.
 
-        ## Flow
+        ## Flow for a `201` (Created) response
+        The following occurs when a provider receives a `Booking Request`:
+
+        1. The payload (`Booking Request`) is schema-validated. In case the payload **is invalid** a `400` (Bad Request) is returned.
+
+           **The process stops here!**
+        2. The payload is schema-valid which means
+            - all required properties are provided
+            - all values provided have correct data type.
+
+            A `carrierBookingRequestReference` (as a reference to the `Booking Request`) is created and linked to the payload in the provider system.
+          
+            **For the rest of this description and in all examples the value `cbrr-123` will be used as `carrierBookingRequestReference`**
+        3. A `201` (Created) response is returned with a payload containing both the `carrierBookingRequestReference` and the `bookingStatus`:
+            ```
+            {
+              carrierBookingRequestReference: 'cbrr-123',
+              bookingStatus: 'RECEIVED'
+            }
+            ```
+        4. All '_relevant_' subscribers will be notified via a [Booking Notification](#/BookingNotification).
+
+        For `POST` `Booking Request` responding with `201` (Created) the process ends here. The `Booking Request`
+          - is now stored in the provider system
+          - has status `RECEIVED` and the status can be queried (a subsequent `GET` request will retrieve the payload)
+          - a `201` (Created) response is sent to the consumer with a payload containing the `carrierBookingRequestReference` and `bookingStatus='RECEIVED'`
+          - awaits further processing by the provider
+          - '_relevant_' subscribers have been notified.
+
+        The provider will now start asynchronous processing. Once processed, the new status of the `Booking Request` will be communicated via a [Booking Notification](#/BookingNotification). In case the consumer does not subscribe to notifications it is necessary for the consumer to poll on the
+
+            GET /v2/bookings/{bookingReference}
+            
+        endPoint to check if the `bookingStatus` of the `Booking Request` has changed.
+        ## Flow for a `202` (Accepted) response
         The following occurs when a provider receives a `Booking Request`:
 
         1. The payload (`Booking Request`) is schema-validated. In case the payload **is invalid** a `400` (Bad Request) is returned.
@@ -84,33 +116,26 @@ paths:
           
             **For the rest of this description and in all examples the value `cbrr-123` will be used as `carrierBookingRequestReference`**
 
-        3. A `201` (Created) or `202` (Accepted) response is returned. A `201` should be returned if the consumer can `GET` the `Booking Request` "shortly after submitting it". A `202` should be returned if the provider accepts the `Booking Request` and a subsequent `GET` request is not possible until the `Booking Request` has been processed. Both response payloads looks like this:
+        3. A `202` (Accepted) response is returned with a payload containing **only** the `carrierBookingRequestReference`:
             ```
             {
-              carrierBookingRequestReference: 'cbrr-123',
-              bookingStatus: 'RECEIVED'
+              carrierBookingRequestReference: 'cbrr-123'
             }
             ```
-        4. If a `201` (Created) is returned - all '_relevant_' subscribers will be notified via a [Booking Notification](#/BookingNotification). If a `202` (Accepted) is returned a [Booking Notification](#/BookingNotification) will be sent once the payload has been processed
 
-        For `POST` `Booking Request` the process ends here.
-          - For response code `201` (Created) the `Booking Request`:
-            - is now stored in the provider system
-            - has status `RECEIVED` and the status can be queried (a subsequent `GET` request will retrieve the payload)
-            - a `201` (Created) response is sent to the consumer with a payload containing the `carrierBookingRequestReference` and `bookingStatus='RECEIVED'`
-            - awaits further processing by the provider
-            - '_relevant_' subscribers have been notified.
-          - For response code `202` (Accepted) the `Booking Request`:
-            - is now accepted in the provider system
-            - has status `RECEIVED` but the status cannot be queried (no `GET` request is possible until the `Booking Request` is further processed in the provider system)
-            - a `202` (Accepted) response is sent to the consumer with a payload containing the `carrierBookingRequestReference` and `bookingStatus='RECEIVED'`
-            - awaits further processing by the provider
+        For `POST` `Booking Request` responding with `202` (Accepted) the process ends here. The `Booking Request`:
+          - is now accepted by the provider system
+          - the `Booking Request` does not yet have any status and cannot be queried (no `GET` request is possible until the `Booking Request` is further processed in the provider system)
+          - a `202` (Accepted) response is sent to the consumer with a payload **only** containing the `carrierBookingRequestReference`
+          - awaits further processing by the provider
 
-        The provider wil now start asynchronous processing. Once processed, the new status of the `Booking Request` will be communicated via a `Booking Notification`. In case the consumer does not subscribe to notifications it is necessary for the consumer to poll on the
+        The provider will now start asynchronous processing. Once processed, the status `RECEIVED` of the `Booking Request` will be communicated via a [Booking Notification](#/BookingNotification). In case the consumer does not subscribe to notifications it is necessary for the consumer to poll on the
 
             GET /v2/bookings/{bookingReference}
             
-        endPoint to check if the `bookingStatus` of the `Booking Request` has changed. In case a `202` (Accepted) status was sent for the `POST` request - then the consumer will have to keep polling on the `GET` endPoint until a response is sent in order to know the status.
+        endPoint to check if the `bookingStatus` of the `Booking Request` has changed.
+        
+        After the status has changed to `RECEIVED` further processing can continue and will be communicated via a [Booking Notification](#/BookingNotification).
       requestBody:
         description: The payload used to create a `Booking Request`
         required: true
@@ -438,9 +463,41 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BookingRefStatus'
+                type: object
+                description: |
+                  The `carrierBookingRequestReference` along with the `bookingStatus` is returned.
+                properties:
+                  carrierBookingRequestReference:
+                    type: string
+                    pattern: ^\S(?:.*\S)?$
+                    maxLength: 100
+                    description: |
+                      A reference to the booking during the booking request phase.
+                    example: 24595eb0-5cfc-4381-9c3a-cedc1975e9aa
+                  bookingStatus:
+                    type: string
+                    maxLength: 50
+                    description: |
+                      The status of the `Booking`. Possible values are:
+                      - `RECEIVED` (Booking request has been received)
+                    example: RECEIVED
+                  feedbacks:
+                    type: array
+                    description: |
+                      Feedback that can be provided includes, but is not limited to:
+                      - unsupported properties
+                      - changed values
+                      - removed properties
+                      - general information
+          
+                      This property is **conditional** on the `bookingStatus='PENDING UPDATE'` (in case the `Booking` has not yet been confirmed) or `bookingStatus='PENDING AMENDMENT'` (in case it is a confirmed `Booking`).
+                    items:
+                      $ref: '#/components/schemas/Feedback'
+                required:
+                  - carrierBookingRequestReference
+                  - bookingStatus
               examples:
-                receExample:
+                receivedExample:
                   summary: |
                     Booking request received
                   description: |
@@ -450,23 +507,34 @@ paths:
                     bookingStatus: RECEIVED
         '202':
           description: |
-            `Booking Request` has been successfully accepted by the provider. The status of the `Booking Request` is now `RECEIVED` - it is not possible to call the `GET` endPoint until the `Booking Request` is further processed in provider system. The consumer is now awaiting provider to process the `Booking Request` asynchronously.
+            `Booking Request` has been successfully accepted by the provider. The `Booking Request` does not yet have a `bookingStatus` - it is not possible to call the `GET` endPoint until the `Booking Request` is further processed in provider system. The consumer is now awaiting provider to process the `Booking Request` asynchronously.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BookingRefStatus'
+                type: object
+                description: |
+                  The `carrierBookingRequestReference` along with the `bookingStatus` is returned.
+                properties:
+                  carrierBookingRequestReference:
+                    type: string
+                    pattern: ^\S(?:.*\S)?$
+                    maxLength: 100
+                    description: |
+                      A reference to the booking during the booking request phase.
+                    example: 24595eb0-5cfc-4381-9c3a-cedc1975e9aa
+                required:
+                  - carrierBookingRequestReference
               examples:
-                receExample:
+                aceptedExample:
                   summary: |
-                    Booking request received
+                    Booking request accepted
                   description: |
-                    A `Booking Request` has been received (`bookingStatus='RECEIVED'`), schema validated and accepted by provider
+                    A `Booking Request` has been accepted (no `bookingStatus`) and schema validated by provider
                   value:
                     carrierBookingRequestReference: cbrr-123
-                    bookingStatus: RECEIVED
         '400':
           description: |
             In case the `Booking Request` does not schema validate a `400` (Bad Request) is returned
@@ -577,7 +645,7 @@ paths:
         - $ref: '#/components/parameters/bookingReferencePathParam'
         - $ref: '#/components/parameters/Api-Version-Major'
       description: |
-        Updates the `Booking Request` with the `bookingReference`. The path can contain either a `carrierBookingRequestReference` or a `carrierBookingReference`. This endPoint corresponds with either
+        Updates the `Booking Request` with the `bookingReference`. The path can contain either a `carrierBookingRequestReference` or a `carrierBookingReference`. Once a Booking has been `CONFIRMED` the `carrierBookingReference` **MUST** always be used. This endPoint corresponds with either
         - **UseCase 3 - Submit updated Booking request**
         - **UseCase 7 - Request amendments to confirmed Booking**
 
@@ -587,7 +655,7 @@ paths:
 
         the endPoint can also be used in case `bookingStatus='RECEIVED'` and the consumer has an update to the `Booking Request`.
 
-        ### Precondition
+        ## Precondition
         In order to update a `Booking Request`, the status of the `Booking Request` needs to be in state
         - `RECEIVED` in case the consumer has updated information for the `Booking Request`
         - `PENDING UPDATE` in case the provider has requested the consumer to update the `Booking Request` (a result of **UseCase 2 - Request to update Booking request**)
@@ -602,8 +670,8 @@ paths:
 
         The consumer will receive a `200` (OK) or a `202` (Accepted) if the payload schema-validates or a `400` (Bad Request) if it does not.
 
-        ## Flow
-        The following occurs when a provider receives an **update** to a `Booking Request`
+        ## Flow for a `200` (OK) response
+        The following occurs when a provider receives an **update** (or an **amendment**) to a `Booking Request`
         1. The payload (`Booking Request`) is schema-validated. In case the payload **is invalid** a `400` (Bad Request) is returned.
 
            **The process stops here!**
@@ -611,11 +679,11 @@ paths:
            - all required properties are provided
            - all values provided have correct data type
           
-           **For the rest of this description and in all examples the value `cbrr-123` will be used as `carrierBookingRequestReference`**
+           **For the rest of this description and in all examples the value `cbrr-123` will be used as `carrierBookingRequestReference` in case the Booking has not yet been `CONFIRMED` and the value `cbr-987` will be used as `carrierBookingReference` in case the Booking has been `CONFIRMED`.**
         3. The response depends on which useCase is the reason for calling this endPoint (what the `bookingStatus` is):
             - If `bookingStatus` **is** `RECEIVED` then this endPoint is being used in addition to **UseCase 1 - Submit booking request**. In this case the consumer would like to make an update to an already sent `Booking Request` - this is done via **UseCase 3 - Submit updated Booking Request**. The `bookingStatus` now changes to `UPDATE RECEIVED`.
             
-              A `200` (OK) or `202` (Accepted) response is returned. A `200` should be returned if the consumer can `GET` the `Booking Request` "shortly after updating it". A `202` should be returned if the provider accepts the `Booking Request` update and a subsequent `GET` request is not possible until the `Booking Request` update has been processed. Both response payloads looks like this:
+              A `200` (OK) response is returned with the following payload:
               ```
               {
                 carrierBookingRequestReference: 'cbrr-123',
@@ -624,7 +692,7 @@ paths:
               ```
             - If `bookingStatus` is `PENDING UPDATE` then this endPoint is being used as a reponse to **UseCase 2 - Request to update Booking request** in this case the provider has requested an update to a `Booking Request`.  The `bookingStatus` now changes to `UPDATE RECEIVED`.
 
-              A `200` (OK) or `202` (Accepted) response is returned. A `200` should be returned if the consumer can `GET` the `Booking Request` "shortly after updating it". A `202` should be returned if the provider accepts the `Booking Request` update and a subsequent `GET` request is not possible until the `Booking Request` update has been processed. Both response payloads looks like this:
+              A `200` (OK) response is returned with the following payload:
               ```
               {
                 carrierBookingRequestReference: 'cbrr-123',
@@ -633,7 +701,7 @@ paths:
               ```
             - If `bookingStatus` is `UPDATE RECEIVED` then this endPoint is being used to update an already sent update. The `bookingStatus` stays as `UPDATE RECEIVED`.
 
-              A `200` (OK) or `202` (Accepted) response is returned. A `200` should be returned if the consumer can `GET` the `Booking Request` "shortly after updating it". A `202` should be returned if the provider accepts the `Booking Request` update and a subsequent `GET` request is not possible until the `Booking Request` update has been processed. Both response payloads looks like this:
+              A `200` (OK) response is returned with the following payload:
               ```
               {
                 carrierBookingRequestReference: 'cbrr-123',
@@ -642,7 +710,7 @@ paths:
               ```
             - If `bookingStatus` is `PENDING AMENDMENT` then this endPoint is being used as a response to **UseCase 6 - Request to amend Confirmed Booking**, in this case the provider has requested an amendment to a `Confirmed Booking`. The `bookingStatus` stays `PENDING AMENDMENT` and `amendedBookingStatus` is set to `AMENDMENT RECEVIED`.
             
-              A `200` (OK) or `202` (Accepted) response is returned. A `200` should be returned if the consumer can `GET` the `Booking Request` "shortly after updating it". A `202` should be returned if the provider accepts the `Booking Request` update and a subsequent `GET` request is not possible until the `Booking Request` update has been processed. Both response payloads looks like this:
+              A `200` (OK) response is returned with the following payload:
               ```
               {
                 carrierBookingReference: 'cbr-987',
@@ -651,9 +719,9 @@ paths:
                 amendedBookingStatus: 'AMENDMENT RECEIVED'
               }
               ```
-            - If `bookingStatus` is `CONFIRMED` then this endPoint is being used in order to request an amendment to a `Confirmed Booking` this is done via **UseCase 7 - Request Amendments to Confirmed Booking**. The `bookingStatus` stays `CONFIRMED` and `amendedBookingStatus` is set to `AMENDMENT RECEIVED`.
+            - If `bookingStatus` is `CONFIRMED` then this endPoint is being used in order to request an amendment to a `Confirmed Booking`. This is done via **UseCase 7 - Request Amendments to Confirmed Booking**. The `bookingStatus` stays `CONFIRMED` and `amendedBookingStatus` is set to `AMENDMENT RECEIVED`.
             
-              A `200` (OK) or `202` (Accepted) response is returned. A `200` should be returned if the consumer can `GET` the `Booking Request` "shortly after updating it". A `202` should be returned if the provider accepts the `Booking Request` update and a subsequent `GET` request is not possible until the `Booking Request` update has been processed. Both response payloads looks like this:
+              A `200` (OK) response is returned with the following payload:
               ```
               {
                 carrierBookingReference: 'cbr-987',
@@ -662,41 +730,74 @@ paths:
                 amendedBookingStatus: 'AMENDMENT RECEIVED'
               }
               ```
-        4. If a `200` (OK) is returned - all '_relevant_' subscribers will be notified via a [Booking Notification](#/BookingNotification). If a `202` (Accepted) is returned a [Booking Notification](#/BookingNotification) will be sent once the payload has been processed
+        4. All '_relevant_' subscribers will be notified via a [Booking Notification](#/BookingNotification).
 
-        For `PUT` `Booking Request` the process ends here.
-          - For response code `200` (OK) the `Booking Request`:
-            - is now stored in the provider system
-            - a `200` (OK) response is sent to the consumer with the status of the `Booking` (and possibly also with the `amendedBookingStatus`) with one of the following values (depending on the useCase):
-              - `bookingStatus='UPDATE RECEIVED'` (if endPoint used before a `Booking`has been confirmed)
-              - `bookingStatus='PENDING AMENDMENT'` and `amendedBookingStatus='AMENDMENT RECEIVED'` (if endPoint used as a response to **UseCase 6 - Request to amend Confirmed Booking**)
-              - `bookingStatus='CONFIRMED'` and `amendedBookingStatus='AMENDMENT RECEIVED'` (if consumer is requesting an amendment to a `Confirmed Booking`)
+        For `PUT` `Booking Request` responding with `200` (OK) the process ends here. The updated `Booking Request`:
+          - is now stored in the provider system
+          - a `200` (OK) response is sent to the consumer with the status of the `Booking` (and possibly also with the `amendedBookingStatus`) with one of the following values (depending on the useCase):
+            - `bookingStatus='UPDATE RECEIVED'` (if endPoint used before a `Booking`has been confirmed)
+            - `bookingStatus='PENDING AMENDMENT'` and `amendedBookingStatus='AMENDMENT RECEIVED'` (if endPoint used as a response to **UseCase 6 - Request to amend Confirmed Booking**)
+            - `bookingStatus='CONFIRMED'` and `amendedBookingStatus='AMENDMENT RECEIVED'` (if consumer is requesting an amendment to a `Confirmed Booking`)
 
-              A subsequent `GET` request to the `Booking Request` will fetch the status along with the `Booking Request`
-            - awaits further processing by the provider
-            - '_relevant_' subscribers have been notified.
-          - For response code `202` (Accepted) the `Booking Request`:
-            - is now accepted in the provider system
-            - a `202` (Accepted) response is sent to the consumer with the status of the `Booking` (and possibly also with the `amendedBookingStatus`) with one of the following values (depending on the useCase):
-              - `bookingStatus='UPDATE RECEIVED'` (if endPoint used before a `Booking`has been confirmed)
-              - `bookingStatus='PENDING AMENDMENT'` and `amendedBookingStatus='AMENDMENT RECEIVED'` (if endPoint used as a response to **UseCase 6 - Request to amend Confirmed Booking**)
-              - `bookingStatus='CONFIRMED'` and `amendedBookingStatus='AMENDMENT RECEIVED'` (if consumer is requesting an amendment to a `Confirmed Booking`)
-              
-              Subsequent `GET` request will not be possible until the `Booking Request` is further processed in the provider system
-            - awaits further processing by the provider
+            A subsequent `GET` request to the `Booking Request` will fetch the status along with the `Booking Request`
+          - awaits further processing by the provider
+          - '_relevant_' subscribers have been notified.
 
-        The provider wil now start asynchronous processing. Once processed, the new status of the `Booking` and `Amended Booking Request` will be communicated via a `Booking Notification`. In case the consumer does not subscribe to notifications it is necessary for the consumer to poll on the
+        The provider will now start asynchronous processing. Once processed, the new status of the `Booking` and `Amended Booking Request` will be communicated via a [Booking Notification](#/BookingNotification). In case the consumer does not subscribe to notifications it is necessary for the consumer to poll on the
+
             GET /v2/bookings/{bookingReference}
-            
-        endPoint to check if the `bookingStatus` and `amendedBookingStatus` of the `Booking` has changed. In case a `202` (Accepted) status was sent for the `PUT` request - then the consumer will have to keep polling on the `GET` endPoint until a response is sent in order to know the status.
+
+        endPoint to check if the `bookingStatus` and `amendedBookingStatus` of the `Booking` has changed.
           
         If the consumer wants to get the content of the `Amended Booking` provided via this `PUT` endPoint, the `GET` endPoint needs to be used in combination with the `?amendedContent=true` queryParameter:
+
             GET /v2/bookings/{bookingReference}?amendedContent=true
 
-        It is possible to `GET` the content of the `Amended Booking` (except when response code is `202` (Accepted) as explained above) via the example above until either:
+        It is possible to `GET` the content of the `Amended Booking` via the example above until either:
 
         - the provider requests for a new amendment (**UseCase 6: Request to amend confirmed Booking**) in which case the "old update" is no longer accessible
         - the consumer submits a new update (**UseCase 7: Request amendment to confirmed Booking**) in which case the "new amendment" provided **replaces** the "old amendment".
+        - the provider re-confirms the `Booking` (**UseCase 5: Confirm booking request**) in which case the "old update" is no longer accessable.
+
+        ## Flow for a `202` (OK) response
+        The following occurs when a provider receives an **update** (or an **amendment**) to a `Booking Request`
+        1. The payload (`Booking Request`) is schema-validated. In case the payload **is invalid** a `400` (Bad Request) is returned.
+
+           **The process stops here!**
+        2. The payload is schema-valid which means
+           - all required properties are provided
+           - all values provided have correct data type
+        3. An empty response is returned and the consumer now awaits futher processing by the provider.
+
+        For `POST` `Booking Request` responding with `202` (Accepted) the process ends here. The Booking Request:
+          - is now accepted by the provider system
+          - the status of the `Booking Request` is unchanged.
+          - a 202 (Accepted) response is sent with an empty payload
+          - awaits further processing by the provider
+        
+        The provider will now start asynchronous processing. Once processed, the state will change to one of the following values depending on the UseCase for calling the `PUT` endPoint:
+          - `UPDATE RECEIVED` in case this endPoint has been used to:
+            - send an update to a newly created Booking (preconition: `bookingStatus='RECEIVED'`)
+            - send an update to a Booking because of a request from provider via **UseCase 2 - Request to update Booking request** (preconition: `bookingStatus='PENDING UPDATE'`)
+            - send an additional update to a Booking that has already received an update  (preconition: `bookingStatus='UPDATE RECEIVED'`)
+          - `bookingStatus` will stay as `PENDING AMENDMENT` but `amendedBookingStatus` will change to `AMENDMENT RECEVIED` in case this endPoint is being used in response to a request from provider via **UseCase 6 - Request to amend Confirmed Booking** (preconition: `bookingStatus='PENDING AMENDMENT'`)
+          - `bookingStatus` will stay as `CONFIRMED` but `amendedBookingStatus` will change to `AMENDMENT RECEVIED` in case this endPoint is being used to update an already confirmed Booking via  **UseCase 7 - Request Amendments to Confirmed Booking** (preconition: `bookingStatus='CONFIRMED'`)
+
+        The new state will be communicated via a [Booking Notification](#/BookingNotification).  In case the consumer does not subscribe to notifications it is necessary for the consumer to poll on the 
+
+            GET /v2/bookings/{bookingReference}
+            
+        endPoint to check if the `bookingStatus` and `amendedBookingStatus` of the `Booking` has changed.
+
+        If the consumer wants to get the content of the `Amended Booking` provided via this `PUT` endPoint, the `GET` endPoint needs to be used in combination with the `?amendedContent=true` queryParameter:
+
+            GET /v2/bookings/{bookingReference}?amendedContent=true
+
+        It is possible to `GET` the content of the `Amended Booking` via the example above until either:
+
+        - the provider requests for a new amendment (**UseCase 6: Request to amend confirmed Booking**) in which case the "old update" is no longer accessible
+        - the consumer submits a new update (**UseCase 7: Request amendment to confirmed Booking**) in which case the "new amendment" provided **replaces** the "old amendment".
+        - the provider re-confirms the `Booking` (**UseCase 5: Confirm booking request**) in which case the "old update" is no longer accessable.
       requestBody:
         description: |
           Parameters used to update the `Booking request`
@@ -1077,57 +1178,18 @@ paths:
                     amendedBookingStatus: AMENDMENT RECEIVED
         '202':
           description: |
-            The `Booking request` update has been successfully accepted by the provider with one of the following combinations (depending on the use case):
-            - `bookingStatus='PENDING UPDATE'` in case the consumer has provided an update to a `Booking request` and is awaiting the provider to take action
-            - `bookingStatus='PENDING AMENDMENT'` and `amendedBookingStatus='AMENDMENT RECEIVED'` in case the provider has requested an amendment and the consumer has provided an amendment to a `Confirmed Booking` and is awaiting the provider to take action
-            - `bookingStatus='CONFIRMED'` and `amendedBookingStatus='AMENDMENT RECEIVED'` in case the consumer has provided an amendment to a `Confirmed Booking` and is awaiting the provider to take action
-
-            Once the provider has processed the `Booking Request` update - the status of the `Booking` can be monitored on the
-                GET /v2/bookings/{bookingReference}
-
-            If the provider has not yet processed the `Booking Request` - the `GET` endPoint will not return valid content. If the provider has finished processing the `Booking Request`and the consumer wants to get the content of the `Amended Booking` the `GET` endPoint needs to be used in combination with the `?amendedContent=true` queryParameter:
-                GET /v2/bookings/{bookingReference}?amendedContent=true
+            The `Booking request` update has been successfully accepted by the provider. `bookingStatus` does not change and response payload is empty. Further processing will be done by provider.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/BookingRefStatus'
               examples:
-                updateReceivedExample:
+                noContentExample:
                   summary: |
-                    Booking request updated
+                    Booking request updated with no content
                   description: |
-                    An updated `Booking request` received, schema validated and accepted by provider - the `Booking` now awaits provider action
-                        `bookingStatus='UPDATE RECEIVED'`
-                  value:
-                    carrierBookingRequestReference: cbrr-123
-                    bookingStatus: UPDATE RECEIVED
-                pendingAmendmentApprovalExample:
-                  summary: |
-                    Confirmed Booking amendment
-                  description: |
-                    An amendment to a `Confirmed Booking` received, schema validated and accepted by provider - the `Booking` now awaits provider action
-                        `bookingStatus='CONFIRMED'`
-                        `amendedBookingStatus: 'AMENDMENT RECEIVED'`
-                  value:
-                    carrierBookingRequestReference: cbrr-123
-                    carrierBookingReference: cbr-987
-                    bookingStatus: CONFIRMED
-                    amendedBookingStatus: AMENDMENT RECEIVED
-                pendingAmendmentExample:
-                  summary: |
-                    Confirm requested Booking amendment
-                  description: |
-                    A requested amendment to a `Confirmed Booking` by the provider has been received, schema validated and accepted by provider. The `Booking` now awaits provider action
-                        `bookingStatus='PENDING AMENDMENT'`
-                        `amendedBookingStatus: 'AMENDMENT RECEIVED'`
-                  value:
-                    carrierBookingRequestReference: cbrr-123
-                    carrierBookingReference: cbr-987
-                    bookingStatus: PENDING AMENDMENT
-                    amendedBookingStatus: AMENDMENT RECEIVED
+                    An updated `Booking request` received, schema validated and accepted by provider - the `Booking` now awaits provider action, `bookingStatus` does not change
         '400':
           description: |
             In case the updated/amended `Booking request` does not schema validate a `400` (Bad Request) is returned
@@ -1298,6 +1360,7 @@ paths:
         Retrieves the `Booking Request` with the `bookingReference`. The path can contain a `carrierBookingRequestReference` or a `carrierBookingReference`. It is recommended to use this endPoint to `GET` data before an update is made to make sure latest version is being updated.
 
         The default payload when calling this endPoint is the "original" `Booking`. It is also possible to get the latest amendment to a `Booking` called the `Amended Booking`. In order to get the `Amended Booking`, it is necessary to use the query parameter `amendedContent` and set it to `true`.
+
             GET /v2/bookings/{bookingReference}?amendedContent=true
 
         The `status` of the "original" `Booking` is included in both payloads as `bookingStatus`. `amendedBookingStatus` and related content is only available after the provider has approved the `Booking` via **UseCase 5: Confirm Booking request** and until:
@@ -1309,7 +1372,7 @@ paths:
 
         If the provider is requesting changes to the `Booking`, the `feedbacks` object is used to inform the consumer what needs to change.
 
-        In case no subscription (`Notification`) has been set up - it is possible to use this endPoint to poll on in order to detect if `bookingStatus` and/or `amendedBookingStatus` has changed. In case a `202` (Accepted) status was sent in an earlier response (to a `PUT` or a `POST` request) - then the consumer will have to keep polling on the `GET` endPoint until a response is sent in order to know the status.
+        In case no subscription (`Notification`) has been set up - it is possible to use this endPoint to poll on in order to detect if `bookingStatus` and/or `amendedBookingStatus` has changed.
 
         In case a previous request is being processed by the provider - a `202` (Accepted) with **no payload** can be used as a response until the processing is finished.
       parameters:
@@ -1522,6 +1585,7 @@ paths:
         '404':
           description: |
             In case the consumer is requesting the `Amended Booking` by calling:
+
                 GET /v2/bookings/{bookingReference}?amendedContent=true
                 
             but:
@@ -1580,6 +1644,39 @@ paths:
                       - errorCode: 7003
                         errorCodeText: No amended booking
                         errorCodeMessage: No amended booking available
+        '409':
+          description: |
+            In case the provider is processing the `Booking request` - it is possible for the provider to reject new incomming requests by returning a `409` (Conflict)
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                conflictExample:
+                  summary: |
+                    Conflicting request
+                  description: |
+                    The provider is already processing a request and needs to finish this process before any new requests are processed
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
+                  value:
+                    httpMethod: GET
+                    requestUri: /v2/bookings/cbrr-123
+                    statusCode: 409
+                    statusCodeText: Conflict
+                    statusCodeMessage: |
+                      Previous request is being processed. Please try again
+                      later
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2023-04-13T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: Conflicting request is being processed
+                        errorCodeMessage: |
+                          The Booking cannot be updated/amended while it is being processed. Please try again later
         '500':
           description: |
             In case a server error occurs in provider system a `500` (Internal Server Error) is returned
@@ -1671,7 +1768,7 @@ paths:
 
         The consumer will receive a `200` (OK) or a `202` (Accepted) if the payload schema-validates or a `400` (Bad Request) if it does not.
 
-        ## Flow
+        ## Flow for a 200 (OK) response
         The following occurs when a provider receives a cancellation request:
         1. The payload is schema-validated. In case the payload **is invalid** a `400` (Bad Request) is returned.
 
@@ -1683,20 +1780,51 @@ paths:
            - the entire `Booking` is cancelled (including any ongoing amendment). This is the case when the payload contains `bookingStatus='CANCELLED'`.
            
              When cancelling a `Booking` the `amendedBookingStatus` is set to `AMENDMENT CANCELLED`
+
+             A `200` (OK) response is returned with the following payload:
+             ```
+             {
+               carrierBookingReference: 'cbr-987',
+               carrierBookingRequestReference: 'cbrr-123',
+               bookingStatus: 'CANCELLED',
+               amendedBookingStatus: 'AMENDMENT CANCELLED'
+             }
+             ```
+             or
+             ```
+             {
+               carrierBookingReference: 'cbr-987',
+               carrierBookingRequestReference: 'cbrr-123',
+               bookingStatus: 'CANCELLED'
+             }
+             ```
+             if there is no ongoing amendment.
            - only the amendment to the `Booking` is cancelled (in this case the `Booking` continues and `bookingStatus` stays unchanged). This is the case when the payload contains `amendedBookingStatus='AMENDMENT CANCELLED'`.
              
              **If** no amendment is being requested prior to this call (`amendedBookingStatus` is **not** `AMENDMENT RECIEVED`) then a `404` (Not Found) is returned
 
-           A `200` (OK) or `202` (Accepted) response is returned. A `200` should be returned if the consumer can `GET` the `Booking Request` "shortly after updating it". A `202` should be returned if the provider accepts the `Booking` cancellation or `Amendment` cancellation and a subsequent `GET` request is not possible until the `Cancellation` been processed. Both responses (for an Amendment cancellation) payload could look like this:
-           ```
-           {
-             carrierBookingReference: 'cbr-987',
-             carrierBookingRequestReference: 'cbrr-123',
-             bookingStatus: 'PENDING AMENDMENT',
-             amendedBookingStatus: 'AMENDMENT CANCELLED'
-           }
-           ```
-        4. If a `200` (OK) is returned - all '_relevant_' subscribers will be notified via a [Booking Notification](#/BookingNotification). If a `202` (Accepted) is returned a [Booking Notification](#/BookingNotification) will be sent once the payload has been processed
+             A `200` (OK) response is returned with the following payload:
+             ```
+             {
+               carrierBookingReference: 'cbr-987',
+               carrierBookingRequestReference: 'cbrr-123',
+               bookingStatus: 'PENDING AMENDMENT',
+               amendedBookingStatus: 'AMENDMENT CANCELLED'
+             }
+             ```
+        4. All '_relevant_' subscribers will be notified via a [Booking Notification](#/BookingNotification).
+
+        ## Flow for a 202 (Accepted) response
+        The following occurs when a provider receives a cancellation request:
+        1. The payload is schema-validated. In case the payload **is invalid** a `400` (Bad Request) is returned.
+
+           **The process stops here!**
+        2. The payload is schema-valid which means:
+           - all required properties are provided.
+           - all values provided have correct data type.
+        3. An empty response is returned and the consumer now awaits futher processing by the provider.
+        
+        Once processed, the `Booking` or `Amended Booking` is cancelled and a [Booking Notification](#/BookingNotification) is sent.
       parameters:
         - $ref: '#/components/parameters/bookingReferencePathParam'
         - $ref: '#/components/parameters/Api-Version-Major'
@@ -1807,42 +1935,21 @@ paths:
               $ref: '#/components/headers/API-Version'
           content:
             application/json:
-              schema:
-                $ref: '#/components/schemas/BookingRefCancelledStatus'
               examples:
                 bookingCancelledExample:
                   summary: |
                     Entire Booking cancelled
                   description: |
-                    The consumer has requested that the entire `Booking` should be cancelled. `bookingStatus` is set to `CANCELLED` and `amendedBookingStatus` is set to `AMENDMENT CANCELLED`.
-                  value:
-                    carrierBookingRequestReference: cbrr-123
-                    carrierBookingReference: cbr-987
-                    bookingStatus: CANCELLED
-                    amendedBookingStatus: AMENDMENT CANCELLED
-                amendmentCancelled1Example:
+                    The consumer has requested that the entire `Booking` should be cancelled. The cancellation has been accepted and is now awaiting further processing by the provider
+                amendmentCancelledExample:
                   summary: |
                     Amendment cancelled on a confirmed Booking
                   description: |
-                    The consumer has requested that the amendment to a confirmed `Booking` is to be cancelled. The status of the `Booking` stays as `CONFIRMED`. The `amendedBookingStatus` is set to `AMENDMENT CANCELLED`.
-                  value:
-                    carrierBookingRequestReference: cbrr-123
-                    carrierBookingReference: cbr-987
-                    bookingStatus: CONFIRMED
-                    amendedBookingStatus: AMENDMENT CANCELLED
-                amendmentCancelled2Example:
-                  summary: |
-                    Amendment requested by provider cancelled by consumer
-                  description: |
-                    The consumer has requested that the amendment to a confirmed `Booking` is to be cancelled. The status of the `Booking` stays as `PENDING AMENDMENT`. The `amendedBookingStatus` is set to `AMENDMENT CANCELLED`.
-                  value:
-                    carrierBookingRequestReference: cbrr-123
-                    carrierBookingReference: cbr-987
-                    bookingStatus: PENDING AMENDMENT
-                    amendedBookingStatus: AMENDMENT CANCELLED
+                    The consumer has requested that the amendment to a confirmed `Booking` is to be cancelled. The cancellation has been accepted and is now awaiting further processing by the provider
         '404':
           description: |
             In case the consumer is cancelling the `Amended Booking` by setting:
+
                 `amendedBookingStatus='AMENDMENT CANCELLED'`
                 
             but:
@@ -1932,8 +2039,9 @@ paths:
                       - errorCode: 7003
                         errorCodeText: Conflicting request is being processed
                         errorCodeMessage: Conflicting request is being processed
-        default:
-          description: Unexpected error
+        '500':
+          description: |
+            In case a server error occurs in provider system a `500` (Internal Server Error) is returned
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -1941,6 +2049,58 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                internalServerErrorExample:
+                  summary: |
+                    Internal Server Error while processing Booking request
+                  description: |
+                    An Internal Server Error has occurred - the consumer should contact {provider-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
+                  value:
+                    httpMethod: PATCH
+                    requestUri: /v2/bookings/cbrr-123
+                    statusCode: 500
+                    statusCodeText: Internal Server Error
+                    statusCodeMessage: |
+                      Internal Server Error occurred while processing Booking request
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2023-04-13T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: Internal Error occurred
+                        errorCodeMessage: Internal Error occurred
+        default:
+          description: |
+            For other errors the error object should be populated with relevant information
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                tooManyRequestsExample:
+                  summary: |
+                    Updating too many Bookings requests
+                  description: |
+                    Calling the endPoint PATCH /v2/bookings/cbrr-123 too many times within a timeperiod.
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
+                  value:
+                    httpMethod: PATCH
+                    requestUri: /v2/bookings/cbrr-123
+                    statusCode: 429
+                    statusCodeText: Too Many Requests
+                    statusCodeMessage: |
+                      Too many request to cancel a booking has been requested. Please try again in 1 hour
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2023-04-13T07:41:00+08:30'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: Max Booking requests reached
+                        errorCodeMessage: A maximum of 10 Bookings can be cancelled per hour
   /v2/booking-notifications:
     post:
       tags:
