@@ -425,7 +425,7 @@ components:
           example: W3C
         partyCode:
           type: string
-          maxLength: 100
+          maxLength: 150
           description: |
             Code to identify the party as provided by the code list provider
           example: MSK
@@ -570,27 +570,31 @@ components:
           type: integer
           format: int32
           minimum: 0
-          description: The requested number of copies of the Transport document to be issued by the carrier including charges. Only applicable for physical (paper) documents
+          description: The requested number of copies of the `Transport Document` to be issued by the carrier including charges.
           example: 2
         numberOfCopiesWithoutCharges:
           type: integer
           format: int32
           minimum: 0
-          description: The requested number of copies of the Transport document to be issued by the carrier **NOT** including charges. Only applicable for physical (paper) documents
+          description: The requested number of copies of the `Transport Document` to be issued by the carrier **NOT** including charges.
           example: 2
         numberOfOriginalsWithCharges:
           type: integer
           format: int32
           minimum: 0
           description: |
-            Number of originals of the bill of lading that has been requested by the customer with charges. Only applicable for physical documents.
+            Number of originals of the Bill of Lading that has been requested by the customer with charges.
+                    
+            **Condition:** Only applicable if `transportDocumentType` = `BOL` (Bill of Lading). If `isElectronic = 'True'`, accepted value is `1` (one) or `0` (zero)
           example: 1
         numberOfOriginalsWithoutCharges:
           type: integer
           format: int32
           minimum: 0
           description: |
-            Number of originals of the bill of lading that has been requested by the customer without charges. Only applicable for physical documents.
+            Number of originals of the Bill of Lading that has been requested by the customer without charges.
+                    
+            **Condition:** Only applicable if `transportDocumentType` = `BOL` (Bill of Lading). If `isElectronic = 'True'`, accepted value is `1` (one) or `0` (zero)
           example: 1
         displayedNameForPlaceOfReceipt:
           description: |
@@ -646,6 +650,13 @@ components:
 
             Exactly one of `shippedOnBoard` and `receiveForShipmentDate` must be provided on an issued B/L.
           example: '2020-12-12'
+        displayedShippedOnBoardReceivedForShipment:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 250
+          description: |
+            The text to be displayed on the `Transport Document` as evidence that the goods have been received for shipment or shipped on board.
+          example: 'Received for Shipment CMA CGM CONCORDE 28-Jul-2022 CMA CGM Agences France SAS As agents for the Carrier'
         termsAndConditions:
           type: string
           maxLength: 50000
@@ -1852,7 +1863,7 @@ components:
         shippingMarks:
           type: array
           description: |
-            A list of the `ShippingMarks` applicable to this `consignmentItem`
+            A list of the `ShippingMarks` applicable to this `UtilizedTransportEquipment`
           items:
             type: string
             maxLength: 500
@@ -1949,11 +1960,13 @@ components:
         source:
           type: string
           description: |
-            The source of the seal, namely who has affixed the seal. This attribute links to the Seal Source ID defined in the Seal Source reference data entity.
+            The source of the seal, namely who has affixed the seal.
             - `CAR` (Carrier)
             - `SHI` (Shipper)
             - `VET` (Veterinary)
             - `CUS` (Customs)
+
+            **Condition:** Seal source may be required depending on the type of commodity being shipped.
           enum:
             - CAR
             - SHI
@@ -2664,7 +2677,6 @@ components:
           $ref: '#/components/schemas/PartyAddress'
         displayedAddress:
           type: array
-          minItems: 1
           maxItems: 999
           description: |
             The address of the party to be displayed on the `Transport Document`. The displayed address may be used to match the address provided in the `Letter of Credit`. For physical BL (`isElectronic=false`), it is only allowed to provide max 2 lines of 35 characters. No limit for electronic BL (`isElectronic=true`).
@@ -2728,7 +2740,6 @@ components:
           $ref: '#/components/schemas/PartyAddress'
         displayedAddress:
           type: array
-          minItems: 1
           maxItems: 999
           description: |
             The address of the party to be displayed on the `Transport Document`. The displayed address may be used to match the address provided in the `Letter of Credit`. For physical BL (`isElectronic=false`), it is only allowed to provide max 2 lines of 35 characters. No limit for electronic BL (`isElectronic=true`).
@@ -2792,7 +2803,6 @@ components:
           $ref: '#/components/schemas/PartyAddress'
         displayedAddress:
           type: array
-          minItems: 1
           maxItems: 999
           description: |
             The address of the party to be displayed on the `Transport Document`. The displayed address may be used to match the address provided in the `Letter of Credit`. For physical BL (`isElectronic=false`), it is only allowed to provide max 2 lines of 35 characters. No limit for electronic BL (`isElectronic=true`).
