@@ -28,7 +28,7 @@ info:
 
     Signing up for notifications is defined outside the scope of this API specification.
 
-    **Note:** This endPoint is to be implemented by the consumers of the `Booking API` in order to recieve push events.
+    **Note:** This endPoint is to be implemented by the consumers of the `Booking API` in order to receive push events.
 
     ### Stats API
     The Stats API offers crucial statistical information for both API providers and consumers to enhance their services and helps DCSA to understand and scale the ecosystem. We expect you to invoke the Stats API for every request made to the Booking API. Further details can be found [here](https://labs.dcsa.org/#/http/guides/api-guides/stats-api/introduction)
@@ -485,8 +485,6 @@ paths:
                       - changed values
                       - removed properties
                       - general information
-          
-                      This property is **conditional** on the `bookingStatus='PENDING UPDATE'` (in case the `Booking` has not yet been confirmed) or `bookingStatus='PENDING AMENDMENT'` (in case it is a confirmed `Booking`).
                     items:
                       $ref: '#/components/schemas/Feedback'
                 required:
@@ -1357,7 +1355,7 @@ paths:
         Gets the Booking
       operationId: get-bookings
       description: |
-        Retrieves the `Booking Request` with the `bookingReference`. The path can contain a `carrierBookingRequestReference` or a `carrierBookingReference`. It is recommended to use this endPoint to `GET` data before an update is made to make sure latest version is being updated.
+        Retrieves the `Booking Request` with the `bookingReference`. The path can contain a `carrierBookingRequestReference` or a `carrierBookingReference`. Once the Booking is confirmed - it is **only** possible to use the `carrierBookingReference`. It is recommended to use this endPoint to `GET` data before an update is made to make sure latest version is being updated.
 
         The default payload when calling this endPoint is the "original" `Booking`. It is also possible to get the latest amendment to a `Booking` called the `Amended Booking`. In order to get the `Amended Booking`, it is necessary to use the query parameter `amendedContent` and set it to `true`.
 
@@ -1746,10 +1744,12 @@ paths:
       tags:
         - Booking
       summary: |
-        Cancels the Booking or cancels a Booking Amendment
+        Cancels the Booking or cancels an Amendment
       operationId: cancel-booking
       description: |
-        A shipper initiated cancellation of the `Booking` or `Booking Amendment`. This endPoint corresponds with **UseCase 11 - Cancel Booking by shipper** or **UseCase 9 - Cancel amendment to confirmed Booking**.
+        A shipper initiated cancellation of the `Booking` or `Booking Amendment` with the `bookingReference`. The path can contain a `carrierBookingRequestReference` or a `carrierBookingReference`. Once the `Booking` is confirmed - it is **only** possible to use the `carrierBookingReference`.
+
+        This endPoint corresponds with **UseCase 11 - Cancel Booking Request by shipper**, **UseCase 9 - Cancel amendment to confirmed Booking** or **UseCase 13 - Cancel confirmed Booking by shipper**.
 
         ## Precondition
         In order to cancel a `Booking`, the `bookingStatus` must be either
@@ -1776,31 +1776,21 @@ paths:
            - all required properties are provided.
            - all values provided have correct data type.
         3. Depending on the paylod of the request - either:
-           - the entire `Booking` is cancelled (including any ongoing amendment). This is the case when the payload contains `bookingStatus='CANCELLED'`.
+           - the `Booking Request` is cancelled. This is the case when the payload contains `bookingStatus='CANCELLED'`. It is only possible to use this payload in combination with `carrierBookingRequestReference` being used in the path (as the `bookingReference`)
            
-             When cancelling a `Booking` the `amendedBookingStatus` is set to `AMENDMENT CANCELLED`
-
              A `200` (OK) response is returned with the following payload:
              ```
              {
-               carrierBookingReference: 'cbr-987',
-               carrierBookingRequestReference: 'cbrr-123',
-               bookingStatus: 'CANCELLED',
-               amendedBookingStatus: 'AMENDMENT CANCELLED'
-             }
-             ```
-             or
-             ```
-             {
-               carrierBookingReference: 'cbr-987',
                carrierBookingRequestReference: 'cbrr-123',
                bookingStatus: 'CANCELLED'
              }
              ```
-             if there is no ongoing amendment.
+
+             **If** the `Booking` is confirmed a `409` (Conflict) should be used as a response
+
            - only the amendment to the `Booking` is cancelled (in this case the `Booking` continues and `bookingStatus` stays unchanged). This is the case when the payload contains `amendedBookingStatus='AMENDMENT CANCELLED'`.
              
-             **If** no amendment is being requested prior to this call (`amendedBookingStatus` is **not** `AMENDMENT RECIEVED`) then a `404` (Not Found) is returned
+             **If** no amendment is being requested prior to this call (`amendedBookingStatus` is **not** `AMENDMENT RECEIVED`) then a `404` (Not Found) is returned
 
              A `200` (OK) response is returned with the following payload:
              ```
@@ -1811,6 +1801,43 @@ paths:
                amendedBookingStatus: 'AMENDMENT CANCELLED'
              }
              ```
+             or
+             ```
+             {
+               carrierBookingReference: 'cbr-987',
+               carrierBookingRequestReference: 'cbrr-123',
+               bookingStatus: 'CONFIRMED',
+               amendedBookingStatus: 'AMENDMENT CANCELLED'
+             }
+             ```
+             if the amendment was not requested by the provider.
+           - the confirmed `Booking` is requesting to be cancelled. This is the case when the payload contains `bookingCancellationStatus='CANCELLATION RECEIVED'`. It is only possible to use this payload in combination with `carrierBookingReference` being used in the path (as the `bookingReference`)
+           
+             A `200` (OK) response is returned with the following payload:
+             ```
+             {
+               carrierBookingReference: 'cbr-987',
+               carrierBookingRequestReference: 'cbrr-123',
+               bookingStatus: 'CONFIRMED',
+               bookingCancellationStatus: 'CANCELLATION RECEIVED'
+             }
+             ```
+             or
+             ```
+             {
+               carrierBookingReference: 'cbr-987',
+               carrierBookingRequestReference: 'cbrr-123',
+               bookingStatus: 'CONFIRMED',
+               amendedBookingStatus: 'AMENDMENT RECEIVED',
+               bookingCancellationStatus: 'CANCELLATION RECEIVED'
+             }
+             ```
+             in case an ongoing amendment is being processed.
+
+             When cancelling a Confirmed Booking - the amendment will also be Cancelled in case the cancellation is confirmed.
+
+             **If** the `Booking` is **not** yet confirmed a `409` (Conflict) should be used as a response
+
         4. All '_relevant_' subscribers will be notified via a [Booking Notification](#/BookingNotification).
 
         ## Flow for a `202` (Accepted) response
@@ -1823,7 +1850,7 @@ paths:
            - all values provided have correct data type.
         3. An empty response is returned and the consumer now awaits further processing by the provider.
         
-        Once processed, the `Booking` or `Amended Booking` is cancelled and a [Booking Notification](#/BookingNotification) is sent.
+        Once processed, the `Booking` or `Amended Booking` is cancelled and a [Booking Notification](#/BookingNotification) is sent. In case of a Confirmed Booking - the provider has the opportunity to decline the Cancellation of the Booking (in which case the `bookingCancellationStatus='CANCELLATION DECLINED'`).
       parameters:
         - $ref: '#/components/parameters/bookingReferencePathParam'
         - $ref: '#/components/parameters/Api-Version-Major'
@@ -1834,33 +1861,50 @@ paths:
               type: object
               oneOf:
                 - type: object
-                  title: Cancel entire Booking
+                  title: Cancel Booking Request (prior to Booking Confirmation)
                   properties:
                     bookingStatus:
                       type: string
                       maxLength: 50
                       description: |
-                        Setting the `bookingStatus` to `CANCELLED` cancels the entire `Booking` (also any ongoing amendment requests). The `Booking` will discontinue if the request is accepted by the provider.
+                        Setting the `bookingStatus` to `CANCELLED` cancels the `Booking Request` (only possible **before** it is `CONFIRMED` and using this property is only possible in combination with the `bookingReference` path-property being the `carrierBookingRequestReference`). The `Booking Request` will discontinue if the request is accepted by the provider.
+
+                        **Conditional:** It is a precondition that the `bookingStatus` **is NOT** `CONFIRMED` or `PENDING AMENDMENT` in order to cancel it. If this is not the case a `409` (Conflict) error response should be returned.
 
                         Only possible value to set is `CANCELLED`.
                       example: CANCELLED
                   required:
                     - bookingStatus
                 - type: object
-                  title: Only cancel the amendment to a Booking
+                  title: Only cancel the amendment to a Confirmed Booking
                   properties:
                     amendedBookingStatus:
                       type: string
                       maxLength: 50
                       description: |
-                        Setting the `amendedBookingStatus` to `AMENDMENT CANCELLED` **only** cancels the amendment to the `Booking`. 
+                        Setting the `amendedBookingStatus` to `AMENDMENT CANCELLED` **only** cancels the amendment to a confirmed `Booking`. This is only possible in combination with the `bookingReference` path-property being the `carrierBookingReference`.
 
-                        It is a precondition that the `amendedBookingStatus` **is** `AMENDMENT RECEIVED` in order to cancel it. If this is not the case a `404` (Not Found) error response should be returned.
+                        **Conditional:** It is a precondition that the `amendedBookingStatus` **is** `AMENDMENT RECEIVED` in order to cancel it. If this is not the case a `404` (Not Found) error response should be returned.
 
                         Only possible value to set is `AMENDMENT CANCELLED`.
                       example: AMENDMENT CANCELLED
                   required:
                     - amendedBookingStatus
+                - type: object
+                  title: Request to cancel a Confirmed Booking
+                  properties:
+                    bookingCancellationStatus:
+                      type: string
+                      maxLength: 50
+                      description: |
+                        Setting the `bookingCancellationStatus` to `CANCELLATION RECEIVED` is a request to cancel a confirmed Booking (only possible **after** it is `CONFIRMED` and using this property is only possible in combination with the `bookingReference` path-property being the `carrierBookingReference`). Upon recieving this request the provider will check if it is possible to cancel the confirmed booking. Further processing is needed by the provider.
+
+                        **Conditional:** It is a precondition that the `bookingStatus` **is** `CONFIRMED` or `PENDING AMENDMENT` in order to cancel it. If this is not the case a `409` (Conflict) error response should be returned.
+
+                        Only possible value to set is `CANCELLATION RECEIVED`.
+                      example: CANCELLATION RECEIVED
+                  required:
+                    - bookingCancellationStatus
               properties:
                 reason:
                   type: string
@@ -1871,9 +1915,9 @@ paths:
             examples:
               bookingCancelledExample:
                 summary: |
-                  Entire Booking cancelled
+                  Booking Request cancelled
                 description: |
-                  The consumer wants to cancel the entire `Booking`. This is done by setting the `bookingStatus` to `CANCELLED` and provide an optional `reason`.
+                  The consumer wants to cancel the `Booking Request`. This is done by setting the `bookingStatus` to `CANCELLED` and provide an optional `reason`.
                 value:
                   bookingStatus: CANCELLED
                   reason: Customer cancelled order
@@ -1881,9 +1925,17 @@ paths:
                 summary: |
                   Amendment cancelled
                 description: |
-                  The consumer wants to **only** cancel the amendment (and keep the `Booking`). This is done by setting the `amendedBookingStatus` to `AMENDMENT CANCELLED`.
+                  The consumer wants to **only** cancel the amendment (and keep the confirmed `Booking`). This is done by setting the `amendedBookingStatus` to `AMENDMENT CANCELLED`.
                 value:
                   amendedBookingStatus: AMENDMENT CANCELLED
+              requestConfirmedBookingCancelledExample:
+                summary: |
+                  Request to cancel a Confirmed Booking
+                description: |
+                  The consumer requests to cancel a `Confirmed Booking`. This is done by setting the `bookingCancellationStatus` to `CANCELLATION RECEIVED` and provide an optional `reason`.
+                value:
+                  bookingCancellationStatus: CANCELLATION RECEIVED
+                  reason: Customer cancelled order
       responses:
         '200':
           description: |
@@ -1894,18 +1946,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BookingRefCancelledStatus'
+                $ref: '#/components/schemas/BookingRefStatus'
               examples:
-                bookingCancelledExample:
+                bookingRequestCancelledExample:
                   summary: |
                     Entire Booking cancelled
                   description: |
-                    The consumer has requested that the entire `Booking` should be cancelled. `bookingStatus` is set to `CANCELLED` and `amendedBookingStatus` is set to `AMENDMENT CANCELLED`.
+                    The consumer has requested that the `Booking Request` should be cancelled. `bookingStatus` is set to `CANCELLED`.
                   value:
                     carrierBookingRequestReference: cbrr-123
-                    carrierBookingReference: cbr-987
                     bookingStatus: CANCELLED
-                    amendedBookingStatus: AMENDMENT CANCELLED
                 amendmentCancelled1Example:
                   summary: |
                     Amendment cancelled on a confirmed Booking
@@ -1926,9 +1976,20 @@ paths:
                     carrierBookingReference: cbr-987
                     bookingStatus: PENDING AMENDMENT
                     amendedBookingStatus: AMENDMENT CANCELLED
+                requestConfirmedBookingCancellationExample:
+                  summary: |
+                    Request to Cancel a Confirmed Booking
+                  description: |
+                    The consumer has requested that a confirmed `Booking` is to be cancelled. The status of the `Booking` stays as is (in the below payload this is `PENDING AMENDMENT`. The `amendedBookingStatus` stays as is (in the below payload this is `AMENDMENT CONFIRMED`.
+                  value:
+                    carrierBookingRequestReference: cbrr-123
+                    carrierBookingReference: cbr-987
+                    bookingStatus: PENDING AMENDMENT
+                    amendedBookingStatus: AMENDMENT CONFIRMED
+                    bookingCancellationStatus: CANCELLATION RECEIVED
         '202':
           description: |
-            Booking has been cancelled
+            Booking cancellation has been accepted
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -1937,15 +1998,21 @@ paths:
               examples:
                 bookingCancelledExample:
                   summary: |
-                    Entire Booking cancelled
+                    Booking Request cancelled
                   description: |
-                    The consumer has requested that the entire `Booking` should be cancelled. The cancellation has been accepted and is now awaiting further processing by the provider
+                    The consumer has requested that the `Booking Request` should be cancelled. The cancellation has been accepted and is now awaiting further processing by the provider
                   value:
                 amendmentCancelledExample:
                   summary: |
-                    Amendment cancelled on a confirmed Booking
+                    Amendment cancellation on a confirmed Booking accepted
                   description: |
                     The consumer has requested that the amendment to a confirmed `Booking` is to be cancelled. The cancellation has been accepted and is now awaiting further processing by the provider
+                  value:
+                confirmedBookingCancellationExample:
+                  summary: |
+                    Request to Cancel a confirmed Booking accepted
+                  description: |
+                    The consumer has requested to cancel a confirmed `Booking`. The cancellation has been accepted and is now awaiting further processing by the provider
                   value:
         '400':
           description: |
@@ -2043,7 +2110,7 @@ paths:
                         errorCodeMessage: No amended booking available
         '409':
           description: |
-            In case the provider is processing a `Booking request` - it is possible for the provider to reject the cancellation by returning a `409` (Conflict)
+            In case the provider is processing a `Booking request` - it is possible for the provider to reject the cancellation by returning a `409` (Conflict). This is also to be used in case a cancellation to a Confirmed Booking is done via the `carrierBookingRequestReference`.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -2272,7 +2339,10 @@ paths:
                     amendedBookingStatus: AMENDMENT DECLINED
                     carrierBookingRequestReference: 24595eb0-5cfc-4381-9c3a-cedc1975e9aa
                     carrierBookingReference: ABC709951
-                    reason: Declined because of no equipment availability
+                    feedbacks:
+                      - severity: INFO
+                        code: INFORMATIONAL_MESSAGE
+                        message: Declined because of no equipment availability
               declinedFullStateTransferExample:
                 summary: |
                   Booking amendment declined (Full State Transfer)
@@ -2291,7 +2361,10 @@ paths:
                     amendedBookingStatus: AMENDMENT DECLINED
                     carrierBookingRequestReference: 24595eb0-5cfc-4381-9c3a-cedc1975e9aa
                     carrierBookingReference: ABC709951
-                    reason: Declined because of no equipment availability
+                    feedbacks:
+                      - severity: INFO
+                        code: INFORMATIONAL_MESSAGE
+                        message: Declined because of no equipment availability
                     booking:
                       carrierBookingRequestReference: 24595eb0-5cfc-4381-9c3a-cedc1975e9aa
                       carrierBookingReference: ABC709951
@@ -2460,6 +2533,25 @@ paths:
                             - commodityType: 'Dry cargo, Freight all kinds'
                               cargoGrossWeight: 36000
                               cargoGrossWeightUnit: KGM
+              cancelConfirmedBookingLightweightExample:
+                summary: |
+                  Confirmed Booking cancelled (Lightweight)
+                description: |
+                  A lightweight notification explaining that a confirmed `Booking` has been cancelled (`bookingCancellationStatus='CANCELLATION CONFIRMED'`)
+                value:
+                  specversion: '1.0'
+                  id: 3cecb101-7a1a-43a4-9d62-e88a131651e2
+                  source: 'https://member.com/'
+                  type: org.dcsa.booking.v2
+                  time: '2018-04-05T17:31:00Z'
+                  datacontenttype: application/json
+                  subscriptionReference: BKG001
+                  data:
+                    bookingStatus: CANCELLED
+                    amendedBookingStatus: AMENDMENT CANCELLED
+                    bookingCancellationStatus: CANCELLATION CONFIRMED
+                    carrierBookingRequestReference: 24595eb0-5cfc-4381-9c3a-cedc1975e9aa
+                    carrierBookingReference: ABC709951
       responses:
         '204':
           description: |
@@ -2718,6 +2810,15 @@ components:
 
                 More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/bookingstatuses.csv).
               example: AMENDMENT RECEIVED
+            bookingCancellationStatus:
+              type: string
+              maxLength: 50
+              description: |
+                The status of the latest booking cancellation. If no cancellation has been requested - then this property is empty. Possible values are:
+                - `CANCELLATION RECEIVED` (A request to cancel a Confirmed Booking has been received and is awaiting to be processed)
+                - `CANCELLATION DECLINED` (Cancellation of the Confirmed Booking has been declined by provider)
+                - `CANCELLATION CONFIRMED` (Cancellation of the Confirmed Booking has been confirmed by provider)
+              example: CANCELLATION RECEIVED
             carrierBookingRequestReference:
               type: string
               pattern: ^\S(?:.*\S)?$
@@ -2736,12 +2837,16 @@ components:
 
                 **Condition:** `carrierBookingRequestReference` and/or `carrierBookingReference` is required to provide
               example: ABC709951
-            reason:
-              type: string
-              maxLength: 5000
+            feedbacks:
+              type: array
               description: |
-                This property can be used to explain `bookingStatus`.
-              example: Rejected because of strike...
+                Feedback that can be provided includes, but is not limited to:
+                - unsupported properties
+                - changed values
+                - removed properties
+                - general information
+              items:
+                $ref: '#/components/schemas/Feedback'
             booking:
               type: object
               title: Booking
@@ -2793,6 +2898,15 @@ components:
                     - `AMENDMENT DECLINED` (Amendment discontinued by provider)
                     - `AMENDMENT CANCELLED` (Amendment discontinued by consumer)
                   example: AMENDMENT RECEIVED
+                bookingCancellationStatus:
+                  type: string
+                  maxLength: 50
+                  description: |
+                    The status of the latest booking cancellation. If no cancellation has been requested - then this property is empty. Possible values are:
+                    - `CANCELLATION RECEIVED` (A request to cancel a Confirmed Booking has been received and is awaiting to be processed)
+                    - `CANCELLATION DECLINED` (Cancellation of the Confirmed Booking has been declined by provider)
+                    - `CANCELLATION CONFIRMED` (Cancellation of the Confirmed Booking has been confirmed by provider)
+                  example: CANCELLATION RECEIVED
                 receiptTypeAtOrigin:
                   type: string
                   maxLength: 3
@@ -3338,16 +3452,8 @@ components:
                     - changed values
                     - removed properties
                     - general information
-
-                    This property is **conditional** on the `bookingStatus='PENDING UPDATE'` (in case the `Booking` has not yet been confirmed) or `bookingStatus='PENDING AMENDMENT'` (in case it is a confirmed `Booking`).
                   items:
                     $ref: '#/components/schemas/Feedback'
-                reason:
-                  type: string
-                  maxLength: 5000
-                  description: |
-                    This field can be used to explain `bookingStatus` and/or `amendedBookingStatus`.
-                  example: Rejected because of strike...
               required:
                 - bookingStatus
                 - receiptTypeAtOrigin
@@ -3415,6 +3521,15 @@ components:
                     - `AMENDMENT DECLINED` (Amendment discontinued by provider)
                     - `AMENDMENT CANCELLED` (Amendment discontinued by consumer)
                   example: AMENDMENT RECEIVED
+                bookingCancellationStatus:
+                  type: string
+                  maxLength: 50
+                  description: |
+                    The status of the latest booking cancellation. If no cancellation has been requested - then this property is empty. Possible values are:
+                    - `CANCELLATION RECEIVED` (A request to cancel a Confirmed Booking has been received and is awaiting to be processed)
+                    - `CANCELLATION DECLINED` (Cancellation of the Confirmed Booking has been declined by provider)
+                    - `CANCELLATION CONFIRMED` (Cancellation of the Confirmed Booking has been confirmed by provider)
+                  example: CANCELLATION RECEIVED
                 receiptTypeAtOrigin:
                   type: string
                   maxLength: 3
@@ -3960,16 +4075,8 @@ components:
                     - changed values
                     - removed properties
                     - general information
-
-                    This property is **conditional** on the `bookingStatus='PENDING UPDATE'` (in case the `Booking` has not yet been confirmed) or `bookingStatus='PENDING AMENDMENT'` (in case it is a confirmed `Booking`).
                   items:
                     $ref: '#/components/schemas/Feedback'
-                reason:
-                  type: string
-                  maxLength: 5000
-                  description: |
-                    This field can be used to explain `bookingStatus` and/or `amendedBookingStatus`.
-                  example: Rejected because of strike...
               required:
                 - bookingStatus
                 - receiptTypeAtOrigin
@@ -4032,7 +4139,7 @@ components:
           example: PROPERTY_WILL_BE_IGNORED
         message:
           type: string
-          maxLength: 500
+          maxLength: 5000
           description: |
             A description with additional information.
           example: Spaces not allowed in facility code
@@ -4170,7 +4277,7 @@ components:
           example: invalidData
         errorCodeMessage:
           type: string
-          maxLength: 200
+          maxLength: 5000
           description: |
             A long description corresponding to the `errorCode` with additional information.
           example: Spaces not allowed in facility code
@@ -5377,6 +5484,15 @@ components:
             - `AMENDMENT DECLINED` (Amendment discontinued by provider)
             - `AMENDMENT CANCELLED` (Amendment discontinued by consumer)
           example: AMENDMENT RECEIVED
+        bookingCancellationStatus:
+          type: string
+          maxLength: 50
+          description: |
+            The status of the latest booking cancellation. If no cancellation has been requested - then this property is empty. Possible values are:
+            - `CANCELLATION RECEIVED` (A request to cancel a Confirmed Booking has been received and is awaiting to be processed)
+            - `CANCELLATION DECLINED` (Cancellation of the Confirmed Booking has been declined by provider)
+            - `CANCELLATION CONFIRMED` (Cancellation of the Confirmed Booking has been confirmed by provider)
+          example: CANCELLATION RECEIVED
         receiptTypeAtOrigin:
           type: string
           maxLength: 3
@@ -5922,16 +6038,8 @@ components:
             - changed values
             - removed properties
             - general information
-
-            This property is **conditional** on the `bookingStatus='PENDING UPDATE'` (in case the `Booking` has not yet been confirmed) or `bookingStatus='PENDING AMENDMENT'` (in case it is a confirmed `Booking`).
           items:
             $ref: '#/components/schemas/Feedback'
-        reason:
-          type: string
-          maxLength: 5000
-          description: |
-            This field can be used to explain `bookingStatus` and/or `amendedBookingStatus`.
-          example: Rejected because of strike...
       required:
         - bookingStatus
         - receiptTypeAtOrigin
@@ -5954,7 +6062,7 @@ components:
       type: object
       title: Booking Response
       description: |
-        The `carrierBookingReference` or `carrierBookingRequestReference` along with the `bookingStatus` and a possible list of **requsted changes** or a **reason** is returned.
+        The `carrierBookingReference` or `carrierBookingRequestReference` along with the statuses and a possible list of **Feedbacks**.
 
         **Condition:** `carrierBookingRequestReference` and/or `carrierBookingReference` must be provided
       properties:
@@ -6001,6 +6109,15 @@ components:
             - `AMENDMENT DECLINED` (Amendment discontinued by provider)
             - `AMENDMENT CANCELLED` (Amendment discontinued by consumer)
           example: AMENDMENT RECEIVED
+        bookingCancellationStatus:
+          type: string
+          maxLength: 50
+          description: |
+            The status of the latest booking cancellation. If no cancellation has been requested - then this property is empty. Possible values are:
+            - `CANCELLATION RECEIVED` (A request to cancel a Confirmed Booking has been received and is awaiting to be processed)
+            - `CANCELLATION DECLINED` (Cancellation of the Confirmed Booking has been declined by provider)
+            - `CANCELLATION CONFIRMED` (Cancellation of the Confirmed Booking has been confirmed by provider)
+          example: CANCELLATION RECEIVED
         feedbacks:
           type: array
           description: |
@@ -6009,69 +6126,8 @@ components:
             - changed values
             - removed properties
             - general information
-
-            This property is **conditional** on the `bookingStatus='PENDING UPDATE'` (in case the `Booking` has not yet been confirmed) or `bookingStatus='PENDING AMENDMENT'` (in case it is a confirmed `Booking`).
           items:
             $ref: '#/components/schemas/Feedback'
-        reason:
-          type: string
-          maxLength: 5000
-          description: |
-            This field can be used to explain `bookingStatus` and/or `amendedBookingStatus`.
-          example: Rejected because of strike...
-      required:
-        - bookingStatus
-
-    ###################################
-    # Booking Cancelled Status response
-    ###################################
-    BookingRefCancelledStatus:
-      title: Cancelled Booking Response
-      description: |
-        The `carrierBookingReference` and/or `carrierBookingRequestReference` along with the `bookingStatus`, `amendedBookingStatus` and a possible `reason` is returned.
-
-        **Condition:** `carrierBookingReference` and/or `carrierBookingRequestReference` must be provided
-      type: object
-      properties:
-        carrierBookingRequestReference:
-          type: string
-          pattern: ^\S(?:.*\S)?$
-          maxLength: 100
-          description: |
-            A reference to the booking during the booking request phase.
-
-            **Condition:** `carrierBookingRequestReference` and/or `carrierBookingReference` must be provided
-          example: 24595eb0-5cfc-4381-9c3a-cedc1975e9aa
-        carrierBookingReference:
-          type: string
-          pattern: ^\S(?:.*\S)?$
-          maxLength: 35
-          description: |
-            The `carrierBookingReference` if know. Often this will not be known until the booking has been confirmed. Is available during a booking amendment.
-
-            **Condition:** `carrierBookingRequestReference` and/or `carrierBookingReference` must be provided
-          example: ABC709951
-        bookingStatus:
-          type: string
-          maxLength: 50
-          description: |
-            The status of the `Booking`. It can only be:
-            - `CANCELLED` (in case the entire `Booking` has been cancelled)
-            - `CONFIRMED` (in case the `Booking` is still confirmed)
-            - `PENDING AMENDMENT` (in case the provider is still waithing for an amendment to a `Booking`)
-          example: CANCELLED
-        amendedBookingStatus:
-          type: string
-          maxLength: 50
-          description: |
-            The status of the amended `Booking`. It can only be `AMENDMENT CANCELLED`.
-          example: AMENDMENT CANCELLED
-        reason:
-          type: string
-          maxLength: 5000
-          description: |
-            This field can be used to explain `bookingStatus` and/or `amendedBookingStatus`.
-          example: Rejected because of strike...
       required:
         - bookingStatus
 
