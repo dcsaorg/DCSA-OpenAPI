@@ -1473,6 +1473,15 @@ components:
               $ref: '#/components/schemas/Endorsee'
             carriersAgentAtDestination:
               $ref: '#/components/schemas/CarriersAgentAtDestination'
+            notifyParties:
+              type: array
+              maxItems: 3
+              description: |
+                List of up to 3 `Notify Parties`. The first item in the list is the **First Notify Party** (`N1`), the second item is the **Second Notify Party** (`N2`) and the last item is the **Other Notify Party** (`NI`).
+                
+                **Condition:** Mandatory for To Order BLs, `isToOrder=true`
+              items:
+                $ref: '#/components/schemas/NotifyParty'
             other:
               type: array
               description: A list of document parties that can be optionally provided in the `Shipping Instructions` and `Transport Document`.
@@ -1480,6 +1489,23 @@ components:
                 $ref: '#/components/schemas/OtherDocumentParty'
           required:
             - shipper
+        isConsignmentDeliveredInEU:
+          type: boolean
+          description: |
+            Indicates whether the goods will be delivered in the European Union, Norway, Northern Ireland or Switzerland. This property is relevant for the carrier to determine whether an `ENS` filing submission is required.
+          example: true
+        routingOfConsignmentCountries:
+          type: array
+          description: |
+            A list of countries the goods will be routed through from origin to destination defined by the 2 characters country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+          items:
+            type: string
+            pattern: ^[A-Z]{2}$
+            minLength: 2
+            maxLength: 2
+            description: |
+              The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+            example: NL
         consignmentItems:
           type: array
           minItems: 1
@@ -1874,6 +1900,13 @@ components:
             A list of `National Commodity Codes` that apply to this `cargoItem`
           items:
             $ref: '#/components/schemas/NationalCommodityCode'
+        houseBillOfLadingReference:
+          type: string
+          maxLength: 20
+          pattern: ^\S(?:.*\S)?$
+          description: |
+            Link to the House Bill of Lading this cargoItem is connected to.
+          example: ABC123          
         customsReferences:
           type: array
           description: |
@@ -3024,6 +3057,11 @@ components:
           maxLength: 10
           description: The post code of the party’s address.
           example: 1047 HM
+        PObox:
+          type: string
+          maxLength: 20
+          description: A numbered box at a post office where a person or business can have mail or parcels delivered.
+          example: '123'
         city:
           type: string
           pattern: ^\S(?:.*\S)?$
@@ -3195,6 +3233,11 @@ components:
           description: The post code of the party’s address.
           maxLength: 10
           example: 1047 HM
+        PObox:
+          type: string
+          maxLength: 20
+          description: A numbered box at a post office where a person or business can have mail or parcels delivered.
+          example: '123'
         city:
           type: string
           description: |
@@ -3246,6 +3289,16 @@ components:
           description: |
             Name of the party.
           example: IKEA Denmark
+        typeOfPerson:
+          type: string
+          maxLength: 50
+          pattern: ^\S(?:.*\S)?$
+          description: |
+            Can be one of the following values as per the Union Customs Code art. 5(4):
+            - `NATURAL PERSON` (A person that is an individual living human being)
+            - `LEGAL PERSON` (person (including a human being and public or private organizations) that can perform legal actions, such as own a property, sue and be sued)
+            - `ASSOCIATION OF PERSONS` (Not a legal person, but recognised under Union or national law as having the capacity to perform legal acts)
+          example: 'NATURAL PERSON'
         address:
           $ref: '#/components/schemas/PartyAddress'
         displayedAddress:
@@ -3277,19 +3330,19 @@ components:
             A list of contact details
           items:
             $ref: '#/components/schemas/PartyContactDetail'
-        shippersReference:
+        reference:
           type: string
           pattern: ^\S(?:.*\S)?$
           maxLength: 35
           description: |
             A reference linked to the `Shipper`.
           example: HHL007
-        shippersPurchaseOrderReference:
+        purchaseOrderReference:
           type: string
           pattern: ^\S(?:.*\S)?$
           maxLength: 35
           description: |
-            A reference linked to the `Shipper Purchase Order`.
+            A purchase order reference linked to the `Shipper`.
           example: HHL007
       required:
         - partyName
@@ -3309,6 +3362,16 @@ components:
           description: |
             Name of the party.
           example: IKEA Denmark
+        typeOfPerson:
+          type: string
+          maxLength: 50
+          pattern: ^\S(?:.*\S)?$
+          description: |
+            Can be one of the following values as per the Union Customs Code art. 5(4):
+            - `NATURAL PERSON` (A person that is an individual living human being)
+            - `LEGAL PERSON` (person (including a human being and public or private organizations) that can perform legal actions, such as own a property, sue and be sued)
+            - `ASSOCIATION OF PERSONS` (Not a legal person, but recognised under Union or national law as having the capacity to perform legal acts)
+          example: 'NATURAL PERSON'
         address:
           $ref: '#/components/schemas/PartyAddress'
         displayedAddress:
@@ -3340,19 +3403,19 @@ components:
             A list of contact details
           items:
             $ref: '#/components/schemas/PartyContactDetail'
-        consigneesReference:
+        reference:
           type: string
           pattern: ^\S(?:.*\S)?$
           maxLength: 35
           description: |
             A reference linked to the `Consignee`.
           example: HHL007
-        consigneesPurchaseOrderReference:
+        purchaseOrderReference:
           type: string
           pattern: ^\S(?:.*\S)?$
           maxLength: 35
           description: |
-            A reference linked to the `Consignee Purchase Order`.
+            A rurchase order eference linked to the `Consignee`.
           example: HHL007
       required:
         - partyName
@@ -3431,6 +3494,70 @@ components:
         - partyName
         - address
         - partyContactDetails
+
+    NotifyParty:
+      type: object
+      title: Notify Party
+      description: |
+        The person to be notified when a shipment arrives at its destination.
+      properties:
+        partyName:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 100
+          description: |
+            Name of the party.
+          example: IKEA Denmark
+        typeOfPerson:
+          type: string
+          maxLength: 50
+          pattern: ^\S(?:.*\S)?$
+          description: |
+            Can be one of the following values as per the Union Customs Code art. 5(4):
+            - `NATURAL PERSON` (A person that is an individual living human being)
+            - `LEGAL PERSON` (person (including a human being and public or private organizations) that can perform legal actions, such as own a property, sue and be sued)
+            - `ASSOCIATION OF PERSONS` (Not a legal person, but recognised under Union or national law as having the capacity to perform legal acts)
+          example: 'NATURAL PERSON'
+        address:
+          $ref: '#/components/schemas/PartyAddress'
+        displayedAddress:
+          type: array
+          maxItems: 999
+          description: |
+            The address of the party to be displayed on the `Transport Document`. The displayed address may be used to match the address provided in the `Letter of Credit`. For physical BL (`isElectronic=false`), it is only allowed to provide max 2 lines of 35 characters. No limit for electronic BL (`isElectronic=true`).
+            
+            **Condition:** if provided, the displayed address must be included in the Transport Document.
+          items:
+            type: string
+            maxLength: 35
+            description: |
+              A single address line
+            example: Strawinskylaan 4117
+        identifyingCodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentifyingCode'
+        taxLegalReferences:
+          description: |
+            A list of `Tax References` for a `Party`
+          type: array
+          items:
+            $ref: '#/components/schemas/TaxLegalReference'
+        partyContactDetails:
+          type: array
+          description: |
+            A list of contact details
+          items:
+            $ref: '#/components/schemas/PartyContactDetail'
+        reference:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 35
+          description: |
+            A reference linked to the `NotifyParty`.
+          example: HHL007
+      required:
+        - partyName
 
     Party:
       type: object
