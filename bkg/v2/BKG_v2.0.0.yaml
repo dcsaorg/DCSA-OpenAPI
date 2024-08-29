@@ -6959,22 +6959,30 @@ components:
           description: |
             Number of requested equipment units.
           example: 3
-        emptyContainerPositionings:
+        containerPositionings:
           type: array
           description: |
-            Possibility to add multiple `ECP` (Empty Container Positioning) locations. If multiple `ECP` locations are provided, all locations must be within the same city.
+            A list of date and time and locations of the customer facility where the container(s) will be loaded. If multiple Container positioning locations (`CPO`) are provided (multi-stop), the first location is where the empty container will be stuffed first. The order in which the `CPO` locations should be visited is implicitly defined by the shipper based on the date and time provided per location.
             
-            **Conditional:** Only applicable to carrier haulage service at origin (`Receipt type at origin = SD`).
+            **Conditional:** Only applicable to carrier haulage service at origin (`Receipt type at origin = 'SD'`). 
           items:
-            $ref: '#/components/schemas/EmptyContainerPositioning'
-        emptyContainerPickupDateTime:
-          type: string
-          format: date-time
+            $ref: '#/components/schemas/ContainerPositioning'
+        emptyContainerPickup:
+          type: object
+          title: Empty Container Pickup
           description: |
-            The date and time requested by the shipper for the pick-up of the empty container(s) at the `Empty Container Depot Release Location` (DRL), if provided.
-          example: '2024-07-05T09:03:00-02:00'
-        emptyContainerDepotReleaseLocation:
-          $ref: '#/components/schemas/EmptyContainerDepotReleaseLocation'
+            The date and time and location for the empty container pick-up.
+            
+            **Condition:** Only applicable to merchange haulage service at origin (`Receipt type at origin = 'CY'`).
+          properties:
+            dateTime:
+              type: string
+              format: date-time
+              description: |
+                The date and time for the pick-up of the empty container(s) at the Empty container depot release location, if provided.
+              example: '2024-07-05T09:03:00-02:00'
+            depotReleaseLocation:
+              $ref: '#/components/schemas/EmptyContainerDepotReleaseLocation'
         equipmentReferences:
           description: |
             A list of equipments to be used by the shipper if known at the time of booking
@@ -7048,22 +7056,30 @@ components:
           description: |
             Number of requested equipment units.
           example: 3
-        emptyContainerPositionings:
+        containerPositionings:
           type: array
           description: |
-            Possibility to add multiple `ECP` (Empty Container Positioning) locations. If multiple `ECP` locations are provided, all locations must be within the same city.
+            A list of date and time and locations of the customer facility where the container(s) will be loaded. If multiple Container positioning locations (`CPO`) are provided (multi-stop), the first location is where the empty container will be stuffed first. The order in which the `CPO` locations should be visited is implicitly defined by the shipper based on the date and time provided per location.
             
-            **Conditional:** Only applicable to carrier haulage service at origin (`Receipt type at origin = SD`).
+            **Conditional:** Only applicable to carrier haulage service at origin (`Receipt type at origin = 'SD'`). 
           items:
-            $ref: '#/components/schemas/EmptyContainerPositioning'
-        emptyContainerPickupDateTime:
-          type: string
-          format: date-time
+            $ref: '#/components/schemas/ContainerPositioning'
+        emptyContainerPickup:
+          type: object
+          title: Empty Container Pickup
           description: |
-            The date and time requested by the shipper for the pick-up of the empty container(s) at the `Empty Container Depot Release Location` (DRL), if provided.
-          example: '2024-07-05T09:03:00-02:00'
-        emptyContainerDepotReleaseLocation:
-          $ref: '#/components/schemas/EmptyContainerDepotReleaseLocation'
+            The date and time and location for the empty container pick-up.
+            
+            **Condition:** Only applicable to merchange haulage service at origin (`Receipt type at origin = 'CY'`).
+          properties:
+            dateTime:
+              type: string
+              format: date-time
+              description: |
+                The date and time requested by the shipper for the pick-up of the empty container(s) at the `Empty Container Depot Release Location` (DRL), if provided.
+              example: '2024-07-05T09:03:00-02:00'
+            depotReleaseLocation:
+              $ref: '#/components/schemas/EmptyContainerDepotReleaseLocation'
         equipmentReferences:
           description: |
             A list of equipments to be used by the shipper if known at the time of booking
@@ -7160,52 +7176,50 @@ components:
       required:
         - isShipperOwned
 
-    EmptyContainerPositioning:
+    ContainerPositioning:
       type: object
-      title: Empty Container Positioning
+      title: Container Positioning
       description: |
-        An object to capture the `Empty Container Positioning Location` together with an optional `Empty Container Positioning Date and Time`.
+        An object to capture the `Location` together with an optional `Date and Time`.
       properties:
-        emptyContainerPositioningDateTime:
+        dateTime:
           type: string
           format: date-time
           description: |
-            The date and time requested by the shipper for the positioning of the empty container(s) at the `Empty Container Positioning Location` (ECP), if provided, or the `Place of Receipt` (PRE) if ECP location is not provided.
-            
-            **Conditional:** Only applicable to carrier haulage service at origin (`Receipt type at origin = SD`).
+            The date and time requested by the shipper for the positioning of the container(s) at the Container positioning location (`CPO`), if provided, or the Place of Receipt (`PRE`) if `CPO` location is not provided.
           example: '2024-07-05T09:03:00-02:00'
-        emptyContainerPositioningLocation:
-          $ref: '#/components/schemas/EmptyContainerPositioningLocation'
+        location:
+          $ref: '#/components/schemas/ContainerPositioningLocation'
       required:
-        - emptyContainerPositioningLocation
+        - location
 
-    EmptyContainerPositioningEstimated:
+    ContainerPositioningEstimated:
       type: object
-      title: Empty Container Positioning
+      title: Container Positioning Estimated
       description: |
-        An object to capture the `Empty Container Positioning Location` together with an optional `Empty Container Positioning Date and Time`.
+        An object to capture the `Location` together with an optional `Date and Time`.
       properties:
-        estimatedEmptyContainerPositioningDateTime:
+        dateTime:
           type: string
           format: date-time
           description: |
-            The estimated date and time for the positioning of the empty container(s) at the `Empty Container Positioning Location` (ECP), if provided, or the `Place of Receipt` (PRE) if ECP location is not provided.
+            The estimated date and time for the positioning of the container(s) at the `Container Positioning Location` (CPO), if provided, or the `Place of Receipt` (PRE) if CPO location is not provided.
             
-            **Conditional:** Only applicable to carrier haulage service at origin (`Receipt type at origin = SD`).
+            **Conditional:** Only applicable to carrier haulage service at origin (`Receipt type at origin = 'SD'`).
           example: '2024-07-05T09:03:00-02:00'
-        emptyContainerPositioningLocation:
-          $ref: '#/components/schemas/EmptyContainerPositioningLocation'
+        location:
+          $ref: '#/components/schemas/ContainerPositioningLocation'
       required:
-        - emptyContainerPositioningLocation
-    EmptyContainerPositioningLocation:
+        - location
+    ContainerPositioningLocation:
       type: object
-      title: Empty Container Positioning Location
+      title: Container Positioning Location
       description: |
-        An object to capture the `Empty Container Positioning Location`.
+        An object to capture the `Container Positioning Location`.
 
-        The location of the customer facility where the empty container(s) will be loaded. If multiple `ECP` locations are provided, all locations must be within the same city.
+        The location of the customer facility where the empty container(s) will be loaded.
         
-        **Conditional:** Only applicable to carrier haulage service at origin (`Receipt type at origin = SD`).
+        **Conditional:** Only applicable to carrier haulage service at origin (`Receipt type at origin = 'SD'`).
 
         The location can be specified in **any** of the following ways: `Address`, `Facility`, `UN Location Code` or a `GeoCoordinate`.
       example:
@@ -8116,22 +8130,30 @@ components:
           description: |
             Number of confirmed equipment units
           example: 3
-        emptyContainerPositionings:
+        containerPositionings:
           type: array
           description: |
-            List of `ECP` (Empty Container Positioning) locations.
+            A list of date and time and locations of the customer facility where the container(s) will be loaded. If multiple Container positioning locations (`CPO`) are provided (multi-stop), the first location is where the empty container will be stuffed first. The order in which the `CPO` locations should be visited is implicitly defined by the shipper based on the date and time provided per location (all times are estimated).
             
-            **Conditional:** Only applicable to carrier haulage service at origin (`Receipt type at origin = SD`).
+            **Conditional:** Only applicable to carrier haulage service at origin (`Receipt type at origin = 'SD'`). 
           items:
-            $ref: '#/components/schemas/EmptyContainerPositioningEstimated'
-        emptyContainerPickupDateTime:
-          type: string
-          format: date-time
+            $ref: '#/components/schemas/ContainerPositioningEstimated'
+        emptyContainerPickup:
+          type: object
+          title: Empty Container Pickup
           description: |
-            The date and time for the pick-up of the empty container(s) at the `Empty Container Depot Release Location` (DRL), if provided.
-          example: '2024-07-05T09:03:00-02:00'
-        emptyContainerDepotReleaseLocation:
-          $ref: '#/components/schemas/EmptyContainerDepotReleaseLocation'
+            The date and time and location for the empty container pick-up.
+            
+            **Condition:** Only applicable to merchange haulage service at origin (`Receipt type at origin = 'CY'`).
+          properties:
+            dateTime:
+              type: string
+              format: date-time
+              description: |
+                The date and time for the pick-up of the empty container(s) at the Empty container depot release location, if provided.
+              example: '2024-07-05T09:03:00-02:00'
+            depotReleaseLocation:
+              $ref: '#/components/schemas/EmptyContainerDepotReleaseLocation'
       required:
         - ISOEquipmentCode
         - units
