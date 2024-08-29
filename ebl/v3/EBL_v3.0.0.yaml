@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   version: 3.0.0
-  title: DCSA OpenAPI specification for Electronic Bill of Lading
+  title: DCSA specification for Shipping Instructions and Transport Document
   description: |
     API specification issued by DCSA.org.
 
@@ -919,7 +919,7 @@ paths:
                     advanceManifestFilings:
                       - manifestTypeCode: AFR
                         countryCode: US
-                        advanceManifestFilingsHouseBLPerformedBy: SHIPPER
+                        advanceManifestFilingsHouseBLPerformedBy: SELF
                         selfFilerCode: HHL007
                     feedbacks:
                       - severity: ERROR
@@ -3180,6 +3180,19 @@ components:
                         - `PRE` (Prepaid)
                         - `COL` (Collect)
                       example: PRE
+                methodOfPayment:
+                  type: string
+                  maxLength: 1
+                  description: |
+                    Method used for the payment of prepaid charges. It can be one of the following values: 
+                    - `A` (Cash)
+                    - `B` (Credit Card)
+                    - `C` (Cheque)
+                    - `D` (Other)
+                    - `H` (Electronic funds transfer)
+                    - `Y` (Account holder with carrier)
+                    - `Z` (Not prepaid)
+                  example: A
                 isElectronic:
                   type: boolean
                   description: |
@@ -3384,6 +3397,19 @@ components:
                       $ref: '#/components/schemas/Endorsee'
                     issueTo:
                       $ref: '#/components/schemas/IssueToParty'
+                    seller:
+                      $ref: '#/components/schemas/Seller'
+                    buyer:
+                      $ref: '#/components/schemas/Buyer'
+                    notifyParties:
+                      type: array
+                      maxItems: 3
+                      description: |
+                        List of up to 3 `Notify Parties`. The first item in the list is the **First Notify Party** (`N1`), the second item is the **Second Notify Party** (`N2`) and the last item is the **Other Notify Party** (`NI`).
+                        
+                        **Condition:** Mandatory for To Order BLs, `isToOrder=true`
+                      items:
+                        $ref: '#/components/schemas/NotifyParty'
                     other:
                       type: array
                       description: A list of document parties that can be optionally provided in the `Shipping Instructions` and `Transport Document`.
@@ -3391,6 +3417,18 @@ components:
                         $ref: '#/components/schemas/OtherDocumentParty'
                   required:
                     - shipper
+                routingOfConsignmentCountries:
+                  type: array
+                  description: |
+                    A list of countries the goods will be routed through from origin to destination defined by the 2 characters country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+                  items:
+                    type: string
+                    pattern: ^[A-Z]{2}$
+                    minLength: 2
+                    maxLength: 2
+                    description: |
+                      The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+                    example: NL
                 consignmentItems:
                   type: array
                   minItems: 1
@@ -3423,6 +3461,17 @@ components:
                     A list of `Advance Manifest Filings` specified by the Shipper to indicate whom is to do the Filing
                   items:
                     $ref: '#/components/schemas/AdvanceManifestFiling'
+                isHBLIssued:
+                  type: boolean
+                  description: |
+                    Indicates whether one or more `House Bill of Lading(s)` have been issued. This property is used by the carrier to identify which `ENS` filing type must be submitted (`F10` or `F11`, `F12` or `F13`) to comply with `ICS2` customs regulations
+                  example: true
+                houseBillOfLadings:
+                  type: array
+                  description: |
+                    A list of `House Bill of Ladings` specified by the Shipper.
+                  items:
+                    $ref: '#/components/schemas/HouseBillOfLading'
                 requestedCarrierCertificates:
                   type: array
                   description: |
@@ -3603,6 +3652,19 @@ components:
                         - `PRE` (Prepaid)
                         - `COL` (Collect)
                       example: PRE
+                methodOfPayment:
+                  type: string
+                  maxLength: 1
+                  description: |
+                    Method used for the payment of prepaid charges. It can be one of the following values: 
+                    - `A` (Cash)
+                    - `B` (Credit Card)
+                    - `C` (Cheque)
+                    - `D` (Other)
+                    - `H` (Electronic funds transfer)
+                    - `Y` (Account holder with carrier)
+                    - `Z` (Not prepaid)
+                  example: A
                 isElectronic:
                   type: boolean
                   description: |
@@ -3807,6 +3869,19 @@ components:
                       $ref: '#/components/schemas/Endorsee'
                     issueTo:
                       $ref: '#/components/schemas/IssueToParty'
+                    seller:
+                      $ref: '#/components/schemas/Seller'
+                    buyer:
+                      $ref: '#/components/schemas/Buyer'
+                    notifyParties:
+                      type: array
+                      maxItems: 3
+                      description: |
+                        List of up to 3 `Notify Parties`. The first item in the list is the **First Notify Party** (`N1`), the second item is the **Second Notify Party** (`N2`) and the last item is the **Other Notify Party** (`NI`).
+                        
+                        **Condition:** Mandatory for To Order BLs, `isToOrder=true`
+                      items:
+                        $ref: '#/components/schemas/NotifyParty'
                     other:
                       type: array
                       description: A list of document parties that can be optionally provided in the `Shipping Instructions` and `Transport Document`.
@@ -3814,6 +3889,18 @@ components:
                         $ref: '#/components/schemas/OtherDocumentParty'
                   required:
                     - shipper
+                routingOfConsignmentCountries:
+                  type: array
+                  description: |
+                    A list of countries the goods will be routed through from origin to destination defined by the 2 characters country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+                  items:
+                    type: string
+                    pattern: ^[A-Z]{2}$
+                    minLength: 2
+                    maxLength: 2
+                    description: |
+                      The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+                    example: NL
                 consignmentItems:
                   type: array
                   minItems: 1
@@ -3846,6 +3933,17 @@ components:
                     A list of `Advance Manifest Filings` specified by the Shipper to indicate whom is to do the Filing
                   items:
                     $ref: '#/components/schemas/AdvanceManifestFiling'
+                isHBLIssued:
+                  type: boolean
+                  description: |
+                    Indicates whether one or more `House Bill of Lading(s)` have been issued. This property is used by the carrier to identify which `ENS` filing type must be submitted (`F10` or `F11`, `F12` or `F13`) to comply with `ICS2` customs regulations
+                  example: true
+                houseBillOfLadings:
+                  type: array
+                  description: |
+                    A list of `House Bill of Ladings` specified by the Shipper.
+                  items:
+                    $ref: '#/components/schemas/HouseBillOfLading'
                 requestedCarrierCertificates:
                   type: array
                   description: |
@@ -4278,7 +4376,7 @@ components:
                   description: |
                     The code list provider for the carrier code. Possible values are:
                     - `SMDG` (Ship Message Design Group)
-                    - `NMFTA` (National Motor Freight Traffic Association) _includes SPLC (Standard Point Location Code)_
+                    - `NMFTA` (National Motor Freight Traffic Association)
                   enum:
                     - SMDG
                     - NMFTA
@@ -4416,6 +4514,15 @@ components:
                       $ref: '#/components/schemas/Endorsee'
                     carriersAgentAtDestination:
                       $ref: '#/components/schemas/CarriersAgentAtDestination'
+                    notifyParties:
+                      type: array
+                      maxItems: 3
+                      description: |
+                        List of up to 3 `Notify Parties`. The first item in the list is the **First Notify Party** (`N1`), the second item is the **Second Notify Party** (`N2`) and the last item is the **Other Notify Party** (`NI`).
+                        
+                        **Condition:** Mandatory for To Order BLs, `isToOrder=true`
+                      items:
+                        $ref: '#/components/schemas/NotifyParty'
                     other:
                       type: array
                       description: A list of document parties that can be optionally provided in the `Shipping Instructions` and `Transport Document`.
@@ -4423,6 +4530,18 @@ components:
                         $ref: '#/components/schemas/OtherDocumentParty'
                   required:
                     - shipper
+                routingOfConsignmentCountries:
+                  type: array
+                  description: |
+                    A list of countries the goods will be routed through from origin to destination defined by the 2 characters country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+                  items:
+                    type: string
+                    pattern: ^[A-Z]{2}$
+                    minLength: 2
+                    maxLength: 2
+                    description: |
+                      The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+                    example: NL
                 consignmentItems:
                   type: array
                   minItems: 1
@@ -4597,6 +4716,19 @@ components:
                 - `PRE` (Prepaid)
                 - `COL` (Collect)
               example: PRE
+        methodOfPayment:
+          type: string
+          maxLength: 1
+          description: |
+            Method used for the payment of prepaid charges. It can be one of the following values: 
+            - `A` (Cash)
+            - `B` (Credit Card)
+            - `C` (Cheque)
+            - `D` (Other)
+            - `H` (Electronic funds transfer)
+            - `Y` (Account holder with carrier)
+            - `Z` (Not prepaid)
+          example: A
         isElectronic:
           type: boolean
           description: |
@@ -4801,6 +4933,19 @@ components:
               $ref: '#/components/schemas/Endorsee'
             issueTo:
               $ref: '#/components/schemas/IssueToParty'
+            seller:
+              $ref: '#/components/schemas/Seller'
+            buyer:
+              $ref: '#/components/schemas/Buyer'
+            notifyParties:
+              type: array
+              maxItems: 3
+              description: |
+                List of up to 3 `Notify Parties`. The first item in the list is the **First Notify Party** (`N1`), the second item is the **Second Notify Party** (`N2`) and the last item is the **Other Notify Party** (`NI`).
+                
+                **Condition:** Mandatory for To Order BLs, `isToOrder=true`
+              items:
+                $ref: '#/components/schemas/NotifyParty'
             other:
               type: array
               description: A list of document parties that can be optionally provided in the `Shipping Instructions` and `Transport Document`.
@@ -4808,6 +4953,18 @@ components:
                 $ref: '#/components/schemas/OtherDocumentParty'
           required:
             - shipper
+        routingOfConsignmentCountries:
+          type: array
+          description: |
+            A list of countries the goods will be routed through from origin to destination defined by the 2 characters country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+          items:
+            type: string
+            pattern: ^[A-Z]{2}$
+            minLength: 2
+            maxLength: 2
+            description: |
+              The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+            example: NL
         consignmentItems:
           type: array
           minItems: 1
@@ -4840,6 +4997,17 @@ components:
             A list of `Advance Manifest Filings` specified by the Shipper to indicate whom is to do the Filing
           items:
             $ref: '#/components/schemas/AdvanceManifestFiling'
+        isHBLIssued:
+          type: boolean
+          description: |
+            Indicates whether one or more `House Bill of Lading(s)` have been issued. This property is used by the carrier to identify which `ENS` filing type must be submitted (`F10` or `F11`, `F12` or `F13`) to comply with `ICS2` customs regulations
+          example: true
+        houseBillOfLadings:
+          type: array
+          description: |
+            A list of `House Bill of Ladings` specified by the Shipper.
+          items:
+            $ref: '#/components/schemas/HouseBillOfLading'
         requestedCarrierCertificates:
           type: array
           description: |
@@ -4980,6 +5148,19 @@ components:
                 - `PRE` (Prepaid)
                 - `COL` (Collect)
               example: PRE
+        methodOfPayment:
+          type: string
+          maxLength: 1
+          description: |
+            Method used for the payment of prepaid charges. It can be one of the following values: 
+            - `A` (Cash)
+            - `B` (Credit Card)
+            - `C` (Cheque)
+            - `D` (Other)
+            - `H` (Electronic funds transfer)
+            - `Y` (Account holder with carrier)
+            - `Z` (Not prepaid)
+          example: A
         isElectronic:
           type: boolean
           description: |
@@ -5184,6 +5365,19 @@ components:
               $ref: '#/components/schemas/Endorsee'
             issueTo:
               $ref: '#/components/schemas/IssueToParty'
+            seller:
+              $ref: '#/components/schemas/Seller'
+            buyer:
+              $ref: '#/components/schemas/Buyer'
+            notifyParties:
+              type: array
+              maxItems: 3
+              description: |
+                List of up to 3 `Notify Parties`. The first item in the list is the **First Notify Party** (`N1`), the second item is the **Second Notify Party** (`N2`) and the last item is the **Other Notify Party** (`NI`).
+                
+                **Condition:** Mandatory for To Order BLs, `isToOrder=true`
+              items:
+                $ref: '#/components/schemas/NotifyParty'
             other:
               type: array
               description: A list of document parties that can be optionally provided in the `Shipping Instructions` and `Transport Document`.
@@ -5191,6 +5385,18 @@ components:
                 $ref: '#/components/schemas/OtherDocumentParty'
           required:
             - shipper
+        routingOfConsignmentCountries:
+          type: array
+          description: |
+            A list of countries the goods will be routed through from origin to destination defined by the 2 characters country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+          items:
+            type: string
+            pattern: ^[A-Z]{2}$
+            minLength: 2
+            maxLength: 2
+            description: |
+              The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+            example: NL
         consignmentItems:
           type: array
           minItems: 1
@@ -5223,6 +5429,17 @@ components:
             A list of `Advance Manifest Filings` specified by the Shipper to indicate whom is to do the Filing
           items:
             $ref: '#/components/schemas/AdvanceManifestFiling'
+        isHBLIssued:
+          type: boolean
+          description: |
+            Indicates whether one or more `House Bill of Lading(s)` have been issued. This property is used by the carrier to identify which `ENS` filing type must be submitted (`F10` or `F11`, `F12` or `F13`) to comply with `ICS2` customs regulations
+          example: true
+        houseBillOfLadings:
+          type: array
+          description: |
+            A list of `House Bill of Ladings` specified by the Shipper.
+          items:
+            $ref: '#/components/schemas/HouseBillOfLading'
         requestedCarrierCertificates:
           type: array
           description: |
@@ -5390,6 +5607,19 @@ components:
                 - `PRE` (Prepaid)
                 - `COL` (Collect)
               example: PRE
+        methodOfPayment:
+          type: string
+          maxLength: 1
+          description: |
+            Method used for the payment of prepaid charges. It can be one of the following values: 
+            - `A` (Cash)
+            - `B` (Credit Card)
+            - `C` (Cheque)
+            - `D` (Other)
+            - `H` (Electronic funds transfer)
+            - `Y` (Account holder with carrier)
+            - `Z` (Not prepaid)
+          example: A
         isElectronic:
           type: boolean
           description: |
@@ -5594,6 +5824,19 @@ components:
               $ref: '#/components/schemas/Endorsee'
             issueTo:
               $ref: '#/components/schemas/IssueToParty'
+            seller:
+              $ref: '#/components/schemas/Seller'
+            buyer:
+              $ref: '#/components/schemas/Buyer'
+            notifyParties:
+              type: array
+              maxItems: 3
+              description: |
+                List of up to 3 `Notify Parties`. The first item in the list is the **First Notify Party** (`N1`), the second item is the **Second Notify Party** (`N2`) and the last item is the **Other Notify Party** (`NI`).
+                
+                **Condition:** Mandatory for To Order BLs, `isToOrder=true`
+              items:
+                $ref: '#/components/schemas/NotifyParty'
             other:
               type: array
               description: A list of document parties that can be optionally provided in the `Shipping Instructions` and `Transport Document`.
@@ -5601,6 +5844,18 @@ components:
                 $ref: '#/components/schemas/OtherDocumentParty'
           required:
             - shipper
+        routingOfConsignmentCountries:
+          type: array
+          description: |
+            A list of countries the goods will be routed through from origin to destination defined by the 2 characters country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+          items:
+            type: string
+            pattern: ^[A-Z]{2}$
+            minLength: 2
+            maxLength: 2
+            description: |
+              The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+            example: NL
         consignmentItems:
           type: array
           minItems: 1
@@ -5633,6 +5888,17 @@ components:
             A list of `Advance Manifest Filings` specified by the Shipper to indicate whom is to do the Filing
           items:
             $ref: '#/components/schemas/AdvanceManifestFiling'
+        isHBLIssued:
+          type: boolean
+          description: |
+            Indicates whether one or more `House Bill of Lading(s)` have been issued. This property is used by the carrier to identify which `ENS` filing type must be submitted (`F10` or `F11`, `F12` or `F13`) to comply with `ICS2` customs regulations
+          example: true
+        houseBillOfLadings:
+          type: array
+          description: |
+            A list of `House Bill of Ladings` specified by the Shipper.
+          items:
+            $ref: '#/components/schemas/HouseBillOfLading'
         requestedCarrierCertificates:
           type: array
           description: |
@@ -5978,6 +6244,11 @@ components:
           maxLength: 10
           description: The post code of the party’s address.
           example: 1047 HM
+        PObox:
+          type: string
+          maxLength: 20
+          description: A numbered box at a post office where a person or business can have mail or parcels delivered.
+          example: '123'
         city:
           type: string
           pattern: ^\S(?:.*\S)?$
@@ -6114,9 +6385,33 @@ components:
             - `DDS` (Consignee's freight forwarder)
             - `COW` (Invoice payer on behalf of the consignor (shipper))
             - `COX` (Invoice payer on behalf of the consignee)
-            - `N1` (First Notify Party)
-            - `N2` (Second Notify Party)
-            - `NI` (Other Notify Party)
+            - `CSR` (Consolidator)
+            - `MFR` (Manufacturer)
+            - `WHK` (Warehouse Keeper)
+          example: DDS
+      required:
+        - party
+        - partyFunction
+
+    OtherDocumentPartyHBL:
+      type: object
+      title: Other Document Party
+      description: |
+        A list of document parties that can be optionally provided in the `Shipping Instructions` and `Transport Document`.
+      properties:
+        party:
+          $ref: '#/components/schemas/Party'
+        partyFunction:
+          type: string
+          maxLength: 3
+          description: |
+            Specifies the role of the party in a given context. Possible values are:
+
+            - `DDR` (Consignor's freight forwarder)
+            - `DDS` (Consignee's freight forwarder)
+            - `CSR` (Consolidator)
+            - `MFR` (Manufacturer)
+            - `WHK` (Warehouse Keeper)
           example: DDS
       required:
         - party
@@ -6150,6 +6445,11 @@ components:
           description: The post code of the party’s address.
           maxLength: 10
           example: 1047 HM
+        PObox:
+          type: string
+          maxLength: 20
+          description: A numbered box at a post office where a person or business can have mail or parcels delivered.
+          example: '123'
         city:
           type: string
           description: |
@@ -6201,6 +6501,16 @@ components:
           description: |
             Name of the party.
           example: IKEA Denmark
+        typeOfPerson:
+          type: string
+          maxLength: 50
+          pattern: ^\S(?:.*\S)?$
+          description: |
+            Can be one of the following values as per the Union Customs Code art. 5(4):
+            - `NATURAL PERSON` (A person that is an individual living human being)
+            - `LEGAL PERSON` (person (including a human being and public or private organizations) that can perform legal actions, such as own a property, sue and be sued)
+            - `ASSOCIATION OF PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
+          example: 'NATURAL PERSON'
         address:
           $ref: '#/components/schemas/PartyAddress'
         displayedAddress:
@@ -6232,20 +6542,64 @@ components:
             A list of contact details
           items:
             $ref: '#/components/schemas/PartyContactDetail'
-        shippersReference:
+        reference:
           type: string
           pattern: ^\S(?:.*\S)?$
           maxLength: 35
           description: |
             A reference linked to the `Shipper`.
           example: HHL007
-        shippersPurchaseOrderReference:
+        purchaseOrderReference:
           type: string
           pattern: ^\S(?:.*\S)?$
           maxLength: 35
           description: |
-            A reference linked to the `Shipper Purchase Order`.
+            A purchase order reference linked to the `Shipper`.
           example: HHL007
+      required:
+        - partyName
+
+    ShipperHBL:
+      type: object
+      title: Shipper
+      description: |
+        The `Shipper` on the `House Bill of Lading`.
+      properties:
+        partyName:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 100
+          description: |
+            Name of the party.
+          example: IKEA Denmark
+        typeOfPerson:
+          type: string
+          maxLength: 50
+          pattern: ^\S(?:.*\S)?$
+          description: |
+            Can be one of the following values as per the Union Customs Code art. 5(4):
+            - `NATURAL PERSON` (A person that is an individual living human being)
+            - `LEGAL PERSON` (person (including a human being and public or private organizations) that can perform legal actions, such as own a property, sue and be sued)
+            - `ASSOCIATION OF PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
+          example: 'NATURAL PERSON'
+        address:
+          $ref: '#/components/schemas/PartyAddress'
+        identifyingCodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentifyingCode'
+        taxLegalReferences:
+          description: |
+            A list of `Tax References` for a `Party`
+          type: array
+          items:
+            $ref: '#/components/schemas/TaxLegalReference'
+        partyContactDetails:
+          type: array
+          description: |
+            A list of contact details
+          items:
+            $ref: '#/components/schemas/PartyContactDetail'
       required:
         - partyName
 
@@ -6264,6 +6618,16 @@ components:
           description: |
             Name of the party.
           example: IKEA Denmark
+        typeOfPerson:
+          type: string
+          maxLength: 50
+          pattern: ^\S(?:.*\S)?$
+          description: |
+            Can be one of the following values as per the Union Customs Code art. 5(4):
+            - `NATURAL PERSON` (A person that is an individual living human being)
+            - `LEGAL PERSON` (person (including a human being and public or private organizations) that can perform legal actions, such as own a property, sue and be sued)
+            - `ASSOCIATION OF PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
+          example: 'NATURAL PERSON'
         address:
           $ref: '#/components/schemas/PartyAddress'
         displayedAddress:
@@ -6295,20 +6659,64 @@ components:
             A list of contact details
           items:
             $ref: '#/components/schemas/PartyContactDetail'
-        consigneesReference:
+        reference:
           type: string
           pattern: ^\S(?:.*\S)?$
           maxLength: 35
           description: |
             A reference linked to the `Consignee`.
           example: HHL007
-        consigneesPurchaseOrderReference:
+        purchaseOrderReference:
           type: string
           pattern: ^\S(?:.*\S)?$
           maxLength: 35
           description: |
-            A reference linked to the `Consignee Purchase Order`.
+            A purchase order reference linked to the `Consignee`.
           example: HHL007
+      required:
+        - partyName
+
+    ConsigneeHBL:
+      type: object
+      title: Consignee
+      description: |
+        The ultimate recipient of the cargo. It must be different from the freight forwarder, (de)consolidator, postal operator, or customs agent.
+      properties:
+        partyName:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 100
+          description: |
+            Name of the party.
+          example: IKEA Denmark
+        typeOfPerson:
+          type: string
+          maxLength: 50
+          pattern: ^\S(?:.*\S)?$
+          description: |
+            Can be one of the following values as per the Union Customs Code art. 5(4):
+            - `NATURAL PERSON` (A person that is an individual living human being)
+            - `LEGAL PERSON` (person (including a human being and public or private organizations) that can perform legal actions, such as own a property, sue and be sued)
+            - `ASSOCIATION OF PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
+          example: 'NATURAL PERSON'
+        address:
+          $ref: '#/components/schemas/PartyAddress'
+        identifyingCodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentifyingCode'
+        taxLegalReferences:
+          description: |
+            A list of `Tax References` for a `Party`
+          type: array
+          items:
+            $ref: '#/components/schemas/TaxLegalReference'
+        partyContactDetails:
+          type: array
+          description: |
+            A list of contact details
+          items:
+            $ref: '#/components/schemas/PartyContactDetail'
       required:
         - partyName
 
@@ -6435,6 +6843,190 @@ components:
       required:
         - partyName
         - sendToPlatform
+
+    NotifyParty:
+      type: object
+      title: Notify Party
+      description: |
+        The person to be notified when a shipment arrives at its destination.
+      properties:
+        partyName:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 100
+          description: |
+            Name of the party.
+          example: IKEA Denmark
+        typeOfPerson:
+          type: string
+          maxLength: 50
+          pattern: ^\S(?:.*\S)?$
+          description: |
+            Can be one of the following values as per the Union Customs Code art. 5(4):
+            - `NATURAL PERSON` (A person that is an individual living human being)
+            - `LEGAL PERSON` (person (including a human being and public or private organizations) that can perform legal actions, such as own a property, sue and be sued)
+            - `ASSOCIATION OF PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
+          example: 'NATURAL PERSON'
+        address:
+          $ref: '#/components/schemas/PartyAddress'
+        displayedAddress:
+          type: array
+          maxItems: 999
+          description: |
+            The address of the party to be displayed on the `Transport Document`. The displayed address may be used to match the address provided in the `Letter of Credit`. For physical BL (`isElectronic=false`), it is only allowed to provide max 2 lines of 35 characters. No limit for electronic BL (`isElectronic=true`).
+            
+            **Condition:** if provided, the displayed address must be included in the Transport Document.
+          items:
+            type: string
+            maxLength: 35
+            description: |
+              A single address line
+            example: Strawinskylaan 4117
+        identifyingCodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentifyingCode'
+        taxLegalReferences:
+          description: |
+            A list of `Tax References` for a `Party`
+          type: array
+          items:
+            $ref: '#/components/schemas/TaxLegalReference'
+        partyContactDetails:
+          type: array
+          description: |
+            A list of contact details
+          items:
+            $ref: '#/components/schemas/PartyContactDetail'
+        reference:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 35
+          description: |
+            A reference linked to the `NotifyParty`.
+          example: HHL007
+      required:
+        - partyName
+
+    NotifyPartyHBL:
+      type: object
+      title: Notify Party
+      description: |
+        The person to be notified when a shipment arrives at its destination.
+      properties:
+        partyName:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 100
+          description: |
+            Name of the party.
+          example: IKEA Denmark
+        typeOfPerson:
+          type: string
+          maxLength: 50
+          pattern: ^\S(?:.*\S)?$
+          description: |
+            Can be one of the following values as per the Union Customs Code art. 5(4):
+            - `NATURAL PERSON` (A person that is an individual living human being)
+            - `LEGAL PERSON` (person (including a human being and public or private organizations) that can perform legal actions, such as own a property, sue and be sued)
+            - `ASSOCIATION OF PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
+          example: 'NATURAL PERSON'
+        address:
+          $ref: '#/components/schemas/PartyAddress'
+        identifyingCodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentifyingCode'
+        taxLegalReferences:
+          description: |
+            A list of `Tax References` for a `Party`
+          type: array
+          items:
+            $ref: '#/components/schemas/TaxLegalReference'
+        partyContactDetails:
+          type: array
+          description: |
+            A list of contact details
+          items:
+            $ref: '#/components/schemas/PartyContactDetail'
+      required:
+        - partyName
+
+    Seller:
+      type: object
+      title: Seller
+      description: |
+        The seller is the last known entity by whom the goods are sold or agreed to be sold to the buyer. If the goods are to be imported otherwise than in pursuance of a purchase, the details of the owner of the goods shall be provided.
+      properties:
+        partyName:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 100
+          description: |
+            Name of the party.
+          example: IKEA Denmark
+        typeOfPerson:
+          type: string
+          maxLength: 50
+          pattern: ^\S(?:.*\S)?$
+          description: |
+            Can be one of the following values as per the Union Customs Code art. 5(4):
+            - `NATURAL PERSON` (A person that is an individual living human being)
+            - `LEGAL PERSON` (person (including a human being and public or private organizations) that can perform legal actions, such as own a property, sue and be sued)
+            - `ASSOCIATION OF PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
+          example: 'NATURAL PERSON'
+        address:
+          $ref: '#/components/schemas/PartyAddress'
+        identifyingCodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentifyingCode'
+        taxLegalReferences:
+          description: |
+            A list of `Tax References` for a `Party`
+          type: array
+          items:
+            $ref: '#/components/schemas/TaxLegalReference'
+      required:
+        - partyName
+
+    Buyer:
+      type: object
+      title: Buyer
+      description: |
+        The buyer is the last known entity to whom the goods are sold or agreed to be sold. If the goods are to be imported otherwise than in pursuance of a purchase, the details of the owner of the goods shall be provided.
+      properties:
+        partyName:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 100
+          description: |
+            Name of the party.
+          example: IKEA Denmark
+        typeOfPerson:
+          type: string
+          maxLength: 50
+          pattern: ^\S(?:.*\S)?$
+          description: |
+            Can be one of the following values as per the Union Customs Code art. 5(4):
+            - `NATURAL PERSON` (A person that is an individual living human being)
+            - `LEGAL PERSON` (person (including a human being and public or private organizations) that can perform legal actions, such as own a property, sue and be sued)
+            - `ASSOCIATION OF PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
+          example: 'NATURAL PERSON'
+        address:
+          $ref: '#/components/schemas/PartyAddress'
+        identifyingCodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentifyingCode'
+        taxLegalReferences:
+          description: |
+            A list of `Tax References` for a `Party`
+          type: array
+          items:
+            $ref: '#/components/schemas/TaxLegalReference'
+      required:
+        - partyName
 
     Party:
       type: object
@@ -6587,6 +7179,7 @@ components:
             - `DNB` (Dun and Bradstreet)
             - `FMC` (Federal Maritime Commission)
             - `DCSA` (Digital Container Shipping Association)
+            - `EU` (European Union Member State Customs Authority)
             - `ZZZ` (Mutually defined)
           example: W3C
         partyCode:
@@ -6603,6 +7196,7 @@ components:
             - `DID` (Decentralized Identifier) for `codeListProvider` `W3C`
             - `LEI` (Legal Entity Identifier) for `codeListProvider` `GLEIF`
             - `DUNS` (Data Universal Numbering System) for `codeListProvider` `DNB`
+            - `EORI` (Economic Operators Registration and Identification) for codeListProvider `EU`
           example: DID
       required:
         - codeListProvider
@@ -6881,7 +7475,7 @@ components:
             The national commodity classification code, which can be one of the following values defined by DCSA:
             - `NCM` (Nomenclatura Comum do Mercosul)
             - `HTS` (Harmonized Tariff Schedule)
-            - `Schedule B` ( Schedule B)
+            - `SCHEDULE B` ( Schedule B)
             - `TARIC` (Integrated Tariff of the European Communities)
             - `CN` (Combined Nomenclature)
             - `CUS` (Customs Union and Statistics)
@@ -7032,6 +7626,13 @@ components:
             A list of `National Commodity Codes` that apply to this `cargoItem`
           items:
             $ref: '#/components/schemas/NationalCommodityCode'
+        houseBillOfLadingReference:
+          type: string
+          maxLength: 20
+          pattern: ^\S(?:.*\S)?$
+          description: |
+            Link to the House Bill of Lading this cargoItem is connected to.
+          example: ABC123          
         customsReferences:
           type: array
           description: |
@@ -7106,6 +7707,13 @@ components:
             A list of `National Commodity Codes` that apply to this `cargoItem`
           items:
             $ref: '#/components/schemas/NationalCommodityCode'
+        houseBillOfLadingReference:
+          type: string
+          maxLength: 20
+          pattern: ^\S(?:.*\S)?$
+          description: |
+            Link to the House Bill of Lading this cargoItem is connected to.
+          example: ABC123          
         customsReferences:
           type: array
           description: |
@@ -7159,11 +7767,11 @@ components:
           maxLength: 30
           description: |
             Property to clearly indicate if the products, packaging and any other items are made of wood. Possible values include:
-            - `Not Applicable` (if no wood or any other wood product such as packaging and supports are being shipped)
-            - `Not treated and not certified` (if the wood or wooden materials have not been treated nor fumigated and do not include a certificate)
-            - `Processed` (if the wood or wooden materials are entirely made of processed wood, such as plywood, particle board, sliver plates of wood and wood laminate sheets produced using glue, heat, pressure or a combination of these)
-            - `Treated and certified` (if the wood or wooden materials have been treated and/or fumigated and include a certificate)
-          example: Treated and certified
+            - `NOT APPLICABLE` (if no wood or any other wood product such as packaging and supports are being shipped)
+            - `NOT TREATED AND NOT CERTIFIED` (if the wood or wooden materials have not been treated nor fumigated and do not include a certificate)
+            - `PROCESSED` (if the wood or wooden materials are entirely made of processed wood, such as plywood, particle board, sliver plates of wood and wood laminate sheets produced using glue, heat, pressure or a combination of these)
+            - `TREATED AND CERTIFIED` (if the wood or wooden materials have been treated and/or fumigated and include a certificate)
+          example: TREATED AND CERTIFIED
       required:
         - numberOfPackages
         - description
@@ -7212,11 +7820,11 @@ components:
           maxLength: 30
           description: |
             Property to clearly indicate if the products, packaging and any other items are made of wood. Possible values include:
-            - `Not Applicable` (if no wood or any other wood product such as packaging and supports are being shipped)
-            - `Not treated and not certified` (if the wood or wooden materials have not been treated nor fumigated and do not include a certificate)
-            - `Processed` (if the wood or wooden materials are entirely made of processed wood, such as plywood, particle board, sliver plates of wood and wood laminate sheets produced using glue, heat, pressure or a combination of these)
-            - `Treated and certified` (if the wood or wooden materials have been treated and/or fumigated and include a certificate)
-          example: Treated and certified
+            - `NOT APPLICABLE` (if no wood or any other wood product such as packaging and supports are being shipped)
+            - `NOT TREATED AND NOT CERTIFIED` (if the wood or wooden materials have not been treated nor fumigated and do not include a certificate)
+            - `PROCESSED` (if the wood or wooden materials are entirely made of processed wood, such as plywood, particle board, sliver plates of wood and wood laminate sheets produced using glue, heat, pressure or a combination of these)
+            - `TREATED AND CERTIFIED` (if the wood or wooden materials have been treated and/or fumigated and include a certificate)
+          example: TREATED AND CERTIFIED
         dangerousGoods:
           type: array
           description: |
@@ -8077,6 +8685,7 @@ components:
         |ACI|EG|Advance Cargo Information in Egypt|
         |ACE|US|Automated Commercial Environment in the United States|
         |AFR|JP|Cargo Summary Notification (CSN)|
+        |ENS|NL|Entry Summary Declaration|
       properties:
         manifestTypeCode:
           type: string
@@ -8084,7 +8693,7 @@ components:
           maxLength: 50
           description: |
             The Manifest type code as defined by the provider. A list of `manifestTypeCodes` together with `countryCode` is maintained in [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/documentation/reference-data/advancemanifestfilings-v300.csv)
-          example: ACE
+          example: ENS
         countryCode:
           type: string
           pattern: ^[A-Z]{2}$
@@ -8096,18 +8705,18 @@ components:
         advanceManifestFilingsHouseBLPerformedBy:
           type: string
           description: |
-            Indicates whether the shipper (`SHIPPER`) will perform the advance manifest filing(s) for the House BL directly or if the carrier (`CARRIER`) should file them on their behalf. Allowed values are:
+            Indicates whether the shipper (`SELF`) will perform the advance manifest filing(s) for the House BL directly or if the carrier (`CARRIER`) should file them on their behalf. Allowed values are:
 
-            - `SHIPPER` (the shipper does the filing)
+            - `SELF` (filing done by the House filer)
             - `CARRIER` (the carrier does the filing)
 
-            In case of self-filing (`SHIPPER`), the shipper can provide their `selfFilerCode` for each manifest.
+            In case of self-filing (`SELF`), the shipper can provide their `selfFilerCode` for each manifest.
 
-            **Condition:** The `selfFilerCode` must be provided when `manifestTypeCode` is either `ACE` (US) or `ACI` (CA) and the `advanceManifestFilingsHouseBLPerformedBy` is set to `SHIPPER`.
+            **Condition:** The `selfFilerCode` must be provided when `manifestTypeCode` is either `ACE` (US) or `ACI` (CA) and the `advanceManifestFilingsHouseBLPerformedBy` is set to `SELF`.
           enum:
-            - SHIPPER
+            - SELF
             - CARRIER
-          example: SHIPPER
+          example: SELF
         selfFilerCode:
           type: string
           pattern: ^\S(?:.*\S)?$
@@ -8115,17 +8724,167 @@ components:
           description: |
             Code identifying the party who will submit the advance manifest filing(s) for the House BL.
 
-            **Mandatory** if `manifestTypeCode` is either `ACE` (US) or `ACI` (CA) and `advanceManifestFilingsHouseBLPerformedBy` is set to `SHIPPER`.
+            **Mandatory** if `manifestTypeCode` is either `ACE` (US) or `ACI` (CA) and `advanceManifestFilingsHouseBLPerformedBy` is set to `SELF`.
           example: FLXP
+        supplementaryDeclarantEORInumber:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 17
+          description: |
+            The Economic Operators Registration and Identification (EORI) number of the house filer responsible for the `ENS` filing.
+
+            **Conditional:** only applicable if `manifestTypeCode` is `ENS`.
+          example: 'FLXP-123321'
       example:
         manifestTypeCode: ACE
         countryCode: US
-        advanceManifestFilingsHouseBLPerformedBy: SHIPPER
+        advanceManifestFilingsHouseBLPerformedBy: SELF
         selfFilerCode: FLXP123
       required:
         - manifestTypeCode
         - countryCode
         - advanceManifestFilingsHouseBLPerformedBy
+
+    ######################
+    # House Bill of Lading
+    ######################
+
+    HouseBillOfLading:
+      type: object
+      title: House Bill of Lading
+      description: |
+        A legal contract between the Ocean Transport Intermediary (OTI), such as a Non-Vessel Operating Common Carrier (NVOCC) or a freight forwarder, and the shipper that acknowledges the receipt of goods and outlines the terms of shipment.
+      properties:
+        houseBillOfLadingReference:
+          type: string
+          maxLength: 20
+          pattern: ^\S(?:.*\S)?$
+          description: |
+            A unique number allocated by the Ocean Transport Intermediary (OTI) to the `House Bill of Lading`.
+          example: HBOL001
+        isToOrder:
+          type: boolean
+          description: |
+            Indicates whether the `House Bill of Lading` (HBL) is issued `to order` or not. If `true`, `Notify party` at `HBL` level is mandatory
+          example: false
+        placeOfAcceptance:
+          $ref: '#/components/schemas/PlaceOfAcceptance'
+        placeOfFinalDelivery:
+          $ref: '#/components/schemas/PlaceOfFinalDelivery'
+        methodOfPayment:
+          type: string
+          maxLength: 1
+          description: |
+            Method used for the payment of prepaid charges. It can be one of the following values: 
+            - `A` (Cash)
+            - `B` (Credit Card)
+            - `C` (Cheque)
+            - `D` (Other)
+            - `H` (Electronic funds transfer)
+            - `Y` (Account holder with carrier)
+            - `Z` (Not prepaid)
+          example: A
+        documentParties:
+          type: object
+          title: Document Parties
+          description: |
+            All `Parties` with associated roles for this `House Bill of Lading`.
+          properties:
+            shipper:
+              $ref: '#/components/schemas/ShipperHBL'
+            consignee:
+              $ref: '#/components/schemas/ConsigneeHBL'
+            notifyParty:
+              $ref: '#/components/schemas/NotifyPartyHBL'
+            seller:
+              $ref: '#/components/schemas/Seller'
+            buyer:
+              $ref: '#/components/schemas/Buyer'
+            other:
+              type: array
+              description: A list of document parties that can be optionally provided in the `Shipping Instructions` and `Transport Document`.
+              items:
+                $ref: '#/components/schemas/OtherDocumentPartyHBL'
+      required:
+        - houseBillOfLadingReference
+
+    PlaceOfAcceptance:
+      type: object
+      title: Place of Acceptance
+      description: |
+        An object to capture `Place of Acceptance` location specified as: identification of the seaport, freight terminal or other place at which the goods are taken over from the shipper by the Ocean Transport Intermediary (OTI) issuing the `House Bill of Lading`.
+
+        **Condition:** Mandatory if different from `Place of Receipt` at the `Master Transport Document` level.
+
+        The location can be specified in **any** of the following ways: `UN Location Code`, `Facility`, an `Address` or a `GeoCoordinate`.
+      example:
+        locationName: Hamburg
+        UNLocationCode: DEHAM
+      properties:
+        locationName:
+          type: string
+          description: The name of the location.
+          pattern: ^\S(?:.*\S)?$
+          example: Port of Amsterdam
+          maxLength: 100
+        address:
+          $ref: '#/components/schemas/Address'
+        facility:
+          $ref: '#/components/schemas/Facility'
+        UNLocationCode:
+          type: string
+          pattern: ^[A-Z]{2}[A-Z2-9]{3}$
+          minLength: 5
+          maxLength: 5
+          description: |
+            The UN Location code specifying where the place is located. The pattern used must be
+
+            - 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+            - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used
+
+            More info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)
+          example: NLAMS
+        geoCoordinate:
+          $ref: '#/components/schemas/GeoCoordinate'
+
+    PlaceOfFinalDelivery:
+      type: object
+      title: Place of Final Delivery
+      description: |
+        An object to capture `Place of Final Delivery` location specified as: Identification of the seaport, freight terminal or other place at which the goods are handed over from the `Ocean Transport Intermediary` (OTI) issuing the `House Bill of Lading` to the `Consignee`.
+        
+        **Condition:** Mandatory if different from `Place of Delivery` at the `Master Transport Document` level. (**Note:** in case of carrier haulage this will be the same as the `Place of Delivery`)
+
+        The location can be specified in **any** of the following ways: `UN Location Code`, `Facility`, an `Address` or a `GeoCoordinate`.
+      example:
+        locationName: Hamburg
+        UNLocationCode: DEHAM
+      properties:
+        locationName:
+          type: string
+          description: The name of the location.
+          pattern: ^\S(?:.*\S)?$
+          example: Port of Amsterdam
+          maxLength: 100
+        address:
+          $ref: '#/components/schemas/Address'
+        facility:
+          $ref: '#/components/schemas/Facility'
+        UNLocationCode:
+          type: string
+          pattern: ^[A-Z]{2}[A-Z2-9]{3}$
+          minLength: 5
+          maxLength: 5
+          description: |
+            The UN Location code specifying where the place is located. The pattern used must be
+
+            - 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+            - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used
+
+            More info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)
+          example: NLAMS
+        geoCoordinate:
+          $ref: '#/components/schemas/GeoCoordinate'
 
     ################################
     # Requested Carrier Certificates
@@ -8463,7 +9222,7 @@ components:
           description: |
             The code list provider for the carrier code. Possible values are:
             - `SMDG` (Ship Message Design Group)
-            - `NMFTA` (National Motor Freight Traffic Association) _includes SPLC (Standard Point Location Code)_
+            - `NMFTA` (National Motor Freight Traffic Association)
           enum:
             - SMDG
             - NMFTA
@@ -8601,6 +9360,15 @@ components:
               $ref: '#/components/schemas/Endorsee'
             carriersAgentAtDestination:
               $ref: '#/components/schemas/CarriersAgentAtDestination'
+            notifyParties:
+              type: array
+              maxItems: 3
+              description: |
+                List of up to 3 `Notify Parties`. The first item in the list is the **First Notify Party** (`N1`), the second item is the **Second Notify Party** (`N2`) and the last item is the **Other Notify Party** (`NI`).
+                
+                **Condition:** Mandatory for To Order BLs, `isToOrder=true`
+              items:
+                $ref: '#/components/schemas/NotifyParty'
             other:
               type: array
               description: A list of document parties that can be optionally provided in the `Shipping Instructions` and `Transport Document`.
@@ -8608,6 +9376,18 @@ components:
                 $ref: '#/components/schemas/OtherDocumentParty'
           required:
             - shipper
+        routingOfConsignmentCountries:
+          type: array
+          description: |
+            A list of countries the goods will be routed through from origin to destination defined by the 2 characters country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+          items:
+            type: string
+            pattern: ^[A-Z]{2}$
+            minLength: 2
+            maxLength: 2
+            description: |
+              The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+            example: NL
         consignmentItems:
           type: array
           minItems: 1
