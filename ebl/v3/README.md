@@ -23,6 +23,7 @@ Snapshot as of 30 of August 2024 for EBL 3.0.0 Beta.
 - `ICS2` added
 - `IssueToParty` object added
 - `HouseBillOfLading` object added
+- many new parties added
 - `partyName`, `street`, `ContactDetailName` and `city` maxLength modified to be compatible with EDI
 - `Feedback` object inserted as a communication from `Carrier` --> `Shipper`  (no more `reason` proeprty)
 
