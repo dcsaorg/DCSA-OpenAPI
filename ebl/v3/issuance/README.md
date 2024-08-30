@@ -16,10 +16,53 @@ This is a moving target and will be updated as soon as the version is published
 ---
 Snapshot as of 30 of August 2024 for EBL Issuance 3.0.0 Beta.
 ## Key changes
+- `errorCodeMessage` maxLength updated from 200 --> 5000 in `DetailedError` object
+- `partyName` maxLength changed from 100 --> 70 in `IssueToParty` object
+- IdentifyingCode object changes:
+  - `EU` added to the `codeListProvider` values
+  - `EORI` added to `codeListName` values
+  - `partyCode` maxLength changed from 100 --> 150
 - `Transport Document` updated
 
 ## Transport Document changes
-- 
+- `numberOfCopiesWithCharges`, `numberOfCopiesWithoutCharges`, `numberOfOriginalsWithCharges` and `numberOfOriginalsWithoutCharges` descriptions updated (conditions removed)
+- `displayedShippedOnBoardReceivedForShipment` added
+- `carrierCodeListProvider` description for `NMFTA` is updated
+- `issuingParty` moved from root level --> `documentParties`
+- `notifyParties added as a `documentParty` (split from `partryFunctionCode` in "Other Document Parties")
+- `routingOfConsignmentCountries` added
+- `name` maxLength changed from 100 --> 35 in `PartyContactDetail` object
+- `Schedule B` changed to `SCHEDULE B` in type in `NationalCommodityCode` object and a typo was fixed in the description
+- `nationalCommodityCodes` added on `CargoItem` level
+- `woodDeclaration` pseudoEnumn values changed to CAPITALIZATION
+- `isCompetentAuthorityApprovalProvided` renamed to `isCompetentAuthorityApprovalRequired` in Dangerous Goods (DG)
+- `shippingMarks` descrtiption updated
+- `sealSource` description updated (condition added)
+- `Address` and `PartyAddress` objects updates:
+  - `street` maxLength changed from 100 --> 70
+  - `PObox` added as property
+  - `city` maxLength changed from 65 --> 35
+- `partyFunctionCode` values updated (`NofityParty` values removed)
+- `Shipper` object changes:
+  - `partyName` maxLength changed from 100 --> 70
+  - `typeOfPerson` added
+  - `displayedAddress` maxItems changed from 999 --> 6 and a condition has been added for physical BLs
+  - `shippersReference` renamed to `reference`
+  - `shippersPurchaseOrderReference` renamed to `purchaseOrderReference`
+- `Consignee` object changes:
+  - `partyName` maxLength changed from 100 --> 70
+  - `typeOfPerson` added
+  - `displayedAddress` maxItems changed from 999 --> 6 and a condition has been added for physical BLs
+  - `consigneesReference` renamed to `reference`
+  - `consigneesPurchaseOrderReference` renamed to `purchaseOrderReference`
+- `Endorsee` object changes:
+  - `partyName` maxLength changed from 100 --> 70
+  - `displayedAddress` maxItems changed from 999 --> 6 and a condition has been added for physical BLs
+- `CarriersAgentAtDestination` object changes:
+  - `partyName` maxLength changed from 100 --> 70
+- `NotifyParty` object added
+- `Party` and `IssuingParty` objects changes:
+  - `partyName` maxLength changed from 100 --> 70
 
 <a name="v300B20240816"></a>[Release v3.0.0 Beta 20240816 (16 of August 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS/3.0.0-Beta-20240816)
 ---
