@@ -16,7 +16,11 @@ This is a moving target and will be updated as soon as the version is published
 ---
 Snapshot as of 30 of August 2024 for EBL Surrender 3.0.0 Beta.
 ## Key changes
-- 
+- `partyName` maxLength changed from 100 -> 70 in `TransactionParty` object
+- description updated on `codeListProvier` to include **`EU` (European Union Member State Customs Authority)** as a value
+- description updated on `codeListName` to include **`EORI` (Economic Operators Registration and Identification)** as a value
+- `partyCode` maxLength changed from 100 --> 150 in `IdentifyingCode` object
+- `errorCodeMessage` maxLength changed from 200 -> 5000
 
 <a name="v300B20240816"></a>[Release v3.0.0 Beta 20240816 (16 of August 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR/3.0.0-Beta-20240816)
 ---
