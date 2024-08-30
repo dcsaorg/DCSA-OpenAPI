@@ -12,6 +12,12 @@ Publications related to the Bill of Lading Surrender API:
 ---
 This is a moving target and will be updated as soon as the version is published
 
+<a name="v300B20240830"></a>[Release v3.0.0 Beta 20240830 (30 of August 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR/3.0.0-Beta-20240830)
+---
+Snapshot as of 30 of August 2024 for EBL Surrender 3.0.0 Beta.
+## Key changes
+- 
+
 <a name="v300B20240816"></a>[Release v3.0.0 Beta 20240816 (16 of August 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR/3.0.0-Beta-20240816)
 ---
 Snapshot as of 16 of August 2024 for EBL Surrender 3.0.0 Beta.
