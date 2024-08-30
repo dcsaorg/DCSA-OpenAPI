@@ -19,6 +19,7 @@ Snapshot as of 30 of August 2024 for Booking 2.0.0 Beta
 - async Cancellation added
 - renaming and reordering of `"Empty" Container Positionings` in `RequestedEquipment` and `ConfirmedEquipment`
 - `partyName`, `street`, `ContactDetailName` and `city` maxLength modified to be compatible with EDI
+- `Feedback` object inserted as a communication from `Carrier` --> `Shipper`  (no more `reason` proeprty)
 
 ## All changes
 - API endPoint descriptions updated
