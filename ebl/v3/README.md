@@ -19,11 +19,88 @@ This is a moving target and will be updated as soon as the version is published
 ---
 Snapshot as of 30 of August 2024 for EBL 3.0.0 Beta.
 ## Key changes
-- 
+- Semantics for `202` responseCode changed
+- `ICS2` added
+- `IssueToParty` object added
+- `partyName`, `street`, `ContactDetailName` and `city` maxLength modified to be compatible with EDI
+- `Feedback` object inserted as a communication from `Carrier` --> `Shipper`  (no more `reason` proeprty)
 
 ## All changes
-- API description updated
-- 
+- API endPoint descriptions updated
+- API examples updated
+- `409` responseCode added to `GET` ShippingInstructions anbd `PATCH` TransportDocument endPoints
+- `ShippingInstructionsNotification` object updated:
+  - `reason` property replaced with `feedbacks` array
+  - `shippingInstructions` and `updatedShippingInstructions` properties aligned with `ShippingInstructions` object
+- `TransportDocumentNotification` object updated:
+  - `reason` property replaced with `feedbacks` array
+  - `transportDocument` property aligned with `TransportDocument` object
+- `CreateShippingInstructions`, `UpdateShippingInstructions` and `ShippingInstructions` object updated:
+  - `methodOfPayment` added
+  - `numberOfCopiesWithCharges`, `numberOfCopiesWithoutCharges`, `numberOfOriginalsWithCharges` and `numberOfOriginalsWithoutCharges` descriptions updated (conditions removed)
+  - `issueTo`, `seller`, `buyer` and `notifyParties` added to `documentParties`
+  - `routingOfConsignmentCountries` added
+  - `isHBLIssued` and `houseBillOfLadings` properties added
+- `ShippingInstructions` object and `ShippingInstructionsRefStatus` object has `reason` property removed and `feedbacks` description updated to remove the condition
+- `ShippingInstructionsRefCancelStatus` object has `reason` replaced with `feedbacks`
+- `message` maxLength updated from 500 --> 5000 in `Feedback` object
+- `errorCodeMessage` maxLength updated from 200 --> 5000 in `DetailedError` object
+- `partyFunctionCode` in `OtherDocumentParty` has additional values:
+  - `CSR` (Consolidator)
+  - `MFR` (Manufacturer)
+  - `WHK` (Warehouse Keeper)
+- special `Party` objects for `ICS2` created: `OtherDocumentPartyHBL`, `ShipperHBL`, `ConsigneeHBL`, `NotifyPartyHBL`
+- new Party objects added: `IssueToParty`, `NotifyParty`, `Seller` and `Buyer` object added
+- `IssuingParty` object changes:
+  - `partyName` maxLength changed from 100 --> 70
+- `commoditySubreference` is no longer a mandatory property in `ConsignmentItemShipper` object
+- `houseBillOfLadingReference` added to `CargoItem` in the `ShippingInstructions`
+- `AdvanceManifestFiling` object updated
+  - description updated
+  - `advanceManifestFilingsHouseBLPerformedBy` value `SHIPPER` changed to `SELF` (and everywhere `SHIPPER` value is referred, `SELF` is used)
+  - `supplementaryDeclarantEORInumber` added
+- `HouseBillOfLading` object added
+- `PlaceOfAcceptance` object added
+- `PlaceOfFinalDelivery` object added
+- `TransportDocument` object updated:
+  - `numberOfCopiesWithCharges`, `numberOfCopiesWithoutCharges`, `numberOfOriginalsWithCharges` and `numberOfOriginalsWithoutCharges` descriptions updated (conditions removed)
+  - `displayedShippedOnBoardReceivedForShipment` added
+  - `carrierCodeListProvider` description for `NMFTA` is updated
+  - `issuingParty` moved from root level --> `documentParties`
+  - `notifyParties added as a `documentParty` (split from `partryFunctionCode` in "Other Document Parties")
+  - `routingOfConsignmentCountries` added
+- `name` maxLength changed from 100 --> 35 in `PartyContactDetail` object
+- `Schedule B` changed to `SCHEDULE B` in type in `NationalCommodityCode` object and a typo was fixed in the description
+- `nationalCommodityCodes` added on `CargoItem` level
+- `woodDeclaration` pseudoEnumn values changed to CAPITALIZATION
+- `isCompetentAuthorityApprovalProvided` renamed to `isCompetentAuthorityApprovalRequired` in Dangerous Goods (DG)
+- `shippingMarks` descrtiption updated
+- `sealSource` description updated (condition added)
+- `Address` and `PartyAddress` objects updates:
+  - `street` maxLength changed from 100 --> 70
+  - `PObox` added as property
+  - `city` maxLength changed from 65 --> 35
+- `partyFunctionCode` values updated (`NofityParty` values removed)
+- `Shipper` object changes:
+  - `partyName` maxLength changed from 100 --> 70
+  - `typeOfPerson` added
+  - `displayedAddress` maxItems changed from 999 --> 6 and a condition has been added for physical BLs
+  - `shippersReference` renamed to `reference`
+  - `shippersPurchaseOrderReference` renamed to `purchaseOrderReference`
+- `Consignee` object changes:
+  - `partyName` maxLength changed from 100 --> 70
+  - `typeOfPerson` added
+  - `displayedAddress` maxItems changed from 999 --> 6 and a condition has been added for physical BLs
+  - `consigneesReference` renamed to `reference`
+  - `consigneesPurchaseOrderReference` renamed to `purchaseOrderReference`
+- `Endorsee` object changes:
+  - `partyName` maxLength changed from 100 --> 70
+  - `displayedAddress` maxItems changed from 999 --> 6 and a condition has been added for physical BLs
+- `CarriersAgentAtDestination` object changes:
+  - `partyName` maxLength changed from 100 --> 70
+- `NotifyParty` object added
+- `Party` and `IssuingParty` objects changes:
+  - `partyName` maxLength changed from 100 --> 70
 
 <a name="v300B20240816"></a>[Release v3.0.0 Beta 20240816 (16 of August 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.0-Beta-20240816)
 ---
