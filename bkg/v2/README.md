@@ -11,6 +11,16 @@ Publications related to the Booking API:
 ---
 This is a moving target and will be updated as soon as the version is published
 
+<a name="v200B20240830"></a>[Release v2.0.0 Beta 20240830 (30 August 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0-Beta-20240830)
+---
+Snapshot as of 30 of August 2024 for Booking 2.0.0 Beta
+## Key changes
+- 
+
+## All changes
+- API description updated
+- 
+
 <a name="v200B20240816"></a>[Release v2.0.0 Beta 20240816 (16 August 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0-Beta-20240816)
 ---
 Snapshot as of 16 of August 2024 for Booking 2.0.0 Beta
