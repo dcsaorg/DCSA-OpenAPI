@@ -15,11 +15,75 @@ This is a moving target and will be updated as soon as the version is published
 ---
 Snapshot as of 30 of August 2024 for Booking 2.0.0 Beta
 ## Key changes
-- 
+- Semantics for `202` responseCode changed
+- async Cancellation added
+- renaming and reordering of `"Empty" Container Positionings` in `RequestedEquipment` and `ConfirmedEquipment`
+- `partyName`, `street`, `ContactDetailName` and `city` maxLength modified to be compatible with EDI
 
 ## All changes
-- API description updated
-- 
+- API endPoint descriptions updated
+- API endPoint examples updated (`name` removed from `address` objects, `isCompetentAuthorityApprovalProvided` renamed to `isCompetentAuthorityApprovalRequested`)
+- `409` (Conflict) responseCode added to `GET` endPoint
+- `PATCH` endPoint updated to reflect async Booking Cancellation
+- `Booking Notification` updated (_in lightweight Notifications_):
+  - `bookingCancellationStatus` added as property in both lightweight and full Notifications
+  - `feedbacks` property added as an array of `Feedback` objects in both lightweight and full Notifications
+  - `reason` field removed (replaced by `feedbacks`) in both lightweight and full Notifications
+  - `booking` and `amendedBooking` objects (_used for full Notifications_) updated just like `Booking` object below
+- `CreateBooking`, `UpdateBooking` and `Booking` objects updated with:
+  - `carrierCodeListProvider` description for `NMFTA` is updated
+- `Booking` object (only) addtitionally updated with:
+  - `reason` property removed
+  - condition on `feedbacks` removed
+  - `bookingCancellationStatus` added
+- `message` maxLength updated from 500 --> 5000 in `Feedback` object
+- `errorCodeMessage` maxLength updated from 200 --> 5000 in `DetailedError` object
+- `Address` and `PartyAddress` objects updates:
+  - `street` maxLength changed from 100 --> 70
+  - `PObox` added as property
+  - `city` maxLength changed from 65 --> 35
+- `BookingRefStatus` object updated with:
+  - `bookingCancellationStatus` added
+  - condition on `feedbacks` removed
+  - `reason` property removed
+- `BookingRefCancelledStatus` object no longer needed
+- `BookingAgent` object changes:
+  - `partyName` maxLength changed from 100 --> 70
+  - `bookingAgentsReference` renamed to `reference`
+- `Shipper` object changes:
+  - `partyName` maxLength changed from 100 --> 70
+  - `shippersReference` renamed to `reference`
+  - `shippersPurchaseOrderReference` renamed to `purchaseOrderReference`
+- `Consignee` object changes:
+  - `partyName` maxLength changed from 100 --> 70
+  - `consigneesReference` renamed to `reference`
+  - `consigneesPurchaseOrderReference` renamed to `purchaseOrderReference`
+- `ServiceContractOwner` object changes:
+  - `partyName` maxLength changed from 100 --> 70
+  - `werviceContractOwnersReference` renamed to `reference`
+- `CarrierBookingOffice` object changes:
+  - `partyName` maxLength changed from 100 --> 70
+- `Party` object changes:
+  - `partyName` maxLength changed from 100 --> 70
+- `name` maxLength changed from 100 --> 35 in `PartyContactDetail` object
+- `IdentifyingCode` object changes:
+  - `EU` added to the `codeListProvider` values
+  - `EORI` added to `codeListName` values
+  - `partyCode` maxLength changed from 100 --> 150
+- In `RequestedEquipment` (and `RequestedEquipmentShipper`) objects:
+  - `emptyContainerPositionings` has been renamed to `containerPositionings` as only the first position in the list is empty
+  - descriptions for `containerPositionings` updated
+  - `emptyContainerPickupDateTime` and `emptyContainerDepotReleaseLocation` merged into an object with 2 properties: `dateTime` and `depotReleaseLocation`
+- `ContainerPositioning` object has renamed:
+  - `emptyContainerPositioningDateTime` to just `dateTime`
+  - `emptyContainerPositioningLocation` to just `location`
+- same changes as the the `RequestedEquipment` also applies to `ConfirmedEquipment`  with:
+  - `EmptyContainerPositioningEstimated` being called `ContainerPositioningEstimated`
+  - `estimatedEmptyContainerPositioningDateTime` renamed to `estimatedDateTime`
+  - `emptyContainerPositioningLocation` renamed to `location`
+- `Schedule B` changed to `SCHEDULE B` in `type` in `NationalCommodityCode` object and a typo was fixed in the description
+- in Dangerous Goods (DG):
+  - `isCompetentAuthorityApprovalProvided` renamed to `isCompetentAuthorityApprovalRequired`
 
 <a name="v200B20240816"></a>[Release v2.0.0 Beta 20240816 (16 August 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0-Beta-20240816)
 ---
