@@ -652,15 +652,15 @@ paths:
         ## Precondition
         In order to update a `Booking Request`, the status of the `Booking Request` needs to be in state
         - `RECEIVED` in case the consumer has updated information for the `Booking Request`
-        - `PENDING UPDATE` in case the provider has requested the consumer to update the `Booking Request` (a result of **UseCase 2 - Request to update Booking request**)
-        - `UPDATE RECEIVED` in case the consumer has additional changes to an already sent update
-        - `PENDING AMENDMENT` in case the provider has requested the consumer to amend the `Booking Request` (a result of **UseCase 6 - Request to amend confirmed Booking**)
+        - `PENDING_UPDATE` in case the provider has requested the consumer to update the `Booking Request` (a result of **UseCase 2 - Request to update Booking request**)
+        - `UPDATE_RECEIVED` in case the consumer has additional changes to an already sent update
+        - `PENDING_AMENDMENT` in case the provider has requested the consumer to amend the `Booking Request` (a result of **UseCase 6 - Request to amend confirmed Booking**)
         - `CONFIRMED` in case the consumer has an amendment to the `Booking Request`
 
         ## Postcondition
         The provider has received an update (**UseCase 3 - Submit updated Booking request**) or an amendment (**UseCase 7 - Request amendments to confirmed Booking**) to the `Booking Request`.
 
-        In case an amendment was received to the `Booking Request` (**UseCase 7 - Request to amend confirmed Booking**) - the amendment will be called `Amended Booking`. The `Amended Booking` and the "original" `Booking Request` will **co-exist** until a new amendment is submitted by the consumer (via **UseCase 7: Request amendments to confirmed Booking**) or until the provider requests an update (sets the `bookingStatus='PENDING AMENDMENT'` via **UseCase 6: Request to amend confirmed Booking**). If the `amendedBookingStatus` is present it always represents the latest version of an amendment received by the provider.
+        In case an amendment was received to the `Booking Request` (**UseCase 7 - Request to amend confirmed Booking**) - the amendment will be called `Amended Booking`. The `Amended Booking` and the "original" `Booking Request` will **co-exist** until a new amendment is submitted by the consumer (via **UseCase 7: Request amendments to confirmed Booking**) or until the provider requests an update (sets the `bookingStatus='PENDING_AMENDMENT'` via **UseCase 6: Request to amend confirmed Booking**). If the `amendedBookingStatus` is present it always represents the latest version of an amendment received by the provider.
 
         The consumer will receive a `200` (OK) or a `202` (Accepted) if the payload schema-validates or a `400` (Bad Request) if it does not.
 
@@ -675,45 +675,45 @@ paths:
           
            **For the rest of this description and in all examples the value `cbrr-123` will be used as `carrierBookingRequestReference` in case the Booking has not yet been `CONFIRMED` and the value `cbr-987` will be used as `carrierBookingReference` in case the Booking has been `CONFIRMED`.**
         3. The response depends on which useCase is the reason for calling this endPoint (what the `bookingStatus` is):
-            - If `bookingStatus` **is** `RECEIVED` then this endPoint is being used in addition to **UseCase 1 - Submit booking request**. In this case the consumer would like to make an update to an already sent `Booking Request` - this is done via **UseCase 3 - Submit updated Booking Request**. The `bookingStatus` now changes to `UPDATE RECEIVED`.
+            - If `bookingStatus` **is** `RECEIVED` then this endPoint is being used in addition to **UseCase 1 - Submit booking request**. In this case the consumer would like to make an update to an already sent `Booking Request` - this is done via **UseCase 3 - Submit updated Booking Request**. The `bookingStatus` now changes to `UPDATE_RECEIVED`.
             
               A `200` (OK) response is returned with the following payload:
               ```
               {
                 carrierBookingRequestReference: 'cbrr-123',
-                bookingStatus: 'UPDATE RECEIVED'
+                bookingStatus: 'UPDATE_RECEIVED'
               }
               ```
-            - If `bookingStatus` is `PENDING UPDATE` then this endPoint is being used as a reponse to **UseCase 2 - Request to update Booking request** in this case the provider has requested an update to a `Booking Request`.  The `bookingStatus` now changes to `UPDATE RECEIVED`.
+            - If `bookingStatus` is `PENDING_UPDATE` then this endPoint is being used as a reponse to **UseCase 2 - Request to update Booking request** in this case the provider has requested an update to a `Booking Request`.  The `bookingStatus` now changes to `UPDATE_RECEIVED`.
 
               A `200` (OK) response is returned with the following payload:
               ```
               {
                 carrierBookingRequestReference: 'cbrr-123',
-                bookingStatus: 'UPDATE RECEIVED'
+                bookingStatus: 'UPDATE_RECEIVED'
               }
               ```
-            - If `bookingStatus` is `UPDATE RECEIVED` then this endPoint is being used to update an already sent update. The `bookingStatus` stays as `UPDATE RECEIVED`.
+            - If `bookingStatus` is `UPDATE_RECEIVED` then this endPoint is being used to update an already sent update. The `bookingStatus` stays as `UPDATE_RECEIVED`.
 
               A `200` (OK) response is returned with the following payload:
               ```
               {
                 carrierBookingRequestReference: 'cbrr-123',
-                bookingStatus: 'UPDATE RECEIVED'
+                bookingStatus: 'UPDATE_RECEIVED'
               }
               ```
-            - If `bookingStatus` is `PENDING AMENDMENT` then this endPoint is being used as a response to **UseCase 6 - Request to amend Confirmed Booking**, in this case the provider has requested an amendment to a `Confirmed Booking`. The `bookingStatus` stays `PENDING AMENDMENT` and `amendedBookingStatus` is set to `AMENDMENT RECEVIED`.
+            - If `bookingStatus` is `PENDING_AMENDMENT` then this endPoint is being used as a response to **UseCase 6 - Request to amend Confirmed Booking**, in this case the provider has requested an amendment to a `Confirmed Booking`. The `bookingStatus` stays `PENDING_AMENDMENT` and `amendedBookingStatus` is set to `AMENDMENT_RECEVIED`.
             
               A `200` (OK) response is returned with the following payload:
               ```
               {
                 carrierBookingReference: 'cbr-987',
                 carrierBookingRequestReference: 'cbrr-123',
-                bookingStatus: 'PENDING AMENDMENT',
-                amendedBookingStatus: 'AMENDMENT RECEIVED'
+                bookingStatus: 'PENDING_AMENDMENT',
+                amendedBookingStatus: 'AMENDMENT_RECEIVED'
               }
               ```
-            - If `bookingStatus` is `CONFIRMED` then this endPoint is being used in order to request an amendment to a `Confirmed Booking`. This is done via **UseCase 7 - Request Amendments to Confirmed Booking**. The `bookingStatus` stays `CONFIRMED` and `amendedBookingStatus` is set to `AMENDMENT RECEIVED`.
+            - If `bookingStatus` is `CONFIRMED` then this endPoint is being used in order to request an amendment to a `Confirmed Booking`. This is done via **UseCase 7 - Request Amendments to Confirmed Booking**. The `bookingStatus` stays `CONFIRMED` and `amendedBookingStatus` is set to `AMENDMENT_RECEIVED`.
             
               A `200` (OK) response is returned with the following payload:
               ```
@@ -721,7 +721,7 @@ paths:
                 carrierBookingReference: 'cbr-987',
                 carrierBookingRequestReference: 'cbrr-123',
                 bookingStatus: 'CONFIRMED',
-                amendedBookingStatus: 'AMENDMENT RECEIVED'
+                amendedBookingStatus: 'AMENDMENT_RECEIVED'
               }
               ```
         4. All '_relevant_' subscribers will be notified via a [Booking Notification](#/BookingNotification).
@@ -729,9 +729,9 @@ paths:
         For `PUT` `Booking Request` responding with `200` (OK) the process ends here. The updated `Booking Request`:
           - is now stored in the provider system
           - a `200` (OK) response is sent to the consumer with the status of the `Booking` (and possibly also with the `amendedBookingStatus`) with one of the following values (depending on the useCase):
-            - `bookingStatus='UPDATE RECEIVED'` (if endPoint used before a `Booking`has been confirmed)
-            - `bookingStatus='PENDING AMENDMENT'` and `amendedBookingStatus='AMENDMENT RECEIVED'` (if endPoint used as a response to **UseCase 6 - Request to amend Confirmed Booking**)
-            - `bookingStatus='CONFIRMED'` and `amendedBookingStatus='AMENDMENT RECEIVED'` (if consumer is requesting an amendment to a `Confirmed Booking`)
+            - `bookingStatus='UPDATE_RECEIVED'` (if endPoint used before a `Booking`has been confirmed)
+            - `bookingStatus='PENDING_AMENDMENT'` and `amendedBookingStatus='AMENDMENT_RECEIVED'` (if endPoint used as a response to **UseCase 6 - Request to amend Confirmed Booking**)
+            - `bookingStatus='CONFIRMED'` and `amendedBookingStatus='AMENDMENT_RECEIVED'` (if consumer is requesting an amendment to a `Confirmed Booking`)
 
             A subsequent `GET` request to the `Booking Request` will fetch the status along with the `Booking Request`
           - awaits further processing by the provider
@@ -770,12 +770,12 @@ paths:
           - awaits further processing by the provider
         
         The provider will now start asynchronous processing. Once processed, the state will change to one of the following values depending on the UseCase for calling the `PUT` endPoint:
-          - `UPDATE RECEIVED` in case this endPoint has been used to:
+          - `UPDATE_RECEIVED` in case this endPoint has been used to:
             - send an update to a newly created Booking (precondition: `bookingStatus='RECEIVED'`)
-            - send an update to a Booking because of a request from provider via **UseCase 2 - Request to update Booking request** (precondition: `bookingStatus='PENDING UPDATE'`)
-            - send an additional update to a Booking that has already received an update  (precondition: `bookingStatus='UPDATE RECEIVED'`)
-          - `bookingStatus` will stay as `PENDING AMENDMENT` but `amendedBookingStatus` will change to `AMENDMENT RECEVIED` in case this endPoint is being used in response to a request from provider via **UseCase 6 - Request to amend Confirmed Booking** (precondition: `bookingStatus='PENDING AMENDMENT'`)
-          - `bookingStatus` will stay as `CONFIRMED` but `amendedBookingStatus` will change to `AMENDMENT RECEVIED` in case this endPoint is being used to update an already confirmed Booking via  **UseCase 7 - Request Amendments to Confirmed Booking** (precondition: `bookingStatus='CONFIRMED'`)
+            - send an update to a Booking because of a request from provider via **UseCase 2 - Request to update Booking request** (precondition: `bookingStatus='PENDING_UPDATE'`)
+            - send an additional update to a Booking that has already received an update  (precondition: `bookingStatus='UPDATE_RECEIVED'`)
+          - `bookingStatus` will stay as `PENDING_AMENDMENT` but `amendedBookingStatus` will change to `AMENDMENT_RECEVIED` in case this endPoint is being used in response to a request from provider via **UseCase 6 - Request to amend Confirmed Booking** (precondition: `bookingStatus='PENDING_AMENDMENT'`)
+          - `bookingStatus` will stay as `CONFIRMED` but `amendedBookingStatus` will change to `AMENDMENT_RECEVIED` in case this endPoint is being used to update an already confirmed Booking via  **UseCase 7 - Request Amendments to Confirmed Booking** (precondition: `bookingStatus='CONFIRMED'`)
 
         The new state will be communicated via a [Booking Notification](#/BookingNotification).  In case the consumer does not subscribe to notifications it is necessary for the consumer to poll on the 
 
@@ -1116,9 +1116,9 @@ paths:
         '200':
           description: |
             The `Booking request` has been successfully updated in the provider system with one of the following combinations (depending on the use case):
-            - `bookingStatus='PENDING UPDATE'` in case the consumer has provided an update to a `Booking request` and is awaiting the provider to take action
-            - `bookingStatus='PENDING AMENDMENT'` and `amendedBookingStatus='AMENDMENT RECEIVED'` in case the provider has requested an amendment and the consumer has provided an amendment to a `Confirmed Booking` and is awaiting the provider to take action
-            - `bookingStatus='CONFIRMED'` and `amendedBookingStatus='AMENDMENT RECEIVED'` in case the consumer has provided an amendment to a `Confirmed Booking` and is awaiting the provider to take action
+            - `bookingStatus='PENDING_UPDATE'` in case the consumer has provided an update to a `Booking request` and is awaiting the provider to take action
+            - `bookingStatus='PENDING_AMENDMENT'` and `amendedBookingStatus='AMENDMENT_RECEIVED'` in case the provider has requested an amendment and the consumer has provided an amendment to a `Confirmed Booking` and is awaiting the provider to take action
+            - `bookingStatus='CONFIRMED'` and `amendedBookingStatus='AMENDMENT_RECEIVED'` in case the consumer has provided an amendment to a `Confirmed Booking` and is awaiting the provider to take action
 
             The status of the `Booking` can be monitored on the
 
@@ -1141,34 +1141,34 @@ paths:
                     Booking request updated
                   description: |
                     An updated `Booking request` received, schema validated and stored in provider system - the `Booking` now awaits provider action
-                        `bookingStatus='UPDATE RECEIVED'`
+                        `bookingStatus='UPDATE_RECEIVED'`
                   value:
                     carrierBookingRequestReference: cbrr-123
-                    bookingStatus: UPDATE RECEIVED
+                    bookingStatus: UPDATE_RECEIVED
                 pendingAmendmentApprovalExample:
                   summary: |
                     Confirmed Booking amendment
                   description: |
                     An amendment to a `Confirmed Booking` received, schema validated and stored in provider system - the `Booking` now awaits provider action
                         `bookingStatus='CONFIRMED'`
-                        `amendedBookingStatus: 'AMENDMENT RECEIVED'`
+                        `amendedBookingStatus: 'AMENDMENT_RECEIVED'`
                   value:
                     carrierBookingRequestReference: cbrr-123
                     carrierBookingReference: cbr-987
                     bookingStatus: CONFIRMED
-                    amendedBookingStatus: AMENDMENT RECEIVED
+                    amendedBookingStatus: AMENDMENT_RECEIVED
                 pendingAmendmentExample:
                   summary: |
                     Confirm requested Booking amendment
                   description: |
                     A requested amendment to a `Confirmed Booking` by the provider has been received, schema validated and stored in provider system. The `Booking` now awaits provider action
-                        `bookingStatus='PENDING AMENDMENT'`
-                        `amendedBookingStatus: 'AMENDMENT RECEIVED'`
+                        `bookingStatus='PENDING_AMENDMENT'`
+                        `amendedBookingStatus: 'AMENDMENT_RECEIVED'`
                   value:
                     carrierBookingRequestReference: cbrr-123
                     carrierBookingReference: cbr-987
-                    bookingStatus: PENDING AMENDMENT
-                    amendedBookingStatus: AMENDMENT RECEIVED
+                    bookingStatus: PENDING_AMENDMENT
+                    amendedBookingStatus: AMENDMENT_RECEIVED
         '202':
           description: |
             The `Booking request` update has been successfully accepted by the provider. `bookingStatus` does not change and response payload is empty. Further processing will be done by provider.
@@ -1366,7 +1366,7 @@ paths:
         - the consumer submits a new amendment (**UseCase 7: Request amendment to confirmed Booking**) in which case the "new update" provided **replaces** the "old update".
         - the provider re-confirms the `Booking` (**UseCase 5: Confirm booking request**) in which case the "old update" is no longer accessable.
 
-        If `amendedContent=true` is requested but no amendment has yet been provided by the consumer **or** the state of the "original" `Booking` is `PENDING AMENDMENT`, then a `404` (Not Found) is returned.
+        If `amendedContent=true` is requested but no amendment has yet been provided by the consumer **or** the state of the "original" `Booking` is `PENDING_AMENDMENT`, then a `404` (Not Found) is returned.
 
         If the provider is requesting changes to the `Booking`, the `feedbacks` object is used to inform the consumer what needs to change.
 
@@ -1392,10 +1392,10 @@ paths:
                   summary: |
                     Standard dry cargo Booking (not confirmed)
                   description: |
-                    Gets a `Booking Request` with standard Dry cargo which has not yet been confirmed. The `Booking` is in state `PENDING UPDATE` and requires some changes (specified in the `feedbacks` property)
+                    Gets a `Booking Request` with standard Dry cargo which has not yet been confirmed. The `Booking` is in state `PENDING_UPDATE` and requires some changes (specified in the `feedbacks` property)
                   value:
                     carrierBookingRequestReference: cbrr-123
-                    bookingStatus: PENDING UPDATE
+                    bookingStatus: PENDING_UPDATE
                     receiptTypeAtOrigin: CY
                     deliveryTypeAtDestination: CY
                     cargoMovementTypeAtOrigin: FCL
@@ -1468,14 +1468,14 @@ paths:
                   summary: |
                     Gets a confirmed Standard dry cargo Booking
                   description: |
-                    Gets a `Confirmed Booking` with standard Dry cargo. In this example the `Booking` has previously received an amendment which was confirmed (`amendedBookingStatus='AMENDMENT CONFIRMED'`)
+                    Gets a `Confirmed Booking` with standard Dry cargo. In this example the `Booking` has previously received an amendment which was confirmed (`amendedBookingStatus='AMENDMENT_CONFIRMED'`)
 
                     As part of the confirmation the `Booking` is enriched with a `transportPlan`, `shipmentCutOffTimes`, `carrierClauses` and in this example also an `advanceManifestFiling` since the `Booking` is arriving in US.
                   value:
                     carrierBookingRequestReference: cbrr-123
                     carrierBookingReference: cbr-987
                     bookingStatus: CONFIRMED
-                    amendedBookingStatus: AMENDMENT CONFIRMED
+                    amendedBookingStatus: AMENDMENT_CONFIRMED
                     receiptTypeAtOrigin: CY
                     deliveryTypeAtDestination: CY
                     cargoMovementTypeAtOrigin: FCL
@@ -1754,13 +1754,13 @@ paths:
         ## Precondition
         In order to cancel a `Booking`, the `bookingStatus` must be either
         - `RECEIVED`
-        - `PENDING UPDATE`
-        - `UPDATE RECEIVED`
+        - `PENDING_UPDATE`
+        - `UPDATE_RECEIVED`
         - `CONFIRMED`
-        - `PENDING AMENDMENT`
+        - `PENDING_AMENDMENT`
 
         In order to cancel a `Booking Amendment`, the status of the `Booking Amendment` must be
-        - `AMENDMENT RECEIVED`
+        - `AMENDMENT_RECEIVED`
 
         ## Postcondition
         The provider has received a cancellation from the consumer for a `Booking` or for a `Booking Amendment`.
@@ -1788,17 +1788,17 @@ paths:
 
              **If** the `Booking` is confirmed a `409` (Conflict) should be used as a response
 
-           - only the amendment to the `Booking` is cancelled (in this case the `Booking` continues and `bookingStatus` stays unchanged). This is the case when the payload contains `amendedBookingStatus='AMENDMENT CANCELLED'`.
+           - only the amendment to the `Booking` is cancelled (in this case the `Booking` continues and `bookingStatus` stays unchanged). This is the case when the payload contains `amendedBookingStatus='AMENDMENT_CANCELLED'`.
              
-             **If** no amendment is being requested prior to this call (`amendedBookingStatus` is **not** `AMENDMENT RECEIVED`) then a `404` (Not Found) is returned
+             **If** no amendment is being requested prior to this call (`amendedBookingStatus` is **not** `AMENDMENT_RECEIVED`) then a `404` (Not Found) is returned
 
              A `200` (OK) response is returned with the following payload:
              ```
              {
                carrierBookingReference: 'cbr-987',
                carrierBookingRequestReference: 'cbrr-123',
-               bookingStatus: 'PENDING AMENDMENT',
-               amendedBookingStatus: 'AMENDMENT CANCELLED'
+               bookingStatus: 'PENDING_AMENDMENT',
+               amendedBookingStatus: 'AMENDMENT_CANCELLED'
              }
              ```
              or
@@ -1807,11 +1807,11 @@ paths:
                carrierBookingReference: 'cbr-987',
                carrierBookingRequestReference: 'cbrr-123',
                bookingStatus: 'CONFIRMED',
-               amendedBookingStatus: 'AMENDMENT CANCELLED'
+               amendedBookingStatus: 'AMENDMENT_CANCELLED'
              }
              ```
              if the amendment was not requested by the provider.
-           - the confirmed `Booking` is requesting to be cancelled. This is the case when the payload contains `bookingCancellationStatus='CANCELLATION RECEIVED'`. It is only possible to use this payload in combination with `carrierBookingReference` being used in the path (as the `bookingReference`)
+           - the confirmed `Booking` is requesting to be cancelled. This is the case when the payload contains `bookingCancellationStatus='CANCELLATION_RECEIVED'`. It is only possible to use this payload in combination with `carrierBookingReference` being used in the path (as the `bookingReference`)
            
              A `200` (OK) response is returned with the following payload:
              ```
@@ -1819,7 +1819,7 @@ paths:
                carrierBookingReference: 'cbr-987',
                carrierBookingRequestReference: 'cbrr-123',
                bookingStatus: 'CONFIRMED',
-               bookingCancellationStatus: 'CANCELLATION RECEIVED'
+               bookingCancellationStatus: 'CANCELLATION_RECEIVED'
              }
              ```
              or
@@ -1828,8 +1828,8 @@ paths:
                carrierBookingReference: 'cbr-987',
                carrierBookingRequestReference: 'cbrr-123',
                bookingStatus: 'CONFIRMED',
-               amendedBookingStatus: 'AMENDMENT RECEIVED',
-               bookingCancellationStatus: 'CANCELLATION RECEIVED'
+               amendedBookingStatus: 'AMENDMENT_RECEIVED',
+               bookingCancellationStatus: 'CANCELLATION_RECEIVED'
              }
              ```
              in case an ongoing amendment is being processed.
@@ -1850,7 +1850,7 @@ paths:
            - all values provided have correct data type.
         3. An empty response is returned and the consumer now awaits further processing by the provider.
         
-        Once processed, the `Booking` or `Amended Booking` is cancelled and a [Booking Notification](#/BookingNotification) is sent. In case of a Confirmed Booking - the provider has the opportunity to decline the Cancellation of the Booking (in which case the `bookingCancellationStatus='CANCELLATION DECLINED'`).
+        Once processed, the `Booking` or `Amended Booking` is cancelled and a [Booking Notification](#/BookingNotification) is sent. In case of a Confirmed Booking - the provider has the opportunity to decline the Cancellation of the Booking (in which case the `bookingCancellationStatus='CANCELLATION_DECLINED'`).
       parameters:
         - $ref: '#/components/parameters/bookingReferencePathParam'
         - $ref: '#/components/parameters/Api-Version-Major'
@@ -1869,7 +1869,7 @@ paths:
                       description: |
                         Setting the `bookingStatus` to `CANCELLED` cancels the `Booking Request` (only possible **before** it is `CONFIRMED` and using this property is only possible in combination with the `bookingReference` path-property being the `carrierBookingRequestReference`). The `Booking Request` will discontinue if the request is accepted by the provider.
 
-                        **Conditional:** It is a precondition that the `bookingStatus` **is NOT** `CONFIRMED` or `PENDING AMENDMENT` in order to cancel it. If this is not the case a `409` (Conflict) error response should be returned.
+                        **Conditional:** It is a precondition that the `bookingStatus` **is NOT** `CONFIRMED` or `PENDING_AMENDMENT` in order to cancel it. If this is not the case a `409` (Conflict) error response should be returned.
 
                         Only possible value to set is `CANCELLED`.
                       example: CANCELLED
@@ -1882,12 +1882,12 @@ paths:
                       type: string
                       maxLength: 50
                       description: |
-                        Setting the `amendedBookingStatus` to `AMENDMENT CANCELLED` **only** cancels the amendment to a confirmed `Booking`. This is only possible in combination with the `bookingReference` path-property being the `carrierBookingReference`.
+                        Setting the `amendedBookingStatus` to `AMENDMENT_CANCELLED` **only** cancels the amendment to a confirmed `Booking`. This is only possible in combination with the `bookingReference` path-property being the `carrierBookingReference`.
 
-                        **Conditional:** It is a precondition that the `amendedBookingStatus` **is** `AMENDMENT RECEIVED` in order to cancel it. If this is not the case a `404` (Not Found) error response should be returned.
+                        **Conditional:** It is a precondition that the `amendedBookingStatus` **is** `AMENDMENT_RECEIVED` in order to cancel it. If this is not the case a `404` (Not Found) error response should be returned.
 
-                        Only possible value to set is `AMENDMENT CANCELLED`.
-                      example: AMENDMENT CANCELLED
+                        Only possible value to set is `AMENDMENT_CANCELLED`.
+                      example: AMENDMENT_CANCELLED
                   required:
                     - amendedBookingStatus
                 - type: object
@@ -1897,12 +1897,12 @@ paths:
                       type: string
                       maxLength: 50
                       description: |
-                        Setting the `bookingCancellationStatus` to `CANCELLATION RECEIVED` is a request to cancel a confirmed Booking (only possible **after** it is `CONFIRMED` and using this property is only possible in combination with the `bookingReference` path-property being the `carrierBookingReference`). Upon recieving this request the provider will check if it is possible to cancel the confirmed booking. Further processing is needed by the provider.
+                        Setting the `bookingCancellationStatus` to `CANCELLATION_RECEIVED` is a request to cancel a confirmed Booking (only possible **after** it is `CONFIRMED` and using this property is only possible in combination with the `bookingReference` path-property being the `carrierBookingReference`). Upon recieving this request the provider will check if it is possible to cancel the confirmed booking. Further processing is needed by the provider.
 
-                        **Conditional:** It is a precondition that the `bookingStatus` **is** `CONFIRMED` or `PENDING AMENDMENT` in order to cancel it. If this is not the case a `409` (Conflict) error response should be returned.
+                        **Conditional:** It is a precondition that the `bookingStatus` **is** `CONFIRMED` or `PENDING_AMENDMENT` in order to cancel it. If this is not the case a `409` (Conflict) error response should be returned.
 
-                        Only possible value to set is `CANCELLATION RECEIVED`.
-                      example: CANCELLATION RECEIVED
+                        Only possible value to set is `CANCELLATION_RECEIVED`.
+                      example: CANCELLATION_RECEIVED
                   required:
                     - bookingCancellationStatus
               properties:
@@ -1925,16 +1925,16 @@ paths:
                 summary: |
                   Amendment cancelled
                 description: |
-                  The consumer wants to **only** cancel the amendment (and keep the confirmed `Booking`). This is done by setting the `amendedBookingStatus` to `AMENDMENT CANCELLED`.
+                  The consumer wants to **only** cancel the amendment (and keep the confirmed `Booking`). This is done by setting the `amendedBookingStatus` to `AMENDMENT_CANCELLED`.
                 value:
-                  amendedBookingStatus: AMENDMENT CANCELLED
+                  amendedBookingStatus: AMENDMENT_CANCELLED
               requestConfirmedBookingCancelledExample:
                 summary: |
                   Request to cancel a Confirmed Booking
                 description: |
-                  The consumer requests to cancel a `Confirmed Booking`. This is done by setting the `bookingCancellationStatus` to `CANCELLATION RECEIVED` and provide an optional `reason`.
+                  The consumer requests to cancel a `Confirmed Booking`. This is done by setting the `bookingCancellationStatus` to `CANCELLATION_RECEIVED` and provide an optional `reason`.
                 value:
-                  bookingCancellationStatus: CANCELLATION RECEIVED
+                  bookingCancellationStatus: CANCELLATION_RECEIVED
                   reason: Customer cancelled order
       responses:
         '200':
@@ -1960,33 +1960,33 @@ paths:
                   summary: |
                     Amendment cancelled on a confirmed Booking
                   description: |
-                    The consumer has requested that the amendment to a confirmed `Booking` is to be cancelled. The status of the `Booking` stays as `CONFIRMED`. The `amendedBookingStatus` is set to `AMENDMENT CANCELLED`.
+                    The consumer has requested that the amendment to a confirmed `Booking` is to be cancelled. The status of the `Booking` stays as `CONFIRMED`. The `amendedBookingStatus` is set to `AMENDMENT_CANCELLED`.
                   value:
                     carrierBookingRequestReference: cbrr-123
                     carrierBookingReference: cbr-987
                     bookingStatus: CONFIRMED
-                    amendedBookingStatus: AMENDMENT CANCELLED
+                    amendedBookingStatus: AMENDMENT_CANCELLED
                 amendmentCancelled2Example:
                   summary: |
                     Amendment requested by provider cancelled by consumer
                   description: |
-                    The consumer has requested that the amendment to a confirmed `Booking` is to be cancelled. The status of the `Booking` stays as `PENDING AMENDMENT`. The `amendedBookingStatus` is set to `AMENDMENT CANCELLED`.
+                    The consumer has requested that the amendment to a confirmed `Booking` is to be cancelled. The status of the `Booking` stays as `PENDING_AMENDMENT`. The `amendedBookingStatus` is set to `AMENDMENT_CANCELLED`.
                   value:
                     carrierBookingRequestReference: cbrr-123
                     carrierBookingReference: cbr-987
-                    bookingStatus: PENDING AMENDMENT
-                    amendedBookingStatus: AMENDMENT CANCELLED
+                    bookingStatus: PENDING_AMENDMENT
+                    amendedBookingStatus: AMENDMENT_CANCELLED
                 requestConfirmedBookingCancellationExample:
                   summary: |
                     Request to Cancel a Confirmed Booking
                   description: |
-                    The consumer has requested that a confirmed `Booking` is to be cancelled. The status of the `Booking` stays as is (in the below payload this is `PENDING AMENDMENT`. The `amendedBookingStatus` stays as is (in the below payload this is `AMENDMENT CONFIRMED`.
+                    The consumer has requested that a confirmed `Booking` is to be cancelled. The status of the `Booking` stays as is (in the below payload this is `PENDING_AMENDMENT`. The `amendedBookingStatus` stays as is (in the below payload this is `AMENDMENT_CONFIRMED`.
                   value:
                     carrierBookingRequestReference: cbrr-123
                     carrierBookingReference: cbr-987
-                    bookingStatus: PENDING AMENDMENT
-                    amendedBookingStatus: AMENDMENT CONFIRMED
-                    bookingCancellationStatus: CANCELLATION RECEIVED
+                    bookingStatus: PENDING_AMENDMENT
+                    amendedBookingStatus: AMENDMENT_CONFIRMED
+                    bookingCancellationStatus: CANCELLATION_RECEIVED
         '202':
           description: |
             Booking cancellation has been accepted
@@ -2045,12 +2045,12 @@ paths:
                         property: amendedBookingStatus
                         value: APPROVE
                         errorCodeText: incorrect value
-                        errorCodeMessage: 'Only AMENDMENT CANCELLED is an allowed value: APPROVE was inserted'
+                        errorCodeMessage: 'Only AMENDMENT_CANCELLED is an allowed value: APPROVE was inserted'
         '404':
           description: |
             In case the consumer is cancelling the `Amended Booking` by setting:
 
-                `amendedBookingStatus='AMENDMENT CANCELLED'`
+                `amendedBookingStatus='AMENDMENT_CANCELLED'`
                 
             but:
             - the `Booking` has not yet been confirmed
@@ -2325,7 +2325,7 @@ paths:
                 summary: |
                   Booking amendment declined (Lightweight)
                 description: |
-                  A lightweight notification explaining that an amendment to a `Booking` has been declined (`amendedBookingStatus='AMENDMENT DECLINED'`)
+                  A lightweight notification explaining that an amendment to a `Booking` has been declined (`amendedBookingStatus='AMENDMENT_DECLINED'`)
                 value:
                   specversion: '1.0'
                   id: 3cecb101-7a1a-43a4-9d62-e88a131651e2
@@ -2336,7 +2336,7 @@ paths:
                   subscriptionReference: BKG001
                   data:
                     bookingStatus: CONFIRMED
-                    amendedBookingStatus: AMENDMENT DECLINED
+                    amendedBookingStatus: AMENDMENT_DECLINED
                     carrierBookingRequestReference: 24595eb0-5cfc-4381-9c3a-cedc1975e9aa
                     carrierBookingReference: ABC709951
                     feedbacks:
@@ -2347,7 +2347,7 @@ paths:
                 summary: |
                   Booking amendment declined (Full State Transfer)
                 description: |
-                  A full state transfer notification explaining that an amendment to a `Booking` has been declined (`amendedBookingStatus='AMENDMENT DECLINED'`). The notification both contains the Booking from before the amendment (in the `booking` property) it also contains the amended booking (in the `amendedBooking` property).
+                  A full state transfer notification explaining that an amendment to a `Booking` has been declined (`amendedBookingStatus='AMENDMENT_DECLINED'`). The notification both contains the Booking from before the amendment (in the `booking` property) it also contains the amended booking (in the `amendedBooking` property).
                 value:
                   specversion: '1.0'
                   id: 3cecb101-7a1a-43a4-9d62-e88a131651e2
@@ -2358,7 +2358,7 @@ paths:
                   subscriptionReference: BKG001
                   data:
                     bookingStatus: CONFIRMED
-                    amendedBookingStatus: AMENDMENT DECLINED
+                    amendedBookingStatus: AMENDMENT_DECLINED
                     carrierBookingRequestReference: 24595eb0-5cfc-4381-9c3a-cedc1975e9aa
                     carrierBookingReference: ABC709951
                     feedbacks:
@@ -2369,7 +2369,7 @@ paths:
                       carrierBookingRequestReference: 24595eb0-5cfc-4381-9c3a-cedc1975e9aa
                       carrierBookingReference: ABC709951
                       bookingStatus: CONFIRMED
-                      amendedBookingStatus: AMENDMENT DECLINED
+                      amendedBookingStatus: AMENDMENT_DECLINED
                       receiptTypeAtOrigin: CY
                       deliveryTypeAtDestination: CY
                       cargoMovementTypeAtOrigin: FCL
@@ -2470,7 +2470,7 @@ paths:
                       carrierBookingRequestReference: 24595eb0-5cfc-4381-9c3a-cedc1975e9aa
                       carrierBookingReference: ABC709951
                       bookingStatus: CONFIRMED
-                      amendedBookingStatus: AMENDMENT DECLINED
+                      amendedBookingStatus: AMENDMENT_DECLINED
                       receiptTypeAtOrigin: CY
                       deliveryTypeAtDestination: CY
                       cargoMovementTypeAtOrigin: FCL
@@ -2537,7 +2537,7 @@ paths:
                 summary: |
                   Confirmed Booking cancelled (Lightweight)
                 description: |
-                  A lightweight notification explaining that a confirmed `Booking` has been cancelled (`bookingCancellationStatus='CANCELLATION CONFIRMED'`)
+                  A lightweight notification explaining that a confirmed `Booking` has been cancelled (`bookingCancellationStatus='CANCELLATION_CONFIRMED'`)
                 value:
                   specversion: '1.0'
                   id: 3cecb101-7a1a-43a4-9d62-e88a131651e2
@@ -2548,8 +2548,8 @@ paths:
                   subscriptionReference: BKG001
                   data:
                     bookingStatus: CANCELLED
-                    amendedBookingStatus: AMENDMENT CANCELLED
-                    bookingCancellationStatus: CANCELLATION CONFIRMED
+                    amendedBookingStatus: AMENDMENT_CANCELLED
+                    bookingCancellationStatus: CANCELLATION_CONFIRMED
                     carrierBookingRequestReference: 24595eb0-5cfc-4381-9c3a-cedc1975e9aa
                     carrierBookingReference: ABC709951
       responses:
@@ -2786,16 +2786,14 @@ components:
                 The status of the `Booking`. Possible values are:
 
                 - `RECEIVED` (Booking request has been received)
-                - `PENDING UPDATE` (An update is required to the Booking)
-                - `UPDATE RECEIVED` (An update has been received and is awaiting to be processed)
+                - `PENDING_UPDATE` (An update is required to the Booking)
+                - `UPDATE_RECEIVED` (An update has been received and is awaiting to be processed)
                 - `CONFIRMED` (Booking has been Confirmed)
-                - `PENDING AMENDMENT` (An amendment is required to the Booking)
+                - `PENDING_AMENDMENT` (An amendment is required to the Booking)
                 - `REJECTED` (Booking discontinued by carrier before it has been Confirmed)
                 - `DECLINED` (Booking discontinued by carrier after it has been Confirmed)
                 - `CANCELLED` (Booking discontinued by consumer)
                 - `COMPLETED` (The Transport Document this Booking is connected to has been Surrendered for Delivery)
-
-                More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/bookingstatuses.csv).
               example: RECEIVED
             amendedBookingStatus:
               type: string
@@ -2803,22 +2801,20 @@ components:
               description: |
                 The status of latest amendment added to the `Booking`. If no amendment has been requested - then this property is empty. Possible values are:
 
-                - `AMENDMENT RECEIVED` (An amendment has been received and is awaiting to be processed)
-                - `AMENDMENT CONFIRMED` (Amendment is confirmed)
-                - `AMENDMENT DECLINED` (Amendment discontinued by provider)
-                - `AMENDMENT CANCELLED` (Amendment discontinued by consumer)
-
-                More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/bookingstatuses.csv).
-              example: AMENDMENT RECEIVED
+                - `AMENDMENT_RECEIVED` (An amendment has been received and is awaiting to be processed)
+                - `AMENDMENT_CONFIRMED` (Amendment is confirmed)
+                - `AMENDMENT_DECLINED` (Amendment discontinued by provider)
+                - `AMENDMENT_CANCELLED` (Amendment discontinued by consumer)
+              example: AMENDMENT_RECEIVED
             bookingCancellationStatus:
               type: string
               maxLength: 50
               description: |
                 The status of the latest booking cancellation. If no cancellation has been requested - then this property is empty. Possible values are:
-                - `CANCELLATION RECEIVED` (A request to cancel a Confirmed Booking has been received and is awaiting to be processed)
-                - `CANCELLATION DECLINED` (Cancellation of the Confirmed Booking has been declined by provider)
-                - `CANCELLATION CONFIRMED` (Cancellation of the Confirmed Booking has been confirmed by provider)
-              example: CANCELLATION RECEIVED
+                - `CANCELLATION_RECEIVED` (A request to cancel a Confirmed Booking has been received and is awaiting to be processed)
+                - `CANCELLATION_DECLINED` (Cancellation of the Confirmed Booking has been declined by provider)
+                - `CANCELLATION_CONFIRMED` (Cancellation of the Confirmed Booking has been confirmed by provider)
+              example: CANCELLATION_RECEIVED
             carrierBookingRequestReference:
               type: string
               pattern: ^\S(?:.*\S)?$
@@ -2879,10 +2875,10 @@ components:
                   description: |
                     The status of the `Booking`. Possible values are:
                     - `RECEIVED` (Booking request has been received)
-                    - `PENDING UPDATE` (An update is required to the Booking)
-                    - `UPDATE RECEIVED` (An update has been received and is awaiting to be processed)
+                    - `PENDING_UPDATE` (An update is required to the Booking)
+                    - `UPDATE_RECEIVED` (An update has been received and is awaiting to be processed)
                     - `CONFIRMED` (Booking has been Confirmed)
-                    - `PENDING AMENDMENT` (An amendment is required to the Booking)
+                    - `PENDING_AMENDMENT` (An amendment is required to the Booking)
                     - `REJECTED` (Booking discontinued by carrier before it has been Confirmed)
                     - `DECLINED` (Booking discontinued by carrier after it has been Confirmed)
                     - `CANCELLED` (Booking discontinued by consumer)
@@ -2893,20 +2889,20 @@ components:
                   maxLength: 50
                   description: |
                     The status of latest amendment added to the `Booking`. If no amendment has been requested - then this field is empty. Possible values are:
-                    - `AMENDMENT RECEIVED` (An amendment has been received and is awaiting to be processed)
-                    - `AMENDMENT CONFIRMED` (Amendment is confirmed)
-                    - `AMENDMENT DECLINED` (Amendment discontinued by provider)
-                    - `AMENDMENT CANCELLED` (Amendment discontinued by consumer)
-                  example: AMENDMENT RECEIVED
+                    - `AMENDMENT_RECEIVED` (An amendment has been received and is awaiting to be processed)
+                    - `AMENDMENT_CONFIRMED` (Amendment is confirmed)
+                    - `AMENDMENT_DECLINED` (Amendment discontinued by provider)
+                    - `AMENDMENT_CANCELLED` (Amendment discontinued by consumer)
+                  example: AMENDMENT_RECEIVED
                 bookingCancellationStatus:
                   type: string
                   maxLength: 50
                   description: |
                     The status of the latest booking cancellation. If no cancellation has been requested - then this property is empty. Possible values are:
-                    - `CANCELLATION RECEIVED` (A request to cancel a Confirmed Booking has been received and is awaiting to be processed)
-                    - `CANCELLATION DECLINED` (Cancellation of the Confirmed Booking has been declined by provider)
-                    - `CANCELLATION CONFIRMED` (Cancellation of the Confirmed Booking has been confirmed by provider)
-                  example: CANCELLATION RECEIVED
+                    - `CANCELLATION_RECEIVED` (A request to cancel a Confirmed Booking has been received and is awaiting to be processed)
+                    - `CANCELLATION_DECLINED` (Cancellation of the Confirmed Booking has been declined by provider)
+                    - `CANCELLATION_CONFIRMED` (Cancellation of the Confirmed Booking has been confirmed by provider)
+                  example: CANCELLATION_RECEIVED
                 receiptTypeAtOrigin:
                   type: string
                   maxLength: 3
@@ -3502,10 +3498,10 @@ components:
                   description: |
                     The status of the `Booking`. Possible values are:
                     - `RECEIVED` (Booking request has been received)
-                    - `PENDING UPDATE` (An update is required to the Booking)
-                    - `UPDATE RECEIVED` (An update has been received and is awaiting to be processed)
+                    - `PENDING_UPDATE` (An update is required to the Booking)
+                    - `UPDATE_RECEIVED` (An update has been received and is awaiting to be processed)
                     - `CONFIRMED` (Booking has been Confirmed)
-                    - `PENDING AMENDMENT` (An amendment is required to the Booking)
+                    - `PENDING_AMENDMENT` (An amendment is required to the Booking)
                     - `REJECTED` (Booking discontinued by carrier before it has been Confirmed)
                     - `DECLINED` (Booking discontinued by carrier after it has been Confirmed)
                     - `CANCELLED` (Booking discontinued by consumer)
@@ -3516,20 +3512,20 @@ components:
                   maxLength: 50
                   description: |
                     The status of latest amendment added to the `Booking`. If no amendment has been requested - then this field is empty. Possible values are:
-                    - `AMENDMENT RECEIVED` (An amendment has been received and is awaiting to be processed)
-                    - `AMENDMENT CONFIRMED` (Amendment is confirmed)
-                    - `AMENDMENT DECLINED` (Amendment discontinued by provider)
-                    - `AMENDMENT CANCELLED` (Amendment discontinued by consumer)
-                  example: AMENDMENT RECEIVED
+                    - `AMENDMENT_RECEIVED` (An amendment has been received and is awaiting to be processed)
+                    - `AMENDMENT_CONFIRMED` (Amendment is confirmed)
+                    - `AMENDMENT_DECLINED` (Amendment discontinued by provider)
+                    - `AMENDMENT_CANCELLED` (Amendment discontinued by consumer)
+                  example: AMENDMENT_RECEIVED
                 bookingCancellationStatus:
                   type: string
                   maxLength: 50
                   description: |
                     The status of the latest booking cancellation. If no cancellation has been requested - then this property is empty. Possible values are:
-                    - `CANCELLATION RECEIVED` (A request to cancel a Confirmed Booking has been received and is awaiting to be processed)
-                    - `CANCELLATION DECLINED` (Cancellation of the Confirmed Booking has been declined by provider)
-                    - `CANCELLATION CONFIRMED` (Cancellation of the Confirmed Booking has been confirmed by provider)
-                  example: CANCELLATION RECEIVED
+                    - `CANCELLATION_RECEIVED` (A request to cancel a Confirmed Booking has been received and is awaiting to be processed)
+                    - `CANCELLATION_DECLINED` (Cancellation of the Confirmed Booking has been declined by provider)
+                    - `CANCELLATION_CONFIRMED` (Cancellation of the Confirmed Booking has been confirmed by provider)
+                  example: CANCELLATION_RECEIVED
                 receiptTypeAtOrigin:
                   type: string
                   maxLength: 3
@@ -5470,10 +5466,10 @@ components:
           description: |
             The status of the `Booking`. Possible values are:
             - `RECEIVED` (Booking request has been received)
-            - `PENDING UPDATE` (An update is required to the Booking)
-            - `UPDATE RECEIVED` (An update has been received and is awaiting to be processed)
+            - `PENDING_UPDATE` (An update is required to the Booking)
+            - `UPDATE_RECEIVED` (An update has been received and is awaiting to be processed)
             - `CONFIRMED` (Booking has been Confirmed)
-            - `PENDING AMENDMENT` (An amendment is required to the Booking)
+            - `PENDING_AMENDMENT` (An amendment is required to the Booking)
             - `REJECTED` (Booking discontinued by carrier before it has been Confirmed)
             - `DECLINED` (Booking discontinued by carrier after it has been Confirmed)
             - `CANCELLED` (Booking discontinued by consumer)
@@ -5484,20 +5480,20 @@ components:
           maxLength: 50
           description: |
             The status of latest amendment added to the `Booking`. If no amendment has been requested - then this field is empty. Possible values are:
-            - `AMENDMENT RECEIVED` (An amendment has been received and is awaiting to be processed)
-            - `AMENDMENT CONFIRMED` (Amendment is confirmed)
-            - `AMENDMENT DECLINED` (Amendment discontinued by provider)
-            - `AMENDMENT CANCELLED` (Amendment discontinued by consumer)
-          example: AMENDMENT RECEIVED
+            - `AMENDMENT_RECEIVED` (An amendment has been received and is awaiting to be processed)
+            - `AMENDMENT_CONFIRMED` (Amendment is confirmed)
+            - `AMENDMENT_DECLINED` (Amendment discontinued by provider)
+            - `AMENDMENT_CANCELLED` (Amendment discontinued by consumer)
+          example: AMENDMENT_RECEIVED
         bookingCancellationStatus:
           type: string
           maxLength: 50
           description: |
             The status of the latest booking cancellation. If no cancellation has been requested - then this property is empty. Possible values are:
-            - `CANCELLATION RECEIVED` (A request to cancel a Confirmed Booking has been received and is awaiting to be processed)
-            - `CANCELLATION DECLINED` (Cancellation of the Confirmed Booking has been declined by provider)
-            - `CANCELLATION CONFIRMED` (Cancellation of the Confirmed Booking has been confirmed by provider)
-          example: CANCELLATION RECEIVED
+            - `CANCELLATION_RECEIVED` (A request to cancel a Confirmed Booking has been received and is awaiting to be processed)
+            - `CANCELLATION_DECLINED` (Cancellation of the Confirmed Booking has been declined by provider)
+            - `CANCELLATION_CONFIRMED` (Cancellation of the Confirmed Booking has been confirmed by provider)
+          example: CANCELLATION_RECEIVED
         receiptTypeAtOrigin:
           type: string
           maxLength: 3
@@ -6095,10 +6091,10 @@ components:
           description: |
             The status of the `Booking`. Possible values are:
             - `RECEIVED` (Booking request has been received)
-            - `PENDING UPDATE` (An update is required to the Booking)
-            - `UPDATE RECEIVED` (An update has been received and is awaiting to be processed)
+            - `PENDING_UPDATE` (An update is required to the Booking)
+            - `UPDATE_RECEIVED` (An update has been received and is awaiting to be processed)
             - `CONFIRMED` (Booking has been Confirmed)
-            - `PENDING AMENDMENT` (An amendment is required to the Booking)
+            - `PENDING_AMENDMENT` (An amendment is required to the Booking)
             - `REJECTED` (Booking discontinued by carrier before it has been Confirmed)
             - `DECLINED` (Booking discontinued by carrier after it has been Confirmed)
             - `CANCELLED` (Booking discontinued by consumer)
@@ -6109,20 +6105,20 @@ components:
           maxLength: 50
           description: |
             The status of latest amendment added to the `Booking`. If no amendment has been requested - then this field is empty. Possible values are:
-            - `AMENDMENT RECEIVED` (An amendment has been received and is awaiting to be processed)
-            - `AMENDMENT CONFIRMED` (Amendment is confirmed)
-            - `AMENDMENT DECLINED` (Amendment discontinued by provider)
-            - `AMENDMENT CANCELLED` (Amendment discontinued by consumer)
-          example: AMENDMENT RECEIVED
+            - `AMENDMENT_RECEIVED` (An amendment has been received and is awaiting to be processed)
+            - `AMENDMENT_CONFIRMED` (Amendment is confirmed)
+            - `AMENDMENT_DECLINED` (Amendment discontinued by provider)
+            - `AMENDMENT_CANCELLED` (Amendment discontinued by consumer)
+          example: AMENDMENT_RECEIVED
         bookingCancellationStatus:
           type: string
           maxLength: 50
           description: |
             The status of the latest booking cancellation. If no cancellation has been requested - then this property is empty. Possible values are:
-            - `CANCELLATION RECEIVED` (A request to cancel a Confirmed Booking has been received and is awaiting to be processed)
-            - `CANCELLATION DECLINED` (Cancellation of the Confirmed Booking has been declined by provider)
-            - `CANCELLATION CONFIRMED` (Cancellation of the Confirmed Booking has been confirmed by provider)
-          example: CANCELLATION RECEIVED
+            - `CANCELLATION_RECEIVED` (A request to cancel a Confirmed Booking has been received and is awaiting to be processed)
+            - `CANCELLATION_DECLINED` (Cancellation of the Confirmed Booking has been declined by provider)
+            - `CANCELLATION_CONFIRMED` (Cancellation of the Confirmed Booking has been confirmed by provider)
+          example: CANCELLATION_RECEIVED
         feedbacks:
           type: array
           description: |
@@ -7545,7 +7541,7 @@ components:
             The national commodity classification code, which can be one of the following values defined by DCSA:
             - `NCM` (Nomenclatura Comum do Mercosul)
             - `HTS` (Harmonized Tariff Schedule)
-            - `SCHEDULE B` ( Schedule B)
+            - `SCHEDULE_B` ( Schedule B)
             - `TARIC` (Integrated Tariff of the European Communities)
             - `CN` (Combined Nomenclature)
             - `CUS` (Customs Union and Statistics)
