@@ -18,7 +18,7 @@ info:
 
     in order to poll information about status changes.
 
-    **Note:** All `/v3/shipping-instructions` and `/v3/transport-documents` endPoints must be implmented by the provider.
+    **Note:** All `/v3/shipping-instructions` and `/v3/transport-documents` endPoints must be implemented by the provider.
 
     ### Notifications (Implemented by consumer)
     It is possible to have notifications pushed to you whenever the provider needs input and/or a state change. The format of the notification is defined by the [Shipping Instructions Notification endPoint](#/ShippingInstructionsNotification) or the [Transport Document Notification endPoint](#/TransportDocumentNotification).
@@ -392,12 +392,12 @@ paths:
         In order to update a `Shipping Instructions`, the status of the `Shipping Instructions` needs to be in state:
 
         - `RECEIVED` in case the consumer has updated information for the `Shipping Instructions`
-        - `PENDING UPDATE` in case the provider has requested the consumer to update the `Shipping Instructions` (a result of **UseCase 2 - Request to update Shipping Instructions**)
+        - `PENDING_UPDATE` in case the provider has requested the consumer to update the `Shipping Instructions` (a result of **UseCase 2 - Request to update Shipping Instructions**)
 
         ## Postcondition
         The provider has received an update to the `Shipping Instructions` (**UseCase 3 - Submit updated Shipping Instructions**), from now on called the `Updated Shipping Instructions`.
 
-        The `Updated Shipping Instructions` and the "original" `Shipping Instructions` **co-exist** until a new update is submitted by the consumer (via **UseCase 3: Submit updated Shipping Instructions**) or until the provider requests an update (sets the `shippingInstructionsStatus='PENDING UPDATE'` via **UseCase 2: Request to update Shipping Instructions**). The `Updated Shipping Instructions` always represents the latest version of an update received by the provider.
+        The `Updated Shipping Instructions` and the "original" `Shipping Instructions` **co-exist** until a new update is submitted by the consumer (via **UseCase 3: Submit updated Shipping Instructions**) or until the provider requests an update (sets the `shippingInstructionsStatus='PENDING_UPDATE'` via **UseCase 2: Request to update Shipping Instructions**). The `Updated Shipping Instructions` always represents the latest version of an update received by the provider.
 
         The consumer will receive a `200` (OK) or a `202` (Accepted) if the payload schema-validates or a `400` (Bad Request) if it does not.
 
@@ -416,25 +416,25 @@ paths:
 
         3. The response depends on which use case is the reason for calling this endPoint (what the `shippingInstructionsStatus` is):
 
-            - If `shippingInstructionsStatus` **is** `RECEIVED`, then this endPoint is being used in addition to **UseCase 1 - Submit Shipping Instructions**. In this case the consumer would like to make an update to an already sent `Shipping Instructions`. This is done via **UseCase 3 - Submit updated Shipping Instructions**. The `shippingInstructionsStatus` stays as `RECEIVED`, `updatedShippingInstructionsStatus` is set to `UPDATE RECEIVED`
+            - If `shippingInstructionsStatus` **is** `RECEIVED`, then this endPoint is being used in addition to **UseCase 1 - Submit Shipping Instructions**. In this case the consumer would like to make an update to an already sent `Shipping Instructions`. This is done via **UseCase 3 - Submit updated Shipping Instructions**. The `shippingInstructionsStatus` stays as `RECEIVED`, `updatedShippingInstructionsStatus` is set to `UPDATE_RECEIVED`
             
               A `200` (OK) response is returned with the following payload:
               ```
               {
                 shippingInstructionsReference: 'si-123',
                 shippingInstructionsStatus: 'RECEIVED',
-                updatedShippingInstructionsStatus: 'UPDATE RECEIVED'
+                updatedShippingInstructionsStatus: 'UPDATE_RECEIVED'
               }
               ```
 
-            - If `shippingInstructionsStatus` is `PENDING UPDATE`, then this endPoint is being used as a response to **UseCase 2 - Request to update Shipping Instructions** in this case the provider has requested an update to a `Shipping Instructions`. The `shippingInstructionsStatus` remains `PENDING UPDATE`, `updatedShippingInstructionsStatus` is set to `UPDATE RECEIVED`.
+            - If `shippingInstructionsStatus` is `PENDING_UPDATE`, then this endPoint is being used as a response to **UseCase 2 - Request to update Shipping Instructions** in this case the provider has requested an update to a `Shipping Instructions`. The `shippingInstructionsStatus` remains `PENDING_UPDATE`, `updatedShippingInstructionsStatus` is set to `UPDATE_RECEIVED`.
               
               A `200` (OK) response is returned with the following payload:
               ```
               {
                 shippingInstructionsReference: 'si-123',
-                shippingInstructionsStatus: 'PENDING UPDATE',
-                updatedShippingInstructionsStatus: 'UPDATE RECEIVED'
+                shippingInstructionsStatus: 'PENDING_UPDATE',
+                updatedShippingInstructionsStatus: 'UPDATE_RECEIVED'
               }
               ```
         4. All '_relevant_' subscribers will be notified via a [Shipping Instructions Notification](#/ShippingInstructionsNotification).
@@ -442,8 +442,8 @@ paths:
         For `PUT` `Shipping Instructions` responding with `200` (OK) the process ends here. The updated `Shipping Instructions`:
           - is now stored in the provider system
           - a `200` (OK) response is sent to the consumer with the status of the `Shipping Instructions` and the `Updated Shipping Instructions` with one of the following combinations (depending on the use case):
-            - `shippingInstructionsStatus='RECEIVED'` and `updatedShippingInstructionsStatus='UPDATE RECEIVED'` (if endPoint used to make an update to a Submitted Shipping Instructions - **UseCase 1 - Submit Shipping Instructions**)
-            - `shippingInstructionsStatus='PENDING UPDATE'` and `updatedShippingInstructionsStatus='UPDATE RECEIVED'` (if endPoint used as a response to **UseCase 2 - Request to update Shipping Instructions**)
+            - `shippingInstructionsStatus='RECEIVED'` and `updatedShippingInstructionsStatus='UPDATE_RECEIVED'` (if endPoint used to make an update to a Submitted Shipping Instructions - **UseCase 1 - Submit Shipping Instructions**)
+            - `shippingInstructionsStatus='PENDING_UPDATE'` and `updatedShippingInstructionsStatus='UPDATE_RECEIVED'` (if endPoint used as a response to **UseCase 2 - Request to update Shipping Instructions**)
 
             A subsequent `GET` request to the `Shipping Instructions` will fetch the status along with the `Shipping Instructions`
           - awaits further processing by the provider
@@ -480,8 +480,8 @@ paths:
           - awaits further processing by the provider
         
         The provider will now start asynchronous processing. Once processed, the state will change to one of the following values depending on the use case for calling the `PUT` endPoint:
-          - `shippingInstructionsStatus='RECEIVED'` and `updatedShippingInstructionsStatus='UPDATE RECEIVED'` (if endPoint is used to make an update to a Submitted Shipping Instructions - **UseCase 1 - Submit Shipping Instructions**)
-          - `shippingInstructionsStatus='PENDING UPDATE'` and `updatedShippingInstructionsStatus='UPDATE RECEIVED'` (if endPoint is used as a response to **UseCase 2 - Request to update Shipping Instructions**)
+          - `shippingInstructionsStatus='RECEIVED'` and `updatedShippingInstructionsStatus='UPDATE_RECEIVED'` (if endPoint is used to make an update to a Submitted Shipping Instructions - **UseCase 1 - Submit Shipping Instructions**)
+          - `shippingInstructionsStatus='PENDING_UPDATE'` and `updatedShippingInstructionsStatus='UPDATE_RECEIVED'` (if endPoint is used as a response to **UseCase 2 - Request to update Shipping Instructions**)
         
         The new state will be communicated via a [Shipping Instructions Notification](#/ShippingInstructionsNotification). In case the consumer does not subscribe to notifications it is necessary for the consumer to poll on the
 
@@ -553,8 +553,8 @@ paths:
         '200':
           description: |
             The `Updated Shipping Instructions` has been successfully stored in the provider system with one of the following combinations (depending on the use case):
-            - `shippingInstructionsStatus='RECEIVED'` and `updatedShippingInstructionsStatus='UPDATE RECEIVED'` (if endPoint is used to make an update to a Submitted Shipping Instructions - **UseCase 1 - Submit Shipping Instructions**)
-            - `shippingInstructionsStatus='PENDING UPDATE'` and `updatedShippingInstructionsStatus='UPDATE RECEIVED'` (if endPoint is used as a response to **UseCase 2 - Request to update Shipping Instructions**)
+            - `shippingInstructionsStatus='RECEIVED'` and `updatedShippingInstructionsStatus='UPDATE_RECEIVED'` (if endPoint is used to make an update to a Submitted Shipping Instructions - **UseCase 1 - Submit Shipping Instructions**)
+            - `shippingInstructionsStatus='PENDING_UPDATE'` and `updatedShippingInstructionsStatus='UPDATE_RECEIVED'` (if endPoint is used as a response to **UseCase 2 - Request to update Shipping Instructions**)
 
             The status of the `Updated Shipping Instructions` can be monitored on the
 
@@ -581,23 +581,23 @@ paths:
                     An `Updated Shipping Instructions` is received and stored in provider system, the `Updated Shipping Instructions` now awaits provider action.
 
                         shippingInstructionsStatus='RECEIVED'
-                        updatedShippingInstructionsStatus='UPDATE RECEIVED'
+                        updatedShippingInstructionsStatus='UPDATE_RECEIVED'
                   value:
                     shippingInstructionsReference: si-123
                     shippingInstructionsStatus: RECEIVED
-                    updatedShippingInstructionsStatus: UPDATE RECEIVED
+                    updatedShippingInstructionsStatus: UPDATE_RECEIVED
                 pendingUpdateExample:
                   summary: |
                     Shipping Instructions updated because of consumer requirement
                   description: |
                     An updated `Shipping Instructions` received and stored in provider system as a response to a provider initiated update request (a response to **UseCase 2 - Request to update Shipping Instructions**). The `Updated Shipping Instructions` now awaits provider action
 
-                        shippingInstructionsStatus='PENDING UPDATE'
-                        updatedShippingInstructionsStatus='UPDATE RECEIVED'
+                        shippingInstructionsStatus='PENDING_UPDATE'
+                        updatedShippingInstructionsStatus='UPDATE_RECEIVED'
                   value:
                     shippingInstructionsReference: si-123
-                    shippingInstructionsStatus: PENDING UPDATE
-                    updatedShippingInstructionsStatus: UPDATE RECEIVED
+                    shippingInstructionsStatus: PENDING_UPDATE
+                    updatedShippingInstructionsStatus: UPDATE_RECEIVED
                 amendmentExample:
                   summary: |
                     Request amendment to Transport Document
@@ -605,12 +605,12 @@ paths:
                     An `Updated Shipping Instructions` received and stored in provider system as an amendment to a `Transport Document` with `transportDocumentReference='td-987'`. The `Updated Shipping Instructions` now awaits provider action
 
                         shippingInstructionsStatus='RECEIVED'
-                        updatedShippingInstructionsStatus='UPDATE RECEIVED'
+                        updatedShippingInstructionsStatus='UPDATE_RECEIVED'
                   value:
                     shippingInstructionsReference: si-123
                     transportDocumentReference: td-987
                     shippingInstructionsStatus: RECEIVED
-                    updatedShippingInstructionsStatus: UPDATE RECEIVED
+                    updatedShippingInstructionsStatus: UPDATE_RECEIVED
         '202':
           description: |
             The `Shipping Instructions` update has been successfully accepted by the provider. `shippingInstructionsStatus` does not change, `updatedShippingInstructionsStatus` is not set and response payload is empty. Further processing will be done by provider.
@@ -799,10 +799,10 @@ paths:
             GET /v3/shipping-instructions/{documentReference}?updatedContent=true
 
         The `status` of the "original" `Shipping Instructions` is included in both payloads as `shippingInstructionsStatus`. `updatedShippingInstructionsStatus` and related content is only available after a consumer has requested an update via **UseCase 3: Submit updated Shipping Instructions** and until:
-        - the provider requests for a new update (**UseCase 2: Request to update Shipping Instructions**) in which case the "old update" is no longer accessable.
+        - the provider requests for a new update (**UseCase 2: Request to update Shipping Instructions**) in which case the "old update" is no longer accessible.
         - the consumer submits a new update (**UseCase 3: Submit updated Shipping Instructions**) in which case the "new update" provided **replaces** the "old update".
 
-        If `updatedContent=true` is requested but no update has yet been provided by the consumer **or** the state of the "original" `Shipping Instructions` is `PENDING UPDATE`, then a `404` (Not Found) is returned.
+        If `updatedContent=true` is requested but no update has yet been provided by the consumer **or** the state of the "original" `Shipping Instructions` is `PENDING_UPDATE`, then a `404` (Not Found) is returned.
 
         If the provider is requesting changes to the `Shipping Instructions`, the `feedbacks` object is used to inform the consumer what needs to change.
 
@@ -878,7 +878,7 @@ paths:
                   value:
                     transportDocumentReference: D8931B95625E4B339F2A
                     shippingInstructionsReference: 9051da7d-4099-4930-af35-7add4e68c635
-                    shippingInstructionsStatus: PENDING UPDATE
+                    shippingInstructionsStatus: PENDING_UPDATE
                     transportDocumentTypeCode: BOL
                     isShippedOnBoardType: true
                     freightPaymentTermCode: PRE
@@ -940,14 +940,14 @@ paths:
                   description: |
                     A `Shipping Instructions` with `Environmentally hazardous substance, liquid, N.O.S (Propiconazole)` which is transported in steel Jarricans.
 
-                    The `Shipping Instructions` has already been applied an update which has been confirmed by the provider (`updatedShippingInstructions='UPDATE CONFIRMED'`). The `Shipping Instructions` is now waiting for the provider to `DRAFT` a `Transport Document`.
+                    The `Shipping Instructions` has already been applied an update which has been confirmed by the provider (`updatedShippingInstructions='UPDATE_CONFIRMED'`). The `Shipping Instructions` is now waiting for the provider to `DRAFT` a `Transport Document`.
 
                     **Notice** that there are no DG (Dangerous Goods) info in the `Shipping Instructions`. If any DG info need to be modified - then a `Booking` amendment must be applied to booking: `RTM1234567`.
                   value:
                     transportDocumentReference: 4AD3FA470BB541B980CE
                     shippingInstructionsReference: b36484d0-1115-43c2-93e4-a378823a8386
                     shippingInstructionsStatus: RECEIVED
-                    updatedShippingInstructionsStatus: UPDATE CONFIRMED
+                    updatedShippingInstructionsStatus: UPDATE_CONFIRMED
                     transportDocumentTypeCode: BOL
                     isShippedOnBoardType: true
                     freightPaymentTermCode: PRE
@@ -1019,7 +1019,7 @@ paths:
                     requestUri: /v3/shipping-instructions/si-123?updatedContent=true
                     statusCode: 404
                     statusCodeText: Not Found
-                    statusCodeMessage: No update accessable
+                    statusCodeMessage: No update accessible
                     providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
                     errorDateTime: '2023-04-13T07:41:00+08:30'
                     errors:
@@ -1047,7 +1047,7 @@ paths:
                         errorCodeMessage: The Shipping Instructions does not exist
         '409':
           description: |
-            In case the provider is processing the `Shipping Instructions` - it is possible for the provider to reject new incomming requests by returning a `409` (Conflict)
+            In case the provider is processing the `Shipping Instructions` - it is possible for the provider to reject new incoming requests by returning a `409` (Conflict)
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -1127,7 +1127,7 @@ paths:
                     
                         GET /v3/shipping-instructions/si-123
                         
-                    too many times within a timeperiod.
+                    too many times within a time period.
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
@@ -1156,10 +1156,10 @@ paths:
         A way for the consumer to Cancel an `Updated Shipping Instructions`. This endPoint corresponds with **UseCase 5 - Cancel update to Shipping Instructions**.
 
         ## Precondition
-        In order to cancel an `Updated Shipping Instructions`, the status of the `Updated Shipping Instructions` must be in in status `UPDATE RECEIVED`. The status of the `Shipping Instructions` can be either `RECEIVED` or `PENDING UPDATE`.
+        In order to cancel an `Updated Shipping Instructions`, the status of the `Updated Shipping Instructions` must be in in status `UPDATE_RECEIVED`. The status of the `Shipping Instructions` can be either `RECEIVED` or `PENDING_UPDATE`.
 
         ## Postcondition
-        The provider has received a cancellation from the consumer for an `Updated Shipping Instructions` that is in state `UPDATE RECEIVED`.
+        The provider has received a cancellation from the consumer for an `Updated Shipping Instructions` that is in state `UPDATE_RECEIVED`.
 
         The consumer will receive a `200` (OK) or a `202` (Accepted) if the payload schema-validates or a `400` (Bad Request) if it does not.
 
@@ -1171,7 +1171,7 @@ paths:
         2. The payload is schema-valid which means:
             - all required properties are provided.
             - all values provided have correct data type.
-        3. The `updatedShippingInstructionsStatus` is set to `UPDATE CANCELLED`.
+        3. The `updatedShippingInstructionsStatus` is set to `UPDATE_CANCELLED`.
         4. All '_relevant_' subscribers will be notified via a [Shipping Instructions Notification](#/ShippingInstructionsNotification).
 
         ## Flow for a `202` (Accepted) response
@@ -1198,8 +1198,8 @@ paths:
                   type: string
                   maxLength: 50
                   description: |
-                    The status of the `Updated Shipping Instructions`. It can only be `UPDATE CANCELLED`
-                  example: UPDATE CANCELLED
+                    The status of the `Updated Shipping Instructions`. It can only be `UPDATE_CANCELLED`
+                  example: UPDATE_CANCELLED
               required:
                 - updatedShippingInstructionsStatus
             examples:
@@ -1207,13 +1207,13 @@ paths:
                 summary: |
                   Cancel a Shipping Instructions update
                 description: |
-                  Consumer wants to cancel an update provided to a `Shipping Instructions`. The `updatedShippingInstructionsStatus` is set to `UPDATE CANCELLED`
+                  Consumer wants to cancel an update provided to a `Shipping Instructions`. The `updatedShippingInstructionsStatus` is set to `UPDATE_CANCELLED`
                 value:
-                  updatedShippingInstructionsStatus: UPDATE CANCELLED
+                  updatedShippingInstructionsStatus: UPDATE_CANCELLED
       responses:
         '200':
           description: |
-            The `Updated Shipping Instructions` is now cancelled. The `updatedShippingInstructionsStatus` is now `UPDATE CANCELLED`. The `shippingInstructionsStatus` is left unchanged.
+            The `Updated Shipping Instructions` is now cancelled. The `updatedShippingInstructionsStatus` is now `UPDATE_CANCELLED`. The `shippingInstructionsStatus` is left unchanged.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -1226,20 +1226,20 @@ paths:
                   summary: |
                     Cancel a Shipping Instructions update
                   description: |
-                    Consumer wants to cancel an update provided to a `Shipping Instructions`. In this case the `shippingInstructionsStatus` stays as `RECEIVED` and the `updatedShippingInstructionsStatus` is set to `UPDATE CANCELLED`. An optional `reason` can be provided.
+                    Consumer wants to cancel an update provided to a `Shipping Instructions`. In this case the `shippingInstructionsStatus` stays as `RECEIVED` and the `updatedShippingInstructionsStatus` is set to `UPDATE_CANCELLED`. An optional `reason` can be provided.
                   value:
                     shippingInstructionsReference: si-123
                     shippingInstructionsStatus: RECEIVED
-                    updatedShippingInstructionsStatus: UPDATE CANCELLED
+                    updatedShippingInstructionsStatus: UPDATE_CANCELLED
                 cancelRequestedUpdateExample:
                   summary: |
                     Cancel a Shipping Instructions update requested by provider
                   description: |
-                    Consumer wants to cancel an update provided to a `Shipping Instructions`. The update was requested by the provider. The `shippingInstructionsStatus` stays as `PENDING UPDATE` and the `updatedShippingInstructionsStatus` is set to `UPDATE CANCELLED`. An optional `reason` can be provided.
+                    Consumer wants to cancel an update provided to a `Shipping Instructions`. The update was requested by the provider. The `shippingInstructionsStatus` stays as `PENDING_UPDATE` and the `updatedShippingInstructionsStatus` is set to `UPDATE_CANCELLED`. An optional `reason` can be provided.
                   value:
                     shippingInstructionsReference: si-123
-                    shippingInstructionsStatus: PENDING UPDATE
-                    updatedShippingInstructionsStatus: UPDATE CANCELLED
+                    shippingInstructionsStatus: PENDING_UPDATE
+                    updatedShippingInstructionsStatus: UPDATE_CANCELLED
         '202':
           description: |
             The cancellation of the `Updated Shipping Instructions` is accepted and is now awaiting further processing by the provider
@@ -1286,10 +1286,10 @@ paths:
                         property: updatedShippingInstructionsStatus
                         value: APPROVE
                         errorCodeText: incorrect value
-                        errorCodeMessage: 'Only UPDATE CANCELLED is an allowed value: APPROVE was inserted'
+                        errorCodeMessage: 'Only UPDATE_CANCELLED is an allowed value: APPROVE was inserted'
         '404':
           description: |
-            In case the consumer is trying to cancel a `Shipping Instructions` that does not have an ongoing update request, an `Updated Shipping Instructions` that is in state `UPDATE RECEIVED`.
+            In case the consumer is trying to cancel a `Shipping Instructions` that does not have an ongoing update request, an `Updated Shipping Instructions` that is in state `UPDATE_RECEIVED`.
 
             A `404` (Not Found) can also be sent in case the provider does not know of the `documentReference` used in the request (the resource does not exist)
           headers:
@@ -1398,7 +1398,7 @@ paths:
                     
                         PATCH /v3/shipping-instructions/si-123
                     
-                    too many times within a timeperiod.
+                    too many times within a time period.
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
@@ -1868,7 +1868,7 @@ paths:
                     
                         GET /v3/transport-documents/td-987
                         
-                    too many times within a timeperiod.
+                    too many times within a time period.
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
@@ -2133,7 +2133,7 @@ paths:
                     
                         PATCH /v3/transport-documents/td-987
                         
-                    too many times within a timeperiod.
+                    too many times within a time period.
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
@@ -2156,7 +2156,7 @@ paths:
       summary: Send a new Shipping Instructions Notification
       operationId: shipping-instructions-notifications
       description: |
-        Creates a new [`Shipping Instructions Notification`](#/ShippingInstructionsNotification). This endPoint is called whenever a `Shipping Instructions` that a cosumer has subscribed to changes state or is updated.
+        Creates a new [`Shipping Instructions Notification`](#/ShippingInstructionsNotification). This endPoint is called whenever a `Shipping Instructions` that a consumer has subscribed to changes state or is updated.
 
         **This endPoint is to be implemented by a consumer of the EBL API in order to receive Notifications**
       parameters:
@@ -2247,7 +2247,7 @@ paths:
                 summary: |
                   Shipping Instructions update declined (Lightweight)
                 description: |
-                  A lightweight notification explaining that an update to a `Shipping Instructions`, that was pending an update by the consumer (`shippingInstructionsStatus='PENDING UPDATE'`), has been declined (`updatedShippingInstructionsStatus='UPDATE DECLINED'`)
+                  A lightweight notification explaining that an update to a `Shipping Instructions`, that was pending an update by the consumer (`shippingInstructionsStatus='PENDING_UPDATE'`), has been declined (`updatedShippingInstructionsStatus='UPDATE_DECLINED'`)
                 value:
                   specversion: '1.0'
                   id: 3cecb101-7a1a-43a4-9d62-e88a131651e2
@@ -2257,14 +2257,14 @@ paths:
                   datacontenttype: application/json
                   subscriptionReference: SI001
                   data:
-                    shippingInstructionsStatus: PENDING UPDATE
-                    updatedShippingInstructionsStatus: UPDATE DECLINED
+                    shippingInstructionsStatus: PENDING_UPDATE
+                    updatedShippingInstructionsStatus: UPDATE_DECLINED
                     shippingInstructionsReference: e0559d83-00e2-438e-afd9-fdd610c1a008
               declinedFullStateTransferExample:
                 summary: |
                   Shipping Instructions update declined (Full State Transfer)
                 description: |
-                  A full state transfer notification explaining that an update to a `Shipping Instructions`, that was pending an update by the consumer (`shippingInstructionsStatus='PENDING UPDATE'`), has been declined (`updatedShippingInstructionsStatus='UPDATE DECLINED'`)
+                  A full state transfer notification explaining that an update to a `Shipping Instructions`, that was pending an update by the consumer (`shippingInstructionsStatus='PENDING_UPDATE'`), has been declined (`updatedShippingInstructionsStatus='UPDATE_DECLINED'`)
 
                   The example shows an original `ShippingInstructions` with a wrong weight on `consignmentItem` and `cargoItem`. The updated weight is also wrong!
                 value:
@@ -2276,13 +2276,13 @@ paths:
                   datacontenttype: application/json
                   subscriptionReference: SI001
                   data:
-                    shippingInstructionsStatus: PENDING UPDATE
-                    updatedShippingInstructionsStatus: UPDATE DECLINED
+                    shippingInstructionsStatus: PENDING_UPDATE
+                    updatedShippingInstructionsStatus: UPDATE_DECLINED
                     shippingInstructionsReference: e0559d83-00e2-438e-afd9-fdd610c1a008
                     shippingInstructions:
                       shippingInstructionsReference: e0559d83-00e2-438e-afd9-fdd610c1a008
-                      shippingInstructionsStatus: PENDING UPDATE
-                      updatedShippingInstructionsStatus: UPDATE DECLINED
+                      shippingInstructionsStatus: PENDING_UPDATE
+                      updatedShippingInstructionsStatus: UPDATE_DECLINED
                       transportDocumentTypeCode: BOL
                       isShippedOnBoardType: true
                       freightPaymentTermCode: PRE
@@ -2324,8 +2324,8 @@ paths:
                           equipmentReference: NARU3472484
                     updatedShippingInstructions:
                       shippingInstructionsReference: e0559d83-00e2-438e-afd9-fdd610c1a008
-                      shippingInstructionsStatus: PENDING UPDATE
-                      updatedShippingInstructionsStatus: UPDATE DECLINED
+                      shippingInstructionsStatus: PENDING_UPDATE
+                      updatedShippingInstructionsStatus: UPDATE_DECLINED
                       transportDocumentTypeCode: BOL
                       isShippedOnBoardType: true
                       freightPaymentTermCode: PRE
@@ -2849,7 +2849,7 @@ paths:
 
                         POST /v3/transport-document-notifications
 
-                    too many times within a timeperiod.
+                    too many times within a time period.
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
@@ -2990,7 +2990,7 @@ components:
                 The status of the `Shipping Instructions`. Possible values are:
 
                 - `RECEIVED` (Shipping Instructions has been received)
-                - `PENDING UPDATE` (An update is required to the Shipping Instructions)
+                - `PENDING_UPDATE` (An update is required to the Shipping Instructions)
                 - `COMPLETED` (The Shipping Instructions can no longer be modified - the related Transport Document has been surrendered for delivery)
 
                 More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/eblstatuses.csv).
@@ -3001,13 +3001,13 @@ components:
               description: |
                 The status of latest update to the `Shipping Instructions`. If no update has been requested - then this property is empty. Possible values are:
 
-                - `UPDATE RECEIVED` (An update to a Shipping Instructions has been recieved and is awaiting to be processed)
-                - `UPDATE CONFIRMED` (Update is confirmed)
-                - `UPDATE CANCELLED` (An update to a Shipping Instructions is discontinued by consumer)
-                - `UPDATE DECLINED` (An update to a Shipping Instructions is discontinued by provider)
+                - `UPDATE_RECEIVED` (An update to a Shipping Instructions has been received and is awaiting to be processed)
+                - `UPDATE_CONFIRMED` (Update is confirmed)
+                - `UPDATE_CANCELLED` (An update to a Shipping Instructions is discontinued by consumer)
+                - `UPDATE_DECLINED` (An update to a Shipping Instructions is discontinued by provider)
 
                 More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/eblstatuses.csv).
-              example: UPDATE RECEIVED
+              example: UPDATE_RECEIVED
             shippingInstructionsReference:
               type: string
               pattern: ^\S(?:.*\S)?$
@@ -3064,7 +3064,7 @@ components:
                   description: |
                     The status of the `Shipping Instructions`. Possible values are:
                     - `RECEIVED` (Shipping Instructions has been received)
-                    - `PENDING UPDATE` (An update is required to the Shipping Instructions)
+                    - `PENDING_UPDATE` (An update is required to the Shipping Instructions)
                     - `COMPLETED` (The Shipping Instructions can no longer be modified - the related Transport Document has been surrendered for delivery)
                   example: RECEIVED
                 updatedShippingInstructionsStatus:
@@ -3072,11 +3072,11 @@ components:
                   maxLength: 50
                   description: |
                     The status of the latest update to the `Shipping Instructions`. If no update has been requested - then this field is empty. Possible values are:
-                    - `UPDATE RECEIVED` (An update to a Shipping Instructions is waiting to be processed)
-                    - `UPDATE CONFIRMED` (An update to a Shipping Instructions has been confirmed)
-                    - `UPDATE CANCELLED` (An update to a Shipping Instructions is discontinued by consumer)
-                    - `UPDATE DECLINED` (An update to a Shipping Instructions is discontinued by provider)
-                  example: UPDATE RECEIVED
+                    - `UPDATE_RECEIVED` (An update to a Shipping Instructions is waiting to be processed)
+                    - `UPDATE_CONFIRMED` (An update to a Shipping Instructions has been confirmed)
+                    - `UPDATE_CANCELLED` (An update to a Shipping Instructions is discontinued by consumer)
+                    - `UPDATE_DECLINED` (An update to a Shipping Instructions is discontinued by provider)
+                  example: UPDATE_RECEIVED
                 transportDocumentTypeCode:
                   type: string
                   description: |
@@ -3536,7 +3536,7 @@ components:
                   description: |
                     The status of the `Shipping Instructions`. Possible values are:
                     - `RECEIVED` (Shipping Instructions has been received)
-                    - `PENDING UPDATE` (An update is required to the Shipping Instructions)
+                    - `PENDING_UPDATE` (An update is required to the Shipping Instructions)
                     - `COMPLETED` (The Shipping Instructions can no longer be modified - the related Transport Document has been surrendered for delivery)
                   example: RECEIVED
                 updatedShippingInstructionsStatus:
@@ -3544,11 +3544,11 @@ components:
                   maxLength: 50
                   description: |
                     The status of the latest update to the `Shipping Instructions`. If no update has been requested - then this field is empty. Possible values are:
-                    - `UPDATE RECEIVED` (An update to a Shipping Instructions is waiting to be processed)
-                    - `UPDATE CONFIRMED` (An update to a Shipping Instructions has been confirmed)
-                    - `UPDATE CANCELLED` (An update to a Shipping Instructions is discontinued by consumer)
-                    - `UPDATE DECLINED` (An update to a Shipping Instructions is discontinued by provider)
-                  example: UPDATE RECEIVED
+                    - `UPDATE_RECEIVED` (An update to a Shipping Instructions is waiting to be processed)
+                    - `UPDATE_CONFIRMED` (An update to a Shipping Instructions has been confirmed)
+                    - `UPDATE_CANCELLED` (An update to a Shipping Instructions is discontinued by consumer)
+                    - `UPDATE_DECLINED` (An update to a Shipping Instructions is discontinued by provider)
+                  example: UPDATE_RECEIVED
                 transportDocumentTypeCode:
                   type: string
                   description: |
@@ -4070,11 +4070,11 @@ components:
                 - `DRAFT` (Transport Document is Drafted)
                 - `APPROVED` (Transport Document has been Approved by consumer)
                 - `ISSUED` (Transport Document has been Issued by provider)
-                - `PENDING SURRENDER FOR AMENDMENT` (Transport Document is Pending for Surrender for an Amendment)
-                - `SURRENDER FOR AMENDMENT` (Transport Document Surrendered for an Amendment)
+                - `PENDING_SURRENDER_FOR_AMENDMENT` (Transport Document is Pending for Surrender for an Amendment)
+                - `SURRENDER_FOR_AMENDMENT` (Transport Document Surrendered for an Amendment)
                 - `VOID` (the Transport Document has been Voided)
-                - `PENDING SURRENDER FOR DELIVERY` (Transport Document pending surrender for Delivery)
-                - `SURRENDERED FOR DELIVERY` (Transport Document surrendered for Delivery)
+                - `PENDING_SURRENDER_FOR_DELIVERY` (Transport Document pending surrender for Delivery)
+                - `SURRENDER_FOR_DELIVERY` (Transport Document surrendered for Delivery)
 
                 More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-Edocumentation/blob/master/edocumentation-domain/src/main/resources/validations/eblstatuses.csv).
               example: DRAFT
@@ -4132,10 +4132,10 @@ components:
                     - DRAFT
                     - APPROVED
                     - ISSUED
-                    - PENDING SURRENDER FOR AMENDMENT
-                    - SURRENDER FOR AMENDMENT
-                    - PENDING SURRENDER FOR DELIVERY
-                    - SURRENDER FOR DELIVERY
+                    - PENDING_SURRENDER_FOR_AMENDMENT
+                    - SURRENDERED_FOR_AMENDMENT
+                    - PENDING_SURRENDER_FOR_DELIVERY
+                    - SURRENDERED_FOR_DELIVERY
                     - VOIDED
                   example: DRAFT
                 transportDocumentTypeCode:
@@ -5492,7 +5492,7 @@ components:
           description: |
             The status of the `Shipping Instructions`. Possible values are:
             - `RECEIVED` (Shipping Instructions has been received)
-            - `PENDING UPDATE` (An update is required to the Shipping Instructions)
+            - `PENDING_UPDATE` (An update is required to the Shipping Instructions)
             - `COMPLETED` (The Shipping Instructions can no longer be modified - the related Transport Document has been surrendered for delivery)
           example: RECEIVED
         updatedShippingInstructionsStatus:
@@ -5500,11 +5500,11 @@ components:
           maxLength: 50
           description: |
             The status of the latest update to the `Shipping Instructions`. If no update has been requested - then this field is empty. Possible values are:
-            - `UPDATE RECEIVED` (An update to a Shipping Instructions is waiting to be processed)
-            - `UPDATE CONFIRMED` (An update to a Shipping Instructions has been confirmed)
-            - `UPDATE CANCELLED` (An update to a Shipping Instructions is discontinued by consumer)
-            - `UPDATE DECLINED` (An update to a Shipping Instructions is discontinued by provider)
-          example: UPDATE RECEIVED
+            - `UPDATE_RECEIVED` (An update to a Shipping Instructions is waiting to be processed)
+            - `UPDATE_CONFIRMED` (An update to a Shipping Instructions has been confirmed)
+            - `UPDATE_CANCELLED` (An update to a Shipping Instructions is discontinued by consumer)
+            - `UPDATE_DECLINED` (An update to a Shipping Instructions is discontinued by provider)
+          example: UPDATE_RECEIVED
         transportDocumentTypeCode:
           type: string
           description: |
@@ -5960,7 +5960,7 @@ components:
           description: |
             The status of the `Shipping Instructions`. Possible values are:
             - `RECEIVED` (Shipping Instructions has been received)
-            - `PENDING UPDATE` (An update is required to the Shipping Instructions)
+            - `PENDING_UPDATE` (An update is required to the Shipping Instructions)
             - `COMPLETED` (The Shipping Instructions can no longer be modified - the related Transport Document has been surrendered for delivery)
           example: RECEIVED
         updatedShippingInstructionsStatus:
@@ -5968,11 +5968,11 @@ components:
           maxLength: 50
           description: |
             The status of the latest update to the `Shipping Instructions`. If no update has been requested - then this field is empty. Possible values are:
-            - `UPDATE RECEIVED` (An update to a Shipping Instructions is waiting to be processed)
-            - `UPDATE CONFIRMED` (An update to a Shipping Instructions has been confirmed)
-            - `UPDATE CANCELLED` (An update to a Shipping Instructions is discontinued by consumer)
-            - `UPDATE DECLINED` (An update to a Shipping Instructions is discontinued by provider)
-          example: UPDATE RECEIVED
+            - `UPDATE_RECEIVED` (An update to a Shipping Instructions is waiting to be processed)
+            - `UPDATE_CONFIRMED` (An update to a Shipping Instructions has been confirmed)
+            - `UPDATE_CANCELLED` (An update to a Shipping Instructions is discontinued by consumer)
+            - `UPDATE_DECLINED` (An update to a Shipping Instructions is discontinued by provider)
+          example: UPDATE_RECEIVED
         feedbacks:
           type: array
           description: |
@@ -6011,15 +6011,15 @@ components:
           description: |
             The status of the `Shipping Instructions`. Possible values are:
             - `RECEIVED` (Shipping Instructions has been received)
-            - `PENDING UPDATE` (An update is required to the Shipping Instructions)
+            - `PENDING_UPDATE` (An update is required to the Shipping Instructions)
             - `COMPLETED` (The Shipping Instructions can no longer be modified - the related Transport Document has been surrendered for delivery)
           example: RECEIVED
         updatedShippingInstructionsStatus:
           type: string
           maxLength: 50
           description: |
-            The status of the `Updated Shipping Instructions`. It can only be `UPDATE CANCELLED`
-          example: UPDATE CANCELLED
+            The status of the `Updated Shipping Instructions`. It can only be `UPDATE_CANCELLED`
+          example: UPDATE_CANCELLED
         feedbacks:
           type: array
           description: |
@@ -6333,7 +6333,8 @@ components:
           type: string
           description: |
             The provider used for identifying the facility Code. Some facility codes are only defined in combination with an `UN Location Code`
-            - `BIC` (Requires a UN Location Code) - `SMDG` (Requires a UN Location Code)
+            - `BIC` (Requires a UN Location Code)
+            - `SMDG` (Requires a UN Location Code)
           enum:
             - BIC
             - SMDG
@@ -6509,10 +6510,10 @@ components:
           pattern: ^\S(?:.*\S)?$
           description: |
             Can be one of the following values as per the Union Customs Code art. 5(4):
-            - `NATURAL PERSON` (A person that is an individual living human being)
-            - `LEGAL PERSON` (person (including a human being and public or private organizations) that can perform legal actions, such as own a property, sue and be sued)
-            - `ASSOCIATION OF PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
-          example: 'NATURAL PERSON'
+            - `NATURAL_PERSON` (A person that is an individual living human being)
+            - `LEGAL_PERSON` (person (including a human being and public or private organizations) that can perform legal actions, such as own a property, sue and be sued)
+            - `ASSOCIATION_OF_PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
+          example: 'NATURAL_PERSON'
         address:
           $ref: '#/components/schemas/PartyAddress'
         displayedAddress:
@@ -6583,10 +6584,10 @@ components:
           pattern: ^\S(?:.*\S)?$
           description: |
             Can be one of the following values as per the Union Customs Code art. 5(4):
-            - `NATURAL PERSON` (A person that is an individual living human being)
-            - `LEGAL PERSON` (person (including a human being and public or private organizations) that can perform legal actions, such as own a property, sue and be sued)
-            - `ASSOCIATION OF PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
-          example: 'NATURAL PERSON'
+            - `NATURAL_PERSON` (A person that is an individual living human being)
+            - `LEGAL_PERSON` (person (including a human being and public or private organizations) that can perform legal actions, such as own a property, sue and be sued)
+            - `ASSOCIATION_OF_PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
+          example: 'NATURAL_PERSON'
         address:
           $ref: '#/components/schemas/PartyAddress'
         identifyingCodes:
@@ -6629,10 +6630,10 @@ components:
           pattern: ^\S(?:.*\S)?$
           description: |
             Can be one of the following values as per the Union Customs Code art. 5(4):
-            - `NATURAL PERSON` (A person that is an individual living human being)
-            - `LEGAL PERSON` (person (including a human being and public or private organizations) that can perform legal actions, such as own a property, sue and be sued)
-            - `ASSOCIATION OF PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
-          example: 'NATURAL PERSON'
+            - `NATURAL_PERSON` (A person that is an individual living human being)
+            - `LEGAL_PERSON` (person (including a human being and public or private organizations) that can perform legal actions, such as own a property, sue and be sued)
+            - `ASSOCIATION_OF_PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
+          example: 'NATURAL_PERSON'
         address:
           $ref: '#/components/schemas/PartyAddress'
         displayedAddress:
@@ -6703,10 +6704,10 @@ components:
           pattern: ^\S(?:.*\S)?$
           description: |
             Can be one of the following values as per the Union Customs Code art. 5(4):
-            - `NATURAL PERSON` (A person that is an individual living human being)
-            - `LEGAL PERSON` (person (including a human being and public or private organizations) that can perform legal actions, such as own a property, sue and be sued)
-            - `ASSOCIATION OF PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
-          example: 'NATURAL PERSON'
+            - `NATURAL_PERSON` (A person that is an individual living human being)
+            - `LEGAL_PERSON` (person (including a human being and public or private organizations) that can perform legal actions, such as own a property, sue and be sued)
+            - `ASSOCIATION_OF_PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
+          example: 'NATURAL_PERSON'
         address:
           $ref: '#/components/schemas/PartyAddress'
         identifyingCodes:
@@ -6874,10 +6875,10 @@ components:
           pattern: ^\S(?:.*\S)?$
           description: |
             Can be one of the following values as per the Union Customs Code art. 5(4):
-            - `NATURAL PERSON` (A person that is an individual living human being)
-            - `LEGAL PERSON` (person (including a human being and public or private organizations) that can perform legal actions, such as own a property, sue and be sued)
-            - `ASSOCIATION OF PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
-          example: 'NATURAL PERSON'
+            - `NATURAL_PERSON` (A person that is an individual living human being)
+            - `LEGAL_PERSON` (person (including a human being and public or private organizations) that can perform legal actions, such as own a property, sue and be sued)
+            - `ASSOCIATION_OF_PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
+          example: 'NATURAL_PERSON'
         address:
           $ref: '#/components/schemas/PartyAddress'
         displayedAddress:
@@ -6941,10 +6942,10 @@ components:
           pattern: ^\S(?:.*\S)?$
           description: |
             Can be one of the following values as per the Union Customs Code art. 5(4):
-            - `NATURAL PERSON` (A person that is an individual living human being)
-            - `LEGAL PERSON` (person (including a human being and public or private organizations) that can perform legal actions, such as own a property, sue and be sued)
-            - `ASSOCIATION OF PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
-          example: 'NATURAL PERSON'
+            - `NATURAL_PERSON` (A person that is an individual living human being)
+            - `LEGAL_PERSON` (person (including a human being and public or private organizations) that can perform legal actions, such as own a property, sue and be sued)
+            - `ASSOCIATION_OF_PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
+          example: 'NATURAL_PERSON'
         address:
           $ref: '#/components/schemas/PartyAddress'
         identifyingCodes:
@@ -6985,10 +6986,10 @@ components:
           pattern: ^\S(?:.*\S)?$
           description: |
             Can be one of the following values as per the Union Customs Code art. 5(4):
-            - `NATURAL PERSON` (A person that is an individual living human being)
-            - `LEGAL PERSON` (person (including a human being and public or private organizations) that can perform legal actions, such as own a property, sue and be sued)
-            - `ASSOCIATION OF PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
-          example: 'NATURAL PERSON'
+            - `NATURAL_PERSON` (A person that is an individual living human being)
+            - `LEGAL_PERSON` (person (including a human being and public or private organizations) that can perform legal actions, such as own a property, sue and be sued)
+            - `ASSOCIATION_OF_PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
+          example: 'NATURAL_PERSON'
         address:
           $ref: '#/components/schemas/PartyAddress'
         identifyingCodes:
@@ -7023,10 +7024,10 @@ components:
           pattern: ^\S(?:.*\S)?$
           description: |
             Can be one of the following values as per the Union Customs Code art. 5(4):
-            - `NATURAL PERSON` (A person that is an individual living human being)
-            - `LEGAL PERSON` (person (including a human being and public or private organizations) that can perform legal actions, such as own a property, sue and be sued)
-            - `ASSOCIATION OF PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
-          example: 'NATURAL PERSON'
+            - `NATURAL_PERSON` (A person that is an individual living human being)
+            - `LEGAL_PERSON` (person (including a human being and public or private organizations) that can perform legal actions, such as own a property, sue and be sued)
+            - `ASSOCIATION_OF_PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
+          example: 'NATURAL_PERSON'
         address:
           $ref: '#/components/schemas/PartyAddress'
         identifyingCodes:
@@ -7489,7 +7490,7 @@ components:
             The national commodity classification code, which can be one of the following values defined by DCSA:
             - `NCM` (Nomenclatura Comum do Mercosul)
             - `HTS` (Harmonized Tariff Schedule)
-            - `SCHEDULE B` ( Schedule B)
+            - `SCHEDULE_B` ( Schedule B)
             - `TARIC` (Integrated Tariff of the European Communities)
             - `CN` (Combined Nomenclature)
             - `CUS` (Customs Union and Statistics)
@@ -7774,11 +7775,11 @@ components:
           maxLength: 30
           description: |
             Property to clearly indicate if the products, packaging and any other items are made of wood. Possible values include:
-            - `NOT APPLICABLE` (if no wood or any other wood product such as packaging and supports are being shipped)
-            - `NOT TREATED AND NOT CERTIFIED` (if the wood or wooden materials have not been treated nor fumigated and do not include a certificate)
+            - `NOT_APPLICABLE` (if no wood or any other wood product such as packaging and supports are being shipped)
+            - `NOT_TREATED_AND_NOT_CERTIFIED` (if the wood or wooden materials have not been treated nor fumigated and do not include a certificate)
             - `PROCESSED` (if the wood or wooden materials are entirely made of processed wood, such as plywood, particle board, sliver plates of wood and wood laminate sheets produced using glue, heat, pressure or a combination of these)
-            - `TREATED AND CERTIFIED` (if the wood or wooden materials have been treated and/or fumigated and include a certificate)
-          example: TREATED AND CERTIFIED
+            - `TREATED_AND_CERTIFIED` (if the wood or wooden materials have been treated and/or fumigated and include a certificate)
+          example: TREATED_AND_CERTIFIED
       required:
         - numberOfPackages
         - description
@@ -7827,11 +7828,11 @@ components:
           maxLength: 30
           description: |
             Property to clearly indicate if the products, packaging and any other items are made of wood. Possible values include:
-            - `NOT APPLICABLE` (if no wood or any other wood product such as packaging and supports are being shipped)
-            - `NOT TREATED AND NOT CERTIFIED` (if the wood or wooden materials have not been treated nor fumigated and do not include a certificate)
+            - `NOT_APPLICABLE` (if no wood or any other wood product such as packaging and supports are being shipped)
+            - `NOT_TREATED_AND_NOT_CERTIFIED` (if the wood or wooden materials have not been treated nor fumigated and do not include a certificate)
             - `PROCESSED` (if the wood or wooden materials are entirely made of processed wood, such as plywood, particle board, sliver plates of wood and wood laminate sheets produced using glue, heat, pressure or a combination of these)
-            - `TREATED AND CERTIFIED` (if the wood or wooden materials have been treated and/or fumigated and include a certificate)
-          example: TREATED AND CERTIFIED
+            - `TREATED_AND_CERTIFIED` (if the wood or wooden materials have been treated and/or fumigated and include a certificate)
+          example: TREATED_AND_CERTIFIED
         dangerousGoods:
           type: array
           description: |
@@ -8210,7 +8211,7 @@ components:
           maxLength: 100
           description: |
             Description of the packaging.
-          example: Wowen plastic water resistant Bag
+          example: Woven plastic water resistant Bag
       required:
         - quantity
         - material
@@ -8657,7 +8658,7 @@ components:
         isDrainholesOpen:
           type: boolean
           description: |
-            Is drainholes open on the container
+            Is drain holes open on the container
           example: true
         isBulbMode:
           type: boolean
@@ -8683,7 +8684,7 @@ components:
       type: object
       title: Advance Manifest Filing
       description: |
-        An Advance Maifest Filing defined by a Manifest type code in combination with a country code.
+        An Advance Manifest Filing defined by a Manifest type code in combination with a country code.
 
         A list of `manifestTypeCodes` together with `countryCode` is maintained in [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/domain/documentation/reference-data/advancemanifestfilings-v300.csv). A (small) subset can be seen here:
 
@@ -8947,7 +8948,7 @@ components:
         - `CARGO_REEFERTEMPERATURE` (Cargo/Reefer temperature)
         - `CARGO_CONFLICTINGTEMPERATURES_MIXEDLOADS` (Cargo/Conflicting temperatures / Mixed loads)
 
-        More infomation can be read [here](https://dcsa.org/wp-content/uploads/2023/12/202312-Standardised-Clauses-BL.pdf)
+        More information can be read [here](https://dcsa.org/wp-content/uploads/2023/12/202312-Standardised-Clauses-BL.pdf)
       example: CARGO_CARGOSPECIFICS
 
     ####################
@@ -8983,10 +8984,10 @@ components:
             - DRAFT
             - APPROVED
             - ISSUED
-            - PENDING SURRENDER FOR AMENDMENT
-            - SURRENDER FOR AMENDMENT
-            - PENDING SURRENDER FOR DELIVERY
-            - SURRENDER FOR DELIVERY
+            - PENDING_SURRENDER_FOR_AMENDMENT
+            - SURRENDERED_FOR_AMENDMENT
+            - PENDING_SURRENDER_FOR_DELIVERY
+            - SURRENDERED_FOR_DELIVERY
             - VOIDED
           example: DRAFT
         transportDocumentTypeCode:
@@ -9468,10 +9469,10 @@ components:
             - DRAFT
             - APPROVED
             - ISSUED
-            - PENDING SURRENDER FOR AMENDMENT
-            - SURRENDER FOR AMENDMENT
-            - PENDING SURRENDER FOR DELIVERY
-            - SURRENDER FOR DELIVERY
+            - PENDING_SURRENDER_FOR_AMENDMENT
+            - SURRENDERED_FOR_AMENDMENT
+            - PENDING_SURRENDER_FOR_DELIVERY
+            - SURRENDERED_FOR_DELIVERY
             - VOIDED
           example: DRAFT
       required:

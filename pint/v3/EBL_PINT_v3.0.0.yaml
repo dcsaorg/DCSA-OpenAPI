@@ -10,7 +10,7 @@ info:
 
     <h2>The Envelope Transfer</h2>
 
-    The PINT API is designed to support non-repudiable transfer of eBL document and any number of additional documents between two eBL platforms. 
+    The PINT API is designed to support transfer of eBL documents with non-repudiation and any number of additional documents between two eBL platforms. 
 
     In the most common scenario, the sending eBL platform executes the envelope transfer by:
     0. Optionally, using the [**'Receiver Validation'**](#/Receiver%20validation/post-receiver-validation) endpoint to allow the sending user to validate the identity of the receiver,  before they transfer the eBL.
@@ -80,7 +80,7 @@ paths:
       responses:
         '200':
           description: |
-            The Receiving platform either accepts the envelope transfer immediately (if there are no additional documents to be transferred, or if it concludes that it is already in the possesion of all the additional documents mentioned in the [`EnvelopeManifest`](#/EnvelopeManifest)), or concludes that in has previously accepted the envelope transfer with the same contents.
+            The Receiving platform either accepts the envelope transfer immediately (if there are no additional documents to be transferred, or if it concludes that it is already in the possession of all the additional documents mentioned in the [`EnvelopeManifest`](#/EnvelopeManifest)), or concludes that in has previously accepted the envelope transfer with the same contents.
 
             The signed response [`EnvelopeTransferFinishedResponseSignedContent`](#/EnvelopeTransferFinishedResponseSignedContent) JWS-signed payload must contain [`EnvelopeTransferFinishedResponse.responseCode`](#/EnvelopeTransferFinishedResponse) that signals the accepted envelope transfer (`RECE` or `DUPE`).
           headers:
@@ -750,7 +750,7 @@ components:
             - `DISE` (Disputed Envelope)
 
             The `RECE` `responseCode` is used when the receiving platform acknowledges that the envelope transfer is accepted. 
-            This response code can also be used when replying to [**'Start envelope transfer'**](#/Start%20envelope%20transfer) endpoint request if and only if the receiving platform is already in possesion of all the additional documents listed in the `EnvelopeManifest`, and is ready to commit to accepting the envelope transfer.  This should only happen in special cases (e.g. Platform A which has performed the intial envelope transfer with additional documents to platform B later during the lifetime of the same eBL receives [**'Start envelope transfer'**](#/Start%20envelope%20transfer) endpoint request from some other Platform C with `EnvelopeManifest` listing additional documents, for which it concludes (based on checksum comparison) that they are identical to the addition documents from the intial envelope transfer). The `RECE` `responseCode` should be used together with the HTTP `200 Ok` response status code.
+            This response code can also be used when replying to [**'Start envelope transfer'**](#/Start%20envelope%20transfer) endpoint request if and only if the receiving platform is already in possession of all the additional documents listed in the `EnvelopeManifest`, and is ready to commit to accepting the envelope transfer.  This should only happen in special cases (e.g. Platform A which has performed the initial envelope transfer with additional documents to platform B later during the lifetime of the same eBL receives [**'Start envelope transfer'**](#/Start%20envelope%20transfer) endpoint request from some other Platform C with `EnvelopeManifest` listing additional documents, for which it concludes (based on checksum comparison) that they are identical to the addition documents from the initial envelope transfer). The `RECE` `responseCode` should be used together with the HTTP `200 Ok` response status code.
 
             The `DUPE` `responseCode` is used in place of `RECE` `responseCode` when the receiving platform has already previously acknowledged and accepted the transfer of this envelope. In this case, the receiving platform asserts that this envelope transfer request is invalid but the prior envelope transfer was successful.  The receiving platform should include accepted version of last `EnvelopeTransferChainEntrySignedContent` entry in `EblEnvelope.envelopeTransferChain` list in the `duplicateOfAcceptedEnvelopeTransferChainEntrySignedContent` field. The receiving platform is only required to detect DUPE `responseCode` if the EnvelopeTransferChainEntrySignedContentChecksum is the same between the two transfer attempt and the sending platform is expected to reuse the same envelope. The `DUPE` `responseCode` should be used together with the HTTP `200 Ok` response status code.
 
@@ -860,21 +860,21 @@ components:
 
             The `TRNS` `action` is used for the transfer of possession of the eBL from the current possessor party to the new possessor party.
 
-            The `ENDO` `action` is used for the endorsement (a.k.a. transfer of title, or the right to take the delivery of the goods) of To-order eBL documents, where the new endorsee party is not named in the eBL document. The endorsement should always happen on the platform of the user that is not only the current endorsee, but also the current possessor of the eBL document. If the new endorsee party resides on the different eBL Platform from the current endorsee's platform, the envelope transfer process is used to notify the new endorsee of the `ENDO` `action` transaction for non-repudiation purposes, and will NOT result in the transfer of possession of the eBL documment contained in the envelope. 
+            The `ENDO` `action` is used for the endorsement (a.k.a. transfer of title, or the right to take the delivery of the goods) of To-order eBL documents, where the new endorsee party is not named in the eBL document. The endorsement should always happen on the platform of the user that is not only the current endorsee, but also the current possessor of the eBL document. If the new endorsee party resides on the different eBL Platform from the current endorsee's platform, the envelope transfer process is used to notify the new endorsee of the `ENDO` `action` transaction for non-repudiation purposes, and will NOT result in the transfer of possession of the eBL document contained in the envelope. 
 
             If the party is the current possessor, and the party is the current consignee/endorsee/shipper (or eBL document is blank-endorsed), the party may request to surrender the eBL to the carrier. This is done by using one of the Request to surrender action types (`RESD` `action` or `RESA` `action`) and with the issuing carrier or the relevant carrier agent as the `recipient` of the action. 
              
              The `RESD` `action` is used when the party wants to request the delivery of the goods. If the request is accepted (for details see `SACC` `action`), the carrier and the party submitting the surrender request will negotiate how the goods will be delivered (e.g. via DCSA shipment release API).
              
-             The `RESA` `action` is used when the party wants to surrender the eBL document, so that the carrier can issue an amended eBL document. If the request is accepted (for details see `SACC` `action` resonse), the alignment on the exact change(s) that need to be made to the eBL document is done outside of the PINT API (e.g. via the DCSA EBL API). If the request is accepted, the existing eBL document is voided along with its envelope transfer chain, and the amended eBL document must be reissued with a new envelope transfer chain (for details see the `ISSU` `action` type description paragraph above). The `RESA` `action` is also used for switch to paper as the DCSA process flow for switching to paper is part of the amendment process (e.g. to note how many originals and copies with and without charges should be issued).
+             The `RESA` `action` is used when the party wants to surrender the eBL document, so that the carrier can issue an amended eBL document. If the request is accepted (for details see `SACC` `action` response), the alignment on the exact change(s) that need to be made to the eBL document is done outside of the PINT API (e.g. via the DCSA EBL API). If the request is accepted, the existing eBL document is voided along with its envelope transfer chain, and the amended eBL document must be reissued with a new envelope transfer chain (for details see the `ISSU` `action` type description paragraph above). The `RESA` `action` is also used for switch to paper as the DCSA process flow for switching to paper is part of the amendment process (e.g. to note how many originals and copies with and without charges should be issued).
 
             If a surrender request (`RESD` `action` or `RESA` `action`) is not addressed to the carrier that issued the eBL document or to their legal representative, then the receiving platform should reject the envelope transfer with the [`EnvelopeTransferFinishedResponse`](#/EnvelopeTransferFinishedResponse) containing `BENV` [`responseCode`](#/EnvelopeTransferFinishedResponse).
 
-            The `SACC` `action` is used by the carrier to asynchronously accept the surrender request initiated via `RESD` `action` or `RESA` `action`. If the party that submitted the surrender request is on the different platform, the envelope transfer process is used to notify the (surrender request submitter) party of the `SACC` `action` transaction for non-repudiation purposes, and will NOT result in the transfer of possession of the eBL documment contained in the envelope. No transactions may occur after a `SACC` `action` transaction. Any envelope transfer chain changes with new transactions after a `SACC` `action` transaction are invalid and should be answered with the [`EnvelopeTransferFinishedResponse`](#/EnvelopeTransferFinishedResponse) containing `BENV` [`responseCode`](#/EnvelopeTransferFinishedResponse). 
+            The `SACC` `action` is used by the carrier to asynchronously accept the surrender request initiated via `RESD` `action` or `RESA` `action`. If the party that submitted the surrender request is on the different platform, the envelope transfer process is used to notify the (surrender request submitter) party of the `SACC` `action` transaction for non-repudiation purposes, and will NOT result in the transfer of possession of the eBL document contained in the envelope. No transactions may occur after a `SACC` `action` transaction. Any envelope transfer chain changes with new transactions after a `SACC` `action` transaction are invalid and should be answered with the [`EnvelopeTransferFinishedResponse`](#/EnvelopeTransferFinishedResponse) containing `BENV` [`responseCode`](#/EnvelopeTransferFinishedResponse). 
 
             The `SREJ` `action` is used by the carrier to asynchronously reject the surrender request initiated via `RESD` `action` or `RESA` `action`, and return the eBL document possession to the party that submitted the surrender request.
 
-            When the transaction recipient is residing on the different platform from the transaction actor's platform, the transaction should be followed by the envelope transfer from the actor's (sending) platform to the recipient's (receiving) platform. If the envelope transfer is caused by either `ENDO` `action` or `SACC` `action` transaction (where the recipient is on the different platform), the envelope transfer process is NOT causing transfer of possession of the eBL document, but is merely used as notificaiton for the non-repudiation purposes.
+            When the transaction recipient is residing on the different platform from the transaction actor's platform, the transaction should be followed by the envelope transfer from the actor's (sending) platform to the recipient's (receiving) platform. If the envelope transfer is caused by either `ENDO` `action` or `SACC` `action` transaction (where the recipient is on the different platform), the envelope transfer process is NOT causing transfer of possession of the eBL document, but is merely used as notification for the non-repudiation purposes.
           enum:
             - ISSU
             - ENDO
@@ -1090,10 +1090,10 @@ components:
             - DRAFT
             - APPROVED
             - ISSUED
-            - PENDING SURRENDER FOR AMENDMENT
-            - SURRENDER FOR AMENDMENT
-            - PENDING SURRENDER FOR DELIVERY
-            - SURRENDER FOR DELIVERY
+            - PENDING_SURRENDER_FOR_AMENDMENT
+            - SURRENDERED_FOR_AMENDMENT
+            - PENDING_SURRENDER_FOR_DELIVERY
+            - SURRENDERED_FOR_DELIVERY
             - VOIDED
           example: DRAFT
         transportDocumentTypeCode:
@@ -1745,7 +1745,7 @@ components:
             The national commodity classification code, which can be one of the following values defined by DCSA:
             - `NCM` (Nomenclatura Comum do Mercosul)
             - `HTS` (Harmonized Tariff Schedule)
-            - `SCHEDULE B` ( Schedule B)
+            - `SCHEDULE_B` ( Schedule B)
             - `TARIC` (Integrated Tariff of the European Communities)
             - `CN` (Combined Nomenclature)
             - `CUS` (Customs Union and Statistics)
@@ -1956,11 +1956,11 @@ components:
           maxLength: 30
           description: |
             Property to clearly indicate if the products, packaging and any other items are made of wood. Possible values include:
-            - `NOT APPLICABLE` (if no wood or any other wood product such as packaging and supports are being shipped)
-            - `NOT TREATED AND NOT CERTIFIED` (if the wood or wooden materials have not been treated nor fumigated and do not include a certificate)
+            - `NOT_APPLICABLE` (if no wood or any other wood product such as packaging and supports are being shipped)
+            - `NOT_TREATED_AND_NOT_CERTIFIED` (if the wood or wooden materials have not been treated nor fumigated and do not include a certificate)
             - `PROCESSED` (if the wood or wooden materials are entirely made of processed wood, such as plywood, particle board, sliver plates of wood and wood laminate sheets produced using glue, heat, pressure or a combination of these)
-            - `TREATED AND CERTIFIED` (if the wood or wooden materials have been treated and/or fumigated and include a certificate)
-          example: TREATED AND CERTIFIED
+            - `TREATED_AND_CERTIFIED` (if the wood or wooden materials have been treated and/or fumigated and include a certificate)
+          example: TREATED_AND_CERTIFIED
         dangerousGoods:
           type: array
           description: |
@@ -2339,7 +2339,7 @@ components:
           maxLength: 100
           description: |
             Description of the packaging.
-          example: Wowen plastic water resistant Bag
+          example: Woven plastic water resistant Bag
       required:
         - quantity
         - material
@@ -2652,7 +2652,7 @@ components:
         isDrainholesOpen:
           type: boolean
           description: |
-            Is drainholes open on the container
+            Is drain holes open on the container
           example: true
         isBulbMode:
           type: boolean
@@ -3132,7 +3132,8 @@ components:
           type: string
           description: |
             The provider used for identifying the facility Code. Some facility codes are only defined in combination with an `UN Location Code`
-            - `BIC` (Requires a UN Location Code) - `SMDG` (Requires a UN Location Code)
+            - `BIC` (Requires a UN Location Code)
+            - `SMDG` (Requires a UN Location Code)
           enum:
             - BIC
             - SMDG
@@ -3281,10 +3282,10 @@ components:
           pattern: ^\S(?:.*\S)?$
           description: |
             Can be one of the following values as per the Union Customs Code art. 5(4):
-            - `NATURAL PERSON` (A person that is an individual living human being)
-            - `LEGAL PERSON` (person (including a human being and public or private organizations) that can perform legal actions, such as own a property, sue and be sued)
-            - `ASSOCIATION OF PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
-          example: 'NATURAL PERSON'
+            - `NATURAL_PERSON` (A person that is an individual living human being)
+            - `LEGAL_PERSON` (person (including a human being and public or private organizations) that can perform legal actions, such as own a property, sue and be sued)
+            - `ASSOCIATION_OF_PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
+          example: 'NATURAL_PERSON'
         address:
           $ref: '#/components/schemas/PartyAddress'
         displayedAddress:
@@ -3357,10 +3358,10 @@ components:
           pattern: ^\S(?:.*\S)?$
           description: |
             Can be one of the following values as per the Union Customs Code art. 5(4):
-            - `NATURAL PERSON` (A person that is an individual living human being)
-            - `LEGAL PERSON` (person (including a human being and public or private organizations) that can perform legal actions, such as own a property, sue and be sued)
-            - `ASSOCIATION OF PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
-          example: 'NATURAL PERSON'
+            - `NATURAL_PERSON` (A person that is an individual living human being)
+            - `LEGAL_PERSON` (person (including a human being and public or private organizations) that can perform legal actions, such as own a property, sue and be sued)
+            - `ASSOCIATION_OF_PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
+          example: 'NATURAL_PERSON'
         address:
           $ref: '#/components/schemas/PartyAddress'
         displayedAddress:
@@ -3509,10 +3510,10 @@ components:
           pattern: ^\S(?:.*\S)?$
           description: |
             Can be one of the following values as per the Union Customs Code art. 5(4):
-            - `NATURAL PERSON` (A person that is an individual living human being)
-            - `LEGAL PERSON` (person (including a human being and public or private organizations) that can perform legal actions, such as own a property, sue and be sued)
-            - `ASSOCIATION OF PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
-          example: 'NATURAL PERSON'
+            - `NATURAL_PERSON` (A person that is an individual living human being)
+            - `LEGAL_PERSON` (person (including a human being and public or private organizations) that can perform legal actions, such as own a property, sue and be sued)
+            - `ASSOCIATION_OF_PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
+          example: 'NATURAL_PERSON'
         address:
           $ref: '#/components/schemas/PartyAddress'
         displayedAddress:
