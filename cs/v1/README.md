@@ -29,8 +29,41 @@ The DCSA Commercial Schedules API is specified on [**SwaggerHub**](https://app.s
         - Vessel Transport → modeOfTransport [`VESSEL`]
         - Barge Transport → modeOfTransport [`BARGE`]
         - Barge Transport → modeOfTransport [`RAIL_TRUCK`,`BARGE_TRUCK`,`BARGE_RAIL`,`MULTIMODAL`]
-    - 
-    - 
+      - `Vessel Transport` and `Barge Transport` discriminator object changes
+        - Added `portVisitReference`,`transportCallReference`,`servicePartners`(object),`vessel`(object in vesselTransport),`barge`(object in bargeTransport)
+        - Added `MMSINumber`,`flag`,`callsign` to `vessel` and `barge` objects.
+        - Changed `vesselOperatorSMDGLinerCode` to `operatorCarrierCode` + `operatorCarrierCodeListProvider`
+        - Changed `vesselName` to `name`
+        - Changed `vesselIMONumber` length from String of 7 to String minimum length 7 and maximum length 8
+        - Changed maximum length of vessel name from 35 to 50
+        - Moved partner related properties `carrierCode`,`carrierCodeListProvider`,`carrierServiceName`,`carrierServiceCode`,`carrierImportVoyageNumber`,`carrierExportVoyageNumber` to the object(new) `servicePartners`
+    - location object changed from discriminators for each location to an object with types of different locations as optional properties
+    - Added `cutOffTimes`
+- Port Schedules
+  - Filters
+    - Changed filter `port` to `UNLocationCode`
+  - Response
+    - location object changed from discriminators for each location to an object with types of different locations as optional properties
+    - Added `cutOffTimes`
+    - Added `servicePartners` object and moved properties `carrierCode`,`carrierCodeListProvider`,`carrierServiceName`,`carrierServiceCode`,`carrierImportVoyageNumber`,`carrierExportVoyageNumber` to it
+    - Added `vessel` object and moved `vesselIMONumber`,`name`(before `vesselName`),`operatorCarrierCode`,`operatorCarrierCodeListProvider` to it.
+    - Added `MMSINumber`,`flag`,`callsign` to `vessel` object
+    - Changed `vesselOperatorSMDGLinerCode` to `operatorCarrierCode` + `operatorCarrierCodeListProvider`
+    - Changed `vesselIMONumber` length from String of 7 to String minimum length 7 and maximum length 8
+    - Changed maximum length of vessel name from 35 to 50
+- Vessel Schedules
+  - Filters
+    - Added filter `vesselOperatorCarrierCode`
+  - Response
+    - location object changed from discriminators for each location to an object with types of different locations as optional properties
+    - Added `vessel` object and moved `vesselIMONumber`,`name`(before `vesselName`),`operatorCarrierCode`,`operatorCarrierCodeListProvider` to it.
+    - Added `MMSINumber`,`flag`,`callsign` to `vessel` object
+    - Added `cutOffTimes`
+    - Changed `vesselOperatorSMDGLinerCode` to `operatorCarrierCode` + `operatorCarrierCodeListProvider`
+    - Changed `vesselName` to `name`
+    - Changed `vesselIMONumber` length from String of 7 to String minimum length 7 and maximum length 8
+    - Changed maximum length of vessel name from 35 to 50
+      
 ### <a name="v100B1"></a>[Release v1.0.0 Beta 1 (15 January 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_CS/1.0.0-Beta-1)
 ---
 Initial release of the DCSA OpenAPI definitions for Commercial Schedule 1.0.0 Beta 1
