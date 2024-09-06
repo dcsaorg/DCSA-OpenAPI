@@ -10,6 +10,7 @@ The DCSA Commercial Schedules API is specified on [**SwaggerHub**](https://app.s
 - `modeOfTransport` modified for point-to-point routings endpoint
 - changed `vesselOperatorSMDGLinerCode` --> `operatorCarrierCode` + `operatorCarrierCodeListProvider`
 - locations are handled differently going forward. Locations are no longer defined using a `oneOf` but rather via optional properties.
+- Added Pagination to all th endpoints
 
 ## All changes
 - Point to Point
@@ -17,6 +18,7 @@ The DCSA Commercial Schedules API is specified on [**SwaggerHub**](https://app.s
     - `departureDateTime` changed to `departureStartDate`,`departureEndDate`
     - `arrivalDateTime` changed to `arrivalStartDate`,`arrivalEndDate`
     - `isTranshipment` changed to `maxTranshipment`($int32)
+    - Added `cursor`
   - Response
     - Added `receiptTypeAtOrigin`,`receiptTypeAtDestination`,`cutOffTimes`,`solutionNumber` to the response
     - `transitTime` format changed from $int64 to $int32
@@ -38,22 +40,39 @@ The DCSA Commercial Schedules API is specified on [**SwaggerHub**](https://app.s
         - Changed maximum length of vessel name from 35 to 50
         - Moved partner related properties `carrierCode`,`carrierCodeListProvider`,`carrierServiceName`,`carrierServiceCode`,`carrierImportVoyageNumber`,`carrierExportVoyageNumber` to the object(new) `servicePartners`
     - location object changed from discriminators for each location to an object with types of different locations as optional properties
-    - Added `cutOffTimes`
+    - Added `X-Next-Page-Cursor` to the response header for pagination
+    - Fixed typo in `errorCodeMessage` and is made mandatory
+    - Changed length of `vesselName` (now `name`) from 35 to 50
+    - Removed `name` from Address Location
+    - Changed `country` in address to `countryCode` and made mandatory.
+    - Added `minItems: 1` to the `Leg` array
+    - `sequenceNumber` format changed from int64 to int32
+    - `errorDateTime` example changed to UTC
+    - `dateTime` examples changed to date time with offset
+    - changed Facility SMDG Location to Facility Location and changed `facilitySMDGCode` to `facilityCode` and `facilityCodeListProvider` in `facility` in location object and added `BIC` to `facilityCodeListProvider`
+    - Changed inline `Detailed Error` to object
 - Port Schedules
   - Filters
     - Changed filter `port` to `UNLocationCode`
+    - Added `limit` and `cursor`
   - Response
     - location object changed from discriminators for each location to an object with types of different locations as optional properties
     - Added `cutOffTimes`
-    - Added `servicePartners` object and moved properties `carrierCode`,`carrierCodeListProvider`,`carrierServiceName`,`carrierServiceCode`,`carrierImportVoyageNumber`,`carrierExportVoyageNumber` to it
+    - Added `servicePartners` object (mandatory) and moved properties `carrierCode`,`carrierCodeListProvider`,`carrierServiceName`,`carrierServiceCode`,`carrierImportVoyageNumber`,`carrierExportVoyageNumber` to it
     - Added `vessel` object and moved `vesselIMONumber`,`name`(before `vesselName`),`operatorCarrierCode`,`operatorCarrierCodeListProvider` to it.
     - Added `MMSINumber`,`flag`,`callsign` to `vessel` object
     - Changed `vesselOperatorSMDGLinerCode` to `operatorCarrierCode` + `operatorCarrierCodeListProvider`
     - Changed `vesselIMONumber` length from String of 7 to String minimum length 7 and maximum length 8
     - Changed maximum length of vessel name from 35 to 50
+    - Changed Timestamp array attribute name from `timestamp` to `timestamps`
+    - Added `X-Next-Page-Cursor` to the response header for pagination
+    - Fixed typo in `errorCodeMessage` and is made mandatory
+    - `errorDateTime` example changed to UTC
+    - Changed inline `Detailed Error` to object
 - Vessel Schedules
   - Filters
     - Added filter `vesselOperatorCarrierCode`
+    - Added `limit` and `cursor`
   - Response
     - location object changed from discriminators for each location to an object with types of different locations as optional properties
     - Added `vessel` object and moved `vesselIMONumber`,`name`(before `vesselName`),`operatorCarrierCode`,`operatorCarrierCodeListProvider` to it.
@@ -63,6 +82,16 @@ The DCSA Commercial Schedules API is specified on [**SwaggerHub**](https://app.s
     - Changed `vesselName` to `name`
     - Changed `vesselIMONumber` length from String of 7 to String minimum length 7 and maximum length 8
     - Changed maximum length of vessel name from 35 to 50
+    - Changed Timestamp array attribute name from `timestamp` to `timestamps`
+    - Added `X-Next-Page-Cursor` to the response header for pagination
+    - Fixed typo in `errorCodeMessage` and is made mandatory
+    - Changed length of `vesselName` (now `name`) from 35 to 50
+    - Removed `name` from Address Location
+    - Changed `country` in address to `countryCode` and made mandatory.
+    - `errorDateTime` example changed to UTC
+    - Made `carrierServiceCode` mandatory
+    - Changed inline `Detailed Error` to object
+    - 
       
 ### <a name="v100B1"></a>[Release v1.0.0 Beta 1 (15 January 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_CS/1.0.0-Beta-1)
 ---
