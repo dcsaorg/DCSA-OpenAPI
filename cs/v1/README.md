@@ -2,7 +2,7 @@
 
 The DCSA Commercial Schedules API is specified on [**SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_CS).
 
-### <a name="v100B1"></a>[Release v1.0.0 (24 September 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_CS/1.0.0)
+### <a name="v100"></a>[Release v1.0.0 (24 September 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_CS/1.0.0)
 ---
 
 ## Key changes
@@ -24,7 +24,7 @@ The DCSA Commercial Schedules API is specified on [**SwaggerHub**](https://app.s
     - `transitTime` format changed from $int64 to $int32
     - `facilitySMDGCode` split to `facilityCode` and `facilityCodeListProvider`(BIC,SMDG)
     - `dateTime` to be expressed in local time with offset (YYYY-MM-DDTHH:MM:SS±HH:MM)
-      - with exception of errorDateTime which is in UTC without offset.
+      - with exception of `errorDateTime` which is in UTC without offset.
     - changed `modeOfTransport` to `transport` object and moved transport-related information to the transport object with discriminators of different transport mode.
       - Added `RAIL_TRUCK`,`BARGE_TRUCK`,`BARGE_RAIL`,`MULTIMODAL` to `modeOfTranport`,now supports `VESSEL`,`BARGE`,`TRUCK`,`RAIL`,`RAIL_TRUCK`,`BARGE_TRUCK`,`BARGE_RAIL`,`MULTIMODAL`
       - discriminators added to `transport` object to limit additional details depending on the `modeOfTransport`
@@ -65,7 +65,7 @@ The DCSA Commercial Schedules API is specified on [**SwaggerHub**](https://app.s
     - Changed `vesselIMONumber` length from String of 7 to String minimum length 7 and maximum length 8
     - Changed maximum length of vessel name from 35 to 50
     - Changed Timestamp array attribute name from `timestamp` to `timestamps`
-    - Added `X-Next-Page-Cursor` to the response header for pagination
+    - Added `Next-Page-Cursor` to the response header for pagination
     - Fixed typo in `errorCodeMessage` and is made mandatory
     - `errorDateTime` example changed to UTC
     - Changed inline `Detailed Error` to object
