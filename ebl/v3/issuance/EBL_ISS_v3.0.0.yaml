@@ -1290,44 +1290,60 @@ components:
 
             If a container does not comply with [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346), it is suggested to follow [Recommendation #2: Containers with non-ISO identification](https://smdg.org/documents/smdg-recommendations) from SMDG.
           example: APZU4812090
-        weight:
-          type: number
-          format: float
-          minimum: 0
-          exclusiveMinimum: true
+        grossWeight:
+          type: object
+          title: Gross Weight
           description: |
             The total weight of the cargo including packaging items being carried in the container(s). Excludes the tare weight of the container(s).
-          example: 13000.3
-        weightUnit:
-          type: string
-          description: |
-            The unit of measure which can be expressed in imperial or metric terms
-            - `KGM` (Kilograms)
-            - `LBR` (Pounds)
-          enum:
-            - KGM
-            - LBR
-          example: KGM
-        volume:
-          type: number
-          format: float
-          minimum: 0
-          exclusiveMinimum: true
+          properties:
+            value:
+              type: number
+              format: float
+              minimum: 0
+              exclusiveMinimum: true
+              description: |
+                Total weight of the goods carried, including packaging. Excludes the tare weight of the container(s).
+              example: 2.4
+            unit:
+              type: string
+              description: |
+                The unit of measure which can be expressed in imperial or metric terms
+                - `KGM` (Kilograms)
+                - `LBR` (Pounds)
+              enum:
+                - KGM
+                - LBR
+              example: KGM
+          required:
+            - value
+            - unit
+        grossVolume:
+          type: object
+          title: Gross Volume
           description: |
             Calculated by multiplying the width, height, and length of the packed cargo.
-          example: 12
-        volumeUnit:
-          type: string
-          description: |
-            The unit of measure which can be expressed in either imperial or metric terms
-            - `FTQ` (Cubic foot)
-            - `MTQ` (Cubic meter)
-
-            **Condition:** Mandatory to provide if `volume` is provided
-          enum:
-            - MTQ
-            - FTQ
-          example: MTQ
+          properties:
+            value:
+              type: number
+              format: float
+              minimum: 0
+              exclusiveMinimum: true
+              description: |
+                Calculated by multiplying the width, height, and length of the packed cargo.
+              example: 2.4
+            unit:
+              type: string
+              description: |
+                The unit of measure which can be expressed in either imperial or metric terms
+                - `FTQ` (Cubic foot)
+                - `MTQ` (Cubic meter)
+              enum:
+                - MTQ
+                - FTQ
+              example: MTQ
+          required:
+            - value
+            - unit
         outerPackaging:
           $ref: '#/components/schemas/OuterPackaging'
         nationalCommodityCodes:
@@ -1344,8 +1360,7 @@ components:
             $ref: '#/components/schemas/CustomsReference'
       required:
         - equipmentReference
-        - weight
-        - weightUnit
+        - grossWeight
         - outerPackaging
 
     #################
@@ -1719,9 +1734,9 @@ components:
           required:
             - value
             - unit
-        volume:
+        netVolume:
           type: object
-          title: Volume
+          title: Net Volume
           description: |
             The volume of the referenced dangerous goods.
 
