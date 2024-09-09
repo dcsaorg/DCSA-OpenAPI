@@ -181,7 +181,8 @@ paths:
                           email: no-reply@dcsa.example.org
                   consignmentItems:
                     - carrierBookingReference: CBR_123_REGULAR
-                      descriptionOfGoods: 'Shoes - black'
+                      descriptionOfGoods:
+                        - 'Shoes - black'
                       HSCodes:
                         - '640510'
                       commoditySubreference: RegSubRef001
@@ -532,7 +533,8 @@ paths:
                           email: no-reply@dcsa.example.org
                   consignmentItems:
                     - carrierBookingReference: CBR_123_REGULAR
-                      descriptionOfGoods: 'Shoes - black'
+                      descriptionOfGoods:
+                        - 'Shoes - black'
                       HSCodes:
                         - '640510'
                       commoditySubreference: RegSubRef001
@@ -851,7 +853,8 @@ paths:
                       - carrierBookingReference: CBR_123_REGULAR
                         weight: 12000
                         weightUnit: KGM
-                        descriptionOfGoods: 'Shoes - black'
+                        descriptionOfGoods:
+                          - 'Shoes - black'
                         HSCodes:
                           - '640510'
                         commoditySubreference: RegSubRef001
@@ -899,7 +902,8 @@ paths:
                             email: no-reply@dcsa.example.org
                     consignmentItems:
                       - carrierBookingReference: CBR_123_REEFER
-                        descriptionOfGoods: Dairy products
+                        descriptionOfGoods:
+                          - 'Dairy products'
                         HSCodes:
                           - '04052090'
                         commoditySubreference: ReeferSubRef002
@@ -968,7 +972,9 @@ paths:
                             email: no-reply@dcsa.example.org
                     consignmentItems:
                       - carrierBookingReference: RTM1234567
-                        descriptionOfGoods: 'Environmentally hazardous substance, liquid, N.O.S (Propiconazole)'
+                        descriptionOfGoods:
+                          - 'Environmentally hazardous substance'
+                          - 'liquid, N.O.S (Propiconazole)'
                         HSCodes:
                           - '293499'
                         commoditySubreference: DGSubRef003
@@ -1538,7 +1544,8 @@ paths:
                             partyCode: MSC
                     consignmentItems:
                       - carrierBookingReference: CBR_123_REGULAR
-                        descriptionOfGoods: 'Shoes - black'
+                        descriptionOfGoods:
+                          - 'Shoes - black'
                         HSCodes:
                           - '640510'
                         cargoItems:
@@ -1645,7 +1652,8 @@ paths:
                             partyCode: MSC
                     consignmentItems:
                       - carrierBookingReference: CBR_123_REEFER
-                        descriptionOfGoods: Dairy products
+                        descriptionOfGoods:
+                          - 'Dairy products'
                         HSCodes:
                           - '04052090'
                         cargoItems:
@@ -1757,7 +1765,9 @@ paths:
                             partyCode: HLC
                     consignmentItems:
                       - carrierBookingReference: RTM1234567
-                        descriptionOfGoods: 'Environmentally hazardous substance, liquid, N.O.S (Propiconazole)'
+                        descriptionOfGoods:
+                          - 'Environmentally hazardous substance'
+                          - 'liquid, N.O.S (Propiconazole)'
                         HSCodes:
                           - '293499'
                         cargoItems:
@@ -2226,7 +2236,8 @@ paths:
                         - carrierBookingReference: CBR_123_REGULAR
                           weight: 12000
                           weightUnit: KGM
-                          descriptionOfGoods: 'Shoes - black'
+                          descriptionOfGoods:
+                            - 'Shoes - black'
                           HSCodes:
                             - '640510'
                           commoditySubreference: RegSubRef001
@@ -2305,7 +2316,8 @@ paths:
                         - carrierBookingReference: CBR_123_REGULAR
                           weight: 12
                           weightUnit: KGM
-                          descriptionOfGoods: 'Shoes - black'
+                          descriptionOfGoods:
+                            - 'Shoes - black'
                           HSCodes:
                             - '640510'
                           commoditySubreference: RegSubRef001
@@ -2348,7 +2360,8 @@ paths:
                         - carrierBookingReference: CBR_123_REGULAR
                           weight: 120000
                           weightUnit: KGM
-                          descriptionOfGoods: 'Shoes - black'
+                          descriptionOfGoods:
+                            - 'Shoes - black'
                           HSCodes:
                             - '640510'
                           commoditySubreference: RegSubRef001
@@ -2607,7 +2620,8 @@ paths:
                               partyCode: MSC
                       consignmentItems:
                         - carrierBookingReference: CBR_123_REGULAR
-                          descriptionOfGoods: 'Shoes - black'
+                          descriptionOfGoods:
+                            - 'Shoes - black'
                           HSCodes:
                             - '640510'
                           cargoItems:
@@ -2741,7 +2755,8 @@ paths:
                               partyCode: MSC
                       consignmentItems:
                         - carrierBookingReference: CBR_123_REGULAR
-                          descriptionOfGoods: 'Shoes - black'
+                          descriptionOfGoods:
+                            - 'Shoes - black'
                           HSCodes:
                             - '640510'
                           cargoItems:
@@ -7311,11 +7326,16 @@ components:
             - Place of B/L Issue (if provided)
           example: ABC709951
         descriptionOfGoods:
-          type: string
-          maxLength: 5000
-          pattern: ^\S(?:.*\S)?$
-          description: The cargo description are details which accurately and properly describe the cargo being shipped in the container(s) as provided by the shipper.
-          example: blue shoes size 47
+          type: array
+          description: |
+            An array of lines accurately and properly describing the cargo being shipped in the container(s) as provided by the shipper.
+          maxItems: 150
+          items:
+            type: string
+            maxLength: 35
+            pattern: ^\S(?:.*\S)?$
+            description: A line describing the cargo
+            example: blue shoes size 47
         HSCodes:
           type: array
           minItems: 1
@@ -7341,11 +7361,12 @@ components:
             $ref: '#/components/schemas/NationalCommodityCode'
         shippingMarks:
           type: array
+          maxItems: 50
           description: |
             A list of the `ShippingMarks` applicable to this `consignmentItem`
           items:
             type: string
-            maxLength: 500
+            maxLength: 35
             description: |
               The identifying details of a package or the actual markings that appear on the package(s). This information is provided by the customer.
             example: Made in China
@@ -7406,11 +7427,16 @@ components:
             A unique reference to the commodity object assigned by the carrier in the booking confirmation. The reference must be provided by the shipper as part of the `Shipping Instructions` for the carrier to link this consignment item to the commodity. A commodity reference is only unique in the context of a booking.
           example: COM-001
         descriptionOfGoods:
-          type: string
-          maxLength: 5000
-          pattern: ^\S(?:.*\S)?$
-          description: The cargo description are details which accurately and properly describe the cargo being shipped in the container(s) as provided by the shipper.
-          example: blue shoes size 47
+          type: array
+          description: |
+            An array of lines accurately and properly describing the cargo being shipped in the container(s) as provided by the shipper.
+          maxItems: 150
+          items:
+            type: string
+            maxLength: 35
+            pattern: ^\S(?:.*\S)?$
+            description: A line describing the cargo
+            example: blue shoes size 47
         HSCodes:
           type: array
           minItems: 1
@@ -7436,11 +7462,12 @@ components:
             $ref: '#/components/schemas/NationalCommodityCode'
         shippingMarks:
           type: array
+          maxItems: 50
           description: |
             A list of the `ShippingMarks` applicable to this `consignmentItem`
           items:
             type: string
-            maxLength: 500
+            maxLength: 35
             description: |
               The identifying details of a package or the actual markings that appear on the package(s). This information is provided by the customer.
             example: Made in China
@@ -8332,11 +8359,12 @@ components:
           $ref: '#/components/schemas/ActiveReeferSettings'
         shippingMarks:
           type: array
+          maxItems: 50
           description: |
             A list of the `ShippingMarks` applicable to this `UtilizedTransportEquipment`
           items:
             type: string
-            maxLength: 500
+            maxLength: 35
             description: |
               The identifying details of a package or the actual markings that appear on the package(s). This information is provided by the customer.
             example: Made in China
@@ -8371,11 +8399,12 @@ components:
       properties:
         shippingMarks:
           type: array
+          maxItems: 50
           description: |
             A list of the `ShippingMarks` applicable to this `UtilizedTransportEquipment`
           items:
             type: string
-            maxLength: 500
+            maxLength: 35
             description: |
               The identifying details of a package or the actual markings that appear on the package(s). This information is provided by the customer.
             example: Made in China
