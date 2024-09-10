@@ -26,14 +26,14 @@ Snapshot as of 30 of August 2024 for EBL Platform Interoperability 3.0.0 Beta.
 - `displayedShippedOnBoardReceivedForShipment` added
 - `carrierCodeListProvider` description for `NMFTA` is updated
 - `issuingParty` moved from root level --> `documentParties`
-- `notifyParties added as a `documentParty` (split from `partryFunctionCode` in "Other Document Parties")
+- `notifyParties` added as a `documentParty` (split from `partyFunctionCode` in "Other Document Parties")
 - `routingOfConsignmentCountries` added
 - `name` maxLength changed from 100 --> 35 in `PartyContactDetail` object
 - `Schedule B` changed to `SCHEDULE B` in type in `NationalCommodityCode` object and a typo was fixed in the description
 - `nationalCommodityCodes` added on `CargoItem` level
-- `woodDeclaration` pseudoEnumn values changed to CAPITALIZATION
+- `woodDeclaration` pseudoEnum values changed to CAPITALIZATION
 - `isCompetentAuthorityApprovalProvided` renamed to `isCompetentAuthorityApprovalRequired` in Dangerous Goods (DG)
-- `shippingMarks` descrtiption updated
+- `shippingMarks` description updated
 - `sealSource` description updated (condition added)
 - `Address` and `PartyAddress` objects updates:
   - `street` maxLength changed from 100 --> 70

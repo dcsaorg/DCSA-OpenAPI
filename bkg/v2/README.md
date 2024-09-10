@@ -19,7 +19,7 @@ Snapshot as of 30 of August 2024 for Booking 2.0.0 Beta
 - async Cancellation added
 - renaming and reordering of `"Empty" Container Positionings` in `RequestedEquipment` and `ConfirmedEquipment`
 - `partyName`, `street`, `ContactDetailName` and `city` maxLength modified to be compatible with EDI
-- `Feedback` object inserted as a communication from `Carrier` --> `Shipper`  (no more `reason` proeprty)
+- `Feedback` object inserted as a communication from `Carrier` --> `Shipper`  (no more `reason` property)
 
 ## All changes
 - API endPoint descriptions updated
@@ -33,7 +33,7 @@ Snapshot as of 30 of August 2024 for Booking 2.0.0 Beta
   - `booking` and `amendedBooking` objects (_used for full Notifications_) updated just like `Booking` object below
 - `CreateBooking`, `UpdateBooking` and `Booking` objects updated with:
   - `carrierCodeListProvider` description for `NMFTA` is updated
-- `Booking` object (only) addtitionally updated with:
+- `Booking` object (only) additionally updated with:
   - `reason` property removed
   - condition on `feedbacks` removed
   - `bookingCancellationStatus` added
@@ -78,7 +78,7 @@ Snapshot as of 30 of August 2024 for Booking 2.0.0 Beta
 - `ContainerPositioning` object has renamed:
   - `emptyContainerPositioningDateTime` to just `dateTime`
   - `emptyContainerPositioningLocation` to just `location`
-- same changes as the the `RequestedEquipment` also applies to `ConfirmedEquipment`  with:
+- same changes as the `RequestedEquipment` also applies to `ConfirmedEquipment`  with:
   - `EmptyContainerPositioningEstimated` being called `ContainerPositioningEstimated`
   - `estimatedEmptyContainerPositioningDateTime` renamed to `estimatedDateTime`
   - `emptyContainerPositioningLocation` renamed to `location`
@@ -93,7 +93,7 @@ Snapshot as of 16 of August 2024 for Booking 2.0.0 Beta
 - `202` response code added to all endPoints
 - maxLength of `value` property of all references changed from `100` --> `35` (in order to align with EDI)
 - `CustomReference` now allows a list of values
-- support for multiple `ECP` (Empty Contianer Positioning) locations
+- support for multiple `ECP` (Empty Container Positioning) locations
 
 ## All changes
 - API description updated
@@ -165,7 +165,7 @@ Snapshot as of 26 of July 2024 for Booking 2.0.0 Beta
 - `estimatedEmptyContainerPositioningDateTime`, `emptyContainerPositioningLocation`, `emptyContainerPickupDateTime` and `emptyContainerDepotReleaseLocation` added to `ConfirmedEquipment`
 - `LoadLocation`  and `DischargeLocation` objects modified to no longer use `oneOf`
 - `ECP` removed from `ShipmentCutOffTimeCode`
-- `documentParties` now has `bookingAgent` as a mandatorty property
+- `documentParties` now has `bookingAgent` as a mandatory property
 - `MULTIMODAL` added as a `Mode of Transport` in the `Transport Plan`
 
 <a name="v200B20240614"></a>[Release v2.0.0 Beta 20240614 (28 June 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0-Beta-20240614)
@@ -256,7 +256,7 @@ This is a list of high-level technical changes:
 - `UpdateBooking` object has the same changes as `CreateBooking` except:
   - `title` changed from `Booking` --> `Update Booking`
 - `Booking` (used for the GET request) object has the same changes as `CreateBooking` except:
-  - `title` statys as `Booking`
+  - `title` stays as `Booking`
   - `confirmedEquipments` description updated
   - `transportPlan` description updated
   - `shipmentCutOffTimes` description updated
@@ -276,7 +276,7 @@ This is a list of high-level technical changes:
     - N2 (Second Notify Party)
     - NI (Other Notify Party)
 - added 5 new "Document Party" objects: `BookingAgent`, `Shipper`, `Consignee`, `ServiceContractOwner` and `CarrierBookingOffice` to be used in the new `documentParies` structure
-- `Party` now uses the `PartyAddress` object (instad of the `Address` object)
+- `Party` now uses the `PartyAddress` object (instead of the `Address` object)
 - `IdentifyingCode` structure has the following changes:
   - `codeListProvider` has changed `maxLength` from 5 --> 100
   - `codeListProvider` has a new list of allowed values: `WAVE` (Wave), `CARX` (CargoX), `ESSD` (EssDOCS), `IDT` (ICE Digital Trade), `BOLE` (Bolero), `EDOX` (EdoxOnline), `IQAX` (IQAX), `SECR` (Secro), `TRGO` (TradeGO), `ETEU` (eTEU), `GSBN` (Global Shipping Business Network), `WISE` (WiseTech), `GLEIF` (Global Legal Entity Identifier Foundation), `W3C` (World Wide Web Consortium), `DNB` (Dun and Bradstreet), `FMC` (Federal Maritime Commission), `DCSA` (Digital Container Shipping Association) and `ZZZ` (Mutually defined)

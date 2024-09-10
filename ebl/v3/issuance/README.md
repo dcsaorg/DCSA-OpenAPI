@@ -4,7 +4,7 @@ The DCSA Bill of Lading Issuance API is specified on [**SwaggerHub**](https://ap
 
 Publications related to the Bill of Lading Issuance API:
 - [Glossary of Terms](https://knowledge.dcsa.org/s/glossary) maintained on the [dcsa.org](https://dcsa.org) website
-- [Bill of Lading](https://dcsa.org/standards/ebill-of-lading/) maintained on the [dcsa.org](https://dcsa.org) websit (contains documents and publications)
+- [Bill of Lading](https://dcsa.org/standards/ebill-of-lading/) maintained on the [dcsa.org](https://dcsa.org) website (contains documents and publications)
 - [Bill of Lading](./../) maintained here on GitHub
 - [Bill of Lading Issuance Response](./../issuance_response/) maintained here on GitHub (the Issuance Response API linked to this API)
 
@@ -29,14 +29,14 @@ Snapshot as of 30 of August 2024 for EBL Issuance 3.0.0 Beta.
 - `displayedShippedOnBoardReceivedForShipment` added
 - `carrierCodeListProvider` description for `NMFTA` is updated
 - `issuingParty` moved from root level --> `documentParties`
-- `notifyParties added as a `documentParty` (split from `partryFunctionCode` in "Other Document Parties")
+- `notifyParties` added as a `documentParty` (split from `partyFunctionCode` in "Other Document Parties")
 - `routingOfConsignmentCountries` added
 - `name` maxLength changed from 100 --> 35 in `PartyContactDetail` object
 - `Schedule B` changed to `SCHEDULE B` in type in `NationalCommodityCode` object and a typo was fixed in the description
 - `nationalCommodityCodes` added on `CargoItem` level
-- `woodDeclaration` pseudoEnumn values changed to CAPITALIZATION
+- `woodDeclaration` pseudoEnum values changed to CAPITALIZATION
 - `isCompetentAuthorityApprovalProvided` renamed to `isCompetentAuthorityApprovalRequired` in Dangerous Goods (DG)
-- `shippingMarks` descrtiption updated
+- `shippingMarks` description updated
 - `sealSource` description updated (condition added)
 - `Address` and `PartyAddress` objects updates:
   - `street` maxLength changed from 100 --> 70
