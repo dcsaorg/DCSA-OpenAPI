@@ -25,6 +25,8 @@ info:
 
     Please see the [Surrender Request](#/surrenderRequestDetails) for details on what data the platform will provide.
 
+    The processes for amendments to eBL (including switch to paper) and for surrender of the eBL for delivery of the goods shall be exclusively governed by and executed in accordance with the Bylaws of the eBL Platform where the Surrender for amendment or Surrender for delivery was received, including establishing whether the User in Control performing the Surrender for amendment or Surrender for delivery is entitled to carry out this action.
+    
     ### API Design & Implementation Principles
     This API follows the guidelines defined in version 2.1 of the API Design & Implementation Principles which can be found on the [DCSA Developer page](https://developer.dcsa.org/api_design)
 
@@ -276,9 +278,15 @@ components:
         endorsementChain:
           type: array
           description: |
-            The endorsement chain consist of (a number of) endorsement actions that were performed **after** the eBL bill was issued.
+           A list of one or more endorsement related actions that were performed on or after the issuance of the eBL. It is equivalent to the "back side" of the physical bill of lading. The type of actions recorded in the endorsement chain as defined by the DCSA standard are listed below:
 
-            For straight B/Ls, the endorsement chain can be omitted. For negotiable eBLs, the endorsement chain must be present, as the carrier receiving the surrender request and will check all endorsements before accepting the eBL. The endorsement chain is the electronic version of the "back side" of the paper world B/L.
+            - **Issue:** The act of issuing an eBL i.e. making the eBL available to the receiver.
+            - **Endorse:** The act of transferring the rights and obligations associated with the eBL to a specific named party, allowing them to claim or deal with the goods. The user in control of the eBL may endorse the eBL in their turn to another named party. Only applicable to To-Order eBL (`isToOrder=true`).
+            - **Sign:** A general-purpose signature that can be used by any party to mark their possession of the eBL. Similar to how any possessor in the physical world can put a physical signature on the paper bill of lading. The endorsement chain as defined by DCSA does not record any transfer of possession of the eBL, unless a signature is added to it.
+            - **Request surrender for amendment:** The presentation (by transfer) of the eBL to the Issuer, or another user appointed by the Issuer, by a user entitled to do so for the puprpose of amending the eBL.
+            - **Request surrender for delivery:** The presentation (by transfer) of the eBL to the Issuer, or another user appointed by the Issuer, by a user entitled to do so for the purpose of claiming delivery of the goods.
+
+            **Note:** DCSA member carriers have agreed that the name `endorsementChain` is still the correct name for this list of actions.
           items:
             $ref: '#/components/schemas/EndorsementChainLink'
       required:
