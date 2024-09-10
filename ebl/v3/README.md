@@ -25,12 +25,12 @@ Snapshot as of 30 of August 2024 for EBL 3.0.0 Beta.
 - `HouseBillOfLading` object added
 - many new parties added
 - `partyName`, `street`, `ContactDetailName` and `city` maxLength modified to be compatible with EDI
-- `Feedback` object inserted as a communication from `Carrier` --> `Shipper`  (no more `reason` proeprty)
+- `Feedback` object inserted as a communication from `Carrier` --> `Shipper`  (no more `reason` property)
 
 ## All changes
 - API endPoint descriptions updated
 - API examples updated
-- `409` responseCode added to `GET` ShippingInstructions anbd `PATCH` TransportDocument endPoints
+- `409` responseCode added to `GET` ShippingInstructions and `PATCH` TransportDocument endPoints
 - `ShippingInstructionsNotification` object updated:
   - `reason` property replaced with `feedbacks` array
   - `shippingInstructions` and `updatedShippingInstructions` properties aligned with `ShippingInstructions` object
@@ -69,14 +69,14 @@ Snapshot as of 30 of August 2024 for EBL 3.0.0 Beta.
   - `displayedShippedOnBoardReceivedForShipment` added
   - `carrierCodeListProvider` description for `NMFTA` is updated
   - `issuingParty` moved from root level --> `documentParties`
-  - `notifyParties added as a `documentParty` (split from `partryFunctionCode` in "Other Document Parties")
+  - `notifyParties` added as a `documentParty` (split from `partyFunctionCode` in "Other Document Parties")
   - `routingOfConsignmentCountries` added
 - `name` maxLength changed from 100 --> 35 in `PartyContactDetail` object
 - `Schedule B` changed to `SCHEDULE B` in type in `NationalCommodityCode` object and a typo was fixed in the description
 - `nationalCommodityCodes` added on `CargoItem` level
-- `woodDeclaration` pseudoEnumn values changed to CAPITALIZATION
+- `woodDeclaration` pseudoEnum values changed to CAPITALIZATION
 - `isCompetentAuthorityApprovalProvided` renamed to `isCompetentAuthorityApprovalRequired` in Dangerous Goods (DG)
-- `shippingMarks` descrtiption updated
+- `shippingMarks` description updated
 - `sealSource` description updated (condition added)
 - `Address` and `PartyAddress` objects updates:
   - `street` maxLength changed from 100 --> 70
@@ -189,7 +189,7 @@ Snapshot as of 14 of June 2024 for EBL 3.0.0 Beta.
   - `name` property removed
   - for `postCode`: `maxLength` changed from 50 --> 10
   - `nullable=true` removed on `stateRegion`
-  - `street`, `streetNumber` and `city` have been added asrequired properties (`name` has been removed)
+  - `street`, `streetNumber` and `city` have been added as required properties (`name` has been removed)
 - `CityLocation` interface has the following changes:
   - `maxLength: 4` added to `locationType`
   - `nullable=true` removed on `stateRegion`
@@ -265,7 +265,7 @@ This is a list of high-level technical changes:
 - `UpdateShippingInstructions` object has the same changes as `CreateShippingInstructions` except:
   - `title` changed from `Shipping Instructions` --> `Update Shipping Instructions`
 - `ShippingInstructions` (used for the GET request) object has the same changes as `CreateShippingInstructions` except:
-  - `title` statys as `Shipping Instructions`
+  - `title` stays as `Shipping Instructions`
 - `ShippingInstructionsRefCancelStatus` title changed to `Shipping Instructions Cancel Response`
 - `RequestedChange` object has split the `field` property into 2 properties: `property` and `jsonPath` in order to align with the `DetailedError` object
 - fixed some typos in the `ErrorResponse` properties descriptions
