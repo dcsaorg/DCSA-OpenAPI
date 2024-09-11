@@ -72,44 +72,9 @@ paths:
         ## Postcondition
         The provider has received the `Shipping Instructions`.
 
-        The consumer will receive a `201` (Created) or a `202` (Accepted) if the payload schema validates or a `400` (Bad Request) if it does not.
+        The consumer will receive a `202` (Accepted) if the payload schema validates or a `400` (Bad Request) if it does not.
 
-        ## Flow for a `201` (Created) response
-        The following occurs when a provider receives a `Shipping Instructions`:
-        1. The payload (`Shipping Instructions`) is schema-validated. In case the payload **is invalid** a `400` (Bad Request) is returned.
-
-           **The process stops here!**
-        2. The payload is schema-valid which means:
-            - all required properties are provided.
-            - all values provided have correct data type.
-
-           A `shippingInstructionsReference` (as a reference to the `Shipping Instructions`) is created and linked to the payload in the provider system.
-          
-           **For the rest of this description and in all examples the value `si-123` will be used as `shippingInstructionsReference`**
-
-        3. A `201` (Created) response is returned with a payload containing the `shippingInstructionsReference` and `shippingInstructionsStatus`:
-            ```
-            {
-              shippingInstructionsReference: 'si-123',
-              shippingInstructionsStatus: 'RECEIVED'
-            }
-            ```
-        4. All '_relevant_' subscribers will be notified via a [Shipping Instructions Notification](#/ShippingInstructionsNotification).
-
-        For `POST` `Shipping Instructions` responding with `201` (Created) the process ends here. The `Shipping Instructions`:
-          - is now stored in the provider system
-          - has status `RECEIVED` and the status can be queried (a subsequent `GET` request will retrieve the payload)
-          - a `201` (Created) response is sent to the consumer with a payload containing the `shippingInstructionsReference` and `shippingInstructionsStatus='RECEIVED'`
-          - '_relevant_' subscribers have been notified.
-          - awaits further processing by the provider
-
-        The provider will now start asynchronous processing. Once processed, the new status of the `Shipping Instructions` will be communicated via a [Shipping Instructions Notification](#/ShippingInstructionsNotification). In case the consumer does not subscribe to notifications it is necessary for the consumer to poll on the
-
-            GET /v3/shipping-instructions/{documentReference}
-            
-        endPoint to check if the `shippingInstructionsStatus` of the `Shipping Instructions` has changed.
-
-        ## Flow for a `202` (Accepted) response
+        ## Flow for the `202` (Accepted) response
         The following occurs when a provider receives a `Shipping Instructions`:
         1. The payload (`Shipping Instructions`) is schema-validated. In case the payload **is invalid** a `400` (Bad Request) is returned.
 
@@ -129,7 +94,7 @@ paths:
             }
             ```
 
-        For `POST` `Shipping Instructions` responding with `202` (Accepted) the process ends here. The `Shipping Instructions`:
+        For `POST` `Shipping Instructions` the process ends here. The `Shipping Instructions`:
           - is now accepted by the provider system
           - the `Shipping Instructions` does not yet have any status and cannot be queried (no `GET` request is possible until the `Shipping Instructions` is further processed in the provider system)
           - a `202` (Accepted) response is sent to the consumer with a payload **only** containing the `shippingInstructionsReference`
@@ -141,7 +106,7 @@ paths:
             
           endPoint to check if the `shippingInstructionsStatus` of the `Shipping Instructions` has changed.
           
-          After the status has changed to `RECEIVED` further processing can continue and will be communicated via a [Shipping Instructions Notification](#/ShippingInstructionsNotification).
+          After the status has changed to `RECEIVED` further processing can continue by provider and will be communicated via a [Shipping Instructions Notification](#/ShippingInstructionsNotification).
       parameters:
         - $ref: '#/components/parameters/Api-Version-Major'
       requestBody:
@@ -201,56 +166,6 @@ paths:
                         - number: DCSA-CTK-1234
                       equipmentReference: NARU3472484
       responses:
-        '201':
-          description: |
-            The `Shipping Instructions` has been successfully created in the provider system. The status of the `Shipping Instructions` is now `RECEIVED`. The consumer is now awaiting provider to process the `Shipping Instructions` asynchronously.
-          headers:
-            API-Version:
-              $ref: '#/components/headers/API-Version'
-          content:
-            application/json:
-              schema:
-                type: object
-                title: Shipping Instructions Response
-                description: |
-                  The `shippingInstructionsReference` along with the `shippingInstructionsStatus` and an optional `feedbacks` is returned.
-                properties:
-                  shippingInstructionsReference:
-                    type: string
-                    pattern: ^\S(?:.*\S)?$
-                    maxLength: 100
-                    description: |
-                      The identifier for a `Shipping Instructions` provided by the carrier for system purposes.
-                    example: e0559d83-00e2-438e-afd9-fdd610c1a008
-                  shippingInstructionsStatus:
-                    type: string
-                    maxLength: 50
-                    description: |
-                      The status of the `Shipping Instructions`. Possible values are:
-                      - `RECEIVED` (Shipping Instructions has been received)
-                    example: RECEIVED
-                  feedbacks:
-                    type: array
-                    description: |
-                      Feedback that can be provided includes, but is not limited to:
-                      - unsupported properties
-                      - changed values
-                      - removed properties
-                      - general information
-                    items:
-                      $ref: '#/components/schemas/Feedback'
-                required:
-                  - shippingInstructionsReference
-                  - shippingInstructionsStatus
-              examples:
-                receExample:
-                  summary: |
-                    Shipping Instructions received
-                  description: |
-                    A `Shipping Instructions` has been received (`shippingInstructionsStatus='RECEIVED'`), schema validated and stored in provider system
-                  value:
-                    shippingInstructionsReference: si-123
-                    shippingInstructionsStatus: RECEIVED
         '202':
           description: |
             The `Shipping Instructions` has been accepted by the provider. The `Shipping Instructions` does not yet have a `shippingInstructionsStatus` - it is not possible to call the `GET` endPoint until the `Shipping Instructions` is further processed in provider system. The consumer is now awaiting provider to process the `Shipping Instructions` asynchronously.
@@ -401,71 +316,9 @@ paths:
 
         The `Updated Shipping Instructions` and the "original" `Shipping Instructions` **co-exist** until a new update is submitted by the consumer (via **UseCase 3: Submit updated Shipping Instructions**) or until the provider requests an update (sets the `shippingInstructionsStatus='PENDING_UPDATE'` via **UseCase 2: Request to update Shipping Instructions**). The `Updated Shipping Instructions` always represents the latest version of an update received by the provider.
 
-        The consumer will receive a `200` (OK) or a `202` (Accepted) if the payload schema-validates or a `400` (Bad Request) if it does not.
+        The consumer will receive a `202` (Accepted) if the payload schema-validates or a `400` (Bad Request) if it does not.
 
-        ## Flow for a `200` (OK) response
-        The following occurs when a provider receives an **update** to a `Shipping Instructions`
-        1. The payload (`Updated Shipping Instructions`) is schema-validated. In case the payload **is invalid** a `400` (Bad Request) is returned.
-
-           **The process stops here!**
-        2. The payload is schema-valid which means:
-            - all required properties are provided
-            - all values provided have correct data type.
-          
-            The `Updated Shipping Instructions` is stored in the provider system alongside the "original" `Shipping Instructions`.
-
-           **For the rest of this description and in all examples the value `si-123` will be used as `shippingInstructionsReference`**
-
-        3. The response depends on which use case is the reason for calling this endPoint (what the `shippingInstructionsStatus` is):
-
-            - If `shippingInstructionsStatus` **is** `RECEIVED`, then this endPoint is being used in addition to **UseCase 1 - Submit Shipping Instructions**. In this case the consumer would like to make an update to an already sent `Shipping Instructions`. This is done via **UseCase 3 - Submit updated Shipping Instructions**. The `shippingInstructionsStatus` stays as `RECEIVED`, `updatedShippingInstructionsStatus` is set to `UPDATE_RECEIVED`
-            
-              A `200` (OK) response is returned with the following payload:
-              ```
-              {
-                shippingInstructionsReference: 'si-123',
-                shippingInstructionsStatus: 'RECEIVED',
-                updatedShippingInstructionsStatus: 'UPDATE_RECEIVED'
-              }
-              ```
-
-            - If `shippingInstructionsStatus` is `PENDING_UPDATE`, then this endPoint is being used as a response to **UseCase 2 - Request to update Shipping Instructions** in this case the provider has requested an update to a `Shipping Instructions`. The `shippingInstructionsStatus` remains `PENDING_UPDATE`, `updatedShippingInstructionsStatus` is set to `UPDATE_RECEIVED`.
-              
-              A `200` (OK) response is returned with the following payload:
-              ```
-              {
-                shippingInstructionsReference: 'si-123',
-                shippingInstructionsStatus: 'PENDING_UPDATE',
-                updatedShippingInstructionsStatus: 'UPDATE_RECEIVED'
-              }
-              ```
-        4. All '_relevant_' subscribers will be notified via a [Shipping Instructions Notification](#/ShippingInstructionsNotification).
-
-        For `PUT` `Shipping Instructions` responding with `200` (OK) the process ends here. The updated `Shipping Instructions`:
-          - is now stored in the provider system
-          - a `200` (OK) response is sent to the consumer with the status of the `Shipping Instructions` and the `Updated Shipping Instructions` with one of the following combinations (depending on the use case):
-            - `shippingInstructionsStatus='RECEIVED'` and `updatedShippingInstructionsStatus='UPDATE_RECEIVED'` (if endPoint used to make an update to a Submitted Shipping Instructions - **UseCase 1 - Submit Shipping Instructions**)
-            - `shippingInstructionsStatus='PENDING_UPDATE'` and `updatedShippingInstructionsStatus='UPDATE_RECEIVED'` (if endPoint used as a response to **UseCase 2 - Request to update Shipping Instructions**)
-
-            A subsequent `GET` request to the `Shipping Instructions` will fetch the status along with the `Shipping Instructions`
-          - awaits further processing by the provider
-          - '_relevant_' subscribers have been notified.
-
-        The provider will now start asynchronous processing. Once processed, the new status of the `Shipping Instructions` and `Updated Shipping Instructions` will be communicated via a [Shipping Instructions Notification](#/ShippingInstructionsNotification). In case the consumer does not subscribe to notifications it is necessary for the consumer to poll on the
-
-            GET /v3/shipping-instructions/{documentReference}
-            
-        endPoint to check if the `shippingInstructionsStatus` and `updatedShippingInstructionsStatus` of the `Shipping Instructions` has changed.
-          
-        If the consumer wants to get the content of the `Update Shipping Instructions` provided via this `PUT` endPoint,  the `GET` endPoint needs to be used in combination with the `?updatedContent=true` queryParameter:
-          
-            GET /v3/shipping-instructions/{documentReference}?updatedContent=true
-            
-        It is possible to `GET` the content of the `Updated Shipping Instructions` via the example above until either:
-          - the provider requests for a new update (**UseCase 2: Request to update Shipping Instructions**) in which case the "old update" is no longer accessible
-          - the consumer submits a new update (**UseCase 3: Submit updated Shipping Instructions**) in which case the "new update" provided **replaces** the "old update".
-
-        ## Flow for a `202` (Accepted) response
+        ## Flow for the `202` (Accepted) response
         The following occurs when a provider receives an **update** to a `Shipping Instructions`
         1. The payload (`Updated Shipping Instructions`) is schema-validated. In case the payload **is invalid** a `400` (Bad Request) is returned.
 
@@ -475,7 +328,7 @@ paths:
             - all values provided have correct data type.
         3. An empty response is returned and the consumer now awaits further processing by the provider.
         
-        For `PUT` `Shipping Instructions` responding with `200` (OK) the process ends here. The `Shipping Instructions`:
+        For `PUT` `Shipping Instructions` the process ends here. The `Shipping Instructions`:
           - is now accepted by the provider system
           - the status of the `Shipping Instructions` is unchanged
           - a `202` (Accepted) response is sent with an empty payload
@@ -554,67 +407,6 @@ paths:
                         - number: DCSA-CTK-1234
                       equipmentReference: NARU3472484
       responses:
-        '200':
-          description: |
-            The `Updated Shipping Instructions` has been successfully stored in the provider system with one of the following combinations (depending on the use case):
-            - `shippingInstructionsStatus='RECEIVED'` and `updatedShippingInstructionsStatus='UPDATE_RECEIVED'` (if endPoint is used to make an update to a Submitted Shipping Instructions - **UseCase 1 - Submit Shipping Instructions**)
-            - `shippingInstructionsStatus='PENDING_UPDATE'` and `updatedShippingInstructionsStatus='UPDATE_RECEIVED'` (if endPoint is used as a response to **UseCase 2 - Request to update Shipping Instructions**)
-
-            The status of the `Updated Shipping Instructions` can be monitored on the
-
-                GET /v3/shipping-instructions/{documentReference}
-
-            endPoint where the "original" `Shipping Instructions` is returned by the consumer.
-
-            If the consumer wants to get the content of the `Update Shipping Instructions`  the `GET` endPoint needs to be used in combination with the `?updatedContent=true` queryParameter:
-
-                GET /v3/shipping-instructions/{documentReference}?updatedContent=true
-
-          headers:
-            API-Version:
-              $ref: '#/components/headers/API-Version'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ShippingInstructionsRefStatus'
-              examples:
-                receivedExample:
-                  summary: |
-                    Shipping Instructions updated by consumer
-                  description: |
-                    An `Updated Shipping Instructions` is received and stored in provider system, the `Updated Shipping Instructions` now awaits provider action.
-
-                        shippingInstructionsStatus='RECEIVED'
-                        updatedShippingInstructionsStatus='UPDATE_RECEIVED'
-                  value:
-                    shippingInstructionsReference: si-123
-                    shippingInstructionsStatus: RECEIVED
-                    updatedShippingInstructionsStatus: UPDATE_RECEIVED
-                pendingUpdateExample:
-                  summary: |
-                    Shipping Instructions updated because of consumer requirement
-                  description: |
-                    An updated `Shipping Instructions` received and stored in provider system as a response to a provider initiated update request (a response to **UseCase 2 - Request to update Shipping Instructions**). The `Updated Shipping Instructions` now awaits provider action
-
-                        shippingInstructionsStatus='PENDING_UPDATE'
-                        updatedShippingInstructionsStatus='UPDATE_RECEIVED'
-                  value:
-                    shippingInstructionsReference: si-123
-                    shippingInstructionsStatus: PENDING_UPDATE
-                    updatedShippingInstructionsStatus: UPDATE_RECEIVED
-                amendmentExample:
-                  summary: |
-                    Request amendment to Transport Document
-                  description: |
-                    An `Updated Shipping Instructions` received and stored in provider system as an amendment to a `Transport Document` with `transportDocumentReference='td-987'`. The `Updated Shipping Instructions` now awaits provider action
-
-                        shippingInstructionsStatus='RECEIVED'
-                        updatedShippingInstructionsStatus='UPDATE_RECEIVED'
-                  value:
-                    shippingInstructionsReference: si-123
-                    transportDocumentReference: td-987
-                    shippingInstructionsStatus: RECEIVED
-                    updatedShippingInstructionsStatus: UPDATE_RECEIVED
         '202':
           description: |
             The `Shipping Instructions` update has been successfully accepted by the provider. `shippingInstructionsStatus` does not change, `updatedShippingInstructionsStatus` is not set and response payload is empty. Further processing will be done by provider.
@@ -808,7 +600,7 @@ paths:
 
         If `updatedContent=true` is requested but no update has yet been provided by the consumer **or** the state of the "original" `Shipping Instructions` is `PENDING_UPDATE`, then a `404` (Not Found) is returned.
 
-        If the provider is requesting changes to the `Shipping Instructions`, the `feedbacks` object is used to inform the consumer what needs to change.
+        If the provider is requesting changes to the `Shipping Instructions`, the `Feedback` object is used to inform the consumer what needs to change.
 
         In case no subscription (`Notification`) has been set up - it is possible to use this endPoint to poll on in order to detect if `shippingInstructionsStatus` and/or `updatedShippingInstructionsStatus` has changed.
 
@@ -853,8 +645,6 @@ paths:
                             email: no-reply@dcsa.example.org
                     consignmentItems:
                       - carrierBookingReference: CBR_123_REGULAR
-                        weight: 12000
-                        weightUnit: KGM
                         descriptionOfGoods:
                           - 'Shoes - black'
                         HSCodes:
@@ -1173,20 +963,9 @@ paths:
         ## Postcondition
         The provider has received a cancellation from the consumer for an `Updated Shipping Instructions` that is in state `UPDATE_RECEIVED`.
 
-        The consumer will receive a `200` (OK) or a `202` (Accepted) if the payload schema-validates or a `400` (Bad Request) if it does not.
+        The consumer will receive a `202` (Accepted) if the payload schema-validates or a `400` (Bad Request) if it does not.
 
-        ## Flow for a `200` (OK) response
-        The following occurs when a provider receives a cancellation:
-        1. The payload is schema-validated. In case the payload **is invalid** a `400` (Bad Request) is returned.
-
-           **The process stops here!**
-        2. The payload is schema-valid which means:
-            - all required properties are provided.
-            - all values provided have correct data type.
-        3. The `updatedShippingInstructionsStatus` is set to `UPDATE_CANCELLED`.
-        4. All '_relevant_' subscribers will be notified via a [Shipping Instructions Notification](#/ShippingInstructionsNotification).
-
-        ## Flow for a `202` (Accepted) response
+        ## Flow for the `202` (Accepted) response
         The following occurs when a provider receives a cancellation:
         1. The payload is schema-validated. In case the payload **is invalid** a `400` (Bad Request) is returned.
 
@@ -1196,7 +975,11 @@ paths:
             - all values provided have correct data type.
         3. An empty response is returned and the consumer now awaits further processing by the provider.
         
-        Once processed, the `Updated Shipping Instructions` is cancelled and a [Shipping Instructions Notification](#/ShippingInstructionsNotification) will be sent
+        Once processed, the `Updated Shipping Instructions` is cancelled and a [Shipping Instructions Notification](#/ShippingInstructionsNotification) will be sent. In case the consumer does not subscribe to notifications it is necessary for the consumer to poll on the
+
+            GET /v3/shipping-instructions/{documentReference}
+            
+        endPoint to check if the `shippingInstructionsStatus` and `updatedShippingInstructionsStatus` of the `Shipping Instructions` has changed.
       requestBody:
         description: |
           Cancel the `Update Shipping Instructions`
@@ -1223,38 +1006,9 @@ paths:
                 value:
                   updatedShippingInstructionsStatus: UPDATE_CANCELLED
       responses:
-        '200':
-          description: |
-            The `Updated Shipping Instructions` is now cancelled. The `updatedShippingInstructionsStatus` is now `UPDATE_CANCELLED`. The `shippingInstructionsStatus` is left unchanged.
-          headers:
-            API-Version:
-              $ref: '#/components/headers/API-Version'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ShippingInstructionsRefCancelStatus'
-              examples:
-                cancelUpdateExample:
-                  summary: |
-                    Cancel a Shipping Instructions update
-                  description: |
-                    Consumer wants to cancel an update provided to a `Shipping Instructions`. In this case the `shippingInstructionsStatus` stays as `RECEIVED` and the `updatedShippingInstructionsStatus` is set to `UPDATE_CANCELLED`. An optional `reason` can be provided.
-                  value:
-                    shippingInstructionsReference: si-123
-                    shippingInstructionsStatus: RECEIVED
-                    updatedShippingInstructionsStatus: UPDATE_CANCELLED
-                cancelRequestedUpdateExample:
-                  summary: |
-                    Cancel a Shipping Instructions update requested by provider
-                  description: |
-                    Consumer wants to cancel an update provided to a `Shipping Instructions`. The update was requested by the provider. The `shippingInstructionsStatus` stays as `PENDING_UPDATE` and the `updatedShippingInstructionsStatus` is set to `UPDATE_CANCELLED`. An optional `reason` can be provided.
-                  value:
-                    shippingInstructionsReference: si-123
-                    shippingInstructionsStatus: PENDING_UPDATE
-                    updatedShippingInstructionsStatus: UPDATE_CANCELLED
         '202':
           description: |
-            The cancellation of the `Updated Shipping Instructions` is accepted and is now awaiting further processing by the provider
+            The cancellation of the `Updated Shipping Instructions` is accepted and is now awaiting further processing by the provider.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -1446,7 +1200,7 @@ paths:
             pattern: ^\S(?:.*\S)?$
             maxLength: 20
             description: |
-              A unique number allocated by the shipping line to the transport document and the main number used for the tracking of the status of the shipment.
+              A unique number allocated by the shipping line to the `Transport Document` and the main number used for the tracking of the status of the shipment.
             example: HHL71800000
         - $ref: '#/components/parameters/Api-Version-Major'
       responses:
@@ -1797,8 +1551,6 @@ paths:
                       - isShipperOwned: false
                         seals:
                           - number: DCSA-CTK-1234
-                        cargoGrossWeight: 12000
-                        cargoGrossWeightUnit: KGM
                         equipment:
                           ISOEquipmentCode: 22G1
                           equipmentReference: HLXU1234567
@@ -1918,26 +1670,9 @@ paths:
         ## Postcondition
         The provider has received an approval from the consumer for a `Transport Document` that is in state `DRAFT`.
 
-        The consumer will receive a `200` (OK) or a `202` (Accepted) if the payload schema-validates or a `400` (Bad Request) if it does not.
+        The consumer will receive a `202` (Accepted) if the payload schema-validates or a `400` (Bad Request) if it does not.
 
-        ## Flow for a `200` (Ok) response
-        The following occurs when a provider receives an approval:
-        1. The payload is schema-validated. In case the payload **is invalid** a `400` (Bad Request) is returned.
-
-           **The process stops here!**
-        2. The payload is schema-valid which means:
-            - all required properties are provided.
-            - all values provided have correct data type.
-        3. The `transportDocumentStatus` is set to `APPROVED`.
-        4. All '_relevant_' subscribers will be notified via a [Transport Document Notification](#/TransportDocumentNotification).
-
-        The provider will now start asynchronous processing. Once processed, the new status of the `Transport Document` (`ISSUED`) will be communicated via a [Transport Document Notification](#/TransportDocumentNotification). In case the consumer does not subscribe to notifications it is necessary for the consumer to poll on the
-
-            GET /v3/transport-documents/{transportDocumentReference}
-
-        endPoint to check if the `transportDocumentStatus` in the `Transport Document` has changed.
-
-        ## Flow for a `202` (Accepted) response
+        ## Flow for the `202` (Accepted) response
         The following occurs when a provider receives an approval:
         1. The payload is schema-validated. In case the payload **is invalid** a `400` (Bad Request) is returned.
 
@@ -1947,7 +1682,11 @@ paths:
             - all values provided have correct data type.
         3. An empty response is returned and the consumer now awaits further processing by the provider.
 
-        Once processed, the `Transport Document` is `ISSUED` and a [Transport Document Notification](#/TransportDocumentNotification) is sent.
+        Once processed, the `Transport Document` is `ISSUED` and a [Transport Document Notification](#/TransportDocumentNotification) is sent. In case the consumer does not subscribe to notifications it is necessary for the consumer to poll on the
+
+            GET /v3/transport-documents/{transportDocumentReference}
+            
+        endPoint to check if the `transportDocumentStatus` of the `Transport Document` has changed.
       parameters:
         - in: path
           name: transportDocumentReference
@@ -1959,7 +1698,7 @@ paths:
             pattern: ^\S(?:.*\S)?$
             maxLength: 20
             description: |
-              A unique number allocated by the shipping line to the transport document and the main number used for the tracking of the status of the shipment.
+              A unique number allocated by the shipping line to the `Transport Document` and the main number used for the tracking of the status of the shipment.
             example: HHL71800000
         - $ref: '#/components/parameters/Api-Version-Major'
       requestBody:
@@ -1977,28 +1716,9 @@ paths:
               required:
                 - transportDocumentStatus
       responses:
-        '200':
-          description: |
-            The `Transport Document` has been successfully `APPROVED`
-          headers:
-            API-Version:
-              $ref: '#/components/headers/API-Version'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TransportDocumentRefStatus'
-              examples:
-                approveExample:
-                  summary: |
-                    Approve Draft Transport Document
-                  description: |
-                    Consumer approves the drafted `Transport Document`.
-                  value:
-                    transportDocumentReference: td-987
-                    transportDocumentStatus: APPROVED
         '202':
           description: |
-            The `Transport Document` has been accepted and now awaits further processing
+            The approval of the `Transport Document` has been accepted and now awaits further processing
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -2243,8 +1963,6 @@ paths:
                               email: no-reply@dcsa.example.org
                       consignmentItems:
                         - carrierBookingReference: CBR_123_REGULAR
-                          weight: 12000
-                          weightUnit: KGM
                           descriptionOfGoods:
                             - 'Shoes - black'
                           HSCodes:
@@ -2324,8 +2042,6 @@ paths:
                               email: no-reply@dcsa.example.org
                       consignmentItems:
                         - carrierBookingReference: CBR_123_REGULAR
-                          weight: 12
-                          weightUnit: KGM
                           descriptionOfGoods:
                             - 'Shoes - black'
                           HSCodes:
@@ -2369,8 +2085,6 @@ paths:
                               email: no-reply@dcsa.example.org
                       consignmentItems:
                         - carrierBookingReference: CBR_123_REGULAR
-                          weight: 120000
-                          weightUnit: KGM
                           descriptionOfGoods:
                             - 'Shoes - black'
                           HSCodes:
