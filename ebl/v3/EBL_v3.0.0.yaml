@@ -4104,12 +4104,12 @@ components:
                   pattern: ^\S+$
                   maxLength: 4
                   description: |
-                    The `NMFTA` or `SMDG` code of the issuing carrier of the `Transport Document`
+                    The `SCAC` code (provided by [NMFTA](https://nmfta.org/scac/)) or `SMDG` code (provided by [SMDG](https://smdg.org/documents/smdg-code-lists/smdg-liner-code-list/)) of the issuing carrier of the `Transport Document`. `carrierCodeListProvider` defines which list the `carrierCode` is based upon.
                   example: MMCU
                 carrierCodeListProvider:
                   type: string
                   description: |
-                    The code list provider for the carrier code. Possible values are:
+                    The code list provider for the `carrierCode`. Possible values are:
                     - `SMDG` (Ship Message Design Group)
                     - `NMFTA` (National Motor Freight Traffic Association)
                   enum:
@@ -5661,104 +5661,6 @@ components:
         - documentParties
         - consignmentItems
         - utilizedTransportEquipments
-    ShippingInstructionsRefStatus:
-      type: object
-      title: Shipping Instructions Response
-      description: |
-        The `shippingInstructionsReference`, possibly the `transportDocumentReference` along with the `shippingInstructionsStatus` and `updatedShippingInstructionsStatus`, an optional list of `Feedback` to be applied to the `Shipping Instructions` and and optional `reason` field is returned.
-      properties:
-        shippingInstructionsReference:
-          type: string
-          pattern: ^\S(?:.*\S)?$
-          maxLength: 100
-          description: |
-            The identifier for a `Shipping Instructions` provided by the carrier for system purposes.
-          example: e0559d83-00e2-438e-afd9-fdd610c1a008
-        transportDocumentReference:
-          type: string
-          pattern: ^\S(?:.*\S)?$
-          maxLength: 20
-          description: |
-            A unique number allocated by the shipping line to the transport document and the main number used for the tracking of the status of the shipment.
-          example: HHL71800000
-        shippingInstructionsStatus:
-          type: string
-          maxLength: 50
-          description: |
-            The status of the `Shipping Instructions`. Possible values are:
-            - `RECEIVED` (Shipping Instructions has been received)
-            - `PENDING_UPDATE` (An update is required to the Shipping Instructions)
-            - `COMPLETED` (The Shipping Instructions can no longer be modified - the related Transport Document has been surrendered for delivery)
-          example: RECEIVED
-        updatedShippingInstructionsStatus:
-          type: string
-          maxLength: 50
-          description: |
-            The status of the latest update to the `Shipping Instructions`. If no update has been requested - then this field is empty. Possible values are:
-            - `UPDATE_RECEIVED` (An update to a Shipping Instructions is waiting to be processed)
-            - `UPDATE_CONFIRMED` (An update to a Shipping Instructions has been confirmed)
-            - `UPDATE_CANCELLED` (An update to a Shipping Instructions is discontinued by consumer)
-            - `UPDATE_DECLINED` (An update to a Shipping Instructions is discontinued by provider)
-          example: UPDATE_RECEIVED
-        feedbacks:
-          type: array
-          description: |
-            Feedback that can be provided includes, but is not limited to:
-            - unsupported properties
-            - changed values
-            - removed properties
-            - general information
-          items:
-            $ref: '#/components/schemas/Feedback'
-      required:
-        - shippingInstructionsStatus
-    ShippingInstructionsRefCancelStatus:
-      type: object
-      title: Shipping Instructions Cancel Response
-      description: |
-        The `shippingInstructionsReference`, possibly the `transportDocumentReference` along with the `shippingInstructionsStatus` and `updatedShippingInstructionsStatus` and and optional `reason` field is returned.
-      properties:
-        shippingInstructionsReference:
-          type: string
-          pattern: ^\S(?:.*\S)?$
-          maxLength: 100
-          description: |
-            The identifier for a `Shipping Instructions` provided by the carrier for system purposes.
-          example: e0559d83-00e2-438e-afd9-fdd610c1a008
-        transportDocumentReference:
-          type: string
-          pattern: ^\S(?:.*\S)?$
-          maxLength: 20
-          description: |
-            A unique number allocated by the shipping line to the transport document and the main number used for the tracking of the status of the shipment.
-          example: HHL71800000
-        shippingInstructionsStatus:
-          type: string
-          maxLength: 50
-          description: |
-            The status of the `Shipping Instructions`. Possible values are:
-            - `RECEIVED` (Shipping Instructions has been received)
-            - `PENDING_UPDATE` (An update is required to the Shipping Instructions)
-            - `COMPLETED` (The Shipping Instructions can no longer be modified - the related Transport Document has been surrendered for delivery)
-          example: RECEIVED
-        updatedShippingInstructionsStatus:
-          type: string
-          maxLength: 50
-          description: |
-            The status of the `Updated Shipping Instructions`. It can only be `UPDATE_CANCELLED`
-          example: UPDATE_CANCELLED
-        feedbacks:
-          type: array
-          description: |
-            Feedback that can be provided includes, but is not limited to:
-            - unsupported properties
-            - changed values
-            - removed properties
-            - general information
-          items:
-            $ref: '#/components/schemas/Feedback'
-      required:
-        - shippingInstructionsStatus
 
     ##########
     # Feedback
@@ -5869,7 +5771,7 @@ components:
           example: 4426d965-0dd8-4005-8c63-dc68b01c4962
         errorDateTime:
           description: |
-            The DateTime corresponding to the error occurring. Must be formatted using [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format.
+            The DateTime corresponding to the error occurring. Must be formatted using [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format.
           type: string
           format: date-time
           example: '2024-09-04T09:41:00Z'
@@ -6053,7 +5955,8 @@ components:
           description: |-
             The code used for identifying the specific facility. This code does not include the UN Location Code.
             The definition of the code depends on the `facilityCodeListProvider`. As code list providers maintain multiple codeLists the following codeList is used:
-            - for `SMDG` - the codeList used is the [SMDG Terminal Code List](https://smdg.org/wp-content/uploads/Codelists/Terminals/SMDG-Terminal-Code-List-v20210401.xlsx)  - for `BIC` - the codeList used is the [BIC Facility Codes](https://www.bic-code.org/facility-codes/)
+            - `SMDG` (the codeList used is the [SMDG Terminal Code List](https://smdg.org/documents/smdg-code-lists/))
+            - `BIC` (the codeList used is the [BIC Facility Codes](https://www.bic-code.org/facility-codes/))
           nullable: false
           example: ADT
         facilityCodeListProvider:
@@ -7333,9 +7236,9 @@ components:
           maxLength: 11
           description: |
             The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.
-            According to [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346), a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit).
+            According to [ISO 6346](https://www.iso.org/standard/83558.html), a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit).
 
-            If a container does not comply with [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346), it is suggested to follow [Recommendation #2: Containers with non-ISO identification](https://smdg.org/documents/smdg-recommendations) from SMDG.
+            If a container does not comply with [ISO 6346](https://www.iso.org/standard/83558.html), it is suggested to follow [Recommendation #2: Containers with non-ISO identification](https://smdg.org/documents/smdg-recommendations) from SMDG.
           example: APZU4812090
         grossWeight:
           type: object
@@ -7422,9 +7325,9 @@ components:
           maxLength: 11
           description: |
             The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.
-            According to [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346), a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit).
+            According to [ISO 6346](https://www.iso.org/standard/83558.html), a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit).
 
-            If a container does not comply with [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346), it is suggested to follow [Recommendation #2: Containers with non-ISO identification](https://smdg.org/documents/smdg-recommendations) from SMDG.
+            If a container does not comply with [ISO 6346](https://www.iso.org/standard/83558.html), it is suggested to follow [Recommendation #2: Containers with non-ISO identification](https://smdg.org/documents/smdg-recommendations) from SMDG.
           example: APZU4812090
         grossWeight:
           type: object
@@ -8211,9 +8114,9 @@ components:
           maxLength: 11
           description: |
             The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.
-            According to [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346), a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit).
+            According to [ISO 6346](https://www.iso.org/standard/83558.html), a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit).
 
-            If a container does not comply with [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346), it is suggested to follow [Recommendation #2: Containers with non-ISO identification](https://smdg.org/documents/smdg-recommendations) from SMDG.
+            If a container does not comply with [ISO 6346](https://www.iso.org/standard/83558.html), it is suggested to follow [Recommendation #2: Containers with non-ISO identification](https://smdg.org/documents/smdg-recommendations) from SMDG.
           example: APZU4812090
       required:
         - isShipperOwned
@@ -8234,9 +8137,9 @@ components:
           maxLength: 11
           description: |
             The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.
-            According to [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346), a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit).
+            According to [ISO 6346](https://www.iso.org/standard/83558.html), a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit).
 
-            If a container does not comply with [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346), it is suggested to follow [Recommendation #2: Containers with non-ISO identification](https://smdg.org/documents/smdg-recommendations) from SMDG.
+            If a container does not comply with [ISO 6346](https://www.iso.org/standard/83558.html), it is suggested to follow [Recommendation #2: Containers with non-ISO identification](https://smdg.org/documents/smdg-recommendations) from SMDG.
           example: APZU4812090
         ISOEquipmentCode:
           type: string
@@ -8286,9 +8189,9 @@ components:
           maxLength: 11
           description: |
             The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.
-            According to [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346), a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit).
+            According to [ISO 6346](https://www.iso.org/standard/83558.html), a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit).
 
-            If a container does not comply with [ISO 6346](https://en.wikipedia.org/wiki/ISO_6346), it is suggested to follow [Recommendation #2: Containers with non-ISO identification](https://smdg.org/documents/smdg-recommendations) from SMDG.
+            If a container does not comply with [ISO 6346](https://www.iso.org/standard/83558.html), it is suggested to follow [Recommendation #2: Containers with non-ISO identification](https://smdg.org/documents/smdg-recommendations) from SMDG.
           example: APZU4812090
         ISOEquipmentCode:
           type: string
@@ -9008,12 +8911,12 @@ components:
           pattern: ^\S+$
           maxLength: 4
           description: |
-            The `NMFTA` or `SMDG` code of the issuing carrier of the `Transport Document`
+            The `SCAC` code (provided by [NMFTA](https://nmfta.org/scac/)) or `SMDG` code (provided by [SMDG](https://smdg.org/documents/smdg-code-lists/smdg-liner-code-list/)) of the issuing carrier of the `Transport Document`. `carrierCodeListProvider` defines which list the `carrierCode` is based upon.
           example: MMCU
         carrierCodeListProvider:
           type: string
           description: |
-            The code list provider for the carrier code. Possible values are:
+            The code list provider for the `carrierCode`. Possible values are:
             - `SMDG` (Ship Message Design Group)
             - `NMFTA` (National Motor Freight Traffic Association)
           enum:
@@ -9229,40 +9132,6 @@ components:
         - carrierCode
         - carrierCodeListProvider
         - transports
-
-    ####################################
-    # Transport Document Status response
-    ####################################
-    TransportDocumentRefStatus:
-      type: object
-      title: Transport Document Response
-      description: |
-        The `transportDocumentReference` along with the `transportDocumentStatus` for the `Transport Document` is returned.
-      properties:
-        transportDocumentReference:
-          type: string
-          pattern: ^\S(?:.*\S)?$
-          maxLength: 20
-          description: |
-            A unique number allocated by the shipping line to the transport document and the main number used for the tracking of the status of the shipment.
-          example: HHL71800000
-        transportDocumentStatus:
-          type: string
-          maxLength: 50
-          description: |
-            The status of the `Transport Document`. Possible values are:
-            - DRAFT
-            - APPROVED
-            - ISSUED
-            - PENDING_SURRENDER_FOR_AMENDMENT
-            - SURRENDERED_FOR_AMENDMENT
-            - PENDING_SURRENDER_FOR_DELIVERY
-            - SURRENDERED_FOR_DELIVERY
-            - VOIDED
-          example: DRAFT
-      required:
-        - transportDocumentReference
-        - transportDocumentStatus
 
     ############
     # Transports
