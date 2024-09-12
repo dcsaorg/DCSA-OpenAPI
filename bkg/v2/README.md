@@ -11,6 +11,60 @@ Publications related to the Booking API:
 ---
 This is a moving target and will be updated as soon as the version is published
 
+<a name="v200B20240912"></a>[Release v2.0.0 Beta 20240912 (12 September 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0-Beta-20240912)
+---
+Snapshot as of 12 of September 2024 for Booking 2.0.0 Beta
+## Key changes
+- `POST`, `PUT` and `PATCH` endPoints only return `202` (Accepted) as a success response code
+- changed all PseudoEnum values so they no longer include spaces (` `)
+- links to specific standardisation bodies versions replaced with more "general" links (Wikipedia links replaced with links to www.iso.org)
+- structure of `weight` and `volume` (`value` and `unit`) specifications changed to object containing two properties: `value` and `unit` instead of conditional properties
+- `volume` renamed to `netVolume` in DG (Dangerous Goods)
+
+## All changes
+- fixed a lot of typos in descriptions
+- Added a link to **API Design & Implementation Principles**
+- API endPoint descriptions updated
+- anything but `200` (OK) and `201` (Created) removed as response codes for `POSt`, `PUT` and `PATCH`
+- modified endPoint examples
+- title property added to all objects
+- `bookingStatus`, `amendedBookingStatus` and `bookingCancellationStatus` values updated - all spaces (` `) have been replaced with underscore (`_`)
+- `originChargesPaymentTerm`, `destinationChargesPaymentTerm` and `vessel` created as globally defined objects and referenced where needed
+- `declaredValueCurrency` description link updated
+- `carrierCode` description updated to make it more clear that it is a `SCAC` code
+- `incoTerms` description updated to not include list of values as this is defined by https://iccwbo.org/business-solutions/incoterms-rules/
+- changed `errorDateTime` example to UTC instead of timeZone specific
+- `facilityCode` description link updated to a more general page instead of a specific version
+- `BookingRefStatus` object removed as it is no longer needed in reponse payloads
+- `TaxLegalReference` object updated:
+  - description updated to no longer link to reference data (it is currently out of scopre for DCSA to maintain this list)
+  - `countryCode` example updated to align with `type` example
+- `CustomsReference` object updated:
+  - description updated to no longer link to reference data (it is currently out of scopre for DCSA to maintain this list)
+  - `countryCode` example updated to align with `type` example
+- `ISOEquipmentCode` description link updated to www.iso.org instead of Wikipedia
+- `emptyContainerPickup` `dateTime` example updated to be UTC time
+- `equipmentReferences` description link updated to www.iso.org instead of Wikipedia
+- structure of `RequestedEquipment` and `RequestedEquipmentShipper` objects changed so it no longer uses `oneOf` to choose between SOC (Shipper Owned Container) and COC (Carrier Owned Container). Instead a conditional `tareWeight` peroperty has been added along with `isShipperOwned`
+- `ContainerPositioning` and `ContainerPositioningEstimated` `dateTime` example updated to be UTC time
+- `ContainerPositioningLocation` and `EmptyContainerDepotReleaseLocation` description updated to include a condition
+- `HSCodes` description link updated to a general link instead of a specific version
+- `cargoGrossWeight` and `cargoGrossWeightUnit` merged into a property called `cargoGrossWeight` containing two mandatory properties `value` and `unit`
+- `cargoGrossVolume` and `cargoGrossVolumeUnit` merged into a property called `cargoGrossVolume` containing two mandatory properties `value` and `unit`
+- `SCHEDULE B` updated to `SCHEDULE_B` as a value in the `type` in `NationalCommodityCode` to avoid the space (` `)
+- `packageCode` description link updated to a general link instead of a specific version
+- `imoPackagingCode` description updated
+- `imoClass` reference data link removed
+- `fumigationDateTime` example updated to use UTC time
+- `volume` renamed to `netVolume` in DG (Dangerous Goods)
+- `LoadLocation` and `DischargeLocation`description updated to make it clear that if multiple ways of specifying a location is used they must point to the same place
+- `cutOffDateTime` example updated to use UTC
+- `AdvanceManifestFiling` object updated:
+  - description updated to no longer link to reference data (it is currently out of scopre for DCSA to maintain this list)
+  - `countryCode` example updated to align with `manifestTypeCode` example
+- `currencyCode` description link updated
+- `OriginChargesPaymentTerm`, `DestinationChargesPaymentTerm` and `Vessel` objects created
+
 <a name="v200B20240830"></a>[Release v2.0.0 Beta 20240830 (30 August 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0-Beta-20240830)
 ---
 Snapshot as of 30 of August 2024 for Booking 2.0.0 Beta
