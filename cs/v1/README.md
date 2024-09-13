@@ -41,7 +41,7 @@ The DCSA Commercial Schedules API is specified on [**SwaggerHub**](https://app.s
         - Moved partner related properties `carrierCode`,`carrierCodeListProvider`,`carrierServiceName`,`carrierServiceCode`,`carrierImportVoyageNumber`,`carrierExportVoyageNumber` to the object(new) `servicePartners`
     - location object changed from discriminators for each location to an object with types of different locations as optional properties
     - Added `Next-Page-Cursor` to the response header for pagination
-    - Fixed typo in `errorCodeMessage` and is made mandatory
+    - Fixed typo in `errorCodeMessage`,made mandatory and changed the maxLength from 200 -> 5000
     - Changed length of `vesselName` (now `name`) from 35 to 50
     - Removed `name` from Address Location
     - Changed `country` in address to `countryCode` and made mandatory.
@@ -66,7 +66,7 @@ The DCSA Commercial Schedules API is specified on [**SwaggerHub**](https://app.s
     - Changed maximum length of vessel name from 35 to 50
     - Changed Timestamp array attribute name from `timestamp` to `timestamps`
     - Added `Next-Page-Cursor` to the response header for pagination
-    - Fixed typo in `errorCodeMessage` and is made mandatory
+    - Fixed typo in `errorCodeMessage`,made mandatory and changed the maxLength from 200 -> 5000
     - `errorDateTime` example changed to UTC
     - Changed inline `Detailed Error` to object
 - Vessel Schedules
@@ -84,7 +84,7 @@ The DCSA Commercial Schedules API is specified on [**SwaggerHub**](https://app.s
     - Changed maximum length of vessel name from 35 to 50
     - Changed Timestamp array attribute name from `timestamp` to `timestamps`
     - Added `Next-Page-Cursor` to the response header for pagination
-    - Fixed typo in `errorCodeMessage` and is made mandatory
+    - Fixed typo in `errorCodeMessage`,made mandatory and changed the maxLength from 200 -> 5000
     - Changed length of `vesselName` (now `name`) from 35 to 50
     - Removed `name` from Address Location
     - Changed `country` in address to `countryCode` and made mandatory.
