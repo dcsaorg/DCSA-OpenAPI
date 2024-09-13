@@ -12,6 +12,21 @@ Publications related to the Bill of Lading Surrender API:
 ---
 This is a moving target and will be updated as soon as the version is published
 
+<a name="v300B20240913"></a>[Release v3.0.0 Beta 20240913 (13 of September 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR/3.0.0-Beta-20240913)
+---
+Snapshot as of 13 of September 2024 for EBL Surrender 3.0.0 Beta.
+## Key changes
+- Added a link to **API Design & Implementation Principles**
+- `eblPlatform` description updated to remove reference data link
+- `actionDateTime` example update to be UTC
+- `actionCode` values updated to no longer contain space (` `)
+- `endorsementChain` description updated
+- `TaxLegalReference` object updated:
+  - description updated to no longer link to reference data (it is currently out of scopre for DCSA to maintain this list)
+  - `countryCode` example updated to align with type example
+- changed `errorDateTime` example to UTC instead of timeZone specific and updated description link
+- typos fixed
+
 <a name="v300B20240830"></a>[Release v3.0.0 Beta 20240830 (30 of August 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR/3.0.0-Beta-20240830)
 ---
 Snapshot as of 30 of August 2024 for EBL Surrender 3.0.0 Beta.
