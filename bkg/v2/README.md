@@ -11,9 +11,9 @@ Publications related to the Booking API:
 ---
 This is a moving target and will be updated as soon as the version is published
 
-<a name="v200B20240912"></a>[Release v2.0.0 Beta 20240912 (12 September 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0-Beta-20240912)
+<a name="v200B20240913"></a>[Release v2.0.0 Beta 20240913 (13 September 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0-Beta-20240913)
 ---
-Snapshot as of 12 of September 2024 for Booking 2.0.0 Beta
+Snapshot as of 13 of September 2024 for Booking 2.0.0 Beta
 ## Key changes
 - `POST`, `PUT` and `PATCH` endPoints only return `202` (Accepted) as a success response code
 - changed all PseudoEnum values so they no longer include spaces (` `)
