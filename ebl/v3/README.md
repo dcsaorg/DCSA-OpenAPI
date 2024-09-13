@@ -15,6 +15,64 @@ Publications related to the Bill of Lading API:
 ---
 This is a moving target and will be updated as soon as the version is published
 
+<a name="v300B20240913"></a>[Release v3.0.0 Beta 20240913 (13 of September 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.0-Beta-20240913)
+---
+Snapshot as of 13 of September 2024 for EBL 3.0.0 Beta.
+## Key changes
+- `POST`, `PUT` and `PATCH` endPoints only return `202` (Accepted) as a success response code
+- changed all PseudoEnum values so they no longer include spaces (` `)
+- links to specific standardisation bodies versions replaced with more "general" links (Wikipedia links replaced with links to www.iso.org)
+- structure of `weight` and `volume` (`value` and `unit`) specifications changed to object containing two mandatory properties: `value` and `unit` instead of conditional properties
+- `volume` renamed to `netVolume` in DG (Dangerous Goods)
+
+## All changes
+- Added a link to **API Design & Implementation Principles**
+- multiple typos fixed
+- API endPoint descriptions and examples updated
+- anything but `200` (OK) and `201` (Created) removed as response codes for `POSt`, `PUT` and `PATCH`
+- title property inserted on objects where it is missing
+- `shippingInstructionsStatus` and `updatedShippingInstructionsStatus` values updated, all spaces (` `) have been replaced with underscore (`_`). Reference data links removed
+- `originChargesPaymentTerm` and `destinationChargesPaymentTerm` properties now reference objects instead of defining properties inline
+- `sendToPlatform` removed from SI and TD root level as it has been replaced by the `Issue To ` party
+- `requestedCarrierCertificates` and `requestedCarroerClauses` now have the string defined inline as part of the array rather than referencing a String "object"
+- `declaredValueCurrency` description link changed
+- `carrierCode` description updated to make it more clear that it is a `SCAC` code
+- `ShippingInstructionsRefStatus`, `ShippingInstructionsRefCancelStatus` and `TransportDocumentRefStatus` objects deleted as they are no longer needed as part of the response payloads
+- changed `errorDateTime` example to UTC instead of timeZone specific
+- `facilityCode` description link updated to a more general page instead of a specific version
+- `typeOfPerson` values no longer contain space (` `)
+- `IssueToParty` description updated
+- `sendToPlatform` reference data link in description removed from `IssueToParty` object
+- `TaxLegalReference` object updated:
+  - description updated to no longer link to reference data (it is currently out of scopre for DCSA to maintain this list)
+  - `countryCode` example updated to align with type example
+- `transportDocumentStatus` values no longer contain space (` `)
+- `descriptionOfGoods` changed from string to string array with a `maxItems` of 150 and a `maxLength` of 35
+- `HSCodes` description link updated to a general link instead of a specific version
+- `shippingMarks` `maxItems` is now 50 and length of each line is 35
+- `SCHEDULE B` updated to `SCHEDULE_B` as a value in the type in NationalCommodityCode to avoid the space (` `)
+- `CustomsReference` object updated:
+  - description updated to no longer link to reference data (it is currently out of scopre for DCSA to maintain this list)
+  - `countryCode` example updated to align with type example
+- `equipmentReference` description link updated to www.iso.org instead of Wikipedia
+- `weight` and `volume` of `CargoItem` renamed to `grossWeight` and `grossVolume` and structure changed to object containing mandatory `value` and `unit`
+- `packageCode` description link updated to a general link instead of a specific version
+- `imoPackagingCode` description updated
+- `woodDeclaration` values no longer contain space (` `)
+- `imoClass` reference data link removed
+- `fumigationDateTime` example updated to use UTC time
+- `volume` renamed to `netVolume` in DG (Dangerous Goods)
+- `ISOEquipmentCode` description link updated and example modified
+- `tareWeight` and `weightUnit` merged into one optional object containing mandatory `value` and `unit`
+- `AdvanceManifestFiling` object updated:
+  - description updated to no longer link to reference data (it is currently out of scopre for DCSA to maintain this list)
+  - `manifestTypeCode` description link to reference data removed
+  - `supplementaryDeclarantEORInumber` renamed to `supplementaryDeclarantEORINumber` (`n` --> `N`)
+- `PlaceOfAcceptance`, `PlaceOfFinalDelivery`, `PlaceOfReceipt`, `PortOfLoading`, `PortOfDischarge`, `PlaceOfDelivery` and `OnwardInlandRouting` condition added to make sure if multiple ways of expressing a location is used that all ways point to the same location
+- `currencyCode` description link changed
+- `RequestedCarrierCertificate` and `RequestedCarrierClause` objects deleted
+- `OriginChargesPaymentTerm` and `DestinationChargesPaymentTerm` objects created
+
 <a name="v300B20240830"></a>[Release v3.0.0 Beta 20240830 (30 of August 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.0-Beta-20240830)
 ---
 Snapshot as of 30 of August 2024 for EBL 3.0.0 Beta.
