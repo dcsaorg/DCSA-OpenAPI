@@ -12,6 +12,50 @@ Publications related to the Bill of Lading Issuance API:
 ---
 This is a moving target and will be updated as soon as the version is published
 
+<a name="v300B20240912"></a>[Release v3.0.0 Beta 20240912 (12 of September 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS/3.0.0-Beta-20240912)
+---
+Snapshot as of 12 of September 2024 for EBL Issuance 3.0.0 Beta.
+## Key changes
+- changed all PseudoEnum values so they no longer include spaces (` `)
+- changed regEx for: `XXXSignedContent` properties to reflect Base64Url encodings
+- links to specific standardisation bodies versions replaced with more "general" links (Wikipedia links replaced with links to www.iso.org)
+- `Transport Document` changes
+
+## All changes
+- Added a link to **API Design & Implementation Principles**
+- changed `errorDateTime` example to UTC instead of timeZone specific
+- multiple typos fixed
+- changed regEx for: `issuanceManifestSignedContent` to now reflect Base64Url encodings
+- modified description for `IssueToParty`
+- removed reference data link on `sendToPlatform` description
+- `TaxLegalReference` object updated:
+  - description updated to no longer link to reference data (it is currently out of scopre for DCSA to maintain this list)
+  - `countryCode` example updated to align with type example
+- `transportDocumentStatus` values no longer contain space (` `)
+- `declaredValueCurrency` description link changed
+- `carrierCode` description updated to make it more clear that it is a `SCAC` code
+- `descriptionOfGoods` changed from string to string array with a `maxItems` of 150 and a `maxLength` of 35
+- `HSCodes` description link updated to a general link instead of a specific version
+- `shippingMarks` `maxItems` is now 50 and length of each line is 35
+- `SCHEDULE B` updated to `SCHEDULE_B` as a value in the type in NationalCommodityCode to avoid the space (` `)
+- `CustomsReference` object updated:
+  - description updated to no longer link to reference data (it is currently out of scopre for DCSA to maintain this list)
+  - `countryCode` example updated to align with type example
+- `equipmentReference` description link updated to www.iso.org instead of Wikipedia
+- `weight` and `volume` of `CargoItem` renamed to `grossWeight` and `grossVolume` and structure changed to object containing mandatory `value` and `unit`
+- `packageCode` description link updated to a general link instead of a specific version
+- `imoPackagingCode` description updated
+- `woodDeclaration` values no longer contain space (` `)
+- `imoClass` reference data link removed
+- `fumigationDateTime` example updated to use UTC time
+- `volume` renamed to `netVolume` in DG (Dangerous Goods)
+- `ISOEquipmentCode` description link updated and example modified
+- `tareWeight` and `weightUnit` merged into one optional object containing mandatory `value` and `unit`
+- `PlaceOfReceipt`, `PortOfLoading`, `PortOfDischarge`, `PlaceOfDelivery` and `OnwardInlandRouting` condition added to make sure if multiple ways of expressing a location is used that all ways point to the same location
+- `currencyCode` description link changed
+- `facilityCode` description link updated to a more general page instead of a specific version
+- `typeOfPerson` values no longer contain space (` `)
+
 <a name="v300B20240830"></a>[Release v3.0.0 Beta 20240830 (30 of August 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS/3.0.0-Beta-20240830)
 ---
 Snapshot as of 30 of August 2024 for EBL Issuance 3.0.0 Beta.
