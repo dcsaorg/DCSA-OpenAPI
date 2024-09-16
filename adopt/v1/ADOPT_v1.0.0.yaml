@@ -14,9 +14,11 @@ info:
 paths:
   /v1/adoption-stats:
     get:
-      summary: Retrieve adoption statistics
+      summary: Retrieve adoption statistics (DCSA to call "Consumer" endPoint)
       description: |
         Retrieve the adoption statistics, currently the number of API calls by DCSA standard, version, traffic-direction, endpoint, query parameter set and response status.
+
+        **Note:** This endPoint is to be implemented on "consumer" side and for DCSA to call
       operationId: get-adoption-stats
       parameters:
         - name: interval
@@ -63,6 +65,35 @@ paths:
         "500":
           description: |
             Internal server error.
+    put:
+      summary: Send (Push) adoption statistics (DCSA endPoint)
+      description: |
+        Send (Push) the adoption statistics, currently the number of API calls by DCSA standard, version, traffic-direction, endpoint, query parameter set and response status.
+
+        **Note:** This endPoint is for DCSA to implement and for the consumer to call
+      operationId: put-adoption-stats
+      parameters:
+        - $ref: '#/components/parameters/Api-Version-Major'
+      requestBody:
+        description: |
+          A successful response with no content.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdoptionStats'
+      responses:
+        "204":
+          description: |
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+        "400":
+          description: |
+            Invalid request.
+        "500":
+          description: |
+            Internal server error.
 components:
   headers:
     API-Version:
@@ -89,7 +120,7 @@ components:
           type: string
           format: date-time
           description: |
-            The DateTime when the stats were last updated. Must be formatted using [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format.
+            The DateTime when the stats were last updated. Must be formatted using [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format.
           example: 2024-06-18T20:44:37+01:00
         interval:
           type: string
