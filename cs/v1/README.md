@@ -44,7 +44,9 @@ The DCSA Commercial Schedules API is specified on [**SwaggerHub**](https://app.s
     - Fixed typo in `errorCodeMessage`,made mandatory and changed the maxLength from 200 -> 5000
     - Changed length of `vesselName` (now `name`) from 35 to 50
     - Removed `name` from Address Location
-    - Changed `country` in address to `countryCode` and made mandatory.
+    - Changed `country` in `address` to `countryCode` and made mandatory.
+    - Made `street` and `city` mandatory in `address`
+    - Changed errorCode link to [DCSA Error Codes](https://developer.dcsa.org/standard-error-codes)
     - Added `minItems: 1` to the `Leg` array
     - `sequenceNumber` format changed from int64 to int32
     - `errorDateTime` example changed to UTC
@@ -69,6 +71,7 @@ The DCSA Commercial Schedules API is specified on [**SwaggerHub**](https://app.s
     - Fixed typo in `errorCodeMessage`,made mandatory and changed the maxLength from 200 -> 5000
     - `errorDateTime` example changed to UTC
     - Changed inline `Detailed Error` to object
+    - Changed errorCode link to [DCSA Error Codes](https://developer.dcsa.org/standard-error-codes)
 - Vessel Schedules
   - Filters
     - Added filter `vesselOperatorCarrierCode`
@@ -88,6 +91,8 @@ The DCSA Commercial Schedules API is specified on [**SwaggerHub**](https://app.s
     - Changed length of `vesselName` (now `name`) from 35 to 50
     - Removed `name` from Address Location
     - Changed `country` in address to `countryCode` and made mandatory.
+    - Made `street` and `city` mandatory in `address`
+    - Changed errorCode link to [DCSA Error Codes](https://developer.dcsa.org/standard-error-codes)
     - `errorDateTime` example changed to UTC
     - Made `carrierServiceCode` mandatory
     - Changed inline `Detailed Error` to object
