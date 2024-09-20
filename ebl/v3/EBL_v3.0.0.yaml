@@ -5703,7 +5703,7 @@ components:
           maxLength: 10
           description: The post code of the address.
           example: 1047 HM
-        PObox:
+        POBox:
           type: string
           maxLength: 20
           description: A numbered box at a post office where a person or business can have mail or parcels delivered.
@@ -5906,7 +5906,7 @@ components:
           description: The post code of the party’s address.
           maxLength: 10
           example: 1047 HM
-        PObox:
+        POBox:
           type: string
           maxLength: 20
           description: A numbered box at a post office where a person or business can have mail or parcels delivered.
@@ -6277,9 +6277,7 @@ components:
       type: object
       title: Issue To Party
       description: |
-        The party to whom the electronic Bill of Lading (eBL) must be issued.
-        
-        **Condition:** Mandatory for eBL (Is Electronic = TRUE).
+        The party to whom the `Bill of Lading` must be issued.
       properties:
         partyName:
           type: string
@@ -6307,6 +6305,8 @@ components:
             - `ETEU` (eTEU)
             - `TRAC` (TRACE Original)
             - `BRIT` (BRITC eBL)
+
+            **Conditional:** only applicable when `isElectronic=true` and `transportDocumentTypeCode=BOL`. The property **must** be absent for paper B/Ls (`isElectronic=false`)
           example: BOLE
         identifyingCodes:
           type: array
@@ -6320,7 +6320,6 @@ components:
             $ref: '#/components/schemas/TaxLegalReference'
       required:
         - partyName
-        - sendToPlatform
 
     NotifyParty:
       type: object
@@ -6612,7 +6611,7 @@ components:
               pattern: ^\S(?:.*\S)?$
               maxLength: 30
               description: |
-                Phone number for the contact
+                Phone number for the contact. Phone **must** include an international phone number format as defined in the [ITU-T recommendation E.123](https://www.itu.int/rec/T-REC-E.123/en).
               example: +45 70262970
           required:
             - phone
@@ -6755,6 +6754,38 @@ components:
         - type
         - value
 
+    ReferenceConsignmentItem:
+      type: object
+      title: Reference (Consignment Item)
+      description: |
+        References provided by the shipper or freight forwarder at the time of `Booking` or at the time of providing `Shipping Instructions`. Carriers share it back when providing `Track & Trace` event updates, some are also printed on the B/L. Customers can use these references to track shipments in their internal systems.
+      properties:
+        type:
+          type: string
+          maxLength: 3
+          description: |
+            The reference type codes defined by DCSA. Possible values are:
+            - `CR` (Customer’s Reference)
+            - `AKG` (Vehicle Identification Number)
+            - `SPO` (Shipper's Purchase Order)
+            - `CPO` (Consignee's Purchase Order)
+          example: CR
+        values:
+          type: array
+          minItems: 1
+          description: |
+            List of `referenceValues` for a given `referenceType`.
+          items:
+            type: string
+            maxLength: 35
+            pattern: ^\S(?:.*\S)?$
+            description: |
+              The value of the reference. 
+            example: HHL00103004
+      required:
+        - type
+        - values
+
     ##################
     # Consignment Item
     ##################
@@ -6838,7 +6869,7 @@ components:
           description: |
             A list of `References`
           items:
-            $ref: '#/components/schemas/Reference'
+            $ref: '#/components/schemas/ReferenceConsignmentItem'
         customsReferences:
           type: array
           description: |
@@ -6937,7 +6968,7 @@ components:
           description: |
             A list of `References`
           items:
-            $ref: '#/components/schemas/Reference'
+            $ref: '#/components/schemas/ReferenceConsignmentItem'
         customsReferences:
           type: array
           description: |
@@ -7856,7 +7887,7 @@ components:
           pattern: ^\S(?:.*\S)?$
           maxLength: 30
           description: |
-            Phone number for the contact
+            Phone number for the contact. Phone **must** include an international phone number format as defined in the [ITU-T recommendation E.123](https://www.itu.int/rec/T-REC-E.123/en).
           example: +45 70262970
         referenceNumber:
           type: string
