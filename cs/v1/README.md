@@ -25,9 +25,9 @@ The DCSA Commercial Schedules API is specified on [**SwaggerHub**](https://app.s
     - `facilitySMDGCode` split to `facilityCode` and `facilityCodeListProvider`(BIC,SMDG)
     - `dateTime` to be expressed in local time with offset (YYYY-MM-DDTHH:MM:SS±HH:MM)
       - with exception of `errorDateTime` which is in UTC without offset.
-    - changed `modeOfTransport` to `transport` object and moved transport-related information to the transport object with discriminators of different transport mode.
+    - changed `modeOfTransport` to `transport` object and moved transport-related information to the transport object with different transport mode.
       - Added `RAIL_TRUCK`,`BARGE_TRUCK`,`BARGE_RAIL`,`MULTIMODAL` to `modeOfTranport`,now supports `VESSEL`,`BARGE`,`TRUCK`,`RAIL`,`RAIL_TRUCK`,`BARGE_TRUCK`,`BARGE_RAIL`,`MULTIMODAL`
-      - discriminators added to `transport` object to limit additional details depending on the `modeOfTransport`
+      - `modeOfTransport` made mandatory and  added to `transport` object to limit additional details depending on the `modeOfTransport`. Each transport mode has only the following values:
         - Vessel Transport → modeOfTransport [`VESSEL`]
         - Barge Transport → modeOfTransport [`BARGE`]
         - Other Transport → modeOfTransport [`RAIL_TRUCK`,`BARGE_TRUCK`,`BARGE_RAIL`,`MULTIMODAL`]
