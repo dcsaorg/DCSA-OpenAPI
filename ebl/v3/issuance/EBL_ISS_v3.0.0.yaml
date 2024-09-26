@@ -835,88 +835,9 @@ components:
             $ref: '#/components/schemas/Charge'
         # New values compared to SI - END
         placeOfIssue:
-          type: object
-          title: Place of Issue
-          description: |
-            An object to capture where the original Transport Document (`Bill of Lading`) will be issued.
-
-            The location can be specified either as a `UN Location Code` or as a `CountryCode`.
-          properties:
-            locationName:
-              type: string
-              description: The name of the location.
-              pattern: ^\S(?:.*\S)?$
-              example: Port of Amsterdam
-              maxLength: 100
-          oneOf:
-            - type: object
-              title: UN Location Code
-              properties:
-                UNLocationCode:
-                  type: string
-                  pattern: ^[A-Z]{2}[A-Z2-9]{3}$
-                  minLength: 5
-                  maxLength: 5
-                  description: |-
-                    The UN Location code specifying where the place is located. The pattern used must be
-
-                    - 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
-                    - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used
-
-                    More info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)
-                  example: NLAMS
-              required:
-                - UNLocationCode
-            - type: object
-              title: Country Code
-              properties:
-                countryCode:
-                  type: string
-                  pattern: ^[A-Z]{2}$
-                  minLength: 2
-                  maxLength: 2
-                  description: |
-                    The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
-                  example: NL
-              required:
-                - countryCode
+          $ref: '#/components/schemas/PlaceOfIssue'
         invoicePayableAt:
-          type: object
-          title: Invoice Payable At
-          description: |
-            Location where payment of ocean freight and charges for the main transport will take place by the customer.
-
-            The location can be provided as a `UN Location Code` or as a fallback - a `freeText` field
-          oneOf:
-            - type: object
-              title: UN Location Code
-              properties:
-                UNLocationCode:
-                  type: string
-                  pattern: ^[A-Z]{2}[A-Z2-9]{3}$
-                  minLength: 5
-                  maxLength: 5
-                  description: |-
-                    The UN Location code specifying where the place is located. The pattern used must be
-
-                    - 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
-                    - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used
-
-                    More info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)
-                  example: NLAMS
-              required:
-                - UNLocationCode
-            - type: object
-              title: Free text
-              properties:
-                freeText:
-                  type: string
-                  maxLength: 35
-                  description: |
-                    The name of the location where payment will be rendered by the customer.
-                  example: DCSA Headquarters
-              required:
-                - freeText
+          $ref: '#/components/schemas/InvoicePayableAt'
         partyContactDetails:
           type: array
           minItems: 1
@@ -925,40 +846,7 @@ components:
           items:
             $ref: '#/components/schemas/PartyContactDetail'
         documentParties:
-          type: object
-          title: Document Parties
-          description: |
-            All `Parties` with associated roles.
-          properties:
-            shipper:
-              $ref: '#/components/schemas/Shipper'
-            consignee:
-              $ref: '#/components/schemas/Consignee'
-            endorsee:
-              $ref: '#/components/schemas/Endorsee'
-            issuingParty:
-              $ref: '#/components/schemas/IssuingParty'
-            carriersAgentAtDestination:
-              $ref: '#/components/schemas/CarriersAgentAtDestination'
-            notifyParties:
-              type: array
-              maxItems: 3
-              description: |
-                List of up to 3 `Notify Parties`. The first item in the list is the **First Notify Party** (`N1`), the second item is the **Second Notify Party** (`N2`) and the last item is the **Other Notify Party** (`NI`).
-
-                **Conditions:** If provided:
-                  - mandatory for To Order BLs, `isToOrder=true`
-                  - the order of the items in this array **MUST** be preserved as by the provider of the API.
-              items:
-                $ref: '#/components/schemas/NotifyParty'
-            other:
-              type: array
-              description: A list of document parties that can be optionally provided in the `Shipping Instructions` and `Transport Document`.
-              items:
-                $ref: '#/components/schemas/OtherDocumentParty'
-          required:
-            - shipper
-            - issuingParty
+          $ref: '#/components/schemas/DocumentParties'
         routingOfConsignmentCountries:
           type: array
           description: |
@@ -1359,113 +1247,13 @@ components:
             If a container does not comply with [ISO 6346](https://www.iso.org/standard/83558.html), it is suggested to follow [Recommendation #2: Containers with non-ISO identification](https://smdg.org/documents/smdg-recommendations) from SMDG.
           example: APZU4812090
         cargoGrossWeight:
-          type: object
-          title: Cargo Gross Weight
-          description: |
-            The weight of the cargo item including packaging being carried in the container. Excludes the tare weight of the container.
-          properties:
-            value:
-              type: number
-              format: float
-              minimum: 0
-              exclusiveMinimum: true
-              description: |
-                The weight of the cargo item including packaging being carried in the container. Excludes the tare weight of the container. A maximum of 3 decimals should be provided.
-              example: 2400
-            unit:
-              type: string
-              description: |
-                The unit of measure which can be expressed in imperial or metric terms
-                - `KGM` (Kilograms)
-                - `LBR` (Pounds)
-              enum:
-                - KGM
-                - LBR
-              example: KGM
-          required:
-            - value
-            - unit
+          $ref: '#/components/schemas/CargoGrossWeight'
         cargoGrossVolume:
-          type: object
-          title: Cargo Gross Volume
-          description: |
-            Calculated by multiplying the width, height, and length of the packed cargo.
-          properties:
-            value:
-              type: number
-              format: float
-              minimum: 0
-              exclusiveMinimum: true
-              description: |
-                Calculated by multiplying the width, height, and length of the packed cargo. A maximum of 4 decimals should be provided.
-              example: 2.4
-            unit:
-              type: string
-              description: |
-                The unit of measure which can be expressed in either imperial or metric terms
-                - `FTQ` (Cubic foot)
-                - `MTQ` (Cubic meter)
-              enum:
-                - MTQ
-                - FTQ
-              example: MTQ
-          required:
-            - value
-            - unit
+          $ref: '#/components/schemas/CargoGrossVolume'
         cargoNetWeight:
-          type: object
-          title: Cargo Net Weight
-          description: |
-            The weight of the cargo item excluding packaging being carried in the container. Excludes the tare weight of the container.
-          properties:
-            value:
-              type: number
-              format: float
-              minimum: 0
-              exclusiveMinimum: true
-              description: |
-                The weight of the cargo item excluding packaging being carried in the container. Excludes the tare weight of the container. A maximum of 3 decimals should be provided.
-              example: 2400
-            unit:
-              type: string
-              description: |
-                The unit of measure which can be expressed in imperial or metric terms
-                - `KGM` (Kilograms)
-                - `LBR` (Pounds)
-              enum:
-                - KGM
-                - LBR
-              example: KGM
-          required:
-            - value
-            - unit
+          $ref: '#/components/schemas/CargoNetWeight'
         cargoNetVolume:
-          type: object
-          title: Cargo Net Volume
-          description: |
-            Calculated by multiplying the width, height, and length of the packed cargo, excluding packaging.
-          properties:
-            value:
-              type: number
-              format: float
-              minimum: 0
-              exclusiveMinimum: true
-              description: |
-                Calculated by multiplying the width, height, and length of the packed cargo, excluding packaging.
-              example: 2.4
-            unit:
-              type: string
-              description: |
-                The unit of measure which can be expressed in either imperial or metric terms
-                - `FTQ` (Cubic foot)
-                - `MTQ` (Cubic meter)
-              enum:
-                - MTQ
-                - FTQ
-              example: MTQ
-          required:
-            - value
-            - unit
+          $ref: '#/components/schemas/CargoNetVolume'
         outerPackaging:
           $ref: '#/components/schemas/OuterPackaging'
         nationalCommodityCodes:
@@ -1484,6 +1272,115 @@ components:
         - equipmentReference
         - cargoGrossWeight
         - outerPackaging
+
+    CargoGrossWeight:
+      type: object
+      title: Cargo Gross Weight
+      description: |
+        The weight of the cargo item including packaging being carried in the container. Excludes the tare weight of the container.
+      properties:
+        value:
+          type: number
+          format: float
+          minimum: 0
+          exclusiveMinimum: true
+          description: |
+            The weight of the cargo item including packaging being carried in the container. Excludes the tare weight of the container. A maximum of 3 decimals should be provided.
+          example: 2400
+        unit:
+          type: string
+          description: |
+            The unit of measure which can be expressed in imperial or metric terms
+            - `KGM` (Kilograms)
+            - `LBR` (Pounds)
+          enum:
+            - KGM
+            - LBR
+          example: KGM
+      required:
+        - value
+        - unit
+    CargoGrossVolume:
+      type: object
+      title: Cargo Gross Volume
+      description: |
+        Calculated by multiplying the width, height, and length of the packed cargo.
+      properties:
+        value:
+          type: number
+          format: float
+          minimum: 0
+          exclusiveMinimum: true
+          description: |
+            Calculated by multiplying the width, height, and length of the packed cargo. A maximum of 4 decimals should be provided.
+          example: 2.4
+        unit:
+          type: string
+          description: |
+            The unit of measure which can be expressed in either imperial or metric terms
+            - `FTQ` (Cubic foot)
+            - `MTQ` (Cubic meter)
+          enum:
+            - MTQ
+            - FTQ
+          example: MTQ
+      required:
+        - value
+        - unit
+    CargoNetWeight:
+      type: object
+      title: Cargo Net Weight
+      description: |
+        The weight of the cargo item excluding packaging being carried in the container. Excludes the tare weight of the container.
+      properties:
+        value:
+          type: number
+          format: float
+          minimum: 0
+          exclusiveMinimum: true
+          description: |
+            The weight of the cargo item excluding packaging being carried in the container. Excludes the tare weight of the container. A maximum of 3 decimals should be provided.
+          example: 2400
+        unit:
+          type: string
+          description: |
+            The unit of measure which can be expressed in imperial or metric terms
+            - `KGM` (Kilograms)
+            - `LBR` (Pounds)
+          enum:
+            - KGM
+            - LBR
+          example: KGM
+      required:
+        - value
+        - unit
+    CargoNetVolume:
+      type: object
+      title: Cargo Net Volume
+      description: |
+        Calculated by multiplying the width, height, and length of the packed cargo, excluding packaging.
+      properties:
+        value:
+          type: number
+          format: float
+          minimum: 0
+          exclusiveMinimum: true
+          description: |
+            Calculated by multiplying the width, height, and length of the packed cargo, excluding packaging.
+          example: 2.4
+        unit:
+          type: string
+          description: |
+            The unit of measure which can be expressed in either imperial or metric terms
+            - `FTQ` (Cubic foot)
+            - `MTQ` (Cubic meter)
+          enum:
+            - MTQ
+            - FTQ
+          example: MTQ
+      required:
+        - value
+        - unit
 
     #################
     # Outer Packaging
@@ -1767,130 +1664,138 @@ components:
             - `D` (Hazard Zone D) can **only** be assigned to specific gases
           example: A
         grossWeight:
-          type: object
-          title: Gross Weight
-          description: |
-            Total weight of the goods carried, including packaging.
-          properties:
-            value:
-              type: number
-              format: float
-              example: 12000.3
-              minimum: 0
-              exclusiveMinimum: true
-              description: |
-                The grand total weight of the DG cargo and weight per `UNNumber`/`NANumber` including packaging items being carried, which can be expressed in imperial or metric terms, as provided by the shipper.
-            unit:
-              type: string
-              description: |
-                The unit of measure which can be expressed in imperial or metric terms
-
-                - `KGM` (Kilograms)
-                - `LBR` (Pounds)
-              enum:
-                - KGM
-                - LBR
-              example: KGM
-          required:
-            - value
-            - unit
+          $ref: '#/components/schemas/GrossWeight'
         netWeight:
-          type: object
-          title: Net Weight
-          description: |
-            Total weight of the goods carried, excluding packaging.
-          properties:
-            value:
-              type: number
-              format: float
-              minimum: 0
-              exclusiveMinimum: true
-              description: |
-                Total weight of the goods carried, excluding packaging.
-              example: 2.4
-            unit:
-              type: string
-              description: |
-                Unit of measure used to describe the `netWeight`. Possible values are
-
-                - `KGM` (Kilograms)
-                - `LBR` (Pounds)
-              enum:
-                - KGM
-                - LBR
-              example: KGM
-          required:
-            - value
-            - unit
+          $ref: '#/components/schemas/NetWeight'
         netExplosiveContent:
-          type: object
-          title: Net Explosive Content
-          description: |
-            The total weight of the explosive substances, without the packaging’s, casings, etc.
-          properties:
-            value:
-              type: number
-              format: float
-              minimum: 0
-              exclusiveMinimum: true
-              description: |
-                The total weight of the explosive substances, without the packaging’s, casings, etc.
-              example: 2.4
-            unit:
-              type: string
-              description: |
-                Unit of measure used to describe the `netExplosiveWeight`. Possible values are
-
-                - `KGM` (Kilograms)
-                - `LBR` (Pounds)
-                - `GRM` (Grams)
-                - `ONZ` (Ounce)
-              enum:
-                - KGM
-                - LBR
-                - GRM
-                - ONZ
-              example: KGM
-          required:
-            - value
-            - unit
+          $ref: '#/components/schemas/NetExplosiveContent'
         netVolume:
-          type: object
-          title: Net Volume
-          description: |
-            The volume of the referenced dangerous goods.
-
-            **Condition:** only applicable to liquids and gas.
-          properties:
-            value:
-              type: number
-              format: float
-              minimum: 0
-              exclusiveMinimum: true
-              description: |
-                The volume of the referenced dangerous goods.
-              example: 2.4
-            unit:
-              type: string
-              description: |
-                The unit of measure which can be expressed in either imperial or metric terms
-
-                - `FTQ` (Cubic foot)
-                - `MTQ` (Cubic meter)
-                - `LTR` (Litre)
-              enum:
-                - MTQ
-                - FTQ
-                - LTR
-              example: MTQ
-          required:
-            - value
-            - unit
+          $ref: '#/components/schemas/NetVolume'
         limits:
           $ref: '#/components/schemas/Limits'
       required:
         - properShippingName
         - imoClass
+    GrossWeight:
+      type: object
+      title: Gross Weight
+      description: |
+        Total weight of the goods carried, including packaging.
+      properties:
+        value:
+          type: number
+          format: float
+          example: 12000.3
+          minimum: 0
+          exclusiveMinimum: true
+          description: |
+            The grand total weight of the DG cargo and weight per `UNNumber`/`NANumber` including packaging items being carried, which can be expressed in imperial or metric terms, as provided by the shipper.
+        unit:
+          type: string
+          description: |
+            The unit of measure which can be expressed in imperial or metric terms
+
+            - `KGM` (Kilograms)
+            - `LBR` (Pounds)
+          enum:
+            - KGM
+            - LBR
+          example: KGM
+      required:
+        - value
+        - unit
+    NetWeight:
+      type: object
+      title: Net Weight
+      description: |
+        Total weight of the goods carried, excluding packaging.
+      properties:
+        value:
+          type: number
+          format: float
+          minimum: 0
+          exclusiveMinimum: true
+          description: |
+            Total weight of the goods carried, excluding packaging.
+          example: 2.4
+        unit:
+          type: string
+          description: |
+            Unit of measure used to describe the `netWeight`. Possible values are
+
+            - `KGM` (Kilograms)
+            - `LBR` (Pounds)
+          enum:
+            - KGM
+            - LBR
+          example: KGM
+      required:
+        - value
+        - unit
+    NetExplosiveContent:
+      type: object
+      title: Net Explosive Content
+      description: |
+        The total weight of the explosive substances, without the packaging’s, casings, etc.
+      properties:
+        value:
+          type: number
+          format: float
+          minimum: 0
+          exclusiveMinimum: true
+          description: |
+            The total weight of the explosive substances, without the packaging’s, casings, etc.
+          example: 2.4
+        unit:
+          type: string
+          description: |
+            Unit of measure used to describe the `netExplosiveWeight`. Possible values are
+
+            - `KGM` (Kilograms)
+            - `LBR` (Pounds)
+            - `GRM` (Grams)
+            - `ONZ` (Ounce)
+          enum:
+            - KGM
+            - LBR
+            - GRM
+            - ONZ
+          example: KGM
+      required:
+        - value
+        - unit
+    NetVolume:
+      type: object
+      title: Net Volume
+      description: |
+        The volume of the referenced dangerous goods.
+
+        **Condition:** only applicable to liquids and gas.
+      properties:
+        value:
+          type: number
+          format: float
+          minimum: 0
+          exclusiveMinimum: true
+          description: |
+            The volume of the referenced dangerous goods.
+          example: 2.4
+        unit:
+          type: string
+          description: |
+            The unit of measure which can be expressed in either imperial or metric terms
+
+            - `FTQ` (Cubic foot)
+            - `MTQ` (Cubic meter)
+            - `LTR` (Litre)
+          enum:
+            - MTQ
+            - FTQ
+            - LTR
+          example: MTQ
+      required:
+        - value
+        - unit
     InnerPackaging:
       type: object
       title: Inner Packaging
@@ -2094,34 +1999,37 @@ components:
             Unique code for the different equipment size and type used to transport commodities. The code can refer to either the ISO size type (e.g. 22G1) or the ISO type group (e.g. 22GP) following the [ISO 6346](https://www.iso.org/standard/83558.html) standard.
           example: 22G1
         tareWeight:
-          type: object
-          title: Tare Weight
-          description: |
-            The weight of an empty container (gross container weight).
-          properties:
-            value:
-              type: number
-              format: float
-              minimum: 0
-              exclusiveMinimum: true
-              description: |
-                The weight of an empty container (gross container weight).
-              example: 4800
-            unit:
-              type: string
-              description: |
-                The unit of measure which can be expressed in imperial or metric terms
-                - `KGM` (Kilograms)
-                - `LBR` (Pounds)
-              enum:
-                - KGM
-                - LBR
-              example: KGM
-          required:
-            - value
-            - unit
+          $ref: '#/components/schemas/TareWeight'
       required:
         - equipmentReference
+
+    TareWeight:
+      type: object
+      title: Tare Weight
+      description: |
+        The weight of an empty container (gross container weight).
+      properties:
+        value:
+          type: number
+          format: float
+          minimum: 0
+          exclusiveMinimum: true
+          description: |
+            The weight of an empty container (gross container weight).
+          example: 4800
+        unit:
+          type: string
+          description: |
+            The unit of measure which can be expressed in imperial or metric terms
+            - `KGM` (Kilograms)
+            - `LBR` (Pounds)
+          enum:
+            - KGM
+            - LBR
+          example: KGM
+      required:
+        - value
+        - unit
 
     ######
     # Seal
@@ -3311,3 +3219,124 @@ components:
       required:
         - transportDocumentReference
         - issuanceResponseCode
+
+    PlaceOfIssue:
+      type: object
+      title: Place of Issue
+      description: |
+        An object to capture where the original Transport Document (`Bill of Lading`) will be issued.
+
+        The location can be specified either as a `UN Location Code` or as a `CountryCode`.
+      properties:
+        locationName:
+          type: string
+          description: The name of the location.
+          pattern: ^\S(?:.*\S)?$
+          example: Port of Amsterdam
+          maxLength: 100
+      oneOf:
+        - type: object
+          title: UN Location Code
+          properties:
+            UNLocationCode:
+              type: string
+              pattern: ^[A-Z]{2}[A-Z2-9]{3}$
+              minLength: 5
+              maxLength: 5
+              description: |-
+                The UN Location code specifying where the place is located. The pattern used must be
+
+                - 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+                - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used
+
+                More info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)
+              example: NLAMS
+          required:
+            - UNLocationCode
+        - type: object
+          title: Country Code
+          properties:
+            countryCode:
+              type: string
+              pattern: ^[A-Z]{2}$
+              minLength: 2
+              maxLength: 2
+              description: |
+                The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+              example: NL
+          required:
+            - countryCode
+
+    InvoicePayableAt:
+      type: object
+      title: Invoice Payable At
+      description: |
+        Location where payment of ocean freight and charges for the main transport will take place by the customer.
+
+        The location can be provided as a `UN Location Code` or as a fallback - a `freeText` field
+      oneOf:
+        - type: object
+          title: UN Location Code
+          properties:
+            UNLocationCode:
+              type: string
+              pattern: ^[A-Z]{2}[A-Z2-9]{3}$
+              minLength: 5
+              maxLength: 5
+              description: |-
+                The UN Location code specifying where the place is located. The pattern used must be
+
+                - 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+                - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used
+
+                More info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)
+              example: NLAMS
+          required:
+            - UNLocationCode
+        - type: object
+          title: Free text
+          properties:
+            freeText:
+              type: string
+              maxLength: 35
+              description: |
+                The name of the location where payment will be rendered by the customer.
+              example: DCSA Headquarters
+          required:
+            - freeText
+
+    DocumentParties:
+      type: object
+      title: Document Parties
+      description: |
+        All `Parties` with associated roles.
+      properties:
+        shipper:
+          $ref: '#/components/schemas/Shipper'
+        consignee:
+          $ref: '#/components/schemas/Consignee'
+        endorsee:
+          $ref: '#/components/schemas/Endorsee'
+        issuingParty:
+          $ref: '#/components/schemas/IssuingParty'
+        carriersAgentAtDestination:
+          $ref: '#/components/schemas/CarriersAgentAtDestination'
+        notifyParties:
+          type: array
+          maxItems: 3
+          description: |
+            List of up to 3 `Notify Parties`. The first item in the list is the **First Notify Party** (`N1`), the second item is the **Second Notify Party** (`N2`) and the last item is the **Other Notify Party** (`NI`).
+
+            **Conditions:** If provided:
+              - mandatory for To Order BLs, `isToOrder=true`
+              - the order of the items in this array **MUST** be preserved as by the provider of the API.
+          items:
+            $ref: '#/components/schemas/NotifyParty'
+        other:
+          type: array
+          description: A list of document parties that can be optionally provided in the `Shipping Instructions` and `Transport Document`.
+          items:
+            $ref: '#/components/schemas/OtherDocumentParty'
+      required:
+        - shipper
+        - issuingParty
