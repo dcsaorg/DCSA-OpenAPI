@@ -17,8 +17,8 @@ Snapshot as of 27 of September 2024 for Booking 2.0.0 Beta
 ## Key changes
 - API description updated
 - Converrted all inner defined objects to globally defined objects. The following objects are now global:
-  - `CreateBookingResponse` previously defined as inner object on the `POST /v3/bookings` endPoint
-  - `CancelBookingRequest` previously defined as inner object on the `PATCH /v3/bookings/{bookingReference}` endPoint
+  - `CreateBookingResponse` previously defined as inner object on the `POST /v2/bookings` endPoint
+  - `CancelBookingRequest` previously defined as inner object on the `PATCH /v2/bookings/{bookingReference}` endPoint
   - `BookingNotification` object split into multiple global objects:
     - `data` property of the CloudEvent now defined as `BookingNotificationData`
     - the `booking` property of the `data` object now defined as `BookingFullNotification`
@@ -225,7 +225,7 @@ Snapshot as of 26 of July 2024 for Booking 2.0.0 Beta
 ## All changes
 - API description updated
 - endPoint examples updated
-- `/v3/booking-notifications` added to include:
+- `/v2/booking-notifications` added to include:
   - `Lightweight Notifications` for Booking
   - `Full State Transfer Notifications` for Booking
   - Notifications use the `CloudEvent` structure (and is merged from the deprecated [Booking Notification](./notification/) API)
