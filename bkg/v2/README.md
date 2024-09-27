@@ -11,6 +11,46 @@ Publications related to the Booking API:
 ---
 This is a moving target and will be updated as soon as the version is published
 
+<a name="v200B20240927"></a>[Release v2.0.0 Beta 20240927 (27 September 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0-Beta-20240927)
+---
+Snapshot as of 27 of September 2024 for Booking 2.0.0 Beta
+## Key changes
+- API description updated
+- Converrted all inner defined objects to globally defined objects. The following objects are now global:
+  - `CreateBookingResponse` previously defined as inner object on the `POST /v3/bookings` endPoint
+  - `CancelBookingRequest` previously defined as inner object on the `PATCH /v3/bookings/{bookingReference}` endPoint
+  - `BookingNotification` object split into multiple global objects:
+    - `data` property of the CloudEvent now defined as `BookingNotificationData`
+    - the `booking` property of the `data` object now defined as `BookingFullNotification`
+    - the `amendedBooking` property of the `data` object now defined as `AmendedBookingFullNotification`
+    - `BookingFullNotification` defined as an `allOf` of the `Booking` object
+    - `AmendedBookingFullNotification` defined as an `allOf` of the `Booking` object
+  - `EmptyContainerPickup` previously defined as inner in `ConfirmedEquipments`, `RequestedEquipment` and `RequestedEquipmentShipper`
+  - `NetVolume`, `NetExplosiveContent`, `NetWeight`, `GrossWeight` previously defined as inner in `DangerousGoods`
+  - `CargoGrossVolume` and `CargoGrossWeight` previously defined as inner in `Commodity` and `CommodityShipper`
+  - `TareWeight` previously defined as inner in `RequestedEquipment` and `RequestedEquipmentShipper`
+  - `DocumentParties` previously defined as inner in `Booking`
+  - `DocumentPartiesReq` previously defined as inner in `CreateBooking` and `UpdateBooking`
+  - `PlaceOfBLIssue` previously defined as inner in `CreateBooking` and `UpdateBooking`
+  - `InvoicePayableAt` previously defined as inner in `CreateBooking` and `UpdateBooking`
+## Object changes
+- properties **added**:
+  - `cargoNetVolume` and `cargoNetWeight` added to `Commodity` and `CommodityShipper` and created as global objects `CargoNetVolume` and `CargoNetWeight`
+- properties **modified**:
+  - `purchaseOrderReference` renamed to `purchaseOrderReferences` and is now an array of Purchase Order References instead of a single Reference in the `Shipper` and `Consginee` parties
+  - `PObox` renamed to `POBox` (with capital `B`)
+  - `isPartialLoadAllowed` is no longer a required property on `CreateBooking`, `UpdateBooking` nor `Booking` objects
+- properties **removed**:
+  - `communicationChannelCode` removed from Booking standard
+
+## All changes
+- `numberOfPackages` now has a maximum limit of 99999999
+- `phone` description updated to include [ITU-T recommendation E.123](https://www.itu.int/rec/T-REC-E.123/en)
+- description updates to properties in the `Address` object (the Address object can be used for other things than just a Party-address)
+- Link to the standardized `errorCode` in the `Error` object updated to a **public** page: [Error codes as specified by DCSA](https://developer.dcsa.org/standard-error-codes)
+- multiple description updated that are conditional in order to streamlike how **Conditions** are specified as part of a description
+- endPoint examples updated to align with new schema
+
 <a name="v200B20240913"></a>[Release v2.0.0 Beta 20240913 (13 September 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0-Beta-20240913)
 ---
 Snapshot as of 13 of September 2024 for Booking 2.0.0 Beta
