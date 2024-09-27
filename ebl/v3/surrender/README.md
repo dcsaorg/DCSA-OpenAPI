@@ -12,6 +12,13 @@ Publications related to the Bill of Lading Surrender API:
 ---
 This is a moving target and will be updated as soon as the version is published
 
+<a name="v300B20240927"></a>[Release v3.0.0 Beta 20240927 (27 of September 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR/3.0.0-Beta-20240927)
+---
+Snapshot as of 27 of September 2024 for EBL Surrender 3.0.0 Beta.
+## All changes
+- API description updated
+- Link to the standardized errorCode in the Error object updated to a public page: [Error codes as specified by DCSA](https://developer.dcsa.org/standard-error-codes)
+
 <a name="v300B20240913"></a>[Release v3.0.0 Beta 20240913 (13 of September 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR/3.0.0-Beta-20240913)
 ---
 Snapshot as of 13 of September 2024 for EBL Surrender 3.0.0 Beta.
