@@ -12,6 +12,60 @@ Publications related to the Bill of Lading Issuance API:
 ---
 This is a moving target and will be updated as soon as the version is published
 
+<a name="v300B20240927"></a>[Release v3.0.0 Beta 20240927 (27 of September 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS/3.0.0-Beta-20240927)
+---
+Snapshot as of 27 of September 2024 for EBL Issuance 3.0.0 Beta.
+## Key changes
+- description on the failed `POST /v3/ebl-issuance-responses` no longer states it is a success
+- `contentType` added as an optional property to the `SupportingDocument` object with a default value of `application/pdf`
+- description clearly updated on properties that are lists/arrays where order needs to be preserved. This goes for:
+  - 4x `displayedNameForXXX` on `Transport Document` root level
+  - `routingOfConsignmentCountries` on `Transport Document` root level
+  - `descriptionOfGoods` on `ConsignmentItem`
+  - `shippingMarks` on `ConsignmentItem`and `UtilizedTransportEquipment`
+  - `displayedAddress` on the Party objects
+- Converrted all inner defined objects to globally defined objects. The following objects are now global:
+  - `PlaceOfIssue` previously defined as inner object on `TransportDocument`
+  - `InvoicePayableAt` previously defined as inner object on `TransportDocument`
+  - `DocumentParties` previously defined as inner object on `TransportDocument`
+  - `CargoGrossWeight` and `CargoGrossVolume` previously defined as inner object on `CargoItem`
+  - `GrossWeight`, `NetWeight`, `NetExplosiveContent` and `NetVolume` previously defined as inner object on `DangerousGoods`
+  - `TareWeight` previously defined as inner object on `Equipment`
+- `Transport Document ` changes
+
+## Changes to the `Transport Document`
+- description update on the `numberOf[Copies|Originals][With|Without]Charges` to better explain the conditions as to how the properties are to be used
+- 4x `displayedNameForXXX` description updated to clearly indicate the the order of the items in the list must be preserved
+- converted `placeOfIssue` to a $ref instead of defining it inline
+- converted `invoicePayableAt` to a $ref instead of defining it inline
+- converted `documentParties` to a $ref instead of defining it inline
+- `routingOfConsignmentCountries` description updated to clearly indicate the the order of the items in the list must be preserved
+- `ConsignmentItem` now allows `SPO` (Shipper's Purchase Order) and `CPO` (Consignee's Purchase Order) as References
+- `grossWeight` and `grossVolume` renamed to `cargoGrossWeight` and `cargoGrossVolume` on `CargoItem`
+- `cargoNetWeight` and `cargoNetVolume` added on `CargoItem`
+- converted the following properties: `GrossWeight`, `NetWeight`, `NetExplosiveContent` and `NetVolume` on `DangerousGoods` to a $ref instead of defining it inline
+- converted `tareWeight` to a $ref instead of defining it inline
+- `purchaseOrderReference` on `Shipper` and `Consignee` renamed to `purchaseOrderReferences` and now allows a list of values
+
+## Object changes
+- properties **added**:
+  - `cargoNetWeight` and `cargoNetVolume` added on `CargoItem`
+  - `references` on `ConsignmentItem` now allows `SPO` (Shipper's Purchase Order) and `CPO` (Consignee's Purchase Order)
+- properties **modified**:
+  -`grossWeight` and `grossVolume` renamed to `cargoGrossWeight` and `cargoGrossVolume` on `CargoItem`
+  - `numberOfPackages` on `OuterPackaging` upper limit set to 99999999
+  - `PObox` renamed to `POBox` (with capital `B`)
+  - `purchaseOrderReference` on `Shipper` and `Consignee` renamed to `purchaseOrderReferences` and now allows a list of values
+- properties **removed**:
+  - No properties have been removed in this release
+
+## All changes
+- API description update
+- Link to the standardized `errorCode` in the `Error` object updated to a public page: [Error codes as specified by DCSA](https://developer.dcsa.org/standard-error-codes)
+- `phone` description updated to include [ITU-T recommendation E.123](https://www.itu.int/rec/T-REC-E.123/en)
+- `ReferenceConsignmentItem` object created to, in addition, allow `SPO` (Shipper's Purchase Order) and `CPO` (Consignee's Purchase Order) on `ConsignmentItem`
+- description updates to properties in the `Address` and `City` objects (the object can be used for other things than just a Party-address)
+
 <a name="v300B20240913"></a>[Release v3.0.0 Beta 20240913 (13 of September 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS/3.0.0-Beta-20240913)
 ---
 Snapshot as of 13 of September 2024 for EBL Issuance 3.0.0 Beta.
