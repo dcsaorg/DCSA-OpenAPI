@@ -4873,6 +4873,8 @@ components:
       title: Notify Party
       description: |
         The person to be notified when a shipment arrives at its destination.
+
+        **Condition:** Mandatory for To Order HBLs (HouseBL `isToOrder=true`)
       properties:
         partyName:
           type: string
@@ -4911,6 +4913,7 @@ components:
             $ref: '#/components/schemas/PartyContactDetail'
       required:
         - partyName
+        - partyContactDetails
 
     Seller:
       type: object
@@ -4947,6 +4950,12 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/TaxLegalReference'
+        partyContactDetails:
+          type: array
+          description: |
+            A list of contact details
+          items:
+            $ref: '#/components/schemas/PartyContactDetailHBL'
       required:
         - partyName
 
@@ -4985,6 +4994,12 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/TaxLegalReference'
+        partyContactDetails:
+          type: array
+          description: |
+            A list of contact details
+          items:
+            $ref: '#/components/schemas/PartyContactDetailHBL'
       required:
         - partyName
 
@@ -5111,6 +5126,55 @@ components:
             - email
       required:
         - name
+
+    PartyContactDetailHBL:
+      type: object
+      title: Party Contact Detail (House B/L)
+      description: |
+        The contact details of the person to contact. It is mandatory to provide either `phone` and/or `email` along with the `name`.
+      example:
+        name: Henrik
+        phone: +45 51801234
+      properties:
+        name:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 35
+          description: |
+            Name of the contact
+          example: Henrik
+      anyOf:
+        - type: object
+          title: Phone required
+          description: |
+            `Phone` is mandatory to provide
+          properties:
+            phone:
+              type: string
+              pattern: ^\+(?:[0-9] ?){6,14}[0-9]$
+              maxLength: 30
+              description: |
+                Phone number for the contact. Phone **MUST** include an international phone number format as defined in the [ITU-T recommendation E.123](https://www.itu.int/rec/T-REC-E.123/en).
+              example: +45 70262970
+          required:
+            - phone
+        - type: object
+          title: Email required
+          description: |
+            `Email` is mandatory to provide
+          properties:
+            email:
+              type: string
+              pattern: ^.+@\S+$
+              maxLength: 100
+              description: |
+                `E-mail` address to be used
+              example: info@dcsa.org
+          required:
+            - email
+      required:
+        - name
+
     IdentifyingCode:
       type: object
       title: Identifying Code
