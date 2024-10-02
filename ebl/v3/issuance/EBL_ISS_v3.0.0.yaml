@@ -72,7 +72,7 @@ paths:
               $ref: '#/components/headers/API-Version'
         '409':
           description: |
-            An Issuance Request is made with a Transport Document Reference (TDR), that was used previously to request the issuance of a Transport Document (TD). The document is either already issued or an TD with the same TDR. 
+            An Issuance Request is made with a `Transport Document Reference` (TDR), that was used previously to request the issuance of a `Transport Document` (TD). The document is either already issued or an TD with the same TDR.
 
             The eBL platform will inform the carrier when the carrier needs to act on this document again. If the issuance is pending, then the carrier will be notified via the DCSA_EBL_ISS_RSP API once the issuance process completes. If the issuance has already succeeded, the eBL platform will notify the carrier when there is a surrender request via the DCSA_EBL_SUR API.
           headers:
@@ -82,6 +82,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                conflictExample:
+                  summary: |
+                    Conflicting Transport Document issue request
+                  description: |
+                    The `Transport Document` referenced in the `PUT` request has previously been used to Issue and is currently being processed.
+
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: PUT
+                    requestUri: /v3/ebl-issuance-requests
+                    statusCode: 409
+                    statusCodeText: Conflict
+                    statusCodeMessage: Is being processed
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2024-09-04T09:41:00Z'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: Transport Document Reference already Issued
+                        errorCodeMessage: The Transport Document cannot be issued with the same Transport Document Reference (TDR) as previously. The eBL platform will inform the carrier when the carrier needs to act on this document again
         default:
           description: Request failed for some reason.
           headers:
