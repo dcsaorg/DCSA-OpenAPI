@@ -146,6 +146,7 @@ paths:
                   isToOrder: true
                   invoicePayableAt:
                     UNLocationCode: DKAAR
+                  isCargoDeliveredInICS2Zone: false
                   partyContactDetails:
                     - name: DCSA test person
                       email: no-reply@dcsa.example.org
@@ -374,6 +375,7 @@ paths:
                   isToOrder: true
                   invoicePayableAt:
                     UNLocationCode: DKAAR
+                  isCargoDeliveredInICS2Zone: false
                   partyContactDetails:
                     - name: DCSA test person
                       email: no-reply@dcsa.example.org
@@ -632,6 +634,7 @@ paths:
                     isToOrder: true
                     invoicePayableAt:
                       UNLocationCode: DKAAR
+                    isCargoDeliveredInICS2Zone: false
                     partyContactDetails:
                       - name: DCSA test person
                         email: no-reply@dcsa.example.org
@@ -682,6 +685,7 @@ paths:
                     isToOrder: true
                     invoicePayableAt:
                       UNLocationCode: DKAAR
+                    isCargoDeliveredInICS2Zone: false
                     partyContactDetails:
                       - name: DCSA test person
                         email: no-reply@dcsa.example.org
@@ -753,6 +757,7 @@ paths:
                     isToOrder: true
                     invoicePayableAt:
                       UNLocationCode: DKAAR
+                    isCargoDeliveredInICS2Zone: false
                     partyContactDetails:
                       - name: DCSA test person
                         email: no-reply@dcsa.example.org
@@ -1934,6 +1939,7 @@ paths:
                       isToOrder: true
                       invoicePayableAt:
                         UNLocationCode: DKAAR
+                      isCargoDeliveredInICS2Zone: false
                       partyContactDetails:
                         - name: DCSA test person
                           email: no-reply@dcsa.example.org
@@ -2013,6 +2019,7 @@ paths:
                       isToOrder: true
                       invoicePayableAt:
                         UNLocationCode: DKAAR
+                      isCargoDeliveredInICS2Zone: false
                       partyContactDetails:
                         - name: DCSA test person
                           email: no-reply@dcsa.example.org
@@ -2056,6 +2063,7 @@ paths:
                       isToOrder: true
                       invoicePayableAt:
                         UNLocationCode: DKAAR
+                      isCargoDeliveredInICS2Zone: false
                       partyContactDetails:
                         - name: DCSA test person
                           email: no-reply@dcsa.example.org
@@ -3056,19 +3064,6 @@ components:
           $ref: '#/components/schemas/OriginChargesPaymentTerm'
         destinationChargesPaymentTerm:
           $ref: '#/components/schemas/DestinationChargesPaymentTerm'
-        methodOfPayment:
-          type: string
-          maxLength: 1
-          description: |
-            Method used for the payment of prepaid charges. It can be one of the following values: 
-            - `A` (Cash)
-            - `B` (Credit Card)
-            - `C` (Cheque)
-            - `D` (Other)
-            - `H` (Electronic funds transfer)
-            - `Y` (Account holder with carrier)
-            - `Z` (Not prepaid)
-          example: A
         isElectronic:
           type: boolean
           description: |
@@ -3199,20 +3194,11 @@ components:
           example: false
         documentParties:
           $ref: '#/components/schemas/DocumentPartiesShippingInstructions'
-        routingOfConsignmentCountries:
-          type: array
+        isCargoDeliveredInICS2Zone:
+          type: boolean
           description: |
-            A list of countries the goods will be routed through from origin to destination defined by the 2 characters country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
-            
-            **Condition:** The order of the items in this array **MUST** be preserved as by the provider of the API.
-          items:
-            type: string
-            pattern: ^[A-Z]{2}$
-            minLength: 2
-            maxLength: 2
-            description: |
-              The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
-            example: NL
+            Indicates whether cargo is delivered to EU, Norway, Switzerland or Northern Ireland.
+          example: true
         consignmentItems:
           type: array
           minItems: 1
@@ -3249,10 +3235,12 @@ components:
             A list of `Advance Manifest Filings` specified by the Shipper to indicate whom is to do the Filing
           items:
             $ref: '#/components/schemas/AdvanceManifestFiling'
-        isHBLIssued:
+        isHouseBillOfLadingsIssued:
           type: boolean
           description: |
-            Indicates whether one or more `House Bill of Lading(s)` have been issued. This property is used by the carrier to identify which `ENS` filing type must be submitted (`F10` or `F11`, `F12` or `F13`) to comply with `ICS2` customs regulations
+            Indicates whether one or more `House Bill of Lading(s)` have been issued.
+            
+            **Condition:** Mandatory if `manifestTypeCode` is `ENS`
           example: true
         houseBillOfLadings:
           type: array
@@ -3319,6 +3307,7 @@ components:
         - freightPaymentTermCode
         - partyContactDetails
         - documentParties
+        - isCargoDeliveredInICS2Zone
         - consignmentItems
         - utilizedTransportEquipments
 
@@ -3365,19 +3354,6 @@ components:
           $ref: '#/components/schemas/OriginChargesPaymentTerm'
         destinationChargesPaymentTerm:
           $ref: '#/components/schemas/DestinationChargesPaymentTerm'
-        methodOfPayment:
-          type: string
-          maxLength: 1
-          description: |
-            Method used for the payment of prepaid charges. It can be one of the following values: 
-            - `A` (Cash)
-            - `B` (Credit Card)
-            - `C` (Cheque)
-            - `D` (Other)
-            - `H` (Electronic funds transfer)
-            - `Y` (Account holder with carrier)
-            - `Z` (Not prepaid)
-          example: A
         isElectronic:
           type: boolean
           description: |
@@ -3508,20 +3484,11 @@ components:
           example: false
         documentParties:
           $ref: '#/components/schemas/DocumentPartiesShippingInstructions'
-        routingOfConsignmentCountries:
-          type: array
+        isCargoDeliveredInICS2Zone:
+          type: boolean
           description: |
-            A list of countries the goods will be routed through from origin to destination defined by the 2 characters country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
-            
-            **Condition:** The order of the items in this array **MUST** be preserved as by the provider of the API.
-          items:
-            type: string
-            pattern: ^[A-Z]{2}$
-            minLength: 2
-            maxLength: 2
-            description: |
-              The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
-            example: NL
+            Indicates whether cargo is delivered to EU, Norway, Switzerland or Northern Ireland.
+          example: true
         consignmentItems:
           type: array
           minItems: 1
@@ -3558,10 +3525,12 @@ components:
             A list of `Advance Manifest Filings` specified by the Shipper to indicate whom is to do the Filing
           items:
             $ref: '#/components/schemas/AdvanceManifestFiling'
-        isHBLIssued:
+        isHouseBillOfLadingsIssued:
           type: boolean
           description: |
-            Indicates whether one or more `House Bill of Lading(s)` have been issued. This property is used by the carrier to identify which `ENS` filing type must be submitted (`F10` or `F11`, `F12` or `F13`) to comply with `ICS2` customs regulations
+            Indicates whether one or more `House Bill of Lading(s)` have been issued.
+            
+            **Condition:** Mandatory if `manifestTypeCode` is `ENS`
           example: true
         houseBillOfLadings:
           type: array
@@ -3629,6 +3598,7 @@ components:
         - freightPaymentTermCode
         - partyContactDetails
         - documentParties
+        - isCargoDeliveredInICS2Zone
         - consignmentItems
         - utilizedTransportEquipments
 
@@ -3701,19 +3671,6 @@ components:
           $ref: '#/components/schemas/OriginChargesPaymentTerm'
         destinationChargesPaymentTerm:
           $ref: '#/components/schemas/DestinationChargesPaymentTerm'
-        methodOfPayment:
-          type: string
-          maxLength: 1
-          description: |
-            Method used for the payment of prepaid charges. It can be one of the following values: 
-            - `A` (Cash)
-            - `B` (Credit Card)
-            - `C` (Cheque)
-            - `D` (Other)
-            - `H` (Electronic funds transfer)
-            - `Y` (Account holder with carrier)
-            - `Z` (Not prepaid)
-          example: A
         isElectronic:
           type: boolean
           description: |
@@ -3844,20 +3801,11 @@ components:
           example: false
         documentParties:
           $ref: '#/components/schemas/DocumentPartiesShippingInstructions'
-        routingOfConsignmentCountries:
-          type: array
+        isCargoDeliveredInICS2Zone:
+          type: boolean
           description: |
-            A list of countries the goods will be routed through from origin to destination defined by the 2 characters country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
-            
-            **Condition:** The order of the items in this array **MUST** be preserved as by the provider of the API.
-          items:
-            type: string
-            pattern: ^[A-Z]{2}$
-            minLength: 2
-            maxLength: 2
-            description: |
-              The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
-            example: NL
+            Indicates whether cargo is delivered to EU, Norway, Switzerland or Northern Ireland.
+          example: true
         consignmentItems:
           type: array
           minItems: 1
@@ -3894,11 +3842,12 @@ components:
             A list of `Advance Manifest Filings` specified by the Shipper to indicate whom is to do the Filing
           items:
             $ref: '#/components/schemas/AdvanceManifestFiling'
-        isHBLIssued:
+        isHouseBillOfLadingsIssued:
           type: boolean
           description: |
-            Indicates whether one or more `House Bill of Lading(s)` have been issued. This property is used by the carrier to identify which `ENS` filing type must be submitted (`F10` or `F11`, `F12` or `F13`) to comply with `ICS2` customs regulations
-          example: true
+            Indicates whether one or more `House Bill of Lading(s)` have been issued.
+            
+            **Condition:** Mandatory if `manifestTypeCode` is `ENS`
         houseBillOfLadings:
           type: array
           description: |
@@ -3975,6 +3924,7 @@ components:
         - freightPaymentTermCode
         - partyContactDetails
         - documentParties
+        - isCargoDeliveredInICS2Zone
         - consignmentItems
         - utilizedTransportEquipments
 
@@ -4540,7 +4490,7 @@ components:
             - `ASSOCIATION_OF_PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
           example: 'NATURAL_PERSON'
         address:
-          $ref: '#/components/schemas/PartyAddress'
+          $ref: '#/components/schemas/Address'
         identifyingCodes:
           type: array
           items:
@@ -4559,6 +4509,7 @@ components:
             $ref: '#/components/schemas/PartyContactDetail'
       required:
         - partyName
+        - typeOfPerson
 
     Consignee:
       type: object
@@ -4665,7 +4616,7 @@ components:
             - `ASSOCIATION_OF_PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
           example: 'NATURAL_PERSON'
         address:
-          $ref: '#/components/schemas/PartyAddress'
+          $ref: '#/components/schemas/Address'
         identifyingCodes:
           type: array
           items:
@@ -4684,6 +4635,7 @@ components:
             $ref: '#/components/schemas/PartyContactDetail'
       required:
         - partyName
+        - typeOfPerson
 
     Endorsee:
       type: object
@@ -4906,7 +4858,7 @@ components:
             - `ASSOCIATION_OF_PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
           example: 'NATURAL_PERSON'
         address:
-          $ref: '#/components/schemas/PartyAddress'
+          $ref: '#/components/schemas/Address'
         identifyingCodes:
           type: array
           items:
@@ -4926,6 +4878,7 @@ components:
       required:
         - partyName
         - partyContactDetails
+        - typeOfPerson
 
     Seller:
       type: object
@@ -4951,7 +4904,7 @@ components:
             - `ASSOCIATION_OF_PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
           example: 'NATURAL_PERSON'
         address:
-          $ref: '#/components/schemas/PartyAddress'
+          $ref: '#/components/schemas/Address'
         identifyingCodes:
           type: array
           items:
@@ -4970,6 +4923,7 @@ components:
             $ref: '#/components/schemas/PartyContactDetailHBL'
       required:
         - partyName
+        - typeOfPerson
 
     Buyer:
       type: object
@@ -4995,7 +4949,7 @@ components:
             - `ASSOCIATION_OF_PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
           example: 'NATURAL_PERSON'
         address:
-          $ref: '#/components/schemas/PartyAddress'
+          $ref: '#/components/schemas/Address'
         identifyingCodes:
           type: array
           items:
@@ -5014,6 +4968,7 @@ components:
             $ref: '#/components/schemas/PartyContactDetailHBL'
       required:
         - partyName
+        - typeOfPerson
 
     Party:
       type: object
@@ -5030,6 +4985,47 @@ components:
           example: Asseco Denmark
         address:
           $ref: '#/components/schemas/PartyAddress'
+        identifyingCodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentifyingCode'
+        taxLegalReferences:
+          description: |
+            A list of `Tax References` for a `Party`
+          type: array
+          items:
+            $ref: '#/components/schemas/TaxLegalReference'
+        partyContactDetails:
+          type: array
+          description: |
+            A list of contact details
+          items:
+            $ref: '#/components/schemas/PartyContactDetail'
+        reference:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 35
+          description: |
+            A reference linked to the `Party`.
+          example: HHL007
+      required:
+        - partyName
+
+    PartyHBL:
+      type: object
+      title: Party
+      description: |
+        Refers to a company or a legal entity.
+      properties:
+        partyName:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 70
+          description: |
+            Name of the party.
+          example: Asseco Denmark
+        address:
+          $ref: '#/components/schemas/Address'
         identifyingCodes:
           type: array
           items:
@@ -5215,7 +5211,6 @@ components:
             - `DNB` (Dun and Bradstreet)
             - `FMC` (Federal Maritime Commission)
             - `DCSA` (Digital Container Shipping Association)
-            - `EU` (European Union Member State Customs Authority)
             - `ZZZ` (Mutually defined)
           example: W3C
         partyCode:
@@ -5232,7 +5227,6 @@ components:
             - `DID` (Decentralized Identifier) for `codeListProvider` `W3C`
             - `LEI` (Legal Entity Identifier) for `codeListProvider` `GLEIF`
             - `DUNS` (Data Universal Numbering System) for `codeListProvider` `DNB`
-            - `EORI` (Economic Operators Registration and Identification) for codeListProvider `EU`
           example: DID
       required:
         - codeListProvider
@@ -5247,6 +5241,7 @@ components:
 
         | Type  | Country | Description |
         |-------|:-------:|-------------|
+        |EORI|NL|Economic Operators Registration and Identification|
         |PAN|IN|Goods and Services Tax Identification Number in India|
         |GSTIN|IN|Goods and Services Tax Identification Number in India|
         |IEC|IN|Importer-Exported Code in India|
@@ -5355,14 +5350,13 @@ components:
           type: string
           pattern: ^\S(?:.*\S)?$
           maxLength: 35
-          # Extended description of carrierBookingReference compared to DCSA_DOMAIN description
           description: |
             The associated booking number provided by the carrier for this `Consignment Item`.
           example: ABC709951
         descriptionOfGoods:
           type: array
           description: |
-            An array of lines accurately and properly describing the cargo being shipped in the container(s) as provided by the shipper.
+            A plain language description that is precise enough for Customs services to be able to identify the goods. General terms (i.e. 'consolidated', 'general cargo' 'parts' or 'freight of all kinds') or not sufficiently precise description cannot be accepted.
 
             **Condition:** The order of the items in this array **MUST** be preserved as by the provider of the API.
           maxItems: 150
@@ -5444,7 +5438,6 @@ components:
           type: string
           pattern: ^\S(?:.*\S)?$
           maxLength: 35
-          # Extended description of carrierBookingReference compared to DCSA_DOMAIN description
           description: |
             The associated booking number provided by the carrier for this `Consignment Item`.
           example: ABC709951
@@ -5458,7 +5451,7 @@ components:
         descriptionOfGoods:
           type: array
           description: |
-            An array of lines accurately and properly describing the cargo being shipped in the container(s) as provided by the shipper.
+            A plain language description that is precise enough for Customs services to be able to identify the goods. General terms (i.e. 'consolidated', 'general cargo' 'parts' or 'freight of all kinds') or not sufficiently precise description cannot be accepted.
 
             **Condition:** The order of the items in this array **MUST** be preserved as by the provider of the API.
           maxItems: 150
@@ -5531,6 +5524,39 @@ components:
         - HSCodes
         - cargoItems
 
+    ConsignmentItemHBL:
+      type: object
+      title: Consignment Item (House B/L)
+      description: |
+        Defines a list of `CargoItems` belonging together in the same consignment. A `ConsignmentItem` can be split across multiple containers (`UtilizedTransportEquipment`) by referencing multiple `CargoItems`
+      properties:
+        descriptionOfGoods:
+          type: string
+          maxLength: 512
+          pattern: ^\S(?:.*\S)?$
+          description: |
+            A plain language description that is precise enough for Customs services to be able to identify the goods. General terms (i.e. 'consolidated', 'general cargo' 'parts' or 'freight of all kinds') or not sufficiently precise description cannot be accepted. Where the declarant provides the CUS code for chemical substances and preparations, Member States may waive the requirement of providing a precise description of the goods.
+          example: blue shoes size 47
+        nationalCommodityCode:
+          $ref: '#/components/schemas/NationalCommodityCode'
+        cargoItems:
+          type: array
+          minItems: 1
+          description: |
+            A list of all `cargoItems`
+          items:
+            $ref: '#/components/schemas/CargoItemHBL'
+        customsReferences:
+          type: array
+          description: |
+            A list of `Customs references`
+          items:
+            $ref: '#/components/schemas/CustomsReference'
+      required:
+        - descriptionOfGoods
+        - cargoItems
+        - nationalCommodityCode
+
     #########################
     # National Commodity Code
     #########################
@@ -5584,9 +5610,12 @@ components:
             - '2106'
             - '2507'
             - '2512'
+      example:
+        type: TARIC
+        value: 
+          - '85171200'
       required:
         - type
-        - countryCode
         - values
 
     ##################
@@ -5602,6 +5631,8 @@ components:
 
         | Type  | Country | Description |
         |-------|:-------:|-------------|
+        |UCR|NL|Unique Consignment Reference|
+        |CUS|NL|Customs Union and Statistics|
         |ACID|EG|Advance Cargo Information Declaration in Egypt|
         |CERS|CA|Canadian Export Reporting System|
         |ITN|US|Internal Transaction Number in US|
@@ -5614,7 +5645,7 @@ components:
           maxLength: 50
           description: |
             The reference type code as defined in the relevant customs jurisdiction.
-          example: ACID
+          example: CUS
         countryCode:
           type: string
           pattern: ^[A-Z]{2}$
@@ -5622,7 +5653,7 @@ components:
           maxLength: 2
           description: |
             The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
-          example: EG
+          example: NL
         values:
           type: array
           minItems: 1
@@ -5740,6 +5771,35 @@ components:
       required:
         - equipmentReference
         - cargoGrossWeight
+
+    CargoItemHBL:
+      type: object
+      title: Cargo Item (House B/L)
+      description: |
+        A `cargoItem` is the smallest unit used by stuffing. A `cargoItem` cannot be split across containers.
+      properties:
+        equipmentReference:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 11
+          description: |
+            The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.
+            According to [ISO 6346](https://www.iso.org/standard/83558.html), a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit).
+
+            If a container does not comply with [ISO 6346](https://www.iso.org/standard/83558.html), it is suggested to follow [Recommendation #2: Containers with non-ISO identification](https://smdg.org/documents/smdg-recommendations) from SMDG.
+          example: APZU4812090
+        cargoGrossWeight:
+          $ref: '#/components/schemas/CargoGrossWeight'
+        outerPackagings:
+          type: array
+          description: |
+            A list of `Outer Packaging`
+          items:
+            $ref: '#/components/schemas/OuterPackagingHBL'
+      required:
+        - equipmentReference
+        - cargoGrossWeight
+        - outerPackagings
 
     CargoGrossWeight:
       type: object
@@ -5958,6 +6018,60 @@ components:
       required:
         - numberOfPackages
         - description
+
+    OuterPackagingHBL:
+      type: object
+      title: Outer Packaging (House B/L)
+      description: |
+        Object for outer packaging/overpack specification. Examples of overpacks are a number of packages stacked on to a pallet and secured by strapping or placed in a protective outer packaging such as a box or crate to form one unit for the convenience of handling and stowage during transport.
+
+        **Condition:** Mandatory for non-dangerous goods cargo.
+      properties:
+        packageCode:
+          type: string
+          pattern: ^[A-Z0-9]{2}$
+          minLength: 2
+          maxLength: 2
+          description: |
+            A code identifying the outer packaging/overpack. `PackageCode` must follow the codes specified in [Recommendation N°21](https://unece.org/trade/uncefact/cl-recommendations)
+          example: 5H
+        numberOfPackages:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 99999999
+          description: |
+            Specifies the number of outer packagings/overpacks associated with this `Cargo Item`.
+            
+            **Condition:** Mandatory if `packageCode` is **NOT** one of the following values:
+
+            - `VY` (Bulk, solid, fine particles ("powders"))
+            - `VS` (Bulk, scrap metal)
+            - `VR` (Bulk, solid, granular particles ("grains"))
+            - `VQ` (Bulk, liquefied gas (at abnormal temperature/pressure))
+            - `VO` (Bulk, solid, large particles ("nodules"))
+            - `VL` (Bulk, liquid)
+            - `NG` (Unpacked or unpackaged, multiple units)
+            - `NF` (Unpacked or unpackaged, single unit)
+            - `NE` (Unpacked or unpackaged)
+            - `VG` (Bulk, gas (at 1031 mbar and 15°C))
+          example: 18
+        shippingMarks:
+          type: string
+          maxLength: 512
+          description: |
+            The identifying details of a package or the actual markings that appear on the package(s). This information is provided by the customer.
+          example: Made in China
+        UNNumber:
+          type: string
+          pattern: ^\d{4}$
+          minLength: 4
+          maxLength: 4
+          description: |
+            United Nations Dangerous Goods Identifier (UNDG) assigned by the UN Sub-Committee of Experts on the Transport of Dangerous Goods and shown in the IMO IMDG.
+          example: '1463'
+      required:
+        - packageCode
 
     #################
     # Dangerous Goods
@@ -6512,6 +6626,17 @@ components:
             A list of `Seals`
           items:
             $ref: '#/components/schemas/Seal'
+        emptyIndicatorCode:
+          type: string
+          description: |
+            Indication if the container is `EMPTY` or `LADEN`.
+            
+            - `EMPTY` (Empty)
+            - `LADEN` (Laden)
+          enum:
+            - LADEN
+            - EMPTY
+          example: LADEN
         references:
           type: array
           description: |
@@ -6534,6 +6659,59 @@ components:
           'false': '#/components/schemas/UTEquipmentReference'
       required:
         - seals
+
+    UtilizedTransportEquipmentHBL:
+      type: object
+      title: Utilized Transport Equipment (House B/L)
+      description: |
+        Specifies the container (`Equipment`), `Seals` and `References`
+      properties:
+        seals:
+          type: array
+          minItems: 1
+          description: |
+            A list of `Seals`
+          items:
+            $ref: '#/components/schemas/Seal'
+        emptyIndicatorCode:
+          type: string
+          description: |
+            Indication if the container is `EMPTY` or `LADEN`.
+            
+            - `EMPTY` (Empty)
+            - `LADEN` (Laden)
+          enum:
+            - LADEN
+            - EMPTY
+          example: LADEN
+        isShipperOwned:
+          type: boolean
+          description: |
+            Indicates whether the container is shipper owned (SOC).
+          example: false
+        equipmentReference:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 11
+          description: |
+            The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.
+            According to [ISO 6346](https://www.iso.org/standard/83558.html), a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit).
+
+            If a container does not comply with [ISO 6346](https://www.iso.org/standard/83558.html), it is suggested to follow [Recommendation #2: Containers with non-ISO identification](https://smdg.org/documents/smdg-recommendations) from SMDG.
+          example: APZU4812090
+        ISOEquipmentCode:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 4
+          description: |
+            Unique code for the different equipment size and type used to transport commodities. The code can refer to either the ISO size type (e.g. 22G1) or the ISO type group (e.g. 22GP) following the [ISO 6346](https://www.iso.org/standard/83558.html) standard.
+          example: 22G1
+      required:
+        - emptyIndicatorCode
+        - isShipperOwned
+        - equipmentReference
+        - ISOEquipmentCode
+
     UTEquipment:
       type: object
       title: Shipper Owned Equipment (SoC)
@@ -6854,23 +7032,22 @@ components:
 
             **Mandatory** if `manifestTypeCode` is either `ACE` (US) or `ACI` (CA) and `advanceManifestFilingsHouseBLPerformedBy` is set to `SELF`.
           example: FLXP
-        supplementaryDeclarantEORINumber:
+        identificationNumber:
           type: string
           pattern: ^\S(?:.*\S)?$
           maxLength: 17
           description: |
-            The Economic Operators Registration and Identification (EORI) number of the house filer responsible for the `ENS` filing.
+            An identification number of the house filer responsible for submitting the `Advance Manifest Filing`.
 
-            **Condition:** Only applicable if `manifestTypeCode` is `ENS`.
+            **Condition:** Mandatory if `manifestTypeCode` is `ENS` and `advanceManifestFilingsHouseBLPerformedBy` is `SELF`.
           example: 'FLXP-123321'
       example:
-        manifestTypeCode: ACE
-        countryCode: US
+        manifestTypeCode: EORI
         advanceManifestFilingsHouseBLPerformedBy: SELF
         selfFilerCode: FLXP123
+        identificationNumber: NL123456712
       required:
         - manifestTypeCode
-        - countryCode
         - advanceManifestFilingsHouseBLPerformedBy
 
     ######################
@@ -6903,19 +7080,47 @@ components:
           type: string
           maxLength: 1
           description: |
-            Method used for the payment of prepaid charges. It can be one of the following values: 
-            - `A` (Cash)
-            - `B` (Credit Card)
-            - `C` (Cheque)
-            - `D` (Other)
+            Method used for the payment of freight charges. It can be one of the following values: 
+            - `A` (Payment in cash)
+            - `B` (Payment by credit card)
+            - `C` (Payment by cheque)
+            - `D` (Other (e.g. direct debit to cash account))
             - `H` (Electronic funds transfer)
             - `Y` (Account holder with carrier)
-            - `Z` (Not prepaid)
+            - `Z` (Not pre-paid)
           example: A
         documentParties:
           $ref: '#/components/schemas/DocumentPartiesHouseBL'
+        isCargoDeliveredInICS2Zone:
+          type: boolean
+          description: |
+            Indicates whether cargo is delivered to EU, Norway, Switzerland or Northern Ireland.
+          example: true
+        routingOfConsignmentCountries:
+          $ref: '#/components/schemas/RoutingOfConsignmentCountries'
+        consignmentItems:
+          type: array
+          minItems: 1
+          description: |
+            A list of `ConsignmentItems` for this `House Bill of Lading`
+          items:
+            $ref: '#/components/schemas/ConsignmentItemHBL'
+        utilizedTransportEquipments:
+          type: array
+          minItems: 1
+          description: |
+            A list of `Utilized Transport Equipment` for this `House Bill of Lading`
+          items:
+            $ref: '#/components/schemas/UtilizedTransportEquipmentHBL'
       required:
         - houseBillOfLadingReference
+        - isToOrder
+        - methodOfPayment
+        - documentParties
+        - isCargoDeliveredInICS2Zone
+        - routingOfConsignmentCountries
+        - consignmentItems
+        - utilizedTransportEquipments
 
     PlaceOfAcceptance:
       type: object
@@ -6923,25 +7128,32 @@ components:
       description: |
         An object to capture `Place of Acceptance` location specified as: identification of the seaport, freight terminal or other place at which the goods are taken over from the shipper by the Ocean Transport Intermediary (OTI) issuing the `House Bill of Lading`.
 
-        **Condition:** Mandatory if different from `Place of Receipt` at the `Master Transport Document` level.
+        **Condition:** Mandatory if different from `Place of Receipt` or `Port of Loading` at the `Master Transport Document` level.
 
-        The location can be specified in **any** of the following ways: `UN Location Code`, `Facility`, an `Address` or a `GeoCoordinate`.
-
-        **Condition:** It is expected that if a location is specified in multiple ways (e.g. both as an `Address` and as a `Facility`) that both ways point to the same location.
+        The location can be specified either using `UN Location Code` and/or `Location Name` together with `Country Code`.
       example:
         locationName: Hamburg
         UNLocationCode: DEHAM
       properties:
         locationName:
           type: string
-          description: The name of the location.
           pattern: ^\S(?:.*\S)?$
+          maxLength: 35
+          description: |
+            The name of the location.
+            
+            **Condition:** Mandatory to provide in case `UN Location Code` is not provided
           example: Port of Amsterdam
-          maxLength: 100
-        address:
-          $ref: '#/components/schemas/Address'
-        facility:
-          $ref: '#/components/schemas/Facility'
+        countryCode:
+          type: string
+          pattern: ^[A-Z]{2}$
+          minLength: 2
+          maxLength: 2
+          description: |
+            The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+            
+            **Condition:** Mandatory to provide in case `UN Location Code` is not provided
+          example: NL
         UNLocationCode:
           type: string
           pattern: ^[A-Z]{2}[A-Z2-9]{3}$
@@ -6955,8 +7167,6 @@ components:
 
             More info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)
           example: NLAMS
-        geoCoordinate:
-          $ref: '#/components/schemas/GeoCoordinate'
 
     PlaceOfFinalDelivery:
       type: object
@@ -6964,25 +7174,32 @@ components:
       description: |
         An object to capture `Place of Final Delivery` location specified as: Identification of the seaport, freight terminal or other place at which the goods are handed over from the `Ocean Transport Intermediary` (OTI) issuing the `House Bill of Lading` to the `Consignee`.
         
-        **Condition:** Mandatory if different from `Place of Delivery` at the `Master Transport Document` level. (**Note:** in case of carrier haulage this will be the same as the `Place of Delivery`)
+        **Condition:** Mandatory if different from `Place of Delivery` at the `Master Transport Document` level.
 
-        The location can be specified in **any** of the following ways: `UN Location Code`, `Facility`, an `Address` or a `GeoCoordinate`.
-
-        **Condition:** It is expected that if a location is specified in multiple ways (e.g. both as an `Address` and as a `Facility`) that both ways point to the same location.
+        The location can be specified either using `UN Location Code` and/or `Location Name` together with `Country Code`.
       example:
         locationName: Hamburg
         UNLocationCode: DEHAM
       properties:
         locationName:
           type: string
-          description: The name of the location.
           pattern: ^\S(?:.*\S)?$
+          maxLength: 35
+          description: |
+            The name of the location.
+            
+            **Condition:** Mandatory to provide in case `UN Location Code` is not provided
           example: Port of Amsterdam
-          maxLength: 100
-        address:
-          $ref: '#/components/schemas/Address'
-        facility:
-          $ref: '#/components/schemas/Facility'
+        countryCode:
+          type: string
+          pattern: ^[A-Z]{2}$
+          minLength: 2
+          maxLength: 2
+          description: |
+            The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+            
+            **Condition:** Mandatory to provide in case `UN Location Code` is not provided
+          example: NL
         UNLocationCode:
           type: string
           pattern: ^[A-Z]{2}[A-Z2-9]{3}$
@@ -6996,8 +7213,24 @@ components:
 
             More info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)
           example: NLAMS
-        geoCoordinate:
-          $ref: '#/components/schemas/GeoCoordinate'
+
+    RoutingOfConsignmentCountries:
+      type: array
+      title: Routing of Consignment Countries
+      description: |
+        Identification in a chronological order of the countries through which the goods are routed between the country of original departure and final destination as stipulated in the lowest House Bill of Lading.
+        
+        **Condition:** The order of the items in this array **MUST** be preserved as by the provider of the API.
+
+        **Condition:** If provided - the first country in the list must be the country of `Place of Acceptance`; the last country in the list must be the country of `Place of Final Delivery`.
+      items:
+        type: string
+        pattern: ^[A-Z]{2}$
+        minLength: 2
+        maxLength: 2
+        description: |
+          The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+        example: NL
 
     ####################
     # Transport Document
@@ -7349,20 +7582,6 @@ components:
             $ref: '#/components/schemas/PartyContactDetail'
         documentParties:
           $ref: '#/components/schemas/DocumentParties'
-        routingOfConsignmentCountries:
-          type: array
-          description: |
-            A list of countries the goods will be routed through from origin to destination defined by the 2 characters country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
-            
-            **Condition:** The order of the items in this array **MUST** be preserved as by the provider of the API.
-          items:
-            type: string
-            pattern: ^[A-Z]{2}$
-            minLength: 2
-            maxLength: 2
-            description: |
-              The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
-            example: NL
         consignmentItems:
           type: array
           minItems: 1
@@ -7982,6 +8201,8 @@ components:
       title: Document Parties
       description: |
         All `Parties` with associated roles.
+        
+        **Condition:** `Buyer` and `Seller` are mandatory if `isCargoDeliveredInICS2Zone=true` **and** `advancedManifestFilingPerformedBy=CARRIER` and `isHouseBillOfLadingsIssued=false`
       properties:
         shipper:
           $ref: '#/components/schemas/Shipper'
@@ -8022,6 +8243,8 @@ components:
       title: Document Parties
       description: |
         All `Parties` with associated roles for this `House Bill of Lading`.
+        
+        **Condition:** `Buyer` and `Seller` are mandatory if `isCargoDeliveredInICS2Zone=true` (on House B/L level) **and** `advancedManifestFilingPerformedBy=CARRIER`
       properties:
         shipper:
           $ref: '#/components/schemas/ShipperHBL'
@@ -8038,6 +8261,8 @@ components:
           description: A list of document parties that can be optionally provided in the `Shipping Instructions` and `Transport Document`.
           items:
             $ref: '#/components/schemas/OtherDocumentPartyHBL'
+      required:
+        - shipper
 
     ##################
     # Document Parties
