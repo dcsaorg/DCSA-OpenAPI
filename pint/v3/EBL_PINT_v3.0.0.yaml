@@ -1000,7 +1000,6 @@ components:
             - `DNB` (Dun and Bradstreet)
             - `FMC` (Federal Maritime Commission)
             - `DCSA` (Digital Container Shipping Association)
-            - `EU` (European Union Member State Customs Authority)
             - `ZZZ` (Mutually defined)
 
           example: W3C
@@ -1019,7 +1018,6 @@ components:
             - `DID` (Decentralized Identifier) for `codeListProvider` `W3C`
             - `LEI` (Legal Entity Identifier) for `codeListProvider` `GLEIF`
             - `DUNS` (Data Universal Numbering System) for `codeListProvider` `DNB`
-            - `EORI` (Economic Operators Registration and Identification) for codeListProvider `EU`
           example: DID
       required:
         - codeListProvider
@@ -1034,6 +1032,7 @@ components:
 
         | Type  | Country | Description |
         |-------|:-------:|-------------|
+        |EORI|NL|Economic Operators Registration and Identification|
         |PAN|IN|Goods and Services Tax Identification Number in India|
         |GSTIN|IN|Goods and Services Tax Identification Number in India|
         |IEC|IN|Importer-Exported Code in India|
@@ -1417,20 +1416,6 @@ components:
             $ref: '#/components/schemas/PartyContactDetail'
         documentParties:
           $ref: '#/components/schemas/DocumentParties'
-        routingOfConsignmentCountries:
-          type: array
-          description: |
-            A list of countries the goods will be routed through from origin to destination defined by the 2 characters country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
-            
-            **Condition:** The order of the items in this array **MUST** be preserved as by the provider of the API.
-          items:
-            type: string
-            pattern: ^[A-Z]{2}$
-            minLength: 2
-            maxLength: 2
-            description: |
-              The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
-            example: NL
         consignmentItems:
           type: array
           minItems: 1
@@ -1614,7 +1599,7 @@ components:
         descriptionOfGoods:
           type: array
           description: |
-            An array of lines accurately and properly describing the cargo being shipped in the container(s) as provided by the shipper.
+            A plain language description that is precise enough for Customs services to be able to identify the goods. General terms (i.e. 'consolidated', 'general cargo' 'parts' or 'freight of all kinds') or not sufficiently precise description cannot be accepted.
 
             **Condition:** The order of the items in this array **MUST** be preserved as by the provider of the API.
           maxItems: 150
@@ -1740,9 +1725,12 @@ components:
             - '2106'
             - '2507'
             - '2512'
+      example:
+        type: TARIC
+        values: 
+          - '85171200'
       required:
         - type
-        - countryCode
         - values
 
     ###################
@@ -1758,6 +1746,8 @@ components:
 
         | Type  | Country | Description |
         |-------|:-------:|-------------|
+        |UCR|NL|Unique Consignment Reference|
+        |CUS|NL|Customs Union and Statistics|
         |ACID|EG|Advance Cargo Information Declaration in Egypt|
         |CERS|CA|Canadian Export Reporting System|
         |ITN|US|Internal Transaction Number in US|
@@ -1770,7 +1760,7 @@ components:
           maxLength: 50
           description: |
             The reference type code as defined in the relevant customs jurisdiction.
-          example: ACID
+          example: CUS
         countryCode:
           type: string
           pattern: ^[A-Z]{2}$
@@ -1778,7 +1768,7 @@ components:
           maxLength: 2
           description: |
             The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
-          example: EG
+          example: NL
         values:
           type: array
           minItems: 1
