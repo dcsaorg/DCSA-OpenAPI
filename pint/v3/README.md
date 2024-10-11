@@ -14,7 +14,7 @@ This is a moving target and will be updated as soon as the version is published
 Snapshot as of 11 of October 2024 for EBL Platform Interoperability 3.0.0 Beta.
 ## Object changes
 - properties **added**:
-  - `transportDocumentSubreference` added to `TransportDocument`
+  - `transportDocumentSubReference` added to `TransportDocument`
   - `exportLicense` and `importLicense` properties added to `TransportDocument`, `ConsignmentItem` and `CargoItem`
   - `ExportLicense` and `ImportLicense` objects added with the following properties: `isRequired`, `reference`, `issueDate` and `expiryDate`
 - properties **modified**:
@@ -25,7 +25,7 @@ Snapshot as of 11 of October 2024 for EBL Platform Interoperability 3.0.0 Beta.
   - `routingOfConsignmentCountries` removed from `TransportDocument`
 
 ## Transport Document changes
-- `transportDocumentSubreference` added as an optional property to the `TransportDocument`
+- `transportDocumentSubReference` added as an optional property to the `TransportDocument`
 - `routingOfConsignmentCountries` removed from `TransportDocument`
 - `exportLicense` and `importLicense` added to `TransportDocument`, `ConsignmentItem` and `CargoItem`
 
