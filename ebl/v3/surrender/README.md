@@ -17,13 +17,13 @@ This is a moving target and will be updated as soon as the version is published
 Snapshot as of 10 of October 2024 for EBL Surrender 3.0.0 Beta.
 ## Object changes
 - properties added:
-  - `transportDocumentSubreference` added to `SurrenderRequestDetails`
+  - `transportDocumentSubReference` added to `SurrenderRequestDetails`
 
 ## All changes
 - API description updated
 - Description of `TRAC` changed from `TRACE Original` to `Enigio trace:original` in both `eblPlatform` and `codeListProvider`
 - `SurrenderRequestDetails` description changed
-- `transportDocumentSubreference` added as an optional property to the `SurrenderRequestDetails`
+- `transportDocumentSubReference` added as an optional property to the `SurrenderRequestDetails`
 - Wrongly defined mandatory required `surrenderRequestedBy` removed from `SurrenderRequestDetails`
 - `EU` removed from `codeListProvider`
 - `EORI` removed from `codeListName`
