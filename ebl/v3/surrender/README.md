@@ -12,6 +12,23 @@ Publications related to the Bill of Lading Surrender API:
 ---
 This is a moving target and will be updated as soon as the version is published
 
+<a name="v300B20241011"></a>[Release v3.0.0 Beta 20241011 (10 of October 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR/3.0.0-Beta-20241011)
+---
+Snapshot as of 10 of October 2024 for EBL Surrender 3.0.0 Beta.
+## Object changes
+- properties added:
+  - `transportDocumentSubreference` added to `SurrenderRequestDetails`
+
+## All changes
+- API description updated
+- Description of `TRAC` changed from `TRACE Original` to `Enigio trace:original` in both `eblPlatform` and `codeListProvider`
+- `SurrenderRequestDetails` description changed
+- `transportDocumentSubreference` added as an optional property to the `SurrenderRequestDetails`
+- Wrongly defined mandatory required `surrenderRequestedBy` removed from `SurrenderRequestDetails`
+- `EU` removed from `codeListProvider`
+- `EORI` removed from `codeListName`
+- extra example added to the `TaxLegalReference` description
+
 <a name="v300B20240927"></a>[Release v3.0.0 Beta 20240927 (27 of September 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR/3.0.0-Beta-20240927)
 ---
 Snapshot as of 27 of September 2024 for EBL Surrender 3.0.0 Beta.
