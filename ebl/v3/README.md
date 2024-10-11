@@ -20,6 +20,7 @@ This is a moving target and will be updated as soon as the version is published
 Snapshot as of 11 of October 2024 for EBL 3.0.0 Beta.
 ## Key changes
 - many ICS2 updates
+- `transportDocumentSubReference` added to `TransportDocument`
 
 ## Changes to the `Shipping Instructions`
 - `methodOfPayment` removed from `Shipping Instructions`
@@ -27,6 +28,9 @@ Snapshot as of 11 of October 2024 for EBL 3.0.0 Beta.
 - `isCargoDeliveredInICS2Zone` added as a mandatory property to `Shipping Instructions`
 - `exportLicense` and `importLicense` added to `Shipping Instructions`
 - `isHBLIssued` renamed to `isHouseBillOfLadingsIssued`, description updated and Condition added
+- `exportLicense` and `importLicense` added to `Shipping Instructions`, `ConsignmentItemShipper` and `CargoItemShipper`
+- `carrierBookingReference` no longer has a Condition
+- `emptyIndicatorCode` added to `UtilizedTransportEquipmentShipper`
 
 The above changes are applicable to:
 - `CreateShippingInstructions` used in `POST /v3/shipping-instructions` endPoint
@@ -34,19 +38,40 @@ The above changes are applicable to:
 - `ShippingInstructions` used in `GET /v3/shipping-instructions/{documentReference}` endPoint
 
 ## Changes to the `Transport Document`
-- 
+- `transportDocumentSubReference` added to `TransportDocument`
+- `routingOfConsignmentCountries` removed from `TransportDocument`
+- `exportLicense` and `importLicense` added to `TransportDocument`, `ConsignmentItem` and `CargoItem`
+- `carrierBookingReference` no longer has a Condition
+- `emptyIndicatorCode` added to `UtilizedTransportEquipment`
 
 ## Object changes
 - properties **added**:
   - `isCargoDeliveredInICS2Zone` added to `Shipping Instructions`
   - `exportLicense` and `importLicense` added to `Shipping Instructions`
+  - `partyContactDetails` added to `Seller` and `Buyer` parties
+  - `PartyHBL` object added
+  - `PartyContactDetailHBL` object added to include a pattern for `phone`
+  - `transportDocumentSubReference` added to `TransportDocument`
+  - `ConsignmentItemHBL` added to `HouseBillofLading`
+  - `CargoItemHBL` added to `ConsignmentItemHBL`
+  - `OuterPackagingHBL` added to `CargoItemHBL`
+  - `emptyIndicatorCode` added to `UtilizedTransportEquipment` and `UtilizedTransportEquipmentShipper`
+  - `UtilizedTransportEquipmentHBL` added to `HouseBillofLading`
+  - following properties added to `HouseBillofLading`: `isCargoDeliveredInICS2Zone`, `routingOfConsignmentCountries`, `consignmentItems` and `utilizedTransportEquipments`
+  - `ExportLicense`, `ImportLicense`, `ExportLicenseShipper` and `ImportLicenseShipper` objects added with the following properties: `isRequired`, `reference`, `issueDate` and `expiryDate`
 - properties **modified**:
   - `isHBLIssued` renamed to `isHouseBillOfLadingsIssued`
   - `partyFunctionCodes` updated:
     - `CSR` -> `CS` (Consolidator)
     - `MFR` -> `MF` (Manufacturer)
     - `WHK` -> `WH` (Warehouse Keeper)
-  - `typeOfPerson` now mandatory on `ShipperHBL`, `ConsigneeHBL`
+  - `typeOfPerson` now mandatory on `ShipperHBL`, `ConsigneeHBL`, `NotifyPartyHBL`, `Seller`, `Buyer`
+  - `partyContactDetails` now mandatory on `NotifyPartyHBL`
+  - `carrierBookingReference` no longer has a Condition
+  - `countryCode` is now optional on `NationalCommodityCode`
+  - `unNumber` and `naNumber` renamed to `UNNumber` and `NANumber` in `Dangerous Goods`
+  - `supplementaryDeclarantEORINumber` renamed to `identificationNumber` in `AdvanceManifestFiling` and description updated and condition added
+  - `countryCode` made optional in `AdvanceManifestFiling`
 - properties **removed**:
   - `methodOfPayment` removed from `Shipping Instructions`
   - `routingOfConsignmentCountries` removed from `Shipping Instructions`
@@ -58,9 +83,24 @@ The above changes are applicable to:
   - In transit clause
 - all "House B/L" related objects (that have a "duplicate" MBL object) have `(House B/L) ` suffixed to their titles
 - `OtherDocumentPartyHBL` links to a `PartyHBL` instead of `Party` object
-- `ShipperHBL`, `ConsigneeHBL` now link to `Address` instead of `PartyAddress`
-- `typeOfPerson` now mandatory on `ShipperHBL`, `ConsigneeHBL`
+- `ShipperHBL`, `ConsigneeHBL`, `NotifyPartyHBL`, `Seller`, `Buyer` now link to `Address` instead of `PartyAddress`
+- `typeOfPerson` now mandatory on `ShipperHBL`, `ConsigneeHBL`, `NotifyPartyHBL`, `Seller`, `Buyer`
 - `TRAC` description updated from `TRACE Original` to `Enigio trace:original`
+- condition added to `NotifyPartyHBL` which also now has `partyContactDetails` as a mandatory property
+- `EU` removed from `codeListProvider` in `IdentifyingCode`
+- `EORI` removed from `codeListName` in `IdentifyingCode`
+- `TaxLegalReference` description updated with extra example
+- description of `descriptionOfGoods` in `ConsignmentItem` updated
+- `NationalCommodityCode` example added
+- updated `CustomsReference` description and examples
+- examples of `AdvanceManifestFiling` updated
+- `methodOfPayment` description updated on `HouseBillofLading`
+- `PlaceOfAcceptance` and `PlaceOfFinalDelivery` description updated and:
+  - `locationName` updated
+  - `address`, `facility` and `geoCoordinate` removed
+  - `countryCode` added
+- `buyer` and `seller` are now conditional on `DocumentPartiesShipper` and `DocumentPartiesHouseBL`
+- `shipper` is a required party on `HouseBillofLading`
 
 <a name="v300B20240927"></a>[Release v3.0.0 Beta 20240927 (27 of September 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.0-Beta-20240927)
 ---
