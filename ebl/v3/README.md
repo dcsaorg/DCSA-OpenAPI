@@ -21,6 +21,7 @@ Snapshot as of 11 of October 2024 for EBL 3.0.0 Beta.
 ## Key changes
 - many ICS2 updates
 - `transportDocumentSubReference` added to `TransportDocument`
+- `ExportLicense` and `ImportLicense` added to `TransportDocument`
 
 ## Changes to the `Shipping Instructions`
 - `methodOfPayment` removed from `Shipping Instructions`
