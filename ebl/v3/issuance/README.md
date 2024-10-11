@@ -12,6 +12,42 @@ Publications related to the Bill of Lading Issuance API:
 ---
 This is a moving target and will be updated as soon as the version is published
 
+<a name="v300B20241011"></a>[Release v3.0.0 Beta 20241011 (11 of October 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS/3.0.0-Beta-20241011)
+---
+Snapshot as of 11 of October 2024 for EBL Issuance 3.0.0 Beta.
+## Key changes
+- example updated on responseCode `409` for endPoint `PUT /v3/ebl-issuance-requests`
+- request example updated on `POST /v3/ebl-issuance-responses` endPoint
+- `transportDocumentSubReference` added to distinguish "versions" of `TransportDocuments`
+- `ExportLicense` and `ImportLicense` added to `TransportDocument`
+
+## Object changes
+- properties **added**:
+  - `transportDocumentSubReference` added to `TransportDocument`
+  - `exportLicense` and `importLicense` properties added to `TransportDocument`, `ConsignmentItem` and `CargoItem`
+  - `ExportLicense` and `ImportLicense` objects added with the following properties: `isRequired`, `reference`, `issueDate` and `expiryDate`
+- properties **modified**:
+  - `carrierBookingReference` no longer has a Condition regarding
+  - `countryCode` is now optional on `NationalCommodityCode`
+  - `unNumber` and `naNumber` renamed to `UNNumber` and `NANumber` in `Dangerous Goods`
+  - `transportDocumentSubReference` added to `TransportDocument`
+- properties **removed**:
+  - `routingOfConsignmentCountries` removed from `TransportDocument`
+
+## Transport Document changes
+- `transportDocumentSubReference` added as an optional property to the `TransportDocument`
+- `routingOfConsignmentCountries` removed from `TransportDocument`
+- `exportLicense` and `importLicense` added to `TransportDocument`, `ConsignmentItem` and `CargoItem`
+
+## All changes
+- Description of `TRAC` changed from `TRACE Original` to `Enigio trace:original` in both `eblPlatform` and `codeListProvider`
+- `EU` removed from `codeListProvider`
+- `EORI` removed from `codeListName`
+- extra example added to the `TaxLegalReference` description
+- description of `descriptionOfGoods` in `ConsignmentItem` updated
+- `NationalCommodityCode` example added
+- updated `CustomsReference` description and examples
+
 <a name="v300B20240927"></a>[Release v3.0.0 Beta 20240927 (27 of September 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS/3.0.0-Beta-20240927)
 ---
 Snapshot as of 27 of September 2024 for EBL Issuance 3.0.0 Beta.
