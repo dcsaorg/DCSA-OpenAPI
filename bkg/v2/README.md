@@ -11,6 +11,35 @@ Publications related to the Booking API:
 ---
 This is a moving target and will be updated as soon as the version is published
 
+<a name="v200B20241011"></a>[Release v2.0.0 Beta 20241011 (11 October 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0-Beta-20241011)
+---
+Snapshot as of 11 of October 2024 for Booking 2.0.0 Beta
+## Key changes
+- `importLicense` and `exportLicense` added to `Commodity` and `CommodityShipper`
+- `cargoGrossWeight` added to `RequestedEquipment` and `RequestedEquipmentShipper` and is no longer mandatory on `Commodity` and `CommodityShipper`. It is required to provide the `cargoGrossWeight` on either `RequestedEquipment` or `Commodity` level
+## Object changes
+- properties **added**:
+  - `cargoGrossWeight` added to `RequestedEquipment` and `RequestedEquipmentShipper`
+  - `importLicense` and `exportLicense` added to `Commodity` and `CommodityShipper`
+  - `ExportLicense` and `ImportLicense` objects added with the following properties: `isRequired`, `reference`, `issueDate` and `expiryDate`
+- properties **modified**:
+  - `isExportDeclarationRequired` is no longer a mandatory property in Booking
+  - `cargoGrossWeight` is no longer a mandatory property on `Commodity`
+  - `commoditySubreference` renamed to `commoditySubReference` (using upperCase `R`)
+  - `countryCode` is no longer mandatory on `NationalCommodityCode` nor on `AdvanceManifestFiling`
+  - `unNumber` and `naNumber` renamed to `UNNumber` and `NANumber` in `Dangerous Goods`
+- properties **removed**:
+  - `isImportLicenseRequired` and `importLicenseReference` removed from `Booking`
+  - `exportLicenseIssueDate` and `exportLicenseExpiryDate` removed from `Commodity` and `CommodityShipper`
+
+## All changes
+- endPoint examples updated
+- wording in Booking Cancellation endPoint description updated to reflect that the Booking is not immediately cancelled when the endPoint is called
+- `exportDeclarationReference` description updated
+- `TRAC` description updated from `TRACE Original` to `Enigio trace:original`
+- `EU` removed from `codeListProvider` in `IdentifyingCode`
+- `EORI` removed from `codeListName` in `IdentifyingCode`
+
 <a name="v200B20240927"></a>[Release v2.0.0 Beta 20240927 (27 September 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0-Beta-20240927)
 ---
 Snapshot as of 27 of September 2024 for Booking 2.0.0 Beta
