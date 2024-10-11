@@ -11,7 +11,7 @@ This is a moving target and will be updated as soon as the version is published
 
 <a name="v300B20241011"></a>[Release v3.0.0 Beta 20241011 (11 of oCTOBER 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_PINT/3.0.0-Beta-20241011)
 ---
-Snapshot as of 11 of oCTOBER 2024 for EBL Platform Interoperability 3.0.0 Beta.
+Snapshot as of 11 of October 2024 for EBL Platform Interoperability 3.0.0 Beta.
 ## Object changes
 - properties **added**:
   - `transportDocumentSubreference` added to `TransportDocument`
