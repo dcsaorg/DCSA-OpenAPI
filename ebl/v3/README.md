@@ -15,6 +15,53 @@ Publications related to the Bill of Lading API:
 ---
 This is a moving target and will be updated as soon as the version is published
 
+<a name="v300B20241011"></a>[Release v3.0.0 Beta 20241011 (11 of October 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.0-Beta-20241011)
+---
+Snapshot as of 11 of October 2024 for EBL 3.0.0 Beta.
+## Key changes
+- many ICS2 updates
+
+## Changes to the `Shipping Instructions`
+- `methodOfPayment` removed from `Shipping Instructions`
+- `routingOfConsignmentCountries` removed from `Shipping Instructions`
+- `isCargoDeliveredInICS2Zone` added as a mandatory property to `Shipping Instructions`
+- `exportLicense` and `importLicense` added to `Shipping Instructions`
+- `isHBLIssued` renamed to `isHouseBillOfLadingsIssued`, description updated and Condition added
+
+The above changes are applicable to:
+- `CreateShippingInstructions` used in `POST /v3/shipping-instructions` endPoint
+- `UpdateShippingInstructions` used in `PUT /v3/shipping-instructions/{documentReference}` endPoint
+- `ShippingInstructions` used in `GET /v3/shipping-instructions/{documentReference}` endPoint
+
+## Changes to the `Transport Document`
+- 
+
+## Object changes
+- properties **added**:
+  - `isCargoDeliveredInICS2Zone` added to `Shipping Instructions`
+  - `exportLicense` and `importLicense` added to `Shipping Instructions`
+- properties **modified**:
+  - `isHBLIssued` renamed to `isHouseBillOfLadingsIssued`
+  - `partyFunctionCodes` updated:
+    - `CSR` -> `CS` (Consolidator)
+    - `MFR` -> `MF` (Manufacturer)
+    - `WHK` -> `WH` (Warehouse Keeper)
+  - `typeOfPerson` now mandatory on `ShipperHBL`, `ConsigneeHBL`
+- properties **removed**:
+  - `methodOfPayment` removed from `Shipping Instructions`
+  - `routingOfConsignmentCountries` removed from `Shipping Instructions`
+
+## All changes
+- endPoint examples updated
+- 2 new Carrier Clases that can be requested by the Shipper has been added:
+  - Shipper's Load, Stow, Weight and Count
+  - In transit clause
+- all "House B/L" related objects (that have a "duplicate" MBL object) have `(House B/L) ` suffixed to their titles
+- `OtherDocumentPartyHBL` links to a `PartyHBL` instead of `Party` object
+- `ShipperHBL`, `ConsigneeHBL` now link to `Address` instead of `PartyAddress`
+- `typeOfPerson` now mandatory on `ShipperHBL`, `ConsigneeHBL`
+- `TRAC` description updated from `TRACE Original` to `Enigio trace:original`
+
 <a name="v300B20240927"></a>[Release v3.0.0 Beta 20240927 (27 of September 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.0-Beta-20240927)
 ---
 Snapshot as of 27 of September 2024 for EBL 3.0.0 Beta.
