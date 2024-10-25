@@ -9,6 +9,37 @@ Publications related to the PINT API:
 ---
 This is a moving target and will be updated as soon as the version is published
 
+<a name="v300B20241025"></a>[Release v3.0.0 Beta 20241025 (25 of October 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_PINT/3.0.0-Beta-20241025)
+---
+Snapshot as of 25 of October 2024 for EBL Platform Interoperability 3.0.0 Beta.
+## Key changes
+- added a `minItems: 1` on all required array-properties (`envelopeTransferChain`, `transactions`, `missingAdditionalDocumentChecksums`)
+- `supportingDocuments` removed as a required property on `EnvelopeManifest`
+- `identifyingCodes` with a minItems of 1 is now mandatory on `IssueToParty`
+- On `Consignee`, `Endorsee`, `NotifyParty` it is now a condition that the `displayedAddress` should be provided instead of the `address`
+
+## Object changes
+- properties **added**:
+- properties **modified**:
+  - `supportingDocuments` removed as a required property on `EnvelopeManifest`
+  - `identifyingCodes` with a minItems of 1 is now mandatory on `TransactionParty`
+  - On `Consignee`, `Endorsee`, `NotifyParty` it is now a condition that the `displayedAddress` should be provided instead of the `address`
+- properties **removed**:
+
+## Transport Document changes
+- On `Consignee`, `Endorsee`, `NotifyParty` it is now a condition that the `displayedAddress` should be provided instead of the `address`
+
+## Minor changes
+- `EnvelopeManifestSignedContent` example updated to reflect a `EnvelopeManifest` payload
+- `issuanceManifestSignedContent` example updated to reflect a `IssuanceManifest` payload
+- `EnvelopeTransferChainEntrySignedContent` example updated to reflect a `EnvelopeTransferChainEntry` payload
+- `duplicateOfAcceptedEnvelopeTransferChainEntrySignedContent` example updated to reflect a `EnvelopeTransferChainEntrySignedContent` payload
+- `EnvelopeTransferFinishedResponseSignedContent` example updated to reflect a `EnvelopeTransferFinishedResponse` payload
+- `declaredValueCurrency` is now a conditional property based on `declaredValue` being provided
+- descriptions have been updated to make it more clear that 'one of X or Y' should be provided instead of 'either X or Y'
+- `unit` descriptions aligned between weights and volumes
+- `IssuingParty` description updated
+
 <a name="v300B20241011"></a>[Release v3.0.0 Beta 20241011 (11 of October 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_PINT/3.0.0-Beta-20241011)
 ---
 Snapshot as of 11 of October 2024 for EBL Platform Interoperability 3.0.0 Beta.
