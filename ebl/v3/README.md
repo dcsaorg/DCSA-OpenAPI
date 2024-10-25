@@ -22,7 +22,7 @@ Snapshot as of 25 of October 2024 for EBL 3.0.0 Beta.
 - `identifyingCodes` description updated to require one of 'address' or 'identifyingCode'
 - On `Consignee`, `Endorsee`, `NotifyParty`, `IssuingParty` and `Party` now has a condition that either `address` or `identifyingCodes` should be provided
 - `identifyingCodes` now has a `minItems: 1` and is a required property on `IssueToParty`
-- removed the array type on `OuterPackaging` - going forward there is a 1:1 mapping between `OuterPackaging` and `CargoItem`
+- removed the array type on `OuterPackaging` for House B/Ls - going forward there is a 1:1 mapping between `OuterPackaging` and `CargoItem`
 
 ## Object changes
 - properties **added**:
