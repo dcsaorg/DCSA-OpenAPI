@@ -304,7 +304,7 @@ paths:
         - $ref: '#/components/parameters/documentReference'
         - $ref: '#/components/parameters/Api-Version-Major'
       description: |
-        Updates the `Shipping Instructions` with the `documentReference`. The path can contain either a `shippingInstructionsReference` or a `transportDocumentReference`. This endPoint corresponds with **UseCase 3 - Submit updated Shipping Instructions**
+        Updates the `Shipping Instructions` with the `documentReference`. The path can contain one of a `shippingInstructionsReference` or a `transportDocumentReference`. This endPoint corresponds with **UseCase 3 - Submit updated Shipping Instructions**
 
         ### Precondition
         In order to update a `Shipping Instructions`, the status of the `Shipping Instructions` needs to be in state:
@@ -349,7 +349,7 @@ paths:
           
             GET /v3/shipping-instructions/{documentReference}?updatedContent=true
             
-        It is possible to `GET` the content of the `Updated Shipping Instructions` via the example above until either:
+        It is possible to `GET` the content of the `Updated Shipping Instructions` via the example above until one of:
           - the provider requests for a new update (**UseCase 2: Request to update Shipping Instructions**) in which case the "old update" is no longer accessible
           - the consumer submits a new update (**UseCase 3: Submit updated Shipping Instructions**) in which case the "new update" provided **replaces** the "old update".
       requestBody:
@@ -963,7 +963,7 @@ paths:
         A way for the consumer to Cancel an `Updated Shipping Instructions`. This endPoint corresponds with **UseCase 5 - Cancel update to Shipping Instructions**.
 
         ## Precondition
-        In order to cancel an `Updated Shipping Instructions`, the status of the `Updated Shipping Instructions` must be in in status `UPDATE_RECEIVED`. The status of the `Shipping Instructions` can be either `RECEIVED` or `PENDING_UPDATE`.
+        In order to cancel an `Updated Shipping Instructions`, the status of the `Updated Shipping Instructions` must be in in status `UPDATE_RECEIVED`. The status of the `Shipping Instructions` can be one of `RECEIVED` or `PENDING_UPDATE`.
 
         ## Postcondition
         The provider has received a cancellation from the consumer for an `Updated Shipping Instructions` that is in state `UPDATE_RECEIVED`.
@@ -2625,7 +2625,7 @@ components:
       in: path
       name: documentReference
       description: |
-        An identifier for a `Shipping Instructions`. It can either be a `shippingInstructionsReference` or a `transportDocumentReference`.
+        An identifier for a `Shipping Instructions`. It can be one of `shippingInstructionsReference` or `transportDocumentReference`.
       schema:
         type: string
         pattern: ^\S(?:.*\S)?$
@@ -4218,7 +4218,7 @@ components:
       type: object
       title: Facility
       description: |
-        An object used to express a location using a `Facility`. The facility can either be expressed using a `BIC` code or a `SMDG` code. The `facilityCode` does not contain the `UNLocationCode` - this should be provided in the `UnLocationCode` attribute.
+        An object used to express a location using a `Facility`. The facility can be expressed using one of `BIC` code or `SMDG` code. The `facilityCode` does not contain the `UNLocationCode` - this should be provided in the `UnLocationCode` attribute.
       properties:
         facilityCode:
           type: string
@@ -4326,7 +4326,7 @@ components:
       type: object
       title: Party Address
       description: |
-        An object for storing address related information
+        Address where the party is located. It is an object of the attributes below.
       properties:
         street:
           type: string
@@ -4397,7 +4397,7 @@ components:
       description: |
         The party by whom or in whose name or on whose behalf a contract of carriage of goods by sea has been concluded with a carrier, or the party by whom or in whose name, or on whose behalf, the goods are actually delivered to the carrier in relation to the contract of carriage by sea.
 
-        **Condition:** Either the `address` or the `displayedAddress` must be included in the `Transport Document`.
+        **Condition:** Either the `address` or a party `identifyingCode` must be provided in the `Shipping Instructions`. If a `displayedAddress` is provided, it must be included in the `Transport Document` instead of the `address`.
       properties:
         partyName:
           type: string
@@ -4437,6 +4437,8 @@ components:
             example: Strawinskylaan 4117
         identifyingCodes:
           type: array
+          description: |
+            **Condition:** Either the `address` or a party `identifyingCode` must be provided. 
           items:
             $ref: '#/components/schemas/IdentifyingCode'
         taxLegalReferences:
@@ -4524,6 +4526,8 @@ components:
         The party to which goods are consigned in the `Master Bill of Lading`.
         
         **Condition:** Mandatory for non-negotiable BL (`isToOrder=false`)
+
+        **Condition:** Either the `address` or a party `identifyingCode` must be provided in the `Shipping Instructions`. If a `displayedAddress` is provided, it must be included in the `Transport Document` instead of the `address`.
       properties:
         partyName:
           type: string
@@ -4563,6 +4567,8 @@ components:
             example: Strawinskylaan 4117
         identifyingCodes:
           type: array
+          description: |
+            **Condition:** Either the `address` or a party `identifyingCode` must be provided. 
           items:
             $ref: '#/components/schemas/IdentifyingCode'
         taxLegalReferences:
@@ -4650,6 +4656,8 @@ components:
         The party to whom the title to the goods is transferred by means of endorsement.
         
         **Condition:** Can only be provided for negotiable BLs (`isToOrder=true`). If a negotiable BL does not have an `Endorsee`, the BL is said to be "blank endorsed". Note `Consignee` and `Endorsee` are mutually exclusive.
+
+        **Condition:** Either the `address` or a party `identifyingCode` must be provided in the `Shipping Instructions`. If a `displayedAddress` is provided, it must be included in the `Transport Document` instead of the `address`.
       properties:
         partyName:
           type: string
@@ -4679,6 +4687,8 @@ components:
             example: Strawinskylaan 4117
         identifyingCodes:
           type: array
+          description: |
+            **Condition:** Either the `address` or a party `identifyingCode` must be provided. 
           items:
             $ref: '#/components/schemas/IdentifyingCode'
         taxLegalReferences:
@@ -4777,6 +4787,8 @@ components:
       title: Notify Party
       description: |
         The person to be notified when a shipment arrives at its destination.
+
+        **Condition:** Either the `address` or a party `identifyingCode` must be provided in the `Shipping Instructions`. If a `displayedAddress` is provided, it must be included in the `Transport Document` instead of the `address`.
       properties:
         partyName:
           type: string
@@ -4816,6 +4828,8 @@ components:
             example: Strawinskylaan 4117
         identifyingCodes:
           type: array
+          description: |
+            **Condition:** Either the `address` or a party `identifyingCode` must be provided. 
           items:
             $ref: '#/components/schemas/IdentifyingCode'
         taxLegalReferences:
@@ -4983,6 +4997,8 @@ components:
       title: Party
       description: |
         Refers to a company or a legal entity.
+
+        **Condition:** Either the `address` or a party `identifyingCode` must be provided in the `Shipping Instructions`.
       properties:
         partyName:
           type: string
@@ -4995,6 +5011,8 @@ components:
           $ref: '#/components/schemas/PartyAddress'
         identifyingCodes:
           type: array
+          description: |
+            **Condition:** Either the `address` or a party `identifyingCode` must be provided. 
           items:
             $ref: '#/components/schemas/IdentifyingCode'
         taxLegalReferences:
@@ -5064,7 +5082,9 @@ components:
       type: object
       title: Issuing Party
       description: |
-        Refers to a company or a legal entity.
+        The company or a legal entity issuing the `Transport Document`.
+
+        **Condition:** Either the `address` or a party `identifyingCode` must be provided in the `Shipping Instructions`.
       properties:
         partyName:
           type: string
@@ -5077,6 +5097,8 @@ components:
           $ref: '#/components/schemas/PartyAddress'
         identifyingCodes:
           type: array
+          description: |
+            **Condition:** Either the `address` or a party `identifyingCode` must be provided. 
           items:
             $ref: '#/components/schemas/IdentifyingCode'
         taxLegalReferences:
@@ -5099,7 +5121,7 @@ components:
       type: object
       title: Party Contact Detail
       description: |
-        The contact details of the person to contact. It is mandatory to provide either `phone` and/or `email` along with the `name`.
+        The contact details of the person to contact. It is mandatory to provide either `phone` and/or `email` along with the `name`, both can be provided.
       example:
         name: Henrik
         phone: +45 51801234
@@ -5147,7 +5169,7 @@ components:
       type: object
       title: Party Contact Detail (House B/L)
       description: |
-        The contact details of the person to contact. It is mandatory to provide either `phone` and/or `email` along with the `name`.
+        The contact details of the person to contact. It is mandatory to provide either `phone` and/or `email` along with the `name`, both can be provided.
       example:
         name: Henrik
         phone: +45 51801234
@@ -5822,7 +5844,7 @@ components:
         unit:
           type: string
           description: |
-            The unit of measure which can be expressed in imperial or metric terms
+            The unit of measure which can be expressed in imperial or metric terms:
             - `KGM` (Kilograms)
             - `LBR` (Pounds)
           enum:
@@ -5849,7 +5871,7 @@ components:
         unit:
           type: string
           description: |
-            The unit of measure which can be expressed in either imperial or metric terms
+            The unit of measure which can be expressed in imperial or metric terms:
             - `FTQ` (Cubic foot)
             - `MTQ` (Cubic meter)
           enum:
@@ -5876,7 +5898,7 @@ components:
         unit:
           type: string
           description: |
-            The unit of measure which can be expressed in imperial or metric terms
+            The unit of measure which can be expressed in imperial or metric terms:
             - `KGM` (Kilograms)
             - `LBR` (Pounds)
           enum:
@@ -5903,7 +5925,7 @@ components:
         unit:
           type: string
           description: |
-            The unit of measure which can be expressed in either imperial or metric terms
+            The unit of measure which can be expressed in imperial or metric terms:
             - `FTQ` (Cubic foot)
             - `MTQ` (Cubic meter)
           enum:
@@ -6082,7 +6104,7 @@ components:
       type: object
       title: Dangerous Goods
       description: |
-        Specification for `Dangerous Goods`. It is mandatory to either provide the `UNNumber` or the `NANumber`. Dangerous Goods is based on **IMDG Amendment Version 41-22**.
+        Specification for `Dangerous Goods`. It is mandatory to provide one of `UNNumber` or `NANumber`. Dangerous Goods is based on **IMDG Amendment Version 41-22**.
       oneOf:
         - type: object
           title: UN Number
@@ -6323,8 +6345,7 @@ components:
         unit:
           type: string
           description: |
-            The unit of measure which can be expressed in imperial or metric terms
-
+            The unit of measure which can be expressed in imperial or metric terms:
             - `KGM` (Kilograms)
             - `LBR` (Pounds)
           enum:
@@ -6351,8 +6372,7 @@ components:
         unit:
           type: string
           description: |
-            Unit of measure used to describe the `netWeight`. Possible values are
-
+            The unit of measure which can be expressed in imperial or metric terms:
             - `KGM` (Kilograms)
             - `LBR` (Pounds)
           enum:
@@ -6379,8 +6399,7 @@ components:
         unit:
           type: string
           description: |
-            Unit of measure used to describe the `netExplosiveWeight`. Possible values are
-
+            The unit of measure which can be expressed in imperial or metric terms:
             - `KGM` (Kilograms)
             - `LBR` (Pounds)
             - `GRM` (Grams)
@@ -6413,8 +6432,7 @@ components:
         unit:
           type: string
           description: |
-            The unit of measure which can be expressed in either imperial or metric terms
-
+            The unit of measure which can be expressed in imperial or metric terms:
             - `FTQ` (Cubic foot)
             - `MTQ` (Cubic meter)
             - `LTR` (Litre)
@@ -6706,7 +6724,7 @@ components:
           pattern: ^\S(?:.*\S)?$
           maxLength: 4
           description: |
-            Unique code for the different equipment size and type used to transport commodities. The code can refer to either the ISO size type (e.g. 22G1) or the ISO type group (e.g. 22GP) following the [ISO 6346](https://www.iso.org/standard/83558.html) standard.
+            Unique code for the different equipment size and type used to transport commodities. The code can refer to one of ISO size type (e.g. 22G1) or ISO type group (e.g. 22GP) following the [ISO 6346](https://www.iso.org/standard/83558.html) standard.
           example: 22G1
       required:
         - emptyIndicatorCode
@@ -6779,7 +6797,7 @@ components:
           pattern: ^\S(?:.*\S)?$
           maxLength: 4
           description: |
-            Unique code for the different equipment size and type used to transport commodities. The code can refer to either the ISO size type (e.g. 22G1) or the ISO type group (e.g. 22GP) following the [ISO 6346](https://www.iso.org/standard/83558.html) standard.
+            Unique code for the different equipment size and type used to transport commodities. The code can refer to one of ISO size type (e.g. 22G1) or ISO type group (e.g. 22GP) following the [ISO 6346](https://www.iso.org/standard/83558.html) standard.
           example: 22G1
         tareWeight:
           $ref: '#/components/schemas/TareWeight'
@@ -6835,7 +6853,7 @@ components:
           pattern: ^\S(?:.*\S)?$
           maxLength: 4
           description: |
-            Unique code for the different equipment size and type used to transport commodities. The code can refer to either the ISO size type (e.g. 22G1) or the ISO type group (e.g. 22GP) following the [ISO 6346](https://www.iso.org/standard/83558.html) standard.
+            Unique code for the different equipment size and type used to transport commodities. The code can refer to one of ISO size type (e.g. 22G1) or ISO type group (e.g. 22GP) following the [ISO 6346](https://www.iso.org/standard/83558.html) standard.
           example: 22G1
         tareWeight:
           $ref: '#/components/schemas/TareWeight'
@@ -7020,7 +7038,7 @@ components:
 
             In case of self-filing (`SELF`), the shipper can provide their `selfFilerCode` for each manifest.
 
-            **Condition:** The `selfFilerCode` must be provided when `manifestTypeCode` is either `ACE` (US) or `ACI` (CA) and the `advanceManifestFilingsHouseBLPerformedBy` is set to `SELF`.
+            **Condition:** The `selfFilerCode` must be provided when `manifestTypeCode` is one of `ACE` (US) or `ACI` (CA) and the `advanceManifestFilingsHouseBLPerformedBy` is set to `SELF`.
           enum:
             - SELF
             - CARRIER
@@ -7032,7 +7050,7 @@ components:
           description: |
             Code identifying the party who will submit the advance manifest filing(s) for the House BL.
 
-            **Mandatory** if `manifestTypeCode` is either `ACE` (US) or `ACI` (CA) and `advanceManifestFilingsHouseBLPerformedBy` is set to `SELF`.
+            **Mandatory** if `manifestTypeCode` is one of `ACE` (US) or `ACI` (CA) and `advanceManifestFilingsHouseBLPerformedBy` is set to `SELF`.
           example: FLXP
         identificationNumber:
           type: string
@@ -7147,7 +7165,7 @@ components:
 
         **Condition:** Mandatory if different from `Place of Receipt` or `Port of Loading` at the `Master Transport Document` level.
 
-        The location can be specified either using `UN Location Code` and/or `Location Name` together with `Country Code`.
+        **Condition:** The location can be specified either using `UN Location Code` and/or (`Location Name` together with `Country Code`), all three properties can be specified.
       example:
         locationName: Hamburg
         UNLocationCode: DEHAM
@@ -7193,7 +7211,7 @@ components:
         
         **Condition:** Mandatory if different from `Place of Delivery` at the `Master Transport Document` level.
 
-        The location can be specified either using `UN Location Code` and/or `Location Name` together with `Country Code`.
+        **Condition:** The location can be specified either using `UN Location Code` and/or (`Location Name` together with `Country Code`), all three properties can be specified.
       example:
         locationName: Hamburg
         UNLocationCode: DEHAM
@@ -8092,7 +8110,7 @@ components:
       description: |
         An object to capture where the original Transport Document (`Bill of Lading`) will be issued.
 
-        The location can be specified either as a `UN Location Code` or as a `CountryCode`.
+        The location can be specified as one of `UN Location Code` or `CountryCode`.
       properties:
         locationName:
           type: string
