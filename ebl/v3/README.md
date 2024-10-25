@@ -15,6 +15,31 @@ Publications related to the Bill of Lading API:
 ---
 This is a moving target and will be updated as soon as the version is published
 
+<a name="v300B20241025"></a>[Release v3.0.0 Beta 20241025 (25 of October 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.0-Beta-20241025)
+---
+Snapshot as of 25 of October 2024 for EBL 3.0.0 Beta.
+## Key changes
+- `identifyingCodes` description updated to require one of 'address' or 'identifyingCode'
+- On `Consignee`, `Endorsee`, `NotifyParty`, `IssuingParty` and `Party` now has a condition that either `address` or `identifyingCodes` should be provided
+- `identifyingCodes` now has a `minItems: 1` and is a required property on `IssueToParty`
+- removed the array type on `OuterPackaging` - going forward there is a 1:1 mapping between `OuterPackaging` and `CargoItem`
+
+## Object changes
+- properties **added**:
+- properties **modified**:
+  - all House parties now link to `PartyContactDetailHBL`
+  - On `Consignee`, `Endorsee`, `NotifyParty`, `IssuingParty` and `Party` now has a condition that either `address` or `identifyingCodes` should be provided
+  - `identifyingCodes` now has a `minItems: 1` and is a required property on `IssueToParty`
+  - removed the array type on `OuterPackaging` - going forward there is a 1:1 mapping between `OuterPackaging` and `CargoItem`
+- properties **removed**:
+
+## Minor changes
+- descriptions have been updated to make it more clear that 'one of X or Y' should be provided instead of 'either X or Y'
+- `requestedCarrierClauses` link updated to include newly added Clauses
+- `unit` descriptions aligned between weights and volumes
+- removed the condition on House B/L `OuterPackaging` property on `CargoItem`
+- `declaredValueCurrency` is now a conditional property based on `declaredValue` being provided
+
 <a name="v300B20241011"></a>[Release v3.0.0 Beta 20241011 (11 of October 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.0-Beta-20241011)
 ---
 Snapshot as of 11 of October 2024 for EBL 3.0.0 Beta.
