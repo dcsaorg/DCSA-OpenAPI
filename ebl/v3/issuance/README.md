@@ -12,6 +12,30 @@ Publications related to the Bill of Lading Issuance API:
 ---
 This is a moving target and will be updated as soon as the version is published
 
+<a name="v300B20241025"></a>[Release v3.0.0 Beta 20241025 (25 of October 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS/3.0.0-Beta-20241025)
+---
+Snapshot as of 25 of October 2024 for EBL Issuance 3.0.0 Beta.
+## Key changes
+- `identifyingCodes` with a minItems of 1 is now mandatory on `IssueToParty`
+- On `Consignee`, `Endorsee`, `NotifyParty` it is now a condition that the `displayedAddress` should be provided instead of the `address`
+
+## Object changes
+- properties **added**:
+- properties **modified**:
+  - `identifyingCodes` with a minItems of 1 is now mandatory on `IssueToParty`
+  - On `Consignee`, `Endorsee`, `NotifyParty` it is now a condition that the `displayedAddress` should be provided instead of the `address`
+- properties **removed**:
+
+## Transport Document changes
+- On `Consignee`, `Endorsee`, `NotifyParty` it is now a condition that the `displayedAddress` should be provided instead of the `address`
+
+## Minor changes
+- `issuanceManifestSignedContent` example updated to reflect a `IssuanceManifest` payload
+- `declaredValueCurrency` is now a conditional property based on `declaredValue` being provided
+- descriptions have been updated to make it more clear that 'one of X or Y' should be provided instead of 'either X or Y'
+- `unit` descriptions aligned between weights and volumes
+- `IssuingParty` description updated
+
 <a name="v300B20241011"></a>[Release v3.0.0 Beta 20241011 (11 of October 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS/3.0.0-Beta-20241011)
 ---
 Snapshot as of 11 of October 2024 for EBL Issuance 3.0.0 Beta.
