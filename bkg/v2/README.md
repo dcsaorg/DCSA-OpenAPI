@@ -11,6 +11,23 @@ Publications related to the Booking API:
 ---
 This is a moving target and will be updated as soon as the version is published
 
+<a name="v200B20241025"></a>[Release v2.0.0 Beta 20241025 (25 October 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0-Beta-20241025)
+---
+Snapshot as of 25 of October 2024 for Booking 2.0.0 Beta
+## Key changes
+- minor updates to description
+
+## Object changes
+- properties **modified**:
+  - `EU` (European Union Member State Customs Authority) removed from `codeListProvider` in `IdentifyingCode`
+
+## Minor changes
+- many places in descriptions 'either X or Y' has been replaced with 'one of X or Y' to make it clear only one of the values are applicable (whenever both values are allowed this will be explicitly mentioned)
+- `declaredValueCurrency` is now a conditional property based on `declaredValue` being provided
+- `EU` (European Union Member State Customs Authority) removed from `codeListProvider` in `IdentifyingCode`
+- `unit` descriptions aligned for weights and volumes
+
+
 <a name="v200B20241011"></a>[Release v2.0.0 Beta 20241011 (11 October 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0-Beta-20241011)
 ---
 Snapshot as of 11 of October 2024 for Booking 2.0.0 Beta
