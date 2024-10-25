@@ -12,6 +12,20 @@ Publications related to the Bill of Lading Surrender API:
 ---
 This is a moving target and will be updated as soon as the version is published
 
+<a name="v300B20241025"></a>[Release v3.0.0 Beta 20241025 (25 of October 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR/3.0.0-Beta-20241025)
+---
+Snapshot as of 25 of October 2024 for EBL Surrender 3.0.0 Beta.
+## Key changes
+- Description of API has been updated to make it clear that a Surrender Request for a B/L **MUST be done from same Solution Provider** as was used to Issue the B/L
+- `identifyingCodes` is now a mandatory property on `TransactionParty`
+
+## Object changes
+- properties modified:
+  - `identifyingCodes` set to mandatory with at least one `IdentifyingCode` on `TransactionParty`
+
+## Minor changes
+- updated Tag descriptions to reflect which party is to implement the endPoints
+
 <a name="v300B20241011"></a>[Release v3.0.0 Beta 20241011 (10 of October 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR/3.0.0-Beta-20241011)
 ---
 Snapshot as of 10 of October 2024 for EBL Surrender 3.0.0 Beta.
