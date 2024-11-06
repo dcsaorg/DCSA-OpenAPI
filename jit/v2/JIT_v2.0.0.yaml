@@ -1,0 +1,1511 @@
+openapi: 3.0.3
+info:
+  version: 2.0.0
+  title: |
+    DCSA Just in Time Port Calls API
+  description: |
+    # DCSA OpenAPI specification for Just in Time Port Call process
+    This API supports <b>JIT</b> v2.0 (Just in Time Port Calls). JIT is used for negotiating timestamps between vessel and port/terminal and other Port Call Service providers. To request a **Port Call Service** the
+
+        PUT /v2/port-call-services
+
+    endPoint is to be used.
+
+    It is the responsibility of the Provider of the initial **Port Call Service** to create a:
+    - `portCallID` to identify all communication regarding the **Port Call**
+    - `transportCallID` to identify each **Transport Call** inside the same `portCallID`. One **Port Call** can contain many **Transport Calls**.
+    - `portCallServiceID` to identify each **Port Call Service** inside the same `transportCallID`. One **Transport Call** can contain many **Port Call Services**
+
+    It is the responsibility of the creator of a **Timestamp** (Estimated, Requested, Planned or Actual) to create the `timestampID` as an identifier for the **Timestamp** for any further referral.
+
+    ### API Design & Implementation Principles
+    This API follows the guidelines defined in version 2.1 of the API Design & Implementation Principles which can be found on the [DCSA Developer page](https://developer.dcsa.org/api_design)
+
+    For a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/jit/v2#v200). Please also [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new) if you have any questions/comments.
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+  contact:
+    name: Digital Container Shipping Association (DCSA)
+    url: 'https://dcsa.org'
+    email: info@dcsa.org
+security: []
+tags:
+  - name: Port Call Service consumer
+    description: |
+      **Consumer** implemented endPoints (_including secondary receiver_)
+  - name: Port Call Service provider
+    description: |
+      **Provider** implemented endPoints (_including secondary receiver_)
+  - name: Port Call Service
+    description: |
+      **Provider** and **Consumer** implemented endPoints (_including secondary receiver_)
+paths:
+  '/v2/port-call-services/{portCallServiceID}':
+    put:
+      parameters:
+        - $ref: '#/components/parameters/portCallServiceIDPathParam'
+        - $ref: '#/components/parameters/Api-Version-Major'
+      tags:
+        - Port Call Service consumer
+      operationId: put-port-call-service
+      summary: Initiates or updates a Port Call Service
+      description: |
+        XXX
+      requestBody:
+        description: Start a new Port Call Service
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PortCallService'
+      responses:
+        '204':
+          description: |
+            A new Port Call Service accepted
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+        default:
+          description: |
+            Unexpected error
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    get:
+      parameters:
+        - $ref: '#/components/parameters/portCallServiceIDPathParam'
+        - $ref: '#/components/parameters/Api-Version-Major'
+      tags:
+        - Port Call Service
+      operationId: get-port-call-service
+      summary: Retrieves a Port Call Service
+      description: |
+        Retrieves a Port Call Service
+      responses:
+        '200':
+          description: |
+            Get the Port Call Service
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortCallService'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  '/v2/port-call-services/{portCallServiceID}/estimated-timestamp':
+    put:
+      parameters:
+        - $ref: '#/components/parameters/portCallServiceIDPathParam'
+        - $ref: '#/components/parameters/Api-Version-Major'
+      tags:
+        - Port Call Service consumer
+      operationId: estimated-timestamp
+      summary: Estimate a timestamp for a Port Call Service
+      description: |
+        XXX
+      requestBody:
+        description: Estimate a timestamp
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EstimatedTimestamp'
+      responses:
+        '204':
+          description: |
+            Estimated time for a **Port Call Service** accepted
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+        default:
+          description: |
+            Unexpected error
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  '/v2/port-call-services/{portCallServiceID}/planned-timestamp':
+    put:
+      parameters:
+        - $ref: '#/components/parameters/portCallServiceIDPathParam'
+        - $ref: '#/components/parameters/Api-Version-Major'
+      tags:
+        - Port Call Service consumer
+      operationId: planned-timestamp
+      summary: Plan a timestamp for a Port Call Service
+      description: |
+        XXX
+      requestBody:
+        description: Plan a timestamp
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlannedTimestamp'
+      responses:
+        '204':
+          description: |
+            Planned time for a **Port Call Service** accepted
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+        default:
+          description: |
+            Unexpected error
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  '/v2/port-call-services/{portCallServiceID}/actual-timestamp':
+    put:
+      parameters:
+        - $ref: '#/components/parameters/portCallServiceIDPathParam'
+        - $ref: '#/components/parameters/Api-Version-Major'
+      tags:
+        - Port Call Service consumer
+      operationId: actual-timestamp
+      summary: Actual timestamp for a Port Call Service
+      description: |
+        XXX
+      requestBody:
+        description: Actual timestamp
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActualTimestamp'
+      responses:
+        '204':
+          description: |
+            Actual time for a **Port Call Service** accepted
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+        default:
+          description: |
+            Unexpected error
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  '/v2/port-call-services/{portCallServiceID}/cancel':
+    post:
+      parameters:
+        - $ref: '#/components/parameters/portCallServiceIDPathParam'
+        - $ref: '#/components/parameters/Api-Version-Major'
+      tags:
+        - Port Call Service consumer
+      operationId: cancel-port-call-service
+      summary: Cancel a Port Call Service
+      description: |
+        Provider canceling a **Port Call Service**.
+      requestBody:
+        description: Cancels a **Port Call Service**
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Cancel'
+      responses:
+        '204':
+          description: |
+            **Port Call Service** successfully cancelled
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  '/v2/port-calls/{portCallID}/omit':
+    post:
+      parameters:
+        - $ref: '#/components/parameters/portCallIDPathParam'
+        - $ref: '#/components/parameters/Api-Version-Major'
+      tags:
+        - Port Call Service consumer
+      operationId: omit-port-call
+      summary: Omits a Port Call
+      description: |
+        Carrier `OMITTING` a **Port Call**
+      requestBody:
+        description: |
+          Omits a **Port Call**
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Omit'
+      responses:
+        '204':
+          description: |
+            **Port Call** successfully marked as omitted.
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+        default:
+          description: |
+            Unexpected error
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  '/v2/port-call-services/{portCallServiceID}/requested-timestamp':
+    put:
+      parameters:
+        - $ref: '#/components/parameters/portCallServiceIDPathParam'
+        - $ref: '#/components/parameters/Api-Version-Major'
+      tags:
+        - Port Call Service provider
+      operationId: requested-timestamp
+      summary: Requested timestamp for a Port Call Service
+      description: |
+        XXX
+      requestBody:
+        description: Request a timestamp
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestedTimestamp'
+      responses:
+        '204':
+          description: |
+            Requested time for a **Port Call Service** accepted
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+        default:
+          description: |
+            Unexpected error
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  '/v2/port-call-services/{portCallServiceID}/decline':
+    post:
+      parameters:
+        - $ref: '#/components/parameters/portCallServiceIDPathParam'
+        - $ref: '#/components/parameters/Api-Version-Major'
+      tags:
+        - Port Call Service provider
+      operationId: decline-port-call-service
+      summary: Decline a Port Call service
+      description: |
+        Consumer declining a **Port Call Service**.
+      requestBody:
+        description: Consumer declining a **Port Call service**
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Decline'
+      responses:
+        '204':
+          description: |
+            **Port Call Service** successfully declined
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+        default:
+          description: Unexpected error
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  headers:
+    API-Version:
+      schema:
+        type: string
+        example: 2.0.0
+      description: |
+        SemVer used to indicate the version of the contract (API version) returned.
+  parameters:
+    Api-Version-Major:
+      in: header
+      name: API-Version
+      required: false
+      schema:
+        type: string
+        example: '2'
+      description: |
+        An API-Version header **MAY** be added to the request (optional); if added it **MUST** only contain **MAJOR** version. API-Version header **MUST** be aligned with the URI version.
+
+    #############
+    # Path params
+    #############
+    portCallServiceIDPathParam:
+      in: path
+      name: portCallServiceID
+      description: |
+        The provider created identifier for the **Port Call Service**
+      schema:
+        type: string
+        format: uuid
+        example: 0342254a-5927-4856-b9c9-aa12e7c00563
+      required: true
+    portCallIDPathParam:
+      in: path
+      name: portCallID
+      description: |
+        The provider created identifier for the **Port Call**
+      schema:
+        type: string
+        format: uuid
+        example: 0342254a-5927-4856-b9c9-aa12e7c00563
+      required: true
+  schemas:
+
+    ###################
+    # Port Call Service
+    ###################
+    PortCallService:
+      type: object
+      title: Port Call Service
+      description: |
+        The **Port Call Service** contains all information about the **Port Call**, the **Transport Call** within the **Port Call**, the **Vessel** information along with `vesselPosition`, `milesToDestinationPort` and `draft`. Finally it also contains the actual **Port Call Service** specification.
+      properties:
+        portCall:
+          $ref: '#/components/schemas/PortCall'
+        transportCall:
+          $ref: '#/components/schemas/TransportCall'
+        vessel:
+          $ref: '#/components/schemas/Vessel'
+        specification:
+          $ref: '#/components/schemas/Specification'
+      required:
+        - portCall
+        - transportCall
+        - vessel
+        - specification
+
+    ###########
+    # Port Call
+    ###########
+    PortCall:
+      type: object
+      title: Port Call
+      description: |
+        **Port Call** information. The `portCallID` uniquely identifies the **Port Call**. Any subsequent **Port Call Services** linked to the same **Port Call** MUST use the same `portCallID`. An optional `portVisitReference` can be added in order to link the **Port Call** to external systems.
+      properties:
+        portCallID:
+          type: string
+          format: uuid
+          description: |
+            Universal unique identifier for the **Port call**. The `portCallID` is created by the provider. The `portCallID` **MUST** only be created once per **Port Call** - which is the first time a **Port Call Service** is also created. To be used in all communication regarding the **Port Call**.
+          example: 0342254a-5927-4856-b9c9-aa12e7c00563
+        portVisitReference:
+          type: string
+          maxLength: 50
+          description: |
+            The unique reference that can be used to link different **Transport Calls** to the same port visit. The reference is provided by the port to uniquely identify a **Port Call**.
+          example: NLAMS1234589
+        carrierServiceName:
+          type: string
+          maxLength: 50
+          pattern: '^\S(?:.*\S)?$'
+          description: |
+            The carrier name of the (Vessel-)service.
+          example: Great Lion Service
+        carrierServiceCode:
+          type: string
+          maxLength: 11
+          pattern: '^\S(?:.*\S)?$'
+          description: |
+            The carrier-specific code of the (Vessel-)service for which the schedule details are published.
+          example: FE1
+        universalServiceReference:
+          type: string
+          pattern: '^SR\d{5}[A-Z]$'
+          minLength: 8
+          maxLength: 8
+          description: |
+            A global unique (Vessel-)service reference, as per DCSA standard, agreed by VSA partners for the (Vessel-)service. The (Vessel-)service reference must match the regular expression pattern: `SR\d{5}[A-Z]`. The letters `SR` followed by `5 digits`, followed by a checksum-character as a capital letter from `A to Z`.
+          example: SR12345A
+        omitted:
+          type: boolean
+          readOnly: true
+          description: |
+            xxx
+          example: false
+      required:
+        - portCallID
+        - carrierServiceName
+        - carrierServiceCode
+
+    ########################
+    # Transport Call Service
+    ########################
+    TransportCall:
+      type: object
+      title: Transport Call
+      description: |
+        **Transport Call** information. The `transportCallID` uniquely identifies the **Transport Call**. Any subsequent **Port Call Services** linked to the same **Transport Call** MUST use the same `transportCallID`. An optional `transportCallReference` can be added in order to link the **Transport Call** to external systems (e.g OVS).
+      properties:
+        transportCallID:
+          type: string
+          format: uuid
+          description: |
+            Universal unique identifier for the **Transport Call**. The `transportCallID` is created by the provider. The `transportCallID` **MUST** only be created once per **Transport Call** - which is the first time a **Port Call Service** is also created. To be used in all communication regarding the **Transport Call**.
+          example: 0342254a-5927-4856-b9c9-aa12e7c00563
+        transportCallReference:
+          type: string
+          description: |
+            The unique reference for a **Transport Call**. It’s the vessel operator’s responsibility to provide the **Transport Call Reference**, other parties are obliged to pick it up and use it. It can take the form of **Port Call References** as defined in OVS Definitions Document, or alternatively a reference as defined by the vessel operator.
+          maxLength: 100
+          example: SR11111X-9321483-2107W-NLAMS-ACT-1-1
+        transportCallSequenceNumber:
+          type: integer
+          format: int32
+          description: |
+            Transport operator's key that uniquely identifies each individual call. This key is essential to distinguish between two separate calls at the same location within one voyage.
+          example: 2
+        carrierImportVoyageNumber:
+          type: string
+          maxLength: 50
+          pattern: '^\S(?:.*\S)?$'
+          description: |
+            The identifier of an import voyage. The carrier-specific identifier of the import Voyage.
+          example: 2103N
+        carrierExportVoyageNumber:
+          type: string
+          maxLength: 50
+          pattern: '^\S(?:.*\S)?$'
+          description: |
+            The identifier of an export voyage. The carrier-specific identifier of the export Voyage.
+          example: 2103S
+        universalImportVoyageReference:
+          type: string
+          pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
+          minLength: 5
+          maxLength: 5
+          description: |
+            A global unique voyage reference for the import Voyage, as per DCSA standard, agreed by VSA partners for the voyage. The voyage reference must match the regular expression pattern: `\d{2}[0-9A-Z]{2}[NEWSR]`
+
+            - `2 digits` for the year
+            - `2 alphanumeric characters` for the sequence number of the voyage
+            - `1 character` for the direction/haul (`N`orth, `E`ast, `W`est, `S`outh or `R`oundtrip).
+          example: 2103N
+        universalExportVoyageReference:
+          type: string
+          pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
+          minLength: 5
+          maxLength: 5
+          description: |
+            A global unique voyage reference for the export Voyage, as per DCSA standard, agreed by VSA partners for the voyage. The voyage reference must match the regular expression pattern: `\d{2}[0-9A-Z]{2}[NEWSR]`
+
+            - `2 digits` for the year
+            - `2 alphanumeric characters` for the sequence number of the voyage
+            - `1 character` for the direction/haul (`N`orth, `E`ast, `W`est, `S`outh or `R`oundtrip).
+          example: 2103N
+      required:
+        - transportCallID
+
+    ########
+    # Vessel
+    ########
+    Vessel:
+      type: object
+      title: Vessel
+      description: |
+        A floating, sea going structure (mother vessels and feeder vessels) with either an internal or external mode of propulsion designed for the transport of cargo and/or passengers. Ocean vessels are uniquely identified by an IMO number consisting of 7 digits.
+      properties:
+        vesselIMONumber:
+          type: string
+          pattern: '^\d{7,8}$'
+          minLength: 7
+          maxLength: 8
+          description: |
+            The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd's register code, which does not change during the lifetime of the vessel
+
+            **Condition:** One of `vesselIMONumber` or `MMSINumber` **MUST** be specified in order to identify the `Vessel`
+          example: '9321483'
+        MMSINumber:
+          type: string
+          description: |
+            Maritime Mobile Service Identities (MMSIs) are nine-digit numbers used by maritime digital selective calling (DSC), automatic identification systems (AIS) and certain other equipment to uniquely identify a ship or a coast radio station.
+
+            **Condition:** One of `vesselIMONumber` or `MMSINumber` **MUST** be specified in order to identify the `Vessel`
+          pattern: '^\d{9}$'
+          minLength: 9
+          maxLength: 9
+          example: '278111222'
+        name:
+          type: string
+          pattern: '^\S(?:.*\S)?$'
+          maxLength: 50
+          description: |
+            The name of the Vessel given by the Vessel Operator and registered with IMO.
+          example: King of the Seas
+        lengthOverall:
+          type: number
+          format: float
+          description: |
+            The maximum length of a ship's hull measured parallel to the waterline (Length OverAll).
+
+            If the length is specified in feet (`FOT`) then the decimal part should be considered as a fraction of a foot and **not** as a number of inches. E.g. 120.5 feet means 120 and a half foot (which would be 120'6")
+          example: 245.45
+        width:
+          type: number
+          format: float
+          description: |
+            Overall width of the ship measured at the widest point of the nominal waterline.
+
+            If the width is specified in feet (`FOT`) then the decimal part should be considered as a fraction of a foot and **not** as a number of inches. E.g. 120.5 feet means 120 and a half foot (which would be 120'6")
+          example: 37.33
+        callSign:
+          type: string
+          maxLength: 10
+          pattern: '^\S(?:.*\S)?$'
+          description: |
+            A unique alphanumeric identity that belongs to the vessel and is assigned by the International Telecommunication Union (ITU). It consists of a three letter alphanumeric prefix that indicates nationality, followed by one to four characters to identify the individual vessel. For instance, vessels registered under Denmark are assigned the prefix ranges 5PA-5QZ, OUAOZZ, and XPA-XPZ. The Call Sign changes whenever a vessel changes its flag.
+          example: NCVV
+        type:
+          type: string
+          description: |
+            Categorization of ocean-going vessels distinguished by the main cargo the vessel carries. Possible values:
+            - `GCGO` (General cargo)
+            - `CONT` (Container)
+            - `RORO` (RoRo)
+            - `CARC` (Car carrier)
+            - `PASS` (Passenger)
+            - `FERY` (Ferry)
+            - `BULK` (Bulk)
+            - `TANK` (Tanker)
+            - `LGTK` (Liquefied gas tanker)
+            - `ASSI` (Assistance)
+            - `PILO` (Pilot boat)
+          enum:
+            - GCGO
+            - CONT
+            - RORO
+            - CARC
+            - PASS
+            - FERY
+            - BULK
+            - TANK
+            - LGTK
+            - ASSI
+            - PILO
+          example: CONT
+        draft:
+          type: number
+          format: float
+          description: |
+            The actual draft of the vessel.
+
+            If the draft is specified in feet (`FOT`) then the decimal part should be considered as a fraction of a foot and **not** as a number of inches. E.g. 120.5 feet means 120 and a half foot (which would be 120'6")
+          example: 12.5
+        dimensionUnit:
+          type: string
+          description: |
+            The unit of measure which can be expressed in
+            - `MTR` (Meter)
+            - `FOT` (Foot)
+          enum:
+            - MTR
+            - FOT
+          example: MTR
+        vesselPosition:
+          $ref: '#/components/schemas/VesselPosition'
+        milesToDestinationPort:
+          type: number
+          format: float
+          description: |
+            Remaining distance reported by the vessel to the next destination port in nautical miles
+          example: 245.45
+
+    ###############
+    # Specification
+    ###############
+    Specification:
+      title: Specification
+      type: object
+      description: |
+        Specification for the **Port Call Service**. The `portCallServiceID` uniquely identifies the **Port Call Service**. Any subsequent  **Timestamps** linked to the same **Port Call Service** MUST use the same `portCallServiceID`.
+
+        The `portCallServiceType` defines what **Port Call Service** is created. `portCallServiceEventTypeCode`, `portCallPhaseTypeCode` and `facilityTypeCode` can further specify the **Port Call Service**.
+      properties:
+        portCallServiceID:
+          type: string
+          format: uuid
+          description: |
+            Universal unique identifier for the **Port Call Service**. The `portCallServiceID` is created by the provider. To be used in all communication regarding the **Port Call Service**.
+          example: 0342254a-5927-4856-b9c9-aa12e7c00563
+        # publisherRole:
+        #   type: string
+        #   description: |
+        #     The role of the publisher. The values are divided into 4 categories:
+
+        #     Carrier:
+        #     - `CA` (Carrier)
+        #     - `AG` (Carrier local agent)
+        #     - `VSL` (Vessel)
+
+        #     Port
+        #     - `ATH` (Port Authorities)
+        #     - `PLT` (Port Pilot)
+        #     - `TWG` (Towage service provider)
+        #     - `MOR` (Mooring service provider)
+
+        #     Terminal
+        #     - `TR` (Terminal)
+
+        #     Port Call Service Provider
+        #     - `LSH` (Lashing service provider)
+        #     - `BUK` (Bunker service provider)
+        #     - `SLU` (Sludge service provider)
+        #     - `SVP` (Any other service provider)
+        #   enum:
+        #     - CA
+        #     - AG
+        #     - VSL
+        #     - ATH
+        #     - PLT
+        #     - TWG
+        #     - MOR
+        #     - TR
+        #     - LSH
+        #     - BUK
+        #     - SLU
+        #     - SVP
+        #   example: CA
+        portCallServiceType:
+          type: string
+          maxLength: 50
+          pattern: '^\S(?:.*\S)?$'
+          description: |
+            The type of the **Port Call Service**.
+
+            **Port Call Services** negotiable through an `ERP`-cycle including an `A`, can be one of:
+            - `BERTH` (Berth)
+            - `CARGO_OPERATIONS` (Cargo operations)
+            - `PILOTAGE` (Pilotage)
+            - `TOWAGE` (Towage)
+            - `MOORING` (Mooring)
+            - `BUNKERING` (Bunkering)
+            - `PILOT_BOARDING_PLACE` (Pilot Boarding Place)
+            - `ANCHORAGE` (Anchorage)
+            - `SLUDGE`(Sludge)
+
+            **Port Call Services** without `ERP`-cycle having only an `A`, can be one of:
+
+            - `SEA_PASSAGE` (Sea Passage)
+            - `ALL_FAST` (All Fast)
+            - `GANGWAY_DOWN_AND_SECURE` (Gangway down and secure)
+            - `VESSEL_READY` (Vessel Ready)
+            - `DISCHARGE_CARGO_OPERATIONS` (Discharge cargo operations)
+            - `LOADING_CARGO_OPERATIONS` (Loading cargo operations)
+            - `LASHING` (Lashing)
+            - `SAFETY` (Safety)
+            - `ANCHORAGE_OPERATIONS` (Anchorage Operations)
+            - `SHORE_POWER` (ShorePower)
+
+            **Port Call Service** without an `ERP` and without an `A`, can be one of:
+            - `MOVES` (Moves)
+          example: BERTH
+        portCallServiceEventTypeCode:
+          type: string
+          description: |
+            The code to identify the type of event that is related to the **Port Call Service**
+            - `STRT` (Started)
+            - `CMPL` (Completed)
+            - `ARRI` (Arrived)
+            - `DEPA` (Departed)
+          enum:
+            - STRT
+            - CMPL
+            - ARRI
+            - DEPA
+          example: STRT
+        portCallPhaseTypeCode:
+          type: string
+          description: |
+            The general direction of the `Vessel` for which information applies
+            - `INBD` (Inbound)
+            - `ALGS` (Alongside)
+            - `SHIF` (Shifting)
+            - `OUTB` (Outbound)
+          enum:
+            - INBD
+            - ALGS
+            - SHIF
+            - OUTB
+          example: ALGS
+        facilityTypeCode:
+          type: string
+          maxLength: 4
+          description: |
+            A specialized version of the facilityCode to be used in the **Port Call Service**. The code to identify the specific type of facility.
+            - `PBPL` (Pilot boarding place)
+            - `BRTH` (Berth)
+            - `ANCH` (Anchorage Location)
+          enum:
+            - PBPL
+            - BRTH
+            - ANCH
+          example: BRTH
+        portCallServiceLocation:
+          $ref: '#/components/schemas/PortCallServiceLocation'
+        moves:
+          type: object
+          description: |
+            Container moves to be made (in some cases estimated).
+
+            **Condition:** Can only be provided if `portCallServiceType` is `MOVES`
+          allOf:
+            - $ref: '#/components/schemas/AllMoves'
+        timestamps:
+          $ref: '#/components/schemas/Timestamps'
+        cancelled:
+          type: boolean
+          readOnly: true
+          description: |
+            The **Port Call Service** has been `cancelled` by the Provider.
+          example: false
+        declined:
+          type: boolean
+          readOnly: true
+          description: |
+            The **Port Call Service** has been `declined` by the Consumer.
+          example: false
+      required:
+        - portCallServiceID
+        # - publisherRole
+        - portCallServiceType
+        - portCallServiceEventTypeCode
+        - portCallServiceLocation
+
+    #################
+    # Vessel position
+    #################
+    VesselPosition:
+      type: object
+      title: Vessel Position
+      description: |
+        The location can be specified using **any** of the nested structures:
+        - `UNLocationCode`
+        - `facility` (used to specify a location using a `facilityCode` and a `facilityCodeListProvider`)
+        - `geoCoordinate` (used to specify a location using `latitude` and `longitude`)
+
+        **Condition:** It is expected that if a location is specified in multiple ways (e.g. both as a `Facility` and as a `GeoCoordinate`) that both ways point to the same location.
+      example:
+        locationName: CMP Container Terminal Copenhagen
+        UNLocationCode: DKCPH
+        facility:
+          facilityCode: CMPDK
+          facilityCodeListProvider: SMDG
+      properties:
+        locationName:
+          type: string
+          description: The name of the location.
+          pattern: '^\S(?:.*\S)?$'
+          example: Port of Amsterdam
+          maxLength: 100
+        facility:
+          $ref: '#/components/schemas/Facility'
+        UNLocationCode:
+          type: string
+          pattern: '^[A-Z]{2}[A-Z2-9]{3}$'
+          minLength: 5
+          maxLength: 5
+          description: |
+            The UN Location code specifying where the place is located. The pattern used must be
+
+            - 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+            - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used
+
+            More info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)
+          example: NLAMS
+        geoCoordinate:
+          $ref: '#/components/schemas/GeoCoordinate'
+
+    ############################
+    # Port Call Service Location
+    ############################
+    PortCallServiceLocation:
+      type: object
+      title: Port Call Service Location
+      description: |
+        The location can be specified using **any** of the nested structures:
+        - `UNLocationCode`
+        - `facility` (used to specify a location using a `facilityCode` and a `facilityCodeListProvider`)
+        - `geoCoordinate` (used to specify a location using `latitude` and `longitude`)
+
+        **Condition:** It is expected that if a location is specified in multiple ways (e.g. both as a `Facility` and as a `GeoCoordinate`) that both ways point to the same location.
+      example:
+        locationName: CMP Container Terminal Copenhagen
+        UNLocationCode: DKCPH
+        facility:
+          facilityCode: CMPDK
+          facilityCodeListProvider: SMDG
+      properties:
+        locationName:
+          type: string
+          description: The name of the location.
+          pattern: '^\S(?:.*\S)?$'
+          example: Port of Amsterdam
+          maxLength: 100
+        facility:
+          $ref: '#/components/schemas/Facility'
+        UNLocationCode:
+          type: string
+          pattern: '^[A-Z]{2}[A-Z2-9]{3}$'
+          minLength: 5
+          maxLength: 5
+          description: |
+            The UN Location code specifying where the place is located. The pattern used must be
+
+            - 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+            - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used
+
+            More info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)
+          example: NLAMS
+        geoCoordinate:
+          $ref: '#/components/schemas/GeoCoordinate'
+
+    ###################
+    # Facility Location
+    ###################
+    Facility:
+      title: Facility
+      type: object
+      description: |
+        An object used to express a location using a `Facility`. The facility can be expressed using one of `BIC` code or `SMDG` code. The `facilityCode` does not contain the `UNLocationCode` - this should be provided in the `UnLocationCode` attribute.
+      properties:
+        facilityCode:
+          type: string
+          pattern: '^\S(?:.*\S)?$'
+          maxLength: 6
+          description: |
+            The code used for identifying the specific facility. This code does not include the UN Location Code.
+
+            The definition of the code depends on the `facilityCodeListProvider`. As code list providers maintain multiple codeLists the following codeList is used:
+
+            - `SMDG` (the codeList used is the [SMDG Terminal Code List](https://smdg.org/documents/smdg-code-lists/))
+            - `BIC` (the codeList used is the [BIC Facility Codes](https://www.bic-code.org/facility-codes/))
+          example: ADT
+        facilityCodeListProvider:
+          type: string
+          description: |
+            The provider used for identifying the facility Code. Some facility codes are only defined in combination with an `UN Location Code`
+            - `BIC` (Requires a UN Location Code)
+            - `SMDG` (Requires a UN Location Code)
+          enum:
+            - BIC
+            - SMDG
+          example: SMDG
+        subFacility:
+          type: string
+          maxLength: 100
+          pattern: '^\S(?:.*\S)?$'
+          description: |
+            The position along the line of a berth, specified by one point (e.g. bollard, manifold, ramp number), allowing the ship to berth in the correct position along the berth.
+          example: Bollard 20
+      required:
+        - facilityCode
+        - facilityCodeListProvider
+
+    #########################
+    # Geo Coordinate Location
+    #########################
+    GeoCoordinate:
+      type: object
+      title: Geo Coordinate
+      description: |
+        An object used to express a location using `latitude` and `longitude`.
+      properties:
+        latitude:
+          type: string
+          description: Geographic coordinate that specifies the north–south position of a point on the Earth's surface.
+          maxLength: 10
+          example: '48.8585500'
+        longitude:
+          type: string
+          description: Geographic coordinate that specifies the east–west position of a point on the Earth's surface.
+          maxLength: 11
+          example: '2.294492036'
+      required:
+        - latitude
+        - longitude
+
+    #####################
+    # Estimated timestamp
+    #####################
+    EstimatedTimestamp:
+      title: Estimated Timestamp
+      type: object
+      description: |
+        Estimated date and time when a **Port Call Service** should be provided.
+      properties:
+        timestampID:
+          type: string
+          format: uuid
+          description: |
+            Universally unique identifier for the **Timestamp**. The creator of the **Timestamp** is responsible to create the `timestampID`
+          example: 0342254a-5927-4856-b9c9-aa12e7c00563
+        replyToTimestampID:
+          type: string
+          format: uuid
+          description: |
+            The identifier of the **Timestamp** being replied to.
+          example: 0342254a-5927-4856-b9c9-aa12e7c00563
+        portCallServiceID:
+          type: string
+          format: uuid
+          description: |
+            Links the timestamp to a **Port Call Service**.
+          example: 0342254a-5927-4856-b9c9-aa12e7c00563
+        portCallServiceDateTime:
+          type: string
+          format: date-time
+          description: |
+            The local date and time, when the **Port Call Service** should be provided, in [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format.
+          example: '2019-11-12T07:41:00+08:30'
+        delayReasonCode:
+          type: string
+          maxLength: 3
+          description: |
+            Reason code for the delay. See SMDG [Code list DELAY](https://smdg.org/documents/smdg-code-lists/delay-reason-and-port-call-activity/) for a list of valid codes to be used for this attribute.
+          example: STR
+        remark:
+          type: string
+          maxLength: 500
+          description: |
+            Free text to provide additional information on the context.
+          example: Port closed due to strike
+      required:
+        - timestampID
+        - portCallServiceID
+        - portCallServiceDateTime
+
+    ###################
+    # Planned timestamp
+    ###################
+    PlannedTimestamp:
+      title: Planned Timestamp
+      type: object
+      description: |
+        Planned date and time when a **Port Call Service** will be provided.
+      properties:
+        timestampID:
+          type: string
+          format: uuid
+          description: |
+            Universally unique identifier for the **Timestamp**. The creator of the **Timestamp** is responsible to create the `timestampID`
+          example: 0342254a-5927-4856-b9c9-aa12e7c00563
+        replyToTimestampID:
+          type: string
+          format: uuid
+          description: |
+            The identifier of the **Timestamp** being replied to.
+          example: 0342254a-5927-4856-b9c9-aa12e7c00563
+        portCallServiceID:
+          type: string
+          format: uuid
+          description: |
+            Links the timestamp to a **Port Call Service**.
+          example: 0342254a-5927-4856-b9c9-aa12e7c00563
+        portCallServiceDateTime:
+          type: string
+          format: date-time
+          description: |
+            The local date and time, when the **Port Call Service** will be provided, in [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format.
+          example: '2019-11-12T07:41:00+08:30'
+        delayReasonCode:
+          type: string
+          maxLength: 3
+          description: |
+            Reason code for the delay. See SMDG [Code list DELAY](https://smdg.org/documents/smdg-code-lists/delay-reason-and-port-call-activity/) for a list of valid codes to be used for this attribute.
+          example: STR
+        remark:
+          type: string
+          maxLength: 500
+          description: |
+            Free text to provide additional information on the context.
+          example: Port closed due to strike
+      required:
+        - timestampID
+        - portCallServiceID
+        - portCallServiceDateTime
+
+    #####################
+    # Requested timestamp
+    #####################
+    RequestedTimestamp:
+      title: Requested Timestamp
+      type: object
+      description: |
+        Requested date and time when a **Port Call Service** should be provided.
+      properties:
+        timestampID:
+          type: string
+          format: uuid
+          description: |
+            Universally unique identifier for the **Timestamp**. The creator of the **Timestamp** is responsible to create the `timestampID`
+          example: 0342254a-5927-4856-b9c9-aa12e7c00563
+        replyToTimestampID:
+          type: string
+          format: uuid
+          description: |
+            The identifier of the **Timestamp** being replied to.
+          example: 0342254a-5927-4856-b9c9-aa12e7c00563
+        portCallServiceID:
+          type: string
+          format: uuid
+          description: |
+            Links the timestamp to a **Port Call Service**.
+          example: 0342254a-5927-4856-b9c9-aa12e7c00563
+        portCallServiceDateTime:
+          type: string
+          format: date-time
+          description: |
+            The local date and time, when the **Port Call Service** should be provided, in [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format.
+          example: '2019-11-12T07:41:00+08:30'
+        delayReasonCode:
+          type: string
+          maxLength: 3
+          description: |
+            Reason code for the delay. See SMDG [Code list DELAY](https://smdg.org/documents/smdg-code-lists/delay-reason-and-port-call-activity/) for a list of valid codes to be used for this attribute.
+          example: STR
+        remark:
+          type: string
+          maxLength: 500
+          description: |
+            Free text to provide additional information on the context.
+          example: Port closed due to strike
+      required:
+        - timestampID
+        - portCallServiceID
+        - portCallServiceDateTime
+
+    ##################
+    # Actual timestamp
+    ##################
+    ActualTimestamp:
+      title: Actual Timestamp
+      type: object
+      description: |
+        Actual date and time when a **Port Call Service** took place.
+      properties:
+        timestampID:
+          type: string
+          format: uuid
+          description: |
+            Universally unique identifier for the **Timestamp**. The creator of the **Timestamp** is responsible to create the `timestampID`
+          example: 0342254a-5927-4856-b9c9-aa12e7c00563
+        replyToTimestampID:
+          type: string
+          format: uuid
+          description: |
+            The identifier of the **Timestamp** being replied to.
+          example: 0342254a-5927-4856-b9c9-aa12e7c00563
+        portCallServiceID:
+          type: string
+          format: uuid
+          description: |
+            Links the timestamp to a **Port Call Service**.
+          example: 0342254a-5927-4856-b9c9-aa12e7c00563
+        portCallServiceDateTime:
+          type: string
+          format: date-time
+          description: |
+            The local date and time, when the **Port Call Service** took place, in [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format.
+          example: '2019-11-12T07:41:00+08:30'
+        delayReasonCode:
+          type: string
+          maxLength: 3
+          description: |
+            Reason code for the delay. See SMDG [Code list DELAY](https://smdg.org/documents/smdg-code-lists/delay-reason-and-port-call-activity/) for a list of valid codes to be used for this attribute.
+          example: STR
+        remark:
+          type: string
+          maxLength: 500
+          description: |
+            Free text to provide additional information on the context.
+          example: Port closed due to strike
+      required:
+        - timestampID
+        - portCallServiceID
+        - portCallServiceDateTime
+
+    ########
+    # Cancel
+    ########
+    Cancel:
+      type: object
+      title: Cancel
+      description: |
+        xx
+      properties:
+        cancel:
+          type: boolean
+          description: |
+            Provider to `CANCEL` a **Port Call Service**
+          example: true
+        reason:
+          type: string
+          maxLength: 500
+          description: |
+            Free text to provide additional information on the context.
+          example: Storms ahead
+      required:
+        - cancel
+
+    #########
+    # Decline
+    #########
+    Decline:
+      type: object
+      title: Decline
+      description: |
+        xx
+      properties:
+        decline:
+          type: boolean
+          description: |
+            Consumer to `DECLINE` a **Port Call Service**
+          example: true
+        reason:
+          type: string
+          maxLength: 500
+          description: |
+            Free text to provide additional information on the context.
+          example: Crane broken
+      required:
+        - decline
+
+    ######
+    # Omit
+    ######
+    Omit:
+      type: object
+      title: Omit
+      description: |
+        xx
+      properties:
+        omit:
+          type: boolean
+          description: |
+            Carrier to `OMIT` a **Port Call**
+          example: true
+        reason:
+          type: string
+          maxLength: 500
+          description: |
+            Free text to provide additional information on the context.
+          example: Engine failure
+      required:
+        - omit
+
+    ############
+    # Timestamps
+    ############
+    Timestamps:
+      type: object
+      title: Timestamps
+      readOnly: true
+      description: |
+        Latest timestamps for Estimated (`EST`), Requested (`REQ`), Planned (`PLN`) and Actual (`ACT`).
+      properties:
+        estimatedDateTime:
+          type: string
+          format: date-time
+          description: |
+            The local date and time, when the **Port Call Service** should be provided, in [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format.
+          example: '2019-11-12T07:41:00+08:30'
+        requestedDateTime:
+          type: string
+          format: date-time
+          description: |
+            The local date and time, when the **Port Call Service** should be provided, in [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format.
+          example: '2019-11-12T07:41:00+08:30'
+        plannedDateTime:
+          type: string
+          format: date-time
+          description: |
+            The local date and time, when the **Port Call Service** will be provided, in [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format.
+          example: '2019-11-12T07:41:00+08:30'
+        actualDateTime:
+          type: string
+          format: date-time
+          description: |
+            The local date and time, when the **Port Call Service** took place, in [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format.
+          example: '2019-11-12T07:41:00+08:30'
+
+    ###########
+    # All Moves
+    ###########
+    AllMoves:
+      type: object
+      description: |
+        XX
+      properties:
+        restowMoves:
+          type: number
+          description: |
+            xx
+          example: 20
+        bbkPieces:
+          type: number
+          description: |
+            xx
+          example: 3
+      oneOf:
+        - type: object
+          title: Total Moves (Dry + Reefer + OOG)
+          description: |
+            ..
+          properties:
+            totalMoves:
+              description: |
+                Total moves...
+              example: 155
+          required:
+            - totalMoves
+        - type: object
+          title: Specific moves (for load and discharge)
+          properties:
+            loadMoves:
+              type: object
+              description: |
+                xx
+              allOf:
+                - $ref: '#/components/schemas/Moves'
+            dischargeMoves:
+              type: object
+              description: |
+                xx
+              allOf:
+                - $ref: '#/components/schemas/Moves'
+    Moves:
+      type: object
+      description: |
+        XX
+      properties:
+        ladenContainers:
+          type: object
+          description: |
+            Laden containers...
+          allOf:
+            - $ref: '#/components/schemas/ContainerMoves'
+        emptyContainers:
+          type: object
+          description: |
+            Empty containers...
+          allOf:
+            - $ref: '#/components/schemas/ContainerMoves'
+        reeferPlugged:
+          type: object
+          description: |
+            Plugged reefer containers...
+          allOf:
+            - $ref: '#/components/schemas/ContainerMoves'
+        oogUnits:
+          type: number
+          description: |
+            xx
+          example: 2
+    ContainerMoves:
+      type: object
+      description: |
+        xx
+      oneOf:
+        - type: object
+          title: Total Moves
+          description: |
+            ..
+          properties:
+            totalMoves:
+              description: |
+                Total moves...
+              example: 55
+          required:
+            - totalMoves
+        - type: object
+          title: Container Moves
+          description: |
+            ..
+          properties:
+            _20_units:
+              type: number
+              description: |
+                xx
+              example: 25
+            _40_units:
+              type: number
+              description: |
+                xx
+              example: 30
+          required:
+            - _20_units
+            - _40_units
+
+    ################
+    # Error Response
+    ################
+    ErrorResponse:
+      title: Error Response
+      type: object
+      description: Unexpected error
+      properties:
+        httpMethod:
+          description: |
+            The HTTP method used to make the request e.g. `GET`, `POST`, etc
+          type: string
+          example: POST
+          enum:
+            - GET
+            - HEAD
+            - POST
+            - PUT
+            - DELETE
+            - OPTION
+            - PATCH
+        requestUri:
+          description: |
+            The URI that was requested.
+          type: string
+          example: /v2/port-call-services/0342254a-5927-4856-b9c9-aa12e7c00563
+        statusCode:
+          description: |
+            The HTTP status code returned.
+          type: integer
+          format: int32
+          example: 400
+        statusCodeText:
+          description: |
+            A standard short description corresponding to the HTTP status code.
+          type: string
+          maxLength: 50
+          example: Bad Request
+        statusCodeMessage:
+          description: |
+            A long description corresponding to the HTTP status code with additional information.
+          type: string
+          maxLength: 200
+          example: The supplied data could not be accepted
+        providerCorrelationReference:
+          description: |
+            A unique identifier to the HTTP request within the scope of the API provider.
+          type: string
+          maxLength: 100
+          example: 4426d965-0dd8-4005-8c63-dc68b01c4962
+        errorDateTime:
+          description: |
+            The DateTime corresponding to the error occurring. Must be formatted using [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format.
+          type: string
+          format: date-time
+          example: '2024-09-04T09:41:00Z'
+        errors:
+          type: array
+          description: |
+            An array of errors providing more detail about the root cause.
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/DetailedError'
+      required:
+        - httpMethod
+        - requestUri
+        - statusCode
+        - statusCodeText
+        - errorDateTime
+        - errors
+    DetailedError:
+      type: object
+      title: Detailed Error
+      description: |
+        A detailed description of what has caused the error.
+      properties:
+        errorCode:
+          type: integer
+          format: int32
+          description: |
+            The detailed error code returned.
+
+              - `7000-7999` Technical error codes
+              - `8000-8999` Functional error codes
+              - `9000-9999` API provider-specific error codes            
+
+            [Error codes as specified by DCSA](https://developer.dcsa.org/standard-error-codes).
+          minimum: 7000
+          maximum: 9999
+          example: 7003
+        property:
+          type: string
+          maxLength: 100
+          description: |
+            The name of the property causing the error.
+          example: facilityCode
+        value:
+          type: string
+          maxLength: 500
+          description: |
+            The value of the property causing the error serialised as a string exactly as in the original request.
+          example: SG SIN WHS
+        jsonPath:
+          type: string
+          maxLength: 500
+          description: |
+            A path to the property causing the error, formatted according to [JSONpath](https://github.com/json-path/JsonPath).
+          example: $.location.facilityCode
+        errorCodeText:
+          description: |
+            A standard short description corresponding to the `errorCode`.
+          type: string
+          maxLength: 100
+          example: invalidData
+        errorCodeMessage:
+          type: string
+          maxLength: 5000
+          description: |
+            A long description corresponding to the `errorCode` with additional information.
+          example: Spaces not allowed in facility code
+      required:
+        - errorCodeText
+        - errorCodeMessage
