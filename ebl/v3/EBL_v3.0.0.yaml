@@ -312,11 +312,13 @@ paths:
 
         - `RECEIVED` in case the consumer has updated information for the `Shipping Instructions`
         - `PENDING_UPDATE` in case the provider has requested the consumer to update the `Shipping Instructions` (a result of **UseCase 2 - Request to update Shipping Instructions**)
+        
+        The status of `updatedShippingInstructionsStatus` can be anything.
 
         ## Postcondition
-        The provider has received an update to the `Shipping Instructions` (**UseCase 3 - Submit updated Shipping Instructions**), from now on called the `Updated Shipping Instructions`.
+        The provider has received an update to the `Shipping Instructions` (**UseCase 3 - Submit updated Shipping Instructions**). In case this is the first update to the `Shipping Instructions` the update will be called the `Updated Shipping Instructions`. If this is a subsequent update to the `Shipping Instructions` - the update will update the `Updated Shipping Instructions`. In both cases the `updatedShippingInstructionStatus` will be set to `UPDATE_RECEIVED`.
 
-        The `Updated Shipping Instructions` and the "original" `Shipping Instructions` **co-exist** until a new update is submitted by the consumer (via **UseCase 3: Submit updated Shipping Instructions**) or until the provider requests an update (sets the `shippingInstructionsStatus='PENDING_UPDATE'` via **UseCase 2: Request to update Shipping Instructions**). The `Updated Shipping Instructions` always represents the latest version of an update received by the provider.
+        The `Updated Shipping Instructions` and the "original" `Shipping Instructions` **co-exist** until a new update is submitted by the consumer (via **UseCase 3: Submit updated Shipping Instructions**) in which case the new update replaces the existing. Or until the provider requests an update (sets the `shippingInstructionsStatus='PENDING_UPDATE'` via **UseCase 2: Request to update Shipping Instructions**). The `Updated Shipping Instructions` always represents the latest version of an update received by the provider.
 
         The consumer will receive a `202` (Accepted) if the payload schema-validates or a `400` (Bad Request) if it does not.
 
