@@ -4568,6 +4568,93 @@ components:
             example: Strawinskylaan 4117
         identifyingCodes:
           type: array
+          minItems: 1
+          description: |
+            **Condition:** Either the `address` or a party `identifyingCode` must be provided. 
+          items:
+            $ref: '#/components/schemas/IdentifyingCode'
+        taxLegalReferences:
+          description: |
+            A list of `Tax References` for a `Party`
+          type: array
+          items:
+            $ref: '#/components/schemas/TaxLegalReference'
+        partyContactDetails:
+          type: array
+          description: |
+            A list of contact details
+          items:
+            $ref: '#/components/schemas/PartyContactDetail'
+        reference:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 35
+          description: |
+            A reference linked to the `Consignee`.
+          example: HHL007
+        purchaseOrderReferences:
+          type: array
+          description: |
+            A list of `Purchase Order Reference`s linked to the `Consignee`.
+          items:
+            type: string
+            pattern: ^\S(?:.*\S)?$
+            maxLength: 35
+            description: |
+              A purchase order reference linked to the `Consignee`.
+            example: HHL007
+      required:
+        - partyName
+        - identifyingCodes
+
+    ConsigneeShipper:
+      type: object
+      title: Consignee (Shipper provided)
+      description: |
+        The party to which goods are consigned in the `Master Bill of Lading`.
+        
+        **Condition:** Mandatory for non-negotiable BL (`isToOrder=false`)
+
+        **Condition:** Either the `address` or a party `identifyingCode` must be provided in the `Shipping Instructions`. If a `displayedAddress` is provided, it must be included in the `Transport Document` instead of the `address`.
+      properties:
+        partyName:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 70
+          description: |
+            Name of the party.
+          example: IKEA Denmark
+        typeOfPerson:
+          type: string
+          maxLength: 50
+          pattern: ^\S(?:.*\S)?$
+          description: |
+            Can be one of the following values as per the Union Customs Code art. 5(4):
+            - `NATURAL_PERSON` (A person that is an individual living human being)
+            - `LEGAL_PERSON` (person (including a human being and public or private organizations) that can perform legal actions, such as own a property, sue and be sued)
+            - `ASSOCIATION_OF_PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
+          example: 'NATURAL_PERSON'
+        address:
+          $ref: '#/components/schemas/PartyAddress'
+        displayedAddress:
+          type: array
+          maxItems: 6
+          description: |
+            The address of the party to be displayed on the `Transport Document`. The displayed address may be used to match the address provided in the `Letter of Credit`.
+            
+            **Conditions:** If provided:
+              - the displayed address must be included in the `Transport Document`.
+              - for physical BL (`isElectronic=false`), it is only allowed to provide max 2 lines of 35 characters
+              - for electronic BL (`isElectronic=true`), the limit is 6 lines of 35 characters
+              - the order of the items in this array **MUST** be preserved as by the provider of the API.
+          items:
+            type: string
+            maxLength: 35
+            description: |
+              A single address line
+            example: Strawinskylaan 4117
+        identifyingCodes:
+          type: array
           description: |
             **Condition:** Either the `address` or a party `identifyingCode` must be provided. 
           items:
@@ -4653,6 +4740,65 @@ components:
     Endorsee:
       type: object
       title: Endorsee
+      description: |
+        The party to whom the title to the goods is transferred by means of endorsement.
+        
+        **Condition:** Can only be provided for negotiable BLs (`isToOrder=true`). If a negotiable BL does not have an `Endorsee`, the BL is said to be "blank endorsed". Note `Consignee` and `Endorsee` are mutually exclusive.
+
+        **Condition:** Either the `address` or a party `identifyingCode` must be provided in the `Shipping Instructions`. If a `displayedAddress` is provided, it must be included in the `Transport Document` instead of the `address`.
+      properties:
+        partyName:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 70
+          description: |
+            Name of the party.
+          example: IKEA Denmark
+        address:
+          $ref: '#/components/schemas/PartyAddress'
+        displayedAddress:
+          type: array
+          maxItems: 6
+          description: |
+            The address of the party to be displayed on the `Transport Document`. The displayed address may be used to match the address provided in the `Letter of Credit`.
+            
+            **Conditions:** If provided:
+              - the displayed address must be included in the `Transport Document`.
+              - for physical BL (`isElectronic=false`), it is only allowed to provide max 2 lines of 35 characters
+              - for electronic BL (`isElectronic=true`), the limit is 6 lines of 35 characters
+              - the order of the items in this array **MUST** be preserved as by the provider of the API.
+          items:
+            type: string
+            maxLength: 35
+            description: |
+              A single address line
+            example: Strawinskylaan 4117
+        identifyingCodes:
+          type: array
+          minItems: 1
+          description: |
+            **Condition:** Either the `address` or a party `identifyingCode` must be provided. 
+          items:
+            $ref: '#/components/schemas/IdentifyingCode'
+        taxLegalReferences:
+          description: |
+            A list of `Tax References` for a `Party`
+          type: array
+          items:
+            $ref: '#/components/schemas/TaxLegalReference'
+        partyContactDetails:
+          type: array
+          description: |
+            A list of contact details
+          items:
+            $ref: '#/components/schemas/PartyContactDetail'
+      required:
+        - partyName
+        - identifyingCodes
+
+    EndorseeShipper:
+      type: object
+      title: Endorsee (Shipper provided)
       description: |
         The party to whom the title to the goods is transferred by means of endorsement.
         
@@ -8230,9 +8376,9 @@ components:
         shipper:
           $ref: '#/components/schemas/Shipper'
         consignee:
-          $ref: '#/components/schemas/Consignee'
+          $ref: '#/components/schemas/ConsigneeShipper'
         endorsee:
-          $ref: '#/components/schemas/Endorsee'
+          $ref: '#/components/schemas/EndorseeShipper'
         issueTo:
           $ref: '#/components/schemas/IssueToParty'
         seller:
