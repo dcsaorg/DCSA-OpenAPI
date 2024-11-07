@@ -33,13 +33,13 @@ security: []
 tags:
   - name: Port Call Service consumer
     description: |
-      **Consumer** implemented endPoints (_including secondary receiver_)
+      **Consumer** implemented endPoints
   - name: Port Call Service provider
     description: |
-      **Provider** implemented endPoints (_including secondary receiver_)
+      **Provider** implemented endPoints
   - name: Port Call Service
     description: |
-      **Provider** and **Consumer** implemented endPoints (_including secondary receiver_)
+      **Provider** and **Consumer** implemented endPoints
 paths:
   '/v2/port-call-services/{portCallServiceID}':
     put:
@@ -106,7 +106,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
   '/v2/port-call-services/{portCallServiceID}/estimated-timestamp':
     put:
       parameters:
@@ -142,7 +141,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
   '/v2/port-call-services/{portCallServiceID}/planned-timestamp':
     put:
       parameters:
@@ -178,7 +176,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
   '/v2/port-call-services/{portCallServiceID}/actual-timestamp':
     put:
       parameters:
@@ -214,7 +211,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
   '/v2/port-call-services/{portCallServiceID}/cancel':
     post:
       parameters:
@@ -249,7 +245,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
   '/v2/port-calls/{portCallID}/omit':
     post:
       parameters:
@@ -286,7 +281,42 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
+  '/v2/transport-calls/{transportCallID}/omit':
+    post:
+      parameters:
+        - $ref: '#/components/parameters/transportCallIDPathParam'
+        - $ref: '#/components/parameters/Api-Version-Major'
+      tags:
+        - Port Call Service consumer
+      operationId: omit-transport-call
+      summary: Omits a Transport Call
+      description: |
+        Carrier `OMITTING` a **Transport Call**
+      requestBody:
+        description: |
+          Omits a **Transport Call**
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Omit'
+      responses:
+        '204':
+          description: |
+            **Transport Call** successfully marked as omitted.
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+        default:
+          description: |
+            Unexpected error
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   '/v2/port-call-services/{portCallServiceID}/requested-timestamp':
     put:
       parameters:
@@ -322,7 +352,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
   '/v2/port-call-services/{portCallServiceID}/decline':
     post:
       parameters:
@@ -375,7 +404,6 @@ components:
         example: '2'
       description: |
         An API-Version header **MAY** be added to the request (optional); if added it **MUST** only contain **MAJOR** version. API-Version header **MUST** be aligned with the URI version.
-
     #############
     # Path params
     #############
@@ -399,8 +427,17 @@ components:
         format: uuid
         example: 0342254a-5927-4856-b9c9-aa12e7c00563
       required: true
+    transportCallIDPathParam:
+      in: path
+      name: transportCallID
+      description: |
+        The provider created identifier for the **Transport Call**
+      schema:
+        type: string
+        format: uuid
+        example: 0342254a-5927-4856-b9c9-aa12e7c00563
+      required: true
   schemas:
-
     ###################
     # Port Call Service
     ###################
@@ -418,15 +455,19 @@ components:
           $ref: '#/components/schemas/Vessel'
         specification:
           $ref: '#/components/schemas/Specification'
+        isFYI:
+          type: boolean
+          description: |
+            If set to `true` it indicates that this message is meant for another party - but is sent as a FYI (for your information).
+          example: true
       required:
         - portCall
         - transportCall
         - vessel
         - specification
-
-    ###########
-    # Port Call
-    ###########
+      ###########
+      # Port Call
+      ###########
     PortCall:
       type: object
       title: Port Call
@@ -477,10 +518,9 @@ components:
         - portCallID
         - carrierServiceName
         - carrierServiceCode
-
-    ########################
-    # Transport Call Service
-    ########################
+      ########################
+      # Transport Call Service
+      ########################
     TransportCall:
       type: object
       title: Transport Call
@@ -543,12 +583,17 @@ components:
             - `2 alphanumeric characters` for the sequence number of the voyage
             - `1 character` for the direction/haul (`N`orth, `E`ast, `W`est, `S`outh or `R`oundtrip).
           example: 2103N
+        omitted:
+          type: boolean
+          readOnly: true
+          description: |
+            xxx
+          example: false
       required:
         - transportCallID
-
-    ########
-    # Vessel
-    ########
+      ########
+      # Vessel
+      ########
     Vessel:
       type: object
       title: Vessel
@@ -659,7 +704,6 @@ components:
           description: |
             Remaining distance reported by the vessel to the next destination port in nautical miles
           example: 245.45
-
     ###############
     # Specification
     ###############
@@ -681,21 +725,17 @@ components:
         #   type: string
         #   description: |
         #     The role of the publisher. The values are divided into 4 categories:
-
         #     Carrier:
         #     - `CA` (Carrier)
         #     - `AG` (Carrier local agent)
         #     - `VSL` (Vessel)
-
         #     Port
         #     - `ATH` (Port Authorities)
         #     - `PLT` (Port Pilot)
         #     - `TWG` (Towage service provider)
         #     - `MOR` (Mooring service provider)
-
         #     Terminal
         #     - `TR` (Terminal)
-
         #     Port Call Service Provider
         #     - `LSH` (Lashing service provider)
         #     - `BUK` (Bunker service provider)
@@ -820,10 +860,9 @@ components:
         - portCallServiceType
         - portCallServiceEventTypeCode
         - portCallServiceLocation
-
-    #################
-    # Vessel position
-    #################
+      #################
+      # Vessel position
+      #################
     VesselPosition:
       type: object
       title: Vessel Position
@@ -864,7 +903,6 @@ components:
           example: NLAMS
         geoCoordinate:
           $ref: '#/components/schemas/GeoCoordinate'
-
     ############################
     # Port Call Service Location
     ############################
@@ -908,7 +946,6 @@ components:
           example: NLAMS
         geoCoordinate:
           $ref: '#/components/schemas/GeoCoordinate'
-
     ###################
     # Facility Location
     ###################
@@ -950,10 +987,9 @@ components:
       required:
         - facilityCode
         - facilityCodeListProvider
-
-    #########################
-    # Geo Coordinate Location
-    #########################
+      #########################
+      # Geo Coordinate Location
+      #########################
     GeoCoordinate:
       type: object
       title: Geo Coordinate
@@ -973,10 +1009,9 @@ components:
       required:
         - latitude
         - longitude
-
-    #####################
-    # Estimated timestamp
-    #####################
+      #####################
+      # Estimated timestamp
+      #####################
     EstimatedTimestamp:
       title: Estimated Timestamp
       type: object
@@ -1013,6 +1048,11 @@ components:
           description: |
             Reason code for the delay. See SMDG [Code list DELAY](https://smdg.org/documents/smdg-code-lists/delay-reason-and-port-call-activity/) for a list of valid codes to be used for this attribute.
           example: STR
+        isFYI:
+          type: boolean
+          description: |
+            If set to `true` it indicates that this message is meant for another party - but is sent as a FYI (for your information).
+          example: true
         remark:
           type: string
           maxLength: 500
@@ -1023,10 +1063,9 @@ components:
         - timestampID
         - portCallServiceID
         - portCallServiceDateTime
-
-    ###################
-    # Planned timestamp
-    ###################
+      ###################
+      # Planned timestamp
+      ###################
     PlannedTimestamp:
       title: Planned Timestamp
       type: object
@@ -1063,6 +1102,11 @@ components:
           description: |
             Reason code for the delay. See SMDG [Code list DELAY](https://smdg.org/documents/smdg-code-lists/delay-reason-and-port-call-activity/) for a list of valid codes to be used for this attribute.
           example: STR
+        isFYI:
+          type: boolean
+          description: |
+            If set to `true` it indicates that this message is meant for another party - but is sent as a FYI (for your information).
+          example: true
         remark:
           type: string
           maxLength: 500
@@ -1073,10 +1117,9 @@ components:
         - timestampID
         - portCallServiceID
         - portCallServiceDateTime
-
-    #####################
-    # Requested timestamp
-    #####################
+      #####################
+      # Requested timestamp
+      #####################
     RequestedTimestamp:
       title: Requested Timestamp
       type: object
@@ -1113,6 +1156,11 @@ components:
           description: |
             Reason code for the delay. See SMDG [Code list DELAY](https://smdg.org/documents/smdg-code-lists/delay-reason-and-port-call-activity/) for a list of valid codes to be used for this attribute.
           example: STR
+        isFYI:
+          type: boolean
+          description: |
+            If set to `true` it indicates that this message is meant for another party - but is sent as a FYI (for your information).
+          example: true
         remark:
           type: string
           maxLength: 500
@@ -1123,10 +1171,9 @@ components:
         - timestampID
         - portCallServiceID
         - portCallServiceDateTime
-
-    ##################
-    # Actual timestamp
-    ##################
+      ##################
+      # Actual timestamp
+      ##################
     ActualTimestamp:
       title: Actual Timestamp
       type: object
@@ -1163,6 +1210,11 @@ components:
           description: |
             Reason code for the delay. See SMDG [Code list DELAY](https://smdg.org/documents/smdg-code-lists/delay-reason-and-port-call-activity/) for a list of valid codes to be used for this attribute.
           example: STR
+        isFYI:
+          type: boolean
+          description: |
+            If set to `true` it indicates that this message is meant for another party - but is sent as a FYI (for your information).
+          example: true
         remark:
           type: string
           maxLength: 500
@@ -1173,20 +1225,19 @@ components:
         - timestampID
         - portCallServiceID
         - portCallServiceDateTime
-
-    ########
-    # Cancel
-    ########
+      ########
+      # Cancel
+      ########
     Cancel:
       type: object
       title: Cancel
       description: |
         xx
       properties:
-        cancel:
+        isFYI:
           type: boolean
           description: |
-            Provider to `CANCEL` a **Port Call Service**
+            If set to `true` it indicates that this message is meant for another party - but is sent as a FYI (for your information).
           example: true
         reason:
           type: string
@@ -1194,9 +1245,6 @@ components:
           description: |
             Free text to provide additional information on the context.
           example: Storms ahead
-      required:
-        - cancel
-
     #########
     # Decline
     #########
@@ -1206,10 +1254,10 @@ components:
       description: |
         xx
       properties:
-        decline:
+        isFYI:
           type: boolean
           description: |
-            Consumer to `DECLINE` a **Port Call Service**
+            If set to `true` it indicates that this message is meant for another party - but is sent as a FYI (for your information).
           example: true
         reason:
           type: string
@@ -1217,9 +1265,6 @@ components:
           description: |
             Free text to provide additional information on the context.
           example: Crane broken
-      required:
-        - decline
-
     ######
     # Omit
     ######
@@ -1229,10 +1274,10 @@ components:
       description: |
         xx
       properties:
-        omit:
+        isFYI:
           type: boolean
           description: |
-            Carrier to `OMIT` a **Port Call**
+            If set to `true` it indicates that this message is meant for another party - but is sent as a FYI (for your information).
           example: true
         reason:
           type: string
@@ -1240,9 +1285,6 @@ components:
           description: |
             Free text to provide additional information on the context.
           example: Engine failure
-      required:
-        - omit
-
     ############
     # Timestamps
     ############
@@ -1277,7 +1319,6 @@ components:
           description: |
             The local date and time, when the **Port Call Service** took place, in [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format.
           example: '2019-11-12T07:41:00+08:30'
-
     ###########
     # All Moves
     ###########
@@ -1385,10 +1426,9 @@ components:
           required:
             - _20_units
             - _40_units
-
-    ################
-    # Error Response
-    ################
+          ################
+          # Error Response
+          ################
     ErrorResponse:
       title: Error Response
       type: object
