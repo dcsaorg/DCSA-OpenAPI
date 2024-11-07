@@ -15,6 +15,21 @@ Publications related to the Bill of Lading API:
 ---
 This is a moving target and will be updated as soon as the version is published
 
+<a name="v300B20241108"></a>[Release v3.0.0 Beta 20241108 (8 of November 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.0-Beta-20241108)
+---
+Snapshot as of 8 of November 2024 for EBL 3.0.0 Beta.
+## Key changes
+- Made it more clear in the `PUT /v3/shipping-instructions/{documentReference}` endPoint that an update can update an ongoing update-request
+- fixed the bad `IdentifyingCodes` examples in endPoint payloads
+- split `Consignee` and `Endorsee` into a `ShippingInstructions`- and a `TransportDocument`-version since the "`TransportDocument`-versions" **MUST** have at least 1 `identifyingCodes` provided
+
+## Object changes
+- properties **modified**:
+  - `identifyingCodes` is now mandatory and has a `minItems: 1` on `Consignee` and `Endorsee`
+
+## Minor changes
+- removed wrongly added condition on `IssuingParty` and `idenfifyingCodes` on `IssuingParty`
+
 <a name="v300B20241025"></a>[Release v3.0.0 Beta 20241025 (25 of October 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.0-Beta-20241025)
 ---
 Snapshot as of 25 of October 2024 for EBL 3.0.0 Beta.
