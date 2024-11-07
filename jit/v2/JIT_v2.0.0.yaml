@@ -106,7 +106,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
   '/v2/port-call-services/{portCallServiceID}/estimated-timestamp':
     put:
       parameters:
@@ -142,7 +141,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
   '/v2/port-call-services/{portCallServiceID}/planned-timestamp':
     put:
       parameters:
@@ -178,7 +176,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
   '/v2/port-call-services/{portCallServiceID}/actual-timestamp':
     put:
       parameters:
@@ -214,7 +211,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
   '/v2/port-call-services/{portCallServiceID}/cancel':
     post:
       parameters:
@@ -249,7 +245,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
   '/v2/port-calls/{portCallID}/omit':
     post:
       parameters:
@@ -286,7 +281,42 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
+  '/v2/trpnsport-calls/{transportCallID}/omit':
+    post:
+      parameters:
+        - $ref: '#/components/parameters/transportCallIDPathParam'
+        - $ref: '#/components/parameters/Api-Version-Major'
+      tags:
+        - Port Call Service consumer
+      operationId: omit-transport-call
+      summary: Omits a Transport Call
+      description: |
+        Carrier `OMITTING` a **Transport Call**
+      requestBody:
+        description: |
+          Omits a **Transport Call**
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Omit'
+      responses:
+        '204':
+          description: |
+            **Transport Call** successfully marked as omitted.
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+        default:
+          description: |
+            Unexpected error
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   '/v2/port-call-services/{portCallServiceID}/requested-timestamp':
     put:
       parameters:
@@ -322,7 +352,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
   '/v2/port-call-services/{portCallServiceID}/decline':
     post:
       parameters:
@@ -394,6 +423,16 @@ components:
       name: portCallID
       description: |
         The provider created identifier for the **Port Call**
+      schema:
+        type: string
+        format: uuid
+        example: 0342254a-5927-4856-b9c9-aa12e7c00563
+      required: true
+    transportCallIDPathParam:
+      in: path
+      name: transportCallID
+      description: |
+        The provider created identifier for the **Transport Call**
       schema:
         type: string
         format: uuid
@@ -548,6 +587,12 @@ components:
             - `2 alphanumeric characters` for the sequence number of the voyage
             - `1 character` for the direction/haul (`N`orth, `E`ast, `W`est, `S`outh or `R`oundtrip).
           example: 2103N
+        omitted:
+          type: boolean
+          readOnly: true
+          description: |
+            xxx
+          example: false
       required:
         - transportCallID
 
@@ -686,21 +731,17 @@ components:
         #   type: string
         #   description: |
         #     The role of the publisher. The values are divided into 4 categories:
-
         #     Carrier:
         #     - `CA` (Carrier)
         #     - `AG` (Carrier local agent)
         #     - `VSL` (Vessel)
-
         #     Port
         #     - `ATH` (Port Authorities)
         #     - `PLT` (Port Pilot)
         #     - `TWG` (Towage service provider)
         #     - `MOR` (Mooring service provider)
-
         #     Terminal
         #     - `TR` (Terminal)
-
         #     Port Call Service Provider
         #     - `LSH` (Lashing service provider)
         #     - `BUK` (Bunker service provider)
