@@ -12,6 +12,20 @@ Publications related to the Bill of Lading Issuance API:
 ---
 This is a moving target and will be updated as soon as the version is published
 
+<a name="v300B20241108"></a>[Release v3.0.0 Beta 20241108 (8 of November 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS/3.0.0-Beta-20241108)
+---
+Snapshot as of 8 of November 2024 for EBL Issuance 3.0.0 Beta.
+## Key changes
+- A link on how to create [Digital Signatures](https://developer.dcsa.org/implementing-digital-signatures-for-transport-documents) have been added to the API description
+- `Consignee` and `Endorsee` now require at least one `IdentifyingCode`
+
+## Object changes
+- properties **modified**:
+  - `IdentifyingCodes` is now a mandatory property with a `minItems: 1` in `Consignee` and `Endorsee` objects
+
+## Transport Document changes
+- `Consignee` and `Endorsee` now require at least one `IdentifyingCode`
+
 <a name="v300B20241025"></a>[Release v3.0.0 Beta 20241025 (25 of October 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS/3.0.0-Beta-20241025)
 ---
 Snapshot as of 25 of October 2024 for EBL Issuance 3.0.0 Beta.
