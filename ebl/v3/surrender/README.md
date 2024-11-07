@@ -15,6 +15,7 @@ This is a moving target and will be updated as soon as the version is published
 <a name="v300B20241108"></a>[Release v3.0.0 Beta 20241108 (8 of November 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR/3.0.0-Beta-20241108)
 ---
 Snapshot as of 8 of November 2024 for EBL Surrender 3.0.0 Beta.
+
 **There are no changes in this Snapshot**
 
 <a name="v300B20241025"></a>[Release v3.0.0 Beta 20241025 (25 of October 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR/3.0.0-Beta-20241025)
