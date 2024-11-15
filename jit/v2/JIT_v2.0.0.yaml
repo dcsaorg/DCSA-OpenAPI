@@ -5,15 +5,49 @@ info:
     DCSA Just in Time Port Calls API
   description: |
     # DCSA OpenAPI specification for Just in Time Port Call process
-    This API supports <b>JIT</b> v2.0 (Just in Time Port Calls). JIT is used for negotiating timestamps between vessel and port/terminal and other Port Call Service providers. To request a **Port Call Service** the
+    The DCSA API for **Just In Time Port Call** aims to simplify and standardize the exchange of operational information between carriers, terminals, port authorities, and service providers, to orchestrate and optimize port calls. JIT can be used for negotiating services execution via timestamps, informing timestamps, or informing moves forecasts, between the parties involved in any given location.
+
+    The planning and execution of events always follow the same pattern, in which several instances of the estimated (`E`), requested (`R`), and planned (`P`) times (from now on referred to as: `ERP`-pattern) can occur if a new estimated or requested time is given after the initially planned time. Some events, specified in this document, do not need the `ERP`-pattern, as they are informative and reflect actuals (`A`) only (i.e. vessel readiness for cargo operations).
+
+    For more information about the ERP-pattern please check [GUIDELINES FOR HARMONIZED COMMUNICATION AND ELECTRONIC EXCHANGE OF OPERATIONAL DATA FOR PORT CALLS](https://wwwcdn.imo.org/localresources/en/OurWork/Facilitation/FAL%20related%20nonmandatory%20documents/FAL.5-Circ.52.pdf) by IMO. Link to IMO GIA [Just In Time Arrival Guide](https://greenvoyage2050.imo.org/wp-content/uploads/2021/01/GIA-just-in-time-hires.pdf)
+
+    ## Port Call Services in the scope of this API
+    Negotiable **Port Call Services** through an `ERP`-pattern including an `A`:
+    - Berth
+    - Cargo operations
+    - Pilotage
+    - Towage
+    - Mooring
+    - Bunkering
+    - Pilot Boarding Place
+    - Anchorage
+    - Sludge
+
+    **Non**-negotiable **Port Call Services** (without `ERP`-pattern) having only an `A`:
+    - Sea Passage
+    - All Fast
+    - Gangway down and secure
+    - Vessel Ready for cargo operations
+    - Vessel Ready to sail
+    - Discharge cargo operations
+    - Loading cargo operations
+    - Lashing
+    - Safety - Terminal ready for vessel departure
+    - Anchorage Operations
+    - ShorePower
+
+    Also in scope:
+    - Moves forecast
+    - cancel (by provider) or decline (by consumer) of a Port Call Service
+    - omission of **Port Call** or **Terminal Call**
+
+    To request a **Port Call Service** the endPoint to use is:
 
         PUT /v2/port-call-services
 
-    endPoint is to be used.
-
     It is the responsibility of the Provider of the initial **Port Call Service** to create a:
     - `portCallID` to identify all communication regarding the **Port Call**
-    - `transportCallID` to identify each **Transport Call** inside the same `portCallID`. One **Port Call** can contain many **Transport Calls**.
+    - `transportCallID` to identify each **Transport Call** inside the same `portCallID`. One **Port Call** can contain many **Transport Calls**
     - `portCallServiceID` to identify each **Port Call Service** inside the same `transportCallID`. One **Transport Call** can contain many **Port Call Services**
 
     It is the responsibility of the creator of a **Timestamp** (Estimated, Requested, Planned or Actual) to create the `timestampID` as an identifier for the **Timestamp** for any further referral.
@@ -762,7 +796,7 @@ components:
           description: |
             The type of the **Port Call Service**.
 
-            **Port Call Services** negotiable through an `ERP`-cycle including an `A`, can be one of:
+            **Port Call Services** negotiable through an `ERP`-pattern including an `A`, can be one of:
             - `BERTH` (Berth)
             - `CARGO_OPERATIONS` (Cargo operations)
             - `PILOTAGE` (Pilotage)
@@ -773,7 +807,7 @@ components:
             - `ANCHORAGE` (Anchorage)
             - `SLUDGE`(Sludge)
 
-            **Port Call Services** without `ERP`-cycle having only an `A`, can be one of:
+            **Port Call Services** without `ERP`-pattern having only an `A`, can be one of:
 
             - `SEA_PASSAGE` (Sea Passage)
             - `ALL_FAST` (All Fast)
