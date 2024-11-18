@@ -6,26 +6,26 @@ info:
   version: 3.0.0
   title: DCSA eBL Surrender API
   description: |
-    <h1>DCSA OpenAPI specification for the surrender of an electronic Bill of Lading (eBL) via an eBL Solution Provider for amendment (incl. switch to paper), and delivery</h1>
+    <h1>DCSA OpenAPI specification for the surrender of an electronic Bill of Lading (referred to as `eBL`) via an eBL Solution Provider for amendment (incl. switch to paper), and delivery</h1>
 
-    This API is intended as an API between a carrier and an EBL Solution Platform.
+    This API is intended as an API between a carrier and an eBL Solution Platform.
 
-    The EBL Solution Platform will submit surrender requests to the carrier, via
+    The eBL Solution Platform will submit surrender requests to the carrier, via
     
         POST /v3/ebl-surrender-requests
     
-    which will be processed asynchronously. The EBL Solution Platform submitting the surrender request to the carrier must be the same EBL Solution Platform from which the eBL was issued. Responses to the surrender requests will be submitted by the carrier via 
+    which will be processed asynchronously. The eBL Solution Platform submitting the surrender request to the carrier must be the same eBL Solution Platform from which the eBL was issued. Responses to the surrender requests will be submitted by the carrier via 
     
         POST /v3/ebl-surrender-responses
 
     When the platform submits a surrender request, the platform guarantees *all* of the following:
 
-    1) The surrender request was submitted by the sole possessor of the EBL.
+    1) The surrender request was submitted by the sole possessor of the eBL.
     2) Depending on the eBL type:
        * For non-negotiable ("straight") eBLs, the surrender request was submitted by either the original shipper OR the consignee.
        * For negotiable eBLs with a named titleholder, the surrender request was submitted by the named titleholder.
        * For negotiable eBLs without a named titleholder / blank eBLs, possession is sufficient for the entity surrendering the eBL.
-    3) The carrier holds possession of the EBL with this surrender request  until it responds to this surrender request.
+    3) The carrier holds possession of the eBL with this surrender request  until it responds to this surrender request.
 
     Please see the [Surrender Request](#/surrenderRequestDetails) for details on what data the platform will provide.
 
@@ -51,7 +51,7 @@ tags:
       The Surrender Requests **implemented** by carrier
   - name: Surrender Request responses
     description: |
-      The Surrender Request responses **implemented** by the EBL Solution Platform
+      The Surrender Request responses **implemented** by the eBL Solution Platform
 paths:
   /v3/ebl-surrender-requests:
     post:
@@ -61,7 +61,7 @@ paths:
       summary: |
         Creates a Surrender Request
       description: |
-        The EBL Solution Platform uses this endpoint to submit a surrender request.
+        The eBL Solution Platform uses this endpoint to submit a surrender request.
 
         The carrier's answer to the surrender request will be returned via a callback response (see the `Callbacks` tab)
       parameters:
@@ -95,7 +95,7 @@ paths:
         - Surrender Request responses
       operationId: post-ebl-surrender-responses
       description: |
-        The carrier uses this endpoint to inform the EBL Solution Platform about the verdict for a given surrender request.
+        The carrier uses this endpoint to inform the eBL Solution Platform about the verdict for a given surrender request.
       parameters:
         - $ref: '#/components/parameters/Api-Version-Major'
       requestBody:
@@ -158,7 +158,7 @@ components:
           pattern: ^\S+$
           maxLength: 4
           description: |
-            The EBL platform of the transaction party. The value **MUST** be one of:
+            The eBL platform of the transaction party. The value **MUST** be one of:
             - `WAVE` (Wave)
             - `CARX` (CargoX)
             - `ESSD` (EssDOCS)
@@ -234,12 +234,12 @@ components:
 
         The platform guarantees *all* of the following:
 
-          1) The surrender request was submitted by the sole possessor of the EBL.
+          1) The surrender request was submitted by the sole possessor of the eBL.
           2) Depending on the eBL type:
            * For non-negotiable ("straight") eBLs, the surrender request was submitted by either the original shipper OR the consignee.
            * For negotiable eBLs with a named titleholder, the surrender request was submitted by the named titleholder.
            * For negotiable eBLs without a named titleholder / blank eBLs, possession is sufficient for the entity surrendering the eBL.
-          3) The carrier holds possession of the EBL with this surrender request  until it responds to this surrender request.
+          3) The carrier holds possession of the eBL with this surrender request  until it responds to this surrender request.
       properties:
         surrenderRequestReference:
           type: string
@@ -532,7 +532,7 @@ components:
           example: Z12345
           pattern: ^\S(?:.*\S)?$
           description: |
-            The surrender request provided by the EBL solution in the surrender request.
+            The surrender request provided by the eBL solution in the surrender request.
         action:
           type: string
           description: |
@@ -542,7 +542,7 @@ components:
 
             When the carrier accepts the surrender (`SURR`), the platform will inform the party that submitted the surrender request that the surrender has been accepted.  If the surrender is due to an amendment, the carrier will follow up with issuing the amended document to the party that submitted the surrender. The carrier will immediately become the possessor of the bill and can now void it.
 
-            When the carrier rejects the surrender (`SREJ`), the EBL is returned to the party that submitted the surrender request.
+            When the carrier rejects the surrender (`SREJ`), the eBL is returned to the party that submitted the surrender request.
           enum:
             - SURR
             - SREJ
