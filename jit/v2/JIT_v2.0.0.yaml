@@ -1489,7 +1489,7 @@ components:
         portCallServiceLocation:
           $ref: '#/components/schemas/PortCallServiceLocation'
         moves:
-          $ref: '#/components/schemas/AllMoves'
+          $ref: '#/components/schemas/Moves'
         timestamps:
           $ref: '#/components/schemas/Timestamps'
         cancelled:
@@ -1982,26 +1982,23 @@ components:
             The local date and time, when the **Port Call Service** took place, in [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format.
           example: '2019-11-12T07:41:00+08:30'
 
-    ###########
-    # All Moves
-    ###########
-    AllMoves:
+    #######
+    # Moves
+    #######
+    Moves:
       type: object
+      title: Moves
       description: |
         Container moves to be made (in some cases estimated).
 
         **Condition:** Can only be provided if `portCallServiceType` is `MOVES`
       properties:
         restowMoves:
-          type: number
+          type: integer
+          format: int32
           description: |
             xx
           example: 20
-        bbkPieces:
-          type: number
-          description: |
-            xx
-          example: 3
       oneOf:
         - type: object
           title: Total Moves (Dry + Reefer + OOG)
@@ -2009,6 +2006,8 @@ components:
             ..
           properties:
             totalMoves:
+              type: integer
+              format: int32
               description: |
                 Total moves...
               example: 155
@@ -2018,47 +2017,49 @@ components:
           title: Specific moves (for load and discharge)
           properties:
             loadMoves:
-              type: object
-              description: |
-                xx
-              allOf:
-                - $ref: '#/components/schemas/Moves'
+              $ref: '#/components/schemas/LoadMoves'
             dischargeMoves:
-              type: object
-              description: |
-                xx
-              allOf:
-                - $ref: '#/components/schemas/Moves'
-    Moves:
+              $ref: '#/components/schemas/DischargeMoves'
+    LoadMoves:
       type: object
+      title: 'Load Moves'
       description: |
-        XX
+        Load moves...
       properties:
-        ladenContainers:
-          type: object
-          description: |
-            Laden containers...
-          allOf:
-            - $ref: '#/components/schemas/ContainerMoves'
-        emptyContainers:
-          type: object
-          description: |
-            Empty containers...
-          allOf:
-            - $ref: '#/components/schemas/ContainerMoves'
-        reeferPlugged:
-          type: object
-          description: |
-            Plugged reefer containers...
-          allOf:
-            - $ref: '#/components/schemas/ContainerMoves'
+        ladenContainerMoves:
+          $ref: '#/components/schemas/LadenContainerMoves'
+        emptyContainerMoves:
+          $ref: '#/components/schemas/EmptyContainerMoves'
+        reeferPluggedContainerMoves:
+          $ref: '#/components/schemas/ReeferPluggedContainerMoves'
         oogUnits:
-          type: number
+          type: integer
+          format: int32
           description: |
             xx
           example: 2
-    ContainerMoves:
+    DischargeMoves:
       type: object
+      title: 'Discharge Moves'
+      description: |
+        Discharge moves...
+      properties:
+        ladenContainerMoves:
+          $ref: '#/components/schemas/LadenContainerMoves'
+        emptyContainerMoves:
+          $ref: '#/components/schemas/EmptyContainerMoves'
+        reeferPluggedContainerMoves:
+          $ref: '#/components/schemas/ReeferPluggedContainerMoves'
+        oogUnits:
+          type: integer
+          format: int32
+          description: |
+            xx
+          example: 2
+
+    LadenContainerMoves:
+      type: object
+      title: 'Laden Container Moves'
       description: |
         xx
       oneOf:
@@ -2068,6 +2069,8 @@ components:
             ..
           properties:
             totalMoves:
+              type: integer
+              format: int32
               description: |
                 Total moves...
               example: 55
@@ -2079,21 +2082,104 @@ components:
             ..
           properties:
             _20_units:
-              type: number
+              type: integer
+              format: int32
               description: |
                 xx
               example: 25
             _40_units:
-              type: number
+              type: integer
+              format: int32
               description: |
                 xx
               example: 30
           required:
             - _20_units
             - _40_units
-          ################
-          # Error Response
-          ################
+
+    EmptyContainerMoves:
+      type: object
+      title: 'Empty Container Moves'
+      description: |
+        xx
+      oneOf:
+        - type: object
+          title: Total Moves
+          description: |
+            ..
+          properties:
+            totalMoves:
+              type: integer
+              format: int32
+              description: |
+                Total moves...
+              example: 55
+          required:
+            - totalMoves
+        - type: object
+          title: Container Moves
+          description: |
+            ..
+          properties:
+            _20_units:
+              type: integer
+              format: int32
+              description: |
+                xx
+              example: 25
+            _40_units:
+              type: integer
+              format: int32
+              description: |
+                xx
+              example: 30
+          required:
+            - _20_units
+            - _40_units
+
+    ReeferPluggedContainerMoves:
+      type: object
+      title: 'Reefer Plugged Container Moves'
+      description: |
+        xx
+      oneOf:
+        - type: object
+          title: Total Moves
+          description: |
+            ..
+          properties:
+            totalMoves:
+              type: integer
+              format: int32
+              description: |
+                Total moves...
+              example: 55
+          required:
+            - totalMoves
+        - type: object
+          title: Container Moves
+          description: |
+            ..
+          properties:
+            _20_units:
+              type: integer
+              format: int32
+              description: |
+                xx
+              example: 25
+            _40_units:
+              type: integer
+              format: int32
+              description: |
+                xx
+              example: 30
+          required:
+            - _20_units
+            - _40_units
+
+    ################
+    # Error Response
+    ################
     ErrorResponse:
       title: Error Response
       type: object
