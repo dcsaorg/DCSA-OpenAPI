@@ -100,6 +100,70 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+        '400':
+          description: |
+            In case creating a new `Port Call Service` does not schema validate a `400` (Bad Request) is returned
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                badRequestExample:
+                  summary: |
+                    Port Call Service missing Vessel object
+                  description: |
+                    `vessel` is a mandatory property in the `Port Call Service`. This is an example of how the error object would look in case this property is missing
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
+                  value:
+                    httpMethod: PUT
+                    requestUri: /v2/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545
+                    statusCode: 400
+                    statusCodeText: Bad Request
+                    statusCodeMessage: |
+                      Vessel object not found - it is a mandatory property in Port Call Service
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2024-11-21T09:41:00Z'
+                    errors:
+                      - errorCode: 7003
+                        property: vessel
+                        errorCodeText: mandatory property missing
+                        errorCodeMessage: |
+                          vessel must be provided as part of a Port Call Service
+        '500':
+          description: |
+            In case a server error occurs in provider system a `500` (Internal Server Error) is returned
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                internalServerErrorExample:
+                  summary: |
+                    Internal Server Error while processing Port Call Service
+                  description: |
+                    An Internal Server Error has occurred - the consumer should contact {provider-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
+                  value:
+                    httpMethod: PUT
+                    requestUri: /v2/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545
+                    statusCode: 500
+                    statusCodeText: Internal Server Error
+                    statusCodeMessage: |
+                      Internal Server Error occurred while processing Port Call Service
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2024-11-21T09:41:00Z'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: Internal Error occurred
+                        errorCodeMessage: Internal Error occurred
         default:
           description: |
             Unexpected error
@@ -131,6 +195,69 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PortCallService'
+        '404':
+          description: |
+            In case the provider does not know of the `portCallServiceID` used in the request (this could be because of a `PUT` request that has not finished processing or simply because the resource does not exist) - it is possible for the provider to reject the requests by returning a `404` (Not Found).
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                notFoundExample:
+                  summary: |
+                    Not Found request
+                  description: |
+                    The provided `portCallServiceID` cannot be found. This can be because a `PUT` request has not been finished processing or because the `portCallServiceID` does not exist in the provider system.
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7006` is just a "random example"
+                  value:
+                    httpMethod: GET
+                    requestUri: /v2/port-call-servcies/085a3207-5e45-49cf-8e1b-f8442beaf545
+                    statusCode: 404
+                    statusCodeText: Not Found
+                    statusCodeMessage: |
+                      portCallServiceID not found
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2024-09-04T09:41:00Z'
+                    errors:
+                      - errorCode: 7006
+                        errorCodeText: portCallServiceID Not Found
+                        errorCodeMessage: |
+                          The Port Call Service does not exist
+        '500':
+          description: |
+            In case a server error occurs in provider system a `500` (Internal Server Error) is returned
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                internalServerErrorExample:
+                  summary: |
+                    Internal Server Error while fetching the Port Call Service
+                  description: |
+                    An Internal Server Error has occurred - the consumer should contact {provider-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
+                  value:
+                    httpMethod: GET
+                    requestUri: /v2/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545
+                    statusCode: 500
+                    statusCodeText: Internal Server Error
+                    statusCodeMessage: |
+                      Internal Server Error occurred while fetching Port Call Service
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2024-11-21T09:41:00Z'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: Internal Error occurred
+                        errorCodeMessage: Internal Error occurred
         default:
           description: Unexpected error
           headers:
@@ -165,6 +292,102 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+        '400':
+          description: |
+            In case creating a new `Estimated Timestamp` does not schema validate a `400` (Bad Request) is returned
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                badRequestExample:
+                  summary: |
+                    Estimated Timestamp missing portCallServiceID
+                  description: |
+                    `portCallServiceID` is a mandatory property in the `Estimated Timestamp`. This is an example of how the error object would look in case this property is missing
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
+                  value:
+                    httpMethod: PUT
+                    requestUri: /v2/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545/estimated-timestamp
+                    statusCode: 400
+                    statusCodeText: Bad Request
+                    statusCodeMessage: |
+                      portCallServiceID object not found - it is a mandatory property in Estimated Timestamp
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2024-11-21T09:41:00Z'
+                    errors:
+                      - errorCode: 7003
+                        property: portCallServiceID
+                        errorCodeText: mandatory property missing
+                        errorCodeMessage: |
+                          portCallServiceID must be provided as part of an Estiamted Timestamp
+        '404':
+          description: |
+            In case the provider does not know of the `portCallServiceID` used in the request (this could be because of a `PUT` request that has not finished processing or simply because the resource does not exist) - it is possible for the provider to reject the requests by returning a `404` (Not Found).
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                notFoundExample:
+                  summary: |
+                    Not Found request
+                  description: |
+                    The provided `portCallServiceID` cannot be found. This can be because a `PUT` request has not been finished processing or because the `portCallServiceID` does not exist in the provider system.
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7006` is just a "random example"
+                  value:
+                    httpMethod: PUT
+                    requestUri: /v2/port-call-servcies/085a3207-5e45-49cf-8e1b-f8442beaf545/estimated-timestamp
+                    statusCode: 404
+                    statusCodeText: Not Found
+                    statusCodeMessage: |
+                      portCallServiceID not found
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2024-09-04T09:41:00Z'
+                    errors:
+                      - errorCode: 7006
+                        errorCodeText: portCallServiceID Not Found
+                        errorCodeMessage: |
+                          The Port Call Service does not exist
+        '500':
+          description: |
+            In case a server error occurs in provider system a `500` (Internal Server Error) is returned
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                internalServerErrorExample:
+                  summary: |
+                    Internal Server Error while processing Port Call Service
+                  description: |
+                    An Internal Server Error has occurred - the consumer should contact {provider-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7005` is just a "random example"
+                  value:
+                    httpMethod: PUT
+                    requestUri: /v2/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545/estimated-timestamp
+                    statusCode: 500
+                    statusCodeText: Internal Server Error
+                    statusCodeMessage: |
+                      Internal Server Error occurred while processing Port Call Service
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2024-11-21T09:41:00Z'
+                    errors:
+                      - errorCode: 7005
+                        errorCodeText: Internal Error occurred
+                        errorCodeMessage: Internal Error occurred
         default:
           description: |
             Unexpected error
@@ -270,6 +493,102 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+        '400':
+          description: |
+            In case cancelling a `Port Call Service` does not schema validate a `400` (Bad Request) is returned
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                badRequestExample:
+                  summary: |
+                    Cancelling a Port Call Service
+                  description: |
+                    `isFYI` is a boolean property - cannnot set the value to '12'. This is an example of how the error object would look in case the value of this property is specified wrongly
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7004` is just a "random example"
+                  value:
+                    httpMethod: POST
+                    requestUri: /v2/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545/cancel
+                    statusCode: 400
+                    statusCodeText: Bad Request
+                    statusCodeMessage: |
+                      isFYI has wrong type - boolean expected but integer found
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2024-11-21T09:41:00Z'
+                    errors:
+                      - errorCode: 7004
+                        property: isFYI
+                        errorCodeText: wrong property type
+                        errorCodeMessage: |
+                          isFYI should be a boolean. '12' provided as value
+        '404':
+          description: |
+            In case the provider does not know of the `portCallServiceID` used in the request (this could be because of a `PUT` request that has not finished processing or simply because the resource does not exist) - it is possible for the provider to reject the requests by returning a `404` (Not Found).
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                notFoundExample:
+                  summary: |
+                    Not Found request
+                  description: |
+                    The provided `portCallServiceID` cannot be found. This can be because a `PUT` request has not been finished processing or because the `portCallServiceID` does not exist in the provider system.
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7006` is just a "random example"
+                  value:
+                    httpMethod: POST
+                    requestUri: /v2/port-call-servcies/085a3207-5e45-49cf-8e1b-f8442beaf545/cancel
+                    statusCode: 404
+                    statusCodeText: Not Found
+                    statusCodeMessage: |
+                      portCallServiceID not found
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2024-09-04T09:41:00Z'
+                    errors:
+                      - errorCode: 7006
+                        errorCodeText: portCallServiceID Not Found
+                        errorCodeMessage: |
+                          The Port Call Service does not exist
+        '500':
+          description: |
+            In case a server error occurs in provider system a `500` (Internal Server Error) is returned
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                internalServerErrorExample:
+                  summary: |
+                    Internal Server Error while processing Port Call Service
+                  description: |
+                    An Internal Server Error has occurred - the consumer should contact {provider-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7005` is just a "random example"
+                  value:
+                    httpMethod: POST
+                    requestUri: /v2/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545/cancel
+                    statusCode: 500
+                    statusCodeText: Internal Server Error
+                    statusCodeMessage: |
+                      Internal Server Error occurred while processing Port Call Service
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2024-11-21T09:41:00Z'
+                    errors:
+                      - errorCode: 7005
+                        errorCodeText: Internal Error occurred
+                        errorCodeMessage: Internal Error occurred
         default:
           description: Unexpected error
           headers:
@@ -305,6 +624,102 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+        '400':
+          description: |
+            In case omitting a `Port Call` does not schema validate a `400` (Bad Request) is returned
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                badRequestExample:
+                  summary: |
+                    Omitting a Port Call
+                  description: |
+                    `isFYI` is a boolean property - cannnot set the value to '12'. This is an example of how the error object would look in case the value of this property is specified wrongly
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7004` is just a "random example"
+                  value:
+                    httpMethod: POST
+                    requestUri: /v2/port-calls/085a3207-5e45-49cf-8e1b-f8442beaf545/omit
+                    statusCode: 400
+                    statusCodeText: Bad Request
+                    statusCodeMessage: |
+                      isFYI has wrong type - boolean expected but integer found
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2024-11-21T09:41:00Z'
+                    errors:
+                      - errorCode: 7004
+                        property: isFYI
+                        errorCodeText: wrong property type
+                        errorCodeMessage: |
+                          isFYI should be a boolean. '12' provided as value
+        '404':
+          description: |
+            In case the provider does not know of the `portCallID` used in the request (this could be because of a `PUT` request that has not finished processing or simply because the resource does not exist) - it is possible for the provider to reject the requests by returning a `404` (Not Found).
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                notFoundExample:
+                  summary: |
+                    Not Found request
+                  description: |
+                    The provided `portCallID` cannot be found. This can be because a `PUT` request has not been finished processing or because the `portCallID` does not exist in the provider system.
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7006` is just a "random example"
+                  value:
+                    httpMethod: POST
+                    requestUri: /v2/port-calls/085a3207-5e45-49cf-8e1b-f8442beaf545/omit
+                    statusCode: 404
+                    statusCodeText: Not Found
+                    statusCodeMessage: |
+                      portCallID not found
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2024-09-04T09:41:00Z'
+                    errors:
+                      - errorCode: 7006
+                        errorCodeText: portCallID Not Found
+                        errorCodeMessage: |
+                          The Port Call Service does not exist
+        '500':
+          description: |
+            In case a server error occurs in provider system a `500` (Internal Server Error) is returned
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                internalServerErrorExample:
+                  summary: |
+                    Internal Server Error while processing Port Call Service
+                  description: |
+                    An Internal Server Error has occurred - the consumer should contact {provider-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7005` is just a "random example"
+                  value:
+                    httpMethod: POST
+                    requestUri: /v2/port-calls/085a3207-5e45-49cf-8e1b-f8442beaf545/omit
+                    statusCode: 500
+                    statusCodeText: Internal Server Error
+                    statusCodeMessage: |
+                      Internal Server Error occurred while processing Port Call Service
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2024-11-21T09:41:00Z'
+                    errors:
+                      - errorCode: 7005
+                        errorCodeText: Internal Error occurred
+                        errorCodeMessage: Internal Error occurred
         default:
           description: |
             Unexpected error
@@ -341,6 +756,102 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+        '400':
+          description: |
+            In case omitting a `Transport Call` does not schema validate a `400` (Bad Request) is returned
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                badRequestExample:
+                  summary: |
+                    Omitting a Transport Call
+                  description: |
+                    `isFYI` is a boolean property - cannnot set the value to '12'. This is an example of how the error object would look in case the value of this property is specified wrongly
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7004` is just a "random example"
+                  value:
+                    httpMethod: POST
+                    requestUri: /v2/transport-calls/085a3207-5e45-49cf-8e1b-f8442beaf545/omit
+                    statusCode: 400
+                    statusCodeText: Bad Request
+                    statusCodeMessage: |
+                      isFYI has wrong type - boolean expected but integer found
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2024-11-21T09:41:00Z'
+                    errors:
+                      - errorCode: 7004
+                        property: isFYI
+                        errorCodeText: wrong property type
+                        errorCodeMessage: |
+                          isFYI should be a boolean. '12' provided as value
+        '404':
+          description: |
+            In case the provider does not know of the `transportCallID` used in the request (this could be because of a `PUT` request that has not finished processing or simply because the resource does not exist) - it is possible for the provider to reject the requests by returning a `404` (Not Found).
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                notFoundExample:
+                  summary: |
+                    Not Found request
+                  description: |
+                    The provided `transportCallID` cannot be found. This can be because a `PUT` request has not been finished processing or because the `transportCallID` does not exist in the provider system.
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7006` is just a "random example"
+                  value:
+                    httpMethod: POST
+                    requestUri: /v2/transport-calls/085a3207-5e45-49cf-8e1b-f8442beaf545/omit
+                    statusCode: 404
+                    statusCodeText: Not Found
+                    statusCodeMessage: |
+                      transportCallID not found
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2024-09-04T09:41:00Z'
+                    errors:
+                      - errorCode: 7006
+                        errorCodeText: transportCallID Not Found
+                        errorCodeMessage: |
+                          The Port Call Service does not exist
+        '500':
+          description: |
+            In case a server error occurs in provider system a `500` (Internal Server Error) is returned
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                internalServerErrorExample:
+                  summary: |
+                    Internal Server Error while processing Port Call Service
+                  description: |
+                    An Internal Server Error has occurred - the consumer should contact {provider-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7005` is just a "random example"
+                  value:
+                    httpMethod: POST
+                    requestUri: /v2/transport-calls/085a3207-5e45-49cf-8e1b-f8442beaf545/omit
+                    statusCode: 500
+                    statusCodeText: Internal Server Error
+                    statusCodeMessage: |
+                      Internal Server Error occurred while processing Port Call Service
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2024-11-21T09:41:00Z'
+                    errors:
+                      - errorCode: 7005
+                        errorCodeText: Internal Error occurred
+                        errorCodeMessage: Internal Error occurred
         default:
           description: |
             Unexpected error
@@ -411,6 +922,102 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+        '400':
+          description: |
+            In case decling a `Port Call Service` does not schema validate a `400` (Bad Request) is returned
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                badRequestExample:
+                  summary: |
+                    Decling a Port Call Service
+                  description: |
+                    `isFYI` is a boolean property - cannnot set the value to '12'. This is an example of how the error object would look in case the value of this property is specified wrongly
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7004` is just a "random example"
+                  value:
+                    httpMethod: POST
+                    requestUri: /v2/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545/decline
+                    statusCode: 400
+                    statusCodeText: Bad Request
+                    statusCodeMessage: |
+                      isFYI has wrong type - boolean expected but integer found
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2024-11-21T09:41:00Z'
+                    errors:
+                      - errorCode: 7004
+                        property: isFYI
+                        errorCodeText: wrong property type
+                        errorCodeMessage: |
+                          isFYI should be a boolean. '12' provided as value
+        '404':
+          description: |
+            In case the provider does not know of the `portCallServiceID` used in the request (this could be because of a `PUT` request that has not finished processing or simply because the resource does not exist) - it is possible for the provider to reject the requests by returning a `404` (Not Found).
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                notFoundExample:
+                  summary: |
+                    Not Found request
+                  description: |
+                    The provided `portCallServiceID` cannot be found. This can be because a `PUT` request has not been finished processing or because the `portCallServiceID` does not exist in the provider system.
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7006` is just a "random example"
+                  value:
+                    httpMethod: POST
+                    requestUri: /v2/port-call-servcies/085a3207-5e45-49cf-8e1b-f8442beaf545/decline
+                    statusCode: 404
+                    statusCodeText: Not Found
+                    statusCodeMessage: |
+                      portCallServiceID not found
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2024-09-04T09:41:00Z'
+                    errors:
+                      - errorCode: 7006
+                        errorCodeText: portCallServiceID Not Found
+                        errorCodeMessage: |
+                          The Port Call Service does not exist
+        '500':
+          description: |
+            In case a server error occurs in provider system a `500` (Internal Server Error) is returned
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                internalServerErrorExample:
+                  summary: |
+                    Internal Server Error while processing Port Call Service
+                  description: |
+                    An Internal Server Error has occurred - the consumer should contact {provider-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7005` is just a "random example"
+                  value:
+                    httpMethod: POST
+                    requestUri: /v2/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545/decline
+                    statusCode: 500
+                    statusCodeText: Internal Server Error
+                    statusCodeMessage: |
+                      Internal Server Error occurred while processing Port Call Service
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2024-11-21T09:41:00Z'
+                    errors:
+                      - errorCode: 7005
+                        errorCodeText: Internal Error occurred
+                        errorCodeMessage: Internal Error occurred
         default:
           description: Unexpected error
           headers:
