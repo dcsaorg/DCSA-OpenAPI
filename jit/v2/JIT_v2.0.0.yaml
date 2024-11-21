@@ -47,8 +47,8 @@ info:
 
     It is the responsibility of the Provider of the initial **Port Call Service** to create a:
     - `portCallID` to identify all communication regarding the **Port Call**
-    - `transportCallID` to identify each **Transport Call** inside the same `portCallID`. One **Port Call** can contain many **Transport Calls**
-    - `portCallServiceID` to identify each **Port Call Service** inside the same `transportCallID`. One **Transport Call** can contain many **Port Call Services**
+    - `terminalCallID` to identify each **Terminal Call** inside the same `portCallID`. One **Port Call** can contain many **Terminal Calls**
+    - `portCallServiceID` to identify each **Port Call Service** inside the same `terminalCallID`. One **Terminal Call** can contain many **Port Call Services**
 
     It is the responsibility of the creator of a **Timestamp** (Estimated, Requested, Planned or Actual) to create the `timestampID` as an identifier for the **Timestamp** for any further referral.
 
@@ -730,20 +730,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  '/v2/transport-calls/{transportCallID}/omit':
+  '/v2/te-minalcalls/{terminalCallID}/omit':
     post:
       parameters:
-        - $ref: '#/components/parameters/transportCallIDPathParam'
+        - $ref: '#/components/parameters/terminalCallIDPathParam'
         - $ref: '#/components/parameters/Api-Version-Major'
       tags:
         - Port Call Service consumer
-      operationId: omit-transport-call
-      summary: Omits a Transport Call
+      operationId: omit-terminal-call
+      summary: Omits a Terminal Call
       description: |
-        Carrier `OMITTING` a **Transport Call**
+        Carrier `OMITTING` a **Terminal Call**
       requestBody:
         description: |
-          Omits a **Transport Call**
+          Omits a **Terminal Call**
         required: true
         content:
           application/json:
@@ -752,13 +752,13 @@ paths:
       responses:
         '204':
           description: |
-            **Transport Call** successfully marked as omitted.
+            **Terminal Call** successfully marked as omitted.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
         '400':
           description: |
-            In case omitting a `Transport Call` does not schema validate a `400` (Bad Request) is returned
+            In case omitting a `Terminal Call` does not schema validate a `400` (Bad Request) is returned
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -769,14 +769,14 @@ paths:
               examples:
                 badRequestExample:
                   summary: |
-                    Omitting a Transport Call
+                    Omitting a Terminal Call
                   description: |
                     `isFYI` is a boolean property - cannnot set the value to '12'. This is an example of how the error object would look in case the value of this property is specified wrongly
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7004` is just a "random example"
                   value:
                     httpMethod: POST
-                    requestUri: /v2/transport-calls/085a3207-5e45-49cf-8e1b-f8442beaf545/omit
+                    requestUri: /v2/terminal-calls/085a3207-5e45-49cf-8e1b-f8442beaf545/omit
                     statusCode: 400
                     statusCodeText: Bad Request
                     statusCodeMessage: |
@@ -791,7 +791,7 @@ paths:
                           isFYI should be a boolean. '12' provided as value
         '404':
           description: |
-            In case the provider does not know of the `transportCallID` used in the request (this could be because of a `PUT` request that has not finished processing or simply because the resource does not exist) - it is possible for the provider to reject the requests by returning a `404` (Not Found).
+            In case the provider does not know of the `terminalCallID` used in the request (this could be because of a `PUT` request that has not finished processing or simply because the resource does not exist) - it is possible for the provider to reject the requests by returning a `404` (Not Found).
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -804,21 +804,21 @@ paths:
                   summary: |
                     Not Found request
                   description: |
-                    The provided `transportCallID` cannot be found. This can be because a `PUT` request has not been finished processing or because the `transportCallID` does not exist in the provider system.
+                    The provided `terminalCallID` cannot be found. This can be because a `PUT` request has not been finished processing or because the `terminalCallID` does not exist in the provider system.
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7006` is just a "random example"
                   value:
                     httpMethod: POST
-                    requestUri: /v2/transport-calls/085a3207-5e45-49cf-8e1b-f8442beaf545/omit
+                    requestUri: /v2/terminal-calls/085a3207-5e45-49cf-8e1b-f8442beaf545/omit
                     statusCode: 404
                     statusCodeText: Not Found
                     statusCodeMessage: |
-                      transportCallID not found
+                      terminalCallID not found
                     providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
                     errorDateTime: '2024-09-04T09:41:00Z'
                     errors:
                       - errorCode: 7006
-                        errorCodeText: transportCallID Not Found
+                        errorCodeText: terminalCallID Not Found
                         errorCodeMessage: |
                           The Port Call Service does not exist
         '500':
@@ -841,7 +841,7 @@ paths:
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7005` is just a "random example"
                   value:
                     httpMethod: POST
-                    requestUri: /v2/transport-calls/085a3207-5e45-49cf-8e1b-f8442beaf545/omit
+                    requestUri: /v2/terminal-calls/085a3207-5e45-49cf-8e1b-f8442beaf545/omit
                     statusCode: 500
                     statusCodeText: Internal Server Error
                     statusCodeMessage: |
@@ -1045,6 +1045,7 @@ components:
         example: '2'
       description: |
         An API-Version header **MAY** be added to the request (optional); if added it **MUST** only contain **MAJOR** version. API-Version header **MUST** be aligned with the URI version.
+
     #############
     # Path params
     #############
@@ -1068,17 +1069,18 @@ components:
         format: uuid
         example: 0342254a-5927-4856-b9c9-aa12e7c00563
       required: true
-    transportCallIDPathParam:
+    terminalCallIDPathParam:
       in: path
-      name: transportCallID
+      name: terminalCallID
       description: |
-        The provider created identifier for the **Transport Call**
+        The provider created identifier for the **Terminal Call**
       schema:
         type: string
         format: uuid
         example: 0342254a-5927-4856-b9c9-aa12e7c00563
       required: true
   schemas:
+
     ###################
     # Port Call Service
     ###################
@@ -1086,12 +1088,12 @@ components:
       type: object
       title: Port Call Service
       description: |
-        The **Port Call Service** contains all information about the **Port Call**, the **Transport Call** within the **Port Call**, the **Vessel** information along with `vesselPosition`, `milesToDestinationPort` and `draft`. Finally it also contains the actual **Port Call Service** specification.
+        The **Port Call Service** contains all information about the **Port Call**, the **Terminal Call** within the **Port Call**, the **Vessel** information along with `vesselPosition`, `milesToDestinationPort` and `draft`. Finally it also contains the actual **Port Call Service** specification.
       properties:
         portCall:
           $ref: '#/components/schemas/PortCall'
-        transportCall:
-          $ref: '#/components/schemas/TransportCall'
+        terminalCall:
+          $ref: '#/components/schemas/TerminalCall'
         vessel:
           $ref: '#/components/schemas/Vessel'
         specification:
@@ -1103,12 +1105,13 @@ components:
           example: true
       required:
         - portCall
-        - transportCall
+        - terminalCall
         - vessel
         - specification
-      ###########
-      # Port Call
-      ###########
+
+    ###########
+    # Port Call
+    ###########
     PortCall:
       type: object
       title: Port Call
@@ -1125,7 +1128,7 @@ components:
           type: string
           maxLength: 50
           description: |
-            The unique reference that can be used to link different **Transport Calls** to the same port visit. The reference is provided by the port to uniquely identify a **Port Call**.
+            The unique reference that can be used to link different **Terminal Calls** to the same port visit. The reference is provided by the port to uniquely identify a **Port Call**.
           example: NLAMS1234589
         carrierServiceName:
           type: string
@@ -1159,25 +1162,26 @@ components:
         - portCallID
         - carrierServiceName
         - carrierServiceCode
-      ########################
-      # Transport Call Service
-      ########################
-    TransportCall:
+
+    ########################
+    # Terminal Call Service
+    ########################
+    TerminalCall:
       type: object
-      title: Transport Call
+      title: Terminal Call
       description: |
-        **Transport Call** information. The `transportCallID` uniquely identifies the **Transport Call**. Any subsequent **Port Call Services** linked to the same **Transport Call** MUST use the same `transportCallID`. An optional `transportCallReference` can be added in order to link the **Transport Call** to external systems (e.g OVS).
+        **Terminal Call** information. The `terminalCallID` uniquely identifies the **Terminal Call**. Any subsequent **Port Call Services** linked to the same **Terminal Call** MUST use the same `terminalCallID`. An optional `transportCallReference` can be added in order to link the **Terminal Call** to external systems (e.g OVS).
       properties:
-        transportCallID:
+        terminalCallID:
           type: string
           format: uuid
           description: |
-            Universal unique identifier for the **Transport Call**. The `transportCallID` is created by the provider. The `transportCallID` **MUST** only be created once per **Transport Call** - which is the first time a **Port Call Service** is also created. To be used in all communication regarding the **Transport Call**.
+            Universal unique identifier for the **Terminal Call**. The `terminalCallID` is created by the provider. The `terminalCallID` **MUST** only be created once per **Terminal Call** - which is the first time a **Port Call Service** is also created. To be used in all communication regarding the **Terminal Call**.
           example: 0342254a-5927-4856-b9c9-aa12e7c00563
         transportCallReference:
           type: string
           description: |
-            The unique reference for a **Transport Call**. It’s the vessel operator’s responsibility to provide the **Transport Call Reference**, other parties are obliged to pick it up and use it. It can take the form of **Port Call References** as defined in OVS Definitions Document, or alternatively a reference as defined by the vessel operator.
+            The unique reference for a **Terminal Call**. It’s the vessel operator’s responsibility to provide the **Terminal Call Reference**, other parties are obliged to pick it up and use it. It can take the form of **Port Call References** as defined in OVS Definitions Document, or alternatively a reference as defined by the vessel operator.
           maxLength: 100
           example: SR11111X-9321483-2107W-NLAMS-ACT-1-1
         transportCallSequenceNumber:
@@ -1231,10 +1235,11 @@ components:
             xxx
           example: false
       required:
-        - transportCallID
-      ########
-      # Vessel
-      ########
+        - terminalCallID
+
+    ########
+    # Vessel
+    ########
     Vessel:
       type: object
       title: Vessel
@@ -1334,7 +1339,7 @@ components:
             The vertical distance from the surface of the water to the highest point of mast or aerial.
 
             If the vertical draft is specified in feet (`FOT`) then the decimal part should be considered as a fraction of a foot and **not as a number of inches. E.g. 120.5 feet means 120 and a half foot (which would be 120'6")
-          example: 60.0
+          example: 60
         dimensionUnit:
           type: string
           description: |
@@ -1353,6 +1358,7 @@ components:
           description: |
             Remaining distance reported by the vessel to the next destination port in nautical miles to the berth in that port.
           example: 245.45
+
     ###############
     # Specification
     ###############
@@ -1504,9 +1510,10 @@ components:
         - portCallServiceType
         - portCallServiceEventTypeCode
         - portCallServiceLocation
-      #################
-      # Vessel position
-      #################
+
+    #################
+    # Vessel position
+    #################
     VesselPosition:
       type: object
       title: Vessel Position
@@ -1547,6 +1554,7 @@ components:
           example: NLAMS
         geoCoordinate:
           $ref: '#/components/schemas/GeoCoordinate'
+
     ############################
     # Port Call Service Location
     ############################
@@ -1590,6 +1598,7 @@ components:
           example: NLAMS
         geoCoordinate:
           $ref: '#/components/schemas/GeoCoordinate'
+
     ###################
     # Facility Location
     ###################
@@ -1631,9 +1640,10 @@ components:
       required:
         - facilityCode
         - facilityCodeListProvider
-      #########################
-      # Geo Coordinate Location
-      #########################
+
+    #########################
+    # Geo Coordinate Location
+    #########################
     GeoCoordinate:
       type: object
       title: Geo Coordinate
@@ -1653,9 +1663,10 @@ components:
       required:
         - latitude
         - longitude
-      #####################
-      # Estimated timestamp
-      #####################
+
+    #####################
+    # Estimated timestamp
+    #####################
     EstimatedTimestamp:
       title: Estimated Timestamp
       type: object
@@ -1707,9 +1718,10 @@ components:
         - timestampID
         - portCallServiceID
         - portCallServiceDateTime
-      ###################
-      # Planned timestamp
-      ###################
+
+    ###################
+    # Planned timestamp
+    ###################
     PlannedTimestamp:
       title: Planned Timestamp
       type: object
@@ -1761,9 +1773,10 @@ components:
         - timestampID
         - portCallServiceID
         - portCallServiceDateTime
-      #####################
-      # Requested timestamp
-      #####################
+
+    #####################
+    # Requested timestamp
+    #####################
     RequestedTimestamp:
       title: Requested Timestamp
       type: object
@@ -1815,9 +1828,10 @@ components:
         - timestampID
         - portCallServiceID
         - portCallServiceDateTime
-      ##################
-      # Actual timestamp
-      ##################
+
+    ##################
+    # Actual timestamp
+    ##################
     ActualTimestamp:
       title: Actual Timestamp
       type: object
@@ -1869,9 +1883,10 @@ components:
         - timestampID
         - portCallServiceID
         - portCallServiceDateTime
-      ########
-      # Cancel
-      ########
+
+    ########
+    # Cancel
+    ########
     Cancel:
       type: object
       title: Cancel
@@ -1889,6 +1904,7 @@ components:
           description: |
             Free text to provide additional information on the context.
           example: Storms ahead
+
     #########
     # Decline
     #########
@@ -1909,6 +1925,7 @@ components:
           description: |
             Free text to provide additional information on the context.
           example: Crane broken
+
     ######
     # Omit
     ######
@@ -1929,6 +1946,7 @@ components:
           description: |
             Free text to provide additional information on the context.
           example: Engine failure
+
     ############
     # Timestamps
     ############
@@ -1963,6 +1981,7 @@ components:
           description: |
             The local date and time, when the **Port Call Service** took place, in [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format.
           example: '2019-11-12T07:41:00+08:30'
+
     ###########
     # All Moves
     ###########
