@@ -85,7 +85,7 @@ paths:
       operationId: put-port-call-service
       summary: Initiates or updates a Port Call Service
       description: |
-        XXX
+        Description...
       requestBody:
         description: Start a new Port Call Service
         required: true
@@ -277,7 +277,7 @@ paths:
       operationId: estimated-timestamp
       summary: Estimate a timestamp for a Port Call Service
       description: |
-        XXX
+        Description...
       requestBody:
         description: Estimate a timestamp
         required: true
@@ -408,7 +408,7 @@ paths:
       operationId: planned-timestamp
       summary: Plan a timestamp for a Port Call Service
       description: |
-        XXX
+        Description...
       requestBody:
         description: Plan a timestamp
         required: true
@@ -443,7 +443,7 @@ paths:
       operationId: actual-timestamp
       summary: Actual timestamp for a Port Call Service
       description: |
-        XXX
+        Description...
       requestBody:
         description: Actual timestamp
         required: true
@@ -872,7 +872,7 @@ paths:
       operationId: requested-timestamp
       summary: Requested timestamp for a Port Call Service
       description: |
-        XXX
+        Description...
       requestBody:
         description: Request a timestamp
         required: true
@@ -1169,7 +1169,7 @@ components:
           type: boolean
           readOnly: true
           description: |
-            xxx
+            If set to `true` it indicates that the **Port Call** ha been omitted by the carrier
           example: false
       required:
         - portCallID
@@ -1246,7 +1246,7 @@ components:
           type: boolean
           readOnly: true
           description: |
-            xxx
+            If set to `true` it indicates that the **Terminal Call** ha been omitted by the carrier
           example: false
       required:
         - terminalCallID
@@ -1983,26 +1983,35 @@ components:
             Forecasted restow moves where containers are off loaded from on board the ship and put back onto the ship either at the same stow position or a different stow position. 
           example: 20
       oneOf:
-        - type: object
-          title: Total Moves (Dry + Reefer + OOG)
+        - $ref: '#/components/schemas/TotalMoves'
+        - $ref: '#/components/schemas/SpecificMoves'
+
+    TotalMoves:
+      type: object
+      title: Total Moves (Dry + Reefer + OOG)
+      description: |
+        Forecasted total container moves for loading and discharging, empty or laden, at a terminal, covering various types such as Dry, Reefer, Out-of-Gauge (OOG)
+      properties:
+        totalMoves:
+          type: integer
+          format: int32
           description: |
             Forecasted total container moves for loading and discharging, empty or laden, at a terminal, covering various types such as Dry, Reefer, Out-of-Gauge (OOG)
-          properties:
-            totalMoves:
-              type: integer
-              format: int32
-              description: |
-                Forecasted total container moves for loading and discharging, empty or laden, at a terminal, covering various types such as Dry, Reefer, Out-of-Gauge (OOG)
-              example: 155
-          required:
-            - totalMoves
-        - type: object
-          title: Specific moves (for load and discharge)
-          properties:
-            loadMoves:
-              $ref: '#/components/schemas/LoadMoves'
-            dischargeMoves:
-              $ref: '#/components/schemas/DischargeMoves'
+          example: 155
+      required:
+        - totalMoves
+
+    SpecificMoves:
+      type: object
+      title: Specific moves (for load and discharge)
+      description: |
+        Forecasted moves for loading and discharging, empty or laden, at a terminal, covering various types such as Dry, Reefer, Out-of-Gauge (OOG)
+      properties:
+        loadMoves:
+          $ref: '#/components/schemas/LoadMoves'
+        dischargeMoves:
+          $ref: '#/components/schemas/DischargeMoves'
+
     LoadMoves:
       type: object
       title: Load Moves
@@ -2046,39 +2055,30 @@ components:
       description: |
         Forecasted laden containers
       oneOf:
-        - type: object
-          title: Total Moves
+        - $ref: '#/components/schemas/TotalMoves'
+        - $ref: '#/components/schemas/ContainerMoves'
+
+    ContainerMoves:
+      type: object
+      title: Container Moves
+      description: |
+        Forecasted container moves for 20-foot and 40-foot containers
+      properties:
+        _20_units:
+          type: integer
+          format: int32
           description: |
-            Forecasted total container moves
-          properties:
-            totalMoves:
-              type: integer
-              format: int32
-              description: |
-                Forecasted total container moves
-              example: 55
-          required:
-            - totalMoves
-        - type: object
-          title: Container Moves
+            Forecasted moves of 20-foot containers
+          example: 25
+        _40_units:
+          type: integer
+          format: int32
           description: |
-            Forecasted container moves for 20-foot and 40-foot containers
-          properties:
-            _20_units:
-              type: integer
-              format: int32
-              description: |
-                Forecasted moves of 20-foot containers
-              example: 25
-            _40_units:
-              type: integer
-              format: int32
-              description: |
-                Forecasted moves of 40-foot containers
-              example: 30
-          required:
-            - _20_units
-            - _40_units
+            Forecasted moves of 40-foot containers
+          example: 30
+      required:
+        - _20_units
+        - _40_units
 
     EmptyContainerMoves:
       type: object
@@ -2086,39 +2086,8 @@ components:
       description: |
         Forecasted empty containers
       oneOf:
-        - type: object
-          title: Total Moves
-          description: |
-            Forecasted total container moves
-          properties:
-            totalMoves:
-              type: integer
-              format: int32
-              description: |
-                Forecasted total container moves
-              example: 55
-          required:
-            - totalMoves
-        - type: object
-          title: Container Moves
-          description: |
-            Forecasted container moves for 20-foot and 40-foot containers
-          properties:
-            _20_units:
-              type: integer
-              format: int32
-              description: |
-                Forecasted moves of 20-foot containers
-              example: 25
-            _40_units:
-              type: integer
-              format: int32
-              description: |
-                Forecasted moves of 40-foot containers
-              example: 30
-          required:
-            - _20_units
-            - _40_units
+        - $ref: '#/components/schemas/TotalMoves'
+        - $ref: '#/components/schemas/ContainerMoves'
 
     ReeferPluggedContainerMoves:
       type: object
@@ -2126,39 +2095,8 @@ components:
       description: |
         Forecasted reefer containers that are plugged
       oneOf:
-        - type: object
-          title: Total Moves
-          description: |
-            Forecasted total container moves
-          properties:
-            totalMoves:
-              type: integer
-              format: int32
-              description: |
-                Forecasted total container moves
-              example: 55
-          required:
-            - totalMoves
-        - type: object
-          title: Container Moves
-          description: |
-            Forecasted container moves for 20-foot and 40-foot containers
-          properties:
-            _20_units:
-              type: integer
-              format: int32
-              description: |
-                Forecasted moves of 20-foot containers
-              example: 25
-            _40_units:
-              type: integer
-              format: int32
-              description: |
-                Forecasted moves of 40-foot containers
-              example: 30
-          required:
-            - _20_units
-            - _40_units
+        - $ref: '#/components/schemas/TotalMoves'
+        - $ref: '#/components/schemas/ContainerMoves'
 
     ################
     # Error Response
