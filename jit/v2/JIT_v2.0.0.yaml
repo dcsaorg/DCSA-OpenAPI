@@ -1135,14 +1135,14 @@ components:
           maxLength: 50
           pattern: '^\S(?:.*\S)?$'
           description: |
-            The carrier name of the (Vessel-)service.
+            The carrier specific name of the service for which the schedule details are published
           example: Great Lion Service
         carrierServiceCode:
           type: string
           maxLength: 11
           pattern: '^\S(?:.*\S)?$'
           description: |
-            The carrier-specific code of the (Vessel-)service for which the schedule details are published.
+            The carrier specific code of the service for which the schedule details are published.
           example: FE1
         universalServiceReference:
           type: string
@@ -1181,7 +1181,7 @@ components:
         transportCallReference:
           type: string
           description: |
-            The unique reference for a **Terminal Call**. It’s the vessel operator’s responsibility to provide the **Terminal Call Reference**, other parties are obliged to pick it up and use it. It can take the form of **Port Call References** as defined in OVS Definitions Document, or alternatively a reference as defined by the vessel operator.
+            The unique reference for a **Terminal Call**. It’s the vessel operator’s responsibility to provide the **Terminal Call Reference**, other parties are obliged to pick it up and use it.
           maxLength: 100
           example: '15063401'
         transportCallSequenceNumber:
@@ -1244,7 +1244,7 @@ components:
       type: object
       title: Vessel
       description: |
-        A floating, sea going structure (mother vessels and feeder vessels) with either an internal or external mode of propulsion designed for the transport of cargo and/or passengers. Ocean vessels are uniquely identified by an IMO number consisting of 7 digits.
+        Vessel related to this **Port Call Service**.
       properties:
         vesselIMONumber:
           type: string
@@ -1374,7 +1374,7 @@ components:
           type: string
           format: uuid
           description: |
-            Universal unique identifier for the **Port Call Service**. The `portCallServiceID` is created by the provider. To be used in all communication regarding the **Port Call Service**.
+            Universal unique identifier for the **Port Call Service**. The `portCallServiceID` is created by the provider. To be used in all communication regarding the **Port Call Service** (i.e. sending a timestamp with the timestamps endpoint).
           example: 0342254a-5927-4856-b9c9-aa12e7c00563
         # publisherRole:
         #   type: string
@@ -1562,8 +1562,7 @@ components:
       type: object
       title: Port Call Service Location
       description: |
-        The location can be specified using **any** of the nested structures:
-        - `UNLocationCode`
+        The location **MUST** be specified as a `UNLocationCode` and can also be specified using **any** of the nested structures:
         - `facility` (used to specify a location using a `facilityCode` and a `facilityCodeListProvider`)
         - `geoCoordinate` (used to specify a location using `latitude` and `longitude`)
 
@@ -1598,6 +1597,8 @@ components:
           example: NLAMS
         geoCoordinate:
           $ref: '#/components/schemas/GeoCoordinate'
+      required:
+        - UNLocationCode
 
     ###################
     # Facility Location
@@ -1807,6 +1808,8 @@ components:
           description: |
             The local date and time, when the **Port Call Service** should be provided, in [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format.
           example: '2019-11-12T07:41:00+08:30'
+        portCallServiceLocation:
+          $ref: '#/components/schemas/PortCallServiceLocation'
         delayReasonCode:
           type: string
           maxLength: 3
@@ -1989,7 +1992,7 @@ components:
       type: object
       title: Moves
       description: |
-        Container moves to be made (in some cases estimated).
+        Forecasted container moves for loading and discharging, empty or laden, at a terminal, covering various types such as Dry, Reefer, Out-of-Gauge (OOG), and Restows. These can be detailed at varying levels of granularity.
 
         **Condition:** Can only be provided if `portCallServiceType` is `MOVES`
       properties:
@@ -1997,19 +2000,19 @@ components:
           type: integer
           format: int32
           description: |
-            xx
+            Forecasted restow moves where containers are off loaded from on board the ship and put back onto the ship either at the same stow position or a different stow position. 
           example: 20
       oneOf:
         - type: object
           title: Total Moves (Dry + Reefer + OOG)
           description: |
-            ..
+            Forecasted total container moves for loading and discharging, empty or laden, at a terminal, covering various types such as Dry, Reefer, Out-of-Gauge (OOG)
           properties:
             totalMoves:
               type: integer
               format: int32
               description: |
-                Total moves...
+                Forecasted total container moves for loading and discharging, empty or laden, at a terminal, covering various types such as Dry, Reefer, Out-of-Gauge (OOG)
               example: 155
           required:
             - totalMoves
@@ -2024,7 +2027,7 @@ components:
       type: object
       title: 'Load Moves'
       description: |
-        Load moves...
+        Forecasted total containeer moves for loading, empty or laden, at a terminal, covering various tyoes such as Dry, Reefer, Out-of-Gauge (OOG)
       properties:
         ladenContainerMoves:
           $ref: '#/components/schemas/LadenContainerMoves'
@@ -2042,7 +2045,7 @@ components:
       type: object
       title: 'Discharge Moves'
       description: |
-        Discharge moves...
+        Forecasted total containeer moves for discharging, empty or laden, at a terminal, covering various tyoes such as Dry, Reefer, Out-of-Gauge (OOG)
       properties:
         ladenContainerMoves:
           $ref: '#/components/schemas/LadenContainerMoves'
@@ -2054,44 +2057,44 @@ components:
           type: integer
           format: int32
           description: |
-            xx
+            Forecasted Out-of-gauge (OOG) units
           example: 2
 
     LadenContainerMoves:
       type: object
       title: 'Laden Container Moves'
       description: |
-        xx
+        Forecasted laden containers
       oneOf:
         - type: object
           title: Total Moves
           description: |
-            ..
+            Forecasted total container moves
           properties:
             totalMoves:
               type: integer
               format: int32
               description: |
-                Total moves...
+                Forecasted total container moves
               example: 55
           required:
             - totalMoves
         - type: object
           title: Container Moves
           description: |
-            ..
+            Forecasted containeer moves for 20-foot and 40-foot containers
           properties:
             _20_units:
               type: integer
               format: int32
               description: |
-                xx
+                Forecasted moves of 20-foot containers
               example: 25
             _40_units:
               type: integer
               format: int32
               description: |
-                xx
+                Forecasted moves of 40-foot containers
               example: 30
           required:
             - _20_units
@@ -2101,37 +2104,37 @@ components:
       type: object
       title: 'Empty Container Moves'
       description: |
-        xx
+        Forecasted empty containers
       oneOf:
         - type: object
           title: Total Moves
           description: |
-            ..
+            Forecasted total container moves
           properties:
             totalMoves:
               type: integer
               format: int32
               description: |
-                Total moves...
+                Forecasted total container moves
               example: 55
           required:
             - totalMoves
         - type: object
           title: Container Moves
           description: |
-            ..
+            Forecasted containeer moves for 20-foot and 40-foot containers
           properties:
             _20_units:
               type: integer
               format: int32
               description: |
-                xx
+                Forecasted moves of 20-foot containers
               example: 25
             _40_units:
               type: integer
               format: int32
               description: |
-                xx
+                Forecasted moves of 40-foot containers
               example: 30
           required:
             - _20_units
@@ -2141,37 +2144,37 @@ components:
       type: object
       title: 'Reefer Plugged Container Moves'
       description: |
-        xx
+        Forecasted reefer containers that are plugged
       oneOf:
         - type: object
           title: Total Moves
           description: |
-            ..
+            Forecasted total container moves
           properties:
             totalMoves:
               type: integer
               format: int32
               description: |
-                Total moves...
+                Forecasted total container moves
               example: 55
           required:
             - totalMoves
         - type: object
           title: Container Moves
           description: |
-            ..
+            Forecasted containeer moves for 20-foot and 40-foot containers
           properties:
             _20_units:
               type: integer
               format: int32
               description: |
-                xx
+                Forecasted moves of 20-foot containers
               example: 25
             _40_units:
               type: integer
               format: int32
               description: |
-                xx
+                Forecasted moves of 40-foot containers
               example: 30
           required:
             - _20_units
