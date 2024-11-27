@@ -267,34 +267,34 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  '/v2/port-call-services/{portCallServiceID}/estimated-timestamp':
+  '/v2/port-call-services/{portCallServiceID}/timestamp':
     put:
       parameters:
         - $ref: '#/components/parameters/portCallServiceIDPathParam'
         - $ref: '#/components/parameters/Api-Version-Major'
       tags:
-        - Port Call Service consumer
-      operationId: estimated-timestamp
-      summary: Estimate a timestamp for a Port Call Service
+        - Port Call Service
+      operationId: timestamp
+      summary: Timestamp for a Port Call Service
       description: |
         Description...
       requestBody:
-        description: Estimate a timestamp
+        description: Any `ERPA` timestamp
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EstimatedTimestamp'
+              $ref: '#/components/schemas/Timestamp'
       responses:
         '204':
           description: |
-            Estimated time for a **Port Call Service** accepted
+            Timestamp for a **Port Call Service** accepted
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
         '400':
           description: |
-            In case creating a new `Estimated Timestamp` fails schema validation a `400` (Bad Request) is returned
+            In case creating a new `Timestamp` fails schema validation, a `400` (Bad Request) is returned
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -305,18 +305,18 @@ paths:
               examples:
                 badRequestExample:
                   summary: |
-                    Estimated Timestamp missing portCallServiceID
+                    Timestamp missing portCallServiceID
                   description: |
-                    `portCallServiceID` is a mandatory property in the `Estimated Timestamp`. This is an example of how the error object would look in case this property is missing
+                    `portCallServiceID` is a mandatory property in the `Timestamp`. This is an example of how the error object would look in case this property is missing
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
                     httpMethod: PUT
-                    requestUri: /v2/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545/estimated-timestamp
+                    requestUri: /v2/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545/timestamp
                     statusCode: 400
                     statusCodeText: Bad Request
                     statusCodeMessage: |
-                      portCallServiceID object not found - it is a mandatory property in Estimated Timestamp
+                      portCallServiceID object not found - it is a mandatory property in Timestamp
                     providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
                     errorDateTime: '2024-11-21T09:41:00Z'
                     errors:
@@ -324,10 +324,10 @@ paths:
                         property: portCallServiceID
                         errorCodeText: mandatory property missing
                         errorCodeMessage: |
-                          portCallServiceID must be provided as part of an Estimated Timestamp
+                          portCallServiceID must be provided as part of a Timestamp
         '404':
           description: |
-            In case the provider does not know of the `portCallServiceID` used in the request (this could be because of a `PUT` request that has not finished processing or simply because the resource does not exist) - it is possible for the provider to reject the requests by returning a `404` (Not Found).
+            In case the provider does not know of the `portCallServiceID` used in the request, it is possible for the provider to reject the requests by returning a `404` (Not Found). This could be because of a `PUT` request, for creating/initiating the Port Call Service, that has not finished processing or simply because the resource does not exist.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -340,12 +340,12 @@ paths:
                   summary: |
                     Not Found request
                   description: |
-                    The provided `portCallServiceID` cannot be found. This can be because a `PUT` request has not been finished processing or because the `portCallServiceID` does not exist in the provider system.
+                    The provided `portCallServiceID` cannot be found. This can be because a `PUT` request, for creating/initiating the **Port Call Service**, has not been finished processing or because the `portCallServiceID` does not exist in the provider system.
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7006` is just a "random example"
                   value:
                     httpMethod: PUT
-                    requestUri: /v2/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545/estimated-timestamp
+                    requestUri: /v2/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545/timestamp
                     statusCode: 404
                     statusCodeText: Not Found
                     statusCodeMessage: |
@@ -388,76 +388,6 @@ paths:
                       - errorCode: 7005
                         errorCodeText: Internal Error occurred
                         errorCodeMessage: Internal Error occurred
-        default:
-          description: |
-            Unexpected error
-          headers:
-            API-Version:
-              $ref: '#/components/headers/API-Version'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  '/v2/port-call-services/{portCallServiceID}/planned-timestamp':
-    put:
-      parameters:
-        - $ref: '#/components/parameters/portCallServiceIDPathParam'
-        - $ref: '#/components/parameters/Api-Version-Major'
-      tags:
-        - Port Call Service consumer
-      operationId: planned-timestamp
-      summary: Plan a timestamp for a Port Call Service
-      description: |
-        Description...
-      requestBody:
-        description: Plan a timestamp
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PlannedTimestamp'
-      responses:
-        '204':
-          description: |
-            Planned time for a **Port Call Service** accepted
-          headers:
-            API-Version:
-              $ref: '#/components/headers/API-Version'
-        default:
-          description: |
-            Unexpected error
-          headers:
-            API-Version:
-              $ref: '#/components/headers/API-Version'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  '/v2/port-call-services/{portCallServiceID}/actual-timestamp':
-    put:
-      parameters:
-        - $ref: '#/components/parameters/portCallServiceIDPathParam'
-        - $ref: '#/components/parameters/Api-Version-Major'
-      tags:
-        - Port Call Service consumer
-      operationId: actual-timestamp
-      summary: Actual timestamp for a Port Call Service
-      description: |
-        Description...
-      requestBody:
-        description: Actual timestamp
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ActualTimestamp'
-      responses:
-        '204':
-          description: |
-            Actual time for a **Port Call Service** accepted
-          headers:
-            API-Version:
-              $ref: '#/components/headers/API-Version'
         default:
           description: |
             Unexpected error
@@ -862,41 +792,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  '/v2/port-call-services/{portCallServiceID}/requested-timestamp':
-    put:
-      parameters:
-        - $ref: '#/components/parameters/portCallServiceIDPathParam'
-        - $ref: '#/components/parameters/Api-Version-Major'
-      tags:
-        - Port Call Service provider
-      operationId: requested-timestamp
-      summary: Requested timestamp for a Port Call Service
-      description: |
-        Description...
-      requestBody:
-        description: Request a timestamp
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RequestedTimestamp'
-      responses:
-        '204':
-          description: |
-            Requested time for a **Port Call Service** accepted
-          headers:
-            API-Version:
-              $ref: '#/components/headers/API-Version'
-        default:
-          description: |
-            Unexpected error
-          headers:
-            API-Version:
-              $ref: '#/components/headers/API-Version'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
   '/v2/port-call-services/{portCallServiceID}/decline':
     post:
       parameters:
@@ -1098,6 +993,25 @@ components:
           $ref: '#/components/schemas/Vessel'
         specification:
           $ref: '#/components/schemas/Specification'
+        timestamps:
+          type: array
+          readOnly: true
+          description: |
+            An array of timestamps linked to the **Port Call Service**.
+          items:
+            $ref: '#/components/schemas/Timestamp'
+        cancelled:
+          type: boolean
+          readOnly: true
+          description: |
+            The **Port Call Service** has been `cancelled` by the Provider.
+          example: false
+        declined:
+          type: boolean
+          readOnly: true
+          description: |
+            The **Port Call Service** has been `declined` by the Consumer.
+          example: false
         isFYI:
           type: boolean
           description: |
@@ -1470,23 +1384,8 @@ components:
           $ref: '#/components/schemas/PortCallServiceLocation'
         moves:
           $ref: '#/components/schemas/Moves'
-        timestamps:
-          $ref: '#/components/schemas/Timestamps'
-        cancelled:
-          type: boolean
-          readOnly: true
-          description: |
-            The **Port Call Service** has been `cancelled` by the Provider.
-          example: false
-        declined:
-          type: boolean
-          readOnly: true
-          description: |
-            The **Port Call Service** has been `declined` by the Consumer.
-          example: false
       required:
         - portCallServiceID
-        # - publisherRole
         - portCallServiceType
         - portCallServiceEventTypeCode
         - portCallServiceLocation
@@ -1547,6 +1446,8 @@ components:
         - `geoCoordinate` (used to specify a location using `latitude` and `longitude`)
 
         **Condition:** It is expected that if a location is specified in multiple ways (e.g. both as a `Facility` and as a `GeoCoordinate`) that both ways point to the same location.
+
+        **Condition:** this property is **only** to be used in combination with `classifierCode=REQ` (a requested **Timestamp**) and can only be used by a **consumer**
       example:
         locationName: CMP Container Terminal Copenhagen
         UNLocationCode: DKCPH
@@ -1645,14 +1546,14 @@ components:
         - latitude
         - longitude
 
-    #####################
-    # Estimated timestamp
-    #####################
-    EstimatedTimestamp:
-      title: Estimated Timestamp
+    ###########
+    # Timestamp
+    ###########
+    Timestamp:
+      title: Timestamp
       type: object
       description: |
-        Estimated date and time when a **Port Call Service** should be provided.
+        Date and time for a `ERPA` Timestamp when a **Port Call Service** should be provided (for `ERP`) or has been provided (for `A`).
       properties:
         timestampID:
           type: string
@@ -1664,117 +1565,11 @@ components:
           type: string
           format: uuid
           description: |
-            The identifier of the **Timestamp** being replied to.
-          example: 0342254a-5927-4856-b9c9-aa12e7c00563
-        portCallServiceID:
-          type: string
-          format: uuid
-          description: |
-            Links the timestamp to a **Port Call Service**.
-          example: 0342254a-5927-4856-b9c9-aa12e7c00563
-        portCallServiceDateTime:
-          type: string
-          format: date-time
-          description: |
-            The local date and time, when the **Port Call Service** should be provided, in [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format.
-          example: '2019-11-12T07:41:00+08:30'
-        delayReasonCode:
-          type: string
-          maxLength: 3
-          description: |
-            Reason code for the delay. See SMDG [Code list DELAY](https://smdg.org/documents/smdg-code-lists/delay-reason-and-port-call-activity/) for a list of valid codes to be used for this attribute.
-          example: STR
-        isFYI:
-          type: boolean
-          description: |
-            If set to `true` it indicates that this message is meant for another party - but is sent as a FYI (for your information).
-          example: true
-        remark:
-          type: string
-          maxLength: 500
-          description: |
-            Free text to provide additional information on the context.
-          example: Port closed due to strike
-      required:
-        - timestampID
-        - portCallServiceID
-        - portCallServiceDateTime
+            The identifier of the **Timestamp** being replied to. Omitted in case the **Timestamp** is the initial **Timestamp**.
 
-    ###################
-    # Planned timestamp
-    ###################
-    PlannedTimestamp:
-      title: Planned Timestamp
-      type: object
-      description: |
-        Planned date and time when a **Port Call Service** will be provided.
-      properties:
-        timestampID:
-          type: string
-          format: uuid
-          description: |
-            Universally unique identifier for the **Timestamp**. The creator of the **Timestamp** is responsible to create the `timestampID`
-          example: 0342254a-5927-4856-b9c9-aa12e7c00563
-        replyToTimestampID:
-          type: string
-          format: uuid
-          description: |
-            The identifier of the **Timestamp** being replied to.
-          example: 0342254a-5927-4856-b9c9-aa12e7c00563
-        portCallServiceID:
-          type: string
-          format: uuid
-          description: |
-            Links the timestamp to a **Port Call Service**.
-          example: 0342254a-5927-4856-b9c9-aa12e7c00563
-        portCallServiceDateTime:
-          type: string
-          format: date-time
-          description: |
-            The local date and time, when the **Port Call Service** will be provided, in [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format.
-          example: '2019-11-12T07:41:00+08:30'
-        delayReasonCode:
-          type: string
-          maxLength: 3
-          description: |
-            Reason code for the delay. See SMDG [Code list DELAY](https://smdg.org/documents/smdg-code-lists/delay-reason-and-port-call-activity/) for a list of valid codes to be used for this attribute.
-          example: STR
-        isFYI:
-          type: boolean
-          description: |
-            If set to `true` it indicates that this message is meant for another party - but is sent as a FYI (for your information).
-          example: true
-        remark:
-          type: string
-          maxLength: 500
-          description: |
-            Free text to provide additional information on the context.
-          example: Port closed due to strike
-      required:
-        - timestampID
-        - portCallServiceID
-        - portCallServiceDateTime
+            **Condition:** Only applicable after initial **Timestamp** has been sent.
 
-    #####################
-    # Requested timestamp
-    #####################
-    RequestedTimestamp:
-      title: Requested Timestamp
-      type: object
-      description: |
-        Requested date and time when a **Port Call Service** should be provided.
-      properties:
-        timestampID:
-          type: string
-          format: uuid
-          description: |
-            Universally unique identifier for the **Timestamp**. The creator of the **Timestamp** is responsible to create the `timestampID`
-          example: 0342254a-5927-4856-b9c9-aa12e7c00563
-        replyToTimestampID:
-          type: string
-          format: uuid
-          description: |
-            The identifier of the **Timestamp** being replied to.
+            **Condition:** Can only reply to a **Timestamp** with the same `portCallServiceID`
           example: 0342254a-5927-4856-b9c9-aa12e7c00563
         portCallServiceID:
           type: string
@@ -1782,11 +1577,31 @@ components:
           description: |
             Links the timestamp to a **Port Call Service**.
           example: 0342254a-5927-4856-b9c9-aa12e7c00563
-        portCallServiceDateTime:
+        classifierCode:
+          type: string
+          description: |
+            Code for describing the timestamp.
+
+            Possible values are:
+            - `ACT` (Actual)
+            - `EST` (Estimated)
+            - `PLN` (Planned)
+            - `REQ` (Requested)
+
+            **Condition:** `EST`, `PLN` and `ACT` are **only** to be used by the **provider** when sending a **Timestamp** to the **consumer**.
+
+            **Condition:** `REQ` is **only** to be used by the **consumer** when sending a **Timestamp** to the **provider**.
+          enum:
+            - ACT
+            - EST
+            - PLN
+            - REQ
+          example: EST
+        dateTime:
           type: string
           format: date-time
           description: |
-            The local date and time, when the **Port Call Service** should be provided, in [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format.
+            The local date and time, when the timestamp for a **Port Call Service** should be (or has been) provided, in [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format.
           example: '2019-11-12T07:41:00+08:30'
         portCallServiceLocation:
           $ref: '#/components/schemas/PortCallServiceLocation'
@@ -1810,62 +1625,8 @@ components:
       required:
         - timestampID
         - portCallServiceID
-        - portCallServiceDateTime
-
-    ##################
-    # Actual timestamp
-    ##################
-    ActualTimestamp:
-      title: Actual Timestamp
-      type: object
-      description: |
-        Actual date and time when a **Port Call Service** took place.
-      properties:
-        timestampID:
-          type: string
-          format: uuid
-          description: |
-            Universally unique identifier for the **Timestamp**. The creator of the **Timestamp** is responsible to create the `timestampID`
-          example: 0342254a-5927-4856-b9c9-aa12e7c00563
-        replyToTimestampID:
-          type: string
-          format: uuid
-          description: |
-            The identifier of the **Timestamp** being replied to.
-          example: 0342254a-5927-4856-b9c9-aa12e7c00563
-        portCallServiceID:
-          type: string
-          format: uuid
-          description: |
-            Links the timestamp to a **Port Call Service**.
-          example: 0342254a-5927-4856-b9c9-aa12e7c00563
-        portCallServiceDateTime:
-          type: string
-          format: date-time
-          description: |
-            The local date and time, when the **Port Call Service** took place, in [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format.
-          example: '2019-11-12T07:41:00+08:30'
-        delayReasonCode:
-          type: string
-          maxLength: 3
-          description: |
-            Reason code for the delay. See SMDG [Code list DELAY](https://smdg.org/documents/smdg-code-lists/delay-reason-and-port-call-activity/) for a list of valid codes to be used for this attribute.
-          example: STR
-        isFYI:
-          type: boolean
-          description: |
-            If set to `true` it indicates that this message is meant for another party - but is sent as a FYI (for your information).
-          example: true
-        remark:
-          type: string
-          maxLength: 500
-          description: |
-            Free text to provide additional information on the context.
-          example: Port closed due to strike
-      required:
-        - timestampID
-        - portCallServiceID
-        - portCallServiceDateTime
+        - classifierCode
+        - dateTime
 
     ########
     # Cancel
@@ -1947,41 +1708,6 @@ components:
           description: |
             Free text to provide additional information on the context.
           example: Engine failure
-
-    ############
-    # Timestamps
-    ############
-    Timestamps:
-      type: object
-      title: Timestamps
-      readOnly: true
-      description: |
-        Latest timestamps for Estimated (`EST`), Requested (`REQ`), Planned (`PLN`) and Actual (`ACT`).
-      properties:
-        estimatedDateTime:
-          type: string
-          format: date-time
-          description: |
-            The local date and time, when the **Port Call Service** should be provided, in [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format.
-          example: '2019-11-12T07:41:00+08:30'
-        requestedDateTime:
-          type: string
-          format: date-time
-          description: |
-            The local date and time, when the **Port Call Service** should be provided, in [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format.
-          example: '2019-11-12T07:41:00+08:30'
-        plannedDateTime:
-          type: string
-          format: date-time
-          description: |
-            The local date and time, when the **Port Call Service** will be provided, in [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format.
-          example: '2019-11-12T07:41:00+08:30'
-        actualDateTime:
-          type: string
-          format: date-time
-          description: |
-            The local date and time, when the **Port Call Service** took place, in [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format.
-          example: '2019-11-12T07:41:00+08:30'
 
     #######
     # Moves
