@@ -174,59 +174,55 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  '/v2/port-call-services':
     get:
       parameters:
-        - $ref: '#/components/parameters/portCallServiceIDPathParam'
+        - $ref: '#/components/parameters/portCallIDQueryParam'
+        - $ref: '#/components/parameters/transportCallIDQueryParam'
+        - $ref: '#/components/parameters/portCallServiceIDQueryParam'
+
+        - $ref: '#/components/parameters/startDateTimeQueryParam'
+        - $ref: '#/components/parameters/endDateTimeQueryParam'
+
+        - $ref: '#/components/parameters/UNLocationCodeQueryParameter'
+        - $ref: '#/components/parameters/portVisitReferenceQueryParam'
+        - $ref: '#/components/parameters/carrierServiceNameQueryParam'
+        - $ref: '#/components/parameters/carrierServiceCodeQueryParam'
+        - $ref: '#/components/parameters/universalServiceReferenceQueryParam'
+
+        - $ref: '#/components/parameters/transportCallReferenceQueryParam'
+        - $ref: '#/components/parameters/transportCallSequenceNumberQueryParam'
+        - $ref: '#/components/parameters/carrierImportVoyageNumberQueryParam'
+        - $ref: '#/components/parameters/carrierExportVoyageNumberQueryParam'
+        - $ref: '#/components/parameters/universalImportVoyageReferenceQueryParam'
+        - $ref: '#/components/parameters/universalExportVoyageReferenceQueryParam'
+        - $ref: '#/components/parameters/portCallServiceTypeQueryParam'
+        - $ref: '#/components/parameters/portCallServiceEventTypeCodeQueryParam'
+
+        - $ref: '#/components/parameters/vesselIMONumberQueryParam'
+        - $ref: '#/components/parameters/vesselNameQueryParam'
+        - $ref: '#/components/parameters/MMSINumberQueryParam'
+
+        - $ref: '#/components/parameters/limitQueryParam'
+        - $ref: '#/components/parameters/cursorQueryParam'
         - $ref: '#/components/parameters/Api-Version-Major'
       tags:
         - Port Call Service
-      operationId: get-port-call-service
-      summary: Retrieves a Port Call Service
+      operationId: get-port-call-services
+      summary: Retrieve a list of Port Call Services.
       description: |
-        Retrieves a Port Call Service
+        Retrieve a list of Port Call Services.
       responses:
         '200':
           description: |
-            Get the Port Call Service
+            Get the list of Port Call Services matching the specified filter(s).
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PortCallService'
-        '404':
-          description: |
-            In case the provider does not know of the `portCallServiceID` used in the request (this could be because of a `PUT` request that has not finished processing or simply because the resource does not exist) - it is possible for the provider to reject the requests by returning a `404` (Not Found).
-          headers:
-            API-Version:
-              $ref: '#/components/headers/API-Version'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              examples:
-                notFoundExample:
-                  summary: |
-                    Not Found request
-                  description: |
-                    The provided `portCallServiceID` cannot be found. This can be because a `PUT` request has not been finished processing or because the `portCallServiceID` does not exist in the provider system.
-
-                    **NB**: `errorCode` not yet standardized by DCSA. Value `7006` is just a "random example"
-                  value:
-                    httpMethod: GET
-                    requestUri: /v2/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545
-                    statusCode: 404
-                    statusCodeText: Not Found
-                    statusCodeMessage: |
-                      portCallServiceID not found
-                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
-                    errorDateTime: '2024-09-04T09:41:00Z'
-                    errors:
-                      - errorCode: 7006
-                        errorCodeText: portCallServiceID Not Found
-                        errorCodeMessage: |
-                          The Port Call Service does not exist
+                $ref: '#/components/schemas/PortCallServices'
         '500':
           description: |
             In case a server error occurs in provider system a `500` (Internal Server Error) is returned
@@ -940,6 +936,263 @@ components:
         example: '2'
       description: |
         An API-Version header **MAY** be added to the request (optional); if added it **MUST** only contain **MAJOR** version. API-Version header **MUST** be aligned with the URI version.
+    ##############
+    # Query params
+    ##############
+
+    # Technical query parameters
+
+    portCallIDQueryParam:
+      in: query
+      name: portCallID
+      description: |
+        The **Port Call Identifier** to filter by. Specifying this filter will only return **Port Call Service** objects including the `portCallID`.
+      schema:
+        type: string
+        format: uuid
+        example: 0342254a-5927-4856-b9c9-aa12e7c00563
+    transportCallIDQueryParam:
+      in: query
+      name: transportCallID
+      description: |
+        The **Transport Call Identifier** to filter by. Specifying this filter will only return **Port Call Service** objects including the `transportCallID`.
+      schema:
+        type: string
+        format: uuid
+        example: 0342254a-5927-4856-b9c9-aa12e7c00563
+    portCallServiceIDQueryParam:
+      in: query
+      name: portCallServiceID
+      description: |
+        The **Port Call Service Identifier** to filter by. Specifying this filter will (at most) return a single **Port Call Service** object including the `portCallServiceID` (if the `portCallServiceID` exists).
+      schema:
+        type: string
+        format: uuid
+        example: 0342254a-5927-4856-b9c9-aa12e7c00563
+
+    # Timestamp query parameters
+
+    startDateTimeQueryParam:
+      in: query
+      name: startDateTime
+      description: |
+        The **Start Date Time** of the period for which **Port Call Service** information is requested. If a date and time of any **Timestamp** inside a **Port Call Service** matches a date and time on or after (≥) the `startDateTime`, the **Port Call Service** will be included in the result. All matching is done towards local Date and time at the place of the **Port Call Service**. The matched **Timestamp** in the timestamps of the **Port Call Service** must be included in the **Port Call Service** objects returned.
+        If this filter is not provided the default value is `3 months` prior to request time.  The value is populated in [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) date format.
+      schema:
+        type: string
+        format: date-time
+        example: '2020-04-06T07:41:00+08:30'
+    endDateTimeQueryParam:
+      in: query
+      name: endDateTime
+      description: |
+        The **End Date Time** of the period for which **Port Call Service** information is requested. If a date and time of any **Timestamp** inside a **Port Call Service** matches a date and time on or before (≤) the `endDateTime`, the **Port Call Service** will be included in the result. All matching is done towards local Date and time at the place of the **Port Call Service**. The matched **Timestamp** in the timestamps of the **Port Call Service** must be included in the **Port Call Service** objects returned.
+        If this filter is not provided the default value is `6 months` after request time.  The value is populated in [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) date format.
+      schema:
+        type: string
+        format: date-time
+        example: '2020-04-10T07:41:00+08:30'
+
+    # Port Call query parameters
+
+    UNLocationCodeQueryParameter:
+      in: query
+      name: UNLocationCode
+      description: |
+        The **UN Location Code** specifying where a port is located. Specifying this filter will only return **Port Call Service** objects including the `UNLocationCode`.
+      schema:
+        type: string
+        pattern: ^[A-Z]{2}[A-Z2-9]{3}$
+        minLength: 5
+        maxLength: 5
+        example: NLAMS
+    portVisitReferenceQueryParam:
+      in: query
+      name: portVisitReference
+      description: |
+        The **Port Visit Reference** to filter by. The result will only return **Port Call Service** objects including the `portVisitReference`.
+      schema:
+        type: string
+        maxLength: 50
+        example: NLAMS1234589
+    carrierServiceNameQueryParam:
+      in: query
+      name: carrierServiceName
+      description: |
+        The **Carrier specific Service Name** to filter by. The result will only return **Port Call Service** objects including the `carrierServiceName`.
+      schema:
+        type: string
+        maxLength: 50
+        pattern: ^\S(?:.*\S)?$
+        example: Great Lion Service
+    carrierServiceCodeQueryParam:
+      in: query
+      name: carrierServiceCode
+      description: |
+        The **Carrier specific Service Code** to filter by. The result will only return **Port Call Service** objects including the `carrierServiceCode`.
+      schema:
+        type: string
+        maxLength: 11
+        pattern: ^\S(?:.*\S)?$
+        example: FE1
+    universalServiceReferenceQueryParam:
+        in: query
+        name: universalServiceReference
+        description: |
+          The **Universal Service Reference** (`USR`) as defined by DCSA to filter by. The result will only return **Port Call Service** objects including the `universalServiceReference`.    
+        schema:
+          type: string
+          pattern: ^SR\d{5}[A-Z]$
+          maxLength: 8
+          minLength: 8
+          example: SR12345A
+
+    # Transport Call query parameters
+
+    transportCallReferenceQueryParam:
+      in: query
+      name: transportCallReference
+      description: |
+        The **Transport Call Reference** to filter by. The result will only return **Port Call Service** objects including the `transportCallReference`.
+      schema:
+        type: string
+        maxLength: 100
+        example: '15063401'
+    transportCallSequenceNumberQueryParam:
+      in: query
+      name: transportCallSequenceNumber
+      description: |
+        The **Transport Call Sequence Number** to filter by. The result will only return **Port Call Service** objects including the `transportCallSequenceNumber`.
+      schema:
+        type: integer
+        format: int32
+        example: 2
+    carrierImportVoyageNumberQueryParam:
+      in: query
+      name: carrierImportVoyageNumber
+      description: |
+        The **Carrier Import Voyage Number** to filter by. The result will only return **Port Call Service** objects including the `carrierImportVoyageNumber`.
+      schema:
+        type: string
+        maxLength: 50
+        pattern: ^\S(?:.*\S)?$
+        example: 2103N
+    carrierExportVoyageNumberQueryParam:
+      in: query
+      name: carrierExportVoyageNumber
+      description: |
+        The **Carrier Export Voyage Number** to filter by. The result will only return **Port Call Service** objects including the `carrierExportVoyageNumber`.
+      schema:
+        type: string
+        maxLength: 50
+        pattern: ^\S(?:.*\S)?$
+        example: 2103S
+    universalImportVoyageReferenceQueryParam:
+      in: query
+      name: universalImportVoyageReference
+      description: |
+        The **Universal Import Voyage Reference** to filter by. The result will only return **Port Call Service** objects including the `universalImportVoyageReference`.
+      schema:
+        type: string
+        pattern: ^\d{2}[0-9A-Z]{2}[NEWSR]$
+        minLength: 5
+        maxLength: 5
+        example: 2103N
+    universalExportVoyageReferenceQueryParam:
+      in: query
+      name: universalExportVoyageReference
+      description: |
+        The **Universal Export Voyage Reference** to filter by. The result will only return **Port Call Service** objects including the `universalExportVoyageReference`.
+      schema:
+        type: string
+        pattern: ^\d{2}[0-9A-Z]{2}[NEWSR]$
+        minLength: 5
+        maxLength: 5
+        example: 2103N
+
+    # Port Call Service query parameters
+
+    portCallServiceTypeQueryParam:
+      in: query
+      name: portCallServiceType
+      description: |
+        The **Port Call Service Type** to filter by. The result will only return **Port Call Service** objects including the `portCallServiceType`.
+      schema:
+        type: string
+        maxLength: 50
+        pattern: ^\S(?:.*\S)?$
+        example: BERTH
+    portCallServiceEventTypeCodeQueryParam:
+      in: query
+      name: portCallServiceEventTypeCode
+      description: |
+        The **Port Call Service Event Type Code** to filter by. The result will only return **Port Call Service** objects including the `portCallServiceEventTypeCode`.
+      schema:
+        type: string
+        enum:
+          - STRT
+          - CMPL
+          - ARRI
+          - DEPA
+        example: STRT
+
+    # Vessel query parameters
+
+    vesselIMONumberQueryParam:
+      in: query
+      name: vesselIMONumber
+      description: |
+        The **Vessel IMO Number** to filter by. The result will only return **Port Call Service** objects including the `vesselIMONumber`.
+      schema:
+        type: string
+        pattern: ^\d{7,8}$
+        minLength: 7
+        maxLength: 8
+        example: '9321483'
+    vesselNameQueryParam:
+      in: query
+      name: vesselName
+      description: |
+        The **Vessel Name** to filter by. The result will only return **Port Call Service** objects including the `vesselName`.
+      schema:
+        type: string
+        pattern: ^\S(?:.*\S)?$
+        maxLength: 50
+        example: King of the Seas
+    MMSINumberQueryParam:
+      in: query
+      name: MMSINumber
+      description: |
+        The **MMSI Number** to filter by. The result will only return **Port Call Service** objects including the `MMSINumber`.
+      schema:
+        type: string
+        pattern: ^\d{9}$
+        minLength: 9
+        maxLength: 9
+        example: '278111222'
+
+    # Pagination query parameters
+
+    limitQueryParam:
+      in: query
+      name: limit
+      description: |
+        Specifies the maximum number of `Port Call Service` objects to return.
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        default: 100
+        example: 100
+    cursorQueryParam:
+      in: query
+      name: cursor
+      description: |
+        A server generated value to specify a specific point in a collection result, used for pagination.
+      schema:
+        type: string
+        maxLength: 1024
+        example: fE9mZnNldHw9MTAmbGltaXQ9MTA
 
     #############
     # Path params
@@ -975,6 +1228,15 @@ components:
         example: 0342254a-5927-4856-b9c9-aa12e7c00563
       required: true
   schemas:
+    ####################
+    # Port Call Services
+    ####################
+    PortCallServices:
+      type: array
+      description: |
+        An array of **Port Call Services** matching the specified filter.
+      items:
+        $ref: '#/components/schemas/PortCallService'
 
     ###################
     # Port Call Service
@@ -1015,7 +1277,7 @@ components:
         isFYI:
           type: boolean
           description: |
-            If set to `true` it indicates that this message is meant for another party - but is sent as a FYI (for your information).
+            If set to `true` it indicates that this message is primarily meant for another party - but is sent as a FYI (for your information).
           example: true
       required:
         - portCall
@@ -1256,7 +1518,7 @@ components:
           type: number
           format: float
           description: |
-            The actual draft of the vessel.
+            The vertical distance between the waterline and the bottom of the hull (keel) of a ship. The depth to which a ship is immersed in water.
 
             If the draft is specified in feet (`FOT`) then the decimal part should be considered as a fraction of a foot and **not** as a number of inches. E.g. 120.5 feet means 120 and a half foot (which would be 120'6")
           example: 12.5
@@ -1553,7 +1815,7 @@ components:
       title: Timestamp
       type: object
       description: |
-        Date and time for a `ERPA` Timestamp when a **Port Call Service** should be provided (for `ERP`) or has been provided (for `A`).
+        Date and time for an `ERP-A` Timestamp when a **Port Call Service** should be provided (for `ERP`) or has been provided (for `A`).
       properties:
         timestampID:
           type: string
@@ -1614,7 +1876,7 @@ components:
         isFYI:
           type: boolean
           description: |
-            If set to `true` it indicates that this message is meant for another party - but is sent as a FYI (for your information).
+            If set to `true` it indicates that this message is primarily meant for another party - but is sent as a FYI (for your information).
           example: true
         remark:
           type: string
@@ -1640,7 +1902,7 @@ components:
         isFYI:
           type: boolean
           description: |
-            If set to `true` it indicates that this message is meant for another party - but is sent as a FYI (for your information).
+            If set to `true` it indicates that this message is primarily meant for another party - but is sent as a FYI (for your information).
           example: true
         reason:
           type: string
@@ -1661,7 +1923,7 @@ components:
         isFYI:
           type: boolean
           description: |
-            If set to `true` it indicates that this message is meant for another party - but is sent as a FYI (for your information).
+            If set to `true` it indicates that this message is primarily meant for another party - but is sent as a FYI (for your information).
           example: true
         reason:
           type: string
@@ -1682,7 +1944,7 @@ components:
         isFYI:
           type: boolean
           description: |
-            If set to `true` it indicates that this message is meant for another party - but is sent as a FYI (for your information).
+            If set to `true` it indicates that this message is primarily meant for another party - but is sent as a FYI (for your information).
           example: true
         reason:
           type: string
@@ -1700,7 +1962,7 @@ components:
         isFYI:
           type: boolean
           description: |
-            If set to `true` it indicates that this message is meant for another party - but is sent as a FYI (for your information).
+            If set to `true` it indicates that this message is primarily meant for another party - but is sent as a FYI (for your information).
           example: true
         reason:
           type: string
