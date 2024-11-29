@@ -5052,6 +5052,55 @@ components:
       title: Seller
       description: |
         The seller is the last known entity by whom the goods are sold or agreed to be sold to the buyer. If the goods are to be imported otherwise than in pursuance of a purchase, the details of the owner of the goods shall be provided.
+
+        **Condition:** Buyer and Seller are mandatory if `isCargoDeliveredInICS2Zone=true` and `manifesttypecode='ENS'` and `advancedManifestFilingPerformedBy='CARRIER'` and `isHouseBillofLadingsIssued=false`.
+      properties:
+        partyName:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 70
+          description: |
+            Name of the party.
+          example: IKEA Denmark
+        typeOfPerson:
+          type: string
+          maxLength: 50
+          pattern: ^\S(?:.*\S)?$
+          description: |
+            Can be one of the following values as per the Union Customs Code art. 5(4):
+            - `NATURAL_PERSON` (A person that is an individual living human being)
+            - `LEGAL_PERSON` (person (including a human being and public or private organizations) that can perform legal actions, such as own a property, sue and be sued)
+            - `ASSOCIATION_OF_PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
+          example: 'NATURAL_PERSON'
+        address:
+          $ref: '#/components/schemas/Address'
+        identifyingCodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentifyingCode'
+        taxLegalReferences:
+          description: |
+            A list of `Tax References` for a `Party`
+          type: array
+          items:
+            $ref: '#/components/schemas/TaxLegalReference'
+        partyContactDetails:
+          type: array
+          description: |
+            A list of contact details
+          items:
+            $ref: '#/components/schemas/PartyContactDetailHBL'
+      required:
+        - partyName
+        - typeOfPerson
+
+    SellerHBL:
+      type: object
+      title: Seller (House B/L)
+      description: |
+        The seller is the last known entity by whom the goods are sold or agreed to be sold to the buyer. If the goods are to be imported otherwise than in pursuance of a purchase, the details of the owner of the goods shall be provided.
+
+        **Condition:** Buyer and Seller are mandatory if `isCargoDeliveredInICS2Zone=true` (on House B/L level) and `manifesttypecode='ENS'` and `advancedManifestFilingPerformedBy='CARRIER'`.
       properties:
         partyName:
           type: string
@@ -5097,6 +5146,55 @@ components:
       title: Buyer
       description: |
         The buyer is the last known entity to whom the goods are sold or agreed to be sold. If the goods are to be imported otherwise than in pursuance of a purchase, the details of the owner of the goods shall be provided.
+
+        **Condition:** Buyer and Seller are mandatory if `isCargoDeliveredInICS2Zone=true` and `manifesttypecode='ENS'` and `advancedManifestFilingPerformedBy='CARRIER'` and `isHouseBillofLadingsIssued=false`.
+      properties:
+        partyName:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 70
+          description: |
+            Name of the party.
+          example: IKEA Denmark
+        typeOfPerson:
+          type: string
+          maxLength: 50
+          pattern: ^\S(?:.*\S)?$
+          description: |
+            Can be one of the following values as per the Union Customs Code art. 5(4):
+            - `NATURAL_PERSON` (A person that is an individual living human being)
+            - `LEGAL_PERSON` (person (including a human being and public or private organizations) that can perform legal actions, such as own a property, sue and be sued)
+            - `ASSOCIATION_OF_PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
+          example: 'NATURAL_PERSON'
+        address:
+          $ref: '#/components/schemas/Address'
+        identifyingCodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentifyingCode'
+        taxLegalReferences:
+          description: |
+            A list of `Tax References` for a `Party`
+          type: array
+          items:
+            $ref: '#/components/schemas/TaxLegalReference'
+        partyContactDetails:
+          type: array
+          description: |
+            A list of contact details
+          items:
+            $ref: '#/components/schemas/PartyContactDetailHBL'
+      required:
+        - partyName
+        - typeOfPerson
+
+    BuyerHBL:
+      type: object
+      title: Buyer (House B/L)
+      description: |
+        The buyer is the last known entity to whom the goods are sold or agreed to be sold. If the goods are to be imported otherwise than in pursuance of a purchase, the details of the owner of the goods shall be provided.
+
+        **Condition:** Buyer and Seller are mandatory if `isCargoDeliveredInICS2Zone=true` (on House B/L level) and `manifesttypecode='ENS'` and `advancedManifestFilingPerformedBy='CARRIER'`.
       properties:
         partyName:
           type: string
@@ -8420,9 +8518,9 @@ components:
         notifyParty:
           $ref: '#/components/schemas/NotifyPartyHBL'
         seller:
-          $ref: '#/components/schemas/Seller'
+          $ref: '#/components/schemas/SellerHBL'
         buyer:
-          $ref: '#/components/schemas/Buyer'
+          $ref: '#/components/schemas/BuyerHBL'
         other:
           type: array
           description: A list of document parties that can be optionally provided in the `Shipping Instructions` and `Transport Document`.
