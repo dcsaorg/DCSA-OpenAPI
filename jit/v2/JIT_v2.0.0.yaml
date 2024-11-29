@@ -178,7 +178,7 @@ paths:
     get:
       parameters:
         - $ref: '#/components/parameters/portCallIDQueryParam'
-        - $ref: '#/components/parameters/transportCallIDQueryParam'
+        - $ref: '#/components/parameters/terminalCallIDQueryParam'
         - $ref: '#/components/parameters/portCallServiceIDQueryParam'
 
         - $ref: '#/components/parameters/startDateTimeQueryParam'
@@ -190,8 +190,8 @@ paths:
         - $ref: '#/components/parameters/carrierServiceCodeQueryParam'
         - $ref: '#/components/parameters/universalServiceReferenceQueryParam'
 
-        - $ref: '#/components/parameters/transportCallReferenceQueryParam'
-        - $ref: '#/components/parameters/transportCallSequenceNumberQueryParam'
+        - $ref: '#/components/parameters/terminalCallReferenceQueryParam'
+        - $ref: '#/components/parameters/terminalCallSequenceNumberQueryParam'
         - $ref: '#/components/parameters/carrierImportVoyageNumberQueryParam'
         - $ref: '#/components/parameters/carrierExportVoyageNumberQueryParam'
         - $ref: '#/components/parameters/universalImportVoyageReferenceQueryParam'
@@ -951,11 +951,11 @@ components:
         type: string
         format: uuid
         example: 0342254a-5927-4856-b9c9-aa12e7c00563
-    transportCallIDQueryParam:
+    terminalCallIDQueryParam:
       in: query
-      name: transportCallID
+      name: terminalCallID
       description: |
-        The **Transport Call Identifier** to filter by. Specifying this filter will only return **Port Call Service** objects including the `transportCallID`.
+        The **Terminal Call Identifier** to filter by. Specifying this filter will only return **Port Call Service** objects including the `terminalCallID`.
       schema:
         type: string
         format: uuid
@@ -1047,22 +1047,22 @@ components:
           minLength: 8
           example: SR12345A
 
-    # Transport Call query parameters
+    # Terminal Call query parameters
 
-    transportCallReferenceQueryParam:
+    terminalCallReferenceQueryParam:
       in: query
-      name: transportCallReference
+      name: terminalCallReference
       description: |
-        The **Transport Call Reference** to filter by. The result will only return **Port Call Service** objects including the `transportCallReference`.
+        The **Terminal Call Reference** to filter by. The result will only return **Port Call Service** objects including the `terminalCallReference`.
       schema:
         type: string
         maxLength: 100
         example: '15063401'
-    transportCallSequenceNumberQueryParam:
+    terminalCallSequenceNumberQueryParam:
       in: query
-      name: transportCallSequenceNumber
+      name: terminalCallSequenceNumber
       description: |
-        The **Transport Call Sequence Number** to filter by. The result will only return **Port Call Service** objects including the `transportCallSequenceNumber`.
+        The **Terminal Call Sequence Number** to filter by. The result will only return **Port Call Service** objects including the `terminalCallSequenceNumber`.
       schema:
         type: integer
         format: int32
@@ -1360,7 +1360,7 @@ components:
       type: object
       title: Terminal Call
       description: |
-        **Terminal Call** information. The `terminalCallID` uniquely identifies the **Terminal Call**. Any subsequent **Port Call Services** linked to the same **Terminal Call** MUST use the same `terminalCallID`. An optional `transportCallReference` can be added in order to link the **Terminal Call** to external systems (e.g OVS).
+        **Terminal Call** information. The `terminalCallID` uniquely identifies the **Terminal Call**. Any subsequent **Port Call Services** linked to the same **Terminal Call** MUST use the same `terminalCallID`. An optional `terminalCallReference` can be added in order to link the **Terminal Call** to external systems (e.g OVS).
       properties:
         terminalCallID:
           type: string
@@ -1368,17 +1368,19 @@ components:
           description: |
             Universal unique identifier for the **Terminal Call**. The `terminalCallID` is created by the provider. The `terminalCallID` **MUST** only be created once per **Terminal Call** - which is the first time a **Port Call Service** is also created. To be used in all communication regarding the **Terminal Call**.
           example: 0342254a-5927-4856-b9c9-aa12e7c00563
-        transportCallReference:
+        terminalCallReference:
           type: string
           description: |
-            The unique reference for a **Terminal Call**. It’s the vessel operator’s responsibility to provide the **Terminal Call Reference**, other parties are obliged to pick it up and use it.
+            The unique reference for a **Terminal Call**. It’s the vessel operator’s responsibility to provide the **Terminal Call Reference**, other parties are obliged to pick it up and use it. 
+
+            In **OVS 3.0** can be found as `transportCallReference`
           maxLength: 100
           example: '15063401'
-        transportCallSequenceNumber:
+        terminalCallSequenceNumber:
           type: integer
           format: int32
           description: |
-            Transport operator's key that uniquely identifies each individual call. This key is essential to distinguish between two separate calls at the same location within one voyage.
+            A sequential number assigned to each **Terminal Call** within a **Port Call**, indicating the order in which the calls are scheduled to occur. This number helps differentiate multiple terminal visits in the same **Port Call**. 
           example: 2
         carrierImportVoyageNumber:
           type: string
