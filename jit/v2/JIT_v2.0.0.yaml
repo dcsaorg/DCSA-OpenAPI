@@ -2089,7 +2089,7 @@ components:
     MovesList:
       type: array
       description: |
-        An array of `Moves`. Can be per VSA-Partner or as an accumulated result.
+        An array of `Moves`. Each object in the array can represent moves data for a specific VSA partner in the vessel or as an accumulated result for the remaining VSA partners in the vessel.
       items:
         $ref: '#/components/schemas/Moves'
     Moves:
@@ -2098,9 +2098,16 @@ components:
       description: |
         Forecasted container moves for loading and discharging, empty or laden, at a terminal, covering various types such as Dry, Reefer, Out-of-Gauge (OOG), and Restows. These can be detailed at varying levels of granularity.
 
-        **Condition:** Can only be provided if `portCallServiceType` is `MOVES`
+        ### Multiple Moves Objects with Carrier Codes
+        If `carrierCode` and `carrierCodeListProvider` are provided for multiple `Moves` objects, any object without these fields represents the accumulated result of moves for the remaining VSA partners in the vessel.
+        
+        ### Single Moves Object Without Carrier Codes
+        If only one `Moves` object exists and does not include `carrierCode` and `carrierCodeListProvider`, it represents the accumulated result for all VSA partners on the vessel.
 
-        **Condition:** `carrierCode` and `carrierCodeListProvider` are to be used if the moves provided in this object is **only** for a single VSA-Partner. If this object is provided **without** `carrierCode` and `carrierCodeListProvider` then it means it is an aggregated result for the remaining moves.
+        ### Single Moves Object with Carrier Codes
+        If only one `Moves` object exists and includes `carrierCode` and `carrierCodeListProvider`, it represents moves specifically for the indicated carrier.
+
+        **Condition:** Can only be provided if `portCallServiceType` is `MOVES`
       properties:
         carrierCode:
           type: string
@@ -2116,8 +2123,6 @@ components:
         carrierCodeListProvider:
           type: string
           description: |
-            Providing this property means that the `Moves` is only related to this particular `carrierCodeListProvider`. Omitting this property means that the `Moves` is an aggregated result from all VSA-Partners.
-
             Identifies the code list provider used for the `carrierCode`. Possible values are:
               - `SMDG` (Ship Message Design Group)
               - `NMFTA` (National Motor Freight Traffic Association)
