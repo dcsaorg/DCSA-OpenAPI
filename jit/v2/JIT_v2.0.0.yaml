@@ -1743,7 +1743,7 @@ components:
         portCallServiceLocation:
           $ref: '#/components/schemas/PortCallServiceLocation'
         moves:
-          $ref: '#/components/schemas/Moves'
+          $ref: '#/components/schemas/MovesList'
       required:
         - portCallServiceID
         - portCallServiceType
@@ -2086,6 +2086,12 @@ components:
     #######
     # Moves
     #######
+    MovesList:
+      type: array
+      description: |
+        An array of `Moves`. Can be per VSA-Partner or as an accumulated result.
+      items:
+        $ref: '#/components/schemas/Moves'
     Moves:
       type: object
       title: Moves
@@ -2093,7 +2099,34 @@ components:
         Forecasted container moves for loading and discharging, empty or laden, at a terminal, covering various types such as Dry, Reefer, Out-of-Gauge (OOG), and Restows. These can be detailed at varying levels of granularity.
 
         **Condition:** Can only be provided if `portCallServiceType` is `MOVES`
+
+        **Condition:** `carrierCode` and `carrierCodeListProvider` are to be used if the moves provided in this object is **only** for a single VSA-Partner. If this object is provided **without** `carrierCode` and `carrierCodeListProvider` then it means it is an aggregated result for the remaining moves.
       properties:
+        carrierCode:
+          type: string
+          description: |
+            Providing this property means that the `Moves` is only related to this particular `carrierCode`. Omitting this property means that the `Moves` is an aggregated result from all VSA-Partners.
+
+            The carrier code based on either the **SMDG** or **SCAC` code lists.
+
+            **Condition:** This is required if `carrierCodeListProvider` is provided
+          maxLength: 4
+          pattern: ^\S+$
+          example: MAEU
+        carrierCodeListProvider:
+          type: string
+          description: |
+            Providing this property means that the `Moves` is only related to this particular `carrierCodeListProvider`. Omitting this property means that the `Moves` is an aggregated result from all VSA-Partners.
+
+            Identifies the code list provider used for the `carrierCode`. Possible values are:
+              - `SMDG` (Ship Message Design Group)
+              - `NMFTA` (National Motor Freight Traffic Association)
+
+            **Condition:** This is required if `carrierCode` is provided
+          example: NMFTA
+          enum:
+            - SMDG
+            - NMFTA
         restowMoves:
           type: integer
           format: int32
