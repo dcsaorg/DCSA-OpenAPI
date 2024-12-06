@@ -6,9 +6,9 @@ The DCSA Interface Standard for Just in Time Portcalls is documented on the **[D
 ---
 This is a moving target and will be updated as soon as the version is published
 
-<a name="v200A20241206"></a>[Release v2.0.0 Alpha 20241206 (12 of December 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_JIT/2.0.0-Alpha-20241206)
+<a name="v200A20241206"></a>[Release v2.0.0 Alpha 20241206 (6 of December 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_JIT/2.0.0-Alpha-20241206)
 ---
-Snapshot as of 12 of December 2024 for JIT 2.0.0 Alpha.
+Snapshot as of 6 of December 2024 for JIT 2.0.0 Alpha.
 ## Key changes
 - Entire API restructure resritten to 'Normalize' the API.
   - **Port Call Service** endpoint split into 4 endpoints:
