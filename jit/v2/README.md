@@ -10,8 +10,8 @@ This is a moving target and will be updated as soon as the version is published
 ---
 Snapshot as of 6 of December 2024 for JIT 2.0.0 Alpha.
 ## Key changes
-- Entire API restructure resritten to 'Normalize' the API.
-  - **Port Call Service** endpoint split into 4 endpoints:
+- Entire API restructure rewritten to 'Normalize' the API.
+  - **Port Call Service** endpoint is split into 4 endpoints:
     - **Port Call** endPoint
     - **Terminal Call** endPoint
     - **Port Call Service** endPoint
@@ -22,9 +22,9 @@ Snapshot as of 6 of December 2024 for JIT 2.0.0 Alpha.
   - **Vessel** object split into 2 objects:
     - **Vessel** containing static vessel data (`IMONumber`, `MMSINumber`, `Name`, ...)
     - **Vessel Status** containing dynamic data (draft, position, `milesToDestinationPort`)
-  - GET endPoint responses changed into a result set. Relevent filters have been added to all
-  - If is now possible to identify if where **Moves** provided, come from. It is possible to specify if the Moves come from a Partner
-  - many properties in the **Port Call Service** object have clear conditions added specifying how and when values can be used
+  - GET endPoint responses changed into a result set. Relevant filters have been added to all
+  - It is possible to specify if the *Moves* belong to a specific VSA partner in the vessel or if the moves are for the whole vessel. 
+  - Many properties in the **Port Call Service** object have clear conditions added specifying how and when values can be used
 
 ## Minor changes
   - error responses fixed
@@ -45,7 +45,7 @@ Snapshot as of 22 of November 2024 for JIT 2.0.0 Alpha.
 - `type` renamed to `typeCode` in the `Vessel` object
 - `airDraft` property added to `Vessel`
 - `VESSEL_READY` split into 2 values: `VESSEL_READY_FOR_CARGO_OPERATIONS` and `VESSEL_READY_TO_SAIL` in `portCallServiceType`
-- a lot of reshufling in the moves object
+- a lot of reshuffling in the moves object
   - changed the structure to **not** include `allOf`
   - all descriptions updated
   - `bbPieces` removed
