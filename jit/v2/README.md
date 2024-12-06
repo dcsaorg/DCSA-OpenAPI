@@ -6,6 +6,34 @@ The DCSA Interface Standard for Just in Time Portcalls is documented on the **[D
 ---
 This is a moving target and will be updated as soon as the version is published
 
+<a name="v200A20241206"></a>[Release v2.0.0 Alpha 20241206 (12 of December 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_JIT/2.0.0-Alpha-20241206)
+---
+Snapshot as of 12 of December 2024 for JIT 2.0.0 Alpha.
+## Key changes
+- Entire API restructure resritten to 'Normalize' the API.
+  - **Port Call Service** endpoint split into 4 endpoints:
+    - **Port Call** endPoint
+    - **Terminal Call** endPoint
+    - **Port Call Service** endPoint
+    - **Vessel Status** endPoint
+  - **Timestamp** endPoint renamed
+    - all timestamp endPoints merged into a single endPoint now containing a `classifierCode` property to distinguish different event types)
+    - GET /timestamp endPoint added (Timestamps removed from **Port Call Service**)
+  - **Vessel** object split into 2 objects:
+    - **Vessel** containing static vessel data (`IMONumber`, `MMSINumber`, `Name`, ...)
+    - **Vessel Status** containing dynamic data (draft, position, `milesToDestinationPort`)
+  - GET endPoint responses changed into a result set. Relevent filters have been added to all
+  - If is now possible to identify if where **Moves** provided, come from. It is possible to specify if the Moves come from a Partner
+  - many properties in the **Port Call Service** object have clear conditions added specifying how and when values can be used
+
+## Minor changes
+  - error responses fixed
+  - Renamed `transportCallReference` to `terminalCallReference`
+  - Renamed `transportCallSequenceNumber` to `terminalCallSequenceNumber`
+  - `airDraft` added to `Vessel Status`
+  - `carrierServiceName`, `carrierServiceCode` and `universalServiceReference` moved from `Port Call` --> `Terminal Call`
+  - `portCallServiceDateTime` in the **Timestamp** renamed to `dateTime`
+
 <a name="v200A20241122"></a>[Release v2.0.0 Alpha 20241122 (22 of November 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_JIT/2.0.0-Alpha-20241122)
 ---
 Snapshot as of 22 of November 2024 for JIT 2.0.0 Alpha.
