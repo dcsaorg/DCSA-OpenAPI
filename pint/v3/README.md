@@ -7,7 +7,28 @@ Publications related to the PINT API:
 
 <a name="v300"></a>[Release v3.0.0 (...)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_PINT/3.0.0)
 ---
-This is a moving target and will be updated as soon as the version is published
+This is a moving target and will continue to be updated:
+
+<a name="v300B20241217"></a>[Release v3.0.0 Beta 20241217 (17 of December 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_PINT/3.0.0-Beta-20241217)
+---
+Snapshot as of 17 of December 2024 for EBL Platform Interoperability 3.0.0 Beta.
+
+## Schema changes
+- missing `INCD` enum value in `responseCode` property added to the `EnvelopeTransferFinishedResponse` object
+
+## Other changes
+- the API follows `API Design & Implementation Principles` v2.**0** instead of v2.1
+- Link to **create a GitHub issue** has been updated to point to DCSA [Contact Us](https://dcsa.org/get-involved/contact-us) page
+- License url has been updated to secure socket (http --> http**s**)
+- typos fixed: everywhere **E**BL was mentioned has been changed to **e**BL
+- The following conditions have been made more clear:
+  - `declaredValueCurrency` should not be provided if `declaredValue` is not provided
+  - `temperatureUnit` should not be provided if `temperatureSetpoint` is not provided
+  - `airExchangeUnit` should not be provided if `airExchange` is not provided
+- typo fixed in `o2Setpoint` (**C**O<sub>2</sub> --> O<sub>2</sub>)
+- `PlaceOfReceipt` and `PlaceOfDelivery` description updated (wrong reference to `Geo Coordinate` removed)
+- description updated for `PlaceOfBLIssue`
+- typo fixed in `reference` (in `ImportLicense`) (athorizes --> a**u**thorizes)
 
 <a name="v300B20241108"></a>[Release v3.0.0 Beta 20241108 (8 of November 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_PINT/3.0.0-Beta-20241108)
 ---
