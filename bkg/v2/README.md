@@ -23,7 +23,7 @@ This is the final version 2.0.0 for the DCSA Booking API. Compared to latest sna
   - `temperatureUnit` should not be provided if `temperatureSetpoint` is not provided
   - `airExchangeUnit` should not be provided if `airExchange` is not provided
 - description updated for `PlaceOfBLIssue`
-- typo fixed in `o2Setpoint` (O<sub>2</sub> --> **C**O<sub>2</sub>)
+- typo fixed in `o2Setpoint` (**C**O<sub>2</sub> --> O<sub>2</sub>)
 - typo fixed in `reference` (in `ImportLicense) (athorizes --> a**u**thorizes)
 
 
