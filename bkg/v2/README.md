@@ -7,9 +7,25 @@ Publications related to the Booking API:
 - [Booking Process](https://dcsa.org/standards/booking-process/) contains documents and publications
 - [Booking Notification](./notification/) maintained here on GitHub  (**DEPRECATED** - now included as part of Booking API)
 
-<a name="v200"></a>[Release v2.0.0 (...)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0)
+<a name="v200"></a>[Release v2.0.0 (17 December 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0)
 ---
-This is a moving target and will be updated as soon as the version is published
+This is the final version 2.0.0 for the DCSA Booking API. Compared to latest snapshot released 8 November the following has changed:
+- the API follows `API Design & Implementation Principles` v2.**0** instead of v2.1
+- Link to **create a GitHub issue** has been updated to point to DCSA [Contact Us](https://dcsa.org/get-involved/contact-us) page
+- License url has been updated to secure socket (http --> http**s**)
+- a `null` has been inserted into the empty `202` response values
+- the following object titles have been updated:
+  - In `BookingFullNotification` title has been updated from `Booking` --> `Booking Full Notification`
+  - In `DocumentPartiesReq` title has been updated from `Document Parties` --> `Document Parties (Shipper)`
+  - 
+- The following conditions have been made more clear:
+  - `declaredValueCurrency` should not be provided if `declaredValue` is not provided
+  - `temperatureUnit` should not be provided if `temperatureSetpoint` is not provided
+  - `airExchangeUnit` should not be provided if `airExchange` is not provided
+- description updated for `PlaceOfBLIssue`
+- typo fixed in `o2Setpoint` (O<sub>2</sub> --> **C**O<sub>2</sub>)
+- typo fixed in `reference` (in `ImportLicense) (athorizes --> a**u**thorizes)
+
 
 <a name="v200B20241108"></a>[Release v2.0.0 Beta 20241108 (8 November 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0-Beta-20241108)
 ---
