@@ -17,7 +17,6 @@ This is the final version 2.0.0 for the DCSA Booking API. Compared to latest sna
 - the following object titles have been updated:
   - In `BookingFullNotification` title has been updated from `Booking` --> `Booking Full Notification`
   - In `DocumentPartiesReq` title has been updated from `Document Parties` --> `Document Parties (Shipper)`
-  - 
 - The following conditions have been made more clear:
   - `declaredValueCurrency` should not be provided if `declaredValue` is not provided
   - `temperatureUnit` should not be provided if `temperatureSetpoint` is not provided
@@ -25,7 +24,6 @@ This is the final version 2.0.0 for the DCSA Booking API. Compared to latest sna
 - description updated for `PlaceOfBLIssue`
 - typo fixed in `o2Setpoint` (**C**O<sub>2</sub> --> O<sub>2</sub>)
 - typo fixed in `reference` (in `ImportLicense`) (athorizes --> a**u**thorizes)
-
 
 <a name="v200B20241108"></a>[Release v2.0.0 Beta 20241108 (8 November 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0-Beta-20241108)
 ---
