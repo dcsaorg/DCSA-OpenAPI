@@ -24,7 +24,7 @@ This is the final version 2.0.0 for the DCSA Booking API. Compared to latest sna
   - `airExchangeUnit` should not be provided if `airExchange` is not provided
 - description updated for `PlaceOfBLIssue`
 - typo fixed in `o2Setpoint` (**C**O<sub>2</sub> --> O<sub>2</sub>)
-- typo fixed in `reference` (in `ImportLicense) (athorizes --> a**u**thorizes)
+- typo fixed in `reference` (in `ImportLicense`) (athorizes --> a**u**thorizes)
 
 
 <a name="v200B20241108"></a>[Release v2.0.0 Beta 20241108 (8 November 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0-Beta-20241108)
