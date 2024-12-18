@@ -2766,7 +2766,7 @@ components:
       type: object
       title: Moves
       description: |
-        Forecasted container moves for loading and discharging, empty or laden, at a terminal, covering various types such as Dry, Reefer, Out-of-Gauge (OOG), and Restows. These can be detailed at varying levels of granularity.
+        Forecasted units of containers to move for loading and discharging, empty or laden, covering various types such as Dry, reefer, Out-of-Gauge (OOG), and units of containers to restow at a terminal. These can be detailed at varying levels of granularity.
 
         ### Multiple Moves Objects with Carrier Codes
         If `carrierCode` and `carrierCodeListProvider` are provided for multiple `Moves` objects, any object without these fields represents the accumulated result of moves for the remaining VSA partners in the vessel.
@@ -2802,128 +2802,185 @@ components:
           enum:
             - SMDG
             - NMFTA
-        restowMoves:
-          type: integer
-          format: int32
-          description: |
-            Forecasted restow moves where containers are off loaded from on board the ship and put back onto the ship either at the same stow position or a different stow position. 
-          example: 20
+        restows:
+          $ref: '#/components/schemas/Restows'
       oneOf:
-        - $ref: '#/components/schemas/TotalMoves'
-        - $ref: '#/components/schemas/SpecificMoves'
+        - $ref: '#/components/schemas/TotalUnits'
+        - $ref: '#/components/schemas/SpecificUnits'
 
-    TotalMoves:
+    Restows:
       type: object
-      title: Total Moves (Dry + Reefer + OOG)
+      title: Restows
+      description: |
+        Forecasted container units to restow, where containers are off loaded from on board the ship and put back onto the ship either at the same stow position or a different stow position.
+      oneOf:
+        - $ref: '#/components/schemas/TotalRestows'
+        - $ref: '#/components/schemas/ContainerRestows'
+
+    TotalRestows:
+      type: object
+      title: Total Restows
       additionalProperties: false
       description: |
-        Forecasted total container moves for loading and discharging, empty or laden, at a terminal, covering various types such as Dry, Reefer, Out-of-Gauge (OOG)
+        Forecasted total container units to restow.
       properties:
-        totalMoves:
+        totalRestows:
           type: integer
           format: int32
           description: |
-            Forecasted total container moves for loading and discharging, empty or laden, at a terminal, covering various types such as Dry, Reefer, Out-of-Gauge (OOG)
+            Forecasted total container units to restow.
           example: 155
       required:
-        - totalMoves
+        - totalRestows
 
-    SpecificMoves:
+    ContainerRestows:
       type: object
-      title: Specific moves (for load and discharge)
+      title: Container Restows
       description: |
-        Forecasted moves for loading and discharging, empty or laden, at a terminal, covering various types such as Dry, Reefer, Out-of-Gauge (OOG)
-      properties:
-        loadMoves:
-          $ref: '#/components/schemas/LoadMoves'
-        dischargeMoves:
-          $ref: '#/components/schemas/DischargeMoves'
-
-    LoadMoves:
-      type: object
-      title: Load Moves
-      description: |
-        Forecasted total container moves for loading, empty or laden, at a terminal, covering various types such as Dry, Reefer, Out-of-Gauge (OOG)
-      properties:
-        ladenContainerMoves:
-          $ref: '#/components/schemas/LadenContainerMoves'
-        emptyContainerMoves:
-          $ref: '#/components/schemas/EmptyContainerMoves'
-        reeferPluggedContainerMoves:
-          $ref: '#/components/schemas/ReeferPluggedContainerMoves'
-        oogUnits:
-          type: integer
-          format: int32
-          description: |
-            Forecasted Out-of-gauge (OOG) units
-          example: 2
-    DischargeMoves:
-      type: object
-      title: Discharge Moves
-      description: |
-        Forecasted total container moves for discharging, empty or laden, at a terminal, covering various types such as Dry, Reefer, Out-of-Gauge (OOG)
-      properties:
-        ladenContainerMoves:
-          $ref: '#/components/schemas/LadenContainerMoves'
-        emptyContainerMoves:
-          $ref: '#/components/schemas/EmptyContainerMoves'
-        reeferPluggedContainerMoves:
-          $ref: '#/components/schemas/ReeferPluggedContainerMoves'
-        oogUnits:
-          type: integer
-          format: int32
-          description: |
-            Forecasted Out-of-gauge (OOG) units
-          example: 2
-
-    LadenContainerMoves:
-      type: object
-      title: Laden Container Moves
-      description: |
-        Forecasted laden containers
-      oneOf:
-        - $ref: '#/components/schemas/TotalMoves'
-        - $ref: '#/components/schemas/ContainerMoves'
-
-    ContainerMoves:
-      type: object
-      title: Container Moves
-      description: |
-        Forecasted container moves for 20-foot and 40-foot containers
+        Forecasted container units to restow, covering three sizes: `20-foot`, `40-foot` containers, and `45-foot` containers
       properties:
         _20_units:
           type: integer
           format: int32
           description: |
-            Forecasted moves of 20-foot containers
+            Forecasted units of `20-foot` containers
           example: 25
         _40_units:
           type: integer
           format: int32
           description: |
-            Forecasted moves of 40-foot containers
+            Forecasted units of `40-foot` containers
+          example: 30
+        _45_units:
+          type: integer
+          format: int32
+          description: |
+            Forecasted units of `45-foot` containers
           example: 30
       required:
         - _20_units
         - _40_units
+        - _45_units
 
-    EmptyContainerMoves:
+    TotalUnits:
       type: object
-      title: Empty Container Moves
+      title: Total Units (Dry + Reefer + OOG)
+      additionalProperties: false
+      description: |
+        Forecasted total units of containers to move for loading and discharging, empty or laden, at a terminal, covering various types such as Dry, Reefer, Out-of-Gauge (OOG)
+      properties:
+        totalUnits:
+          type: integer
+          format: int32
+          description: |
+            Forecasted total units of containers to move for loading and discharging, empty or laden, at a terminal, covering various types such as Dry, Reefer, Out-of-Gauge (OOG)
+          example: 155
+      required:
+        - totalUnits
+
+    SpecificUnits:
+      type: object
+      title: Specific Units (for load and discharge)
+      description: |
+        Forecasted units of containers to move for loading and discharging, empty or laden, at a terminal, covering various types such as Dry, Reefer, Out-of-Gauge (OOG)
+      properties:
+        loadUnits:
+          $ref: '#/components/schemas/LoadUnits'
+        dischargeUnits:
+          $ref: '#/components/schemas/DischargeUnits'
+
+    LoadUnits:
+      type: object
+      title: Load Units
+      description: |
+        Forecasted total units of containers to move for loading, empty or laden, at a terminal, covering various types such as Dry, Reefer, Out-of-Gauge (OOG)
+      properties:
+        ladenContainerUnits:
+          $ref: '#/components/schemas/LadenContainerUnits'
+        emptyContainerUnits:
+          $ref: '#/components/schemas/EmptyContainerUnits'
+        reeferPluggedContainerUnits:
+          $ref: '#/components/schemas/ReeferPluggedContainerUnits'
+        oogUnits:
+          type: integer
+          format: int32
+          description: |
+            Forecasted Out-of-gauge (OOG) units
+          example: 2
+    DischargeUnits:
+      type: object
+      title: Discharge Units
+      description: |
+        Forecasted total units of containers to move for discharging, empty or laden, at a terminal, covering various types such as Dry, Reefer, Out-of-Gauge (OOG)
+      properties:
+        ladenContainerUnits:
+          $ref: '#/components/schemas/LadenContainerUnits'
+        emptyContainerUnits:
+          $ref: '#/components/schemas/EmptyContainerUnits'
+        reeferPluggedContainerUnits:
+          $ref: '#/components/schemas/ReeferPluggedContainerUnits'
+        oogUnits:
+          type: integer
+          format: int32
+          description: |
+            Forecasted Out-of-gauge (OOG) units
+          example: 2
+
+    LadenContainerUnits:
+      type: object
+      title: Laden Container Units
+      description: |
+        Forecasted laden containers
+      oneOf:
+        - $ref: '#/components/schemas/TotalUnits'
+        - $ref: '#/components/schemas/ContainerUnits'
+
+    ContainerUnits:
+      type: object
+      title: Container Units
+      description: |
+        Forecasted units of containers to move for `20-foot`, `40-foot` and `45-foot` containers
+      properties:
+        _20_units:
+          type: integer
+          format: int32
+          description: |
+            Forecasted units of `20-foot` containers
+          example: 25
+        _40_units:
+          type: integer
+          format: int32
+          description: |
+            Forecasted units of `40-foot` containers
+          example: 30
+        _45_units:
+          type: integer
+          format: int32
+          description: |
+            Forecasted units of `45-foot` containers
+          example: 15
+      required:
+        - _20_units
+        - _40_units
+        - _45_units
+
+    EmptyContainerUnits:
+      type: object
+      title: Empty Container Units
       description: |
         Forecasted empty containers
       oneOf:
-        - $ref: '#/components/schemas/TotalMoves'
-        - $ref: '#/components/schemas/ContainerMoves'
+        - $ref: '#/components/schemas/TotalUnits'
+        - $ref: '#/components/schemas/ContainerUnits'
 
-    ReeferPluggedContainerMoves:
+    ReeferPluggedContainerUnits:
       type: object
-      title: Reefer Plugged Container Moves
+      title: Reefer Plugged Container Units
       description: |
         Forecasted reefer containers that are plugged
       oneOf:
-        - $ref: '#/components/schemas/TotalMoves'
-        - $ref: '#/components/schemas/ContainerMoves'
+        - $ref: '#/components/schemas/TotalUnits'
+        - $ref: '#/components/schemas/ContainerUnits'
 
     ################
     # Error Response
