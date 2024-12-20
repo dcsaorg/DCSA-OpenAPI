@@ -6,6 +6,21 @@ The DCSA Interface Standard for Just in Time Portcalls is documented on the **[D
 ---
 This is a moving target and will be updated as soon as the version is published
 
+<a name="v200A20241220"></a>[Release v2.0.0 Alpha 20241220 (20 of December 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_JIT/2.0.0-Alpha-20241220)
+---
+Snapshot as of 20 of December 2024 for JIT 2.0.0 Alpha.
+## Key changes
+- endPoint description and example(s) updates have been provided for (`PUT /v2/port-calls/{portCallID}`, `POST /v2/port-calls/{portCallID}/omit` and `GET /v2/port-calls`
+- `afterDraft` and `forwardDraft` added to `VesselStatus`
+- `Moves` updated to make it more clear that it is about **units**
+  - many descriptions updated
+  - `Restows` changed to include **totals** and **specifics**
+  - `45" units` added to all types of moves
+  - many properties updated to include `units` instead of `moves` as part of the property name
+
+## Minor changes
+- JIT now links to DNI (API Design & Implementation Principles) version 2.**0** instead of 2.1
+
 <a name="v200A20241206"></a>[Release v2.0.0 Alpha 20241206 (6 of December 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_JIT/2.0.0-Alpha-20241206)
 ---
 Snapshot as of 6 of December 2024 for JIT 2.0.0 Alpha.
