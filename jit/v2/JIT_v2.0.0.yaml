@@ -95,9 +95,14 @@ paths:
       operationId: put-port-call
       summary: Initiates a new or updates a Port Call
       description: |
-        Creates or updates a **Port Call**. The caller must provide a unique portCallID (UUIDv4), which identifies the **Port Call**. The `portCallID` must remain consistent across all subsequent communications and linked **Terminal Calls**. If updating an existing **Port Call**, e.g. including the `portVisitReference` in case it was not provided earlier, the provided `portCallID` must match the existing record.
+        Creates or updates a **Port Call** record. The caller must provide a unique portCallID (UUIDv4), which identifies the **Port Call**. The `portCallID` must remain consistent across all subsequent communications and linked **Terminal Calls**. If updating an existing **Port Call**, e.g. including the `portVisitReference`, the provided `portCallID` must match the existing record.
 
-        The **Port Call** consists of information about the location (which is required), ` business identifier for the Port (optional), static **Vessel** information (which also is required) and lastly if the provider is just sending the **Port Call** as information (`isFYI= true`).
+        The **Port Call** includes:
+          
+          - Location information (required): `UNLocationCode`
+          - static **Vessel** information (required): `vessel`
+          - an optional business identifier for the port visit: `portVisitReference`
+          - The ability to send the record with informational purpose only, using `isFYI= true`
 
         This call is often provided as the first call from a **Carrier** to a **Terminal** before creating a **Terminal Call** and then sending `ETA-Berth` or `Moves`.
       requestBody:
@@ -253,13 +258,15 @@ paths:
       operationId: omit-port-call
       summary: Omits a Port Call
       description: |
-        Provider `OMITTING` a **Port Call**. This is called whenever the provider has to omit a **Port Call**.
+        Allows the provider to `OMIT` a **Port Call**, signaling that the **Port Call** is no longer going to happen.
 
-        When a consumer reieves an OMIT - it is the responsibility to pass on this information to any secondary receivers the consumer has called in the past using the `isFYI=true` property while creating **Port Calls** also using `isFYI=true`.
+        When a consumer reieves an `OMIT` - it is their responsibility to propagate this information to any secondary recipients they previously informed using the `isFYI=true` property while creating **Port Calls** or sending related updates.
 
-        It is the responsibility of the provider to also send an OMIT to all **Terminal Calls** linked to the `portCallID` and to **Cancel** all `PortCallServices` linked to omitted **Terminal Calls** because of this **Port Call** omit.
+        The provider is responsible for:
+          - sending an `OMIT` to all **Terminal Calls** linked to the `portCallID`
+          - **Cancel** all `PortCallServices` associatedwith the omitted **Terminal Calls** and **Port Call**
 
-            Once a **Port Call** has been OMITTED - it is **NOT** possible to undo. In case the OMIT has to be "undone" a new **Port Call** must be created with new **Terminal Calls** and new **Port Call Services**.
+            Once a **Port Call** has been `OMITTED`, this action **CANNOT** be undone. In case the `OMIT` has to be "undone" a new **Port Call** must be created with new **Terminal Calls** and new **Port Call Services**.
       requestBody:
         description: |
           Omits a **Port Call**
@@ -423,7 +430,7 @@ paths:
       operationId: get-port-call
       summary: Retrieves a list of Port Calls
       description: |
-        Fetches a list of **Port Calls** that match the filter criterias. If only a specific **Port Call** is requested then it is possible to filter the result by `portCallID` which will return an array with at most a single object (the array can also be empty in case the `portCallID` is not linked to any **Port Call** known by the consumer).
+        Retrieves a list of **Port Calls** that match the specified filter criteria. To retrieve details for a specific **Port Call**, use the `portCallID` filter. This will return an array containing at most a single object. The response will return an empty array if no **Port Call** known by the consumer is linked to the provided `portCallID`.
       responses:
         '200':
           description: |
