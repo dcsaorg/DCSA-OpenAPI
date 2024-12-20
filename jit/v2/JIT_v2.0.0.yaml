@@ -95,7 +95,11 @@ paths:
       operationId: put-port-call
       summary: Initiates a new or updates a Port Call
       description: |
-        Description...
+        Creates or updates a **Port Call**. The caller must provide a unique portCallID (UUIDv4), which identifies the **Port Call**. The `portCallID` must remain consistent across all subsequent communications and linked **Terminal Calls**. If updating an existing **Port Call**, e.g. including the `portVisitReference` in case it was not provided earlier, the provided `portCallID` must match the existing record.
+
+        The **Port Call** consists of information about the location (which is required), ` business identifier for the Port (optional), static **Vessel** information (which also is required) and lastly if the provider is just sending the **Port Call** as information (`isFYI= true`).
+
+        This call is often provided as the first call from a **Carrier** to a **Terminal** before creating a **Terminal Call** and then sending `ETA-Berth` or `Moves`.
       requestBody:
         description: Initiates a new or updates a Port Call
         required: true
@@ -103,10 +107,44 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PortCall'
+            examples:
+              CreateNewPortCallForETA:
+                summary: |
+                  Create a new Port Call to be used for an ETA
+                description: |
+                  A new `Port Call` for **Port of Amsterdam" for the **YM WHOLESOME**. After this call is accepted by consumer - a **Transport Call** can be created. In this example no `portVisitReference` has yet been assigned to the **Port Call**.
+                value:
+                  portCallID: '0342254a-5927-4856-b9c9-aa12e7c00563'
+                  UNLocationCode: NLAMS
+                  vessel:
+                    vesselIMONumber: '9704611'
+                    MMSINumber: '477524700'
+                    name: YM WHOLESOME
+                    lengthOverall: 368.07
+                    dimensionUnit: MTR
+                    callSign: VROO4
+                    typeCode: CONT
+              SendFYI:
+                summary: |
+                  Send a FYI to a consumer
+                description: |
+                  A `Port Call` has already been created - now send the **Port Call** as a FYI to a (sencondary) consumer. In this example all properties are the same as the example above
+                value:
+                  portCallID: '0342254a-5927-4856-b9c9-aa12e7c00563'
+                  UNLocationCode: NLAMS
+                  vessel:
+                    vesselIMONumber: '9704611'
+                    MMSINumber: '477524700'
+                    name: YM WHOLESOME
+                    lengthOverall: 368.07
+                    dimensionUnit: MTR
+                    callSign: VROO4
+                    typeCode: CONT
+                  isFYI: true
       responses:
         '204':
           description: |
-            A new or updated Port Call accepted
+            A new or updated Port Call accepted by the consumer.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -125,7 +163,7 @@ paths:
                   summary: |
                     Port Call missing Vessel object
                   description: |
-                    `vessel` is a mandatory property in the `Port Call`. This is an example of how the error object would look in case this property is missing
+                    `vessel` is a mandatory property in the `Port Call`. This is an example of how the error object would look in case this property is missing.
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
@@ -181,6 +219,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                tooManyRequestsExample:
+                  summary: |
+                    Making too many Port Calls
+                  description: |
+                    Calling the endPoint
+
+                        PUT /v2/port-calls/{portCallID}
+                        
+                    too many times within a time period results in an error.
+
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: PUT
+                    requestUri: /v2/port-calls/085a3207-5e45-49cf-8e1b-f8442beaf545
+                    statusCode: 429
+                    statusCodeText: Too Many Requests
+                    statusCodeMessage: Too many request to create a Port Call has been requested. Please try again in 1 hour
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2024-09-04T09:41:00Z'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: Max Port Call creations reached
+                        errorCodeMessage: A maximum of 10 unique Port Calls can be created per hour
   '/v2/port-calls/{portCallID}/omit':
     post:
       parameters:
@@ -191,7 +253,13 @@ paths:
       operationId: omit-port-call
       summary: Omits a Port Call
       description: |
-        Provider `OMITTING` a **Port Call**
+        Provider `OMITTING` a **Port Call**. This is called whenever the provider has to omit a **Port Call**.
+
+        When a consumer reieves an OMIT - it is the responsibility to pass on this information to any secondary receivers the consumer has called in the past using the `isFYI=true` property while creating **Port Calls** also using `isFYI=true`.
+
+        It is the responsibility of the provider to also send an OMIT to all **Terminal Calls** linked to the `portCallID` and to **Cancel** all `PortCallServices` linked to omitted **Terminal Calls** because of this **Port Call** omit.
+
+            Once a **Port Call** has been OMITTED - it is **NOT** possible to undo. In case the OMIT has to be "undone" a new **Port Call** must be created with new **Terminal Calls** and new **Port Call Services**.
       requestBody:
         description: |
           Omits a **Port Call**
@@ -200,6 +268,14 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/OmitPortCall'
+            examples:
+              omit:
+                summary: |
+                  Send an OMIT
+                description: |
+                  Send an `OMIT` to a **Port Call** because the vessel has engine problems. Sending this OMIT is irreversible.
+                value:
+                  reason: 'Engine failures'
       responses:
         '204':
           description: |
@@ -308,6 +384,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                conflictingOmit:
+                  summary: |
+                    Omit is being called twice on the same Port Call
+                  description: |
+                    In case a **Port Call** has already been OMITTED - it is possible to send a 409 (Conflict) indicating that the OMIT cannot be performed again.
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7005` is just a "random example"
+                  value:
+                    httpMethod: POST
+                    requestUri: /v2/port-calls/085a3207-5e45-49cf-8e1b-f8442beaf545/omit
+                    statusCode: 409
+                    statusCodeText: Port Call already omitted
+                    statusCodeMessage: It is not possible to Omit a Port Call twice
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2024-11-21T09:41:00Z'
+                    errors:
+                      - errorCode: 7005
+                        errorCodeText: Conflicting omit
+                        errorCodeMessage: Trying to omit an already Omitted Port Call
   '/v2/port-calls':
     get:
       parameters:
@@ -327,7 +423,7 @@ paths:
       operationId: get-port-call
       summary: Retrieves a list of Port Calls
       description: |
-        Description...
+        Fetches a list of **Port Calls** that match the filter criterias. If only a specific **Port Call** is requested then it is possible to filter the result by `portCallID` which will return an array with at most a single object (the array can also be empty in case the `portCallID` is not linked to any **Port Call** known by the consumer).
       responses:
         '200':
           description: |
@@ -379,6 +475,29 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+                tooManyRequestsExample:
+                  summary: |
+                    Making too many Port Call requests
+                  description: |
+                    Calling the endPoint
+
+                        GET /v2/port-calls
+                        
+                    too many times within a time period results in an error.
+
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: GET
+                    requestUri: /v2/port-calls
+                    statusCode: 429
+                    statusCodeText: Too Many Requests
+                    statusCodeMessage: Too many request to fetch Port Calls has been requested. Please try again in 1 hour
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2024-09-04T09:41:00Z'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: Max Port Call requests reached
+                        errorCodeMessage: A maximum of 500 Port Call requests can be created per hour
   '/v2/terminal-calls/{terminalCallID}':
     put:
       parameters:
