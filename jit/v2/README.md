@@ -12,6 +12,7 @@ Snapshot as of 17 of January 2025 for JIT 2.0.0 Alpha.
 ## Key changes
 - endPoint description and example(s) updates have been provided for all endPoints
 - added `409` (Conflict) response codes to the PUT endPoints in case the caller is trying to update or create something that is cancelled, declined or omitted
+- added `404` (Not Found) response codes to some of the PUT endPoints in case the caller is trying to update or create something that is linked to something that does not exist
 - removed pagination on GET endPoints (removed the `limit` and `cursor` queryParameters). EndPoint descriptions have been updated to reflect the fact that some queryParameters are mandatory to provide in order to limit the response
 - `terminalCallSequenceNumber` removed as a queryParameter on `GET /v2/terminal-calls`
 - `portCallServiceEventTypeCode` removed as a queryParameter on `GET /v2/port-call-services`
