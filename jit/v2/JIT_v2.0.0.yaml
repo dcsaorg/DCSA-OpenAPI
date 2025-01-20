@@ -95,16 +95,18 @@ paths:
       operationId: put-port-call
       summary: Initiates a new or updates a Port Call
       description: |
-        Creates or updates a **Port Call** record. The caller must provide a unique portCallID (UUIDv4), which identifies the **Port Call**. The `portCallID` must remain consistent across all subsequent communications and linked **Terminal Calls**. If updating an existing **Port Call**, e.g. including the `portVisitReference`, the provided `portCallID` must match the existing record.
+        Creates or updates a **Port Call** record. The caller must provide a unique `portCallID` (UUIDv4), which identifies the **Port Call**. The `portCallID` must remain consistent across all subsequent communications and linked **Terminal Calls**. If updating an existing **Port Call**, e.g. including the `portVisitReference`, the provided `portCallID` must match the existing record.
 
         The **Port Call** includes:
           
           - Location information (required): `UNLocationCode`
           - static **Vessel** information (required): `vessel`
           - an optional business identifier for the port visit: `portVisitReference`
-          - The ability to send the record with informational purpose only, using `isFYI= true`
+          - The ability to send the record with informational purpose only, using `isFYI=true`
 
         This call is often provided as the first call from a **Carrier** to a **Terminal** before creating a **Terminal Call** and then sending `ETA-Berth` or `Moves`.
+
+        It is not possible to update a **Port Call** that has been `OMITTED`
       requestBody:
         description: Initiates a new or updates a Port Call
         required: true
@@ -113,49 +115,49 @@ paths:
             schema:
               $ref: '#/components/schemas/PortCall'
             examples:
-              CreateNewPortCallForETA:
+              createNewPortCallForETA:
                 summary: |
                   Create a new Port Call to be used for an ETA
                 description: |
-                  A new `Port Call` for **Port of Amsterdam** for the **YM WHOLESOME**. After this call is accepted by consumer - a **Transport Call** can be created. In this example no `portVisitReference` has yet been assigned to the **Port Call**.
+                  A new **Port Call** for **Port of Amsterdam** for the **YM WHOLESOME**. After this call is accepted by consumer - a **Terminal Call** can be created. In this example no `portVisitReference` has yet been assigned to the **Port Call**.
                 value:
                   portCallID: '0342254a-5927-4856-b9c9-aa12e7c00563'
-                  UNLocationCode: NLAMS
+                  UNLocationCode: 'NLAMS'
                   vessel:
                     vesselIMONumber: '9704611'
                     MMSINumber: '477524700'
-                    name: YM WHOLESOME
+                    name: 'YM WHOLESOME'
                     lengthOverall: 368.07
-                    dimensionUnit: MTR
-                    callSign: VROO4
-                    typeCode: CONT
-              SendFYI:
+                    dimensionUnit: 'MTR'
+                    callSign: 'VROO4'
+                    typeCode: 'CONT'
+              sendFYI:
                 summary: |
                   Send a FYI to a consumer
                 description: |
-                  A `Port Call` has already been created - now send the **Port Call** as a FYI to a (secondary) consumer. In this example all properties are the same as the example above.
+                  A **Port Call** has already been created - now send the **Port Call** as a FYI to a (secondary) consumer. In this example all properties are the same as the example above.
                 value:
                   portCallID: '0342254a-5927-4856-b9c9-aa12e7c00563'
-                  UNLocationCode: NLAMS
+                  UNLocationCode: 'NLAMS'
                   vessel:
                     vesselIMONumber: '9704611'
                     MMSINumber: '477524700'
-                    name: YM WHOLESOME
+                    name: 'YM WHOLESOME'
                     lengthOverall: 368.07
-                    dimensionUnit: MTR
-                    callSign: VROO4
-                    typeCode: CONT
+                    dimensionUnit: 'MTR'
+                    callSign: 'VROO4'
+                    typeCode: 'CONT'
                   isFYI: true
       responses:
         '204':
           description: |
-            A new or updated Port Call accepted by the consumer.
+            A new or updated Port Call successfully accepted by the consumer.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
         '400':
           description: |
-            In case creating a new `Port Call` fails schema validation, a `400` (Bad Request) is returned.
+            In case creating a new **Port Call** fails schema validation, a `400` (Bad Request) is returned.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -168,25 +170,55 @@ paths:
                   summary: |
                     Port Call missing Vessel object
                   description: |
-                    `vessel` is a mandatory property in the `Port Call`. This is an example of how the error object would look in case this property is missing.
+                    `vessel` is a mandatory property in the **Port Call**. This is an example of how the error object would look in case this property is missing.
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
-                    httpMethod: PUT
-                    requestUri: /v2/port-calls/085a3207-5e45-49cf-8e1b-f8442beaf545
+                    httpMethod: 'PUT'
+                    requestUri: '/v2/port-calls/085a3207-5e45-49cf-8e1b-f8442beaf545'
                     statusCode: 400
-                    statusCodeText: Bad Request
-                    statusCodeMessage: Vessel object not found - it is a mandatory property in Port Call.
-                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    statusCodeText: 'Bad Request'
+                    statusCodeMessage: 'Vessel object not found - it is a mandatory property in Port Call.'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
                     errorDateTime: '2024-11-21T09:41:00Z'
                     errors:
                       - errorCode: 7003
-                        property: vessel
-                        errorCodeText: mandatory property missing
-                        errorCodeMessage: vessel must be provided as part of a Port Call
+                        property: 'vessel'
+                        errorCodeText: 'mandatory property missing'
+                        errorCodeMessage: 'vessel must be provided as part of a Port Call'
+        '409':
+          description: |
+            In case updating a **Port Call** that has been `OMITTED`, a `409` (Conflict) is returned.
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                conflictRequestExample:
+                  summary: |
+                    Updating a Port Call that is OMITTED
+                  description: |
+                    Updating an OMITTED **Port Call**, returns a 409 (Conflict)
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
+                  value:
+                    httpMethod: 'PUT'
+                    requestUri: '/v2/port-calls/085a3207-5e45-49cf-8e1b-f8442beaf545'
+                    statusCode: 409
+                    statusCodeText: 'Conflict'
+                    statusCodeMessage: 'Trying to update a Port Call that has been OMITTED'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    errorDateTime: '2024-11-21T09:41:00Z'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: 'Updating OMITTED Port Call'
+                        errorCodeMessage: 'Cannot update a Port Call that has been OMITTED'
         '500':
           description: |
-            In case a server error occurs in implementor system, a `500` (Internal Server Error) is returned.
+            In case a server error occurs in implementer system, a `500` (Internal Server Error) is returned.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -199,21 +231,21 @@ paths:
                   summary: |
                     Internal Server Error while processing Port Call
                   description: |
-                    An Internal Server Error has occurred - the caller should contact {implementor-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+                    An Internal Server Error has occurred - the caller should contact {implementer-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
-                    httpMethod: PUT
-                    requestUri: /v2/port-calls/085a3207-5e45-49cf-8e1b-f8442beaf545
+                    httpMethod: 'PUT'
+                    requestUri: '/v2/port-calls/085a3207-5e45-49cf-8e1b-f8442beaf545'
                     statusCode: 500
-                    statusCodeText: Internal Server Error
-                    statusCodeMessage: Internal Server Error occurred while processing Port Call
-                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    statusCodeText: 'Internal Server Error'
+                    statusCodeMessage: 'Internal Server Error occurred while processing Port Call'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
                     errorDateTime: '2024-11-21T09:41:00Z'
                     errors:
                       - errorCode: 7003
-                        errorCodeText: Internal Error occurred
-                        errorCodeMessage: Internal Error occurred
+                        errorCodeText: 'Internal Error occurred'
+                        errorCodeMessage: 'Internal Error occurred'
         default:
           description: |
             Unexpected error
@@ -237,17 +269,17 @@ paths:
 
                     **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
                   value:
-                    httpMethod: PUT
-                    requestUri: /v2/port-calls/085a3207-5e45-49cf-8e1b-f8442beaf545
+                    httpMethod: 'PUT'
+                    requestUri: '/v2/port-calls/085a3207-5e45-49cf-8e1b-f8442beaf545'
                     statusCode: 429
-                    statusCodeText: Too Many Requests
-                    statusCodeMessage: Too many request to create a Port Call has been requested. Please try again in 1 hour
-                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    statusCodeText: 'Too Many Requests'
+                    statusCodeMessage: 'Too many requests to create a Port Call has been requested. Please try again in 1 hour'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
                     errorDateTime: '2024-09-04T09:41:00Z'
                     errors:
                       - errorCode: 7003
-                        errorCodeText: Max Port Call creations reached
-                        errorCodeMessage: A maximum of 100 unique Port Calls can be created per hour
+                        errorCodeText: 'Max Port Call requests reached'
+                        errorCodeMessage: 'A maximum of 100 unique Port Calls can be requested per hour'
   '/v2/port-calls/{portCallID}/omit':
     post:
       parameters:
@@ -260,13 +292,17 @@ paths:
       description: |
         Allows the provider to `OMIT` a **Port Call**, signaling that the **Port Call** is no longer going to happen.
 
-        When a consumer receives an `OMIT`, it is their responsibility to propagate this information to any secondary recipients, they previously informed using the `isFYI=true` property, while creating **Port Calls** or sending related updates.
+        When a consumer receives an `OMIT`, it is their responsibility to propagate this information to any secondary receivers, they previously informed using the `isFYI=true` property, while creating **Port Calls** or sending related updates.
 
         The provider is responsible for:
-          - sending an `OMIT` to all **Terminal Calls** linked to the `portCallID`
-          - **Cancel** all `PortCallServices` associatedwith the omitted **Terminal Calls** and **Port Call**
+          - sending an `OMIT` to all **Terminal Calls** linked to the `portCallID` (including secondary receivers)
+          - **Cancel** all `PortCallServices` that are associated with the omitted **Terminal Calls** and **Port Call**
 
-            Once a **Port Call** has been `OMITTED`, this action **CANNOT** be undone. In case the `OMIT` has to be "undone" a new **Port Call** must be created with new **Terminal Calls** and new **Port Call Services**.
+        The consumer is responsible for:
+          - propagating the `OMIT` to any secondary receivers
+          - **Cancel** any **Port Call Services** linked to the omitted **Terminal Call** initiated by the consumer
+
+        Once a **Port Call** has been `OMITTED`, this action **CANNOT** be undone. In case the `OMIT` has to be "undone" a new **Port Call** must be created with new **Terminal Calls** and new **Port Call Services**.
       requestBody:
         description: |
           Omits a **Port Call**
@@ -283,6 +319,14 @@ paths:
                   Send an `OMIT` to a **Port Call** because the vessel has engine problems. Sending this OMIT is irreversible.
                 value:
                   reason: 'Engine failures'
+              omitFYI:
+                summary: |
+                  Send an OMIT as a FYI
+                description: |
+                  Send an `OMIT` to a **Port Call** to a secondary receiver.
+                value:
+                  reason: 'Engine failures'
+                  isFYI: true
       responses:
         '204':
           description: |
@@ -292,7 +336,7 @@ paths:
               $ref: '#/components/headers/API-Version'
         '400':
           description: |
-            In case omitting a `Port Call` fails schema validation, a `400` (Bad Request) is returned.
+            In case omitting a **Port Call** fails schema validation, a `400` (Bad Request) is returned.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -309,21 +353,21 @@ paths:
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7004` is just a "random example"
                   value:
-                    httpMethod: POST
-                    requestUri: /v2/port-calls/085a3207-5e45-49cf-8e1b-f8442beaf545/omit
+                    httpMethod: 'POST'
+                    requestUri: '/v2/port-calls/085a3207-5e45-49cf-8e1b-f8442beaf545/omit'
                     statusCode: 400
-                    statusCodeText: Bad Request
-                    statusCodeMessage: isFYI has wrong type - boolean expected but integer found
-                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    statusCodeText: 'Bad Request'
+                    statusCodeMessage: 'isFYI has wrong type - boolean expected but integer found'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
                     errorDateTime: '2024-11-21T09:41:00Z'
                     errors:
                       - errorCode: 7004
-                        property: isFYI
-                        errorCodeText: wrong property type
-                        errorCodeMessage: isFYI should be a boolean. '12' provided as value
+                        property: 'isFYI'
+                        errorCodeText: 'wrong property type'
+                        errorCodeMessage: 'isFYI should be a boolean. `12` provided as value'
         '404':
           description: |
-            In case the implementor does not know of the `portCallID` used in the request (this could be because of a `PUT` request that has not finished processing or simply because the resource does not exist), it is possible for the implementor to reject the requests by returning a `404` (Not Found).
+            In case the implementer does not know of the `portCallID` used in the request (this could be because of a `PUT` request that has not finished processing or simply because the resource does not exist), it is possible for the implementer to reject the request by returning a `404` (Not Found).
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -336,24 +380,24 @@ paths:
                   summary: |
                     portCallID not Found
                   description: |
-                    The provided `portCallID` cannot be found. This can be because a `PUT` request has not been finished processing or because the `portCallID` does not exist in the implementor system.
+                    The provided `portCallID` cannot be found. This can be because a `PUT` request has not been finished processing or because the `portCallID` does not exist in the implementer system.
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7006` is just a "random example"
                   value:
-                    httpMethod: POST
-                    requestUri: /v2/port-calls/085a3207-5e45-49cf-8e1b-f8442beaf545/omit
+                    httpMethod: 'POST'
+                    requestUri: '/v2/port-calls/085a3207-5e45-49cf-8e1b-f8442beaf545/omit'
                     statusCode: 404
-                    statusCodeText: Not Found
-                    statusCodeMessage: portCallID not found
-                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    statusCodeText: 'Not Found'
+                    statusCodeMessage: 'portCallID not found'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
                     errorDateTime: '2024-09-04T09:41:00Z'
                     errors:
                       - errorCode: 7006
-                        errorCodeText: portCallID Not Found
-                        errorCodeMessage: The Port Call does not exist
+                        errorCodeText: 'portCallID Not Found'
+                        errorCodeMessage: 'The Port Call does not exist'
         '500':
           description: |
-            In case a server error occurs in implementor system, a `500` (Internal Server Error) is returned.
+            In case a server error occurs in implementer system, a `500` (Internal Server Error) is returned.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -366,21 +410,21 @@ paths:
                   summary: |
                     Internal Server Error while processing Port Call Service
                   description: |
-                    An Internal Server Error has occurred - the caller should contact {implementor-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+                    An Internal Server Error has occurred - the caller should contact {implementer-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7005` is just a "random example"
                   value:
-                    httpMethod: POST
-                    requestUri: /v2/port-calls/085a3207-5e45-49cf-8e1b-f8442beaf545/omit
+                    httpMethod: 'POST'
+                    requestUri: '/v2/port-calls/085a3207-5e45-49cf-8e1b-f8442beaf545/omit'
                     statusCode: 500
-                    statusCodeText: Internal Server Error
-                    statusCodeMessage: Internal Server Error occurred while processing Port Call
-                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    statusCodeText: 'Internal Server Error'
+                    statusCodeMessage: 'Internal Server Error occurred while processing Port Call'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
                     errorDateTime: '2024-11-21T09:41:00Z'
                     errors:
                       - errorCode: 7005
-                        errorCodeText: Internal Error occurred
-                        errorCodeMessage: Internal Error occurred
+                        errorCodeText: 'Internal Error occurred'
+                        errorCodeMessage: 'Internal Error occurred'
         default:
           description: |
             Unexpected error
@@ -392,25 +436,29 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
               examples:
-                conflictingOmit:
+                tooManyRequestsExample:
                   summary: |
-                    Omit is being called twice on the same Port Call
+                    Making too many Omit requests
                   description: |
-                    In case a **Port Call** has already been OMITTED - it is possible to send a 409 (Conflict) indicating that the OMIT cannot be performed again.
+                    Calling the endPoint
 
-                    **NB**: `errorCode` not yet standardized by DCSA. Value `7005` is just a "random example"
+                        POST /v2/port-calls/{portCallID}/omit
+                        
+                    too many times within a time period results in an error.
+
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
                   value:
-                    httpMethod: POST
-                    requestUri: /v2/port-calls/085a3207-5e45-49cf-8e1b-f8442beaf545/omit
-                    statusCode: 409
-                    statusCodeText: Port Call already omitted
-                    statusCodeMessage: It is not possible to Omit a Port Call twice
-                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
-                    errorDateTime: '2024-11-21T09:41:00Z'
+                    httpMethod: 'POST'
+                    requestUri: '/v2/port-calls/085a3207-5e45-49cf-8e1b-f8442beaf545/omit'
+                    statusCode: 429
+                    statusCodeText: 'Too Many Requests'
+                    statusCodeMessage: 'Too many requests to omit a Port Call has been requested. Please try again in 1 hour'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    errorDateTime: '2024-09-04T09:41:00Z'
                     errors:
-                      - errorCode: 7005
-                        errorCodeText: Conflicting omit
-                        errorCodeMessage: Trying to omit an already Omitted Port Call
+                      - errorCode: 7003
+                        errorCodeText: 'Max Port Call omits reached'
+                        errorCodeMessage: 'A maximum of 100 unique Port Calls can be omitted per hour'
   '/v2/port-calls':
     get:
       parameters:
@@ -422,15 +470,29 @@ paths:
         - $ref: '#/components/parameters/vesselNameQueryParam'
         - $ref: '#/components/parameters/MMSINumberQueryParam'
 
-        - $ref: '#/components/parameters/limitQueryParam'
-        - $ref: '#/components/parameters/cursorQueryParam'
         - $ref: '#/components/parameters/Api-Version-Major'
       tags:
         - Port Call Service
       operationId: get-port-call
       summary: Retrieves a list of Port Calls
       description: |
-        Retrieves a list of **Port Calls** that match the specified filter criteria. To retrieve details for a specific **Port Call**, use the `portCallID` filter. This will return an array containing at most a single object. The response will return an empty array if no **Port Call** known by the consumer is linked to the provided `portCallID`.
+        Retrieves a list of **Port Calls** that match the specified filter criteria. It is **mandatory** to provide at least 1 filter.
+
+        The result set of this endPoint will always include **Port Calls** that have **not yet been completed**. Definition of a completed **Port Call** is:
+        ````
+        A Port Call:
+        - that has a Terminal Call, and
+        - that has a Port Call Service with: `portCallServiceType=BERTH` AND `portCallServiceEventTypeCode=DEPA`, and
+        - that has a Timestamp with: `classifierCode=PLN` AND `dateTime < {now}`
+        ````
+        This can potentially result in empty result sets. **Example:** filtering by `portCallID` that has been completed.
+
+        Here are some example queries:
+          * To get a specific **Port Call** use the `portCallID` filter with the ID of the Port Call to filter by. This results in at most a single object. The response will return an empty array if no **Port Call** known by the consumer having the provided `portCallID`.
+          * To get a list of not completed **Port Calls** for a specific VesselIMONumber, use the `vesselIMONumber` filter with the `vesselIMONumber` of the Vessel to filter by. This will result in a list of potentially many **Port Calls** all of which will be visited by the Vessel with the `vesselIMONumber` specified.
+          * To get a list of  not completed **Port Calls** for a specific UN Location Code, use the `UNLocationCode` filter with the `UNLocationCode` of the location to filter by. This will result in a list of potentially many **Port Calls** all of which will be located in the UNLocationCode specified.
+
+        **Note:** Beware it is possible to specify filters that exclude all results. Example: if filtering by `vesselIMONumber` and `MMSINumber` **not** belonging to the same Vessel - the result set will be an empty list. No error will be reported.
       responses:
         '200':
           description: |
@@ -438,15 +500,94 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
-            Next-Page-Cursor:
-              $ref: '#/components/headers/Next-Page-Cursor'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PortCalls'
+              examples:
+                portCallsMatchingUNLocationCode:
+                  summary: |
+                    Get all Port Calls matching UNLocationCode=NLAMS
+                  description: |
+                    Get a list of all **Port Calls** visiting a port with `UNLocationCode` matching `NLAMS` (Amsterdam in the Netherlands). The request would look like this:
+
+                        GET /v2/port-calls?UNLocationCode=NLAMS
+
+                    **Note:** This will only return **Port Calls** that have not been completed. See endPoint description for a definition of "Completed Port Call"
+                  value:
+                    - portCallID: '0342254a-5927-4856-b9c9-aa12e7c00563'
+                      UNLocationCode: 'NLAMS'
+                      vessel:
+                        vesselIMONumber: '9704611'
+                        MMSINumber: '477524700'
+                        name: 'YM WHOLESOME'
+                        lengthOverall: 368.07
+                        dimensionUnit: 'MTR'
+                        callSign: 'VROO4'
+                        typeCode: 'CONT'
+                    - portCallID: '9d4b83fa-cf48-413e-aa79-8d01a17ee201'
+                      UNLocationCode: 'NLAMS'
+                      vessel:
+                        vesselIMONumber: '9619907'
+                        MMSINumber: '219018271'
+                        name: 'MAERSK MC-KINNEY MOLLER'
+                        lengthOverall: 399
+                        dimensionUnit: 'MTR'
+                        callSign: 'OWIZ2'
+                        typeCode: 'CONT'
+                    - portCallID: '070c0b3b-97ff-4711-adf4-a0517d76fc30'
+                      UNLocationCode: 'NLAMS'
+                      vessel:
+                        vesselIMONumber: '9929429'
+                        MMSINumber: '636022601'
+                        name: 'MSC IRINA'
+                        lengthOverall: 400
+                        dimensionUnit: 'MTR'
+                        callSign: '5LJP3'
+                        typeCode: 'CONT'
+                portCallsMatchingVesselIMONumber:
+                  summary: |
+                    Get all Port Calls matching vesselIMONumber=9929429
+                  description: |
+                    Get a list of all **Port Calls** that the vessel with `vesselIMONumber=9929429` visits. The request would look like this:
+
+                        GET /v2/port-calls?vesselIMONumber=9929429
+
+                    **Note:** This will only return **Port Calls** that have not been completed. See endPoint description for a definition of "Completed Port Call"
+                  value:
+                    - portCallID: 'ba78faa2-f50d-49b1-abdf-cecfe4a817da'
+                      UNLocationCode: 'NLAMS'
+                      vessel:
+                        vesselIMONumber: '9929429'
+                        MMSINumber: '636022601'
+                        name: 'MSC IRINA'
+                        lengthOverall: 400
+                        dimensionUnit: 'MTR'
+                        callSign: '5LJP3'
+                        typeCode: 'CONT'
+                    - portCallID: 'b37cefe2-e80d-4abf-ad6f-665db3519edd'
+                      UNLocationCode: 'PAPCN'
+                      vessel:
+                        vesselIMONumber: '9929429'
+                        MMSINumber: '636022601'
+                        name: 'MSC IRINA'
+                        lengthOverall: 400
+                        dimensionUnit: 'MTR'
+                        callSign: '5LJP3'
+                        typeCode: 'CONT'
+                    - portCallID: '852beee4-a68e-474c-a825-4ba60433e912'
+                      UNLocationCode: 'SGSIN'
+                      vessel:
+                        vesselIMONumber: '9929429'
+                        MMSINumber: '636022601'
+                        name: 'MSC IRINA'
+                        lengthOverall: 400
+                        dimensionUnit: 'MTR'
+                        callSign: '5LJP3'
+                        typeCode: 'CONT'
         '500':
           description: |
-            In case a server error occurs in implementor system, a `500` (Internal Server Error) is returned.
+            In case a server error occurs in implementer system, a `500` (Internal Server Error) is returned.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -459,21 +600,21 @@ paths:
                   summary: |
                     Internal Server Error while processing Port Call request
                   description: |
-                    An Internal Server Error has occurred - the caller should contact {implementor-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+                    An Internal Server Error has occurred - the caller should contact {implementer-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
-                    httpMethod: GET
-                    requestUri: /v2/port-calls
+                    httpMethod: 'GET'
+                    requestUri: '/v2/port-calls'
                     statusCode: 500
-                    statusCodeText: Internal Server Error
-                    statusCodeMessage: Internal Server Error occurred while processing Port Call request
-                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    statusCodeText: 'Internal Server Error'
+                    statusCodeMessage: 'Internal Server Error occurred while processing Port Call request'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
                     errorDateTime: '2024-11-21T09:41:00Z'
                     errors:
                       - errorCode: 7003
-                        errorCodeText: Internal Error occurred
-                        errorCodeMessage: Internal Error occurred
+                        errorCodeText: 'Internal Error occurred'
+                        errorCodeMessage: 'Internal Error occurred'
         default:
           description: |
             Unexpected error
@@ -484,6 +625,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+              examples:
                 tooManyRequestsExample:
                   summary: |
                     Making too many Port Call requests
@@ -496,17 +638,17 @@ paths:
 
                     **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
                   value:
-                    httpMethod: GET
-                    requestUri: /v2/port-calls
+                    httpMethod: 'GET'
+                    requestUri: '/v2/port-calls'
                     statusCode: 429
-                    statusCodeText: Too Many Requests
-                    statusCodeMessage: Too many request to fetch Port Calls has been requested. Please try again in 1 hour
-                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    statusCodeText: 'Too Many Requests'
+                    statusCodeMessage: 'Too many requests to fetch Port Calls has been requested. Please try again in 1 hour'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
                     errorDateTime: '2024-09-04T09:41:00Z'
                     errors:
                       - errorCode: 7003
-                        errorCodeText: Max Port Call requests reached
-                        errorCodeMessage: A maximum of 500 Port Call requests can be created per hour
+                        errorCodeText: 'Max Port Call requests reached'
+                        errorCodeMessage: 'A maximum of 500 Port Calls can be requested per hour'
   '/v2/terminal-calls/{terminalCallID}':
     put:
       parameters:
@@ -517,7 +659,19 @@ paths:
       operationId: put-terminal-call
       summary: Initiates a new or updates a Terminal Call
       description: |
-        Description...
+        Creates or updates a **Terminal Call** record. The caller must provide a unique `terminalCallID` (UUIDv4), which identifies the **Terminal Call**. The `terminalCallID` must remain consistent across all subsequent communications and linked **Port Call Services**. If updating an existing **Terminal Call**, e.g. including the `terminalCallReference`, the provided `terminalCallID` must match the existing record.
+
+        The **Terminal Call** includes:
+          
+          - link to the **Port Call** (required): `portCallID`
+          - Service information (required): `carrierServiceCode`, `carrierServiceName` (and an optional `universalServiceReference`)
+          - Voyage information: `carrierImportVoyageNumber`, `carrierExportVoyageNumber`, `universalImportVoyageReference` and `universalExportVoyageReference`
+          - terminal information: `terminalCallReference` and `terminalCallSequenceNumber`
+          - The ability to send the record with informational purpose only, using `isFYI=true`
+
+        This call is often provided as the second call from a **Carrier** to a **Terminal** after the creation of the **Port Call** and then sending `ETA-Berth` or `Moves`.
+
+        It is not possible to update a **Terminal Call** that has been `OMITTED`
       requestBody:
         description: Initiates a new or updates a Terminal Call
         required: true
@@ -525,16 +679,51 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/TerminalCall'
+            examples:
+              createNewTerminalCallForETA:
+                summary: |
+                  Create a new Terminal Call to be used for an ETA
+                description: |
+                  A new **Terminal Call** linked to a previously created **Port Call** (in this example with `portCallID=0342254a-5927-4856-b9c9-aa12e7c00563`). After this call is accepted by consumer - a **Port Call Service** can be created. In this example no `terminalCallReference` has yet been assigned to the **Terminal Call**.
+                value:
+                  terminalCallID: '0342254a-5927-4856-b9c9-aa12e7c00563'
+                  portCallID: '0342254a-5927-4856-b9c9-aa12e7c00563'
+                  terminalCallSequenceNumber: 2
+                  carrierServiceName: 'Great Lion Service'
+                  carrierServiceCode: 'FE1'
+                  universalServiceReference: 'SR12345A'
+                  carrierImportVoyageNumber: '2103N'
+                  carrierExportVoyageNumber: '2103S'
+                  universalImportVoyageReference: '2103N'
+                  universalExportVoyageReference: '2103N'
+                  isFYI: false
+              sendFYI:
+                summary: |
+                  Send a FYI to a (secondary) consumer
+                description: |
+                  A **Terminal Call** has already been created - now send the **Terminal Call** as a FYI to a (secondary) consumer. In this example all properties are the same as the previous example, except for `isFYI`.
+                value:
+                  terminalCallID: '0342254a-5927-4856-b9c9-aa12e7c00563'
+                  portCallID: '0342254a-5927-4856-b9c9-aa12e7c00563'
+                  terminalCallSequenceNumber: 2
+                  carrierServiceName: 'Great Lion Service'
+                  carrierServiceCode: 'FE1'
+                  universalServiceReference: 'SR12345A'
+                  carrierImportVoyageNumber: '2103N'
+                  carrierExportVoyageNumber: '2103S'
+                  universalImportVoyageReference: '2103N'
+                  universalExportVoyageReference: '2103N'
+                  isFYI: true
       responses:
         '204':
           description: |
-            A new or updated Terminal Call accepted
+            A new or updated Terminal Call successfully accepted by consumer
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
         '400':
           description: |
-            In case creating a new `Terminal Call` fails schema validation, a `400` (Bad Request) is returned.
+            In case creating a new **Terminal Call** fails schema validation, a `400` (Bad Request) is returned.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -547,25 +736,85 @@ paths:
                   summary: |
                     carrierServiceCode is missing
                   description: |
-                    `carrierServiceCode` is a mandatory property in the `Terminal Call`. This is an example of how the error object would look in case this property is missing
+                    `carrierServiceCode` is a mandatory property in the **Terminal Call**. This is an example of how the error object would look in case this property is missing
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
-                    httpMethod: PUT
-                    requestUri: /v2/terminal-calls/085a3207-5e45-49cf-8e1b-f8442beaf545
+                    httpMethod: 'PUT'
+                    requestUri: '/v2/terminal-calls/085a3207-5e45-49cf-8e1b-f8442beaf545'
                     statusCode: 400
-                    statusCodeText: Bad Request
-                    statusCodeMessage: carrierServiceCode not found - it is a mandatory property in Terminal Call
-                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    statusCodeText: 'Bad Request'
+                    statusCodeMessage: 'carrierServiceCode not found - it is a mandatory property in Terminal Call'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
                     errorDateTime: '2024-11-21T09:41:00Z'
                     errors:
                       - errorCode: 7003
-                        property: carrierServiceCode
-                        errorCodeText: mandatory property missing
-                        errorCodeMessage: carrierServiceCode must be provided as part of a Terminal Call
+                        property: 'carrierServiceCode'
+                        errorCodeText: 'mandatory property missing'
+                        errorCodeMessage: 'carrierServiceCode must be provided as part of a Terminal Call'
+        '404':
+          description: |
+            In case the implementer does not know of the `portCallID` used in the request payload - it is possible for the implementer to reject the request by returning a `404` (Not Found).
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                notFoundExample:
+                  summary: |
+                    Not Found request
+                  description: |
+                    The provided `portCallID` cannot be found.
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7006` is just a "random example"
+                  value:
+                    httpMethod: 'PUT'
+                    requestUri: '/v2/terminal-calls/085a3207-5e45-49cf-8e1b-f8442beaf545'
+                    statusCode: 404
+                    statusCodeText: 'Not Found'
+                    statusCodeMessage: 'portCallID not found'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    errorDateTime: '2024-09-04T09:41:00Z'
+                    errors:
+                      - errorCode: 7006
+                        errorCodeText: 'portCallID Not Found'
+                        errorCodeMessage: 'The Port Call does not exist'
+        '409':
+          description: |
+            In case creating a new or updating a **Terminal Call** linked to a **Port Call** that has been `OMITTED`, a `409` (Conflict) is returned.
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                conflictRequestExample:
+                  summary: |
+                    Updating a Terminal Call that is OMITTED
+                  description: |
+                    Updating an OMITTED **Terminal Call** or creating a new **Terminal Call** linked to an OMITTED **Port Call**, returns a 409 (Conflict)
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
+                  value:
+                    httpMethod: 'PUT'
+                    requestUri: '/v2/terminal-calls/085a3207-5e45-49cf-8e1b-f8442beaf545'
+                    statusCode: 409
+                    statusCodeText: 'Conflict'
+                    statusCodeMessage: 'Trying to update a Terminal Call that has been OMITTED'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    errorDateTime: '2024-11-21T09:41:00Z'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: 'Updating OMITTED Terminal Call'
+                        errorCodeMessage: 'Cannot update a Terminal Call that has been OMITTED'
         '500':
           description: |
-            In case a server error occurs in implementor system, a `500` (Internal Server Error) is returned.
+            In case a server error occurs in implementer system, a `500` (Internal Server Error) is returned.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -578,21 +827,21 @@ paths:
                   summary: |
                     Internal Server Error while processing Terminal Call
                   description: |
-                    An Internal Server Error has occurred - the caller should contact {implementor-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+                    An Internal Server Error has occurred - the caller should contact {implementer-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
-                    httpMethod: PUT
-                    requestUri: /v2/terminal-calls/085a3207-5e45-49cf-8e1b-f8442beaf545
+                    httpMethod: 'PUT'
+                    requestUri: '/v2/terminal-calls/085a3207-5e45-49cf-8e1b-f8442beaf545'
                     statusCode: 500
-                    statusCodeText: Internal Server Error
-                    statusCodeMessage: Internal Server Error occurred while processing Terminal Call
-                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    statusCodeText: 'Internal Server Error'
+                    statusCodeMessage: 'Internal Server Error occurred while processing Terminal Call'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
                     errorDateTime: '2024-11-21T09:41:00Z'
                     errors:
                       - errorCode: 7003
-                        errorCodeText: Internal Error occurred
-                        errorCodeMessage: Internal Error occurred
+                        errorCodeText: 'Internal Error occurred'
+                        errorCodeMessage: 'Internal Error occurred'
         default:
           description: |
             Unexpected error
@@ -603,6 +852,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                tooManyRequestsExample:
+                  summary: |
+                    Making too many Terminal Calls
+                  description: |
+                    Calling the endPoint
+
+                        PUT /v2/terminal-calls/{terminalCallID}
+                        
+                    too many times within a time period results in an error.
+
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: 'PUT'
+                    requestUri: '/v2/terminal-calls/085a3207-5e45-49cf-8e1b-f8442beaf545'
+                    statusCode: 429
+                    statusCodeText: 'Too Many Requests'
+                    statusCodeMessage: 'Too many requests to create a Terminal Call has been requested. Please try again in 1 hour'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    errorDateTime: '2024-09-04T09:41:00Z'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: 'Max Terminal Call requests reached'
+                        errorCodeMessage: 'A maximum of 100 unique Terminal Calls can be requested per hour'
   '/v2/terminal-calls/{terminalCallID}/omit':
     post:
       parameters:
@@ -613,7 +886,18 @@ paths:
       operationId: omit-terminal-call
       summary: Omits a Terminal Call
       description: |
-        Provider `OMITTING` a **Terminal Call**
+        Allows the provider to `OMIT` a **Terminal Call**, signaling that the **Terminal Call** is no longer going to happen.
+
+        When a consumer receives an `OMIT`, it is their responsibility to propagate this information to any secondary receivers, they previously informed using the `isFYI=true` property, while creating **Terminal Calls** or sending related updates. It is also the responsibility of the consumer to **Cancel** any Port Call Services initiated, associated to the **Terminal Call** that is now omitted.
+
+        The provider is responsible for:
+          - **Cancel** all **Port Call Services** that are associated with the omitted **Terminal Call** (including secondary receivers)
+
+        The consumer is responsible for:
+          - propagating the `OMIT` to any secondary receivers
+          - **Cancel** any **Port Call Services** linked to the omitted **Terminal Call** initiated by the consumer
+
+        Once a **Terminal Call** has been `OMITTED`, this action **CANNOT** be undone. In case the `OMIT` has to be "undone" a new **Terminal Call** must be created with new **Port Call Services**.
       requestBody:
         description: |
           Omits a **Terminal Call**
@@ -622,6 +906,22 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/OmitTerminalCall'
+            examples:
+              omit:
+                summary: |
+                  Send an OMIT
+                description: |
+                  Send an `OMIT` to a **Terminal Call** because of timing issues. Sending this OMIT is irreversible.
+                value:
+                  reason: 'Not enough time'
+              omitFYI:
+                summary: |
+                  Send an OMIT as a FYI
+                description: |
+                  Send an `OMIT` to a **Terminal Call** to a secondary receiver.
+                value:
+                  reason: 'Engine failures'
+                  isFYI: true
       responses:
         '204':
           description: |
@@ -631,7 +931,7 @@ paths:
               $ref: '#/components/headers/API-Version'
         '400':
           description: |
-            In case omitting a `Terminal Call` does not schema validate a `400` (Bad Request) is returned.
+            In case omitting a **Terminal Call** does not schema validate, a `400` (Bad Request) is returned.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -648,21 +948,21 @@ paths:
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7004` is just a "random example"
                   value:
-                    httpMethod: POST
-                    requestUri: /v2/terminal-calls/085a3207-5e45-49cf-8e1b-f8442beaf545/omit
+                    httpMethod: 'POST'
+                    requestUri: '/v2/terminal-calls/085a3207-5e45-49cf-8e1b-f8442beaf545/omit'
                     statusCode: 400
-                    statusCodeText: Bad Request
-                    statusCodeMessage: isFYI has wrong type - boolean expected but integer found
-                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    statusCodeText: 'Bad Request'
+                    statusCodeMessage: 'isFYI has wrong type - boolean expected but integer found'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
                     errorDateTime: '2024-11-21T09:41:00Z'
                     errors:
                       - errorCode: 7004
-                        property: isFYI
-                        errorCodeText: wrong property type
-                        errorCodeMessage: isFYI should be a boolean. '12' provided as value
+                        property: 'isFYI'
+                        errorCodeText: 'wrong property type'
+                        errorCodeMessage: 'isFYI should be a boolean. `12` provided as value'
         '404':
           description: |
-            In case the implementor does not know of the `terminalCallID` used in the request (this could be because of a `PUT` request that has not finished processing or simply because the resource does not exist) - it is possible for the implementor to reject the requests by returning a `404` (Not Found).
+            In case the implementer does not know of the `terminalCallID` used in the request (this could be because of a `PUT` request that has not finished processing or simply because the resource does not exist) - it is possible for the implementer to reject the request by returning a `404` (Not Found).
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -675,24 +975,24 @@ paths:
                   summary: |
                     Not Found request
                   description: |
-                    The provided `terminalCallID` cannot be found. This can be because a `PUT` request has not been finished processing or because the `terminalCallID` does not exist in the implementor system.
+                    The provided `terminalCallID` cannot be found. This can be because a `PUT` request has not been finished processing or because the `terminalCallID` does not exist in the implementer system.
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7006` is just a "random example"
                   value:
-                    httpMethod: POST
-                    requestUri: /v2/terminal-calls/085a3207-5e45-49cf-8e1b-f8442beaf545/omit
+                    httpMethod: 'POST'
+                    requestUri: '/v2/terminal-calls/085a3207-5e45-49cf-8e1b-f8442beaf545/omit'
                     statusCode: 404
-                    statusCodeText: Not Found
-                    statusCodeMessage: terminalCallID not found
-                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    statusCodeText: 'Not Found'
+                    statusCodeMessage: 'terminalCallID not found'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
                     errorDateTime: '2024-09-04T09:41:00Z'
                     errors:
                       - errorCode: 7006
-                        errorCodeText: terminalCallID Not Found
-                        errorCodeMessage: The Terminal Call does not exist
+                        errorCodeText: 'terminalCallID Not Found'
+                        errorCodeMessage: 'The Terminal Call does not exist'
         '500':
           description: |
-            In case a server error occurs in implementor system, a `500` (Internal Server Error) is returned.
+            In case a server error occurs in implementer system, a `500` (Internal Server Error) is returned.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -705,21 +1005,21 @@ paths:
                   summary: |
                     Internal Server Error while processing Port Call Service
                   description: |
-                    An Internal Server Error has occurred - the caller should contact {implementor-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+                    An Internal Server Error has occurred - the caller should contact {implementer-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7005` is just a "random example"
                   value:
-                    httpMethod: POST
-                    requestUri: /v2/terminal-calls/085a3207-5e45-49cf-8e1b-f8442beaf545/omit
+                    httpMethod: 'POST'
+                    requestUri: '/v2/terminal-calls/085a3207-5e45-49cf-8e1b-f8442beaf545/omit'
                     statusCode: 500
-                    statusCodeText: Internal Server Error
-                    statusCodeMessage: Internal Server Error occurred while processing Terminal Call
-                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    statusCodeText: 'Internal Server Error'
+                    statusCodeMessage: 'Internal Server Error occurred while processing Terminal Call'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
                     errorDateTime: '2024-11-21T09:41:00Z'
                     errors:
                       - errorCode: 7005
-                        errorCodeText: Internal Error occurred
-                        errorCodeMessage: Internal Error occurred
+                        errorCodeText: 'Internal Error occurred'
+                        errorCodeMessage: 'Internal Error occurred'
         default:
           description: |
             Unexpected error
@@ -730,13 +1030,36 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                tooManyRequestsExample:
+                  summary: |
+                    Making too many Omit requests
+                  description: |
+                    Calling the endPoint
+
+                        POST /v2/terminal-calls/{terminalCallID}/omit
+                        
+                    too many times within a time period results in an error.
+
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: 'POST'
+                    requestUri: '/v2/terminal-calls/085a3207-5e45-49cf-8e1b-f8442beaf545/omit'
+                    statusCode: 429
+                    statusCodeText: 'Too Many Requests'
+                    statusCodeMessage: 'Too many requests to omit a Terminal Call has been requested. Please try again in 1 hour'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    errorDateTime: '2024-09-04T09:41:00Z'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: 'Max Terminal Call omits reached'
+                        errorCodeMessage: 'A maximum of 100 unique Terminal Calls can be omitted per hour'
   '/v2/terminal-calls':
     get:
       parameters:
         - $ref: '#/components/parameters/portCallIDQueryParam'
         - $ref: '#/components/parameters/terminalCallIDQueryParam'
         - $ref: '#/components/parameters/terminalCallReferenceQueryParam'
-        - $ref: '#/components/parameters/terminalCallSequenceNumberQueryParam'
 
         - $ref: '#/components/parameters/carrierServiceNameQueryParam'
         - $ref: '#/components/parameters/carrierServiceCodeQueryParam'
@@ -746,15 +1069,41 @@ paths:
         - $ref: '#/components/parameters/universalImportVoyageReferenceQueryParam'
         - $ref: '#/components/parameters/universalExportVoyageReferenceQueryParam'
 
-        - $ref: '#/components/parameters/limitQueryParam'
-        - $ref: '#/components/parameters/cursorQueryParam'
         - $ref: '#/components/parameters/Api-Version-Major'
       tags:
         - Port Call Service
       operationId: get-terminal-call
       summary: Retrieves a list of Terminal Calls
       description: |
-        Description...
+        Retrieves a list of **Terminal Calls** that match the specified filter(s) criteria(s). It is **mandatory** to provide at least 1 of the following filters:
+          * `portCallID`
+          * `terminalCallID`
+          * `carrierServiceName`
+          * `carrierServiceCode`
+          * `universalServiceReference`
+          * `terminalCallReference`
+
+        The following filters can also be used together with `carrierServiceName`, `carrierServiceCode` or `universalServiceReference` to narrow down the result set even further:
+          * `carrierImportVoyageNumber`
+          * `carrierExportVoyageNumber`
+          * `universalImportVoyageReference`
+          * `universalExportVoyageReference`
+
+        The result set of this endPoint will always include **Terminal Calls** that are linked to **Port Calls** that have **not yet been completed**. Definition of a completed **Port Call** is:
+        ````
+        A Port Call:
+        - that has a Terminal Call
+        - that has a Port Call Service with: `portCallServiceType=BERTH` AND `portCallServiceEventTypeCode=DEPA`
+        - that has a Timestamp with: `classifierCode=PLN` AND `dateTime < {now}`
+        ````
+        This can potentially result in empty result sets. **Example:** filtering by `terminalCallID` included in a **Port Call** that has been completed.
+
+        Here are some example queries:
+          * To get a specific **Terminal Call** use the `terminalCallID` filter with the ID of the **Terminal Call** to filter by. This results in at most a single object. The response will return an empty array if no **Terminal Call** known by the consumer is linked to the provided `terminalCallID`.
+          * To get a list of **Terminal Calls** for a specific Service use the `carrierServiceCode` (or alternatively `carrierServiceName` or `universalServiceReference`) filter with the `carrierServiceCode` of the Service to filter by. This will result in a list of potentially many **Terminal Calls** all of which will be visited by the Vessel with the `vesselIMONumber` specified.
+            * If the result set is too large - it is possible to further narrow it down by **also** filtering by a voyage number (`carrierImportVoyageNumber`, `carrierExportVoyageNumber`, `universalImportVoyageReference`, or `universalExportVoyageReference`).
+
+        **Note:** Beware it is possible to specify filters that exclude all results. Example: if filtering by `carrierServiceCode` and `carrierImportVoyageNumber` **not** belonging to the same `carrierServiceCode` - the result set will be an empty list. No error will be reported.
       responses:
         '200':
           description: |
@@ -762,15 +1111,47 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
-            Next-Page-Cursor:
-              $ref: '#/components/headers/Next-Page-Cursor'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TerminalCalls'
+              examples:
+                terminalCallsMatchingPortCallID:
+                  summary: |
+                    Get the Terminal Calls matching portCallID=0342254a-5927-4856-b9c9-aa12e7c00563
+                  description: |
+                    Get all the **Terminal Calls** that matches the `portCallID=0342254a-5927-4856-b9c9-aa12e7c00563`. The request would look like this:
+
+                        GET /v2/terminal-calls?portCallID=0342254a-5927-4856-b9c9-aa12e7c00563
+
+                    In this example there are 2 **Terminal Calls** linked to the **Port Call** with `portCallID=0342254a-5927-4856-b9c9-aa12e7c00563`
+                    The default value for the `omitted` property is `false` so in the below example it does not matter if it is provided or not. For clarity it is provided here.
+                  value:
+                    - portCallID: '0342254a-5927-4856-b9c9-aa12e7c00563'
+                      terminalCallID: 'e51a16a8-9877-4f15-9da3-17f163bef278'
+                      terminalCallSequenceNumber: 1
+                      carrierServiceName: 'Great Lion Service'
+                      carrierServiceCode: 'FE1'
+                      universalServiceReference: 'SR12345A'
+                      carrierImportVoyageNumber: '2103N'
+                      carrierExportVoyageNumber: '2103S'
+                      universalImportVoyageReference: '2103N'
+                      universalExportVoyageReference: '2103N'
+                      omitted: false
+                    - portCallID: '0342254a-5927-4856-b9c9-aa12e7c00563'
+                      terminalCallID: 'c73cb5a7-de9a-439e-adb1-c72bdc2d3e0c'
+                      terminalCallSequenceNumber: 2
+                      carrierServiceName: 'Great Lion Service'
+                      carrierServiceCode: 'FE1'
+                      universalServiceReference: 'SR12345A'
+                      carrierImportVoyageNumber: '2103N'
+                      carrierExportVoyageNumber: '2103S'
+                      universalImportVoyageReference: '2103N'
+                      universalExportVoyageReference: '2103N'
+                      omitted: false
         '500':
           description: |
-            In case a server error occurs in implementor system, a `500` (Internal Server Error) is returned.
+            In case a server error occurs in implementer system, a `500` (Internal Server Error) is returned.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -783,21 +1164,21 @@ paths:
                   summary: |
                     Internal Server Error while processing Port Call Service
                   description: |
-                    An Internal Server Error has occurred - the caller should contact {implementor-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+                    An Internal Server Error has occurred - the caller should contact {implementer-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
-                    httpMethod: GET
-                    requestUri: /v2/terminal-calls
+                    httpMethod: 'GET'
+                    requestUri: '/v2/terminal-calls'
                     statusCode: 500
-                    statusCodeText: Internal Server Error
-                    statusCodeMessage: Internal Server Error occurred while processing Terminal Call request
-                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    statusCodeText: 'Internal Server Error'
+                    statusCodeMessage: 'Internal Server Error occurred while processing Terminal Call request'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
                     errorDateTime: '2024-11-21T09:41:00Z'
                     errors:
                       - errorCode: 7003
-                        errorCodeText: Internal Error occurred
-                        errorCodeMessage: Internal Error occurred
+                        errorCodeText: 'Internal Error occurred'
+                        errorCodeMessage: 'Internal Error occurred'
         default:
           description: |
             Unexpected error
@@ -808,6 +1189,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                tooManyRequestsExample:
+                  summary: |
+                    Making too many Terminal Calls
+                  description: |
+                    Calling the endPoint
+
+                        GET /v2/terminal-calls
+                        
+                    too many times within a time period results in an error.
+
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: 'GET'
+                    requestUri: '/v2/terminal-calls'
+                    statusCode: 429
+                    statusCodeText: 'Too Many Requests'
+                    statusCodeMessage: 'Too many requests to fetch a list of Terminal Calls has been requested. Please try again in 1 hour'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    errorDateTime: '2024-09-04T09:41:00Z'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: 'Max Terminal Call requests reached'
+                        errorCodeMessage: 'A maximum of 1000 Terminal Calls can be requested per hour'
   '/v2/port-call-services/{portCallServiceID}':
     put:
       parameters:
@@ -818,9 +1223,19 @@ paths:
       operationId: put-port-call-service
       summary: Initiates a new or updates a Port Call Service
       description: |
-        Description...
+        Creates or updates a **Port Call Service** record. The caller must provide a unique `portCallServiceID` (UUIDv4), which identifies the **Port Call Service**. The `portCallServiceID` must remain consistent across all subsequent communications and linked **Timestamps**. If updating an existing **Port Call Service**, e.g. updating the `moves`, the provided `portCallServiceID` must match the existing record.
+
+        The **Port Call Service** includes:
+          
+          - link to the **Terminal Call** (required): `terminalCallID`
+          - type of Service (required): `portCallServiceType` and `portCallServiceEventTypeCode` (and optionally `portCallPhaseTypeCode` and `facilityTypeCode`)
+          - a location (required): `portCallServiceLocation`
+          - Moves forecast information: `moves`
+          - The ability to send the record with informational purpose only, using `isFYI=true`
+
+        This call is used to initiate a Service linked to a **Terminal Call**. It is used for sending e.g. `ETA-Berth` or `Moves`.
       requestBody:
-        description: Initiates a new or updates a Port Call Service
+        description: Initiates a new or updates a **Port Call Service**
         required: true
         content:
           application/json:
@@ -835,7 +1250,7 @@ paths:
               $ref: '#/components/headers/API-Version'
         '400':
           description: |
-            In case creating a new `Port Call Service` fails schema validation, a `400` (Bad Request) is returned.
+            In case creating a new **Port Call Service** fails schema validation, a `400` (Bad Request) is returned.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -848,25 +1263,85 @@ paths:
                   summary: |
                     Port Call Service missing portCallServiceType
                   description: |
-                    `portCallServiceType` is a mandatory property in the `Port Call Service`. This is an example of how the error object would look in case this property is missing
+                    `portCallServiceType` is a mandatory property in the **Port Call Service**. This is an example of how the error object would look in case this property is missing
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
-                    httpMethod: PUT
-                    requestUri: /v2/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545
+                    httpMethod: 'PUT'
+                    requestUri: '/v2/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545'
                     statusCode: 400
-                    statusCodeText: Bad Request
-                    statusCodeMessage: portCallServiceType not found - it is a mandatory property in Port Call Service.
-                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    statusCodeText: 'Bad Request'
+                    statusCodeMessage: 'portCallServiceType not found - it is a mandatory property in Port Call Service.'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
                     errorDateTime: '2024-11-21T09:41:00Z'
                     errors:
                       - errorCode: 7003
-                        property: portCallServiceType
-                        errorCodeText: mandatory property missing
-                        errorCodeMessage: portCallServiceType must be provided as part of a Port Call Service
+                        property: 'portCallServiceType'
+                        errorCodeText: 'mandatory property missing'
+                        errorCodeMessage: 'portCallServiceType must be provided as part of a Port Call Service'
+        '404':
+          description: |
+            In case the implementer does not know of the `terminalCallID` used in the request payload - it is possible for the implementer to reject the request by returning a `404` (Not Found).
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                notFoundExample:
+                  summary: |
+                    Not Found request
+                  description: |
+                    The provided `terminalCallID` cannot be found.
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7006` is just a "random example"
+                  value:
+                    httpMethod: 'PUT'
+                    requestUri: '/v2/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545'
+                    statusCode: 404
+                    statusCodeText: 'Not Found'
+                    statusCodeMessage: 'terminalCallID not found'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    errorDateTime: '2024-09-04T09:41:00Z'
+                    errors:
+                      - errorCode: 7006
+                        errorCodeText: 'terminalCallID Not Found'
+                        errorCodeMessage: 'The Terminal Call does not exist'
+        '409':
+          description: |
+            In case creating a new or updating a **Port Call Service** that is linked to a **Terminal Call** that has been `OMITTED`, a `409` (Conflict) is returned.
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                conflictRequestExample:
+                  summary: |
+                    Updating a Port Call Service that has been CANCELLED
+                  description: |
+                    Updating a CANCELLED **Port Call Service** or creating a new **Port Call Service** linked to an OMITTED **Terminal Call**, returns a 409 (Conflict)
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
+                  value:
+                    httpMethod: 'PUT'
+                    requestUri: '/v2/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545'
+                    statusCode: 409
+                    statusCodeText: 'Conflict'
+                    statusCodeMessage: 'Trying to update a CANCELLED Port Call Service'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    errorDateTime: '2024-11-21T09:41:00Z'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: 'Updating CANCELLED Port Call Service'
+                        errorCodeMessage: 'Cannot update a Port Call Service that has been CANCELLED'
         '500':
           description: |
-            In case a server error occurs in implementor system, a `500` (Internal Server Error) is returned.
+            In case a server error occurs in implementer system, a `500` (Internal Server Error) is returned.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -879,21 +1354,21 @@ paths:
                   summary: |
                     Internal Server Error while processing Port Call Service
                   description: |
-                    An Internal Server Error has occurred - the caller should contact {implementor-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+                    An Internal Server Error has occurred - the caller should contact {implementer-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
-                    httpMethod: PUT
-                    requestUri: /v2/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545
+                    httpMethod: 'PUT'
+                    requestUri: '/v2/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545'
                     statusCode: 500
-                    statusCodeText: Internal Server Error
-                    statusCodeMessage: Internal Server Error occurred while processing Port Call Service
-                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    statusCodeText: 'Internal Server Error'
+                    statusCodeMessage: 'Internal Server Error occurred while processing Port Call Service'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
                     errorDateTime: '2024-11-21T09:41:00Z'
                     errors:
                       - errorCode: 7003
-                        errorCodeText: Internal Error occurred
-                        errorCodeMessage: Internal Error occurred
+                        errorCodeText: 'Internal Error occurred'
+                        errorCodeMessage: 'Internal Error occurred'
         default:
           description: |
             Unexpected error
@@ -904,6 +1379,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                tooManyRequestsExample:
+                  summary: |
+                    Making too many Port Call Services
+                  description: |
+                    Calling the endPoint
+
+                        PUT /v2/port-call-services/{portCallServiceID}
+                        
+                    too many times within a time period results in an error.
+
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: 'PUT'
+                    requestUri: '/v2/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545'
+                    statusCode: 429
+                    statusCodeText: 'Too Many Requests'
+                    statusCodeMessage: 'Too many requests to create a Port Call Service has been requested. Please try again in 1 hour'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    errorDateTime: '2024-09-04T09:41:00Z'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: 'Max Port Call Service requests reached'
+                        errorCodeMessage: 'A maximum of 100 unique Port Call Services can be requested per hour'
   '/v2/port-call-services/{portCallServiceID}/cancel':
     post:
       parameters:
@@ -914,6 +1413,15 @@ paths:
       summary: Cancel a Port Call Service
       description: |
         Provider canceling a **Port Call Service**.
+
+        Allows the provider to `CANCEL` a **Port Call Service**, signaling that the **Port Call Service** is no longer going to happen.
+
+        When a consumer receives a `CANCEL`, it is their responsibility to propagate this information to any secondary receivers, they previously informed using the `isFYI=true` property, while creating **Port Call Service** or sending related updates.
+
+        The consumer is responsible for:
+          - propagating the `CANCEL` to any secondary receivers
+
+        Once a **Port Call Service** has been `CANCELLED`, this action **CANNOT** be undone. In case the `CANCEL` has to be "undone" a new **Port Call Service** must be created.
       requestBody:
         description: Cancels a **Port Call Service**
         required: true
@@ -930,7 +1438,7 @@ paths:
               $ref: '#/components/headers/API-Version'
         '400':
           description: |
-            In case cancelling a `Port Call Service` fails schema validation, a `400` (Bad Request) is returned.
+            In case cancelling a **Port Call Service** fails schema validation, a `400` (Bad Request) is returned.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -947,21 +1455,21 @@ paths:
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7004` is just a "random example"
                   value:
-                    httpMethod: POST
-                    requestUri: /v2/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545/cancel
+                    httpMethod: 'POST'
+                    requestUri: '/v2/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545/cancel'
                     statusCode: 400
-                    statusCodeText: Bad Request
-                    statusCodeMessage: isFYI has wrong type - boolean expected but integer found
-                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    statusCodeText: 'Bad Request'
+                    statusCodeMessage: 'isFYI has wrong type - boolean expected but integer found'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
                     errorDateTime: '2024-11-21T09:41:00Z'
                     errors:
                       - errorCode: 7004
-                        property: isFYI
-                        errorCodeText: wrong property type
-                        errorCodeMessage: isFYI should be a boolean. '12' provided as value
+                        property: 'isFYI'
+                        errorCodeText: 'wrong property type'
+                        errorCodeMessage: 'isFYI should be a boolean. `12` provided as value'
         '404':
           description: |
-            In case the implementor does not know of the `portCallServiceID` used in the request (this could be because of a `PUT` request that has not finished processing or simply because the resource does not exist) - it is possible for the implementor to reject the requests by returning a `404` (Not Found).
+            In case the implementer does not know of the `portCallServiceID` used in the request (this could be because of a `PUT` request that has not finished processing or simply because the resource does not exist) - it is possible for the implementer to reject the request by returning a `404` (Not Found).
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -974,24 +1482,24 @@ paths:
                   summary: |
                     Not Found request
                   description: |
-                    The provided `portCallServiceID` cannot be found. This can be because a `PUT` request has not been finished processing or because the `portCallServiceID` does not exist in the implementor system.
+                    The provided `portCallServiceID` cannot be found. This can be because a `PUT` request has not been finished processing or because the `portCallServiceID` does not exist in the implementer system.
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7006` is just a "random example"
                   value:
-                    httpMethod: POST
-                    requestUri: /v2/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545/cancel
+                    httpMethod: 'POST'
+                    requestUri: '/v2/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545/cancel'
                     statusCode: 404
-                    statusCodeText: Not Found
-                    statusCodeMessage: portCallServiceID not found
-                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    statusCodeText: 'Not Found'
+                    statusCodeMessage: 'portCallServiceID not found'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
                     errorDateTime: '2024-09-04T09:41:00Z'
                     errors:
                       - errorCode: 7006
-                        errorCodeText: portCallServiceID Not Found
-                        errorCodeMessage: The Port Call Service does not exist
+                        errorCodeText: 'portCallServiceID Not Found'
+                        errorCodeMessage: 'The Port Call Service does not exist'
         '500':
           description: |
-            In case a server error occurs in implementor system, a `500` (Internal Server Error) is returned.
+            In case a server error occurs in implementer system, a `500` (Internal Server Error) is returned.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -1004,21 +1512,21 @@ paths:
                   summary: |
                     Internal Server Error while processing Port Call Service
                   description: |
-                    An Internal Server Error has occurred - the caller should contact {implementor-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+                    An Internal Server Error has occurred - the caller should contact {implementer-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7005` is just a "random example"
                   value:
-                    httpMethod: POST
-                    requestUri: /v2/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545/cancel
+                    httpMethod: 'POST'
+                    requestUri: '/v2/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545/cancel'
                     statusCode: 500
-                    statusCodeText: Internal Server Error
-                    statusCodeMessage: Internal Server Error occurred while processing Port Call Service
-                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    statusCodeText: 'Internal Server Error'
+                    statusCodeMessage: 'Internal Server Error occurred while processing Port Call Service'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
                     errorDateTime: '2024-11-21T09:41:00Z'
                     errors:
                       - errorCode: 7005
-                        errorCodeText: Internal Error occurred
-                        errorCodeMessage: Internal Error occurred
+                        errorCodeText: 'Internal Error occurred'
+                        errorCodeMessage: 'Internal Error occurred'
         default:
           description: Unexpected error
           headers:
@@ -1028,6 +1536,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                tooManyRequestsExample:
+                  summary: |
+                    Making too many Cancel requests
+                  description: |
+                    Calling the endPoint
+
+                        POST /v2/port-call-services/{portCallServiceID}/cancel
+                        
+                    too many times within a time period results in an error.
+
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: 'POST'
+                    requestUri: '/v2/terminal-calls/085a3207-5e45-49cf-8e1b-f8442beaf545/cancel'
+                    statusCode: 429
+                    statusCodeText: 'Too Many Requests'
+                    statusCodeMessage: 'Too many requests to cancel a Port Call Service has been requested. Please try again in 1 hour'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    errorDateTime: '2024-09-04T09:41:00Z'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: 'Max Port Call Service cancellations reached'
+                        errorCodeMessage: 'A maximum of 100 unique Port Call Services can be cancelled per hour'
   '/v2/port-call-services':
     get:
       parameters:
@@ -1035,33 +1567,101 @@ paths:
         - $ref: '#/components/parameters/portCallServiceIDQueryParam'
 
         - $ref: '#/components/parameters/portCallServiceTypeQueryParam'
-        - $ref: '#/components/parameters/portCallServiceEventTypeCodeQueryParam'
 
-        - $ref: '#/components/parameters/limitQueryParam'
-        - $ref: '#/components/parameters/cursorQueryParam'
         - $ref: '#/components/parameters/Api-Version-Major'
       tags:
         - Port Call Service
       operationId: get-port-call-services
       summary: Retrieves a list of Port Call Services
       description: |
-        Retrieves a list of Port Call Services
+        Retrieves a list of **Port Call Services** that match the specified filter criteria. It is **mandatory** to provide at least 1 of the following filters:
+          * `terminalCallID`
+          * `portCallServiceID`
+
+        Additionally `portCallServiceType` can be optionally added to narrow the result set even further.
+
+        The result set of this endPoint will always include **Port Call Services** that are linked to **Port Calls** that have **not yet been completed**. Definition of a completed **Port Call** is:
+        ````
+        A Port Call:
+        - that has a Terminal Call
+        - that has a Port Call Service with: `portCallServiceType=BERTH` AND `portCallServiceEventTypeCode=DEPA`
+        - that has a Timestamp with: `classifierCode=PLN` AND `dateTime < {now}`
+        ````
+        This can potentially result in empty result sets. **Example:** filtering by `portCallServiceID` included in a **Port Call** that has been completed.
+
+        Here are some example queries:
+          * To get a specific **Port Call Service** use the `portCallServiceID` filter with the ID of the **Port Call Service** to filter by. This results in at most a single object. The response will return an empty array if no **Port Call Service** known by the consumer is linked to the provided `portCallServiceID`.
+          * To get a list of **Port Call Services** for a specific **Terminal Call** use the `terminalCallID` filter with the `terminalCallID` of the **Terminal Call** to filter by. This will result in a list of potentially many **Port Call Services** all of which will be linked to the **Terminal Call** specified.
+
+        **Note:** Beware it is possible to specify filters that exclude all results. Example: if filtering by `portCallServiceID` and a `portCallServiceType` that does **not** belong to the same `portCallServiceID` - the result set will be an empty list. No error will be reported.
       responses:
         '200':
           description: |
-            Get the list of Port Call Services matching the specified filter
+            Get the list of **Port Call Services** matching the specified filter
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
-            Next-Page-Cursor:
-              $ref: '#/components/headers/Next-Page-Cursor'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PortCallServices'
+              examples:
+                portCallServicesMatchingTerminalCallID:
+                  summary: |
+                    Get the Port Call Services matching terminalCallID=0342254a-5927-4856-b9c9-aa12e7c00563
+                  description: |
+                    Get all the **Port Call Services** that matches the `terminalCallID=0342254a-5927-4856-b9c9-aa12e7c00563`. The request would look like this:
+
+                        GET /v2/port-call-services?terminalCallID=0342254a-5927-4856-b9c9-aa12e7c00563
+
+                    In this example there are 2 **Port Call Services** linked to the **Terminal Call** with `terminalCallID=0342254a-5927-4856-b9c9-aa12e7c00563`
+                    The default value for the `cancelled` and `declined` property is `false` so in the below example it does not matter if it is provided or not. For clarity it is provided here.
+                  value:
+                    - terminalCallID: '0342254a-5927-4856-b9c9-aa12e7c00563'
+                      portCallServiceID: '0342254a-5927-4856-b9c9-aa12e7c00563'
+                      portCallServiceType: 'BERTH'
+                      portCallServiceEventTypeCode: 'ARRI'
+                      portCallServiceLocation:
+                        locationName: 'CMP Container Terminal Copenhagen'
+                        UNLocationCode: 'DKCPH'
+                      cancelled: false
+                      declined: false
+                    - terminalCallID: '0342254a-5927-4856-b9c9-aa12e7c00563'
+                      portCallServiceID: '7992f6cb-3a5f-45c9-bf43-36e4f05e0bd4'
+                      portCallServiceType: 'PILOTAGE'
+                      portCallServiceEventTypeCode: 'STRT'
+                      portCallServiceLocation:
+                        locationName: 'CMP Container Terminal Copenhagen'
+                        UNLocationCode: 'DKCPH'
+                      cancelled: false
+                      declined: false
+                portCallServicesMatchingTerminalCallIDAndMoves:
+                  summary: |
+                    Get the Moves for Port Call Services matching terminalCallID=0342254a-5927-4856-b9c9-aa12e7c00563
+                  description: |
+                    Get all the `Moves` for **Port Call Services** that matches the `terminalCallID=0342254a-5927-4856-b9c9-aa12e7c00563`. The request would look like this:
+
+                        GET /v2/port-call-services?terminalCallID=0342254a-5927-4856-b9c9-aa12e7c00563&portCallServiceType=MOVES
+
+                    In this example there is a single `Moves` object for the **Port Call Service** linked to the **Terminal Call**
+                    The default value for the `cancelled` and `declined` property is `false` so in the below example it does not matter if it is provided or not. For clarity it is provided here.
+                  value:
+                    - terminalCallID: '0342254a-5927-4856-b9c9-aa12e7c00563'
+                      portCallServiceID: '0342254a-5927-4856-b9c9-aa12e7c00563'
+                      portCallServiceType: 'MOVES'
+                      portCallServiceEventTypeCode: 'ARRI'
+                      portCallServiceLocation:
+                        locationName: 'CMP Container Terminal Copenhagen'
+                        UNLocationCode: DKCPH
+                      moves:
+                        - carrierCode: 'MAEU'
+                          carrierCodeListProvider: 'NMFTA'
+                          restows:
+                            totalRestows: 155
+                          totalUnits: 155
         '500':
           description: |
-            In case a server error occurs in implementor system, a `500` (Internal Server Error) is returned.
+            In case a server error occurs in implementer system, a `500` (Internal Server Error) is returned.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -1074,21 +1674,21 @@ paths:
                   summary: |
                     Internal Server Error while fetching the Port Call Service
                   description: |
-                    An Internal Server Error has occurred - the caller should contact {implementor-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+                    An Internal Server Error has occurred - the caller should contact {implementer-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
-                    httpMethod: GET
-                    requestUri: /v2/port-call-services
+                    httpMethod: 'GET'
+                    requestUri: '/v2/port-call-services'
                     statusCode: 500
-                    statusCodeText: Internal Server Error
-                    statusCodeMessage: Internal Server Error occurred while fetching Port Call Service
-                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    statusCodeText: 'Internal Server Error'
+                    statusCodeMessage: 'Internal Server Error occurred while fetching Port Call Service'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
                     errorDateTime: '2024-11-21T09:41:00Z'
                     errors:
                       - errorCode: 7003
-                        errorCodeText: Internal Error occurred
-                        errorCodeMessage: Internal Error occurred
+                        errorCodeText: 'Internal Error occurred'
+                        errorCodeMessage: 'Internal Error occurred'
         default:
           description: Unexpected error
           headers:
@@ -1098,6 +1698,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                tooManyRequestsExample:
+                  summary: |
+                    Making too many Port Call Services requests
+                  description: |
+                    Calling the endPoint
+
+                        GET /v2/port-call-services
+                        
+                    too many times within a time period results in an error.
+
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: 'GET'
+                    requestUri: '/v2/port-call-services'
+                    statusCode: 429
+                    statusCodeText: 'Too Many Requests'
+                    statusCodeMessage: 'Too many requests to fetch a list of Port Call Services has been requested. Please try again in 1 hour'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    errorDateTime: '2024-09-04T09:41:00Z'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: 'Max Port Call Service requests reached'
+                        errorCodeMessage: 'A maximum of 1000 Port Call Services can be requested per hour'
   '/v2/timestamps/{timestampID}':
     put:
       parameters:
@@ -1106,9 +1730,21 @@ paths:
       tags:
         - Port Call Service
       operationId: put-timestamp
-      summary: Timestamp for a Port Call Service
+      summary: Initiates a new or updates a Timestamp
       description: |
-        Description...
+        Creates or updates a **Timestamp** record. The caller must provide a unique `timestampID` (UUIDv4), which identifies the **Timestamp**. If updating an existing **Timestamp**, e.g. updating the `delayReasonCode`, the provided `timestampID` must match the existing record.
+
+        The **Timestamp** includes:
+          
+          - link to the **Port Call Service** (required): `portCallServiceID`
+          - link to the **Timestamp** it replies to (in case it is not the initial **Timestamp*): `replyToTimestampID`
+          - a ERP-A classification (required): `classifierCode`
+          - dateTime of the **Timestamp** (required): `dateTime`
+          - an updated location (optional only with `REQ`uested **Timestamp**): `portCallServiceLocation`
+          - **Timestamp** information: `delayReasonCode` and `remark`
+          - The ability to send the record with informational purpose only, using `isFYI=true`
+
+        This call is used to provide a **Timestamp** in an `ERP-A` negotiation (or just an `A` for non-negotiations) for a **Port Call Service**.
       requestBody:
         description: Any `ERP-A` timestamp
         required: true
@@ -1125,7 +1761,7 @@ paths:
               $ref: '#/components/headers/API-Version'
         '400':
           description: |
-            In case creating a new `Timestamp` fails schema validation, a `400` (Bad Request) is returned.
+            In case creating a new **Timestamp** fails schema validation, a `400` (Bad Request) is returned.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -1138,25 +1774,25 @@ paths:
                   summary: |
                     Timestamp missing classifierCode
                   description: |
-                    `classifierCode` is a mandatory property in the `Timestamp`. This is an example of how the error object would look in case this property is missing
+                    `classifierCode` is a mandatory property in the **Timestamp**. This is an example of how the error object would look in case this property is missing
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
-                    httpMethod: PUT
-                    requestUri: /v2/timestamps/085a3207-5e45-49cf-8e1b-f8442beaf545
+                    httpMethod: 'PUT'
+                    requestUri: '/v2/timestamps/085a3207-5e45-49cf-8e1b-f8442beaf545'
                     statusCode: 400
-                    statusCodeText: Bad Request
-                    statusCodeMessage: classifierCode property not found - it is a mandatory property in Timestamp
-                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    statusCodeText: 'Bad Request'
+                    statusCodeMessage: 'classifierCode property not found - it is a mandatory property in Timestamp'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
                     errorDateTime: '2024-11-21T09:41:00Z'
                     errors:
                       - errorCode: 7003
-                        property: classifierCode
-                        errorCodeText: mandatory property missing
-                        errorCodeMessage: classifierCode must be provided as part of a Timestamp
+                        property: 'classifierCode'
+                        errorCodeText: 'mandatory property missing'
+                        errorCodeMessage: 'classifierCode must be provided as part of a Timestamp'
         '404':
           description: |
-            In case the implementor does not know of the `portCallServiceID` used in the request, it is possible for the implementor to reject the requests by returning a `404` (Not Found). This could be because of a `PUT` request, for creating/initiating the Port Call Service, that has not finished processing or simply because the resource does not exist.
+            In case the implementer does not know of the `portCallServiceID` used in the request, it is possible for the implementer to reject the request by returning a `404` (Not Found). This could be because of a `PUT` request, for creating/initiating the Port Call Service, that has not finished processing or simply because the resource does not exist.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -1169,24 +1805,54 @@ paths:
                   summary: |
                     Not Found request
                   description: |
-                    The provided `portCallServiceID` cannot be found. This can be because a `PUT` request, for creating/initiating the **Port Call Service**, has not been finished processing or because the `portCallServiceID` does not exist in the implementor system.
+                    The provided `portCallServiceID` cannot be found. This can be because a `PUT` request, for creating/initiating the **Port Call Service**, has not been finished processing or because the `portCallServiceID` does not exist in the implementer system.
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7006` is just a "random example"
                   value:
-                    httpMethod: PUT
-                    requestUri: /v2/timestamps/085a3207-5e45-49cf-8e1b-f8442beaf545
+                    httpMethod: 'PUT'
+                    requestUri: '/v2/timestamps/085a3207-5e45-49cf-8e1b-f8442beaf545'
                     statusCode: 404
-                    statusCodeText: Not Found
-                    statusCodeMessage: portCallServiceID not found
-                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    statusCodeText: 'Not Found'
+                    statusCodeMessage: 'portCallServiceID not found'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
                     errorDateTime: '2024-09-04T09:41:00Z'
                     errors:
                       - errorCode: 7006
-                        errorCodeText: portCallServiceID Not Found
-                        errorCodeMessage: The Port Call Service does not exist
+                        errorCodeText: 'portCallServiceID Not Found'
+                        errorCodeMessage: 'The Port Call Service does not exist'
+        '409':
+          description: |
+            In case creating a new **Timestamp** that is linked to a **Port Call Service** that has been `CANCELLED`, a `409` (Conflict) is returned.
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                conflictRequestExample:
+                  summary: |
+                    Creating a Timestamp that links to a CANCELLED Port Call Service
+                  description: |
+                    Creating a **Timestamp** that links to a CANCELLED **Port Call Service**, returns a 409 (Conflict)
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
+                  value:
+                    httpMethod: 'PUT'
+                    requestUri: '/v2/timestamps/085a3207-5e45-49cf-8e1b-f8442beaf545'
+                    statusCode: 409
+                    statusCodeText: 'Conflict'
+                    statusCodeMessage: 'Trying to link a Timestamp to a CANCELLED Port Call Service'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    errorDateTime: '2024-11-21T09:41:00Z'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: 'Linking to a CANCELLED Port Call Service'
+                        errorCodeMessage: C'annot link a Timestamp to a Port Call Service that has been CANCELLED'
         '500':
           description: |
-            In case a server error occurs in implementor system, a `500` (Internal Server Error) is returned.
+            In case a server error occurs in implementer system, a `500` (Internal Server Error) is returned.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -1199,21 +1865,21 @@ paths:
                   summary: |
                     Internal Server Error while processing Port Call Service
                   description: |
-                    An Internal Server Error has occurred - the caller should contact {implementor-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+                    An Internal Server Error has occurred - the caller should contact {implementer-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7005` is just a "random example"
                   value:
-                    httpMethod: PUT
-                    requestUri: /v2/timestamps/085a3207-5e45-49cf-8e1b-f8442beaf545
+                    httpMethod: 'PUT'
+                    requestUri: '/v2/timestamps/085a3207-5e45-49cf-8e1b-f8442beaf545'
                     statusCode: 500
-                    statusCodeText: Internal Server Error
-                    statusCodeMessage: Internal Server Error occurred while processing Timestamp
-                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    statusCodeText: 'Internal Server Error'
+                    statusCodeMessage: 'Internal Server Error occurred while processing Timestamp'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
                     errorDateTime: '2024-11-21T09:41:00Z'
                     errors:
                       - errorCode: 7005
-                        errorCodeText: Internal Error occurred
-                        errorCodeMessage: Internal Error occurred
+                        errorCodeText: 'Internal Error occurred'
+                        errorCodeMessage: 'Internal Error occurred'
         default:
           description: |
             Unexpected error
@@ -1224,6 +1890,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                tooManyRequestsExample:
+                  summary: |
+                    Making too many Timestamps
+                  description: |
+                    Calling the endPoint
+
+                        PUT /v2/timestamps/{timestampID}
+                        
+                    too many times within a time period results in an error.
+
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: 'PUT'
+                    requestUri: '/v2/timestamps/085a3207-5e45-49cf-8e1b-f8442beaf545'
+                    statusCode: 429
+                    statusCodeText: 'Too Many Requests'
+                    statusCodeMessage: 'Too many requests to create a Timestamp has been requested. Please try again in 1 hour'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    errorDateTime: '2024-09-04T09:41:00Z'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: 'Max Timestamp requests reached'
+                        errorCodeMessage: 'A maximum of 100 unique Timestamps can be requested per hour'
   '/v2/timestamps':
     get:
       parameters:
@@ -1231,18 +1921,32 @@ paths:
         - $ref: '#/components/parameters/timestampIDQueryParam'
         - $ref: '#/components/parameters/classifierCodeQueryParam'
 
-        - $ref: '#/components/parameters/startDateTimeQueryParam'
-        - $ref: '#/components/parameters/endDateTimeQueryParam'
-
-        - $ref: '#/components/parameters/limitQueryParam'
-        - $ref: '#/components/parameters/cursorQueryParam'
         - $ref: '#/components/parameters/Api-Version-Major'
       tags:
         - Port Call Service
       operationId: get-timestamp
       summary: Retrieves a list of Timestamps
       description: |
-        Description...
+        Retrieves a list of **Timestamps** that match the specified filter criteria. It is **mandatory** to provide at least 1 of the following filters:
+          * `timestampID`
+          * `portCallServiceID`
+
+        Additionally `classifierCode` can be optionally added to narrow the result set even further.
+
+        The result set of this endPoint will always include **Timestamps** that are linked to **Port Calls** that have **not yet been completed**. Definition of a completed **Port Call** is:
+        ````
+        A Port Call:
+        - that has a Terminal Call
+        - that has a Port Call Service with: `portCallServiceType=BERTH` AND `portCallServiceEventTypeCode=DEPA`
+        - that has a Timestamp with: `classifierCode=PLN` AND `dateTime < {now}`
+        ````
+        This can potentially result in empty result sets. **Example:** filtering by `timestampID` included in a **Port Call** that has been completed.
+
+        Here are some example queries:
+          * To get a specific **Timestamp** use the `timestampID` filter with the ID of the **Timestamp** to filter by. This results in at most a single object. The response will return an empty array if no **Timestamp** known by the consumer is linked to the provided `timestampID`.
+          * To get a list of **Timestamps** for a specific **Port Call Service** use the `portCallServiceID` filter with the `portCallServiceID` of the **Port Call Service** to filter by. This will result in a list of potentially many **Timestamps** all of which will be linked to the **Port Call Service** specified.
+
+        **Note:** Beware it is possible to specify filters that exclude all results. Example: if filtering by `timestampID` and a `classifierCode` that does **not** belong to the same `timestampID` - the result set will be an empty list. No error will be reported.
       responses:
         '200':
           description: |
@@ -1250,15 +1954,38 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
-            Next-Page-Cursor:
-              $ref: '#/components/headers/Next-Page-Cursor'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Timestamps'
+              examples:
+                timestampsMatchingPortCallServiceID:
+                  summary: |
+                    Get the Timestamps matching portCallServiceID=20648fdc-4287-4e0f-81e8-f5ad9b3e5973
+                  description: |
+                    Get all the **Timestamps** that matches the `portCallServiceID=20648fdc-4287-4e0f-81e8-f5ad9b3e5973`. The request would look like this:
+
+                        GET /v2/timestamps?portCallServiceID=20648fdc-4287-4e0f-81e8-f5ad9b3e5973
+
+                    In this example there are 3 **Timestamps** linked to the **Port Call Service** with `portCallServiceID=20648fdc-4287-4e0f-81e8-f5ad9b3e5973`. An `EST` (Estimated), then a `REQ` (Requested) suggesting an hour later and last a `PLN` (Planned) confirming the `REQ`
+                  value:
+                    - timestampID: '05986866-1d62-4f84-bc10-3e1b0ddf6990'
+                      portCallServiceID: '20648fdc-4287-4e0f-81e8-f5ad9b3e5973'
+                      classifierCode: 'EST'
+                      dateTime: '2019-11-12T07:41:00+08:30'
+                    - timestampID: '0342254a-5927-4856-b9c9-aa12e7c00563'
+                      replyToTimestampID: '05986866-1d62-4f84-bc10-3e1b0ddf6990'
+                      portCallServiceID: '20648fdc-4287-4e0f-81e8-f5ad9b3e5973'
+                      classifierCode: 'REQ'
+                      dateTime: '2019-11-12T08:41:00+08:30'
+                    - timestampID: '2a3aea90-42f8-4c0e-98d7-f0f6892f4563'
+                      replyToTimestampID: '0342254a-5927-4856-b9c9-aa12e7c00563'
+                      portCallServiceID: '20648fdc-4287-4e0f-81e8-f5ad9b3e5973'
+                      classifierCode: 'PLN'
+                      dateTime: '2019-11-12T08:41:00+08:30'
         '500':
           description: |
-            In case a server error occurs in implementor system, a `500` (Internal Server Error) is returned.
+            In case a server error occurs in implementer system, a `500` (Internal Server Error) is returned.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -1271,21 +1998,21 @@ paths:
                   summary: |
                     Internal Server Error while processing Port Call Service
                   description: |
-                    An Internal Server Error has occurred - the caller should contact {implementor-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+                    An Internal Server Error has occurred - the caller should contact {implementer-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7005` is just a "random example"
                   value:
-                    httpMethod: GET
-                    requestUri: /v2/timestamps
+                    httpMethod: 'GET'
+                    requestUri: '/v2/timestamps'
                     statusCode: 500
-                    statusCodeText: Internal Server Error
-                    statusCodeMessage: Internal Server Error occurred while processing Timestamp
-                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    statusCodeText: 'Internal Server Error'
+                    statusCodeMessage: 'Internal Server Error occurred while processing Timestamp'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
                     errorDateTime: '2024-11-21T09:41:00Z'
                     errors:
                       - errorCode: 7005
-                        errorCodeText: Internal Error occurred
-                        errorCodeMessage: Internal Error occurred
+                        errorCodeText: 'Internal Error occurred'
+                        errorCodeMessage: 'Internal Error occurred'
         default:
           description: |
             Unexpected error
@@ -1296,6 +2023,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                tooManyRequestsExample:
+                  summary: |
+                    Making too many Timestamp requests
+                  description: |
+                    Calling the endPoint
+
+                        GET /v2/timestamps
+                        
+                    too many times within a time period results in an error.
+
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: 'GET'
+                    requestUri: '/v2/timestamps'
+                    statusCode: 429
+                    statusCodeText: 'Too Many Requests'
+                    statusCodeMessage: 'Too many requests to fetch a list of Timestamps has been requested. Please try again in 1 hour'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    errorDateTime: '2024-09-04T09:41:00Z'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: 'Max Timestamp requests reached'
+                        errorCodeMessage: 'A maximum of 1000 Timestamps can be requested per hour'
   '/v2/vessel-statuses/{portCallServiceID}':
     put:
       parameters:
@@ -1304,11 +2055,19 @@ paths:
       tags:
         - Port Call Service - Consumer
       operationId: put-vessel-status
-      summary: Send Vessel Status for a **Port Call Service**
+      summary: Send Vessel Status for a Port Call Service
       description: |
-        Description...
+        Updates a **Vessel Status** record for a **Port Call Service**. The caller must provide a `portCallServiceID` (UUIDv4), which identifies the **Port Call Service** to update.
+
+        The **Vessel Status** includes:
+          
+          - link to the **Port Call Service** (required): `portCallServiceID`
+          - dynamic information about a Vessel: `draft`, `airDraft`, `aftDraft`, `forwardDraft`, `vesselPosition` and `milesToDestinationPort` 
+          - The ability to send the record with informational purpose only, using `isFYI=true`
+
+        This call is used to provide a **Vessel Status** (dynamic Vessel information) for a Vessel connected to a **Port Call Service**. It is up to the implementer if "new" records are stored every time this endPoint is called or the same record is updated.
       requestBody:
-        description: ...
+        description: Send dynamic Vessel information
         required: true
         content:
           application/json:
@@ -1317,13 +2076,13 @@ paths:
       responses:
         '204':
           description: |
-            Timestamp for a **Port Call Service** accepted
+            Dynamic Vessel information for a **Port Call Service** received
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
         '400':
           description: |
-            In case creating a new `Timestamp` fails schema validation, a `400` (Bad Request) is returned.
+            In case updating a **Vessel Status** fails schema validation, a `400` (Bad Request) is returned.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -1340,21 +2099,21 @@ paths:
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
-                    httpMethod: PUT
-                    requestUri: /v2/vessel-statuses/085a3207-5e45-49cf-8e1b-f8442beaf545
+                    httpMethod: 'PUT'
+                    requestUri: '/v2/vessel-statuses/085a3207-5e45-49cf-8e1b-f8442beaf545'
                     statusCode: 400
-                    statusCodeText: Bad Request
-                    statusCodeMessage: portCallServiceID object not found - it is a mandatory property in Vessel Status
-                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    statusCodeText: 'Bad Request'
+                    statusCodeMessage: 'portCallServiceID object not found - it is a mandatory property in Vessel Status'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
                     errorDateTime: '2024-11-21T09:41:00Z'
                     errors:
                       - errorCode: 7003
-                        property: portCallServiceID
-                        errorCodeText: mandatory property missing
-                        errorCodeMessage: portCallServiceID must be provided as part of a Vessel Status
+                        property: 'portCallServiceID'
+                        errorCodeText: 'mandatory property missing'
+                        errorCodeMessage: 'portCallServiceID must be provided as part of a Vessel Status'
         '404':
           description: |
-            In case the implementor does not know of the `portCallServiceID` used in the request, it is possible for the implementor to reject the requests by returning a `404` (Not Found). This could be because of a `PUT` request, for creating/initiating the Port Call Service, that has not finished processing or simply because the resource does not exist.
+            In case the implementer does not know of the `portCallServiceID` used in the request, it is possible for the implementer to reject the request by returning a `404` (Not Found). This could be because of a `PUT` request, for creating/initiating the Port Call Service, that has not finished processing or simply because the resource does not exist.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -1367,24 +2126,54 @@ paths:
                   summary: |
                     Not Found request
                   description: |
-                    The provided `portCallServiceID` cannot be found. This can be because a `PUT` request, for creating/initiating the **Port Call Service**, has not been finished processing or because the `portCallServiceID` does not exist in the implementor system.
+                    The provided `portCallServiceID` cannot be found. This can be because a `PUT` request, for creating/initiating the **Port Call Service**, has not been finished processing or because the `portCallServiceID` does not exist in the implementer system.
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7006` is just a "random example"
                   value:
-                    httpMethod: PUT
-                    requestUri: /v2/vessel-statuses/085a3207-5e45-49cf-8e1b-f8442beaf545
+                    httpMethod: 'PUT'
+                    requestUri: '/v2/vessel-statuses/085a3207-5e45-49cf-8e1b-f8442beaf545'
                     statusCode: 404
-                    statusCodeText: Not Found
-                    statusCodeMessage: portCallServiceID not found
-                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    statusCodeText: 'Not Found'
+                    statusCodeMessage: 'portCallServiceID not found'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
                     errorDateTime: '2024-09-04T09:41:00Z'
                     errors:
                       - errorCode: 7006
-                        errorCodeText: portCallServiceID Not Found
-                        errorCodeMessage: The Port Call Service does not exist
+                        errorCodeText: 'portCallServiceID Not Found'
+                        errorCodeMessage: 'The Port Call Service does not exist'
+        '409':
+          description: |
+            In case updating a **Vessel Status** that is linked to a **Port Call Service** that has been `CANCELLED`, a `409` (Conflict) is returned.
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                conflictRequestExample:
+                  summary: |
+                    Updating the Vessel Status that links to a CANCELLED Port Call Service
+                  description: |
+                    Updating the **Vessel Status** that links to a CANCELLED **Port Call Service**, returns a 409 (Conflict)
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
+                  value:
+                    httpMethod: 'PUT'
+                    requestUri: '/v2/vessel-status/085a3207-5e45-49cf-8e1b-f8442beaf545'
+                    statusCode: 409
+                    statusCodeText: 'Conflict'
+                    statusCodeMessage: 'Trying to update the Vessel Status for a CANCELLED Port Call Service'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    errorDateTime: '2024-11-21T09:41:00Z'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: 'Linking to a CANCELLED Port Call Service'
+                        errorCodeMessage: 'Cannot link Vessel Status to a Port Call Service that has been CANCELLED'
         '500':
           description: |
-            In case a server error occurs in implementor system, a `500` (Internal Server Error) is returned.
+            In case a server error occurs in implementer system, a `500` (Internal Server Error) is returned.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -1397,21 +2186,21 @@ paths:
                   summary: |
                     Internal Server Error while processing Port Call Service
                   description: |
-                    An Internal Server Error has occurred - the caller should contact {implementor-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+                    An Internal Server Error has occurred - the caller should contact {implementer-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7005` is just a "random example"
                   value:
-                    httpMethod: PUT
-                    requestUri: /v2/vessel-statuses/085a3207-5e45-49cf-8e1b-f8442beaf545
+                    httpMethod: 'PUT'
+                    requestUri: '/v2/vessel-statuses/085a3207-5e45-49cf-8e1b-f8442beaf545'
                     statusCode: 500
-                    statusCodeText: Internal Server Error
-                    statusCodeMessage: Internal Server Error occurred while processing Vessel Status
-                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    statusCodeText: 'Internal Server Error'
+                    statusCodeMessage: 'Internal Server Error occurred while processing Vessel Status'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
                     errorDateTime: '2024-11-21T09:41:00Z'
                     errors:
                       - errorCode: 7005
-                        errorCodeText: Internal Error occurred
-                        errorCodeMessage: Internal Error occurred
+                        errorCodeText: 'Internal Error occurred'
+                        errorCodeMessage: 'Internal Error occurred'
         default:
           description: |
             Unexpected error
@@ -1422,20 +2211,55 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                tooManyRequestsExample:
+                  summary: |
+                    Making too many Vessel Status updates
+                  description: |
+                    Calling the endPoint
+
+                        PUT /v2/vessel-status/{portCallStatusID}
+                        
+                    too many times within a time period results in an error.
+
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: 'PUT'
+                    requestUri: '/v2/vessel-status/085a3207-5e45-49cf-8e1b-f8442beaf545'
+                    statusCode: 429
+                    statusCodeText: 'Too Many Requests'
+                    statusCodeMessage: 'Too many requests to update the Vessel Status has been requested. Please try again in 1 hour'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    errorDateTime: '2024-09-04T09:41:00Z'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: 'Max Vessel Status updates reached'
+                        errorCodeMessage: 'A maximum of 100 unique Vessel Status can be updated per hour'
   '/v2/vessel-statuses':
     get:
       parameters:
-        - $ref: '#/components/parameters/portCallServiceIDQueryParam'
-
-        - $ref: '#/components/parameters/limitQueryParam'
-        - $ref: '#/components/parameters/cursorQueryParam'
+        - $ref: '#/components/parameters/portCallServiceIDRequiredQueryParam'
         - $ref: '#/components/parameters/Api-Version-Major'
       tags:
         - Port Call Service
       operationId: get-vessel-status
       summary: Retrieves a list of **Vessel Statuses**
       description: |
-        Retrieves a list of **Vessel Statuses**
+        Retrieves a list of **Vessel Statuses** that match the specified filter criteria. It is **mandatory** to provide the `portCallServiceID`
+
+        The result set of this endPoint will always include **Vessel Statuses** that are linked to **Port Calls** that have **not yet been completed**. Definition of a completed **Port Call** is:
+        ````
+        A Port Call:
+        - that has a Terminal Call
+        - that has a Port Call Service with: `portCallServiceType=BERTH` AND `portCallServiceEventTypeCode=DEPA`
+        - that has a Timestamp with: `classifierCode=PLN` AND `dateTime < {now}`
+        ````
+        This can potentially result in empty result sets. **Example:** filtering by `portCallServiceID` included in a **Port Call** that has been completed.
+
+        Here is an example query:
+          * To get a list of **Vessel Statuses** for a specific **Port Call Service** use the `portCallServiceID` filter with the `portCallServiceID` of the **Port Call Service** to filter by. This will result in a list of potentially many **Vessel Statuses** all of which will be linked to the **Port Call Service** specified.
+        
+        The implementation of the **Vessel Status** allows for two possible approaches: it can either be a list with a single object that is updated each time the **Vessel Status** is sent, or it can be a list of **Vessel Status** updates. If multiple **Vessel Status** updates are included in the response, the result set must be sorted, with the newest update appearing at the top of the list and the oldest at the bottom.
       responses:
         '200':
           description: |
@@ -1443,15 +2267,48 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
-            Next-Page-Cursor:
-              $ref: '#/components/headers/Next-Page-Cursor'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/VesselStatuses'
+              examples:
+                vesselStatusesMatchingPortCallServiceID:
+                  summary: |
+                    Get the Vessel Statuses matching portCallServiceID=20648fdc-4287-4e0f-81e8-f5ad9b3e5973
+                  description: |
+                    Get all the **Vessel Statuses** that matches the `portCallServiceID=20648fdc-4287-4e0f-81e8-f5ad9b3e5973`. The request would look like this:
+
+                        GET /v2/vessel-Statuses?portCallServiceID=20648fdc-4287-4e0f-81e8-f5ad9b3e5973
+
+                    In this example there are 3 **Vessel Statuses** linked to the **Port Call Service** with `portCallServiceID=20648fdc-4287-4e0f-81e8-f5ad9b3e5973`.
+                  value:
+                    - portCallServiceID: '0342254a-5927-4856-b9c9-aa12e7c00563'
+                      draft: 12.5
+                      airDraft: 55
+                      aftDraft: 37
+                      forwardDraft: 35
+                      dimensionUnit: 'MTR'
+                      milesToDestinationPort: 0
+                      isFYI: false
+                    - portCallServiceID: '0342254a-5927-4856-b9c9-aa12e7c00563'
+                      draft: 14.5
+                      airDraft: 53
+                      aftDraft: 39
+                      forwardDraft: 37
+                      dimensionUnit: 'MTR'
+                      milesToDestinationPort: 0
+                      isFYI: false
+                    - portCallServiceID: '0342254a-5927-4856-b9c9-aa12e7c00563'
+                      draft: 16.5
+                      airDraft: 51
+                      aftDraft: 41
+                      forwardDraft: 39
+                      dimensionUnit: 'MTR'
+                      milesToDestinationPort: 0
+                      isFYI: false
         '500':
           description: |
-            In case a server error occurs in implementor system, a `500` (Internal Server Error) is returned.
+            In case a server error occurs in implementer system, a `500` (Internal Server Error) is returned.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -1464,21 +2321,21 @@ paths:
                   summary: |
                     Internal Server Error while processing Port Call Service
                   description: |
-                    An Internal Server Error has occurred - the caller should contact {implementor-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+                    An Internal Server Error has occurred - the caller should contact {implementer-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7005` is just a "random example"
                   value:
-                    httpMethod: GET
-                    requestUri: /v2/vessel-statuses
+                    httpMethod: 'GET'
+                    requestUri: '/v2/vessel-statuses'
                     statusCode: 500
-                    statusCodeText: Internal Server Error
-                    statusCodeMessage: Internal Server Error occurred while processing Vessel Status
-                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    statusCodeText: 'Internal Server Error'
+                    statusCodeMessage: 'Internal Server Error occurred while processing Vessel Status'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
                     errorDateTime: '2024-11-21T09:41:00Z'
                     errors:
                       - errorCode: 7005
-                        errorCodeText: Internal Error occurred
-                        errorCodeMessage: Internal Error occurred
+                        errorCodeText: 'Internal Error occurred'
+                        errorCodeMessage: 'Internal Error occurred'
         default:
           description: |
             Unexpected error
@@ -1489,6 +2346,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                tooManyRequestsExample:
+                  summary: |
+                    Making too many Timestamp requests
+                  description: |
+                    Calling the endPoint
+
+                        GET /v2/vessel-statuses
+                        
+                    too many times within a time period results in an error.
+
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: 'GET'
+                    requestUri: '/v2/vessel-statuses'
+                    statusCode: 429
+                    statusCodeText: 'Too Many Requests'
+                    statusCodeMessage: 'Too many requests to fetch a list of Vessel Statuses has been requested. Please try again in 1 hour'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    errorDateTime: '2024-09-04T09:41:00Z'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: 'Max Vessel Status requests reached'
+                        errorCodeMessage: 'A maximum of 1000 Vessel Statuses can be requested per hour'
   '/v2/port-call-services/{portCallServiceID}/decline':
     post:
       parameters:
@@ -1500,6 +2381,15 @@ paths:
       summary: Decline a Port Call service
       description: |
         Consumer declining a **Port Call Service**.
+
+        Allows the consumer to `DECLINE` a **Port Call Service**, signaling that the **Port Call Service** is no longer going to happen.
+
+        When a provider receives a `DECLINE`, it is their responsibility to propagate this information to any secondary receivers, they previously informed using the `isFYI=true` property, while creating **Port Call Service** or sending related updates.
+
+        The provider is responsible for:
+          - propagating the `DECLINE` to any secondary receivers
+
+        Once a **Port Call Service** has been `DECLINED`, this action **CANNOT** be undone. In case the `DECLINE` has to be "undone" a **provider** must create a new **Port Call Service**.
       requestBody:
         description: Consumer declining a **Port Call service**
         required: true
@@ -1516,7 +2406,7 @@ paths:
               $ref: '#/components/headers/API-Version'
         '400':
           description: |
-            In case declining a `Port Call Service` fails schema validation, a `400` (Bad Request) is returned.
+            In case declining a **Port Call Service** fails schema validation, a `400` (Bad Request) is returned.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -1533,21 +2423,21 @@ paths:
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7004` is just a "random example"
                   value:
-                    httpMethod: POST
-                    requestUri: /v2/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545/decline
+                    httpMethod: 'POST'
+                    requestUri: '/v2/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545/decline'
                     statusCode: 400
-                    statusCodeText: Bad Request
-                    statusCodeMessage: isFYI has wrong type - boolean expected but integer found
-                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    statusCodeText: 'Bad Request'
+                    statusCodeMessage: 'isFYI has wrong type - boolean expected but integer found'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
                     errorDateTime: '2024-11-21T09:41:00Z'
                     errors:
                       - errorCode: 7004
-                        property: isFYI
-                        errorCodeText: wrong property type
-                        errorCodeMessage: isFYI should be a boolean. '12' provided as value
+                        property: 'isFYI'
+                        errorCodeText: 'wrong property type'
+                        errorCodeMessage: 'isFYI should be a boolean. `12` provided as value'
         '404':
           description: |
-            In case the implementor does not know of the `portCallServiceID` used in the request (this could be because of a `PUT` request that has not finished processing or simply because the resource does not exist) - it is possible for the implementor to reject the requests by returning a `404` (Not Found).
+            In case the implementer does not know of the `portCallServiceID` used in the request (this could be because the resource does not exist) - it is possible for the implementer to reject the request by returning a `404` (Not Found).
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -1560,24 +2450,24 @@ paths:
                   summary: |
                     Not Found request
                   description: |
-                    The provided `portCallServiceID` cannot be found. This can be because a `PUT` request has not been finished processing or because the `portCallServiceID` does not exist in the implementor system.
+                    The provided `portCallServiceID` cannot be found. This can be because the `portCallServiceID` does not exist in the implementer system.
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7006` is just a "random example"
                   value:
-                    httpMethod: POST
-                    requestUri: /v2/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545/decline
+                    httpMethod: 'POST'
+                    requestUri: '/v2/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545/decline'
                     statusCode: 404
-                    statusCodeText: Not Found
-                    statusCodeMessage: portCallServiceID not found
-                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    statusCodeText: 'Not Found'
+                    statusCodeMessage: 'portCallServiceID not found'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
                     errorDateTime: '2024-09-04T09:41:00Z'
                     errors:
                       - errorCode: 7006
-                        errorCodeText: portCallServiceID Not Found
-                        errorCodeMessage: The Port Call Service does not exist
+                        errorCodeText: 'portCallServiceID Not Found'
+                        errorCodeMessage: 'The Port Call Service does not exist'
         '500':
           description: |
-            In case a server error occurs in implementor system, a `500` (Internal Server Error) is returned.
+            In case a server error occurs in implementer system, a `500` (Internal Server Error) is returned.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -1590,21 +2480,21 @@ paths:
                   summary: |
                     Internal Server Error while processing Port Call Service
                   description: |
-                    An Internal Server Error has occurred - the caller should contact {implementor-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+                    An Internal Server Error has occurred - the caller should contact {implementer-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7005` is just a "random example"
                   value:
-                    httpMethod: POST
-                    requestUri: /v2/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545/decline
+                    httpMethod: 'POST'
+                    requestUri: '/v2/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545/decline'
                     statusCode: 500
-                    statusCodeText: Internal Server Error
-                    statusCodeMessage: Internal Server Error occurred while processing Port Call Service
-                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    statusCodeText: 'Internal Server Error'
+                    statusCodeMessage: 'Internal Server Error occurred while processing Port Call Service'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
                     errorDateTime: '2024-11-21T09:41:00Z'
                     errors:
                       - errorCode: 7005
-                        errorCodeText: Internal Error occurred
-                        errorCodeMessage: Internal Error occurred
+                        errorCodeText: 'Internal Error occurred'
+                        errorCodeMessage: 'Internal Error occurred'
         default:
           description: Unexpected error
           headers:
@@ -1614,6 +2504,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                tooManyRequestsExample:
+                  summary: |
+                    Making too many Decline requests
+                  description: |
+                    Calling the endPoint
+
+                        POST /v2/port-call-services/{portCallServiceID}/decline
+                        
+                    too many times within a time period results in an error.
+
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: 'POST'
+                    requestUri: '/v2/terminal-calls/085a3207-5e45-49cf-8e1b-f8442beaf545/decline'
+                    statusCode: 429
+                    statusCodeText: 'Too Many Requests'
+                    statusCodeMessage: 'Too many requests to decline a Port Call Service has been requested. Please try again in 1 hour'
+                    providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
+                    errorDateTime: '2024-09-04T09:41:00Z'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: 'Max Port Call Service declines reached'
+                        errorCodeMessage: 'A maximum of 100 unique Port Call Services can be declined per hour'
 components:
   headers:
     API-Version:
@@ -1622,17 +2536,6 @@ components:
         example: 2.0.0
       description: |
         SemVer used to indicate the version of the contract (API version) returned.
-    Next-Page-Cursor:
-      schema:
-        type: string
-        maxLength: 1024
-        example: fE9mZnNldHw9MTAmbGltaXQ9MTA
-      description: |
-        The Next-Page-Cursor header contains a cursor value that points to the next page of results in a paginated API response.
-        When an initial `GET` endpoint request includes the query parameter `limit=...` the API provider limits the number of items in the root array of the response to the specified limit. If the response would contain more items than the specified limit, the API provider includes only the first set of limit items and appends the following response header:
-        `Next-Page-Cursor=fE9mZnNldHw9MTAmbGltaXQ9MTA`, a string that acts as a reference for the next page of results. The cursor value is used in subsequent requests to retrieve the next page by passing it as a query parameter: `?cursor=fE9mZnNldHw9MTAmbGltaXQ9MTA`.
-
-        To retrieve the next page, the API consumer sends a `GET` request to the endpoint URL with only `?cursor=fE9mZnNldHw9MTAmbGltaXQ9MTA` as query parameter. The limit of items per page and any other query parameters may not be altered, therefore it may also not be specified when requesting subsequent pages. The API provider must ignore any query parameters passed along with a cursor, and should return a `400` error if any other query parameter is passed along with the `cursor`.
   parameters:
     Api-Version-Major:
       in: header
@@ -1676,31 +2579,16 @@ components:
         type: string
         format: uuid
         example: 0342254a-5927-4856-b9c9-aa12e7c00563
-
-    # Timestamp query parameters
-
-    startDateTimeQueryParam:
+    portCallServiceIDRequiredQueryParam:
       in: query
-      name: startDateTime
+      name: portCallServiceID
       description: |
-        The starting point of the time range for filtering **Port Call Service** timestamps. If the date and time of any timestamp (Estimated, Requested, Planned, or Actual) of a **Port Call Service** is **on or after (≥)** the specified `startDateTime`, that timestamp will be included in the results. Matching is based on the local date and time of the **Port Call Service** location.
-
-        **Note:** If this filter is not provided the **default value is 1 month prior** to request date time.
+        The **Port Call Service Identifier** to filter by. Specifying this filter will ensure that the result set contains only objects where the `portCallServiceID` property is present and its value matches one of the values of the corresponding filter query parameter.
+      required: true
       schema:
         type: string
-        format: date-time
-        example: '2020-04-06T07:41:00+08:30'
-    endDateTimeQueryParam:
-      in: query
-      name: endDateTime
-      description: |
-        The endpoint of the time range for filtering **Port Call Service** timestamps. If the date and time of any timestamp (Estimated, Requested, Planned, or Actual) of a **Port Call Service** is **on or before (≤)** the specified `endDateTime`, that timestamp will be included in the results. Matching is based on the local date and time of the **Port Call Service** location.
-
-        **Note:** If this filter is not provided the default value is 1 month after the request date time.
-      schema:
-        type: string
-        format: date-time
-        example: '2020-04-10T07:41:00+08:30'
+        format: uuid
+        example: 0342254a-5927-4856-b9c9-aa12e7c00563
 
     # Port Call query parameters
 
@@ -1767,15 +2655,6 @@ components:
         type: string
         maxLength: 100
         example: '15063401'
-    terminalCallSequenceNumberQueryParam:
-      in: query
-      name: terminalCallSequenceNumber
-      description: |
-        The **Terminal Call Sequence Number** to filter by. Specifying this filter will ensure that the result set contains only objects where the `terminalCallSequenceNumber` property is present and its value matches one of the values of the corresponding filter query parameter.
-      schema:
-        type: integer
-        format: int32
-        example: 2
     carrierImportVoyageNumberQueryParam:
       in: query
       name: carrierImportVoyageNumber
@@ -1831,19 +2710,6 @@ components:
         maxLength: 50
         pattern: ^\S(?:.*\S)?$
         example: BERTH
-    portCallServiceEventTypeCodeQueryParam:
-      in: query
-      name: portCallServiceEventTypeCode
-      description: |
-        The **Port Call Service Event Type Code** to filter by. Specifying this filter will ensure that the result set contains only objects where the `portCallServiceEventTypeCode` property is present and its value matches one of the values of the corresponding filter query parameter.
-      schema:
-        type: string
-        enum:
-          - STRT
-          - CMPL
-          - ARRI
-          - DEPA
-        example: STRT
 
     # Vessel query parameters
 
@@ -1900,29 +2766,6 @@ components:
         format: uuid
         example: 0342254a-5927-4856-b9c9-aa12e7c00563
     
-    # Pagination query parameters
-
-    limitQueryParam:
-      in: query
-      name: limit
-      description: |
-        Specifies the maximum number of objects in the result set.
-      schema:
-        type: integer
-        format: int32
-        minimum: 1
-        default: 100
-        example: 100
-    cursorQueryParam:
-      in: query
-      name: cursor
-      description: |
-        A server generated value to specify a specific point in a collection result, used for pagination.
-      schema:
-        type: string
-        maxLength: 1024
-        example: fE9mZnNldHw9MTAmbGltaXQ9MTA
-
     #############
     # Path params
     #############
@@ -3256,7 +4099,7 @@ components:
           example: 4426d965-0dd8-4005-8c63-dc68b01c4962
         errorDateTime:
           description: |
-            The DateTime corresponding to the error occurring. Must be formatted using [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format.
+            The DateTime corresponding to the error occurring.
           type: string
           format: date-time
           example: '2024-09-04T09:41:00Z'
