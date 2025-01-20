@@ -6,6 +6,24 @@ The DCSA Interface Standard for Just in Time Portcalls is documented on the **[D
 ---
 This is a moving target and will be updated as soon as the version is published
 
+<a name="v200A20250117"></a>[Release v2.0.0 Alpha 20250117 (17 of January 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_JIT/2.0.0-Alpha-20250117)
+---
+Snapshot as of 17 of January 2025 for JIT 2.0.0 Alpha.
+## Key changes
+- endPoint description and example(s) updates have been provided for all endPoints
+- added `409` (Conflict) response codes to the PUT endPoints in case the caller is trying to update or create something that is cancelled, declined or omitted
+- removed pagination on GET endPoints (removed the `limit` and `cursor` queryParameters). EndPoint descrioptions have been updated to reflect the fact that some queryParameters are mandatory to provide in order to limit the response
+- `terminalCallSequenceNumber` removed as a queryParameter on `GET /v2/terminal-calls`
+- `portCallServiceEventTypeCode` removed as a queryParameter on `GET /v2/port-call-services`
+- `startDateTime` and `startDateTime` removed as a queryParameter on `GET /v2/timestamps`
+- `default=false` added to `omitted`, `isFYI`, `cancelled` and `declined` boolean properties. Since these parameters are optional to provide - a default value of `false` has been added to them
+- `afterDraft` renamed to `aftDraft`
+
+## Minor changes
+- `minimum=0` added to units-properties in the `Moves` object
+- descriptions of properties in the `Moves` object have been updated to better reflect the meaning of the property
+- updated the `errorDateTime` property in the error object and removed the conflicting reference to ISO 8601
+
 <a name="v200A20241220"></a>[Release v2.0.0 Alpha 20241220 (20 of December 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_JIT/2.0.0-Alpha-20241220)
 ---
 Snapshot as of 20 of December 2024 for JIT 2.0.0 Alpha.
