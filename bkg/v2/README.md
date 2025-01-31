@@ -82,7 +82,7 @@ Snapshot as of 11 of October 2024 for Booking 2.0.0 Beta
 Snapshot as of 27 of September 2024 for Booking 2.0.0 Beta
 ## Key changes
 - API description updated
-- Converrted all inner defined objects to globally defined objects. The following objects are now global:
+- Converted all inner defined objects to globally defined objects. The following objects are now global:
   - `CreateBookingResponse` previously defined as inner object on the `POST /v2/bookings` endPoint
   - `CancelBookingRequest` previously defined as inner object on the `PATCH /v2/bookings/{bookingReference}` endPoint
   - `BookingNotification` object split into multiple global objects:
@@ -114,7 +114,7 @@ Snapshot as of 27 of September 2024 for Booking 2.0.0 Beta
 - `phone` description updated to include [ITU-T recommendation E.123](https://www.itu.int/rec/T-REC-E.123/en)
 - description updates to properties in the `Address` object (the Address object can be used for other things than just a Party-address)
 - Link to the standardized `errorCode` in the `Error` object updated to a **public** page: [Error codes as specified by DCSA](https://developer.dcsa.org/standard-error-codes)
-- multiple description updated that are conditional in order to streamlike how **Conditions** are specified as part of a description
+- multiple description updated that are conditional in order to streamline how **Conditions** are specified as part of a description
 - endPoint examples updated to align with new schema
 
 <a name="v200B20240913"></a>[Release v2.0.0 Beta 20240913 (13 September 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0-Beta-20240913)
@@ -141,17 +141,17 @@ Snapshot as of 13 of September 2024 for Booking 2.0.0 Beta
 - `incoTerms` description updated to not include list of values as this is defined by https://iccwbo.org/business-solutions/incoterms-rules/
 - changed `errorDateTime` example to UTC instead of timeZone specific
 - `facilityCode` description link updated to a more general page instead of a specific version
-- `BookingRefStatus` object removed as it is no longer needed in reponse payloads
+- `BookingRefStatus` object removed as it is no longer needed in response payloads
 - `TaxLegalReference` object updated:
-  - description updated to no longer link to reference data (it is currently out of scopre for DCSA to maintain this list)
+  - description updated to no longer link to reference data (it is currently out of scope for DCSA to maintain this list)
   - `countryCode` example updated to align with `type` example
 - `CustomsReference` object updated:
-  - description updated to no longer link to reference data (it is currently out of scopre for DCSA to maintain this list)
+  - description updated to no longer link to reference data (it is currently out of scope for DCSA to maintain this list)
   - `countryCode` example updated to align with `type` example
 - `ISOEquipmentCode` description link updated to www.iso.org instead of Wikipedia
 - `emptyContainerPickup` `dateTime` example updated to be UTC time
 - `equipmentReferences` description link updated to www.iso.org instead of Wikipedia
-- structure of `RequestedEquipment` and `RequestedEquipmentShipper` objects changed so it no longer uses `oneOf` to choose between SOC (Shipper Owned Container) and COC (Carrier Owned Container). Instead a conditional `tareWeight` peroperty has been added along with `isShipperOwned`
+- structure of `RequestedEquipment` and `RequestedEquipmentShipper` objects changed so it no longer uses `oneOf` to choose between SOC (Shipper Owned Container) and COC (Carrier Owned Container). Instead, a conditional `tareWeight` property has been added along with `isShipperOwned`
 - `ContainerPositioning` and `ContainerPositioningEstimated` `dateTime` example updated to be UTC time
 - `ContainerPositioningLocation` and `EmptyContainerDepotReleaseLocation` description updated to include a condition
 - `HSCodes` description link updated to a general link instead of a specific version
@@ -166,7 +166,7 @@ Snapshot as of 13 of September 2024 for Booking 2.0.0 Beta
 - `LoadLocation` and `DischargeLocation`description updated to make it clear that if multiple ways of specifying a location is used they must point to the same place
 - `cutOffDateTime` example updated to use UTC
 - `AdvanceManifestFiling` object updated:
-  - description updated to no longer link to reference data (it is currently out of scopre for DCSA to maintain this list)
+  - description updated to no longer link to reference data (it is currently out of scope for DCSA to maintain this list)
   - `countryCode` example updated to align with `manifestTypeCode` example
 - `currencyCode` description link updated
 - `OriginChargesPaymentTerm`, `DestinationChargesPaymentTerm` and `Vessel` objects created
@@ -221,7 +221,7 @@ Snapshot as of 30 of August 2024 for Booking 2.0.0 Beta
   - `consigneesPurchaseOrderReference` renamed to `purchaseOrderReference`
 - `ServiceContractOwner` object changes:
   - `partyName` maxLength changed from 100 --> 70
-  - `werviceContractOwnersReference` renamed to `reference`
+  - `serviceContractOwnersReference` renamed to `reference`
 - `CarrierBookingOffice` object changes:
   - `partyName` maxLength changed from 100 --> 70
 - `Party` object changes:
@@ -354,7 +354,7 @@ Snapshot as of 14 of June 2024 for Booking 2.0.0 Beta
 - `reference` added to the `Party` object
 
 ## Object changes
-- `RequestedEquipmentCarrier` renamed to `RequestedEquipment` and modified to include everything that was in the `RequestedEquipmentCarrier` (no use of `allOf` any more)
+- `RequestedEquipmentCarrier` renamed to `RequestedEquipment` and modified to include everything that was in the `RequestedEquipmentCarrier` (no use of `allOf` anymore)
 - `RequestedEquipmentShipper` modified so it no longer needs a `allOf`
 - `CommodityCarrier` modified so it no longer needs a `allOf`
 
@@ -365,7 +365,7 @@ Snapshot as of 14 of June 2024 for Booking 2.0.0 Beta
 
 <a name="v200B3"></a>[Release v2.0.0 Beta 3 (...)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0-Beta-3)
 ---
-Going forward Beta 3 will not be updated any more. The new way of working will be that we update the final v2.0.0 continuously. Every once in a while we release "Snapshots". An example of this is the [Snapshot of 14 June 2024](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/bkg/v2#v200B20240614) just above.
+Going forward Beta 3 will not be updated anymore. The new way of working will be that we update the final v2.0.0 continuously. Every once in a while we release "Snapshots". An example of this is the [Snapshot of 14 June 2024](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/bkg/v2#v200B20240614) just above.
 
 <a name="v200B2"></a>[Release v2.0.0 Beta 2 (12 April 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0-Beta-2)
 ---
