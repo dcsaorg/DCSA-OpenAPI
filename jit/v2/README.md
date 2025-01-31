@@ -18,7 +18,7 @@ Snapshot as of 31 of January 2025 for JIT 2.0.0 Alpha.
 - minor adjustments to indentions
 - typo fixed
 
-Link to [commits included in this Snapshot](https://github.com/dcsaorg/DCSA-OpenAPI/commits/master/jit/v2/JIT_v2.0.0.yaml?since=2025-01-18&until=2025-01-31)
+Link to [commits included in this Snapshot](https://github.com/dcsaorg/DCSA-OpenAPI/commits/master/jit/v2/JIT_v2.0.0.yaml?since=2025-01-21&until=2025-01-31)
 
 <a name="v200A20250117"></a>[Release v2.0.0 Alpha 20250117 (17 of January 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_JIT/2.0.0-Alpha-20250117)
 ---
@@ -39,7 +39,7 @@ Snapshot as of 17 of January 2025 for JIT 2.0.0 Alpha.
 - descriptions of properties in the `Moves` object have been updated to better reflect the meaning of the property
 - updated the `errorDateTime` property in the error object and removed the conflicting reference to ISO 8601
 
-Link to [commits included in this Snapshot](https://github.com/dcsaorg/DCSA-OpenAPI/commits/master/jit/v2/JIT_v2.0.0.yaml?since=2024-12-21&until=2025-01-17)
+Link to [commits included in this Snapshot](https://github.com/dcsaorg/DCSA-OpenAPI/commits/master/jit/v2/JIT_v2.0.0.yaml?since=2024-12-21&until=2025-01-20)
 
 <a name="v200A20241220"></a>[Release v2.0.0 Alpha 20241220 (20 of December 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_JIT/2.0.0-Alpha-20241220)
 ---
