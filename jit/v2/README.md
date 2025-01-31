@@ -25,6 +25,8 @@ Snapshot as of 17 of January 2025 for JIT 2.0.0 Alpha.
 - descriptions of properties in the `Moves` object have been updated to better reflect the meaning of the property
 - updated the `errorDateTime` property in the error object and removed the conflicting reference to ISO 8601
 
+Link to [commits included in this Snapshot](https://github.com/dcsaorg/DCSA-OpenAPI/commits/master/jit/v2/JIT_v2.0.0.yaml?since=2024-12-21&until=2025-01-17)
+
 <a name="v200A20241220"></a>[Release v2.0.0 Alpha 20241220 (20 of December 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_JIT/2.0.0-Alpha-20241220)
 ---
 Snapshot as of 20 of December 2024 for JIT 2.0.0 Alpha.
@@ -39,6 +41,8 @@ Snapshot as of 20 of December 2024 for JIT 2.0.0 Alpha.
 
 ## Minor changes
 - JIT now links to DNI (API Design & Implementation Principles) version 2.**0** instead of 2.1
+
+Link to [commits included in this Snapshot](https://github.com/dcsaorg/DCSA-OpenAPI/commits/master/jit/v2/JIT_v2.0.0.yaml?since=2024-12-07&until=2024-12-20)
 
 <a name="v200A20241206"></a>[Release v2.0.0 Alpha 20241206 (6 of December 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_JIT/2.0.0-Alpha-20241206)
 ---
@@ -67,6 +71,8 @@ Snapshot as of 6 of December 2024 for JIT 2.0.0 Alpha.
   - `airDraft` added to `Vessel Status`
   - `carrierServiceName`, `carrierServiceCode` and `universalServiceReference` moved from `Port Call` --> `Terminal Call`
   - `portCallServiceDateTime` in the **Timestamp** renamed to `dateTime`
+
+Link to [commits included in this Snapshot](https://github.com/dcsaorg/DCSA-OpenAPI/commits/master/jit/v2/JIT_v2.0.0.yaml?since=2024-11-23&until=2024-12-06)
 
 <a name="v200A20241122"></a>[Release v2.0.0 Alpha 20241122 (22 of November 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_JIT/2.0.0-Alpha-20241122)
 ---
@@ -98,8 +104,12 @@ Snapshot as of 22 of November 2024 for JIT 2.0.0 Alpha.
   - `carrierServiceName`, `carrierServiceCode`, `omitted` (both in **Port Call** and **Transport Call**, `Vessel`, `milesToDestinationPort`, `portCallServiceID`, `cancel`, `decline`, `omit` and `portCallServiceType`
   - `transportCallReference` example updated
 
+Link to [commits included in this Snapshot](https://github.com/dcsaorg/DCSA-OpenAPI/commits/master/jit/v2/JIT_v2.0.0.yaml?since=2024-11-09&until=2024-11-22)
+
 <a name="v200A20241108"></a>[Release v2.0.0 Alpha 20241108 (8 of November 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_JIT/2.0.0-Alpha-20241108)
 ---
 Snapshot as of 8 of November 2024 for JIT 2.0.0 Alpha. The API has fundamentally changed compared to v1.x
 ## Key changes
 - Initial major release
+
+Link to [commits included in this Snapshot](https://github.com/dcsaorg/DCSA-OpenAPI/commits/master/jit/v2/JIT_v2.0.0.yaml?until=2024-11-08)
