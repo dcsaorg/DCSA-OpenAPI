@@ -6,6 +6,20 @@ The DCSA Interface Standard for Just in Time Portcalls is documented on the **[D
 ---
 This is a moving target and will be updated as soon as the version is published
 
+<a name="v200A20250131"></a>[Release v2.0.0 Alpha 20250131 (31 of January 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_JIT/2.0.0-Alpha-20250131)
+---
+Snapshot as of 31 of January 2025 for JIT 2.0.0 Alpha.
+## Key changes
+- `v2` removed from all URLs
+- `classifierCode` query parameter format fixed and example updated
+
+## Minor changes
+- remove ISO 8601 reference from `dateTime` property in Timestamp
+- minor adjustments to indentions
+- typo fixed
+
+Link to [commits included in this Snapshot](https://github.com/dcsaorg/DCSA-OpenAPI/commits/master/jit/v2/JIT_v2.0.0.yaml?since=2025-01-18&until=2025-01-31)
+
 <a name="v200A20250117"></a>[Release v2.0.0 Alpha 20250117 (17 of January 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_JIT/2.0.0-Alpha-20250117)
 ---
 Snapshot as of 17 of January 2025 for JIT 2.0.0 Alpha.
