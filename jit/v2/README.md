@@ -13,7 +13,7 @@ Snapshot as of 17 of January 2025 for JIT 2.0.0 Alpha.
 - endPoint description and example(s) updates have been provided for all endPoints
 - added `409` (Conflict) response codes to the PUT endPoints in case the caller is trying to update or create something that is cancelled, declined or omitted
 - added `404` (Not Found) response codes to some of the PUT endPoints in case the caller is trying to update or create something that is linked to something that does not exist
-- removed pagination on GET endPoints (removed the `limit` and `cursor` queryParameters). EndPoint descriptions have been updated to reflect the fact that some queryParameters are mandatory to provide in order to limit the response
+- removed pagination on GET endPoints (removed the `limit` and `cursor` query parameters). EndPoint descriptions have been updated to reflect the fact that some query parameters are mandatory to provide in order to limit the response
 - `terminalCallSequenceNumber` removed as a queryParameter on `GET /v2/terminal-calls`
 - `portCallServiceEventTypeCode` removed as a queryParameter on `GET /v2/port-call-services`
 - `startDateTime` and `endDateTime` removed as a queryParameter on `GET /v2/timestamps`
@@ -51,7 +51,7 @@ Snapshot as of 6 of December 2024 for JIT 2.0.0 Alpha.
     - **Port Call Service** endPoint
     - **Vessel Status** endPoint
   - **Timestamp** endPoint renamed
-    - all timestamp endPoints merged into a single endPoint now containing a `classifierCode` property to distinguish different event types)
+    - all timestamp endPoints merged into a single endPoint now containing a `classifierCode` property (to distinguish different event types)
     - GET /timestamp endPoint added (Timestamps removed from **Port Call Service**)
   - **Vessel** object split into 2 objects:
     - **Vessel** containing static vessel data (`IMONumber`, `MMSINumber`, `Name`, ...)
@@ -84,7 +84,7 @@ Snapshot as of 22 of November 2024 for JIT 2.0.0 Alpha.
   - all descriptions updated
   - `bbPieces` removed
   - all inner defined objects in `oneOf` structures are now $ref pointing to globally defined objects
-  - `TotalMoves` object (used in may of the `oneOf` structures) has `additionalProperties: false` set in order for code generators to work properly
+  - `TotalMoves` object (used in many of the `oneOf` structures) has `additionalProperties: false` set in order for code generators to work properly
   - all properties set to `type: integer` and `format: int32`
   - Many "helper" objects created globally
   - some properties renamed to better align property and objects
