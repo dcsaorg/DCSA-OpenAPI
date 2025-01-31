@@ -114,7 +114,7 @@ Snapshot as of 27 of September 2024 for EBL Platform Interoperability 3.0.0 Beta
   - `descriptionOfGoods` on `ConsignmentItem`
   - `shippingMarks` on `ConsignmentItem`and `UtilizedTransportEquipment`
   - `displayedAddress` on the Party objects
-- Converrted all inner defined objects to globally defined objects. The following objects are now global:
+- Converted all inner defined objects to globally defined objects. The following objects are now global:
   - `PlaceOfIssue` previously defined as inner object on `TransportDocument`
   - `InvoicePayableAt` previously defined as inner object on `TransportDocument`
   - `DocumentParties` previously defined as inner object on `TransportDocument`
@@ -125,11 +125,11 @@ Snapshot as of 27 of September 2024 for EBL Platform Interoperability 3.0.0 Beta
 
 ## Changes to the `Transport Document`
 - description update on the `numberOf[Copies|Originals][With|Without]Charges` to better explain the conditions as to how the properties are to be used
-- 4x `displayedNameForXXX` description updated to clearly indicate the the order of the items in the list must be preserved
+- 4x `displayedNameForXXX` description updated to clearly indicate the order of the items in the list must be preserved
 - converted `placeOfIssue` to a $ref instead of defining it inline
 - converted `invoicePayableAt` to a $ref instead of defining it inline
 - converted `documentParties` to a $ref instead of defining it inline
-- `routingOfConsignmentCountries` description updated to clearly indicate the the order of the items in the list must be preserved
+- `routingOfConsignmentCountries` description updated to clearly indicate the order of the items in the list must be preserved
 - `ConsignmentItem` now allows `SPO` (Shipper's Purchase Order) and `CPO` (Consignee's Purchase Order) as References
 - `grossWeight` and `grossVolume` renamed to `cargoGrossWeight` and `cargoGrossVolume` on `CargoItem`
 - `cargoNetWeight` and `cargoNetVolume` added on `CargoItem`
@@ -152,7 +152,7 @@ Snapshot as of 27 of September 2024 for EBL Platform Interoperability 3.0.0 Beta
 ## All changes
 - API description update
 - `duplicateOfAcceptedEnvelopeTransferChainEntrySignedContent` now defined locally instead of $ref
-- cleaning up `DocumentMetadata` object (removed unnessesary pattern and added a maxLength and a title)
+- cleaning up `DocumentMetadata` object (removed unnecessary pattern and added a maxLength and a title)
 - added title to `Transaction` object
 - Link to the standardized `errorCode` in the `Error` object updated to a public page: [Error codes as specified by DCSA](https://developer.dcsa.org/standard-error-codes)
 - `phone` description updated to include [ITU-T recommendation E.123](https://www.itu.int/rec/T-REC-E.123/en)
@@ -181,7 +181,7 @@ Snapshot as of 13 of September 2024 for EBL Platform Interoperability 3.0.0 Beta
 - `transportDocumentChecksum`, `transportDocumentChecksum` pattern added
 - `action` description on `Transaction` updated
 - `TaxLegalReference` object updated:
-  - description updated to no longer link to reference data (it is currently out of scopre for DCSA to maintain this list)
+  - description updated to no longer link to reference data (it is currently out of scope for DCSA to maintain this list)
   - `countryCode` example updated to align with type example
 - `transportDocumentStatus` values no longer contain space (` `)
 - `declaredValueCurrency` description link changed
@@ -191,7 +191,7 @@ Snapshot as of 13 of September 2024 for EBL Platform Interoperability 3.0.0 Beta
 - `shippingMarks` `maxItems` is now 50 and length of each line is 35
 - `SCHEDULE B` updated to `SCHEDULE_B` as a value in the type in NationalCommodityCode to avoid the space (` `)
 - `CustomsReference` object updated:
-  - description updated to no longer link to reference data (it is currently out of scopre for DCSA to maintain this list)
+  - description updated to no longer link to reference data (it is currently out of scope for DCSA to maintain this list)
   - `countryCode` example updated to align with type example
 - `equipmentReference` description link updated to www.iso.org instead of Wikipedia
 - `weight` and `volume` of `CargoItem` renamed to `grossWeight` and `grossVolume` and structure changed to object containing mandatory `value` and `unit`
@@ -203,7 +203,7 @@ Snapshot as of 13 of September 2024 for EBL Platform Interoperability 3.0.0 Beta
 - `volume` renamed to `netVolume` in DG (Dangerous Goods)
 - `ISOEquipmentCode` description link updated and example modified
 - `tareWeight` and `weightUnit` merged into one optional object containing mandatory `value` and `unit`
-- `PlaceOfReceipt`, `PortOfLoading`, `PortOfDischarge`, `PlaceOfDelivery` and `OnwardInlandRouting` condition added to make sure if multiple ways of expressing a location is used that all ways point to the same location
+- `PlaceOfReceipt`, `PortOfLoading`, `PortOfDischarge`, `PlaceOfDelivery` and `OnwardInlandRouting` condition added to make sure if multiple ways of expressing a location is used that always point to the same location
 - `currencyCode` description link changed
 - `facilityCode` description link updated to a more general page instead of a specific version
 - `typeOfPerson` values no longer contain space (` `)
@@ -284,12 +284,12 @@ Snapshot as of 16 of August 2024 for EBL Platform Interoperability 3.0.0 Beta.
 ---
 Snapshot as of 26 of July 2024 for EBL Platform Interoperability 3.0.0 Beta.
 ## Key changes
-- `Reciever validation` endPoint added
+- `Receiver validation` endPoint added
 - `Transport Document` updated
 
 ## EBL PINT changes
 - multiple description changes (typos)
-- Added `Reciever validation` endPoint
+- Added `Receiver validation` endPoint
 - `DocumentChecksum` description modified
 - `ReceiverValidationResponse` object added
 - `IssuanceManifest` object added
