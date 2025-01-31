@@ -192,7 +192,7 @@ Snapshot as of 13 of September 2024 for EBL Issuance 3.0.0 Beta.
 - `volume` renamed to `netVolume` in DG (Dangerous Goods)
 - `ISOEquipmentCode` description link updated and example modified
 - `tareWeight` and `weightUnit` merged into one optional object containing mandatory `value` and `unit`
-- `PlaceOfReceipt`, `PortOfLoading`, `PortOfDischarge`, `PlaceOfDelivery` and `OnwardInlandRouting` condition added to make sure if multiple ways of expressing a location is used that allways point to the same location
+- `PlaceOfReceipt`, `PortOfLoading`, `PortOfDischarge`, `PlaceOfDelivery` and `OnwardInlandRouting` condition added to make sure if multiple ways of expressing a location is used that always point to the same location
 - `currencyCode` description link changed
 - `facilityCode` description link updated to a more general page instead of a specific version
 - `typeOfPerson` values no longer contain space (` `)
