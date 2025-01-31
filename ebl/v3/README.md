@@ -58,7 +58,7 @@ Snapshot as of 8 of November 2024 for EBL 3.0.0 Beta.
   - `identifyingCodes` is now mandatory and has a `minItems: 1` on `Consignee` and `Endorsee`
 
 ## Minor changes
-- removed wrongly added condition on `IssuingParty` and `idenfifyingCodes` on `IssuingParty`
+- removed wrongly added condition on `IssuingParty` and `identifyingCodes` on `IssuingParty`
 
 <a name="v300B20241025"></a>[Release v3.0.0 Beta 20241025 (25 of October 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.0-Beta-20241025)
 ---
@@ -149,7 +149,7 @@ The above changes are applicable to:
 
 ## All changes
 - endPoint examples updated
-- 2 new Carrier Clases that can be requested by the Shipper has been added:
+- 2 new Carrier Classes that can be requested by the Shipper has been added:
   - Shipper's Load, Stow, Weight and Count
   - In transit clause
 - all "House B/L" related objects (that have a "duplicate" MBL object) have `(House B/L) ` suffixed to their titles
@@ -177,7 +177,7 @@ The above changes are applicable to:
 ---
 Snapshot as of 27 of September 2024 for EBL 3.0.0 Beta.
 ## Key changes
-- Converrted all inner defined objects to globally defined objects. The following objects are now global:
+- Converted all inner defined objects to globally defined objects. The following objects are now global:
   - `CreateShippingInstructionsResponse` previously defined as inner object on the `POST /v3/shipping-instructions` endPoint
   - `CancelShippingInstructionsUpdate` previously defined as inner object on the `PATCH /v3/shipping-instructions/{documentReference}` endPoint
   - description on `GET /v3/transport-documents/{transportDocumentReference}` endPoint updated so it now requires that "the order of **ALL** lists/arrays **MUST** be preserved as by the provider of the API"
@@ -207,11 +207,11 @@ Snapshot as of 27 of September 2024 for EBL 3.0.0 Beta.
 
 ## Changes to the `Shipping Instructions`
 - description update on the `numberOf[Copies|Originals][With|Without]Charges` to better explain the conditions as to how the properties are to be used
-- 4x `displayedNameForXXX` description updated to clearly indicate the the order of the items in the list must be preserved
+- 4x `displayedNameForXXX` description updated to clearly indicate the order of the items in the list must be preserved
 - converted `placeOfIssue` to a $ref instead of defining it inline
 - converted `invoicePayableAt` to a $ref instead of defining it inline
 - converted `documentParties` to a $ref instead of defining it inline
-- `routingOfConsignmentCountries` description updated to clearly indicate the the order of the items in the list must be preserved
+- `routingOfConsignmentCountries` description updated to clearly indicate the order of the items in the list must be preserved
 - `Shipper` and `Consignee` now allows for a list of `purchaseOrderReferences`
 - `IssueToParty` description updated
 - description updated on `sendToPlatform` property on `IssueToParty` and it is now an optional property
@@ -228,13 +228,13 @@ The above changes are applicable to:
 
 ## Changes to the `Transport Document`
 - description update on the `numberOf[Copies|Originals][With|Without]Charges` to better explain the conditions as to how the properties are to be used
-- 4x `displayedNameForXXX` description updated to clearly indicate the the order of the items in the list must be preserved
+- 4x `displayedNameForXXX` description updated to clearly indicate the order of the items in the list must be preserved
 - converted `placeOfIssue` to a $ref instead of defining it inline
 - converted `invoicePayableAt` to a $ref instead of defining it inline
 - converted `documentParties` to a $ref instead of defining it inline
 - `Shipper` and `Consignee` now allows for a list of `purchaseOrderReferences`
 - `ConsignmentItem` now allows `SPO` (Shipper's Purchase Order) and `CPO` (Consignee's Purchase Order) as References
-- `routingOfConsignmentCountries` description updated to clearly indicate the the order of the items in the list must be preserved
+- `routingOfConsignmentCountries` description updated to clearly indicate the order of the items in the list must be preserved
 - `grossWeight` and `grossVolume` renamed to `cargoGrossWeight` and `cargoGrossVolume` on `CargoItem`
 - `cargoNetWeight` and `cargoNetVolume` added on `CargoItem`
 - converted the following properties: `GrossWeight`, `NetWeight`, `NetExplosiveContent` and `NetVolume` on `DangerousGoods` to a $ref instead of defining it inline
@@ -289,7 +289,7 @@ Snapshot as of 13 of September 2024 for EBL 3.0.0 Beta.
 - `IssueToParty` description updated
 - `sendToPlatform` reference data link in description removed from `IssueToParty` object
 - `TaxLegalReference` object updated:
-  - description updated to no longer link to reference data (it is currently out of scopre for DCSA to maintain this list)
+  - description updated to no longer link to reference data (it is currently out of scope for DCSA to maintain this list)
   - `countryCode` example updated to align with type example
 - `transportDocumentStatus` values no longer contain space (` `)
 - `descriptionOfGoods` changed from string to string array with a `maxItems` of 150 and a `maxLength` of 35
@@ -297,7 +297,7 @@ Snapshot as of 13 of September 2024 for EBL 3.0.0 Beta.
 - `shippingMarks` `maxItems` is now 50 and length of each line is 35
 - `SCHEDULE B` updated to `SCHEDULE_B` as a value in the type in NationalCommodityCode to avoid the space (` `)
 - `CustomsReference` object updated:
-  - description updated to no longer link to reference data (it is currently out of scopre for DCSA to maintain this list)
+  - description updated to no longer link to reference data (it is currently out of scope for DCSA to maintain this list)
   - `countryCode` example updated to align with type example
 - `equipmentReference` description link updated to www.iso.org instead of Wikipedia
 - `weight` and `volume` of `CargoItem` renamed to `grossWeight` and `grossVolume` and structure changed to object containing mandatory `value` and `unit`
@@ -310,10 +310,10 @@ Snapshot as of 13 of September 2024 for EBL 3.0.0 Beta.
 - `ISOEquipmentCode` description link updated and example modified
 - `tareWeight` and `weightUnit` merged into one optional object containing mandatory `value` and `unit`
 - `AdvanceManifestFiling` object updated:
-  - description updated to no longer link to reference data (it is currently out of scopre for DCSA to maintain this list)
+  - description updated to no longer link to reference data (it is currently out of scope for DCSA to maintain this list)
   - `manifestTypeCode` description link to reference data removed
   - `supplementaryDeclarantEORInumber` renamed to `supplementaryDeclarantEORINumber` (`n` --> `N`)
-- `PlaceOfAcceptance`, `PlaceOfFinalDelivery`, `PlaceOfReceipt`, `PortOfLoading`, `PortOfDischarge`, `PlaceOfDelivery` and `OnwardInlandRouting` condition added to make sure if multiple ways of expressing a location is used that all ways point to the same location
+- `PlaceOfAcceptance`, `PlaceOfFinalDelivery`, `PlaceOfReceipt`, `PortOfLoading`, `PortOfDischarge`, `PlaceOfDelivery` and `OnwardInlandRouting` condition added to make sure if multiple ways of expressing a location is used that always point to the same location
 - `currencyCode` description link changed
 - `RequestedCarrierCertificate` and `RequestedCarrierClause` objects deleted
 - `OriginChargesPaymentTerm` and `DestinationChargesPaymentTerm` objects created
@@ -385,7 +385,7 @@ Snapshot as of 30 of August 2024 for EBL 3.0.0 Beta.
   - `street` maxLength changed from 100 --> 70
   - `PObox` added as property
   - `city` maxLength changed from 65 --> 35
-- `partyFunctionCode` values updated (`NofityParty` values removed)
+- `partyFunctionCode` values updated (`NotifyParty` values removed)
 - `Shipper` object changes:
   - `partyName` maxLength changed from 100 --> 70
   - `typeOfPerson` added
@@ -526,7 +526,7 @@ Snapshot as of 14 of June 2024 for EBL 3.0.0 Beta.
 
 <a name="v300B3"></a>[Release v3.0.0 Beta 3 (...)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.0-Beta-3)
 ---
-Going forward Beta 3 will not be updated any more. The new way of working will be that we update the final v3.0.0 continuously. Every once in a while we release "Snapshots". An example of this is the [Snapshot of 14 June 2024](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/ebl/v3#v300B20240614) just above.
+Going forward Beta 3 will not be updated anymore. The new way of working will be that we update the final v3.0.0 continuously. Every once in a while we release "Snapshots". An example of this is the [Snapshot of 14 June 2024](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/ebl/v3#v300B20240614) just above.
 
 <a name="v300B2"></a>[Release v3.0.0 Beta 2 (12 April 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.0-Beta-2)
 ---
