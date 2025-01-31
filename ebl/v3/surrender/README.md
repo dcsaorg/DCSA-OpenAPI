@@ -15,7 +15,7 @@ This is the final version 3.0.0 for the DCSA Bill of Lading Surrender API. Compa
 - Link to **create a GitHub issue** has been updated to point to DCSA [Contact Us](https://dcsa.org/get-involved/contact-us) page
 - License url has been updated to secure socket (http --> http**s**)
 - typos fixed: everywhere **E**BL was mentioned has been changed to **e**BL
-- typos fixed: puprpose --> purpose in `endorsementChain` description
+- typos fixed: purpose --> purpose in `endorsementChain` description
 
 <a name="v300B20241108"></a>[Release v3.0.0 Beta 20241108 (8 of November 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR/3.0.0-Beta-20241108)
 ---
@@ -71,7 +71,7 @@ Snapshot as of 13 of September 2024 for EBL Surrender 3.0.0 Beta.
 - `actionCode` values updated to no longer contain space (` `)
 - `endorsementChain` description updated
 - `TaxLegalReference` object updated:
-  - description updated to no longer link to reference data (it is currently out of scopre for DCSA to maintain this list)
+  - description updated to no longer link to reference data (it is currently out of scope for DCSA to maintain this list)
   - `countryCode` example updated to align with type example
 - changed `errorDateTime` example to UTC instead of timeZone specific and updated description link
 - typos fixed
@@ -81,7 +81,7 @@ Snapshot as of 13 of September 2024 for EBL Surrender 3.0.0 Beta.
 Snapshot as of 30 of August 2024 for EBL Surrender 3.0.0 Beta.
 ## Key changes
 - `partyName` maxLength changed from 100 -> 70 in `TransactionParty` object
-- description updated on `codeListProvier` to include **`EU` (European Union Member State Customs Authority)** as a value
+- description updated on `codeListProvider` to include **`EU` (European Union Member State Customs Authority)** as a value
 - description updated on `codeListName` to include **`EORI` (Economic Operators Registration and Identification)** as a value
 - `partyCode` maxLength changed from 100 --> 150 in `IdentifyingCode` object
 - `errorCodeMessage` maxLength changed from 200 -> 5000
