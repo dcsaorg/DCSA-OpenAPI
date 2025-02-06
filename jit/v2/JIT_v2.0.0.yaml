@@ -482,7 +482,7 @@ paths:
         ````
         A Port Call:
         - that has a Terminal Call, and
-        - that has a Port Call Service with: `portCallServiceType=BERTH` AND `portCallServiceEventTypeCode=DEPA`, and
+        - that has a Port Call Service with: `portCallServiceTypeCode=BERTH` AND `portCallServiceEventTypeCode=DEPA`, and
         - that has a Timestamp with: `classifierCode=PLN` AND `dateTime < {now}`
         ````
         This can potentially result in empty result sets. **Example:** filtering by `portCallID` that has been completed.
@@ -1093,7 +1093,7 @@ paths:
         ````
         A Port Call:
         - that has a Terminal Call
-        - that has a Port Call Service with: `portCallServiceType=BERTH` AND `portCallServiceEventTypeCode=DEPA`
+        - that has a Port Call Service with: `portCallServiceTypeCode=BERTH` AND `portCallServiceEventTypeCode=DEPA`
         - that has a Timestamp with: `classifierCode=PLN` AND `dateTime < {now}`
         ````
         This can potentially result in empty result sets. **Example:** filtering by `terminalCallID` included in a **Port Call** that has been completed.
@@ -1228,7 +1228,7 @@ paths:
         The **Port Call Service** includes:
         
           - link to the **Terminal Call** (required): `terminalCallID`
-          - type of Service (required): `portCallServiceType` and `portCallServiceEventTypeCode` (and optionally `portCallPhaseTypeCode` and `facilityTypeCode`)
+          - type of Service (required): `portCallServiceTypeCode` and `portCallServiceEventTypeCode` (and optionally `portCallPhaseTypeCode` and `facilityTypeCode`)
           - a location (required): `portCallServiceLocation`
           - Moves forecast information: `moves`
           - The ability to send the record with informational purpose only, using `isFYI=true`
@@ -1261,9 +1261,9 @@ paths:
               examples:
                 badRequestExample:
                   summary: |
-                    Port Call Service missing portCallServiceType
+                    Port Call Service missing portCallServiceTypeCode
                   description: |
-                    `portCallServiceType` is a mandatory property in the **Port Call Service**. This is an example of how the error object would look in case this property is missing
+                    `portCallServiceTypeCode` is a mandatory property in the **Port Call Service**. This is an example of how the error object would look in case this property is missing
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
@@ -1271,14 +1271,14 @@ paths:
                     requestUri: '/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545'
                     statusCode: 400
                     statusCodeText: 'Bad Request'
-                    statusCodeMessage: 'portCallServiceType not found - it is a mandatory property in Port Call Service.'
+                    statusCodeMessage: 'portCallServiceTypeCode not found - it is a mandatory property in Port Call Service.'
                     providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
                     errorDateTime: '2024-11-21T09:41:00Z'
                     errors:
                       - errorCode: 7003
-                        property: 'portCallServiceType'
+                        property: 'portCallServiceTypeCode'
                         errorCodeText: 'mandatory property missing'
-                        errorCodeMessage: 'portCallServiceType must be provided as part of a Port Call Service'
+                        errorCodeMessage: 'portCallServiceTypeCode must be provided as part of a Port Call Service'
         '404':
           description: |
             In case the implementer does not know of the `terminalCallID` used in the request payload - it is possible for the implementer to reject the request by returning a `404` (Not Found).
@@ -1578,13 +1578,13 @@ paths:
           * `terminalCallID`
           * `portCallServiceID`
 
-        Additionally `portCallServiceType` can be optionally added to narrow the result set even further.
+        Additionally `portCallServiceTypeCode` can be optionally added to narrow the result set even further.
 
         The result set of this endPoint will always include **Port Call Services** that are linked to **Port Calls** that have **not yet been completed**. Definition of a completed **Port Call** is:
         ````
         A Port Call:
         - that has a Terminal Call
-        - that has a Port Call Service with: `portCallServiceType=BERTH` AND `portCallServiceEventTypeCode=DEPA`
+        - that has a Port Call Service with: `portCallServiceTypeCode=BERTH` AND `portCallServiceEventTypeCode=DEPA`
         - that has a Timestamp with: `classifierCode=PLN` AND `dateTime < {now}`
         ````
         This can potentially result in empty result sets. **Example:** filtering by `portCallServiceID` included in a **Port Call** that has been completed.
@@ -1593,7 +1593,7 @@ paths:
           * To get a specific **Port Call Service** use the `portCallServiceID` filter with the ID of the **Port Call Service** to filter by. This results in at most a single object. The response will return an empty array if no **Port Call Service** known by the consumer is linked to the provided `portCallServiceID`.
           * To get a list of **Port Call Services** for a specific **Terminal Call** use the `terminalCallID` filter with the `terminalCallID` of the **Terminal Call** to filter by. This will result in a list of potentially many **Port Call Services** all of which will be linked to the **Terminal Call** specified.
 
-        **Note:** Beware it is possible to specify filters that exclude all results. Example: if filtering by `portCallServiceID` and a `portCallServiceType` that does **not** belong to the same `portCallServiceID` - the result set will be an empty list. No error will be reported.
+        **Note:** Beware it is possible to specify filters that exclude all results. Example: if filtering by `portCallServiceID` and a `portCallServiceTypeCode` that does **not** belong to the same `portCallServiceID` - the result set will be an empty list. No error will be reported.
       responses:
         '200':
           description: |
@@ -1619,7 +1619,7 @@ paths:
                   value:
                     - terminalCallID: '0342254a-5927-4856-b9c9-aa12e7c00563'
                       portCallServiceID: '0342254a-5927-4856-b9c9-aa12e7c00563'
-                      portCallServiceType: 'BERTH'
+                      portCallServiceTypeCode: 'BERTH'
                       portCallServiceEventTypeCode: 'ARRI'
                       portCallServiceLocation:
                         locationName: 'CMP Container Terminal Copenhagen'
@@ -1628,7 +1628,7 @@ paths:
                       declined: false
                     - terminalCallID: '0342254a-5927-4856-b9c9-aa12e7c00563'
                       portCallServiceID: '7992f6cb-3a5f-45c9-bf43-36e4f05e0bd4'
-                      portCallServiceType: 'PILOTAGE'
+                      portCallServiceTypeCode: 'PILOTAGE'
                       portCallServiceEventTypeCode: 'STRT'
                       portCallServiceLocation:
                         locationName: 'CMP Container Terminal Copenhagen'
@@ -1641,14 +1641,14 @@ paths:
                   description: |
                     Get all the `Moves` for **Port Call Services** that matches the `terminalCallID=0342254a-5927-4856-b9c9-aa12e7c00563`. The request would look like this:
 
-                        GET /port-call-services?terminalCallID=0342254a-5927-4856-b9c9-aa12e7c00563&portCallServiceType=MOVES
+                        GET /port-call-services?terminalCallID=0342254a-5927-4856-b9c9-aa12e7c00563&portCallServiceTypeCode=MOVES
 
                     In this example there is a single `Moves` object for the **Port Call Service** linked to the **Terminal Call**
                     The default value for the `cancelled` and `declined` property is `false` so in the below example it does not matter if it is provided or not. For clarity it is provided here.
                   value:
                     - terminalCallID: '0342254a-5927-4856-b9c9-aa12e7c00563'
                       portCallServiceID: '0342254a-5927-4856-b9c9-aa12e7c00563'
-                      portCallServiceType: 'MOVES'
+                      portCallServiceTypeCode: 'MOVES'
                       portCallServiceEventTypeCode: 'ARRI'
                       portCallServiceLocation:
                         locationName: 'CMP Container Terminal Copenhagen'
@@ -1937,7 +1937,7 @@ paths:
         ````
         A Port Call:
         - that has a Terminal Call
-        - that has a Port Call Service with: `portCallServiceType=BERTH` AND `portCallServiceEventTypeCode=DEPA`
+        - that has a Port Call Service with: `portCallServiceTypeCode=BERTH` AND `portCallServiceEventTypeCode=DEPA`
         - that has a Timestamp with: `classifierCode=PLN` AND `dateTime < {now}`
         ````
         This can potentially result in empty result sets. **Example:** filtering by `timestampID` included in a **Port Call** that has been completed.
@@ -2251,7 +2251,7 @@ paths:
         ````
         A Port Call:
         - that has a Terminal Call
-        - that has a Port Call Service with: `portCallServiceType=BERTH` AND `portCallServiceEventTypeCode=DEPA`
+        - that has a Port Call Service with: `portCallServiceTypeCode=BERTH` AND `portCallServiceEventTypeCode=DEPA`
         - that has a Timestamp with: `classifierCode=PLN` AND `dateTime < {now}`
         ````
         This can potentially result in empty result sets. **Example:** filtering by `portCallServiceID` included in a **Port Call** that has been completed.
@@ -2702,9 +2702,9 @@ components:
 
     portCallServiceTypeQueryParam:
       in: query
-      name: portCallServiceType
+      name: portCallServiceTypeCode
       description: |
-        The **Port Call Service Type** to filter by. Specifying this filter will ensure that the result set contains only objects where the `portCallServiceType` property is present and its value matches one of the values of the corresponding filter query parameter.
+        The **Port Call Service Type** to filter by. Specifying this filter will ensure that the result set contains only objects where the `portCallServiceTypeCode` property is present and its value matches one of the values of the corresponding filter query parameter.
       schema:
         type: string
         maxLength: 50
@@ -3026,7 +3026,7 @@ components:
           description: |
             Universal unique identifier for the **Port Call Service**. The `portCallServiceID` is created by the provider. To be used in all communication regarding the **Port Call Service** (i.e. sending a timestamp with the timestamps endpoint).
           example: 0342254a-5927-4856-b9c9-aa12e7c00563
-        portCallServiceType:
+        portCallServiceTypeCode:
           type: string
           maxLength: 50
           pattern: ^\S(?:.*\S)?$
@@ -3071,7 +3071,7 @@ components:
             - `DEPA` (Departed)
 
             **Conditions:**
-            - These `portCallServiceType` values can only be used with `portCallServiceEventTypeCode` values `STRT` and `CMPL`:
+            - These `portCallServiceTypeCode` values can only be used with `portCallServiceEventTypeCode` values `STRT` and `CMPL`:
               - `CARGO_OPERATIONS` (Cargo operations)
               - `PILOTAGE` (Pilotage)
               - `TOWAGE` (Towage)
@@ -3086,9 +3086,9 @@ components:
               - `ANCHORAGE_OPERATIONS` (Anchorage Operations)
               - `SHORE_POWER` (ShorePower)
 
-            - The `portCallServiceType='BERTH'` (Berth) can only be used with `portCallServiceEventTypeCode` values `ARRI` and `DEPA`.
+            - The `portCallServiceTypeCode='BERTH'` (Berth) can only be used with `portCallServiceEventTypeCode` values `ARRI` and `DEPA`.
 
-            - These `portCallServiceType` values can only be used with `portCallServiceEventTypeCode` value `ARRI`:
+            - These `portCallServiceTypeCode` values can only be used with `portCallServiceEventTypeCode` value `ARRI`:
               - `PILOT_BOARDING_PLACE` (Pilot Boarding Place)
               - `ALL_FAST` (All Fast)
               - `GANGWAY_DOWN_AND_SECURE` (Gangway down and secure)
@@ -3096,7 +3096,7 @@ components:
               - `VESSEL_READY_TO_SAIL` (Vessel Ready to sail)
               - `MOVES` (Moves)
 
-            - The `portCallServiceType='SAFETY'` can only be used with `portCallServiceEventTypeCode` value `DEPA`.
+            - The `portCallServiceTypeCode='SAFETY'` can only be used with `portCallServiceEventTypeCode` value `DEPA`.
           enum:
             - STRT
             - CMPL
@@ -3113,7 +3113,7 @@ components:
             - `OUTB` (Outbound)
 
             **Recommendations:**
-            - `INBD` should preferably be used with the following `portCallServiceType`:
+            - `INBD` should preferably be used with the following `portCallServiceTypeCode`:
               - `BERTH` (Berth)
               - `PILOTAGE` (Pilotage)
               - `TOWAGE` (Towage)
@@ -3121,7 +3121,7 @@ components:
               - `PILOT_BOARDING_PLACE` (Pilot Boarding Place)
               - `SEA_PASSAGE` (Sea Passage)
 
-            - `ALGS` should preferably be used with the following `portCallServiceType`:
+            - `ALGS` should preferably be used with the following `portCallServiceTypeCode`:
               - `BERTH` (Berth)
               - `BUNKERING` (Bunkering)
               - `CARGO_OPERATIONS` (Cargo operations)
@@ -3135,19 +3135,19 @@ components:
               - `SAFETY` (Safety)
               - `SHORE_POWER` (ShorePower)
 
-            - `SHIF` should preferably be used with the following `portCallServiceType`:
+            - `SHIF` should preferably be used with the following `portCallServiceTypeCode`:
               - `PILOTAGE` (Pilotage)
               - `TOWAGE` (Towage)
               - `MOORING` (Mooring)
 
-            - `OUTB` should preferably be used with the following `portCallServiceType`:
+            - `OUTB` should preferably be used with the following `portCallServiceTypeCode`:
               - `BERTH` (Berth)
               - `PILOTAGE` (Pilotage)
               - `TOWAGE` (Towage)
               - `MOORING` (Mooring)
               - `SEA_PASSAGE` (Sea Passage)
 
-            - The property `portCallPhaseTypeCode` should preferably **not** be sent with the following `portCallServiceType`:
+            - The property `portCallPhaseTypeCode` should preferably **not** be sent with the following `portCallServiceTypeCode`:
               - `ANCHORAGE` (Anchorage)
               - `SLUDGE` (Sludge)
               - `ANCHORAGE_OPERATIONS` (Anchorage Operations)
@@ -3168,12 +3168,12 @@ components:
             - `ANCH` (Anchorage Location)
 
             **Recommendations:**
-              - `PBPL`, when used, should preferably be used with the following `portCallServiceType`:
+              - `PBPL`, when used, should preferably be used with the following `portCallServiceTypeCode`:
                 - `PILOTAGE` (Pilotage)
                 - `TOWAGE` (Towage)
                 - `PILOT_BOARDING_PLACE` (Pilot Boarding Place)
 
-              - `BRTH`, when used, should preferably be used with the following `portCallServiceType`:
+              - `BRTH`, when used, should preferably be used with the following `portCallServiceTypeCode`:
                 - `BERTH` (Berth)
                 - `CARGO_OPERATIONS` (Cargo operations)
                 - `PILOTAGE` (Pilotage)
@@ -3192,7 +3192,7 @@ components:
                 - `ANCHORAGE_OPERATIONS` (Anchorage Operations)
                 - `SHORE_POWER` (ShorePower)
 
-            - `ANCH`, when used, should preferably be used with the following `portCallServiceType`:
+            - `ANCH`, when used, should preferably be used with the following `portCallServiceTypeCode`:
               - `ANCHORAGE` (Anchorage)
               - `ANCHORAGE_OPERATIONS` (Anchorage Operations)
           enum:
@@ -3228,7 +3228,7 @@ components:
       required:
         - terminalCallID
         - portCallServiceID
-        - portCallServiceType
+        - portCallServiceTypeCode
         - portCallServiceEventTypeCode
         - portCallServiceLocation
 
@@ -3284,8 +3284,8 @@ components:
             **Conditions:**
             - `EST`, `PLN` and `ACT` can **only** be used by the **provider** when sending a **Timestamp** to the **consumer**.
             - `REQ` is **only** to be used by the **consumer** when sending a **Timestamp** to the **provider**.
-            - `ACT` can be used in a **Timestamp** for any **Port Call Service** except `portCallServiceType='MOVES'`
-            - `EST`, `REQ`and `PLN` can be used in a **Timestamp** for any **Port Call Service** with `portCallServiceType` having one of the following values:
+            - `ACT` can be used in a **Timestamp** for any **Port Call Service** except `portCallServiceTypeCode='MOVES'`
+            - `EST`, `REQ`and `PLN` can be used in a **Timestamp** for any **Port Call Service** with `portCallServiceTypeCode` having one of the following values:
               - `BERTH` (Berth)
               - `CARGO_OPERATIONS` (Cargo operations)
               - `PILOTAGE` (Pilotage)
@@ -3829,7 +3829,7 @@ components:
         ### Single Moves Object with Carrier Codes
         If only one `Moves` object exists and includes `carrierCode` and `carrierCodeListProvider`, it represents moves specifically for the indicated carrier.
 
-        **Condition:** Can only be provided if `portCallServiceType` is `MOVES`
+        **Condition:** Can only be provided if `portCallServiceTypeCode` is `MOVES`
       properties:
         carrierCode:
           type: string
