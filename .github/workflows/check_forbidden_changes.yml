@@ -65,15 +65,16 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const forbiddenPaths = ${{ steps.forbidden_paths.outputs.result }};
-            const changedFiles = ${{ steps.changed_files.outputs.changed_files }};
+            const changedFilesString = '${{ steps.changed_files.outputs.changed_files }}';
+            const changedFiles = changedFilesString.split(',');
 
             let violations = [];
 
             changedFiles.forEach(file => {
               forbiddenPaths.forEach(forbiddenPath => {
                 const regex = new RegExp(forbiddenPath); // Use regex for matching
-                if (regex.test(file.filename)) {
-                  violations.push(file.filename);
+                if (regex.test(file)) {  // Changed from file.filename to file
+                  violations.push(file);  // Changed from file.filename to file
                 }
               });
             });
@@ -81,7 +82,7 @@ jobs:
             if (violations.length > 0) {
               core.setFailed(`You are not allowed to change the following file(s): ${violations.join(', ')}`);
               // Create a comment on the PR
-              github.rest.issues.createComment({
+              await github.rest.issues.createComment({
                 issue_number: context.issue.number,
                 owner: context.repo.owner,
                 repo: context.repo.repo,
