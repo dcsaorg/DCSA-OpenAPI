@@ -24,7 +24,7 @@ Release of the DCSA OpenAPI definitions for Booking 1.0.0. This release fixes mi
   - `eventDateTime` added as new query parameter
 - Referenced domains above should be consulted to see exact updates - some if the major items include
   - linkage between `Commodity` and `RequestedEquipment`
-  - better support for paper-version of B/L (displayedAddress, displaedName...)
+  - better support for paper-version of B/L (displayedAddress, displayedName...)
   - `references` and `seals` objects updated
   - minor updates to the `Party` object (`PartyName` is now mandatory, new `parrtyFunctionCodes`)
   - confirmed and requested Equipment groups updated
