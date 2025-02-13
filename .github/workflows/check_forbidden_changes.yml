@@ -26,33 +26,67 @@ jobs:
               return []; // Return empty array to avoid script failing
             }
 
-      - name: Check for forbidden changes
-        id: check_changes
+      - name: Get changed files
+        id: changed_files
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const forbiddenPaths = ${{ steps.forbidden_paths.outputs.result }};
-            const changedFiles = context.payload.pull_request.files;
-
-            let violations = [];
-
-            changedFiles.forEach(file => {
-              forbiddenPaths.forEach(forbiddenPath => {
-                const regex = new RegExp(forbiddenPath); // Use regex for matching
-                if (regex.test(file.filename)) {
-                  violations.push(file.filename);
-                }
-              });
+            const { owner, repo } = context.repo;
+            const pull_number = context.issue.number; // For PRs
+            
+            const response = await github.rest.pulls.listFiles({
+              owner,
+              repo,
+              pull_number,
+              per_page: 100 // Adjust per_page if you expect a very large number of changed files
             });
+            
+            const changedFiles = response.data.map(file => file.filename);
+            
+            core.setOutput('changed_files', changedFiles.join(',')); // Set the output
+            
+            // Optionally, log the files to the console (for debugging)
+            console.log('Changed files:', changedFiles);
 
-            if (violations.length > 0) {
-              core.setFailed(`You are not allowed to change the following file(s): ${violations.join(', ')}`);
-              // Create a comment on the PR
-              github.rest.issues.createComment({
-                issue_number: context.issue.number,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                body: `The following file(s) are not allowed to be changed: ${violations.join(', ')}`
-              });
-            }
+      - name: Use the changed files
+        run: |
+          echo "Changed files: ${{ steps.changed_files.outputs.changed_files }}"
+          # You can now use the list of changed files in subsequent steps
+          # For example, loop through them:
+          for file in ${{ steps.changed_files.outputs.changed_files }}; do
+            echo "Processing file: $file"
+            # Perform actions based on the changed file
+          done
+
+
+#      - name: Check for forbidden changes
+#        id: check_changes
+#        uses: actions/github-script@v6
+#        with:
+#          github-token: ${{ secrets.GITHUB_TOKEN }}
+#          script: |
+#            const forbiddenPaths = ${{ steps.forbidden_paths.outputs.result }};
+#            const changedFiles = context.payload.pull_request.files;
+#
+#            let violations = [];
+#
+#            changedFiles.forEach(file => {
+#              forbiddenPaths.forEach(forbiddenPath => {
+#                const regex = new RegExp(forbiddenPath); // Use regex for matching
+#                if (regex.test(file.filename)) {
+#                  violations.push(file.filename);
+#                }
+#              });
+#            });
+#
+#            if (violations.length > 0) {
+#              core.setFailed(`You are not allowed to change the following file(s): ${violations.join(', ')}`);
+#              // Create a comment on the PR
+#              github.rest.issues.createComment({
+#                issue_number: context.issue.number,
+#                owner: context.repo.owner,
+#                repo: context.repo.repo,
+#                body: `The following file(s) are not allowed to be changed: ${violations.join(', ')}`
+#              });
+#            }
