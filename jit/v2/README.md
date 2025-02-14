@@ -11,7 +11,7 @@ This is a moving target and will be updated as soon as the version is published
 Snapshot as of 14 of February 2025 for JIT 2.0.0 Beta.
 ## Key changes
 - `portCallServiceType` renamed to `portCallServiceTypeCode` (to comply with DCSA API Design principles)
-- clarified condition for `carrierCode' in `moves` object in the descriptions to remove ambiguity.
+- clarified condition for `carrierCode` in `moves` object in the descriptions to remove ambiguity.
 
 ## Minor changes
 - descriptions updated to make it clear if there is a **Condition** or a **Recommendation**
