@@ -6,6 +6,22 @@ The DCSA Interface Standard for Just in Time Portcalls is documented on the **[D
 ---
 This is a moving target and will be updated as soon as the version is published
 
+<a name="v200B20250214"></a>[Release v2.0.0 Beta 20250214 (14 of February 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_JIT/2.0.0-Beta-20250214)
+---
+Snapshot as of 14 of February 2025 for JIT 2.0.0 Beta.
+## Key changes
+- `portCallServiceType` renamed to `portCallServiceTypeCode` (to comply with DCSA API Design principles)
+- clarified condition for `carrierCode` in `moves` object in the descriptions to remove ambiguity.
+
+## Minor changes
+- descriptions updated to make it clear if there is a **Condition** or a **Recommendation**
+  - `portCallPhaseTypeCode` and `facilityTypeCode` values only have Recommendations (and not Conditions)
+- description for the `portCallServiceLocation` on the **Timestamp** object has been updated (was previously shared with the `portCallServiceLocation` of the **PortCallService** object)
+- it is now more clear that at least one of: `vesselIMONumber` and `MMSINumber` must be provided. It is also acceptable to provide both properties.
+- punctuation and formatting improved
+
+Link to [commits included in this Snapshot](https://github.com/dcsaorg/DCSA-OpenAPI/commits/master/jit/v2/JIT_v2.0.0.yaml?since=2025-02-01&until=2025-02-14)
+
 <a name="v200A20250131"></a>[Release v2.0.0 Alpha 20250131 (31 of January 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_JIT/2.0.0-Alpha-20250131)
 ---
 Snapshot as of 31 of January 2025 for JIT 2.0.0 Alpha.
@@ -15,7 +31,7 @@ Snapshot as of 31 of January 2025 for JIT 2.0.0 Alpha.
 
 ## Minor changes
 - remove ISO 8601 reference from `dateTime` property in Timestamp
-- minor adjustments to indentions
+- minor adjustments to indentations
 - typo fixed
 
 Link to [commits included in this Snapshot](https://github.com/dcsaorg/DCSA-OpenAPI/commits/master/jit/v2/JIT_v2.0.0.yaml?since=2025-01-21&until=2025-01-31)

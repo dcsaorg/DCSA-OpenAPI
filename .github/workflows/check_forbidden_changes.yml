@@ -1,0 +1,81 @@
+name: Check Forbidden Changes
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [master]
+
+jobs:
+  check_changes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Load forbidden paths
+        id: forbidden_paths
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            try {
+              const forbiddenPaths = fs.readFileSync('.github/forbidden_changes.txt', 'utf8').split('\n').filter(path => path.trim() !== ''); // Read and filter empty lines
+              console.log("Found valid lines (files): " + forbiddenPaths.length);
+              return forbiddenPaths;
+            } catch (error) {
+              core.setFailed('Could not read forbidden paths file: ' + error.message);
+              return [];
+            }
+
+      - name: Get changed files
+        id: changed_files
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { owner, repo } = context.repo;
+            const pull_number = context.issue.number; // For PRs
+            
+            const response = await github.rest.pulls.listFiles({
+              owner,
+              repo,
+              pull_number,
+              per_page: 100
+            });
+            
+            const changedFiles = response.data.map(file => file.filename).filter(file => !file.endsWith('.md'));
+            core.setOutput('changed_files', changedFiles.join(',')); // Set the output
+            // console.log('Changed files:', changedFiles);
+
+      - name: Check for forbidden changes
+        id: check_changes
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const forbiddenPaths = ${{ steps.forbidden_paths.outputs.result }};
+            const changedFilesString = '${{ steps.changed_files.outputs.changed_files }}';
+            const changedFiles = changedFilesString.split(',');
+
+            let violations = [];
+
+            changedFiles.forEach(file => {
+              forbiddenPaths.forEach(forbiddenPath => {
+                // console.log("Processing file: " + file + " with forbidden path: " + forbiddenPath);
+                const regex = new RegExp(forbiddenPath); // Use regex for matching
+                if (regex.test(file)) {
+                  violations.push(file);
+                }
+              });
+            });
+
+            if (violations.length > 0) {
+              core.setFailed(`You are not allowed to change the following file(s): ${violations.join(', ')}`);
+              // Create a comment on the PR
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `**Error**: The following file(s) are not allowed to be changed: ${violations.join(', ')}`
+              });
+            }
