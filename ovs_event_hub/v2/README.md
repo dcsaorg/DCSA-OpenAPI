@@ -4,7 +4,7 @@ The DCSA Interface Standard for Operational Vessel Schedule Event Hub is documen
 
 The purpose of an Event Hub is to send events and manage subscriptions. In case of the Operational Vessel Schedule Hub, this hub manages both **TransportEvents and OperationalEvents**. It is only possible to receive **TransportEvents and OperationalEvents** and subscribe to **TransportEvents and OperationalEvents** when implementing this hub.
 
-### Releasenotes
+### Release notes
 
 ### [v2.0.0 - 1 September 2021](https://app.swaggerhub.com/apis-docs/dcsaorg/OVS_EVENT_HUB/2.0.0)
 Initial release of the DCSA OpenAPI definitions for Operational Vessel Schedules Event Hub
