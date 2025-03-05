@@ -38,7 +38,7 @@ info:
 
     Also in scope:
     - Moves forecast
-    - cancel (by provider) or decline (by consumer) of a Port Call Service
+    - cancel (by **Service Provider**) or decline (by **Service Consumer**) of a **Port Call Service**
     - omission of **Port Call** or **Terminal Call**
 
     ## How to create a Port Call Service
@@ -55,7 +55,7 @@ info:
     
             PUT /port-call-services/{portCallServiceID}
 
-    It is the responsibility of the Provider of the initial **Port Call Service** to create a:
+    It is the responsibility of the **Service Provider** of the initial **Port Call Service** to create a:
     - `portCallID` to identify all communication regarding the **Port Call**
     - `terminalCallID` to identify each **Terminal Call** inside the same `portCallID`. One **Port Call** can contain many **Terminal Calls**
     - `portCallServiceID` to identify each **Port Call Service** inside the same `terminalCallID`. One **Terminal Call** can contain many **Port Call Services**
@@ -75,15 +75,15 @@ info:
     email: info@dcsa.org
 security: []
 tags:
-  - name: Port Call Service - Consumer
+  - name: Port Call Service - Service Consumer
     description: |
-      **Consumer** implemented endPoints
-  - name: Port Call Service - Provider
+      **Service Consumer** implemented endPoints
+  - name: Port Call Service - Service Provider
     description: |
-      **Provider** implemented endPoints
+      **Service Provider** implemented endPoints
   - name: Port Call Service
     description: |
-      **Provider** and **Consumer** implemented endPoints
+      **Service Provider** and **Service Consumer** implemented endPoints
 paths:
   '/port-calls/{portCallID}':
     put:
@@ -91,7 +91,7 @@ paths:
         - $ref: '#/components/parameters/portCallIDPathParam'
         - $ref: '#/components/parameters/Api-Version-Major'
       tags:
-        - Port Call Service - Consumer
+        - Port Call Service - Service Consumer
       operationId: put-port-call
       summary: Initiates a new or updates a Port Call
       description: |
@@ -108,7 +108,8 @@ paths:
 
         It is not possible to update a **Port Call** that has been `OMITTED`.
       requestBody:
-        description: Initiates a new or updates a Port Call
+        description: |
+          Initiates a new or updates a **Port Call**
         required: true
         content:
           application/json:
@@ -119,7 +120,7 @@ paths:
                 summary: |
                   Create a new Port Call to be used for an ETA
                 description: |
-                  A new **Port Call** for **Port of Amsterdam** for the **YM WHOLESOME**. After this call is accepted by consumer - a **Terminal Call** can be created. In this example no `portVisitReference` has yet been assigned to the **Port Call**.
+                  A new **Port Call** for **Port of Amsterdam** for the **YM WHOLESOME**. After this call is accepted by **Service Consumer** - a **Terminal Call** can be created. In this example no `portVisitReference` has yet been assigned to the **Port Call**.
                 value:
                   portCallID: '0342254a-5927-4856-b9c9-aa12e7c00563'
                   UNLocationCode: 'NLAMS'
@@ -133,9 +134,9 @@ paths:
                     typeCode: 'CONT'
               sendFYI:
                 summary: |
-                  Send a FYI to a consumer
+                  Send a FYI to a Service Consumer
                 description: |
-                  A **Port Call** has already been created - now send the **Port Call** as a FYI to a (secondary) consumer. In this example all properties are the same as the previous example, except for `isFYI`.
+                  A **Port Call** has already been created - now send the **Port Call** as a FYI to a (secondary) **Service Consumer**. In this example all properties are the same as the previous example, except for `isFYI`.
                 value:
                   portCallID: '0342254a-5927-4856-b9c9-aa12e7c00563'
                   UNLocationCode: 'NLAMS'
@@ -151,7 +152,7 @@ paths:
       responses:
         '204':
           description: |
-            A new or updated Port Call successfully accepted by the consumer.
+            A new or updated **Port Call** successfully accepted by the **Service Consumer**.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -286,21 +287,21 @@ paths:
         - $ref: '#/components/parameters/portCallIDPathParam'
         - $ref: '#/components/parameters/Api-Version-Major'
       tags:
-        - Port Call Service - Consumer
+        - Port Call Service - Service Consumer
       operationId: omit-port-call
       summary: Omits a Port Call
       description: |
-        Allows the provider to `OMIT` a **Port Call**, signaling that the **Port Call** is no longer going to happen.
+        Allows the **Service Provider** to `OMIT` a **Port Call**, signaling that the **Port Call** is no longer going to happen.
 
-        When a consumer receives an `OMIT`, it is their responsibility to propagate this information to any secondary receivers, they previously informed using the `isFYI=true` property, while creating **Port Calls** or sending related updates.
+        When a **Service Consumer** receives an `OMIT`, it is their responsibility to propagate this information to any secondary receivers, they previously informed using the `isFYI=true` property, while creating **Port Calls** or sending related updates.
 
-        The provider is responsible for:
+        The **Service Provider** is responsible for:
           - sending an `OMIT` to all **Terminal Calls** linked to the `portCallID` (including secondary receivers)
           - **Cancel** all **Port Call Services** that are associated with the omitted **Terminal Calls** and **Port Call**
 
-        The consumer is responsible for:
+        The **Service Consumer** is responsible for:
           - propagating the `OMIT` to any secondary receivers
-          - **Cancel** any **Port Call Services** linked to the omitted **Terminal Call** initiated by the consumer
+          - **Cancel** any **Port Call Services** linked to the omitted **Terminal Call** initiated by the **Service Consumer**
 
         Once a **Port Call** has been `OMITTED`, this action **CANNOT** be undone. In case the `OMIT` has to be "undone" a new **Port Call** must be created with new **Terminal Calls** and new **Port Call Services**.
       requestBody:
@@ -480,15 +481,15 @@ paths:
 
         The result set of this endPoint will always include **Port Calls** that have **not yet been completed**. Definition of a completed **Port Call** is:
         ````
-        A Port Call:
-        - that has a Terminal Call, and
-        - that has a Port Call Service with: `portCallServiceTypeCode=BERTH` AND `portCallServiceEventTypeCode=DEPA`, and
-        - that has a Timestamp with: `classifierCode=PLN` AND `dateTime < {now}`
+        A **Port Call**:
+        - that has a **Terminal Call**, and
+        - that has a **Port Call Service** with: `portCallServiceTypeCode=BERTH` AND `portCallServiceEventTypeCode=DEPA`, and
+        - that has a **Timestamp** with: `classifierCode=PLN` AND `dateTime < {now}`
         ````
         This can potentially result in empty result sets. **Example:** filtering by `portCallID` that has been completed.
 
         Here are some example queries:
-          * To get a specific **Port Call** use the `portCallID` filter with the ID of the **Port Call** to filter by. This results in at most a single object. The response will return an empty array if no **Port Call** known by the consumer having the provided `portCallID`.
+          * To get a specific **Port Call** use the `portCallID` filter with the ID of the **Port Call** to filter by. This results in at most a single object. The response will return an empty array if no **Port Call** known by the **Service Consumer** having the provided `portCallID`.
           * To get a list of not completed **Port Calls** for a specific **VesselIMONumber**, use the `vesselIMONumber` filter with the `vesselIMONumber` of the **Vessel** to filter by. This will result in a list of potentially many **Port Calls** all of which will be visited by the **Vessel** with the `vesselIMONumber` specified.
           * To get a list of  not completed **Port Calls** for a specific **UN Location Code**, use the `UNLocationCode` filter with the `UNLocationCode` of the location to filter by. This will result in a list of potentially many **Port Calls** all of which will be located in the `UNLocationCode` specified.
 
@@ -496,7 +497,7 @@ paths:
       responses:
         '200':
           description: |
-            Retrieve a list of Port Calls
+            Retrieve a list of **Port Calls** that match the specified filter criteria.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -513,7 +514,7 @@ paths:
 
                         GET /port-calls?UNLocationCode=NLAMS
 
-                    **Note:** This will only return **Port Calls** that have not been completed. See endPoint description for a definition of "Completed Port Call".
+                    **Note:** This will only return **Port Calls** that have not been completed. See endPoint description for a definition of "Completed **Port Call**".
                   value:
                     - portCallID: '0342254a-5927-4856-b9c9-aa12e7c00563'
                       UNLocationCode: 'NLAMS'
@@ -553,7 +554,7 @@ paths:
 
                         GET /port-calls?vesselIMONumber=9929429
 
-                    **Note:** This will only return **Port Calls** that have not been completed. See endPoint description for a definition of "Completed Port Call".
+                    **Note:** This will only return **Port Calls** that have not been completed. See endPoint description for a definition of "Completed **Port Call**".
                   value:
                     - portCallID: 'ba78faa2-f50d-49b1-abdf-cecfe4a817da'
                       UNLocationCode: 'NLAMS'
@@ -655,7 +656,7 @@ paths:
         - $ref: '#/components/parameters/terminalCallIDPathParam'
         - $ref: '#/components/parameters/Api-Version-Major'
       tags:
-        - Port Call Service - Consumer
+        - Port Call Service - Service Consumer
       operationId: put-terminal-call
       summary: Initiates a new or updates a Terminal Call
       description: |
@@ -673,7 +674,8 @@ paths:
 
         It is not possible to update a **Terminal Call** that has been `OMITTED`.
       requestBody:
-        description: Initiates a new or updates a Terminal Call.
+        description: |
+          Initiates a new or updates a **Terminal Call**.
         required: true
         content:
           application/json:
@@ -684,7 +686,7 @@ paths:
                 summary: |
                   Create a new Terminal Call to be used for an ETA
                 description: |
-                  A new **Terminal Call** linked to a previously created **Port Call** (in this example with `portCallID=0342254a-5927-4856-b9c9-aa12e7c00563`). After this call is accepted by consumer - a **Port Call Service** can be created. In this example no `terminalCallReference` has yet been assigned to the **Terminal Call**.
+                  A new **Terminal Call** linked to a previously created **Port Call** (in this example with `portCallID=0342254a-5927-4856-b9c9-aa12e7c00563`). After this call is accepted by **Service Consumer** - a **Port Call Service** can be created. In this example no `terminalCallReference` has yet been assigned to the **Terminal Call**.
                 value:
                   terminalCallID: '0342254a-5927-4856-b9c9-aa12e7c00563'
                   portCallID: '0342254a-5927-4856-b9c9-aa12e7c00563'
@@ -699,9 +701,9 @@ paths:
                   isFYI: false
               sendFYI:
                 summary: |
-                  Send a FYI to a (secondary) consumer
+                  Send a FYI to a (secondary) Service Consumer
                 description: |
-                  A **Terminal Call** has already been created - now send the **Terminal Call** as a FYI to a (secondary) consumer. In this example all properties are the same as the previous example, except for `isFYI`.
+                  A **Terminal Call** has already been created - now send the **Terminal Call** as a FYI to a (secondary) **Service Consumer**. In this example all properties are the same as the previous example, except for `isFYI`.
                 value:
                   terminalCallID: '0342254a-5927-4856-b9c9-aa12e7c00563'
                   portCallID: '0342254a-5927-4856-b9c9-aa12e7c00563'
@@ -717,7 +719,7 @@ paths:
       responses:
         '204':
           description: |
-            A new or updated Terminal Call successfully accepted by consumer.
+            A new or updated **Terminal Call** successfully accepted by **Service Consumer**.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -882,20 +884,20 @@ paths:
         - $ref: '#/components/parameters/terminalCallIDPathParam'
         - $ref: '#/components/parameters/Api-Version-Major'
       tags:
-        - Port Call Service - Consumer
+        - Port Call Service - Service Consumer
       operationId: omit-terminal-call
       summary: Omits a Terminal Call
       description: |
-        Allows the provider to `OMIT` a **Terminal Call**, signaling that the **Terminal Call** is no longer going to happen.
+        Allows the **Service Provider** to `OMIT` a **Terminal Call**, signaling that the **Terminal Call** is no longer going to happen.
 
-        When a consumer receives an `OMIT`, it is their responsibility to propagate this information to any secondary receivers, they previously informed using the `isFYI=true` property, while creating **Terminal Calls** or sending related updates. It is also the responsibility of the consumer to **Cancel** any Port Call Services initiated, associated to the **Terminal Call** that is now omitted.
+        When a **Service Consumer** receives an `OMIT`, it is their responsibility to propagate this information to any secondary receivers, they previously informed using the `isFYI=true` property, while creating **Terminal Calls** or sending related updates. It is also the responsibility of the **Service Consumer** to **Cancel** any **Port Call Services** initiated, associated to the **Terminal Call** that is now omitted.
 
-        The provider is responsible for:
+        The **Service Provider** is responsible for:
           - **Cancel** all **Port Call Services** that are associated with the omitted **Terminal Call** (including secondary receivers)
 
-        The consumer is responsible for:
+        The **Service Consumer** is responsible for:
           - propagating the `OMIT` to any secondary receivers
-          - **Cancel** any **Port Call Services** linked to the omitted **Terminal Call** initiated by the consumer
+          - **Cancel** any **Port Call Services** linked to the omitted **Terminal Call** initiated by the **Service Consumer**
 
         Once a **Terminal Call** has been `OMITTED`, this action **CANNOT** be undone. In case the `OMIT` has to be "undone" a new **Terminal Call** must be created with new **Port Call Services**.
       requestBody:
@@ -1091,15 +1093,15 @@ paths:
 
         The result set of this endPoint will always include **Terminal Calls** that are linked to **Port Calls** that have **not yet been completed**. Definition of a completed **Port Call** is:
         ````
-        A Port Call:
-        - that has a Terminal Call
-        - that has a Port Call Service with: `portCallServiceTypeCode=BERTH` AND `portCallServiceEventTypeCode=DEPA`
-        - that has a Timestamp with: `classifierCode=PLN` AND `dateTime < {now}`
+        A **Port Call**:
+        - that has a **Terminal Call**
+        - that has a **Port Call Service** with: `portCallServiceTypeCode=BERTH` AND `portCallServiceEventTypeCode=DEPA`
+        - that has a **Timestamp** with: `classifierCode=PLN` AND `dateTime < {now}`
         ````
         This can potentially result in empty result sets. **Example:** filtering by `terminalCallID` included in a **Port Call** that has been completed.
 
         Here are some example queries:
-          * To get a specific **Terminal Call** use the `terminalCallID` filter with the ID of the **Terminal Call** to filter by. This results in at most a single object. The response will return an empty array if no **Terminal Call** known by the consumer is linked to the provided `terminalCallID`.
+          * To get a specific **Terminal Call** use the `terminalCallID` filter with the ID of the **Terminal Call** to filter by. This results in at most a single object. The response will return an empty array if no **Terminal Call** known by the **Service Consumer** is linked to the provided `terminalCallID`.
           * To get a list of **Terminal Calls** for a specific Service use the `carrierServiceCode` (or alternatively `carrierServiceName` or `universalServiceReference`) filter with the `carrierServiceCode` of the Service to filter by. This will result in a list of potentially many **Terminal Calls** all of which will be visited by the Vessel with the `vesselIMONumber` specified.
             * If the result set is too large - it is possible to further narrow it down by **also** filtering by a voyage number (`carrierImportVoyageNumber`, `carrierExportVoyageNumber`, `universalImportVoyageReference`, or `universalExportVoyageReference`).
 
@@ -1219,7 +1221,7 @@ paths:
         - $ref: '#/components/parameters/portCallServiceIDPathParam'
         - $ref: '#/components/parameters/Api-Version-Major'
       tags:
-        - Port Call Service - Consumer
+        - Port Call Service - Service Consumer
       operationId: put-port-call-service
       summary: Initiates a new or updates a Port Call Service
       description: |
@@ -1244,7 +1246,7 @@ paths:
       responses:
         '204':
           description: |
-            A new Port Call Service accepted
+            A new **Port Call** Service accepted
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -1408,17 +1410,17 @@ paths:
       parameters:
         - $ref: '#/components/parameters/portCallServiceIDPathParam'
       tags:
-        - Port Call Service - Consumer
+        - Port Call Service - Service Consumer
       operationId: cancel-port-call-service
       summary: Cancel a Port Call Service
       description: |
-        Provider canceling a **Port Call Service**.
+        **Service Provider** canceling a **Port Call Service**.
 
-        Allows the provider to `CANCEL` a **Port Call Service**, signaling that the **Port Call Service** is no longer going to happen.
+        Allows the **Service Provider** to `CANCEL` a **Port Call Service**, signaling that the **Port Call Service** is no longer going to happen.
 
-        When a consumer receives a `CANCEL`, it is their responsibility to propagate this information to any secondary receivers, they previously informed using the `isFYI=true` property, while creating **Port Call Service** or sending related updates.
+        When a **Service Consumer** receives a `CANCEL`, it is their responsibility to propagate this information to any secondary receivers, they previously informed using the `isFYI=true` property, while creating **Port Call Service** or sending related updates.
 
-        The consumer is responsible for:
+        The **Service Consumer** is responsible for:
           - propagating the `CANCEL` to any secondary receivers
 
         Once a **Port Call Service** has been `CANCELLED`, this action **CANNOT** be undone. In case the `CANCEL` has to be "undone" a new **Port Call Service** must be created.
@@ -1582,15 +1584,15 @@ paths:
 
         The result set of this endPoint will always include **Port Call Services** that are linked to **Port Calls** that have **not yet been completed**. Definition of a completed **Port Call** is:
         ````
-        A Port Call:
-        - that has a Terminal Call
-        - that has a Port Call Service with: `portCallServiceTypeCode=BERTH` AND `portCallServiceEventTypeCode=DEPA`
-        - that has a Timestamp with: `classifierCode=PLN` AND `dateTime < {now}`
+        A **Port Call**:
+        - that has a **Terminal Call**
+        - that has a **Port Call Service** with: `portCallServiceTypeCode=BERTH` AND `portCallServiceEventTypeCode=DEPA`
+        - that has a **Timestamp** with: `classifierCode=PLN` AND `dateTime < {now}`
         ````
         This can potentially result in empty result sets. **Example:** filtering by `portCallServiceID` included in a **Port Call** that has been completed.
 
         Here are some example queries:
-          * To get a specific **Port Call Service** use the `portCallServiceID` filter with the ID of the **Port Call Service** to filter by. This results in at most a single object. The response will return an empty array if no **Port Call Service** known by the consumer is linked to the provided `portCallServiceID`.
+          * To get a specific **Port Call Service** use the `portCallServiceID` filter with the ID of the **Port Call Service** to filter by. This results in at most a single object. The response will return an empty array if no **Port Call Service** known by the **Service Consumer** is linked to the provided `portCallServiceID`.
           * To get a list of **Port Call Services** for a specific **Terminal Call** use the `terminalCallID` filter with the `terminalCallID` of the **Terminal Call** to filter by. This will result in a list of potentially many **Port Call Services** all of which will be linked to the **Terminal Call** specified.
 
         **Note:** Beware it is possible to specify filters that exclude all results. Example: if filtering by `portCallServiceID` and a `portCallServiceTypeCode` that does **not** belong to the same `portCallServiceID` - the result set will be an empty list. No error will be reported.
@@ -1746,7 +1748,8 @@ paths:
 
         This call is used to provide a **Timestamp** in an `ERP-A` negotiation (or just an `A` for non-negotiations) for a **Port Call Service**.
       requestBody:
-        description: Any `ERP-A` timestamp
+        description: |
+          Any `ERP-A` **Timestamp**
         required: true
         content:
           application/json:
@@ -1755,7 +1758,7 @@ paths:
       responses:
         '204':
           description: |
-            Timestamp for a **Port Call Service** accepted
+            **Timestamp** for a **Port Call Service** accepted
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -1792,7 +1795,7 @@ paths:
                         errorCodeMessage: 'classifierCode must be provided as part of a Timestamp'
         '404':
           description: |
-            In case the implementer does not know of the `portCallServiceID` used in the request, it is possible for the implementer to reject the request by returning a `404` (Not Found). This could be because of a `PUT` request, for creating/initiating the Port Call Service, that has not finished processing or simply because the resource does not exist.
+            In case the implementer does not know of the `portCallServiceID` used in the request, it is possible for the implementer to reject the request by returning a `404` (Not Found). This could be because of a `PUT` request, for creating/initiating the **Port Call Service**, that has not finished processing or simply because the resource does not exist.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -1935,15 +1938,15 @@ paths:
 
         The result set of this endPoint will always include **Timestamps** that are linked to **Port Calls** that have **not yet been completed**. Definition of a completed **Port Call** is:
         ````
-        A Port Call:
-        - that has a Terminal Call
-        - that has a Port Call Service with: `portCallServiceTypeCode=BERTH` AND `portCallServiceEventTypeCode=DEPA`
-        - that has a Timestamp with: `classifierCode=PLN` AND `dateTime < {now}`
+        A **Port Call**:
+        - that has a **Terminal Call**
+        - that has a **Port Call Service** with: `portCallServiceTypeCode=BERTH` AND `portCallServiceEventTypeCode=DEPA`
+        - that has a **Timestamp** with: `classifierCode=PLN` AND `dateTime < {now}`
         ````
         This can potentially result in empty result sets. **Example:** filtering by `timestampID` included in a **Port Call** that has been completed.
 
         Here are some example queries:
-          * To get a specific **Timestamp** use the `timestampID` filter with the ID of the **Timestamp** to filter by. This results in at most a single object. The response will return an empty array if no **Timestamp** known by the consumer is linked to the provided `timestampID`.
+          * To get a specific **Timestamp** use the `timestampID` filter with the ID of the **Timestamp** to filter by. This results in at most a single object. The response will return an empty array if no **Timestamp** known by the **Service Consumer** is linked to the provided `timestampID`.
           * To get a list of **Timestamps** for a specific **Port Call Service** use the `portCallServiceID` filter with the `portCallServiceID` of the **Port Call Service** to filter by. This will result in a list of potentially many **Timestamps** all of which will be linked to the **Port Call Service** specified.
 
         **Note:** Beware it is possible to specify filters that exclude all results. Example: if filtering by `timestampID` and a `classifierCode` that does **not** belong to the same `timestampID` - the result set will be an empty list. No error will be reported.
@@ -2053,7 +2056,7 @@ paths:
         - $ref: '#/components/parameters/portCallServiceIDPathParam'
         - $ref: '#/components/parameters/Api-Version-Major'
       tags:
-        - Port Call Service - Consumer
+        - Port Call Service - Service Consumer
       operationId: put-vessel-status
       summary: Send Vessel Status for a Port Call Service
       description: |
@@ -2113,7 +2116,7 @@ paths:
                         errorCodeMessage: 'portCallServiceID must be provided as part of a Vessel Status'
         '404':
           description: |
-            In case the implementer does not know of the `portCallServiceID` used in the request, it is possible for the implementer to reject the request by returning a `404` (Not Found). This could be because of a `PUT` request, for creating/initiating the Port Call Service, that has not finished processing or simply because the resource does not exist.
+            In case the implementer does not know of the `portCallServiceID` used in the request, it is possible for the implementer to reject the request by returning a `404` (Not Found). This could be because of a `PUT` request, for creating/initiating the **Port Call Service**, that has not finished processing or simply because the resource does not exist.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -2249,10 +2252,10 @@ paths:
 
         The result set of this endPoint will always include **Vessel Statuses** that are linked to **Port Calls** that have **not yet been completed**. Definition of a completed **Port Call** is:
         ````
-        A Port Call:
-        - that has a Terminal Call
-        - that has a Port Call Service with: `portCallServiceTypeCode=BERTH` AND `portCallServiceEventTypeCode=DEPA`
-        - that has a Timestamp with: `classifierCode=PLN` AND `dateTime < {now}`
+        A **Port Call**:
+        - that has a **Terminal Call**
+        - that has a **Port Call Service** with: `portCallServiceTypeCode=BERTH` AND `portCallServiceEventTypeCode=DEPA`
+        - that has a **Timestamp** with: `classifierCode=PLN` AND `dateTime < {now}`
         ````
         This can potentially result in empty result sets. **Example:** filtering by `portCallServiceID` included in a **Port Call** that has been completed.
 
@@ -2376,22 +2379,23 @@ paths:
         - $ref: '#/components/parameters/portCallServiceIDPathParam'
         - $ref: '#/components/parameters/Api-Version-Major'
       tags:
-        - Port Call Service - Provider
+        - Port Call Service - Service Provider
       operationId: decline-port-call-service
       summary: Decline a Port Call service
       description: |
-        Consumer declining a **Port Call Service**.
+        **Service Consumer** declining a **Port Call Service**.
 
-        Allows the consumer to `DECLINE` a **Port Call Service**, signaling that the **Port Call Service** is no longer going to happen.
+        Allows the **Service Consumer** to `DECLINE` a **Port Call Service**, signaling that the **Port Call Service** is no longer going to happen.
 
-        When a provider receives a `DECLINE`, it is their responsibility to propagate this information to any secondary receivers, they previously informed using the `isFYI=true` property, while creating **Port Call Service** or sending related updates.
+        When a **Service Provider** receives a `DECLINE`, it is their responsibility to propagate this information to any secondary receivers, they previously informed using the `isFYI=true` property, while creating **Port Call Service** or sending related updates.
 
-        The provider is responsible for:
+        The **Service Provider** is responsible for:
           - propagating the `DECLINE` to any secondary receivers
 
-        Once a **Port Call Service** has been `DECLINED`, this action **CANNOT** be undone. In case the `DECLINE` has to be "undone" a **provider** must create a new **Port Call Service**.
+        Once a **Port Call Service** has been `DECLINED`, this action **CANNOT** be undone. In case the `DECLINE` has to be "undone" a **Service Provider** must create a new **Port Call Service**.
       requestBody:
-        description: Consumer declining a **Port Call service**
+        description: |
+          **Service Consumer** declining a **Port Call service**
         required: true
         content:
           application/json:
@@ -2777,7 +2781,7 @@ components:
       in: path
       name: portCallServiceID
       description: |
-        The provider created identifier for the **Port Call Service**.
+        The **Service Provider** created identifier for the **Port Call Service**.
       schema:
         type: string
         format: uuid
@@ -2787,7 +2791,7 @@ components:
       in: path
       name: portCallID
       description: |
-        The provider created identifier for the **Port Call**.
+        The **Service Provider** created identifier for the **Port Call**.
       schema:
         type: string
         format: uuid
@@ -2797,7 +2801,7 @@ components:
       in: path
       name: terminalCallID
       description: |
-        The provider created identifier for the **Terminal Call**.
+        The **Service Provider** created identifier for the **Terminal Call**.
       schema:
         type: string
         format: uuid
@@ -2807,7 +2811,7 @@ components:
       in: path
       name: timestampID
       description: |
-        The provider or consumer created identifier for the **Timestamp**.
+        The Service **Service Provider** or **Service Consumer** created identifier for the **Timestamp**.
       schema:
         type: string
         format: uuid
@@ -2834,7 +2838,7 @@ components:
           type: string
           format: uuid
           description: |
-            Universal unique identifier for the **Port call**. The `portCallID` is created by the provider. The `portCallID` **MUST** only be created once per **Port Call**. To be used in all communication regarding the **Port Call**.
+            Universal unique identifier for the **Port call**. The `portCallID` is created by the **Service Provider**. The `portCallID` **MUST** only be created once per **Port Call**. To be used in all communication regarding the **Port Call**.
           example: 0342254a-5927-4856-b9c9-aa12e7c00563
         portVisitReference:
           type: string
@@ -2896,13 +2900,13 @@ components:
           type: string
           format: uuid
           description: |
-            Universal unique identifier for the **Terminal Call**. The `terminalCallID` is created by the provider. The `terminalCallID` **MUST** only be created once per **Terminal Call**. To be used in all communication regarding the **Terminal Call**.
+            Universal unique identifier for the **Terminal Call**. The `terminalCallID` is created by the **Service Provider**. The `terminalCallID` **MUST** only be created once per **Terminal Call**. To be used in all communication regarding the **Terminal Call**.
           example: 0342254a-5927-4856-b9c9-aa12e7c00563
         portCallID:
           type: string
           format: uuid
           description: |
-            Universal unique identifier for the **Port call**. The `portCallID` is created by the provider. The `portCallID` **MUST** only be created once per **Port Call**. To be used in all communication regarding the **Port Call**.
+            Universal unique identifier for the **Port call**. The `portCallID` is created by the **Service Provider**. The `portCallID` **MUST** only be created once per **Port Call**. To be used in all communication regarding the **Port Call**.
           example: 0342254a-5927-4856-b9c9-aa12e7c00563
         terminalCallReference:
           type: string
@@ -3018,13 +3022,13 @@ components:
           type: string
           format: uuid
           description: |
-            Universal unique identifier for the **Terminal Call**. The `terminalCallID` is created by the provider. The `terminalCallID` **MUST** only be created once per **Terminal Call**. To be used in all communication regarding the **Terminal Call**.
+            Universal unique identifier for the **Terminal Call**. The `terminalCallID` is created by the **Service Provider**. The `terminalCallID` **MUST** only be created once per **Terminal Call**. To be used in all communication regarding the **Terminal Call**.
           example: 0342254a-5927-4856-b9c9-aa12e7c00563
         portCallServiceID:
           type: string
           format: uuid
           description: |
-            Universal unique identifier for the **Port Call Service**. The `portCallServiceID` is created by the provider. To be used in all communication regarding the **Port Call Service** (i.e. sending a timestamp with the timestamps endpoint).
+            Universal unique identifier for the **Port Call Service**. The `portCallServiceID` is created by the **Service Provider**. To be used in all communication regarding the **Port Call Service** (i.e. sending a **Timestamp** with the timestamps endpoint).
           example: 0342254a-5927-4856-b9c9-aa12e7c00563
         portCallServiceTypeCode:
           type: string
@@ -3209,14 +3213,14 @@ components:
           readOnly: true
           default: false
           description: |
-            The **Port Call Service** has been `cancelled` by the Provider.
+            The **Port Call Service** has been `cancelled` by the **Service Provider**.
           example: false
         declined:
           type: boolean
           readOnly: true
           default: false
           description: |
-            The **Port Call Service** has been `declined` by the Consumer.
+            The **Port Call Service** has been `declined` by the **Service Consumer**.
           example: false
         isFYI:
           type: boolean
@@ -3268,12 +3272,12 @@ components:
           type: string
           format: uuid
           description: |
-            Links the timestamp to a **Port Call Service**.
+            Links the **Timestamp** to a **Port Call Service**.
           example: 0342254a-5927-4856-b9c9-aa12e7c00563
         classifierCode:
           type: string
           description: |
-            Code for describing the timestamp.
+            Code for describing the **Timestamp**.
 
             Possible values are:
             - `ACT` (Actual)
@@ -3282,8 +3286,8 @@ components:
             - `REQ` (Requested)
 
             **Conditions:**
-            - `EST`, `PLN` and `ACT` can **only** be used by the **provider** when sending a **Timestamp** to the **consumer**.
-            - `REQ` is **only** to be used by the **consumer** when sending a **Timestamp** to the **provider**.
+            - `EST`, `PLN` and `ACT` can **only** be used by the **Service Provider** when sending a **Timestamp** to the **Service Consumer**.
+            - `REQ` is **only** to be used by the **Service Consumer** when sending a **Timestamp** to the **Service Provider**.
             - `ACT` can be used in a **Timestamp** for any **Port Call Service** except `portCallServiceTypeCode='MOVES'`
             - `EST`, `REQ`and `PLN` can be used in a **Timestamp** for any **Port Call Service** with `portCallServiceTypeCode` having one of the following values:
               - `BERTH` (Berth)
@@ -3455,7 +3459,7 @@ components:
           type: string
           format: uuid
           description: |
-            Universal unique identifier for the **Port Call Service**. The `portCallServiceID` is created by the provider. To be used in all communication regarding the **Port Call Service** (i.e. sending a timestamp with the timestamps endpoint).
+            Universal unique identifier for the **Port Call Service**. The `portCallServiceID` is created by the **Service Provider**. To be used in all communication regarding the **Port Call Service** (i.e. sending a **Vessel Status** with the vessel-status endpoint).
           example: 0342254a-5927-4856-b9c9-aa12e7c00563
         draft:
           type: number
@@ -3621,7 +3625,7 @@ components:
 
         **Conditions:**
         - It is expected that if a location is specified in multiple ways (e.g. both as a `facility` and as a `geoCoordinate`) that both ways point to the same location.
-        - this property is **only** to be used in combination with `classifierCode=REQ` (a requested **Timestamp**) and can only be used by a **consumer**
+        - this property is **only** to be used in combination with `classifierCode=REQ` (a requested **Timestamp**) and can only be used by a **Service Consumer**
       example:
         locationName: CMP Container Terminal Copenhagen
         UNLocationCode: DKCPH
@@ -3679,7 +3683,7 @@ components:
         facilityCodeListProvider:
           type: string
           description: |
-            The provider used for identifying the facility Code. Some facility codes are only defined in combination with an **UN Location Code**
+            The **Service Provider** used for identifying the facility Code. Some facility codes are only defined in combination with an **UN Location Code**
             - `BIC` (Requires a UN Location Code)
             - `SMDG` (Requires a UN Location Code)
           enum:
@@ -3727,7 +3731,7 @@ components:
       type: object
       title: Cancel
       description: |
-        Used by provider to cancel a **Port Call Service**.
+        Used by **Service Provider** to cancel a **Port Call Service**.
       properties:
         reason:
           type: string
@@ -3749,7 +3753,7 @@ components:
       type: object
       title: Decline
       description: |
-        Used by consumer to decline a **Port Call Service**.
+        Used by **Service Consumer** to decline a **Port Call Service**.
       properties:
         reason:
           type: string
@@ -3771,7 +3775,7 @@ components:
       type: object
       title: Omit Port Call
       description: |
-        Used by consumer to omit a **Port Call**.
+        Used by **Service Consumer** to omit a **Port Call**.
       properties:
         reason:
           type: string
@@ -3790,7 +3794,7 @@ components:
       type: object
       title: Omit Terminal Call
       description: |
-        Used by consumer to omit a **Terminal Call**.
+        Used by **Service Consumer** to omit a **Terminal Call**.
       properties:
         reason:
           type: string
@@ -3849,7 +3853,7 @@ components:
         carrierCodeListProvider:
           type: string
           description: |
-            Identifies the code list provider used for the `carrierCode`. Possible values are:
+            Identifies the code list **Service Provider** used for the `carrierCode`. Possible values are:
               - `SMDG` (Ship Message Design Group)
               - `NMFTA` (National Motor Freight Traffic Association)
 
