@@ -39,6 +39,17 @@ info:
 
     At various stages during the envelope transfer process, the receiving platform can inform the sending platform whether envelope transfer has been accepted or rejected by sending the final response using the [`EnvelopeTransferFinishedResponse`](#/EnvelopeTransferFinishedResponse) schema object which has been wrapped in JWS-signed response [`EnvelopeTransferFinishedResponseSignedContent`](#/EnvelopeTransferFinishedResponseSignedContent) schema object for non-repudiation purposes. All other response schema types are unsigned, and therefore they can not be used by the sending platform for the non-repudiation purposes.
 
+    <h2>Control tracking registry support</h2>
+
+    The PINT transfers can be guarded by a Control Tracking Registry (`CTR`). The first platform chooses what registry to use, if any, and this registry must be used for all
+    remaining cross platform transfers.
+
+    The Control Tracking Registry is the final arbiter on which platform has control of the eBL at any given moment in time and may allow senders to cancel transfers
+    without waiting for signed response from the receiving platform. Additionally, the receiving platform can accept a transfer in the CTR and then fail to
+    provide the correct PINT level response (such as returning an unsigned error rather than a signed acceptance response). If this happens, then the transfer
+    is still accepted since the acceptance was recorded in the CTR. In all cases, parties should check with the CTR to see whether the transfer occurred. The
+    PINT level information is advisory at best.
+
     ### API Design & Implementation Principles
     This API follows the guidelines defined in version 2.0 of the API Design & Implementation Principles which can be found on the [DCSA Developer Portal](https://developer.dcsa.org/api_design)
 
@@ -806,6 +817,9 @@ components:
             Unless otherwise stated for a given response code, receiving platform will reject the active envelope transfer (if any). Some failures that result in receiving platform rejecting the envelope transfer may be retriable, in which case the sending platform can attempt a new envelope transfer for the same envelope.
 
             The sending platform must not rely on the HTTP response status code alone as it is not covered by the signature. When there is a mismatch between the HTTP response status code and the signed response `EnvelopeTransferFinishedResponseSignedResponse` JWS-signed payload [`EnvelopeTransferFinishedResponse.responseCode`](#/EnvelopeTransferFinishedResponse), [`responseCode`](#/EnvelopeTransferFinishedResponse) decides the outcome.
+
+            Note: When the transfer is guarded by a Control Tracking Registry and the PINT level response conflicts with the Control Tracking Registry state, then the Control Tracking Registry should be trusted. As an example, if the PINT response indicates a transfer failure but the CTR has data suggesting the transfer was accepted,
+            then the sending platform must assume the transfer was successful.
           enum:
             - RECE
             - DUPE
