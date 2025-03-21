@@ -3,7 +3,7 @@ servers:
   - description: SwaggerHub API Auto Mocking
     url: 'https://virtserver.swaggerhub.com/dcsaorg/DCSA_BKG/2.0.0'
 info:
-  version: 2.X
+  version: 2.0.1
   title: DCSA Booking API
   description: |
     <h1>DCSA OpenAPI specification for the Booking process</h1>
@@ -2959,7 +2959,7 @@ components:
           description: |
             The name of a service as specified by the carrier.
 
-            **Condition:** Mandatory if `carrierExportVoyageNumber` is provided and Vessel details or `carrierServiceCode` are blank
+            **Condition:** Mandatory if `carrierExportVoyageNumber` is provided and Vessel details or `carrierServiceCode` are blank. If `routingReference` is provided - this property MUST not be provided.
           example: Great Lion Service
         carrierServiceCode:
           type: string
@@ -2968,7 +2968,7 @@ components:
           description: |
             The carrier specific code of the service for which the schedule details are published.
 
-            **Condition:** Mandatory if `carrierExportVoyageNumber` is provided and Vessel details or `carrierServiceName` are blank
+            **Condition:** Mandatory if `carrierExportVoyageNumber` is provided and Vessel details or `carrierServiceName` are blank. If `routingReference` is provided - this property MUST not be provided.
           example: FE1
         universalServiceReference:
           type: string
@@ -2977,6 +2977,8 @@ components:
           maxLength: 8
           description: |
             A global unique service reference, as per DCSA standard, agreed by VSA partners for the service. The service reference must match the regular expression pattern: `SR\d{5}[A-Z]`. The letters `SR` followed by `5 digits`, followed by a checksum-character as a capital letter from `A to Z`.
+
+            **Condition:** If `routingReference` is provided - this property MUST not be provided.
           example: SR12345A
         carrierExportVoyageNumber:
           type: string
@@ -2986,7 +2988,7 @@ components:
           description: |
             The carrier specific identifier of the export Voyage.
 
-            **Condition:** Mandatory if `expectedDepartureDate` or `expectedArrivalAtPlaceOfDeliveryStartDate` and `expectedArrivalAtPlaceOfDeliveryEndDate` is not provided.
+            **Condition:** Mandatory if `expectedDepartureDate` or `expectedArrivalAtPlaceOfDeliveryStartDate` and `expectedArrivalAtPlaceOfDeliveryEndDate` is not provided. If `routingReference` is provided - this property MUST not be provided.
         universalExportVoyageReference:
           type: string
           pattern: ^\d{2}[0-9A-Z]{2}[NEWSR]$
@@ -2998,7 +3000,31 @@ components:
             - `2 digits` for the year
             - `2 alphanumeric characters` for the sequence number of the voyage
             - `1 character` for the direction/haul (`N`orth, `E`ast, `W`est, `S`outh or `R`oundtrip).
+
+            **Condition:** If `routingReference` is provided - this property MUST not be provided.
           example: 2103N
+        routingReference:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 5000
+          description: |
+            A reference to a predefined `route` specified in **Commercial Schedules - Point to point**. When specifying this property - it is not needed to specify the following properties:
+              - `vessel` which includes:
+                - `vesselName`
+                - `vesselIMONumber`
+              - `carrierServiceName`
+              - `carrierServiceCode`
+              - `universalServiceReference`
+              - `carrierExportVoyageNumber`
+              - `universalExportVoyageReference`
+              - `expectedDepartureDate`
+              - `expectedArrivalAtPlaceOfDeliveryStartDate` or `expectedArrivalAtPlaceOfDeliveryEndDate`
+              - the following `locationTypeCode` in `shipmentLocations`:
+                - `PRE` (Place of Receipt)
+                - `POL` (Port of Loading)
+                - `POD` (Port of Discharge)
+                - `PDE` (Place of Delivery)
+          example: Route123
         declaredValue:
           type: number
           format: float
@@ -3060,7 +3086,7 @@ components:
           description: |
             The date when the shipment is expected to be loaded on board a vessel as provided by the shipper or its agent.
             
-            **Condition:** Mandatory if vessel/voyage/service details or `expectedArrivalAtPlaceOfDeliveryDate` is not provided.
+            **Condition:** Mandatory if vessel/voyage/service details or `expectedArrivalAtPlaceOfDeliveryDate` is not provided. If `routingReference` is provided - this property MUST not be provided.
           example: '2021-05-17'
         expectedArrivalAtPlaceOfDeliveryStartDate:
           type: string
@@ -3068,7 +3094,7 @@ components:
           description: |
             The start date (provided as a range together with `expectedArrivalAtPlaceOfDeliveryEndDate`) for when the shipment is expected to arrive at `Place Of Delivery`.
             
-            **Condition:** Mandatory if vessel/voyage/service details or `expectedDepartureDate` is not provided.
+            **Condition:** Mandatory if vessel/voyage/service details or `expectedDepartureDate` is not provided. If `routingReference` is provided - this property MUST not be provided.
           example: '2021-05-17'
         expectedArrivalAtPlaceOfDeliveryEndDate:
           type: string
@@ -3076,7 +3102,7 @@ components:
           description: |
             The end date (provided as a range together with `expectedArrivalAtPlaceOfDeliveryStartDate`) for when the shipment is expected to arrive at `Place Of Delivery`.
             
-            **Condition:** Mandatory if vessel/voyage/service details or `expectedDepartureDate` is not provided.
+            **Condition:** Mandatory if vessel/voyage/service details or `expectedDepartureDate` is not provided. If `routingReference` is provided - this property MUST not be provided.
           example: '2021-05-19'
         transportDocumentTypeCode:
           type: string
@@ -3263,7 +3289,7 @@ components:
           description: |
             The name of a service as specified by the carrier.
 
-            **Condition:** Mandatory if `carrierExportVoyageNumber` is provided and Vessel details or `carrierServiceCode` are blank
+            **Condition:** Mandatory if `carrierExportVoyageNumber` is provided and Vessel details or `carrierServiceCode` are blank. If `routingReference` is provided - this property MUST not be provided.
           example: Great Lion Service
         carrierServiceCode:
           type: string
@@ -3272,7 +3298,7 @@ components:
           description: |
             The carrier specific code of the service for which the schedule details are published.
 
-            **Condition:** Mandatory if `carrierExportVoyageNumber` is provided and Vessel details or `carrierServiceName` are blank
+            **Condition:** Mandatory if `carrierExportVoyageNumber` is provided and Vessel details or `carrierServiceName` are blank. If `routingReference` is provided - this property MUST not be provided.
           example: FE1
         universalServiceReference:
           type: string
@@ -3281,6 +3307,8 @@ components:
           maxLength: 8
           description: |
             A global unique service reference, as per DCSA standard, agreed by VSA partners for the service. The service reference must match the regular expression pattern: `SR\d{5}[A-Z]`. The letters `SR` followed by `5 digits`, followed by a checksum-character as a capital letter from `A to Z`.
+
+            **Condition:** If `routingReference` is provided - this property MUST not be provided.
           example: SR12345A
         carrierExportVoyageNumber:
           type: string
@@ -3290,7 +3318,7 @@ components:
           description: |
             The carrier specific identifier of the export Voyage.
 
-            **Condition:** Mandatory if `expectedDepartureDate` or `expectedArrivalAtPlaceOfDeliveryStartDate` and `expectedArrivalAtPlaceOfDeliveryEndDate` is not provided.
+            **Condition:** Mandatory if `expectedDepartureDate` or `expectedArrivalAtPlaceOfDeliveryStartDate` and `expectedArrivalAtPlaceOfDeliveryEndDate` is not provided. If `routingReference` is provided - this property MUST not be provided.
         universalExportVoyageReference:
           type: string
           pattern: ^\d{2}[0-9A-Z]{2}[NEWSR]$
@@ -3301,7 +3329,31 @@ components:
             - `2 digits` for the year
             - `2 alphanumeric characters` for the sequence number of the voyage
             - `1 character` for the direction/haul (`N`orth, `E`ast, `W`est, `S`outh or `R`oundtrip).
+
+            **Condition:** If `routingReference` is provided - this property MUST not be provided.
           example: 2103N
+        routingReference:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 5000
+          description: |
+            A reference to a predefined `route` specified in **Commercial Schedules - Point to point**. When specifying this property - it is not needed to specify the following properties:
+              - `vessel` which includes:
+                - `vesselName`
+                - `vesselIMONumber`
+              - `carrierServiceName`
+              - `carrierServiceCode`
+              - `universalServiceReference`
+              - `carrierExportVoyageNumber`
+              - `universalExportVoyageReference`
+              - `expectedDepartureDate`
+              - `expectedArrivalAtPlaceOfDeliveryStartDate` or `expectedArrivalAtPlaceOfDeliveryEndDate`
+              - the following `locationTypeCode` in `shipmentLocations`:
+                - `PRE` (Place of Receipt)
+                - `POL` (Port of Loading)
+                - `POD` (Port of Discharge)
+                - `PDE` (Place of Delivery)
+          example: Route123
         declaredValue:
           type: number
           format: float
@@ -3363,7 +3415,7 @@ components:
           description: |
             The date when the shipment is expected to be loaded on board a vessel as provided by the shipper or its agent.
             
-            **Condition:** Mandatory if vessel/voyage/service details or `expectedArrivalAtPlaceOfDeliveryDate` is not provided.
+            **Condition:** Mandatory if vessel/voyage/service details or `expectedArrivalAtPlaceOfDeliveryDate` is not provided. If `routingReference` is provided - this property MUST not be provided.
           example: '2021-05-17'
         expectedArrivalAtPlaceOfDeliveryStartDate:
           type: string
@@ -3371,7 +3423,7 @@ components:
           description: |
             The start date (provided as a range together with `expectedArrivalAtPlaceOfDeliveryEndDate`) for when the shipment is expected to arrive at `Place Of Delivery`.
             
-            **Condition:** Mandatory if vessel/voyage/service details or `expectedDepartureDate` is not provided.
+            **Condition:** Mandatory if vessel/voyage/service details or `expectedDepartureDate` is not provided. If `routingReference` is provided - this property MUST not be provided.
           example: '2021-05-17'
         expectedArrivalAtPlaceOfDeliveryEndDate:
           type: string
@@ -3379,7 +3431,7 @@ components:
           description: |
             The end date (provided as a range together with `expectedArrivalAtPlaceOfDeliveryStartDate`) for when the shipment is expected to arrive at `Place Of Delivery`.
             
-            **Condition:** Mandatory if vessel/voyage/service details or `expectedDepartureDate` is not provided.
+            **Condition:** Mandatory if vessel/voyage/service details or `expectedDepartureDate` is not provided. If `routingReference` is provided - this property MUST not be provided.
           example: '2021-05-19'
         transportDocumentTypeCode:
           type: string
@@ -3633,7 +3685,7 @@ components:
           description: |
             The name of a service as specified by the carrier.
 
-            **Condition:** Mandatory if `carrierExportVoyageNumber` is provided and Vessel details or `carrierServiceCode` are blank
+            **Condition:** Mandatory if `carrierExportVoyageNumber` is provided and Vessel details or `carrierServiceCode` are blank. If `routingReference` is provided - this property MUST not be provided.
           example: Great Lion Service
         carrierServiceCode:
           type: string
@@ -3642,7 +3694,7 @@ components:
           description: |
             The carrier specific code of the service for which the schedule details are published.
 
-            **Condition:** Mandatory if `carrierExportVoyageNumber` is provided and Vessel details or `carrierServiceName` are blank
+            **Condition:** Mandatory if `carrierExportVoyageNumber` is provided and Vessel details or `carrierServiceName` are blank. If `routingReference` is provided - this property MUST not be provided.
           example: FE1
         universalServiceReference:
           type: string
@@ -3651,6 +3703,8 @@ components:
           minLength: 8
           description: |
             A global unique service reference, as per DCSA standard, agreed by VSA partners for the service. The service reference must match the regular expression pattern: `SR\d{5}[A-Z]`. The letters `SR` followed by `5 digits`, followed by a checksum-character as a capital letter from `A to Z`.
+
+            **Condition:** If `routingReference` is provided - this property MUST not be provided.
           example: SR12345A
         carrierExportVoyageNumber:
           type: string
@@ -3660,7 +3714,7 @@ components:
           description: |
             The carrier specific identifier of the export Voyage.
 
-            **Condition:** Mandatory if `expectedDepartureDate` or `expectedArrivalAtPlaceOfDeliveryStartDate` and `expectedArrivalAtPlaceOfDeliveryEndDate` is not provided.
+            **Condition:** Mandatory if `expectedDepartureDate` or `expectedArrivalAtPlaceOfDeliveryStartDate` and `expectedArrivalAtPlaceOfDeliveryEndDate` is not provided. If `routingReference` is provided - this property MUST not be provided.
         universalExportVoyageReference:
           type: string
           pattern: ^\d{2}[0-9A-Z]{2}[NEWSR]$
@@ -3671,7 +3725,31 @@ components:
             - `2 digits` for the year
             - `2 alphanumeric characters` for the sequence number of the voyage
             - `1 character` for the direction/haul (`N`orth, `E`ast, `W`est, `S`outh or `R`oundtrip).
+
+            **Condition:** If `routingReference` is provided - this property MUST not be provided.
           example: 2103N
+        routingReference:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 5000
+          description: |
+            A reference to a predefined `route` specified in **Commercial Schedules - Point to point**. When specifying this property - it is not needed to specify the following properties:
+              - `vessel` which includes:
+                - `vesselName`
+                - `vesselIMONumber`
+              - `carrierServiceName`
+              - `carrierServiceCode`
+              - `universalServiceReference`
+              - `carrierExportVoyageNumber`
+              - `universalExportVoyageReference`
+              - `expectedDepartureDate`
+              - `expectedArrivalAtPlaceOfDeliveryStartDate` or `expectedArrivalAtPlaceOfDeliveryEndDate`
+              - the following `locationTypeCode` in `shipmentLocations`:
+                - `PRE` (Place of Receipt)
+                - `POL` (Port of Loading)
+                - `POD` (Port of Discharge)
+                - `PDE` (Place of Delivery)
+          example: Route123
         declaredValue:
           type: number
           format: float
@@ -3733,7 +3811,7 @@ components:
           description: |
             The date when the shipment is expected to be loaded on board a vessel as provided by the shipper or its agent.
             
-            **Condition:** Mandatory if vessel/voyage/service details or `expectedArrivalAtPlaceOfDeliveryDate` is not provided.
+            **Condition:** Mandatory if vessel/voyage/service details or `expectedArrivalAtPlaceOfDeliveryDate` is not provided. If `routingReference` is provided - this property MUST not be provided.
           example: '2021-05-17'
         expectedArrivalAtPlaceOfDeliveryStartDate:
           type: string
@@ -3741,7 +3819,7 @@ components:
           description: |
             The start date (provided as a range together with `expectedArrivalAtPlaceOfDeliveryEndDate`) for when the shipment is expected to arrive at `Place Of Delivery`.
             
-            **Condition:** Mandatory if vessel/voyage/service details or `expectedDepartureDate` is not provided.
+            **Condition:** Mandatory if vessel/voyage/service details or `expectedDepartureDate` is not provided. If `routingReference` is provided - this property MUST not be provided.
           example: '2021-05-17'
         expectedArrivalAtPlaceOfDeliveryEndDate:
           type: string
@@ -3749,7 +3827,7 @@ components:
           description: |
             The end date (provided as a range together with `expectedArrivalAtPlaceOfDeliveryStartDate`) for when the shipment is expected to arrive at `Place Of Delivery`.
             
-            **Condition:** Mandatory if vessel/voyage/service details or `expectedDepartureDate` is not provided.
+            **Condition:** Mandatory if vessel/voyage/service details or `expectedDepartureDate` is not provided. If `routingReference` is provided - this property MUST not be provided.
           example: '2021-05-19'
         transportDocumentTypeCode:
           type: string
@@ -4199,6 +4277,7 @@ components:
             - `N1` (First Notify Party)
             - `N2` (Second Notify Party)
             - `NI` (Other Notify Party)
+            - `NAC` (Named Account Customer)
           example: DDS
       required:
         - party
@@ -4728,6 +4807,8 @@ components:
       title: Shipment Location
       description: |
         Maps the relationship between `Shipment` and `Location`, e.g., the `Place of Receipt` and the `Place of Delivery` for a specific shipment. This is a reusable object between `Booking` and `Transport Document`
+
+        **Condition:** In case `routingReference` is provided - then `PRE` (Place of Receipt), `POL` (Port of Loading), `POD` (Port of Discharge) and `PDE` (Place of Delivery) MUST not be provided.
       properties:
         location:
           $ref: '#/components/schemas/Location'
@@ -6556,7 +6637,7 @@ components:
       description: |
         Vessels related to this booking request.
         
-        **Condition:** Mandatory if `carrierExportVoyageNumber` is provided and `carrierServiceCode` or `carrierServiceName` are blank.
+        **Condition:** Mandatory if `carrierExportVoyageNumber` is provided and `carrierServiceCode` or `carrierServiceName` are blank. If `routingReference` is provided - this object MUST not be provided.
       required:
         - name
       properties:
