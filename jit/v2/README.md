@@ -6,6 +6,22 @@ The DCSA Interface Standard for Just in Time Portcalls is documented on the **[D
 ---
 This is a moving target and will be updated as soon as the version is published
 
+<a name="v200B20250328"></a>[Release v2.0.0 Beta 20250328 (28 of March 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_JIT/2.0.0-Beta-20250328)
+---
+Snapshot as of 28 of March 2025 for JIT 2.0.0 Beta.
+## Key changes
+- added 2 new headers: `Response-Sending-Party` and `Response-Receiving-Party` to all endPoint responses (this allows relaying JIT messages through 3rd party system)
+- renamed 2 headers: `Sending-Party` and `Receiving-Party` to `Request-Sending-Party` and `Request-Receiving-Party`
+- changed the `httpMethod` enum value `OPTION` --> `OPTIONS` in the Error object
+
+## Minor changes
+- improved some descriptions and modified some whitespace for better readability
+- updated some `statusCode` error examples from `404` -> `400`
+- fixed missing `'` in an example
+- updated example values and description on the `Request-Sending-Party` and `Request-Receiving-Party` headers to make it more clear
+
+Link to [commits included in this Snapshot](https://github.com/dcsaorg/DCSA-OpenAPI/commits/master/jit/v2/JIT_v2.0.0.yaml?since=2025-03-15&until=2025-03-28)
+
 <a name="v200B20250314"></a>[Release v2.0.0 Beta 20250314 (14 of March 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_JIT/2.0.0-Beta-20250314)
 ---
 Snapshot as of 14 of March 2025 for JIT 2.0.0 Beta.
