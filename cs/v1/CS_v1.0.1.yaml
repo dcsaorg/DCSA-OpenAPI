@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: DCSA OpenAPI specification for Commercial Schedules
-  version: 1.X
+  version: 1.0.1
   description: |
     API specification issued by [Digital Container Shipping Association (DCSA)](https://dcsa.org/).
 
@@ -28,7 +28,7 @@ info:
     ### API Design & Implementation Principles
     This API follows the guidelines defined in version 2.0 of the API Design & Implementation Principles which can be found on the [DCSA Developer page](https://developer.dcsa.org/api_design).
 
-    For a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/cs/v1#v100). If you have any questions, feel free to [Contact Us](https://dcsa.org/get-involved/contact-us).
+    For a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/cs/v1#v101). If you have any questions, feel free to [Contact Us](https://dcsa.org/get-involved/contact-us).
   license:
     url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
     name: Apache 2.0
@@ -36,8 +36,6 @@ info:
     name: Digital Container Shipping Association (DCSA)
     url: 'https://dcsa.org/'
     email: info@dcsa.org
-servers:
-  - url: 'http://localhost:3000'
 paths:
   /v1/point-to-point-routes:
     get:
@@ -57,9 +55,9 @@ paths:
             API-Version:
               schema:
                 type: string
-                example: 1.0.0
+                example: 1.0.1
               description: |
-                SemVer used to indicate the version of the contract (API version) returned
+                SemVer used to indicate the version of the contract (API version) returned.
             Next-Page-Cursor:
               schema:
                 type: string
@@ -77,7 +75,7 @@ paths:
             API-Version:
               schema:
                 type: string
-                example: 1.0.0
+                example: 1.0.1
               description: |
                 SemVer used to indicate the version of the contract (API version) returned.
           content:
@@ -105,7 +103,7 @@ paths:
             API-Version:
               schema:
                 type: string
-                example: 1.0.0
+                example: 1.0.1
               description: |
                 SemVer used to indicate the version of the contract (API version) returned.
           content:
@@ -201,7 +199,10 @@ paths:
             minimum: 0
           in: query
           name: maxTranshipment
-          description: Specifies the maximum number of transhipments that the proposed routings can have in the response. By default, transhipments are allowed and the responses can have either direct routings or routings with transhipment. The default value of maximum transhipments is defined by the carrier for when the consumer does not provide a value. If the user sets the number of transhipments to 0, only direct routings can be returned in the response.
+          description: |
+            Specifies the maximum number of transhipments that the proposed routings can have in the response. By default, transhipments are allowed and the responses can have either direct routings or routings with transhipment. The default value of maximum transhipments is defined by the carrier for when the consumer does not provide a value. If the user sets the number of transhipments to 0, only direct routings can be returned in the response.
+
+            **Note:** According to the DCSA definition, a “transshipment” specifically refers to transferring containers or cargo from one vessel to another, focusing exclusively on ocean transport. This means that, under the current interpretation, only vessel-to-vessel transfers are counted as transshipments. Moves between road, rail, or barge and a vessel (i.e., inland legs) do not fall under this definition and, therefore, should not be counted as transshipments.
         - schema:
             type: string
             enum:
@@ -275,7 +276,7 @@ paths:
             API-Version:
               schema:
                 type: string
-                example: 1.0.0
+                example: 1.0.1
               description: |
                 SemVer used to indicate the version of the contract (API version) returned.
             Next-Page-Cursor:
@@ -295,7 +296,7 @@ paths:
             API-Version:
               schema:
                 type: string
-                example: 1.0.0
+                example: 1.0.1
               description: |
                 SemVer used to indicate the version of the contract (API version) returned.
           content:
@@ -323,7 +324,7 @@ paths:
             API-Version:
               schema:
                 type: string
-                example: 1.0.0
+                example: 1.0.1
               description: |
                 SemVer used to indicate the version of the contract (API version) returned.
           content:
@@ -413,7 +414,7 @@ paths:
             API-Version:
               schema:
                 type: string
-                example: 1.0.0
+                example: 1.0.1
               description: |
                 SemVer used to indicate the version of the contract (API version) returned.
             Next-Page-Cursor:
@@ -433,7 +434,7 @@ paths:
             API-Version:
               schema:
                 type: string
-                example: 1.0.0
+                example: 1.0.1
               description: |
                 SemVer used to indicate the version of the contract (API version) returned.
           content:
@@ -461,7 +462,7 @@ paths:
             API-Version:
               schema:
                 type: string
-                example: 1.0.0
+                example: 1.0.1
               description: |
                 SemVer used to indicate the version of the contract (API version) returned.
           content:
@@ -549,7 +550,7 @@ paths:
             example: APM
           in: query
           name: facilitySMDGCode
-          description: The facilitySMDGCode specifying a specific facility (using SMDG Code). Be aware that the `facilitySMDGCode` does not contain a `UNLocationCode` - this must be specified in the `UNLocationCode` filter.  Specifying this filter will only return schedules including entire Voyages related to this particular `facilitySMDGCode`.
+          description: The facilitySMDGCode specifying a specific facility (using SMDG Code). Be aware that the `facilitySMDGCode` does not contain a `UNLocationCode` - this must be specified in the `UNLocationCode` filter.  Specifying this filter will only return schedules including entire Voyages related to this particular `facilitySMDGCode`. It is recommended to specify a value for this query parameter only if a value is provided for `UNLocationCode`.
         - schema:
             type: string
             example: MAEU
@@ -565,7 +566,7 @@ paths:
           name: startDate
           description: |
             The start date of the period for which schedule information is requested. If a date of any Timestamp (ATA, ETA or PTA) inside a PortCall matches a date on or after (≥) the `startDate` the entire Voyage (import- and export-Voyage) matching the PortCall will be included in the result. All matching is done towards local Date at the place of the port call.
-            If this filter is not provided the default value is `3 months` prior to request time.  The value is populated in [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) date format.
+            If this filter is not provided, the default value is **3 months** prior to the request time.
         - schema:
             type: string
             format: date
@@ -574,7 +575,7 @@ paths:
           name: endDate
           description: |
             The end date of the period for which schedule information is requested. If a date of any Timestamp (ATA, ETA or PTA) inside a PortCall matches a date on or before (≤) the `endDate` the entire Voyage(import- and export-Voyage) matching the PortCall will be included in the result. All matching is done towards local Date at the place of the port call.  
-            If this filter is not provided the default value is `6 months` after request time.  The value is populated in [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) date format.
+            If this filter is not provided, the default value is **6 months** after the request time.
         - schema:
             type: integer
             format: int32
@@ -660,7 +661,7 @@ components:
           type: string
           format: date-time
           example: '2025-01-14T09:21:00+01:00'
-          description: The local date and time, when the event will take place, in [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format specifying the offset.
+          description: The local date and time, when the event will take place.
     PlaceOfDelivery:
       title: Place of Delivery
       type: object
@@ -694,7 +695,7 @@ components:
           type: string
           format: date-time
           example: '2025-01-14T09:21:00+01:00'
-          description: The local date and time, when the event will take place, in [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format specifying the offset.
+          description: The local date and time, when the event will take place.
     PlaceOfArrival:
       title: Place of Arrival
       type: object
@@ -728,7 +729,7 @@ components:
           type: string
           format: date-time
           example: '2025-01-14T09:21:00+01:00'
-          description: The local date and time, when the event will take place, in [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format specifying the offset.
+          description: The local date and time, when the event will take place.
     PlaceOfDeparture:
       title: Place of Departure
       type: object
@@ -762,7 +763,7 @@ components:
           type: string
           format: date-time
           example: '2025-01-14T09:21:00+01:00'
-          description: The local date and time, when the event will take place, in [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format specifying the offset.
+          description: The local date and time, when the event will take place.
     PointToPoint:
       title: Point to Point
       type: object
@@ -812,6 +813,13 @@ components:
           minimum: 1
           example: 1
           description: Solution number, starting with 1. Used to group and identify similar or same routings in the response as per the carrier commercial definitions.
+        routingReference:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 5000
+          description: |
+            A reference to be used when creating a **Booking** in the **Booking API**.
+          example: Route123
         transitTime:
           type: integer
           description: The estimated total time in days that it takes a shipment to move from place of receipt to place of delivery. Transit time includes stop-over time during transhipments and waiting time at connection points, if applicable, thus can vary between the same locations.
@@ -1000,7 +1008,7 @@ components:
         eventDateTime:
           type: string
           format: date-time
-          description: The local date and time, when the event takes place, in [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format specifying the offset.
+          description: The local date and time, when the event takes place.
           example: '2025-01-14T09:21:00+01:00'
     ServiceSchedule:
       title: Service Schedule
@@ -1076,14 +1084,12 @@ components:
               - `SPA` (Special booking acceptance)
               - `CUA` (Customs Acceptance)
               - `AFC` (Advanced filling cut-off)
-              
-            More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/reference-data/CutOffDateTimeCodeList-CS_v1.0.0.csv)
           maxLength: 3
           example: DCO
         cutOffDateTime:
           type: string
           format: date-time
-          description: Estimated cut-off time expressed in local time with offset following [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format.
+          description: Estimated cut-off time expressed in local time with offset.
           example: '2019-11-12T07:41:00-08:30'
     Address:
       title: Address
@@ -1183,7 +1189,7 @@ components:
           example: 4426d965-0dd8-4005-8c63-dc68b01c4962
         errorDateTime:
           type: string
-          description: The DateTime corresponding to the error occurring. Must be formatted using [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format.
+          description: The DateTime corresponding to the error occurring.
           example: '2019-11-12T07:41:00Z'
           format: date-time
         errors:
@@ -1236,7 +1242,10 @@ components:
           maxLength: 10
         operatorCarrierCodeListProvider:
           type: string
-          description: Identifies the code list provider used for the operator and partner carriercodes.
+          description: |
+            Identifies the code list provider used for the operator and partner carriercodes.
+            - `SMDG` (Ship Message Design Group)
+            - `NMFTA` (National Motor Freight Traffic Association)
           example: NMFTA
           enum:
             - SMDG
@@ -1285,7 +1294,10 @@ components:
           maxLength: 10
         operatorCarrierCodeListProvider:
           type: string
-          description: Identifies the code list provider used for the operator and partner carriercodes.
+          description: |
+            Identifies the code list provider used for the operator and partner carriercodes.
+            - `SMDG` (Ship Message Design Group)
+            - `NMFTA` (National Motor Freight Traffic Association)
           example: NMFTA
           enum:
             - SMDG
@@ -1482,7 +1494,10 @@ components:
           example: MAEU
         carrierCodeListProvider:
           type: string
-          description: Identifies the code list provider used for the `carrierCode`.
+          description: |
+            Identifies the code list provider used for the `carrierCode`.
+            - `SMDG` (Ship Message Design Group)
+            - `NMFTA` (National Motor Freight Traffic Association)
           example: NMFTA
           enum:
             - SMDG
@@ -1529,7 +1544,10 @@ components:
           example: MAEU
         carrierCodeListProvider:
           type: string
-          description: Identifies the code list provider used for the  `carrierCode`.
+          description: |
+            Identifies the code list provider used for the `carrierCode`.
+            - `SMDG` (Ship Message Design Group)
+            - `NMFTA` (National Motor Freight Traffic Association)
           example: NMFTA
           enum:
             - SMDG
