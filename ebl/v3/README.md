@@ -11,7 +11,7 @@ Publications related to the Bill of Lading API:
 - [Bill of Lading Surrender](./surrender/) maintained here on GitHub
 - [Bill of Lading Surrender Response](./surrender_response/) maintained here on GitHub (**DEPRECATED** - now included as part of EBL Surrender API)
 
-<a name="v301"></a>[Release v3.0.1 (?? April 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.1)
+<a name="v301"></a>[Release v3.0.1 (TBD April 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.1)
 ---
 This is a patch version for the DCSA Bill of Lading API. The primary reason for this patch is the `ShippingInstructionRequestor` party, but other improvements have been added as well:
 ## Schema changes
