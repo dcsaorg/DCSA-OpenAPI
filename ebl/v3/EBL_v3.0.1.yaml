@@ -1,9 +1,6 @@
 openapi: 3.0.3
-servers:
-  - description: SwaggerHub API Auto Mocking
-    url: 'https://virtserver.swaggerhub.com/dcsaorg/DCSA_EBL/3.0.0'
 info:
-  version: 3.0.0
+  version: 3.0.1
   title: DCSA Shipping Instructions and Transport Document API
   description: |
     <h1>DCSA OpenAPI specification for the Shipping Instructions and Transport Document process</h1>
@@ -47,7 +44,7 @@ info:
     This API follows the guidelines defined in version 2.0 of the API Design & Implementation Principles which can be found on the [DCSA Developer Portal](https://developer.dcsa.org/api_design)
 
     ### Changelog and GitHub
-    For a changelog, please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/ebl/v3#v300). If you have any questions, feel free to [Contact Us](https://dcsa.org/get-involved/contact-us).
+    For a changelog, please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/ebl/v3#v301). If you have any questions, feel free to [Contact Us](https://dcsa.org/get-involved/contact-us).
 
     API specification issued by [DCSA.org](https://dcsa.org/).
   license:
@@ -743,7 +740,7 @@ paths:
                   summary: |
                     Updated Shipping Instructions with DG cargo
                   description: |
-                    A `Shipping Instructions` with `Environmentally hazardous substance, liquid, N.O.S (Propiconazole)` which is transported in steel Jerricans.
+                    A `Shipping Instructions` with `Environmentally hazardous substance, liquid, N.O.S (Propiconazole)` which is transported in steel Jerrycans.
 
                     The `Shipping Instructions` has already been applied an update which has been confirmed by the provider (`updatedShippingInstructions='UPDATE_CONFIRMED'`). The `Shipping Instructions` is now waiting for the provider to `DRAFT` a `Transport Document`.
 
@@ -787,7 +784,7 @@ paths:
                               unit: KGM
                             outerPackaging:
                               numberOfPackages: 400
-                              description: 'Jerrican, steel'
+                              description: 'Jerrycan, steel'
                     utilizedTransportEquipments:
                       - isShipperOwned: false
                         seals:
@@ -1442,7 +1439,7 @@ paths:
                   summary: |
                     Issued Transport Document with DG (Dangerous Goods) cargo
                   description: |
-                    An `ISSUED` Transport Document by the provider containing DG (Dangerous Goods). The cargo is `Environmentally hazardous substance, liquid, N.O.S (Propiconazole)` which is transported in steel Jerricans.
+                    An `ISSUED` Transport Document by the provider containing DG (Dangerous Goods). The cargo is `Environmentally hazardous substance, liquid, N.O.S (Propiconazole)` which is transported in steel Jerrycans.
                   value:
                     transportDocumentReference: 4AD3FA470BB541B980CE
                     shippingInstructionsReference: b36484d0-1115-43c2-93e4-a378823a8386
@@ -1541,7 +1538,7 @@ paths:
                             outerPackaging:
                               numberOfPackages: 400
                               imoPackagingCode: 3A1
-                              description: 'Jerrican, steel'
+                              description: 'Jerrycan, steel'
                               dangerousGoods:
                                 - UNNumber: '3082'
                                   properShippingName: 'Environmentally hazardous substance, liquid, N.O.S'
@@ -2608,7 +2605,7 @@ components:
     API-Version:
       schema:
         type: string
-        example: 3.0.0
+        example: 3.0.1
       description: |
         SemVer used to indicate the version of the contract (API version) returned.
   parameters:
@@ -4046,7 +4043,7 @@ components:
           example: 4426d965-0dd8-4005-8c63-dc68b01c4962
         errorDateTime:
           description: |
-            The DateTime corresponding to the error occurring. Must be formatted using [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format.
+            The DateTime corresponding to the error occurring.
           type: string
           format: date-time
           example: '2024-09-04T09:41:00Z'
@@ -4232,7 +4229,6 @@ components:
             The definition of the code depends on the `facilityCodeListProvider`. As code list providers maintain multiple codeLists the following codeList is used:
             - `SMDG` (the codeList used is the [SMDG Terminal Code List](https://smdg.org/documents/smdg-code-lists/))
             - `BIC` (the codeList used is the [BIC Facility Codes](https://www.bic-code.org/facility-codes/))
-          nullable: false
           example: ADT
         facilityCodeListProvider:
           type: string
@@ -4278,7 +4274,31 @@ components:
       type: object
       title: Other Document Party
       description: |
-        A list of document parties that can be optionally provided in the `Shipping Instructions` and `Transport Document`.
+        A list of document parties that can be optionally provided in the `Transport Document`.
+      properties:
+        party:
+          $ref: '#/components/schemas/Party'
+        partyFunction:
+          type: string
+          maxLength: 3
+          description: |
+            Specifies the role of the party in a given context. Possible values are:
+
+            - `SCO` (Service Contract Owner)
+            - `DDR` (Consignor's freight forwarder)
+            - `DDS` (Consignee's freight forwarder)
+            - `COW` (Invoice payer on behalf of the consignor (shipper))
+            - `COX` (Invoice payer on behalf of the consignee)
+          example: DDS
+      required:
+        - party
+        - partyFunction
+
+    OtherDocumentPartyShippingInstructions:
+      type: object
+      title: Other Document Party (Shipping Instructions)
+      description: |
+        A list of document parties that can be optionally provided in the `Shipping Instructions`.
       properties:
         party:
           $ref: '#/components/schemas/Party'
@@ -4305,7 +4325,7 @@ components:
       type: object
       title: Other Document Party (House B/L)
       description: |
-        A list of document parties that can be optionally provided in the `Shipping Instructions` and `Transport Document`.
+        A list of document parties that can be optionally provided in the `House B/L`.
       properties:
         party:
           $ref: '#/components/schemas/PartyHBL'
@@ -5053,7 +5073,7 @@ components:
       description: |
         The seller is the last known entity by whom the goods are sold or agreed to be sold to the buyer. If the goods are to be imported otherwise than in pursuance of a purchase, the details of the owner of the goods shall be provided.
 
-        **Condition:** Buyer and Seller are mandatory if `isCargoDeliveredInICS2Zone=true` and `manifesttypecode='ENS'` and `advancedManifestFilingPerformedBy='CARRIER'` and `isHouseBillofLadingsIssued=false`.
+        **Condition:** Buyer and Seller are mandatory if `isCargoDeliveredInICS2Zone=true` and `manifestTypeCode='ENS'` and `advancedManifestFilingPerformedBy='CARRIER'` and `isHouseBillOfLadingsIssued=false`.
       properties:
         partyName:
           type: string
@@ -5100,7 +5120,7 @@ components:
       description: |
         The seller is the last known entity by whom the goods are sold or agreed to be sold to the buyer. If the goods are to be imported otherwise than in pursuance of a purchase, the details of the owner of the goods shall be provided.
 
-        **Condition:** Buyer and Seller are mandatory if `isCargoDeliveredInICS2Zone=true` (on House B/L level) and `manifesttypecode='ENS'` and `advancedManifestFilingPerformedBy='CARRIER'`.
+        **Condition:** Buyer and Seller are mandatory if `isCargoDeliveredInICS2Zone=true` (on House B/L level) and `manifestTypeCode='ENS'` and `advancedManifestFilingPerformedBy='CARRIER'`.
       properties:
         partyName:
           type: string
@@ -5147,7 +5167,7 @@ components:
       description: |
         The buyer is the last known entity to whom the goods are sold or agreed to be sold. If the goods are to be imported otherwise than in pursuance of a purchase, the details of the owner of the goods shall be provided.
 
-        **Condition:** Buyer and Seller are mandatory if `isCargoDeliveredInICS2Zone=true` and `manifesttypecode='ENS'` and `advancedManifestFilingPerformedBy='CARRIER'` and `isHouseBillofLadingsIssued=false`.
+        **Condition:** Buyer and Seller are mandatory if `isCargoDeliveredInICS2Zone=true` and `manifestTypeCode='ENS'` and `advancedManifestFilingPerformedBy='CARRIER'` and `isHouseBillOfLadingsIssued=false`.
       properties:
         partyName:
           type: string
@@ -5194,7 +5214,7 @@ components:
       description: |
         The buyer is the last known entity to whom the goods are sold or agreed to be sold. If the goods are to be imported otherwise than in pursuance of a purchase, the details of the owner of the goods shall be provided.
 
-        **Condition:** Buyer and Seller are mandatory if `isCargoDeliveredInICS2Zone=true` (on House B/L level) and `manifesttypecode='ENS'` and `advancedManifestFilingPerformedBy='CARRIER'`.
+        **Condition:** Buyer and Seller are mandatory if `isCargoDeliveredInICS2Zone=true` (on House B/L level) and `manifestTypeCode='ENS'` and `advancedManifestFilingPerformedBy='CARRIER'`.
       properties:
         partyName:
           type: string
@@ -5355,6 +5375,35 @@ components:
       required:
         - partyName
         - address
+
+    ShippingInstructionsRequestor:
+      type: object
+      title: Shipping Instructions Requestor
+      description: |
+        The requestor of whoever submits the `Shipping Instructions`.
+        **Condition:** Either the `address` or a party `identifyingCode` must be provided.
+      properties:
+        partyName:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 70
+          description: |
+            Name of the party.
+          example: Asseco Denmark
+        address:
+          $ref: '#/components/schemas/PartyAddress'
+        identifyingCodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentifyingCode'
+        partyContactDetails:
+          type: array
+          description: |
+            A list of contact details
+          items:
+            $ref: '#/components/schemas/PartyContactDetail'
+      required:
+        - partyName
 
     PartyContactDetail:
       type: object
@@ -7573,14 +7622,14 @@ components:
           maxLength: 50
           description: |
             The status of the `Transport Document`. Possible values are:
-            - DRAFT
-            - APPROVED
-            - ISSUED
-            - PENDING_SURRENDER_FOR_AMENDMENT
-            - SURRENDERED_FOR_AMENDMENT
-            - PENDING_SURRENDER_FOR_DELIVERY
-            - SURRENDERED_FOR_DELIVERY
-            - VOIDED
+            - `DRAFT` (Transport Document is Drafted)
+            - `APPROVED` (Transport Document has been Approved by consumer)
+            - `ISSUED` (Transport Document has been Issued by provider)
+            - `PENDING_SURRENDER_FOR_AMENDMENT` (Transport Document is Pending for Surrender for an Amendment)
+            - `SURRENDERED_FOR_AMENDMENT` (Transport Document Surrendered for an Amendment)
+            - `PENDING_SURRENDER_FOR_DELIVERY` (Transport Document pending surrender for Delivery)
+            - `SURRENDERED_FOR_DELIVERY` (Transport Document surrendered for Delivery)
+            - `VOIDED` (the Transport Document has been Voided)
           example: DRAFT
         transportDocumentTypeCode:
           type: string
@@ -8540,11 +8589,13 @@ components:
               - The order of the items in this array **MUST** be preserved as by the provider of the API.
           items:
             $ref: '#/components/schemas/NotifyParty'
+        shippingInstructionsRequestor:
+          $ref: '#/components/schemas/ShippingInstructionsRequestor'
         other:
           type: array
           description: A list of document parties that can be optionally provided in the `Shipping Instructions` and `Transport Document`.
           items:
-            $ref: '#/components/schemas/OtherDocumentParty'
+            $ref: '#/components/schemas/OtherDocumentPartyShippingInstructions'
       required:
         - shipper
 
