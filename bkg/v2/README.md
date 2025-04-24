@@ -16,7 +16,7 @@ This is a patch release for the DCSA Booking API. The primary purpose of this pa
 - remove Servers list that was wrongly added (no Virtual Servers are connected to DCSA APIs)
 - remove the reference to `ISO 8601` in the `errorDateTime` property in the `Error` object (all dateTime fields must comply with [RFC 3339, section 5.6](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6))
 
-Link to [commits included in this Snapshot](https://github.com/dcsaorg/DCSA-OpenAPI/commits/master/bkg/v2/BKG_v2.0.1.yaml?since=2024-01-15&until=2025-04-25)
+Link to [commits included in this patch](https://github.com/dcsaorg/DCSA-OpenAPI/commits/master/bkg/v2/BKG_v2.0.1.yaml?since=2024-01-15&until=2025-04-25)
 
 <a name="v200"></a>[Release v2.0.0 (17 December 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0)
 ---
