@@ -20,7 +20,7 @@ This is a patch version for the DCSA Bill of Lading API. The primary reason for 
 - remove `nullable=false` as false is the default
 - updated spelling for Jerr**i**cans -> Jerr**y**cans
 - updated some typos
-- remove the reference to `ISO 8601` (all dateTime fields must comply with [RFC 3339, section 5.6])(https://datatracker.ietf.org/doc/html/rfc3339#section-5.6)
+- remove the reference to `ISO 8601` (all dateTime fields must comply with [RFC 3339, section 5.6](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6))
 - update partyFunction codes for the `TransportDocument` as it was wrongly aligned with `ShippingInstructions` (`CS` (Consolidator), `MF` (Manufacturer) and `WH` (Warehouse Keeper) removed)
 - fixed some formatting in the `transportDocumentStatus` description
 
