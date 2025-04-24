@@ -14,7 +14,7 @@ This is a patch release for the DCSA Commercial Schedules API. The primary purpo
 - `operatorCarrierCodeListProvider` and `carrierCodeListProvider` descriptions improved in order to list the enum values
 - `facilitySMDGCode`, `startDate` and `endDate` descriptions have been improved
 - Github link to reference data for `cutOffDateTimeCode` has been removed
-- remove Servers list that was wrongly added (no Virtual Servers are connected to DCSA APIs)
+- removed Servers list that was wrongly added (no Virtual Servers are connected to DCSA APIs)
 - Contact Us link update to **https://dcsa.org/get-involved/contact-us**
 
 Link to [commits included in this patch](https://github.com/dcsaorg/DCSA-OpenAPI/commits/master/cs/v1/CS_v1.0.1.yaml?since=2024-01-15&until=2025-04-25)
