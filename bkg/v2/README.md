@@ -7,6 +7,17 @@ Publications related to the Booking API:
 - [Booking Process](https://dcsa.org/standards/booking-process/) contains documents and publications
 - [Booking Notification](./notification/) maintained here on GitHub  (**DEPRECATED** - now included as part of Booking API)
 
+<a name="v201"></a>[Release v2.0.1 (25 April 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.1)
+---
+This is a patch release for the DCSA Booking API. The primary purpose of this patch is to include the `routingReference` property in order to reference a route found in [Commercial Schedules](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/cs/v1), it also adds the `NAC` (Named Account Customer) party to `otherDocumentParty`. Here is a list of changes
+
+- `routingReference` property added to the Booking object. When `routingReferenced` is provided, other properties should be omitted. The conditions for the following properties have changed: `carrierServiceName`, `carrierServiceCode`, `universalServiceReference`, `carrierExportVoyageNumber`, `universalExportVoyageReference`, `expectedDepartureDate`, - `NAC` (Named Account Customer) added as partyFunctionCode on `otherDocumentParty` object
+`expectedArrivalAtPlaceOfDeliveryStartDate`, `expectedArrivalAtPlaceOfDeliveryEndDate`, `Vessel` object and the following `shipmentLocationTypeCodes`: `PRE` (Place of Receipt), `POL` (Port of Loading), `POD` (Port of Discharge) and `PDE` (Place of Delivery)
+- remove Servers list that was wrongly added (no Virtual Servers are connected to DCSA APIs)
+- remove the reference to `ISO 8601` in the `errorDateTime` property in the `Error` object (all dateTime fields must comply with [RFC 3339, section 5.6](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6))
+
+Link to [commits included in this Snapshot](https://github.com/dcsaorg/DCSA-OpenAPI/commits/master/bkg/v2/BKG_v2.0.1.yaml?since=2024-01-15&until=2025-04-25)
+
 <a name="v200"></a>[Release v2.0.0 (17 December 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0)
 ---
 This is the final version 2.0.0 for the DCSA Booking API. Compared to latest snapshot released 8 November the following has changed:
