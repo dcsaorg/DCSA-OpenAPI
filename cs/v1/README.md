@@ -2,6 +2,22 @@
 
 The DCSA Commercial Schedules API is specified on [**SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_CS).
 
+<a name="v101"></a>[Release v1.0.1 (25 April 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_CS/1.0.1)
+---
+This is a patch release for the DCSA Commercial Schedules API. The primary purpose of this patch is to include the `routingReference` property in the Point-to-point responses in order to be able to reference a route in [Booking](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/bkg/v2). Here is a list of changes
+
+- `routingReference` property added to the PointToPoint object.
+- `maxTranshipment` query parameter description imporved to explain meaning of a "transhipment"
+- remove the reference to `ISO 8601` (all dateTime fields must comply with [RFC 3339, section 5.6](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6)), affecting the following query parameters: `startDate` and `endDate`, the following properties: `dateTime` (in `PlaceOfReceipt`, `PlaceOfDelivery`, `PlaceOfArrival` and `PlaceOfDeparture`), `eventDateTime` (in Timestamp), `cutOffDateTime` (in CutOffTime), `errorDateTime` (in ErrorResponse)
+- typos and punctuation fixed in descriptions
+- `operatorCarrierCodeListProvider` and `carrierCodeListProvider` descriptions improved in order to list the enum values
+- `facilitySMDGCode`, `startDate` and `endDate` descriptions have been improved
+- Github link to reference data for `cutOffDateTimeCode` has been removed
+- removed Servers list that was wrongly added (no Virtual Servers are connected to DCSA APIs)
+- Contact Us link update to **https://dcsa.org/get-involved/contact-us**
+
+Link to [commits included in this patch](https://github.com/dcsaorg/DCSA-OpenAPI/commits/master/cs/v1/CS_v1.0.1.yaml?since=2024-01-15&until=2025-04-25)
+
 ### <a name="v100"></a>[Release v1.0.0 (24 September 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_CS/1.0.0)
 ---
 
