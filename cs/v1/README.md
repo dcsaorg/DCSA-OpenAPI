@@ -8,7 +8,6 @@ This is a patch release for the DCSA Commercial Schedules API. The primary purpo
 
 - `routingReference` property added to the PointToPoint object.
 - `maxTranshipment` query parameter description imporved to explain meaning of a "transhipment"
-- `facilitySMDGCode` query parameter description improved
 - remove the reference to `ISO 8601` (all dateTime fields must comply with [RFC 3339, section 5.6](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6)), affecting the following query parameters: `startDate` and `endDate`, the following properties: `dateTime` (in `PlaceOfReceipt`, `PlaceOfDelivery`, `PlaceOfArrival` and `PlaceOfDeparture`), `eventDateTime` (in Timestamp), `cutOffDateTime` (in CutOffTime), `errorDateTime` (in ErrorResponse)
 - typos and punctuation fixed in descriptions
 - `operatorCarrierCodeListProvider` and `carrierCodeListProvider` descriptions improved in order to list the enum values
