@@ -11,18 +11,19 @@ Publications related to the Bill of Lading API:
 - [Bill of Lading Surrender](./surrender/) maintained here on GitHub
 - [Bill of Lading Surrender Response](./surrender_response/) maintained here on GitHub (**DEPRECATED** - now included as part of EBL Surrender API)
 
-<a name="v301"></a>[Release v3.0.1 (TBD April 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.1)
+<a name="v301"></a>[Release v3.0.1 (TBD May 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.1)
 ---
-This is a patch version for the DCSA Bill of Lading API. The primary reason for this patch is the `ShippingInstructionRequestor` party, but other improvements have been added as well:
+This is a patch version for the DCSA Bill of Lading API. The primary reason for this patch is the `ShippingInstructionRequestor` party and adding a `transportDocumentReference` by Shipper, but other improvements have been added as well:
 ## Schema changes
 - added `shippingInstructionsRequestor` as an optional party
+- added `transportDocumentReference` as an optional property when creating and updating a `Shipping Instructions`
 - remove Servers list that was wrongly added (no Virtual Servers are connected to DCSA APIs)
 - remove `nullable=false` as false is the default
 - updated spelling for Jerr**i**cans -> Jerr**y**cans
 - updated some typos
 - remove the reference to `ISO 8601` (all dateTime fields must comply with [RFC 3339, section 5.6](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6))
 - update partyFunction codes for the `TransportDocument` as it was wrongly aligned with `ShippingInstructions` (`CS` (Consolidator), `MF` (Manufacturer) and `WH` (Warehouse Keeper) removed)
-- fixed some formatting in the `transportDocumentStatus` description
+- fixed some formatting in the `transportDocumentStatus` description and some places referring to `Transport Document`
 
 <a name="v300"></a>[Release v3.0.0 (17 December 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.0)
 ---
