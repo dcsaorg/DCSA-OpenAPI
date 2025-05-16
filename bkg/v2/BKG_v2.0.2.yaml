@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  version: 2.0.1
+  version: 2.0.2
   title: DCSA Booking API
   description: |
     <h1>DCSA OpenAPI specification for the Booking process</h1>
@@ -43,7 +43,7 @@ info:
     This API follows the guidelines defined in version 2.0 of the API Design & Implementation Principles which can be found on the [DCSA Developer Portal](https://developer.dcsa.org/api_design)
 
     ### Changelog and GitHub
-    For a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/bkg/v2#v201). If you have any questions, feel free to [Contact Us](https://dcsa.org/get-involved/contact-us).
+    For a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/bkg/v2#v202). If you have any questions, feel free to [Contact Us](https://dcsa.org/get-involved/contact-us).
 
     API specification issued by [DCSA.org](https://dcsa.org/).
   license:
@@ -2246,7 +2246,7 @@ components:
     API-Version:
       schema:
         type: string
-        example: 2.0.1
+        example: 2.0.2
       description: |
         SemVer used to indicate the version of the contract (API version) returned.
   parameters:
@@ -2794,6 +2794,8 @@ components:
           maxLength: 2
           description: |
             The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+
+            **Note:** In case the `countryCode` is unknown it is possible to use the code `ZZ`.
           example: NL
       required:
         - street
@@ -3115,9 +3117,30 @@ components:
           type: string
           pattern: ^\S(?:.*\S)?$
           maxLength: 20
+          deprecated: true
           description: |
             A unique reference allocated by the shipping line to the `Transport Document` that the booking concerns.
+
+            **Deprecated:** In case both provider and consumer are on API v2.0.2 (or later), please use `transportDocumentReferences` property instead.
           example: reserved-HHL123
+        transportDocumentReferences:
+          type: array
+          description:
+            An array of `transportDocumentReference` requested by the Shipper to be associated to this Booking.
+          items:
+            type: string
+            pattern: ^\S(?:.*\S)?$
+            maxLength: 20
+            description: |
+              The `transportDocumentReference` requested by the Shipper to be associated to this Booking.
+            example: reserved-HHL123
+        requestedNumberOfTransportDocuments:
+          type: integer
+          format: int32
+          minimum: 1
+          description: |
+            The number of `Transport Documents` requested to be linked to this Booking by the Shipper.
+          example: 3
         bookingChannelReference:
           type: string
           pattern: ^\S(?:.*\S)?$
@@ -3169,6 +3192,34 @@ components:
             A list of `Shipment Locations`
           items:
             $ref: '#/components/schemas/ShipmentLocation'
+        requestedPreCarriageModeOfTransport:
+          type: string
+          maxLength: 50
+          description: |
+            The `Mode of Transport` requested ​by the shipper for the **pre carriage**. The supported values include:
+            - `VESSEL` (Vessel)
+            - `RAIL` (Rail)
+            - `TRUCK` (Truck)
+            - `BARGE` (Barge)
+            - `RAIL_TRUCK`(Rail and truck)
+            - `BARGE_TRUCK`(Barge and truck)
+            - `BARGE_RAIL`(Barge and rail)
+            - `MULTIMODAL` (if multiple modes are used)
+          example: VESSEL
+        requestedOnCarriageModeOfTransport:
+          type: string
+          maxLength: 50
+          description: |
+            The `Mode of Transport` requested ​by the shipper for the **on carriage**. The supported values include:
+            - `VESSEL` (Vessel)
+            - `RAIL` (Rail)
+            - `TRUCK` (Truck)
+            - `BARGE` (Barge)
+            - `RAIL_TRUCK`(Rail and truck)
+            - `BARGE_TRUCK`(Barge and truck)
+            - `BARGE_RAIL`(Barge and rail)
+            - `MULTIMODAL` (if multiple modes are used)
+          example: VESSEL
         requestedEquipments:
           type: array
           minItems: 1
@@ -3444,9 +3495,30 @@ components:
           type: string
           pattern: ^\S(?:.*\S)?$
           maxLength: 20
+          deprecated: true
           description: |
             A unique reference allocated by the shipping line to the `Transport Document` that the booking concerns.
+
+            **Deprecated:** In case both provider and consumer are on API v2.0.2 (or later), please use `transportDocumentReferences` property instead
           example: reserved-HHL123
+        transportDocumentReferences:
+          type: array
+          description:
+            An array of `transportDocumentReference` requested by the Shipper to be associated to this Booking.
+          items:
+            type: string
+            pattern: ^\S(?:.*\S)?$
+            maxLength: 20
+            description: |
+              The `transportDocumentReference` requested by the Shipper to be associated to this Booking.
+            example: reserved-HHL123
+        requestedNumberOfTransportDocuments:
+          type: integer
+          format: int32
+          minimum: 1
+          description: |
+            The number of `Transport Documents` requested to be linked to this Booking by the Shipper.
+          example: 3
         bookingChannelReference:
           type: string
           pattern: ^\S(?:.*\S)?$
@@ -3498,6 +3570,34 @@ components:
             A list of `Shipment Locations`
           items:
             $ref: '#/components/schemas/ShipmentLocation'
+        requestedPreCarriageModeOfTransport:
+          type: string
+          maxLength: 50
+          description: |
+            The `Mode of Transport` requested ​by the shipper for the **pre carriage**. The supported values include:
+            - `VESSEL` (Vessel)
+            - `RAIL` (Rail)
+            - `TRUCK` (Truck)
+            - `BARGE` (Barge)
+            - `RAIL_TRUCK`(Rail and truck)
+            - `BARGE_TRUCK`(Barge and truck)
+            - `BARGE_RAIL`(Barge and rail)
+            - `MULTIMODAL` (if multiple modes are used)
+          example: VESSEL
+        requestedOnCarriageModeOfTransport:
+          type: string
+          maxLength: 50
+          description: |
+            The `Mode of Transport` requested ​by the shipper for the **on carriage**. The supported values include:
+            - `VESSEL` (Vessel)
+            - `RAIL` (Rail)
+            - `TRUCK` (Truck)
+            - `BARGE` (Barge)
+            - `RAIL_TRUCK`(Rail and truck)
+            - `BARGE_TRUCK`(Barge and truck)
+            - `BARGE_RAIL`(Barge and rail)
+            - `MULTIMODAL` (if multiple modes are used)
+          example: VESSEL
         requestedEquipments:
           type: array
           minItems: 1
@@ -3840,9 +3940,30 @@ components:
           type: string
           pattern: ^\S(?:.*\S)?$
           maxLength: 20
+          deprecated: true
           description: |
             A unique reference allocated by the shipping line to the `Transport Document` that the booking concerns.
+
+            **Deprecated:** In case both provider and consumer are on API v2.0.2 (or later), please use `transportDocumentReferences` property instead
           example: reserved-HHL123
+        transportDocumentReferences:
+          type: array
+          description:
+            An array of `transportDocumentReference` to be associated to this Booking.
+          items:
+            type: string
+            pattern: ^\S(?:.*\S)?$
+            maxLength: 20
+            description: |
+              The `transportDocumentReference` to be associated to this Booking.
+            example: reserved-HHL123
+        requestedNumberOfTransportDocuments:
+          type: integer
+          format: int32
+          minimum: 1
+          description: |
+            The number of `Transport Documents` requested to be linked to this Booking by the Shipper.
+          example: 3
         bookingChannelReference:
           type: string
           pattern: ^\S(?:.*\S)?$
@@ -3900,6 +4021,34 @@ components:
             A list of `Shipment Locations`
           items:
             $ref: '#/components/schemas/ShipmentLocation'
+        requestedPreCarriageModeOfTransport:
+          type: string
+          maxLength: 50
+          description: |
+            The `Mode of Transport` requested ​by the shipper for the **pre carriage**. The supported values include:
+            - `VESSEL` (Vessel)
+            - `RAIL` (Rail)
+            - `TRUCK` (Truck)
+            - `BARGE` (Barge)
+            - `RAIL_TRUCK`(Rail and truck)
+            - `BARGE_TRUCK`(Barge and truck)
+            - `BARGE_RAIL`(Barge and rail)
+            - `MULTIMODAL` (if multiple modes are used)
+          example: VESSEL
+        requestedOnCarriageModeOfTransport:
+          type: string
+          maxLength: 50
+          description: |
+            The `Mode of Transport` requested ​by the shipper for the **on carriage**. The supported values include:
+            - `VESSEL` (Vessel)
+            - `RAIL` (Rail)
+            - `TRUCK` (Truck)
+            - `BARGE` (Barge)
+            - `RAIL_TRUCK`(Rail and truck)
+            - `BARGE_TRUCK`(Barge and truck)
+            - `BARGE_RAIL`(Barge and rail)
+            - `MULTIMODAL` (if multiple modes are used)
+          example: VESSEL
         requestedEquipments:
           type: array
           minItems: 1
@@ -4043,6 +4192,8 @@ components:
               maxLength: 2
               description: |
                 The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+
+                **Note:** In case the `countryCode` is unknown it is possible to use the code `ZZ`.
               example: DK
           required:
             - countryCode
@@ -4248,6 +4399,8 @@ components:
           maxLength: 2
           description: |
             The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+
+            **Note:** In case the `countryCode` is unknown it is possible to use the code `ZZ`.
           example: NL
       required:
         - street
@@ -4678,6 +4831,8 @@ components:
           maxLength: 2
           description: |
             The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+
+            **Note:** In case the `countryCode` is unknown it is possible to use the code `ZZ`.
           example: IN
         value:
           type: string
@@ -4780,6 +4935,8 @@ components:
           maxLength: 2
           description: |
             The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+
+            **Note:** In case the `countryCode` is unknown it is possible to use the code `ZZ`.
           example: EG
         values:
           type: array
@@ -4907,6 +5064,14 @@ components:
             $ref: '#/components/schemas/ContainerPositioning'
         emptyContainerPickup:
           $ref: '#/components/schemas/EmptyContainerPickup'
+        emptyContainerPickupAnyOriginType:
+          $ref: '#/components/schemas/EmptyContainerPickupAnyOriginType'
+        fullContainerPickupDateTime:
+          type: string
+          format: date-time
+          description: |
+            The date and time when the loaded container(s) need to be picked up from the `Place of Receipt`, if provided.
+          example: '2025-05-16T09:14:00Z'
         equipmentReferences:
           description: |
             A list of equipments to be used by the shipper if known at the time of booking
@@ -4993,6 +5158,14 @@ components:
             $ref: '#/components/schemas/ContainerPositioning'
         emptyContainerPickup:
           $ref: '#/components/schemas/EmptyContainerPickup'
+        emptyContainerPickupAnyOriginType:
+          $ref: '#/components/schemas/EmptyContainerPickupAnyOriginType'
+        fullContainerPickupDateTime:
+          type: string
+          format: date-time
+          description: |
+            The date and time when the loaded container(s) need to be picked up from the `Place of Receipt`, if provided.
+          example: '2025-05-16T09:14:00Z'
         equipmentReferences:
           description: |
             A list of equipments to be used by the shipper if known at the time of booking
@@ -5584,6 +5757,8 @@ components:
           maxLength: 2
           description: |
             The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+
+            **Note:** In case the `countryCode` is unknown it is possible to use the code `ZZ`.
           example: BR
         values:
           type: array
@@ -6173,17 +6348,22 @@ components:
             $ref: '#/components/schemas/ContainerPositioningEstimated'
         emptyContainerPickup:
           $ref: '#/components/schemas/EmptyContainerPickup'
+        emptyContainerPickupAnyOriginType:
+          $ref: '#/components/schemas/EmptyContainerPickupAnyOriginType'
       required:
         - ISOEquipmentCode
         - units
 
     EmptyContainerPickup:
       type: object
+      deprecated: true
       title: Empty Container Pickup
       description: |
         The date and time and location for the empty container pick-up.
         
         **Condition:** Only applicable to merchant haulage service at origin (`Receipt type at origin = 'CY'`).
+
+        **Deprecated:** In case both provider and consumer are on API v2.0.2 (or later), please use `emptyContainerPickupAnyOriginType` instead as it contains no conditions.
       properties:
         dateTime:
           type: string
@@ -6194,6 +6374,22 @@ components:
         depotReleaseLocation:
           $ref: '#/components/schemas/EmptyContainerDepotReleaseLocation'
 
+    EmptyContainerPickupAnyOriginType:
+      type: object
+      title: Empty Container Pickup (Any Origin Type)
+      description: |
+        The date, time and location of the depot from which the empty container(s) will be released from.
+        
+        **Note:** Applicable to **all** `Receipt type at origin`.
+      properties:
+        dateTime:
+          type: string
+          format: date-time
+          description: |
+            The date and time for the pick-up of the empty container(s) at the Empty container depot release location, if provided.
+          example: '2024-09-04T09:41:00Z'
+        depotReleaseLocation:
+          $ref: '#/components/schemas/EmptyContainerDepotReleaseLocation'
     ###########
     # Transport
     ###########
@@ -6230,12 +6426,16 @@ components:
           format: date
           description: |
             The planned date of departure.
+
+            **Note:** In case no date is available, the date `1970-01-01` should be used.
           example: '2021-05-17'
         plannedArrivalDate:
           type: string
           format: date
           description: |
             The planned date of arrival.
+
+            **Note:** In case no date is available, the date `1970-01-01` should be used.
           example: '2021-05-19'
         modeOfTransport:
           type: string
@@ -6246,6 +6446,9 @@ components:
             - `RAIL` (Rail)
             - `TRUCK` (Truck)
             - `BARGE` (Barge)
+            - `RAIL_TRUCK`(Rail and truck)
+            - `BARGE_TRUCK`(Barge and truck)
+            - `BARGE_RAIL`(Barge and rail)
             - `MULTIMODAL` (if multiple modes are used)
           example: VESSEL
         vesselName:
@@ -6461,6 +6664,8 @@ components:
           maxLength: 2
           description: |
             The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+
+            **Note:** In case the `countryCode` is unknown it is possible to use the code `ZZ`.
           example: US
       example:
         manifestTypeCode: ACE
