@@ -7,6 +7,27 @@ Publications related to the Booking API:
 - [Booking Process](https://dcsa.org/standards/booking-process/) contains documents and publications
 - [Booking Notification](./notification/) maintained here on GitHub  (**DEPRECATED** - now included as part of Booking API)
 
+<a name="v202"></a>[Release v2.0.2 (TBD)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.2)
+---
+This is a patch release for the DCSA Booking API. A lot of minor changes have been added to this patch, here is a list of changes
+
+- allow `countryCode` `ZZ` in case it is not known
+- added `expectedDepartureFromPlaceOfReceiptDate` next to `expectedDepartureDate` for the Shipper to also be able to specify the departure date from PoR
+- `transportDocumentReferences` (a list of TDR) to replace `transportDocumentReference` (a single TDR) as a Booking can potentially result in multiple Transport Documents
+- `transportDocumentReference` marked as Deprecated
+- `requestedNumberOfTransportDocuments` added in case the Shipper does not know the TDR(s) but knows how many are needed
+- `requestedPreCarriageModeOfTransport` and `requestedOnCarriageModeOfTransport` added for Shipper to specify the Mode of Transport for `pre`- and `on`-Carriage
+- add `emptyContainerPickupAnyOriginType` to allow empty container pickups that are not covered by `emptyContainerPickup`
+- and `fullContainerPickupDateTime`
+- `EmptyContainerPickup` marked as Deprecated as `emptyContainerPickupAnyOriginType` covers all cases
+- `1970-01-01` should be used for `plannedDepartureDate` and `plannedArrivalDate` in case the dates are not know
+- the following (extra) `Modes of Transport` have been added:
+  - `RAIL_TRUCK`(Rail and truck)
+  - `BARGE_TRUCK`(Barge and truck)
+  - `BARGE_RAIL`(Barge and rail)
+
+Link to [commits included in this patch](https://github.com/dcsaorg/DCSA-OpenAPI/commits/master/bkg/v2/BKG_v2.0.2.yaml?since=2025-04-25&until=2025-05-20)
+
 <a name="v201"></a>[Release v2.0.1 (25 April 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.1)
 ---
 This is a patch release for the DCSA Booking API. The primary purpose of this patch is to include the `routingReference` property in order to reference a route found in [Commercial Schedules](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/cs/v1), it also adds the `NAC` (Named Account Customer) party to `otherDocumentParty`. Here is a list of changes
