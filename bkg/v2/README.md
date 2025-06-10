@@ -17,16 +17,16 @@ This is a patch release for the DCSA Booking API. A lot of minor changes have be
 - `transportDocumentReference` marked as Deprecated
 - `requestedNumberOfTransportDocuments` added in case the Shipper does not know the TDR(s) but knows how many are needed
 - `requestedPreCarriageModeOfTransport` and `requestedOnCarriageModeOfTransport` added for Shipper to specify the Mode of Transport for `pre`- and `on`-Carriage
-- add `emptyContainerPickupAnyOriginType` to allow empty container pickups that are not covered by `emptyContainerPickup`
+- add `originEmptyContainerPickup` to allow empty container pickups that are not covered by `emptyContainerPickup`
 - and `fullContainerPickupDateTime`
-- `EmptyContainerPickup` marked as Deprecated as `emptyContainerPickupAnyOriginType` covers all cases
+- `EmptyContainerPickup` marked as Deprecated as `originEmptyContainerPickup` covers all cases
 - `1970-01-01` should be used for `plannedDepartureDate` and `plannedArrivalDate` in case the dates are not know
 - the following (extra) `Modes of Transport` have been added:
   - `RAIL_TRUCK`(Rail and truck)
   - `BARGE_TRUCK`(Barge and truck)
   - `BARGE_RAIL`(Barge and rail)
 
-Link to [commits included in this patch](https://github.com/dcsaorg/DCSA-OpenAPI/commits/master/bkg/v2/BKG_v2.0.2.yaml?since=2025-04-25&until=2025-05-20)
+Link to [commits included in this patch](https://github.com/dcsaorg/DCSA-OpenAPI/commits/master/bkg/v2/BKG_v2.0.2.yaml?since=2025-04-25&until=2025-06-12)
 
 <a name="v201"></a>[Release v2.0.1 (25 April 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.1)
 ---
