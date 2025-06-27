@@ -9,10 +9,10 @@ Publications related to the Booking API:
 
 <a name="v202"></a>[Release v2.0.2 (TBD)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.2)
 ---
-This is a patch release for the DCSA Booking API. A lot of minor changes have been added to this patch, here is a list of changes
+This is a patch release for the DCSA Booking API. A bug in the `GET`, `PUT` and `PATCH` description has been fixed (chaning the semantics of the endPoints) and a lot of minor changes have been added to this patch, here is a list of changes
 
 - allow `countryCode` `ZZ` in case it is not known
-- added `expectedDepartureFromPlaceOfReceiptDate` next to `expectedDepartureDate` for the Shipper to also be able to specify the departure date from PoR
+- added `expectedDepartureFromPlaceOfReceiptDate` next to `expectedDepartureDate` for the Shipper to also be able to specify the departure date from `PRE` (Place of Receipt)
 - `transportDocumentReferences` (a list of TDR) to replace `transportDocumentReference` (a single TDR) as a Booking can potentially result in multiple Transport Documents
 - `transportDocumentReference` marked as Deprecated
 - `requestedNumberOfTransportDocuments` added in case the Shipper does not know the TDR(s) but knows how many are needed
@@ -25,8 +25,9 @@ This is a patch release for the DCSA Booking API. A lot of minor changes have be
   - `RAIL_TRUCK`(Rail and truck)
   - `BARGE_TRUCK`(Barge and truck)
   - `BARGE_RAIL`(Barge and rail)
+- fixed a bug in the description of the `PUT`, `GET` and `PATCH`. It is now possible to use CBRR (`carrierBookingRequestReference`) after a Booking has been Confirmed (the description wrongly prevented this). This changes the semantics of the endPoints - but the change is needed as the standard cannot be used as it is in case a Shipper does not implement the ability to receive PUSH notifications.
 
-Link to [commits included in this patch](https://github.com/dcsaorg/DCSA-OpenAPI/commits/master/bkg/v2/BKG_v2.0.2.yaml?since=2025-04-25&until=2025-06-12)
+Link to [commits included in this patch](https://github.com/dcsaorg/DCSA-OpenAPI/commits/master/bkg/v2/BKG_v2.0.2.yaml?since=2025-04-25&until=2025-06-28)
 
 <a name="v201"></a>[Release v2.0.1 (25 April 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.1)
 ---
