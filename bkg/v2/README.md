@@ -25,9 +25,9 @@ This is a patch release for the DCSA Booking API. A bug in the `GET`, `PUT` and 
   - `RAIL_TRUCK`(Rail and truck)
   - `BARGE_TRUCK`(Barge and truck)
   - `BARGE_RAIL`(Barge and rail)
-- fixed a bug in the description of the `PUT`, `GET` and `PATCH`. It is now possible to use CBRR (`carrierBookingRequestReference`) after a Booking has been Confirmed (the description wrongly prevented this). This changes the semantics of the endPoints - but the change is needed as the standard cannot be used as it is in case a Shipper does not implement the ability to receive PUSH notifications.
+- We have removed a constraint that was preventing shippers who don't receive notifications to transition from using the carrier booking request reference (CBRR) to using the carrier booking reference (CBR) when the booking is confirmed
 
-Link to [commits included in this patch](https://github.com/dcsaorg/DCSA-OpenAPI/commits/master/bkg/v2/BKG_v2.0.2.yaml?since=2025-04-25&until=2025-06-28)
+Link to [commits included in this patch](https://github.com/dcsaorg/DCSA-OpenAPI/commits/master/bkg/v2/BKG_v2.0.2.yaml?since=2025-04-25&until=2025-07-04)
 
 <a name="v201"></a>[Release v2.0.1 (25 April 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.1)
 ---
