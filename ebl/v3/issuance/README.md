@@ -8,12 +8,12 @@ Publications related to the Bill of Lading Issuance API:
 - [Bill of Lading](./../) maintained here on GitHub
 - [Bill of Lading Issuance Response](./../issuance_response/) maintained here on GitHub (the Issuance Response API linked to this API)
 
-<a name="v301"></a>[Release v3.0.1 (29 July 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS/3.0.1)
+<a name="v301"></a>[Release v3.0.1 (30 July 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS/3.0.1)
 ---
 This is a patch version for the DCSA Issuance API. It only includes minor cosmetic changes. The purpose of the patch is to align with electronic Bill of Lading v3.0.1 API.
 ## Minor changes
-- remove Servers list that was wrongly added (no Virtual Servers are connected to DCSA APIs)
-- remove the reference to `ISO 8601` (all dateTime fields must comply with [RFC 3339, section 5.6](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6))
+- removed Servers list that was wrongly added (no Virtual Servers are connected to DCSA APIs)
+- removed the reference to `ISO 8601` (all dateTime fields must comply with [RFC 3339, section 5.6](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6))
 - fixed some formatting in the `transportDocumentStatus` description and some places referring to `Transport Document`
 - added an extra **Note** on the `dispalyedAdress` mentioning that some carriers might allow for more than 2 lines for physical Bill of Ladings
 - `codeListProvider` and `sendToPlatform` updated with the following values: `COVA` (Covantis), `ETIT` (e-title), `KTNE` (KTNET) and `CRED` (Credore)
