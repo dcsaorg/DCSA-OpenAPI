@@ -17,6 +17,7 @@ This is a patch version for the DCSA Issuance API. It only includes minor cosmet
 - fixed some formatting in the `transportDocumentStatus` description and some places referring to `Transport Document`
 - added an extra **Note** on the `dispalyedAdress` mentioning that some carriers might allow for more than 2 lines for physical Bill of Ladings
 - `codeListProvider` and `sendToPlatform` updated with the following values: `COVA` (Covantis), `ETIT` (e-title), `KTNE` (KTNET) and `CRED` (Credore)
+- clarifies which party `partyContactDetails` refers to
 
 <a name="v300"></a>[Release v3.0.0 (17 December 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS/3.0.0)
 ---

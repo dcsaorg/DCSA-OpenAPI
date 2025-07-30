@@ -39,6 +39,7 @@ Snapshot as of 17 of December 2024 for EBL Platform Interoperability 3.0.0 Beta.
 - `PlaceOfReceipt` and `PlaceOfDelivery` description updated (wrong reference to `Geo Coordinate` removed)
 - description updated for `PlaceOfBLIssue`
 - typo fixed in `reference` (in `ImportLicense`) (athorizes --> a**u**thorizes)
+- clarifies which party `partyContactDetails` refers to
 
 <a name="v300B20241108"></a>[Release v3.0.0 Beta 20241108 (8 of November 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_PINT/3.0.0-Beta-20241108)
 ---
