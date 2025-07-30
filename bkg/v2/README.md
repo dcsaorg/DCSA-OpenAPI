@@ -27,6 +27,7 @@ This is a patch release for the DCSA Booking API. A bug in the `GET`, `PUT` and 
   - `BARGE_RAIL`(Barge and rail)
 - We have removed a constraint that was preventing shippers who don't receive notifications to transition from using the carrier booking request reference (CBRR) to using the carrier booking reference (CBR) when the booking is confirmed
 - `codeListProvider` updated with the following values: `COVA` (Covantis), `ETIT` (e-title), `KTNE` (KTNET) and `CRED` (Credore)
+- clarifies which party `partyContactDetails` refers to
 Link to [commits included in this patch](https://github.com/dcsaorg/DCSA-OpenAPI/commits/master/bkg/v2/BKG_v2.0.2.yaml?since=2025-04-25&until=2025-07-04)
 
 <a name="v201"></a>[Release v2.0.1 (25 April 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.1)
