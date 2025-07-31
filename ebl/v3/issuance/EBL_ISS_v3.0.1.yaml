@@ -1,9 +1,6 @@
 openapi: 3.0.3
-servers:
-  - description: SwaggerHub API Auto Mocking
-    url: 'https://virtserver.swaggerhub.com/dcsaorg/DCSA_EBL_ISS/3.0.0'
 info:
-  version: 3.0.0
+  version: 3.0.1
   title: DCSA eBL Issuance API
   description: |
     <h1>DCSA OpenAPI specification for the issuance of an electronic Bill of Lading (referred to as eBL) via an eBL Solution Provider</h1>
@@ -20,7 +17,7 @@ info:
 
     for the eBL Solution Provider to call.
 
-    When the document is to be surrendered, it should happen via a version of the [DCSA eBL Surrender](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR/3.0.0) API.
+    When the document is to be surrendered, it should happen via a version of the [DCSA eBL Surrender](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR/3.0.1) API.
 
     ### API Design & Implementation Principles
     This API follows the guidelines defined in version 2.0 of the API Design & Implementation Principles which can be found on the [DCSA Developer Portal](https://developer.dcsa.org/api_design)
@@ -29,7 +26,7 @@ info:
     Please look at the following implementation guide for how to create [Digital Signatures](https://developer.dcsa.org/implementing-digital-signatures-for-transport-documents). 
     
     ### Changelog and GitHub
-    For a changelog, please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/ebl/v3/issuance#v300). If you have any questions, feel free to [Contact Us](https://dcsa.org/get-involved/contact-us).
+    For a changelog, please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/ebl/v3/issuance#v301). If you have any questions, feel free to [Contact Us](https://dcsa.org/get-involved/contact-us).
 
     API specification issued by [DCSA.org](https://dcsa.org/).
   license:
@@ -163,7 +160,7 @@ components:
     API-Version:
       schema:
         type: string
-        example: 3.0.0
+        example: 3.0.1
       description: |
         SemVer used to indicate the version of the contract (API version) returned.
   parameters:
@@ -226,7 +223,7 @@ components:
           example: 4426d965-0dd8-4005-8c63-dc68b01c4962
         errorDateTime:
           description: |
-            The DateTime corresponding to the error occurring. Must be formatted using [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format.
+            The DateTime corresponding to the error occurring.
           type: string
           format: date-time
           example: '2024-09-04T09:41:00Z'
@@ -416,6 +413,10 @@ components:
             - `ETEU` (eTEU)
             - `TRAC` (Enigio trace:original)
             - `BRIT` (BRITC eBL)
+            - `COVA` (Covantis)
+            - `ETIT` (e-title)
+            - `KTNE` (KTNET)
+            - `CRED` (Credore)
           example: BOLE
         identifyingCodes:
           type: array
@@ -455,6 +456,10 @@ components:
             - `ETEU` (eTEU)
             - `TRAC` (Enigio trace:original)
             - `BRIT` (BRITC eBL)
+            - `COVA` (Covantis)
+            - `ETIT` (e-title)
+            - `KTNE` (KTNET)
+            - `CRED` (Credore)
             - `GSBN` (Global Shipping Business Network)
             - `WISE` (WiseTech)
             - `GLEIF` (Global Legal Entity Identifier Foundation)
@@ -547,7 +552,7 @@ components:
           pattern: ^\S(?:.*\S)?$
           maxLength: 20
           description: |
-            A unique number allocated by the shipping line to the transport document and the main number used for the tracking of the status of the shipment.
+            A unique number allocated by the shipping line to the `Transport Document` and the main number used for the tracking of the status of the shipment.
           example: HHL71800000
         transportDocumentSubReference:
           type: string
@@ -568,14 +573,14 @@ components:
           maxLength: 50
           description: |
             The status of the `Transport Document`. Possible values are:
-            - DRAFT
-            - APPROVED
-            - ISSUED
-            - PENDING_SURRENDER_FOR_AMENDMENT
-            - SURRENDERED_FOR_AMENDMENT
-            - PENDING_SURRENDER_FOR_DELIVERY
-            - SURRENDERED_FOR_DELIVERY
-            - VOIDED
+            - `DRAFT` (the Transport Document is currently a Draft)
+            - `APPROVED` (the Transport Document has been Approved by consumer)
+            - `ISSUED` (the Transport Document has been Issued by provider)
+            - `PENDING_SURRENDER_FOR_AMENDMENT` (the Transport Document has a pending Surrender for Amendment)
+            - `SURRENDERED_FOR_AMENDMENT` (the Transport Document is Surrendered for Amendment)
+            - `PENDING_SURRENDER_FOR_DELIVERY` (the Transport Document has a pending Surrender for Delivery)
+            - `SURRENDERED_FOR_DELIVERY` (the Transport Document is Surrendered for Delivery)
+            - `VOIDED` (the Transport Document has been Voided)
           example: DRAFT
         transportDocumentTypeCode:
           type: string
@@ -885,7 +890,7 @@ components:
           type: array
           minItems: 1
           description: |
-            The contact details of the person(s) to contact in relation to the **Transport Document** (changes, notifications etc.) 
+            The contact details of the Shipping Instructions requestor(s) to contact in relation to the **Transport Document** (changes, notifications etc.)
           items:
             $ref: '#/components/schemas/PartyContactDetail'
         documentParties:
@@ -2831,7 +2836,7 @@ components:
             
             **Conditions:** If provided:
               - the displayed address must be included in the `Transport Document`.
-              - for physical BL (`isElectronic=false`), it is only allowed to provide max 2 lines of 35 characters
+              - for physical BL (`isElectronic=false`), it is only allowed to provide max 2 lines of 35 characters. **Note:** Some carriers may choose to allow more lines, please consult the carrier's API documentation to check if this is the case.
               - for electronic BL (`isElectronic=true`), the limit is 6 lines of 35 characters
               - the order of the items in this array **MUST** be preserved as by the provider of the API.
           items:
@@ -2914,7 +2919,7 @@ components:
             
             **Conditions:** If provided:
               - the displayed address must be included in the `Transport Document`.
-              - for physical BL (`isElectronic=false`), it is only allowed to provide max 2 lines of 35 characters
+              - for physical BL (`isElectronic=false`), it is only allowed to provide max 2 lines of 35 characters. **Note:** Some carriers may choose to allow more lines, please consult the carrier's API documentation to check if this is the case.
               - for electronic BL (`isElectronic=true`), the limit is 6 lines of 35 characters
               - the order of the items in this array **MUST** be preserved as by the provider of the API.
           items:
@@ -2989,7 +2994,7 @@ components:
             
             **Conditions:** If provided:
               - the displayed address must be included in the `Transport Document`.
-              - for physical BL (`isElectronic=false`), it is only allowed to provide max 2 lines of 35 characters
+              - for physical BL (`isElectronic=false`), it is only allowed to provide max 2 lines of 35 characters. **Note:** Some carriers may choose to allow more lines, please consult the carrier's API documentation to check if this is the case.
               - for electronic BL (`isElectronic=true`), the limit is 6 lines of 35 characters
               - the order of the items in this array **MUST** be preserved as by the provider of the API.
           items:
@@ -3080,7 +3085,7 @@ components:
             
             **Conditions:** If provided:
               - the displayed address must be included in the `Transport Document`.
-              - for physical BL (`isElectronic=false`), it is only allowed to provide max 2 lines of 35 characters
+              - for physical BL (`isElectronic=false`), it is only allowed to provide max 2 lines of 35 characters. **Note:** Some carriers may choose to allow more lines, please consult the carrier's API documentation to check if this is the case.
               - for electronic BL (`isElectronic=true`), the limit is 6 lines of 35 characters
               - the order of the items in this array **MUST** be preserved as by the provider of the API.
           items:
@@ -3223,7 +3228,7 @@ components:
           pattern: ^\S(?:.*\S)?$
           maxLength: 20
           description: |
-            A unique number allocated by the shipping line to the transport document and the main number used for the tracking of the status of the shipment.
+            A unique number allocated by the shipping line to the `Transport Document` and the main number used for the tracking of the status of the shipment.
           example: HHL71800000
         transportDocumentSubReference:
           type: string

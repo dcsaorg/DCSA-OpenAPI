@@ -1,9 +1,6 @@
 openapi: 3.0.3
-servers:
-  - description: SwaggerHub API Auto Mocking
-    url: 'https://virtserver.swaggerhub.com/dcsaorg/DCSA_EBL_SUR/3.0.0'
 info:
-  version: 3.0.0
+  version: 3.0.1
   title: DCSA eBL Surrender API
   description: |
     <h1>DCSA OpenAPI specification for the surrender of an electronic Bill of Lading (referred to as eBL) via an eBL Solution Provider for amendment (incl. switch to paper), and delivery</h1>
@@ -35,7 +32,7 @@ info:
     This API follows the guidelines defined in version 2.0 of the API Design & Implementation Principles which can be found on the [DCSA Developer Portal](https://developer.dcsa.org/api_design)
 
     ### Changelog and GitHub
-    For a changelog, please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/ebl/v3/surrender#v300). If you have any questions, feel free to [Contact Us](https://dcsa.org/get-involved/contact-us).
+    For a changelog, please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/ebl/v3/surrender#v301). If you have any questions, feel free to [Contact Us](https://dcsa.org/get-involved/contact-us).
 
     API specification issued by [DCSA.org](https://dcsa.org/).
   license:
@@ -134,7 +131,7 @@ components:
     API-Version:
       schema:
         type: string
-        example: 3.0.0
+        example: 3.0.1
       description: |
         SemVer used to indicate the version of the contract (API version) returned.
   parameters:
@@ -171,6 +168,10 @@ components:
             - `ETEU` (eTEU)
             - `TRAC` (Enigio trace:original)
             - `BRIT` (BRITC eBL)
+            - `COVA` (Covantis)
+            - `ETIT` (e-title)
+            - `KTNE` (KTNET)
+            - `CRED` (Credore)
           example: BOLE
         partyName:
           type: string
@@ -253,7 +254,7 @@ components:
           pattern: ^\S(?:.*\S)?$
           maxLength: 20
           description: |
-            A unique number allocated by the shipping line to the transport document and the main number used for the tracking of the status of the shipment.
+            A unique number allocated by the shipping line to the `Transport Document` and the main number used for the tracking of the status of the shipment.
           example: HHL71800000
         transportDocumentSubReference:
           type: string
@@ -266,10 +267,10 @@ components:
           type: string
           description: |
             Surrender Request codes:
-            - `SREQ` (Requested to surrender for Delivery)
-            - `AREQ` (Requested to surrender for Amendment)
+            - `SREQ` (Requested to Surrender for Delivery)
+            - `AREQ` (Requested to Surrender for Amendment)
 
-            The surrender request code determines the type of surrender request. Any parallel negotiation between the consignee and the carrier related to any of these type surrender are handled outside this API. Examples could be the shipment release related to a surrender for delivery or the actual contents of the amendment in a surrender related to an amendment.
+            The surrender request code determines the type of surrender request. Any parallel negotiation between the consignee and the carrier related to any of these type surrender are handled outside this API. Examples could be the shipment release related to a Surrender for Delivery or the actual contents of the amendment in a surrender related to an amendment.
 
             Note that "Switch to paper" is considered an amendment in how it is modelled via the DCSA eBL data standard.
           enum:
@@ -279,7 +280,9 @@ components:
         reasonCode:
           type: string
           maxLength: 4
-          description: "A code defined by DCSA indicating the reason for requesting a surrender for amendment. Possible values are:\n-\t`SWTP` (Switch to paper)\n"
+          description: |
+            A code defined by DCSA indicating the reason for requesting a Surrender for Amendment. Possible values are:
+            - `SWTP` (Switch to paper)
           example: SWTP
         comments:
           type: string
@@ -295,8 +298,8 @@ components:
             - **Issue:** The act of issuing an eBL i.e. making the eBL available to the receiver.
             - **Endorse:** The act of transferring the rights and obligations associated with the eBL to a specific named party, allowing them to claim or deal with the goods. The user in control of the eBL may endorse the eBL in their turn to another named party. Only applicable to To-Order eBL (`isToOrder=true`).
             - **Sign:** A general-purpose signature that can be used by any party to mark their possession of the eBL. Similar to how any possessor in the physical world can put a physical signature on the paper bill of lading. The endorsement chain as defined by DCSA does not record any transfer of possession of the eBL, unless a signature is added to it.
-            - **Request surrender for amendment:** The presentation (by transfer) of the eBL to the Issuer, or another user appointed by the Issuer, by a user entitled to do so for the purpose of amending the eBL.
-            - **Request surrender for delivery:** The presentation (by transfer) of the eBL to the Issuer, or another user appointed by the Issuer, by a user entitled to do so for the purpose of claiming delivery of the goods.
+            - **Request Surrender for Amendment:** The presentation (by transfer) of the eBL to the Issuer, or another user appointed by the Issuer, by a user entitled to do so for the purpose of amending the eBL.
+            - **Request Surrender for Delivery:** The presentation (by transfer) of the eBL to the Issuer, or another user appointed by the Issuer, by a user entitled to do so for the purpose of claiming delivery of the goods.
 
             **Note:** DCSA member carriers have agreed that the name `endorsementChain` is still the correct name for this list of actions.
           items:
@@ -326,6 +329,10 @@ components:
             - `ETEU` (eTEU)
             - `TRAC` (Enigio trace:original)
             - `BRIT` (BRITC eBL)
+            - `COVA` (Covantis)
+            - `ETIT` (e-title)
+            - `KTNE` (KTNET)
+            - `CRED` (Credore)
             - `GSBN` (Global Shipping Business Network)
             - `WISE` (WiseTech)
             - `GLEIF` (Global Legal Entity Identifier Foundation)
@@ -450,7 +457,7 @@ components:
           example: 4426d965-0dd8-4005-8c63-dc68b01c4962
         errorDateTime:
           description: |
-            The DateTime corresponding to the error occurring. Must be formatted using [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format.
+            The DateTime corresponding to the error occurring.
           type: string
           format: date-time
           example: '2024-09-04T09:41:00Z'

@@ -9,6 +9,16 @@ Publications related to the PINT API:
 ---
 This is a moving target and will continue to be updated:
 
+<a name="v300B20250731"></a>[Release v3.0.0 Beta 20250731 (31 of July 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_PINT/3.0.0-Beta-20250731)
+---
+Snapshot as of 31 of July 2025 for EBL Platform Interoperability 3.0.0 Beta.
+
+## Other changes
+- removed Servers list that was wrongly added (no Virtual Servers are connected to DCSA APIs)
+- removed the reference to `ISO 8601` (all dateTime fields must comply with [RFC 3339, section 5.6](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6))
+- added an extra **Note** on the `dispalyedAdress` mentioning that some carriers might allow for more than 2 lines for physical Bill of Ladings
+- `codeListProvider` and `eblPlatform` updated with the following values: `COVA` (Covantis), `ETIT` (e-title), `KTNE` (KTNET) and `CRED` (Credore)
+
 <a name="v300B20241217"></a>[Release v3.0.0 Beta 20241217 (17 of December 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_PINT/3.0.0-Beta-20241217)
 ---
 Snapshot as of 17 of December 2024 for EBL Platform Interoperability 3.0.0 Beta.
@@ -29,6 +39,7 @@ Snapshot as of 17 of December 2024 for EBL Platform Interoperability 3.0.0 Beta.
 - `PlaceOfReceipt` and `PlaceOfDelivery` description updated (wrong reference to `Geo Coordinate` removed)
 - description updated for `PlaceOfBLIssue`
 - typo fixed in `reference` (in `ImportLicense`) (athorizes --> a**u**thorizes)
+- clarifies which party `partyContactDetails` refers to
 
 <a name="v300B20241108"></a>[Release v3.0.0 Beta 20241108 (8 of November 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_PINT/3.0.0-Beta-20241108)
 ---
