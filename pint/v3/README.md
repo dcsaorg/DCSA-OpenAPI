@@ -9,9 +9,9 @@ Publications related to the PINT API:
 ---
 This is a moving target and will continue to be updated:
 
-<a name="v300B20250730"></a>[Release v3.0.0 Beta 20250730 (30 of July 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_PINT/3.0.0-Beta-20250730)
+<a name="v300B20250731"></a>[Release v3.0.0 Beta 20250731 (31 of July 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_PINT/3.0.0-Beta-20250731)
 ---
-Snapshot as of 30 of July 2025 for EBL Platform Interoperability 3.0.0 Beta.
+Snapshot as of 31 of July 2025 for EBL Platform Interoperability 3.0.0 Beta.
 
 ## Other changes
 - removed Servers list that was wrongly added (no Virtual Servers are connected to DCSA APIs)

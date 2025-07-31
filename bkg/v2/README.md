@@ -7,7 +7,7 @@ Publications related to the Booking API:
 - [Booking Process](https://dcsa.org/standards/booking-process/) contains documents and publications
 - [Booking Notification](./notification/) maintained here on GitHub  (**DEPRECATED** - now included as part of Booking API)
 
-<a name="v202"></a>[Release v2.0.2 (30 July 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.2)
+<a name="v202"></a>[Release v2.0.2 (31 July 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.2)
 ---
 This is a patch release for the DCSA Booking API. A bug in the `GET`, `PUT` and `PATCH` description has been fixed (chaning the semantics of the endPoints) and a lot of minor changes have been added to this patch, here is a list of changes
 
