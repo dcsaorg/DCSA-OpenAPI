@@ -16,7 +16,7 @@ Snapshot as of 31 of July 2025 for EBL Platform Interoperability 3.0.0 Beta.
 ## Other changes
 - removed Servers list that was wrongly added (no Virtual Servers are connected to DCSA APIs)
 - removed the reference to `ISO 8601` (all dateTime fields must comply with [RFC 3339, section 5.6](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6))
-- added an extra **Note** on the `dispalyedAdress` mentioning that some carriers might allow for more than 2 lines for physical Bill of Ladings
+- added an extra **Note** on the `displayedAdress` mentioning that some carriers might allow for more than 2 lines for physical Bill of Ladings
 - `codeListProvider` and `eblPlatform` updated with the following values: `COVA` (Covantis), `ETIT` (e-title), `KTNE` (KTNET) and `CRED` (Credore)
 
 <a name="v300B20241217"></a>[Release v3.0.0 Beta 20241217 (17 of December 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_PINT/3.0.0-Beta-20241217)
@@ -249,7 +249,7 @@ Snapshot as of 30 of August 2024 for EBL Platform Interoperability 3.0.0 Beta.
   - `street` maxLength changed from 100 --> 70
   - `PObox` added as property
   - `city` maxLength changed from 65 --> 35
-- `partyFunctionCode` values updated (`NofityParty` values removed)
+- `partyFunctionCode` values updated (`NotifyParty` values removed)
 - `Shipper` object changes:
   - `partyName` maxLength changed from 100 --> 70
   - `typeOfPerson` added
