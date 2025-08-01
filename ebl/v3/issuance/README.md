@@ -15,7 +15,7 @@ This is a patch version for the DCSA Issuance API. It only includes minor cosmet
 - removed Servers list that was wrongly added (no Virtual Servers are connected to DCSA APIs)
 - removed the reference to `ISO 8601` (all dateTime fields must comply with [RFC 3339, section 5.6](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6))
 - fixed some formatting in the `transportDocumentStatus` description and some places referring to `Transport Document`
-- added an extra **Note** on the `dispalyedAdress` mentioning that some carriers might allow for more than 2 lines for physical Bill of Ladings
+- added an extra **Note** on the `displayedAdress` mentioning that some carriers might allow for more than 2 lines for physical Bill of Ladings
 - `codeListProvider` and `sendToPlatform` updated with the following values: `COVA` (Covantis), `ETIT` (e-title), `KTNE` (KTNET) and `CRED` (Credore)
 - clarifies which party `partyContactDetails` refers to
 
