@@ -23,7 +23,7 @@ This is a patch version for the DCSA Bill of Lading API. The primary reason for 
 
 ## Minor changes
 - removed Servers list that was wrongly added (no Virtual Servers are connected to DCSA APIs)
-- added an extra **Note** on the `dispalyedAdress` mentioning that some carriers might allow for more than 2 lines for physical Bill of Ladings
+- added an extra **Note** on the `displayedAdress` mentioning that some carriers might allow for more than 2 lines for physical Bill of Ladings
 - updated spelling for Jerr**i**cans -> Jerr**y**cans
 - updated some typos
 - removed the reference to `ISO 8601` (all dateTime fields must comply with [RFC 3339, section 5.6](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6))
