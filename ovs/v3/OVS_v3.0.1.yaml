@@ -1,48 +1,195 @@
 openapi: 3.0.3
 info:
   title: Operational Vessel Schedules
-  version: 3.0.1
-  description: "API specification issued by DCSA.org\r\n\r\nThis API supports <b>OVS</b> (Operational Vessel Schedules)\r\n\r\nThe Interface Standards for OVS and other documentation can be found on the [DCSA Website](https://dcsa.org/standards/operational-vessel-schedules/).\r\n\r\nFor explanation to specific values or objects please refer to the [Information Model](https://dcsa.org/wp-content/uploads/2024/01/DCSA-Information-Model-2023.Q4.pdf).\r\n\r\n### Stats API\r\nThe Stats API offers crucial statistical information for both API providers and consumers to enhance their services and helps DCSA to understand and scale the ecosystem. We expect you to invoke the Stats API for every request made to the Operational Vessel Schedules API. Further details can be found [here](https://developer.dcsa.org/#/http/guides/api-guides/stats-api)\r\n\r\nFor a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/ovs/v3#v300). If you have any questions, feel free to [Contact Us](https://dcsa.org/get-involved/contact-us)"
+  description: |
+    API specification issued by DCSA.org
+    
+    This API supports **OVS** (Operational Vessel Schedules)
+    
+    The Interface Standards for OVS and other documentation can be found on the [DCSA Website](https://dcsa.org/standards/operational-vessel-schedules/).
+    
+    For explanation to specific values or objects please refer to the [Information Model](https://dcsa.org/wp-content/uploads/2024/01/DCSA-Information-Model-2023.Q4.pdf).
+    
+    ### Stats API
+    
+    The Stats API offers crucial statistical information for both API providers and consumers to enhance their services and helps DCSA to understand and scale the ecosystem. We expect you to invoke the Stats API for every request made to the Operational Vessel Schedules API. Further details can be found [here](https://developer.dcsa.org/#/http/guides/api-guides/stats-api)
+    
+    For a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/ovs/v3#v301). Please [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new)
   contact:
     name: Digital Container Shipping Association (DCSA)
-    url: 'https://dcsa.org'
+    url: https://dcsa.org
     email: info@dcsa.org
   license:
-    url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
     name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 3.0.1
 servers:
-  - url: 'http://localhost:3000'
+- url: http://localhost:3000
+tags:
+- name: Operational Vessel Schedules
+  description: ' '
 paths:
   /v3/service-schedules:
     get:
-      summary: Get a list of Schedules
       tags:
-        - Operational Vessel Schedules
+      - Operational Vessel Schedules
+      summary: Get a list of Schedules
+      description: |
+        Get a list of service schedules. The result is `Vessel-Centric` - this means that the `Vessel` is in the top of the hierarchy of the response structure. A service is a heirarchical structure with the following elements:
+        - One or more `Services` which can contain one or more `Vessels`
+        - A `Vessel` which can call multiple `Ports` (`TransportCalls`).
+        - A `Port` (`TransportCall`) can contain one or more `TimeStamps`.
+        
+        The number of service schedules in the list can be narrowed down by providing filter parameters. The resulting payload will always include **entire voyage(s) being matched**. This means that even though a filter only matches a single `Port` in a `Voyage` or a single `Timestamp` within a `Port` in a `Voyage` - **the entire Voyage matched** is returned. If the `carrierImportVoyageNumber` of the `Port` differs from the `carrierExportVoyageNumber` of the `Port` then the **entire Voyage** for both these Voyage numbers are included.
+        
+        An example of this is when `&UNLocationCode=DEHAM` is used as a filter parameter. In this case **entire Voyages** would be listed where `DEHAM` is a `Port`.
+        
+        Be aware that it is possible to specify filters that are mutially exclusive resulting in an empty response list. An example of this could be when both using `vesselIMONumber` and `vesselName` filters at the same time:
+        
+        &vesselIMONumber=9321483&vesselName=King of the Seas
+        
+        If no `Vessel` exists where `vesselIMONumber` is **9321483** and `vesselName` is **King of the Seas** then the result will be an empty list
+        
+        If no `startDate` filter is provided then **3 months** prior to the request data is used. If no `endDate` filters is provided then **6 months** after the request date is used.
+      operationId: get-v3-service-schedules
+      parameters:
+      - name: carrierServiceName
+        in: query
+        description: |
+          The carrier service name to filter by. The result will only return schedules including the service name.
+        required: false
+        schema:
+          type: string
+          maxLength: 50
+          example: Great Lion Service
+      - name: carrierServiceCode
+        in: query
+        description: |
+          The carrier specific service code to filter by. The result will only return schedules including the service code.
+        required: false
+        schema:
+          type: string
+          maxLength: 11
+          example: FE1
+      - name: universalServiceReference
+        in: query
+        description: |
+          The **U**niversal **S**ervice **R**eference (`USR`) as defined by **DCSA** to filter by. The service code must match the regular expression pattern: `SR\d{5}[A-Z]`. The letters `SR` followed by `5 digits`, followed by a checksum-character as a capital letter from `A to Z`. The result will only return schedules including the service reference
+        required: false
+        schema:
+          type: string
+          pattern: ^SR\d{5}[A-Z]$
+          maxLength: 8
+          example: SR12345A
+      - name: vesselIMONumber
+        in: query
+        description: |
+          The identifier of a vessel. The result will only return schedules including the vessel with the specified IMO number.              It is not a requirement for dummy vessels to have an `IMO Number`. In this case filtering by `vesselName` should be used.
+        required: false
+        schema:
+          type: string
+          pattern: ^\d{7}$
+          maxLength: 7
+          example: '9321483'
+      - name: vesselName
+        in: query
+        description: |
+          The name of a vessel. The result will only return schedules including the vessel with the specified name. Be aware that the `vesselName` is not unique and might match multiple vessels. If possible, filtering by `IMO Number` is preferred. In case of dummy vessels an `IMO Number` might not exist in which case this filter is to be used.'
+        required: false
+        schema:
+          type: string
+          maxLength: 35
+          example: King of the Seas
+      - name: carrierVoyageNumber
+        in: query
+        description: |
+          The carrier specific identifier of a `Voyage` - can be both **importVoyageNumber** and **exportVoyageNumber**. The result will only return schedules including the `Ports` where `carrierVoyageNumber` is either `carrierImportVoyageNumber` or `carrierExportVoyageNumber`
+        required: false
+        schema:
+          type: string
+          maxLength: 50
+          example: 2103S
+      - name: universalVoyageReference
+        in: query
+        description: |
+          The Universal Reference of a `Voyage` - can be both **importUniversalVoyageReference** and **exportUniversalVoyageReference**. The result will only return schedules including the `Ports` where `universalVoyageReference` is either `importUniversalVoyageReference` or `exportUniversalVoyageReference`
+        required: false
+        schema:
+          type: string
+          pattern: ^\d{2}[0-9A-Z]{2}[NEWSR]$
+          maxLength: 5
+          example: 2201N
+      - name: UNLocationCode
+        in: query
+        description: |
+          The `UN Location Code` specifying where a port is located. Specifying this filter will only return schedules including **entire Voyages** related to this particular `UN Location Code`.
+        required: false
+        schema:
+          type: string
+          pattern: ^[A-Z]{2}[A-Z2-9]{3}$
+          minLength: 5
+          maxLength: 5
+          example: NLAMS
+      - name: facilitySMDGCode
+        in: query
+        description: |
+          The `facilitySMDGCode` specifying a specific facility (using SMDG Code). Be aware that the `facilitySMDGCode` does not contain a `UNLocationCode` - this must be specified in the `UNLocationCode` filter. Specifying this filter will only return schedules including **entire Voyages** related to this particular `facilitySMDGCode`.
+        required: false
+        schema:
+          type: string
+          maxLength: 6
+          example: APM
+      - name: startDate
+        in: query
+        description: |
+          The start date of the period for which schedule information is requested. If a date of any Timestamp (`ATA`, `ETA` or `PTA`) inside a `PortCall` matches a date on or after (`≥`) the `startDate` the **entire Voyage** (import- and export-Voyage) matching the `PortCall` will be included in the result. All matching is done towards local Date at the place of the port call. If this filter is not provided the default value is **3 months** prior to request time. The value is populated in `ISO 8601` date format.
+        required: false
+        schema:
+          type: string
+          format: date
+          example: '2020-04-06'
+      - name: endDate
+        in: query
+        description: |
+          The end date of the period for which schedule information is requested. If a date of any Timestamp (`ATA`, `ETA` or `PTA`) inside a `PortCall` matches a date on or before (`≤`) the `endDate` the **entire Voyage**(import- and export-Voyage) matching the `PortCall` will be included in the result. All matching is done towards local Date at the place of the port call. If this filter is not provided the default value is **6 months** after request time. The value is populated in `ISO 8601` date format.
+        required: false
+        schema:
+          type: string
+          format: date
+          example: '2020-04-10'
+      - name: limit
+        in: query
+        description: Maximum number of items to return.
+        required: false
+        schema:
+          minimum: 0
+          type: number
+          default: 100
+      - name: API-Version
+        in: header
+        description: |
+          An API-Version header **MAY** be added to the request (optional); if added it **MUST** only contain **MAJOR** version. API-Version header **MUST** be aligned with the URI version.
+        required: false
+        schema:
+          type: string
+          example: '3'
       responses:
         '200':
           description: OK
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/ServiceSchedule'
-          headers:
-            API-Version:
-              schema:
-                type: string
-                example: 3.0.1
-              description: |
-                SemVer used to indicate the version of the contract (API version) returned.
         '400':
           description: Bad Request
           headers:
             API-Version:
-              schema:
-                type: string
-                example: 3.0.1
-              description: |
-                SemVer used to indicate the version of the contract (API version) returned.
+              $ref: '#/components/headers/API-Version'
           content:
             application/json:
               schema:
@@ -51,26 +198,22 @@ paths:
                 Example 1:
                   value:
                     httpMethod: GET
-                    requestUri: 'https://dcsa.org/ovs/v3/service-schedules'
+                    requestUri: https://dcsa.org/ovs/v3/service-schedules
                     statusCode: 400
                     statusCodeText: Bad Request
                     providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
                     errorDateTime: '2019-11-12T07:41:00+08:30'
                     errors:
-                      - errorCode: 7007
-                        property: UNLocationCode
-                        value: NA
-                        errorCodeText: invalidQuery
-                        errorCodeMessage: UNLocationCode does not exist
+                    - errorCode: 7007
+                      property: UNLocationCode
+                      value: NA
+                      errorCodeText: invalidQuery
+                      erorCodeMessage: UNLocationCode does not exist
         '500':
           description: Internal Server Error
           headers:
             API-Version:
-              schema:
-                type: string
-                example: 3.0.1
-              description: |
-                SemVer used to indicate the version of the contract (API version) returned.
+              $ref: '#/components/headers/API-Version'
           content:
             application/json:
               schema:
@@ -79,257 +222,343 @@ paths:
                 Example 1:
                   value:
                     httpMethod: GET
-                    requestUri: 'https://dcsa.org/ovs/v3/service-schedules'
+                    requestUri: https://dcsa.org/ovs/v3/service-schedules
                     statusCode: 500
                     statusCodeText: Internal Server Error
                     statusCodeMessage: Cannot process request.
                     providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
                     errorDateTime: '2019-11-12T07:41:00+08:30'
-                    errors:
-                      - errorCode: 7003
-                        errorCodeText: Internal Error occurred
-                        errorCodeMessage: Internal Error occurred
-      operationId: get-v3-service-schedules
-      description: "Get a list of service schedules. The result is `Vessel-Centric` - this means that the `Vessel` is in the top of the hierarchy of the response structure. A service is a heirarchical structure with the following elements:\r\n- One or more `Services` which can contain one or more `Vessels`\r\n- A `Vessel` which can call multiple `Ports` (`TransportCalls`).\r\n- A `Port` (`TransportCall`) can contain one or more `TimeStamps`.\r\n\r\nThe number of service schedules in the list can be narrowed down by providing filter parameters. The resulting payload will always include **entire voyage(s) being matched**. This means that even though a filter only matches a single `Port` in a `Voyage` or a single `Timestamp` within a `Port` in a `Voyage` - **the entire Voyage matched** is returned. If the `carrierImportVoyageNumber` of the `Port` differs from the `carrierExportVoyageNumber` of the `Port` then the **entire Voyage** for both these Voyage numbers are included.\r\n\r\nAn example of this is when `&UNLocationCode=DEHAM` is used as a filter parameter. In this case **entire Voyages** would be listed where `DEHAM` is a `Port`.\r\n\r\nBe aware that it is possible to specify filters that are mutially exclusive resulting in an empty response list. An example of this could be when both using `vesselIMONumber` and `vesselName` filters at the same time:\r\n\r\n&vesselIMONumber=9321483&vesselName=King of the Seas\r\n\r\nIf no `Vessel` exists where `vesselIMONumber` is **9321483** and `vesselName` is **King of the Seas** then the result will be an empty list\r\n\r\nIf no `startDate` filter is provided then **3 months** prior to the request data is used. If no `endDate` filters is provided then **6 months** after the request date is used."
-      parameters:
-        - schema:
-            type: string
-            example: Great Lion Service
-            maxLength: 50
-          in: query
-          name: carrierServiceName
-          description: The carrier service name to filter by. The result will only return schedules including the service name.
-        - schema:
-            type: string
-            example: FE1
-            maxLength: 11
-          in: query
-          name: carrierServiceCode
-          description: The carrier specific service code to filter by. The result will only return schedules including the service code.
-        - schema:
-            type: string
-            maxLength: 8
-            pattern: '^SR\d{5}[A-Z]$'
-            example: SR12345A
-          in: query
-          name: universalServiceReference
-          description: 'The **U**niversal **S**ervice **R**eference (`USR`) as defined by **DCSA** to filter by. The service code must match the regular expression pattern: `SR\d{5}[A-Z]`. The letters `SR` followed by `5 digits`, followed by a checksum-character as a capital letter from `A to Z`. The result will only return schedules including the service reference'
-        - schema:
-            type: string
-            maxLength: 7
-            pattern: '^\d{7}$'
-            example: '9321483'
-          in: query
-          name: vesselIMONumber
-          description: The identifier of a vessel. The result will only return schedules including the vessel with the specified IMO number.              It is not a requirement for dummy vessels to have an `IMO Number`. In this case filtering by `vesselName` should be used.
-        - schema:
-            type: string
-            maxLength: 35
-            example: King of the Seas
-          in: query
-          name: vesselName
-          description: 'The name of a vessel. The result will only return schedules including the vessel with the specified name.              Be aware that the `vesselName` is not unique and might match multiple vessels. If possible, filtering by `IMO Number` is preferred.              In case of dummy vessels an `IMO Number` might not exist in which case this filter is to be used.'
-        - schema:
-            type: string
-            maxLength: 50
-            example: 2103S
-          in: query
-          name: carrierVoyageNumber
-          description: The carrier specific identifier of a `Voyage` - can be both **importVoyageNumber** and **exportVoyageNumber**. The result will only return schedules including the `Ports` where `carrierVoyageNumber` is either `carrierImportVoyageNumber` or `carrierExportVoyageNumber`
-        - schema:
-            type: string
-            pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
-            maxLength: 5
-            example: 2201N
-          in: query
-          name: universalVoyageReference
-          description: The Universal Reference of a `Voyage` - can be both **importUniversalVoyageReference** and **exportUniversalVoyageReference**. The result will only return schedules including the `Ports` where `universalVoyageReference` is either `importUniversalVoyageReference` or `exportUniversalVoyageReference`
-        - schema:
-            type: string
-            pattern: '^[A-Z]{2}[A-Z2-9]{3}$'
-            minLength: 5
-            maxLength: 5
-            example: NLAMS
-          in: query
-          name: UNLocationCode
-          description: The `UN Location Code` specifying where a port is located.              Specifying this filter will only return schedules including **entire Voyages** related to this particular `UN Location Code`.
-        - schema:
-            type: string
-            maxLength: 6
-            example: APM
-          in: query
-          name: facilitySMDGCode
-          description: The `facilitySMDGCode` specifying a specific facility (using SMDG Code). Be aware that the `facilitySMDGCode` does not contain a `UNLocationCode` - this must be specified in the `UNLocationCode` filter.              Specifying this filter will only return schedules including **entire Voyages** related to this particular `facilitySMDGCode`.
-        - schema:
-            type: string
-            format: date
-            example: '2020-04-06'
-          in: query
-          name: startDate
-          description: 'The start date of the period for which schedule information is requested. If a date of any Timestamp (`ATA`, `ETA` or `PTA`) inside a `PortCall` matches a date on or after (`≥`) the `startDate` the **entire Voyage** (import- and export-Voyage) matching the `PortCall` will be included in the result. All matching is done towards local Date at the place of the port call.              If this filter is not provided the default value is **3 months** prior to request time.              The value is populated in `ISO 8601` date format.'
-        - schema:
-            type: string
-            format: date
-            example: '2020-04-10'
-          in: query
-          name: endDate
-          description: 'The end date of the period for which schedule information is requested. If a date of any Timestamp (`ATA`, `ETA` or `PTA`) inside a `PortCall` matches a date on or before (`≤`) the `endDate` the **entire Voyage**(import- and export-Voyage) matching the `PortCall` will be included in the result. All matching is done towards local Date at the place of the port call.              If this filter is not provided the default value is **6 months** after request time.              The value is populated in `ISO 8601` date format.'
-        - schema:
-            type: number
-            default: 100
-          in: query
-          name: limit
-          description: Maximum number of items to return.
-        - schema:
-            type: string
-            example: '3'
-          in: header
-          name: API-Version
-          description: An API-Version header **MAY** be added to the request (optional); if added it **MUST** only contain **MAJOR** version. API-Version header **MUST** be aligned with the URI version.
-        - schema:
-            type: string
-            example: fE9mZnNldHw9MTAmbGltaXQ9MTA=
-            maxLength: 1024
-          in: query
-          name: cursor
-          description: 'A server generated value to specify a specific point in a collection result, used for pagination.'
+                    errors: []
+      servers:
+      - url: http://localhost:3000
 components:
   schemas:
     ServiceSchedule:
-      title: Service Schedule
       type: object
+      title: ServiceSchedule
       properties:
         carrierServiceName:
           type: string
-          description: The name of the service.
           maxLength: 50
+          description: |
+            The name of the service.
           example: Great Lion Service
         carrierServiceCode:
           type: string
           maxLength: 11
+          description: |
+            The carrier-specific code of the service for which the schedule details are published.
           example: FE1
-          description: The carrier-specific code of the service for which the schedule details are published.
         universalServiceReference:
           type: string
+          pattern: ^SR\d{5}[A-Z]$
           maxLength: 8
+          description: |
+            A global unique service reference, as per DCSA standard, agreed by VSA partners for the service. The service reference must match the regular expression pattern: `SR\d{5}[A-Z]`. The letters `SR` followed by `5 digits`, followed by a checksum-character as a capital letter from `A to Z`.
           example: SR12345A
-          pattern: '^SR\d{5}[A-Z]$'
-          description: 'A global unique service reference, as per DCSA standard, agreed by VSA partners for the service. The service reference must match the regular expression pattern: `SR\d{5}[A-Z]`. The letters `SR` followed by `5 digits`, followed by a checksum-character as a capital letter from `A to Z`.'
         vesselSchedules:
           type: array
           items:
             $ref: '#/components/schemas/VesselSchedule'
       required:
-        - carrierServiceName
-        - carrierServiceCode
+      - carrierServiceCode
+      - carrierServiceName
     VesselSchedule:
-      title: Vessel Schedule
       type: object
-      required:
-        - vesselOperatorSMDGLinerCode
-        - isDummyVessel
+      title: VesselSchedule
       properties:
         vesselOperatorSMDGLinerCode:
           type: string
-          description: 'The carrier who is in charge of the vessel operation based on the SMDG code. If not available at the moment of sharing the schedule, use `TBD` (To be defined). In the case an operator is still using a code not from SMDG, use the available code.'
           maxLength: 10
+          description: |
+            The carrier who is in charge of the vessel operation based on the SMDG code.
+            
+            If not available at the moment of sharing the schedule, use `TBD` (To be defined).
+            
+            In the case an operator is still using a code not from SMDG, use the available code.'
           example: HLC
         vesselIMONumber:
           type: string
-          pattern: '^\d{7}$'
+          pattern: ^\d{7}$
           maxLength: 7
+          description: |
+            The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd's register code, which does not change during the lifetime of the vessel
+            
+            Condition: If the vessel is not dummy, there needs to be an IMO. If the vessel is dummy, the IMO is optional.
           example: '9321483'
-          description: "The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd's register code, which does not change during the lifetime of the vessel\r\n\r\nCondition: If the vessel is not dummy, there needs to be an IMO. If the vessel is dummy, the IMO is optional."
         vesselName:
           type: string
           maxLength: 35
+          description: |
+            The name of the Vessel given by the Vessel Operator and registered with IMO.
           example: King of the Seas
-          description: The name of the Vessel given by the Vessel Operator and registered with IMO.
         vesselCallSign:
           type: string
           maxLength: 10
+          description: |
+            A unique alphanumeric identity that belongs to the vessel and is assigned by the International Telecommunication Union (ITU). It consists of a threeletter alphanumeric prefix that indicates nationality, followed by one to four characters to identify the individual vessel. For instance, vessels registered under Denmark are assigned the prefix ranges 5PA-5QZ, OUAOZZ, and XPA-XPZ. The Call Sign changes whenever a vessel changes its flag.
           example: NCVV
-          description: 'A unique alphanumeric identity that belongs to the vessel and is assigned by the International Telecommunication Union (ITU). It consists of a threeletter alphanumeric prefix that indicates nationality, followed by one to four characters to identify the individual vessel. For instance, vessels registered under Denmark are assigned the prefix ranges 5PA-5QZ, OUAOZZ, and XPA-XPZ. The Call Sign changes whenever a vessel changes its flag.'
         isDummyVessel:
           type: boolean
-          description: Is this a dummy vessel. In case no vessel has been asigned yet - this property can be set to `true` indicating that the vesselIMONumber does not exist.
+          description: |
+            Is this a dummy vessel. In case no vessel has been asigned yet - this property can be set to `true` indicating that the vesselIMONumber does not exist.
         transportCalls:
           type: array
           items:
             $ref: '#/components/schemas/TransportCall'
-    TransportCall:
-      title: Transport Call
-      type: object
-      description: "\t\nA transportCall in the schedule. A transportCall can be either just a Port or further specified as a terminalCall.\n\nThe order of the list is the sequence of the list"
       required:
-        - transportCallReference
-        - carrierImportVoyageNumber
+      - isDummyVessel
+      - vesselOperatorSMDGLinerCode
+    TransportCall:
+      type: object
+      title: TransportCall
+      description: |
+        A transportCall in the schedule. A transportCall can be either just a Port or further specified as a terminalCall.
+        
+        The order of the list is the sequence of the list
       properties:
         portVisitReference:
           type: string
           maxLength: 50
+          description: |
+            The unique reference that can be used to link different `transportCallReferences` to the same port visit. The reference is provided by the port to uniquely identify a port call
           example: NLAMS1234589
-          description: The unique reference that can be used to link different `transportCallReferences` to the same port visit. The reference is provided by the port to uniquely identify a port call
         transportCallReference:
           type: string
           maxLength: 100
+          description: |
+            The unique reference for a transport call. It’s the vessel operator’s responsibility to provide the Transport Call Reference, other parties are obliged to pick it up and use it. It can take the form of Port Call References as defined in OVS Definitions Document, or alternatively a reference as defined by the vessel operator.
           example: SR11111X-9321483-2107W-NLAMS-ACT-1-1
-          description: 'The unique reference for a transport call. It’s the vessel operator’s responsibility to provide the Transport Call Reference, other parties are obliged to pick it up and use it. It can take the form of Port Call References as defined in OVS Definitions Document, or alternatively a reference as defined by the vessel operator.'
         carrierImportVoyageNumber:
           type: string
-          description: The identifier of an import voyage. The carrier-specific identifier of the import Voyage.
-          example: 2103N
           maxLength: 50
+          description: |
+            The identifier of an import voyage. The carrier-specific identifier of the import Voyage.
+          example: 2103N
         carrierExportVoyageNumber:
           type: string
-          description: The identifier of an export voyage. The carrier-specific identifier of the export Voyage.
-          example: 2103S
           maxLength: 50
+          description: |
+            The identifier of an export voyage. The carrier-specific identifier of the export Voyage.
+          example: 2103S
         universalImportVoyageReference:
           type: string
-          pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
+          pattern: ^\d{2}[0-9A-Z]{2}[NEWSR]$
+          description: |
+            A global unique voyage reference for the import Voyage, as per DCSA standard, agreed by VSA partners for the voyage. The voyage reference must match the regular expression pattern: `\d{2}[0-9A-Z]{2}[NEWSR]`
+            - `2 digits` for the year
+            - `2 alphanumeric characters` for the sequence number of the voyage
+            - `1 character` for the direction/haul (`N`orth, `E`ast, `W`est, `S`outh or `R`oundtrip).
           example: 2103N
-          description: "A global unique voyage reference for the import Voyage, as per DCSA standard, agreed by VSA partners for the voyage. The voyage reference must match the regular expression pattern: `\\d{2}[0-9A-Z]{2}[NEWSR]`\r\n- `2 digits` for the year\r\n- `2 alphanumeric characters` for the sequence number of the voyage\r\n- `1 character` for the direction/haul (`N`orth, `E`ast, `W`est, `S`outh or `R`oundtrip)."
         universalExportVoyageReference:
           type: string
-          pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
+          pattern: ^\d{2}[0-9A-Z]{2}[NEWSR]$
+          description: |
+            A global unique voyage reference for the export Voyage, as per DCSA standard, agreed by VSA partners for the voyage. The voyage reference must match the regular expression pattern: `\d{2}[0-9A-Z]{2}[NEWSR]`
+            - `2 digits` for the year
+            - `2 alphanumeric characters` for the sequence number of the voyage
+            - `1 character` for the direction/haul (`N`orth, `E`ast, `W`est, `S`outh or `R`oundtrip).
           example: 2103N
-          description: "A global unique voyage reference for the export Voyage, as per DCSA standard, agreed by VSA partners for the voyage. The voyage reference must match the regular expression pattern: `\\d{2}[0-9A-Z]{2}[NEWSR]`\r\n- `2 digits` for the year\r\n- `2 alphanumeric characters` for the sequence number of the voyage\r\n- `1 character` for the direction/haul (`N`orth, `E`ast, `W`est, `S`outh or `R`oundtrip)."
         location:
-          description: 'General purpose object to capture location-related data, the location can be specified in **one** of the following ways: `UN Location Code`, a `Facility` or an `Address`.'
-          oneOf:
-            - $ref: '#/components/schemas/UNLocationLocation'
-            - $ref: '#/components/schemas/FacilitySMDGLocation'
-            - $ref: '#/components/schemas/AddressLocation'
+          description: |
+            General purpose object to capture location-related data, the location can be specified in **one** of the following ways: `UN Location Code`, a `Facility` or an `Address`.
           discriminator:
             propertyName: locationType
             mapping:
-              UNLO: '#/components/schemas/UNLocationLocation'
-              FACS: '#/components/schemas/FacilitySMDGLocation'
-              ADDR: '#/components/schemas/AddressLocation'
+              UNLO: "#/components/schemas/UNLocationLocation"
+              FACS: "#/components/schemas/FacilitySMDGLocation"
+              ADDR: "#/components/schemas/AddressLocation"
+          oneOf:
+          - $ref: '#/components/schemas/UNLocationLocation'
+          - $ref: '#/components/schemas/FacilitySMDGLocation'
+          - $ref: '#/components/schemas/AddressLocation'
         statusCode:
           type: string
-          description: "The set of codes in `Status Code` are ONLY meant to communicate any change / exception to the published schedule. This is not required in case of normal schedule. Possible values are:\r\n\r\n- OMIT (Omit)\r\n- BLNK (Blank)\r\n- ADHO (Ad Hoc)\r\n- PHOT (Phase Out)\r\n- PHIN (Phase In)\r\n- SLID (Sliding)\r\n- ROTC (Rotation Change)\r\n- CUTR (Cut and Run)\r\n\r\nMore details can be found on [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/ovs/v3/reference-data/portcallstatuscodes-v300.csv)"
+          description: |
+            The set of codes in `Status Code` are ONLY meant to communicate any change / exception to the published schedule. This is not required in case of normal schedule. Possible values are:
+            
+            - OMIT (Omit)
+            - BLNK (Blank)
+            - ADHO (Ad Hoc)
+            - PHOT (Phase Out)
+            - PHIN (Phase In)
+            - SLID (Sliding)
+            - ROTC (Rotation Change)
+            - CUTR (Cut and Run)
+            
+            More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/ovs/v3/reference-data/portcallstatuscodes-v300.csv)
           example: OMIT
         timestamps:
           type: array
           items:
             $ref: '#/components/schemas/Timestamp'
-    Timestamp:
-      title: Timestamp
+      required:
+      - carrierImportVoyageNumber
+      - transportCallReference
+    UNLocationLocation:
       type: object
-      description: "\t\nA timestamp for a port."
+      title: UNLocationLocation
+      description: |
+        An interface used to express a location using a `Un Location Code`.
+      properties:
+        locationName:
+          type: string
+          pattern: ^\S+(\s+\S+)*$
+          maxLength: 100
+          description: |
+            The name of the location.
+          example: Port of Amsterdam
+        locationType:
+          type: string
+          maxLength: 4
+          description: |
+            Discriminator used to identify this as a `UNLocation` location interface.
+          example: UNLO
+        UNLocationCode:
+          type: string
+          pattern: ^[A-Z]{2}[A-Z2-9]{3}$
+          minLength: 5
+          maxLength: 5
+          description: |
+            The UN Location code specifying where the place is located. The pattern used must be
+
+             - 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+             - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used
+
+            More info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)
+          example: NLAMS
+      required:
+      - UNLocationCode
+      - locationType
+    FacilitySMDGLocation:
+      type: object
+      title: FacilitySMDGLocation
+      description: |
+        An interface used to express a location using a `Facility` by the `SMDG` code list. The `facilitySMDGCode` does not contain the `UNLocationCode` - this should be provided in the `UnLocationCode` attribute.
+      properties:
+        locationName:
+          type: string
+          maxLength: 100
+          description: |
+            The name of the location.
+          example: Port of Amsterdam
+        locationType:
+          type: string
+          maxLength: 4
+          description: |
+            Discriminator used to identify this as a `Facility Location` interface only using `SMDG` code list.
+          example: FACS
+        UNLocationCode:
+          type: string
+          pattern: ^[A-Z]{2}[A-Z2-9]{3}$
+          minLength: 5
+          maxLength: 5
+          description: |
+            The UN Location code specifying where the place is located. The pattern used must be
+
+             - 2 characters for the country code using [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)
+             - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used
+
+            More info can be found here: [UN/LOCODE](https://en.wikipedia.org/wiki/UN/LOCODE)
+          example: NLAMS
+        facilitySMDGCode:
+          type: string
+          maxLength: 6
+          description: |
+            The code used for identifying the specific facility. This code does not include the UN Location Code.
+
+            The codeList used by SMDG is the [SMDG Terminal Code List](https://smdg.org/wp-content/uploads/Codelists/Terminals/SMDG-Terminal-Code-List-v20210401.xlsx)
+          example: ACT
+      required:
+      - UNLocationCode
+      - facilitySMDGCode
+      - locationType
+    AddressLocation:
+      type: object
+      title: AddressLocation
+      description: |
+        An interface used to express a location using an `Address` object.
+      properties:
+        locationName:
+          type: string
+          maxLength: 100
+          description: |
+            The name of the location.
+          example: Port of Amsterdam
+        locationType:
+          type: string
+          maxLength: 4
+          description: |
+            Discriminator used to identify this as an `Address` location interface.
+          example: ADDR
+        address:
+          type: object
+          description: An object for storing address related information.
+          properties:
+            name:
+              maxLength: 100
+              type: string
+              description: Name of the address.
+              example: John
+            street:
+              maxLength: 100
+              type: string
+              description: The name of the street of the party’s address.
+              example: Ruijggoordweg
+            streetNumber:
+              maxLength: 50
+              type: string
+              description: The number of the street of the party’s address.
+              example: '100'
+            floor:
+              maxLength: 50
+              type: string
+              description: The floor of the party’s street number.
+              example: N/A
+            postCode:
+              maxLength: 50
+              type: string
+              description: The post code of the party’s address.
+              example: 1047 HM
+            city:
+              maxLength: 65
+              type: string
+              description: The city name of the party’s address.
+              example: Amsterdam
+            stateRegion:
+              maxLength: 65
+              type: string
+              description: The state/region of the party’s address.
+              example: North Holland
+            country:
+              maxLength: 75
+              type: string
+              description: The country of the party’s address.
+              example: The Netherlands
+          required:
+          - name
+      required:
+      - address
+      - locationType
+    Timestamp:
+      type: object
+      title: Timestamp
+      description: |
+        A timestamp for a port.
       properties:
         eventTypeCode:
+          type: string
+          description: |
+            Identifier for type of `transportEvent`
+            - ARRI (Arrived)
+            - DEPA (Departed)
+            
+            More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/ovs/v3/reference-data/transporteventtypecodes-v300.csv).
           enum:
-            - ARRI
-            - DEPA
-          description: "Identifier for type of `transportEvent`\r\n\r\n- ARRI (Arrived)\r\n- DEPA (Departed)\r\n\r\nMore details can be found on [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/ovs/v3/reference-data/transporteventtypecodes-v300.csv)."
+          - ARRI
+          - DEPA
         eventClassifierCode:
-          enum:
-            - PLN
-            - EST
-            - ACT
+          type: string
           description: |
             Code for the event classifier. Values can vary depending on eventType.
 
@@ -337,262 +566,164 @@ components:
             - ACT (Actual)
             - EST (Estimated)
             - PLN (Planned)
+          enum:
+          - PLN
+          - EST
+          - ACT
         eventDateTime:
           type: string
           format: date-time
-          description: Time in the timestamp
+          description: |
+            Time in the timestamp
           example: '2025-01-14T09:21:00+01:00'
         delayReasonCode:
           type: string
           maxLength: 3
+          description: |
+            Reason code for the delay. See SMDG [Code list DELAY](https://smdg.org/documents/smdg-code-lists/delay-reason-and-port-call-activity/) for a list of valid codes to be used for this attribute.
           example: WEA
-          description: 'Reason code for the delay. See SMDG [Code list DELAY](https://smdg.org/documents/smdg-code-lists/delay-reason-and-port-call-activity/) for a list of valid codes to be used for this attribute.'
         changeRemark:
           type: string
           maxLength: 250
+          description: |
+            Free text field to provide information as to why the `TransportEvent` was sent.
           example: Bad weather
-          description: Free text field to provide information as to why the `TransportEvent` was sent.
       required:
-        - eventTypeCode
-        - eventClassifierCode
-        - eventDateTime
-    AddressLocation:
-      title: Address Location
-      type: object
-      description: An interface used to express a location using an `Address` object.
-      required:
-        - locationType
-        - address
-      properties:
-        locationName:
-          type: string
-          description: The name of the location.
-          example: Port of Amsterdam
-          maxLength: 100
-        locationType:
-          type: string
-          description: Discriminator used to identify this as an `Address` location interface.
-          example: ADDR
-          maxLength: 4
-        address:
-          type: object
-          required:
-            - name
-          description: An object for storing address related information.
-          properties:
-            name:
-              type: string
-              description: Name of the address.
-              example: John
-              maxLength: 100
-            street:
-              type: string
-              description: The name of the street of the party’s address.
-              example: Ruijggoordweg
-              maxLength: 100
-            streetNumber:
-              type: string
-              description: The number of the street of the party’s address.
-              example: '100'
-              maxLength: 50
-            floor:
-              type: string
-              description: The floor of the party’s street number.
-              example: N/A
-              maxLength: 50
-            postCode:
-              type: string
-              description: The post code of the party’s address.
-              example: 1047 HM
-              maxLength: 50
-            city:
-              type: string
-              description: The city name of the party’s address.
-              example: Amsterdam
-              maxLength: 65
-            stateRegion:
-              type: string
-              description: The state/region of the party’s address.
-              example: North Holland
-              maxLength: 65
-            country:
-              type: string
-              description: The country of the party’s address.
-              example: The Netherlands
-              maxLength: 75
-    UNLocationLocation:
-      title: UNLocation Location
-      type: object
-      description: An interface used to express a location using a `Un Location Code`.
-      additionalProperties: false
-      required:
-        - locationType
-        - UNLocationCode
-      properties:
-        locationName:
-          type: string
-          description: The name of the location.
-          example: Port of Amsterdam
-          maxLength: 100
-          pattern: ^\S+(\s+\S+)*$
-        locationType:
-          type: string
-          description: Discriminator used to identify this as a `UNLocation` location interface.
-          example: UNLO
-          maxLength: 4
-        UNLocationCode:
-          type: string
-          description: "The UN Location code specifying where the place is located. The pattern used must be\r\n\r\n - 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)\r\n - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used\r\n\r\nMore info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)"
-          example: NLAMS
-          pattern: '^[A-Z]{2}[A-Z2-9]{3}$'
-          minLength: 5
-          maxLength: 5
-    FacilitySMDGLocation:
-      title: Facility SMDG Location
-      type: object
-      description: An interface used to express a location using a `Facility` by the `SMDG` code list. The `facilitySMDGCode` does not contain the `UNLocationCode` - this should be provided in the `UnLocationCode` attribute.
-      required:
-        - locationType
-        - UNLocationCode
-        - facilitySMDGCode
-      properties:
-        locationName:
-          type: string
-          description: The name of the location.
-          example: Port of Amsterdam
-          maxLength: 100
-        locationType:
-          type: string
-          description: Discriminator used to identify this as a `Facility Location` interface only using `SMDG` code list.
-          example: FACS
-          maxLength: 4
-        UNLocationCode:
-          type: string
-          description: "The UN Location code specifying where the place is located. The pattern used must be\r\n\r\n - 2 characters for the country code using [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)\r\n - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used\r\n\r\nMore info can be found here: [UN/LOCODE](https://en.wikipedia.org/wiki/UN/LOCODE)"
-          example: NLAMS
-          pattern: '^[A-Z]{2}[A-Z2-9]{3}$'
-          minLength: 5
-          maxLength: 5
-        facilitySMDGCode:
-          type: string
-          description: "The code used for identifying the specific facility. This code does not include the UN Location Code.\r\n\r\nThe codeList used by SMDG is the [SMDG Terminal Code List](https://smdg.org/wp-content/uploads/Codelists/Terminals/SMDG-Terminal-Code-List-v20210401.xlsx)"
-          example: ACT
-          maxLength: 6
+      - eventClassifierCode
+      - eventDateTime
+      - eventTypeCode
     ErrorResponse:
-      title: ErrorResponse
       type: object
-      description: Unexpected error
-      required:
-        - httpMethod
-        - requestUri
-        - statusCode
-        - statusCodeText
-        - errorDateTime
-        - errors
+      title: ErrorResponse
+      description: |
+        Unexpected error
       properties:
         httpMethod:
+          type: string
           description: |
             The HTTP method used to make the request e.g. `GET`, `POST`, etc
-          type: string
-          example: POST
           enum:
-            - GET
-            - HEAD
-            - POST
-            - PUT
-            - DELETE
-            - OPTION
-            - PATCH
+          - GET
+          - HEAD
+          - POST
+          - PUT
+          - DELETE
+          - OPTION
+          - PATCH
+          example: POST
         requestUri:
+          type: string
           description: |
             The URI that was requested.
-          type: string
           example: /v1/events
         statusCode:
-          description: |
-            The HTTP status code returned.
           type: integer
           format: int32
+          description: |
+            The HTTP status code returned.
           example: 400
         statusCodeText:
-          description: |
-            A standard short description corresponding to the HTTP status code.
           type: string
           maxLength: 50
+          description: |
+            A standard short description corresponding to the HTTP status code.
           example: Bad Request
         statusCodeMessage:
-          description: |
-            A long description corresponding to the HTTP status code with additional information.
           type: string
           maxLength: 200
+          description: |
+            A long description corresponding to the HTTP status code with additional information.
           example: The supplied data could not be accepted
         providerCorrelationReference:
-          description: |
-            A unique identifier to the HTTP request within the scope of the API provider.
           type: string
           maxLength: 100
+          description: |
+            A unique identifier to the HTTP request within the scope of the API provider.
           example: 4426d965-0dd8-4005-8c63-dc68b01c4962
         errorDateTime:
+          type: string
           description: |
             The DateTime corresponding to the error occuring. Must be formatted using [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format.
-          type: string
           format: date-time
-          example: '2019-11-12T07:41:00Z'
+          example: 2019-11-12T07:41:00+08:30
         errors:
           type: array
           description: |
             An array of errors provding more detail about the root cause.
-          minItems: 1
           items:
-            type: object
-            title: Detailed Error
-            required:
-              - errorCodeText
-            properties:
-              errorCode:
-                type: integer
-                format: int32
-                description: |
-                  The detailed error code returned.
-
-                    - `7000-7999` Technical error codes
-                    - `8000-8999` Functional error codes
-                    - `9000-9999` API provider-specific error codes            
-
-                  [Error codes as specified by DCSA](https://dcsa.atlassian.net/wiki/spaces/DTG/pages/197132308/Standard+Error+Codes).
-                minimum: 7000
-                maximum: 9999
-                example: 7003
-              property:
-                type: string
-                maxLength: 100
-                description: |
-                  The name of the property causing the error.
-                example: facilityCode
-              value:
-                type: string
-                maxLength: 500
-                description: |
-                  The value of the property causing the error serialised as a string exactly as in the original request.
-                example: SG SIN WHS
-              jsonPath:
-                type: string
-                maxLength: 500
-                description: |
-                  A path to the property causing the error, formatted according to [JSONpath](https://github.com/json-path/JsonPath).
-                example: $.location.facilityCode
-              errorCodeText:
-                description: |
-                  A standard short description corresponding to the `errorCode`.
-                type: string
-                maxLength: 100
-                example: invalidData
-              errorCodeMessage:
-                type: string
-                maxLength: 200
-                description: |
-                  A long description corresponding to the `errorCode` with additional information.
-                example: Spaces not allowed in facility code
-tags:
-  - name: Operational Vessel Schedules
-    description: ' '
+            $ref: "#/components/schemas/DetailedError"
+      required:
+      - errorDateTime
+      - errors
+      - httpMethod
+      - requestUri
+      - statusCode
+      - statusCodeText
+    DetailedError:
+      title: DetailedError
+      required:
+      - errorCodeText
+      type: object
+      properties:
+        errorCode:
+          maximum: 9999
+          minimum: 7000
+          type: integer
+          description: "The detailed error code returned.\n\n  - `7000-7999` Technical error codes\n  - `8000-8999` Functional error codes\n  - `9000-9999` API provider-specific error codes            \n\n[Error codes as specified by DCSA](https://dcsa.atlassian.net/wiki/spaces/DTG/pages/197132308/Standard+Error+Codes).\n"
+          format: int32
+          example: 7003
+        property:
+          maxLength: 100
+          type: string
+          description: |
+            The name of the property causing the error.
+          example: facilityCode
+        value:
+          maxLength: 500
+          type: string
+          description: |
+            The value of the property causing the error serialised as a string exactly as in the original request.
+          example: SG SIN WHS
+        jsonPath:
+          maxLength: 500
+          type: string
+          description: |
+            A path to the property causing the error, formatted according to [JSONpath](https://github.com/json-path/JsonPath).
+          example: $.location.facilityCode
+        errorCodeText:
+          maxLength: 100
+          type: string
+          description: |
+            A standard short description corresponding to the `errorCode`.
+          example: invalidData
+        erorCodeMessage:
+          maxLength: 200
+          type: string
+          description: |
+            A long description corresponding to the `errorCode` with additional information.
+          example: Spaces not allowed in facility code
+  parameters:
+    Limit:
+      name: limit
+      in: query
+      description: Maximum number of items to return.
+      required: false
+      schema:
+        minimum: 0
+        type: number
+        default: 100
+    APIVersionMajor:
+      name: API-Version
+      in: header
+      description: An API-Version header **MAY** be added to the request (optional); if added it **MUST** only contain **MAJOR** version. API-Version header **MUST** be aligned with the URI version.
+      required: false
+      schema:
+        type: string
+        example: "3"
+  headers:
+    API-Version:
+      description: |
+        SemVer used to indicate the version of the contract (API version) returned.
+      schema:
+        type: string
+        example: 3.0.0
