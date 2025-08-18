@@ -2,19 +2,22 @@ openapi: 3.0.3
 info:
   title: Operational Vessel Schedules
   description: |
-    API specification issued by DCSA.org
-    
-    This API supports **OVS** (Operational Vessel Schedules)
+    <h1>DCSA OpenAPI specification for Operational Vessel Schedules</h1>
     
     The Interface Standards for OVS and other documentation can be found on the [DCSA Website](https://dcsa.org/standards/operational-vessel-schedules/).
     
     For explanation to specific values or objects please refer to the [Information Model](https://dcsa.org/wp-content/uploads/2024/01/DCSA-Information-Model-2023.Q4.pdf).
     
     ### Stats API
-    
     The Stats API offers crucial statistical information for both API providers and consumers to enhance their services and helps DCSA to understand and scale the ecosystem. We expect you to invoke the Stats API for every request made to the Operational Vessel Schedules API. Further details can be found [here](https://developer.dcsa.org/#/http/guides/api-guides/stats-api)
     
-    For a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/ovs/v3#v301). Please [create a GitHub issue](https://github.com/dcsaorg/DCSA-OpenAPI/issues/new)
+    ### API Design & Implementation Principles
+    This API follows the guidelines defined in version 2.0 of the API Design & Implementation Principles which can be found on the [DCSA Developer Portal](https://developer.dcsa.org/api_design)
+
+    ### Changelog and Contact Us
+    For a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/ovs/v3#v301). If you have any questions, feel free to [Contact Us](https://dcsa.org/get-involved/contact-us).
+
+    API specification issued by [DCSA.org](https://dcsa.org/).
   contact:
     name: Digital Container Shipping Association (DCSA)
     url: https://dcsa.org
@@ -23,17 +26,17 @@ info:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   version: 3.0.1
-servers:
-- url: http://localhost:3000
 tags:
-- name: Operational Vessel Schedules
-  description: ' '
+  - name: Operational Vessel Schedules
+    description: ' '
 paths:
   /v3/service-schedules:
     get:
       tags:
-      - Operational Vessel Schedules
-      summary: Get a list of Schedules
+        - Operational Vessel Schedules
+      summary: |
+        Get a list of Schedules
+      operationId: get-v3-service-schedules
       description: |
         Get a list of service schedules. The result is `Vessel-Centric` - this means that the `Vessel` is in the top of the hierarchy of the response structure. A service is a heirarchical structure with the following elements:
         - One or more `Services` which can contain one or more `Vessels`
@@ -46,133 +49,121 @@ paths:
         
         Be aware that it is possible to specify filters that are mutially exclusive resulting in an empty response list. An example of this could be when both using `vesselIMONumber` and `vesselName` filters at the same time:
         
+        ```
         &vesselIMONumber=9321483&vesselName=King of the Seas
+        ```
         
         If no `Vessel` exists where `vesselIMONumber` is **9321483** and `vesselName` is **King of the Seas** then the result will be an empty list
         
         If no `startDate` filter is provided then **3 months** prior to the request data is used. If no `endDate` filters is provided then **6 months** after the request date is used.
-      operationId: get-v3-service-schedules
       parameters:
-      - name: carrierServiceName
-        in: query
-        description: |
-          The carrier service name to filter by. The result will only return schedules including the service name.
-        required: false
-        schema:
-          type: string
-          maxLength: 50
-          example: Great Lion Service
-      - name: carrierServiceCode
-        in: query
-        description: |
-          The carrier specific service code to filter by. The result will only return schedules including the service code.
-        required: false
-        schema:
-          type: string
-          maxLength: 11
-          example: FE1
-      - name: universalServiceReference
-        in: query
-        description: |
-          The **U**niversal **S**ervice **R**eference (`USR`) as defined by **DCSA** to filter by. The service code must match the regular expression pattern: `SR\d{5}[A-Z]`. The letters `SR` followed by `5 digits`, followed by a checksum-character as a capital letter from `A to Z`. The result will only return schedules including the service reference
-        required: false
-        schema:
-          type: string
-          pattern: ^SR\d{5}[A-Z]$
-          maxLength: 8
-          example: SR12345A
-      - name: vesselIMONumber
-        in: query
-        description: |
-          The identifier of a vessel. The result will only return schedules including the vessel with the specified IMO number.              It is not a requirement for dummy vessels to have an `IMO Number`. In this case filtering by `vesselName` should be used.
-        required: false
-        schema:
-          type: string
-          pattern: ^\d{7}$
-          maxLength: 7
-          example: '9321483'
-      - name: vesselName
-        in: query
-        description: |
-          The name of a vessel. The result will only return schedules including the vessel with the specified name. Be aware that the `vesselName` is not unique and might match multiple vessels. If possible, filtering by `IMO Number` is preferred. In case of dummy vessels an `IMO Number` might not exist in which case this filter is to be used.'
-        required: false
-        schema:
-          type: string
-          maxLength: 35
-          example: King of the Seas
-      - name: carrierVoyageNumber
-        in: query
-        description: |
-          The carrier specific identifier of a `Voyage` - can be both **importVoyageNumber** and **exportVoyageNumber**. The result will only return schedules including the `Ports` where `carrierVoyageNumber` is either `carrierImportVoyageNumber` or `carrierExportVoyageNumber`
-        required: false
-        schema:
-          type: string
-          maxLength: 50
-          example: 2103S
-      - name: universalVoyageReference
-        in: query
-        description: |
-          The Universal Reference of a `Voyage` - can be both **importUniversalVoyageReference** and **exportUniversalVoyageReference**. The result will only return schedules including the `Ports` where `universalVoyageReference` is either `importUniversalVoyageReference` or `exportUniversalVoyageReference`
-        required: false
-        schema:
-          type: string
-          pattern: ^\d{2}[0-9A-Z]{2}[NEWSR]$
-          maxLength: 5
-          example: 2201N
-      - name: UNLocationCode
-        in: query
-        description: |
-          The `UN Location Code` specifying where a port is located. Specifying this filter will only return schedules including **entire Voyages** related to this particular `UN Location Code`.
-        required: false
-        schema:
-          type: string
-          pattern: ^[A-Z]{2}[A-Z2-9]{3}$
-          minLength: 5
-          maxLength: 5
-          example: NLAMS
-      - name: facilitySMDGCode
-        in: query
-        description: |
-          The `facilitySMDGCode` specifying a specific facility (using SMDG Code). Be aware that the `facilitySMDGCode` does not contain a `UNLocationCode` - this must be specified in the `UNLocationCode` filter. Specifying this filter will only return schedules including **entire Voyages** related to this particular `facilitySMDGCode`.
-        required: false
-        schema:
-          type: string
-          maxLength: 6
-          example: APM
-      - name: startDate
-        in: query
-        description: |
-          The start date of the period for which schedule information is requested. If a date of any Timestamp (`ATA`, `ETA` or `PTA`) inside a `PortCall` matches a date on or after (`≥`) the `startDate` the **entire Voyage** (import- and export-Voyage) matching the `PortCall` will be included in the result. All matching is done towards local Date at the place of the port call. If this filter is not provided the default value is **3 months** prior to request time. The value is populated in `ISO 8601` date format.
-        required: false
-        schema:
-          type: string
-          format: date
-          example: '2020-04-06'
-      - name: endDate
-        in: query
-        description: |
-          The end date of the period for which schedule information is requested. If a date of any Timestamp (`ATA`, `ETA` or `PTA`) inside a `PortCall` matches a date on or before (`≤`) the `endDate` the **entire Voyage**(import- and export-Voyage) matching the `PortCall` will be included in the result. All matching is done towards local Date at the place of the port call. If this filter is not provided the default value is **6 months** after request time. The value is populated in `ISO 8601` date format.
-        required: false
-        schema:
-          type: string
-          format: date
-          example: '2020-04-10'
-      - name: limit
-        in: query
-        description: Maximum number of items to return.
-        required: false
-        schema:
-          minimum: 0
-          type: number
-          default: 100
-      - name: API-Version
-        in: header
-        description: |
-          An API-Version header **MAY** be added to the request (optional); if added it **MUST** only contain **MAJOR** version. API-Version header **MUST** be aligned with the URI version.
-        required: false
-        schema:
-          type: string
-          example: '3'
+        - name: carrierServiceName
+          in: query
+          description: |
+            The carrier service name to filter by. The result will only return schedules including the service name.
+          schema:
+            type: string
+            maxLength: 50
+            example: Great Lion Service
+        - name: carrierServiceCode
+          in: query
+          description: |
+            The carrier specific service code to filter by. The result will only return schedules including the service code.
+          schema:
+            type: string
+            maxLength: 11
+            example: FE1
+        - name: universalServiceReference
+          in: query
+          description: |
+            The **U**niversal **S**ervice **R**eference (`USR`) as defined by **DCSA** to filter by. The service code must match the regular expression pattern: `SR\d{5}[A-Z]`. The letters `SR` followed by `5 digits`, followed by a checksum-character as a capital letter from `A to Z`. The result will only return schedules including the service reference
+          schema:
+            type: string
+            pattern: ^SR\d{5}[A-Z]$
+            maxLength: 8
+            example: SR12345A
+        - name: vesselIMONumber
+          in: query
+          description: |
+            The identifier of a vessel. The result will only return schedules including the vessel with the specified IMO number. It is not a requirement for dummy vessels to have an `IMO Number`. In this case filtering by `vesselName` should be used.
+          schema:
+            type: string
+            pattern: ^\d{7}$
+            maxLength: 7
+            example: '9321483'
+        - name: vesselName
+          in: query
+          description: |
+            The name of a vessel. The result will only return schedules including the vessel with the specified name. Be aware that the `vesselName` is not unique and might match multiple vessels. If possible, filtering by `IMO Number` is preferred. In case of dummy vessels an `IMO Number` might not exist in which case this filter is to be used.'
+          schema:
+            type: string
+            maxLength: 35
+            example: King of the Seas
+        - name: carrierVoyageNumber
+          in: query
+          description: |
+            The carrier specific identifier of a `Voyage` - can be both **importVoyageNumber** and **exportVoyageNumber**. The result will only return schedules including the `Ports` where `carrierVoyageNumber` is either `carrierImportVoyageNumber` or `carrierExportVoyageNumber`
+          schema:
+            type: string
+            maxLength: 50
+            example: 2103S
+        - name: universalVoyageReference
+          in: query
+          description: |
+            The Universal Reference of a `Voyage` - can be both **importUniversalVoyageReference** and **exportUniversalVoyageReference**. The result will only return schedules including the `Ports` where `universalVoyageReference` is either `importUniversalVoyageReference` or `exportUniversalVoyageReference`
+          schema:
+            type: string
+            pattern: ^\d{2}[0-9A-Z]{2}[NEWSR]$
+            maxLength: 5
+            example: 2201N
+        - name: UNLocationCode
+          in: query
+          description: |
+            The `UN Location Code` specifying where a port is located. Specifying this filter will only return schedules including **entire Voyages** related to this particular `UN Location Code`.
+          schema:
+            type: string
+            pattern: ^[A-Z]{2}[A-Z2-9]{3}$
+            minLength: 5
+            maxLength: 5
+            example: NLAMS
+        - name: facilitySMDGCode
+          in: query
+          description: |
+            The `facilitySMDGCode` specifying a specific facility (using SMDG Code). Be aware that the `facilitySMDGCode` does not contain a `UNLocationCode` - this must be specified in the `UNLocationCode` filter. Specifying this filter will only return schedules including **entire Voyages** related to this particular `facilitySMDGCode`.
+          schema:
+            type: string
+            maxLength: 6
+            example: APM
+        - name: startDate
+          in: query
+          description: |
+            The start date of the period for which schedule information is requested. If a date of any Timestamp (`ATA`, `ETA` or `PTA`) inside a `PortCall` matches a date on or after (`≥`) the `startDate` the **entire Voyage** (import- and export-Voyage) matching the `PortCall` will be included in the result. All matching is done towards local Date at the place of the port call. If this filter is not provided the default value is **3 months** prior to request time.
+          schema:
+            type: string
+            format: date
+            example: '2020-04-06'
+        - name: endDate
+          in: query
+          description: |
+            The end date of the period for which schedule information is requested. If a date of any Timestamp (`ATA`, `ETA` or `PTA`) inside a `PortCall` matches a date on or before (`≤`) the `endDate` the **entire Voyage**(import- and export-Voyage) matching the `PortCall` will be included in the result. All matching is done towards local Date at the place of the port call. If this filter is not provided the default value is **6 months** after request time.
+          schema:
+            type: string
+            format: date
+            example: '2020-04-10'
+        - name: limit
+          in: query
+          description: Maximum number of items to return.
+          schema:
+            minimum: 0
+            type: number
+            default: 100
+        - name: API-Version
+          in: header
+          description: |
+            An API-Version header **MAY** be added to the request (optional); if added it **MUST** only contain **MAJOR** version. API-Version header **MUST** be aligned with the URI version.
+          schema:
+            type: string
+            example: '3'
       responses:
         '200':
           description: OK
@@ -195,10 +186,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
               examples:
-                Example 1:
+                noUNLocationCode:
+                  summary: |
+                    UNLocationCode does not exist
                   value:
                     httpMethod: GET
-                    requestUri: https://dcsa.org/ovs/v3/service-schedules
+                    requestUri: https://dcsa.org/ovs/v3/service-schedules?UNLocationCode=XX123
                     statusCode: 400
                     statusCodeText: Bad Request
                     providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
@@ -219,7 +212,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
               examples:
-                Example 1:
+                internalError:
+                  summary:
+                    Internal Error
                   value:
                     httpMethod: GET
                     requestUri: https://dcsa.org/ovs/v3/service-schedules
@@ -229,13 +224,13 @@ paths:
                     providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
                     errorDateTime: '2019-11-12T07:41:00+08:30'
                     errors: []
-      servers:
-      - url: http://localhost:3000
 components:
   schemas:
     ServiceSchedule:
       type: object
-      title: ServiceSchedule
+      title: Service Schedule
+      description: |
+        The timetable of the roundtrip sequence of ports being served by a (number of) vessel(s) on a specific Proforma (schedule). Synonyms are rotation, loop, or string. A Service is defined by rotation, transit times, weekdays of departure per port, and frequencies.
       properties:
         carrierServiceName:
           type: string
@@ -261,11 +256,13 @@ components:
           items:
             $ref: '#/components/schemas/VesselSchedule'
       required:
-      - carrierServiceCode
-      - carrierServiceName
+        - carrierServiceCode
+        - carrierServiceName
     VesselSchedule:
       type: object
-      title: VesselSchedule
+      title: Vessel Schedule
+      description: |
+        The timetable of departure and arrival times for each port call on the rotation of the vessel in question.
       properties:
         vesselOperatorSMDGLinerCode:
           type: string
@@ -275,7 +272,7 @@ components:
             
             If not available at the moment of sharing the schedule, use `TBD` (To be defined).
             
-            In the case an operator is still using a code not from SMDG, use the available code.'
+            In the case an operator is still using a code not from SMDG, use the available code.
           example: HLC
         vesselIMONumber:
           type: string
@@ -311,7 +308,7 @@ components:
       - vesselOperatorSMDGLinerCode
     TransportCall:
       type: object
-      title: TransportCall
+      title: Transport Call
       description: |
         A transportCall in the schedule. A transportCall can be either just a Port or further specified as a terminalCall.
         
@@ -377,27 +374,25 @@ components:
           description: |
             The set of codes in `Status Code` are ONLY meant to communicate any change / exception to the published schedule. This is not required in case of normal schedule. Possible values are:
             
-            - OMIT (Omit)
-            - BLNK (Blank)
-            - ADHO (Ad Hoc)
-            - PHOT (Phase Out)
-            - PHIN (Phase In)
-            - SLID (Sliding)
-            - ROTC (Rotation Change)
-            - CUTR (Cut and Run)
-            
-            More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/ovs/v3/reference-data/portcallstatuscodes-v300.csv)
+            - `OMIT` (Omit)
+            - `BLNK` (Blank)
+            - `ADHO` (Ad Hoc)
+            - `PHOT` (Phase Out)
+            - `PHIN` (Phase In)
+            - `SLID` (Sliding)
+            - `ROTC` (Rotation Change)
+            - `CUTR` (Cut and Run)
           example: OMIT
         timestamps:
           type: array
           items:
             $ref: '#/components/schemas/Timestamp'
       required:
-      - carrierImportVoyageNumber
-      - transportCallReference
+        - carrierImportVoyageNumber
+        - transportCallReference
     UNLocationLocation:
       type: object
-      title: UNLocationLocation
+      title: UN Location
       description: |
         An interface used to express a location using a `Un Location Code`.
       properties:
@@ -432,7 +427,7 @@ components:
       - locationType
     FacilitySMDGLocation:
       type: object
-      title: FacilitySMDGLocation
+      title: Facility SMDG Location
       description: |
         An interface used to express a location using a `Facility` by the `SMDG` code list. The `facilitySMDGCode` does not contain the `UNLocationCode` - this should be provided in the `UnLocationCode` attribute.
       properties:
@@ -475,7 +470,7 @@ components:
       - locationType
     AddressLocation:
       type: object
-      title: AddressLocation
+      title: Address Location
       description: |
         An interface used to express a location using an `Address` object.
       properties:
@@ -550,31 +545,31 @@ components:
           type: string
           description: |
             Identifier for type of `transportEvent`
-            - ARRI (Arrived)
-            - DEPA (Departed)
-            
-            More details can be found on [GitHub](https://github.com/dcsaorg/DCSA-OpenAPI/blob/master/ovs/v3/reference-data/transporteventtypecodes-v300.csv).
+            - `ARRI` (Arrived)
+            - `DEPA` (Departed)
           enum:
           - ARRI
           - DEPA
+          example: ARRI
         eventClassifierCode:
           type: string
           description: |
             Code for the event classifier. Values can vary depending on eventType.
 
             Possible values are:
-            - ACT (Actual)
-            - EST (Estimated)
-            - PLN (Planned)
+            - `ACT` (Actual)
+            - `EST` (Estimated)
+            - `PLN` (Planned)
           enum:
           - PLN
           - EST
           - ACT
+          example: EST
         eventDateTime:
           type: string
           format: date-time
           description: |
-            Time in the timestamp
+            Time in the timestamp.
           example: '2025-01-14T09:21:00+01:00'
         delayReasonCode:
           type: string
@@ -594,7 +589,7 @@ components:
       - eventTypeCode
     ErrorResponse:
       type: object
-      title: ErrorResponse
+      title: Error Response
       description: |
         Unexpected error
       properties:
@@ -643,7 +638,7 @@ components:
         errorDateTime:
           type: string
           description: |
-            The DateTime corresponding to the error occuring. Must be formatted using [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format.
+            The DateTime corresponding to the error occuring.
           format: date-time
           example: 2019-11-12T07:41:00+08:30
         errors:
@@ -660,10 +655,10 @@ components:
       - statusCode
       - statusCodeText
     DetailedError:
-      title: DetailedError
-      required:
-      - errorCodeText
       type: object
+      title: Detailed Error
+      description: |
+        A detailed object used to describe the error.
       properties:
         errorCode:
           maximum: 9999
@@ -702,6 +697,8 @@ components:
           description: |
             A long description corresponding to the `errorCode` with additional information.
           example: Spaces not allowed in facility code
+      required:
+      - errorCodeText
   parameters:
     Limit:
       name: limit
