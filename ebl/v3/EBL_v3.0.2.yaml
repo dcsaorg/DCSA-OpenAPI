@@ -4568,6 +4568,32 @@ components:
       required:
         - partyName
 
+    OnBehalfOfShipper:
+      type: object
+      title: On Behalf of Shipper
+      description: |
+        The party allowed to act on behalf of the shipper for documentation purposes.
+
+        **Condition:** Either the `address` or a party `identifyingCode` must be provided in the `Shipping Instructions`. If a `displayedAddress` is provided, it must be included in the `Transport Document` instead of the `address`.
+      properties:
+        partyName:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 70
+          description: |
+            Name of the party.
+          example: IKEA Denmark
+        address:
+          $ref: '#/components/schemas/PartyAddress'
+        identifyingCodes:
+          type: array
+          description: |
+            **Condition:** Either the `address` or a party `identifyingCode` must be provided. 
+          items:
+            $ref: '#/components/schemas/IdentifyingCode'
+      required:
+        - partyName
+
     ShipperHBL:
       type: object
       title: Shipper (House B/L)
@@ -4697,6 +4723,31 @@ components:
       required:
         - partyName
         - identifyingCodes
+
+    OnBehalfOfConsignee:
+      type: object
+      title: On Behalf of Consignee
+      description: |
+        The party allowed to act on behalf of the consignee for documentation purposes.
+
+        **Condition:** Either the `address` or a party `identifyingCode` must be provided in the `Shipping Instructions`. If a `displayedAddress` is provided, it must be included in the `Transport Document` instead of the `address`.
+      properties:
+        partyName:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 70
+          description: |
+            Name of the party.
+          example: IKEA Denmark
+        address:
+          $ref: '#/components/schemas/PartyAddress'
+        identifyingCodes:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/IdentifyingCode'
+      required:
+        - partyName
 
     ConsigneeShipper:
       type: object
@@ -8663,8 +8714,12 @@ components:
       properties:
         shipper:
           $ref: '#/components/schemas/Shipper'
+        onBehalfOfShipper:
+          $ref: '#/components/schemas/OnBehalfOfShipper'
         consignee:
           $ref: '#/components/schemas/ConsigneeShipper'
+        onBehalfOfConsignee:
+          $ref: '#/components/schemas/OnBehalfOfConsignee'
         endorsee:
           $ref: '#/components/schemas/EndorseeShipper'
         issueTo:
@@ -8734,8 +8789,12 @@ components:
       properties:
         shipper:
           $ref: '#/components/schemas/Shipper'
+        onBehalfOfShipper:
+          $ref: '#/components/schemas/OnBehalfOfShipper'
         consignee:
           $ref: '#/components/schemas/Consignee'
+        onBehalfOfConsignee:
+          $ref: '#/components/schemas/OnBehalfOfConsignee'
         endorsee:
           $ref: '#/components/schemas/Endorsee'
         issuingParty:
