@@ -1020,10 +1020,32 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/TaxLegalReference'
+        representedParty:
+          $ref: '#/components/schemas/RepresentedParty'
       required:
         - partyName
         - eblPlatform
         - identifyingCodes
+
+    RepresentedParty:
+      type: object
+      title: Represented Party
+      description: The party allowed to act on behalf of the `Shipper` or `Consignee` for documentation purposes.
+      properties:
+        partyName:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 70
+          description: |
+            Name of the party.
+          example: Globeteam
+        identifyingCodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentifyingCode'
+      required:
+        - partyName
+
     IdentifyingCode:
       type: object
       title: Identifying Code
@@ -3481,6 +3503,32 @@ components:
       required:
         - partyName
 
+    OnBehalfOfShipper:
+      type: object
+      title: On Behalf of Shipper
+      description: |
+        The party allowed to act on behalf of the shipper for documentation purposes.
+
+        **Condition:** Either the `address` or a party `identifyingCode` must be provided in the `Shipping Instructions`. If a `displayedAddress` is provided, it must be included in the `Transport Document` instead of the `address`.
+      properties:
+        partyName:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 70
+          description: |
+            Name of the party.
+          example: IKEA Denmark
+        address:
+          $ref: '#/components/schemas/PartyAddress'
+        identifyingCodes:
+          type: array
+          description: |
+            **Condition:** Either the `address` or a party `identifyingCode` must be provided. 
+          items:
+            $ref: '#/components/schemas/IdentifyingCode'
+      required:
+        - partyName
+
     Consignee:
       type: object
       title: Consignee
@@ -3565,6 +3613,31 @@ components:
       required:
         - partyName
         - identifyingCodes
+
+    OnBehalfOfConsignee:
+      type: object
+      title: On Behalf of Consignee
+      description: |
+        The party allowed to act on behalf of the consignee for documentation purposes.
+
+        **Condition:** Either the `address` or a party `identifyingCode` must be provided in the `Shipping Instructions`. If a `displayedAddress` is provided, it must be included in the `Transport Document` instead of the `address`.
+      properties:
+        partyName:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 70
+          description: |
+            Name of the party.
+          example: IKEA Denmark
+        address:
+          $ref: '#/components/schemas/PartyAddress'
+        identifyingCodes:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/IdentifyingCode'
+      required:
+        - partyName
 
     Endorsee:
       type: object
@@ -3890,8 +3963,12 @@ components:
       properties:
         shipper:
           $ref: '#/components/schemas/Shipper'
+        onBehalfOfShipper:
+          $ref: '#/components/schemas/OnBehalfOfShipper'
         consignee:
           $ref: '#/components/schemas/Consignee'
+        onBehalfOfConsignee:
+          $ref: '#/components/schemas/OnBehalfOfConsignee'
         endorsee:
           $ref: '#/components/schemas/Endorsee'
         issuingParty:
