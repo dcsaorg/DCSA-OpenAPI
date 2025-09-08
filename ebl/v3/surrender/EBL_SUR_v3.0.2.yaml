@@ -231,13 +231,18 @@ components:
           type: string
           maxLength: 50
           description: |
-            The action performed by the party. This should be one of:
-            - `ISSUE` (The actor issued the document to the recipient)
+            The action performed by the actor. This should be one of:
+            - `ISSUE` (The actor issued the document to the recipient, who is the first possessor of the eBL, as designated by the `Issue to Party`)
             - `ENDORSE` (The actor endorsed the document to the recipient)
-            - `SIGN` (The actor signed or performed an "assignment" to the recipient)
+            - `SIGN` (The actor signed the eBL while it was in the actor's possession)
             - `SURRENDER_FOR_DELIVERY` (The actor requested this surrender request for delivery to the recipient)
             - `SURRENDER_FOR_AMENDMENT` (The actor requested this surrender request for amendment to the recipient)
-            Not all actions are applicable to all surrender requests.
+            - `BLANK_ENDORSE` (The actor endorsed the document in blank)
+            - `ENDORSE_TO_ORDER` (The actor endorsed the document to order of the recipient, allowing the recipient to further endorse the eBL to another party)
+            - `TRANSFER` (The actor transferred the possession of the eBL to the recipient.)
+            - `SURRENDERED` (The actor acknowledged that the eBL has been accepted and the lifecycle of the eBL is accomplished.)
+
+            Not all actions are applicable to all surrender requests. The combination and order of endorsement chain entries may differ by eBL Solution Provider, based on their rulebook and/or bilateral agreements with carriers.
           example: ISSUE
         actor:
           $ref: '#/components/schemas/TransactionParty'
@@ -318,13 +323,17 @@ components:
         endorsementChain:
           type: array
           description: |
-           A list of one or more endorsement related actions that were performed on or after the issuance of the eBL. It is equivalent to the "back side" of the physical bill of lading. The type of actions recorded in the endorsement chain as defined by the DCSA standard are listed below:
-
-            - **Issue:** The act of issuing an eBL i.e. making the eBL available to the receiver.
-            - **Endorse:** The act of transferring the rights and obligations associated with the eBL to a specific named party, allowing them to claim or deal with the goods. The user in control of the eBL may endorse the eBL in their turn to another named party. Only applicable to To-Order eBL (`isToOrder=true`).
-            - **Sign:** A general-purpose signature that can be used by any party to mark their possession of the eBL. Similar to how any possessor in the physical world can put a physical signature on the paper bill of lading. The endorsement chain as defined by DCSA does not record any transfer of possession of the eBL, unless a signature is added to it.
-            - **Request Surrender for Amendment:** The presentation (by transfer) of the eBL to the Issuer, or another user appointed by the Issuer, by a user entitled to do so for the purpose of amending the eBL.
-            - **Request Surrender for Delivery:** The presentation (by transfer) of the eBL to the Issuer, or another user appointed by the Issuer, by a user entitled to do so for the purpose of claiming delivery of the goods.
+            A list of one or more actions that affect an electronic Bill of Lading, from its issuance onward. It is equivalent to the "back side" of the paper Bill of Lading. The type of actions recorded in the endorsement chain as defined by the DCSA standard are listed below:
+            
+            - **Issue:** The act of issuing an eBL i.e. making the eBL available to the recipient.
+            - **Endorse:** The act of transferring the rights and obligations associated with the eBL to a specific named party, allowing them to claim or deal with the goods. The party in control of the eBL may **NOT** further endorse the eBL to another party. Only applicable to negotiable eBL (`isToOrder=true`).
+            - **Sign:** A general-purpose signature that the current eBL possessor can use to mark their possession of the eBL, similar to how a possessor may sign a paper Bill of Lading.
+            - **Request Surrender for Amendment:** The presentation (by transfer) of the eBL to the Issuer, or another user appointed by the Issuer, by a party entitled to do so for the purpose of amending the eBL.
+            - **Request Surrender for Delivery:** The presentation (by transfer) of the eBL to the Issuer, or another user appointed by the Issuer, by a party entitled to do so for the purpose of claiming delivery of the goods.
+            - **Blank Endorse:** The act of transferring the rights and obligations associated with the eBL in blank. Only applicable to negotiable eBL (`isToOrder=true`).
+            - **Endorse to Order:** The act of transferring the rights and obligations associated with the eBL to a specific named party, allowing them to claim or deal with the goods. The party in control of the eBL may further endorse the eBL to another party. Only applicable to negotiable eBL (`isToOrder=true`).
+            - **Transfer:** The act of transferring the possession of the eBL to the recipient.
+            - **Surrendered:** Indication that the eBL has now been surrendered, completing its lifecycle.
 
             **Note:** DCSA member carriers have agreed that the name `endorsementChain` is still the correct name for this list of actions.
           items:
@@ -336,6 +345,8 @@ components:
     IdentifyingCode:
       type: object
       title: Identifying Code
+      description: |
+        A code and value that uniquely identifies a party.
       properties:
         codeListProvider:
           type: string
@@ -560,6 +571,8 @@ components:
     SurrenderRequestAnswer:
       type: object
       title: Surrender Request Answer
+      description: |
+        Response to the Surrender Request
       properties:
         surrenderRequestReference:
           type: string
