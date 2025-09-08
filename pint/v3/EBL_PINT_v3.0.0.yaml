@@ -911,41 +911,44 @@ components:
           type: string
           maxLength: 50
           description: |
-            Action denotes the transaction type, which can have one of the following values:
-            - `ISSUE` (Issuance)
-            - `TRANSFER` (Transfer of possession)
-            - `ENDORSE` (Endorsement a.k.a. Transfer of title)
-            - `RESD` (Request to Surrender for Delivery)
-            - `RESA` (Request to Surrender for Amendment)
-            - `SACC` (Surrender accepted)
-            - `SREJ` (Surrender rejected)
-            - `SIGN` (Sign while in possesion)
-            - `BLANK_ENDORSE` (The actor endorsed the document in blank)
+            The action code denotes the transaction type, which can have one of the following values:
+
+            - `ISSUE` (The actor issued the document to the recipient)
+            - `TRANSFER` (The actor transferred the possession of the eBL to the recipient)
+            - `ENDORSE` (The actor endorsed the document to the recipient)
             - `ENDORSE_TO_ORDER` (The actor endorsed the document to order of the recipient, allowing the recipient to further endorse the eBL to another party)
+            - `BLANK_ENDORSE` (The actor endorsed the document in blank)
+            - `SURRENDER_FOR_DELIVERY` (The actor requested to surrender the eBL to the recipient for delivery)
+            - `SURRENDER_FOR_AMENDMENT` (The actor requested to surrender the eBL to the recipient for amendment)
+            - `SACC` (The surrender request was accepted)
+            - `SREJ` (The surrender request was rejected)
+            - `SIGN` (The actor signed the eBL while it was in the actor's possession)
 
-            The `ISSUE` `actionCode` is used for the eBL issuance transaction from the carrier party to the shipper party, and must appear exactly once in the first transaction of the first [`EnvelopeTransferChainEntry`](#/EnvelopeTransferChainEntry) entry (as JWS payload of [`EnvelopeTransferChainEntrySignedContent`](#/EnvelopeTransferChainEntrySignedContent) entry) in the [`EblEnvelope.envelopeTransferChain`](#/EblEnvelope) list. If the eBL document is issued to the shipper party that resides on the different eBL Platform from the carrier's platform, initial envelope transfer should contain envelope transfer chain where first entry's first transaction has `ISSUE` `actionCode` type. 
-
-            The `TRANSFER` `actionCode` is used for the transfer of possession of the eBL from the current possessor party to the new possessor party.
-
-            The `ENDORSE` `actionCode` is used for the endorsement (a.k.a. transfer of title, or the right to take the delivery of the goods) of To-order eBL documents, where the new endorsee party is not named in the eBL document. The endorsement should always happen on the platform of the user that is not only the current endorsee, but also the current possessor of the eBL document. If the new endorsee party resides on the different eBL Platform from the current endorsee's platform, the envelope transfer process is used to notify the new endorsee of the `ENDORSE` `actionCode` transaction for non-repudiation purposes, and will NOT result in the transfer of possession of the eBL document contained in the envelope. 
-
-            If the party is the current possessor, and the party is the current consignee/endorsee/shipper (or eBL document is blank-endorsed), the party may request to surrender the eBL to the carrier. This is done by using one of the Request to surrender `actionCode` types (`RESD` `actionCode` or `RESA` `Code`) and with the issuing carrier or the relevant carrier agent as the `recipient` of the action. 
-             
-            The `RESD` `actionCode` is used when the party wants to request the delivery of the goods. If the request is accepted (for details see `SACC` `actionCode`), the carrier and the party submitting the surrender request will negotiate how the goods will be delivered (e.g. via DCSA shipment release API).
-             
-            The `RESA` `actionCode` is used when the party wants to surrender the eBL document, so that the carrier can issue an amended eBL document. If the request is accepted (for details see `SACC` `actionCode` response), the alignment on the exact change(s) that need to be made to the eBL document is done outside of the PINT API (e.g. via the DCSA eBL API). If the request is accepted, the existing eBL document is voided along with its envelope transfer chain, and the amended eBL document must be reissued with a new envelope transfer chain (for details see the `ISSUE` `actionCode` type description paragraph above). The `RESA` `actionCode` is also used for switch to paper as the DCSA process flow for switching to paper is part of the amendment process (e.g. to note how many originals and copies with and without charges should be issued).
-
-            If a surrender request (`RESD` `actionCode` or `RESA` `actionCode`) is not addressed to the carrier that issued the eBL document or to their legal representative, then the receiving platform should reject the envelope transfer with the [`EnvelopeTransferFinishedResponse`](#/EnvelopeTransferFinishedResponse) containing `BENV` [`responseCode`](#/EnvelopeTransferFinishedResponse).
-
-            The `SACC` `actionCode` is used by the carrier to asynchronously accept the surrender request initiated via `RESD` `actionCode` or `RESA` `actionCode`. If the party that submitted the surrender request is on the different platform, the envelope transfer process is used to notify the (surrender request submitter) party of the `SACC` `actionCode` transaction for non-repudiation purposes, and will NOT result in the transfer of possession of the eBL document contained in the envelope. No transactions may occur after a `SACC` `actionCode` transaction. Any envelope transfer chain changes with new transactions after a `SACC` `actionCode` transaction are invalid and should be answered with the [`EnvelopeTransferFinishedResponse`](#/EnvelopeTransferFinishedResponse) containing `BENV` [`responseCode`](#/EnvelopeTransferFinishedResponse). 
-
-            The `SREJ` `actionCode` is used by the carrier to asynchronously reject the surrender request initiated via `RESD` `actionCode` or `RESA` `actionCode`, and return the eBL document possession to the party that submitted the surrender request.
-
-            The `SIGN` `actionCode` is used to allow the actor to sign the eBL while it was in the actor's possession.
-
-            The `BLANK_ENDORSE` `actionCode` is used for a party to Endorse in black.
-
-            The `ENDORSE_TO_ORDER` `actionCode` is used for endorsement that allows further endorsements
+            The `ISSUE` action code is used for the eBL issuance transaction from the carrier to the `Issue to` party, meaning the designated recipient of the action (typically the shipper or their on behalf of party). `ISSUE` must appear exactly once in the first transaction of the first [`EnvelopeTransferChainEntry`](#/EnvelopeTransferChainEntry) entry (as JWS payload of [`EnvelopeTransferChainEntrySignedContent`](#/EnvelopeTransferChainEntrySignedContent) entry) in the [`EblEnvelope.envelopeTransferChain`](#/EblEnvelope) list. If the eBL is issued to a party on a different eBL platform than the carrier, the first transfer must show an envelope transfer chain starting with an `ISSUE` action code.
+            
+            The `TRANSFER` action code is used for the transfer of possession of the eBL from the current possessor to a new possessor, meaning the designated recipient of the action.
+            
+            The `ENDORSE` action code is used to endorse a negotiable eBL to a new endorsee, meaning the designated recipient of the action. This recipient CANNOT further endorse the eBL. The endorsement must always take place on the eBL platform of the current endorsee, who also holds possession of the eBL. If the new endorsee is on a different eBL platform than the current endorsee, the envelope transfer process is used to notify them of the `ENDORSE` transaction for non-repudiation purposes. However, this transaction does NOT result in the transfer of possession of the eBL contained in the envelope.
+            
+            The `ENDORSE_TO_ORDER` action code is used to endorse a negotiable eBL to a new endorsee, meaning the designated recipient of the action. This recipient CAN further endorse the eBL to another party. The endorsement must always take place on the eBL platform of the current endorsee, who also holds possession of the eBL. If the new endorsee is on a different eBL platform than the current endorsee, the envelope transfer process is used to notify them of the `ENDORSE_TO_ORDER` transaction for non-repudiation purposes. However, this transaction does NOT result in the transfer of possession of the eBL contained in the envelope.
+            
+            The `BLANK_ENDORSE` action code is used to endorse a negotiable eBL in blank, meaning that the endorsement does not specify a recipient. The endorsement must always take place on the eBL platform of the current possessor of the eBL.
+            
+            The `SURRENDER_FOR_DELIVERY` action code is used when a party requests delivery of the goods.
+            
+            The `SURRENDER_FOR_AMENDMENT` action code is used when a party surrenders an eBL so that the carrier can issue an amended version. If the request is accepted (see the `SACC` action code for details), the exact amendments to the eBL are agreed upon outside the PINT API (for example, through the DCSA EBL API). Once accepted, the original eBL and its envelope transfer chain are voided, and the amended eBL must be reissued with a new envelope transfer chain (see the `ISSUE` action code description above).
+            
+            This action code is also used when switching the eBL to a physical document (“switch to paper”), which is treated as part of the amendment process in the DCSA standard.
+            
+            If a surrender request (`SURRENDER_FOR_DELIVERY` or `SURRENDER_FOR_AMENDMENT` action code) is not addressed to the carrier that issued the eBL or to their legal representative, then the receiving platform should reject the envelope transfer with the [`EnvelopeTransferFinishedResponse`](#/EnvelopeTransferFinishedResponse) containing `BENV` [`responseCode`](#/EnvelopeTransferFinishedResponse).
+            
+            The `SACC` action code is used by the carrier to asynchronously accept a surrender request (initiated with either the `SURRENDER_FOR_DELIVERY` or `SURRENDER_FOR_AMENDMENT` action code). If the surrendering party is on a different platform than the carrier, the envelope transfer process is used to notify them of the `SACC` transaction for non-repudiation purposes. However, this transaction does NOT result in the transfer of possession of the eBL contained in the envelope.
+            
+            Once a `SACC` transaction has been recorded, no further transactions are permitted. Any changes to the envelope transfer chain involving new transactions after a `SACC` transaction are invalid and must be rejected with the [`EnvelopeTransferFinishedResponse`](#/EnvelopeTransferFinishedResponse) containing `BENV` [`responseCode`](#/EnvelopeTransferFinishedResponse).
+            
+            The `SREJ` action code is used by the carrier to asynchronously reject a surrender request (initiated with either the `SURRENDER_FOR_DELIVERY` or `SURRENDER_FOR_AMENDMENT` action code), and return possession of the eBL to the party that submitted the surrender request.
+            
+            The `SIGN` action code is used by an actor to visibly confirm their possession of the eBL within the chain. This action has no designated recipient and can only be performed while the actor is the current possessor of the eBL.
 
             When the transaction recipient is residing on the different platform from the transaction actor's platform, the transaction should be followed by the envelope transfer from the actor's (sending) platform to the recipient's (receiving) platform. If the envelope transfer is caused by either `ENDORSE` `actionCode` or `SACC` `actionCode` transaction (where the recipient is on the different platform), the envelope transfer process is NOT causing transfer of possession of the eBL document, but is merely used as notification for the non-repudiation purposes.
           example: ISSUE
@@ -963,14 +966,14 @@ components:
           type: string
           maxLength: 4
           description: |
-            A code defined by DCSA indicating the reason for `RESA` (Request to Surrender for Amendment). Possible values are:
+            A code defined by DCSA indicating the reason for `SURRENDER_FOR_AMENDMENT` (Surrender for Amendment). Possible values are:
             - `SWTP` (Switch to paper)
             - `COD` (Change of destination)
             - `SWI` (Switch BL)
 
-            In case no valid reason code exists for the `RESA` (Request to Surrender for Amendment) - it is possible to use the `comments` property below to add more information.
+            In case no valid reason code exists for the `SURRENDER_FOR_AMENDMENT` (Surrender for Amendment) - it is possible to use the `comments` property below to add more information.
 
-            **Condition:** on `actionCode` being `RESA`
+            **Condition:** on `actionCode` being `SURRENDER_FOR_AMENDMENT`
           example: SWTP
         comments:
           type: string
