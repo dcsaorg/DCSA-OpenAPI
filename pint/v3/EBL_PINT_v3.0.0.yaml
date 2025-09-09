@@ -22,7 +22,7 @@ info:
     The PINT API is designed to support transfer of the following types of eBL documents:
     1. Straight eBL documents. This type of eBL document is defined by [`EblEnvelope.transportDocument.isToOrder`](#/EblEnvelope) attribute to `false`
     2. Blank-endorsed eBL documents. This type of eBL document is created by setting [`EblEnvelope.transportDocument.isToOrder`](#/EblEnvelope) attribute to `true`, and making sure that [`EblEnvelope.transportDocument.documentParties[]`](#/EblEnvelope) list does not contain document party where `DocumentParty.partyFunction` has value `END` (Endorsee)
-    3. To-order/Negotiable eBL documents. This type of eBL document is created by setting the [`EblEnvelope.transportDocument.isToOrder`](#/EblEnvelope) attribute to `true`, and making sure that [`EblEnvelope.transportDocument.documentParties[]`](#/EblEnvelope) list contains document party where `DocumentParty.partyFunction` has value `END` (Endorsee). If the current endorsee party is also in possession of the eBL (possessor), this party can endorse some other party on the same eBL Platform (and make that other party new endorsee) by executing transaction with [`Transaction.action`](#/Transaction) type `ENDO` (Endorsement). The DCSA PINT API support To-order/Negotiable documents, however, given that not all of the eBL solution providers support the split between possession and endorsements, this doesn't apply yet to interoperable eBL
+    3. To-order/Negotiable eBL documents. This type of eBL document is created by setting the [`EblEnvelope.transportDocument.isToOrder`](#/EblEnvelope) attribute to `true`, and making sure that [`EblEnvelope.transportDocument.documentParties[]`](#/EblEnvelope) list contains document party where `DocumentParty.partyFunction` has value `END` (Endorsee). If the current endorsee party is also in possession of the eBL (possessor), this party can endorse some other party on the same eBL Platform (and make that other party new endorsee) by executing transaction with [`Transaction.actionCode`](#/Transaction) type `ENDORSE` (Endorsement). The DCSA PINT API support To-order/Negotiable documents, however, given that not all of the eBL solution providers support the split between possession and endorsements, this doesn't apply yet to interoperable eBL
 
     <h2>The Additional Documents</h2>
 
@@ -154,7 +154,7 @@ paths:
       description: |
         Transfer **additional document** associated with an eBL envelope transfer. The transferred document should be either one of the **supporting documents** from the [`EnvelopeManifest.supportingDocuments`](#/EnvelopeManifest) list, or **eBLVisualisationByCarrier document** if attribute [`EnvelopeManifest.eBLVisualisationByCarrier`](#/EnvelopeManifest) was defined.
 
-        The `requestBody` should contain the document being transferred. It is recommended to use the `application/json` media type for the `requestBody`. The media type provided in the initial `ISSU` (Issuance) transaction is the one that will be associated with the transferred additional document in the end.
+        The `requestBody` should contain the document being transferred. It is recommended to use the `application/json` media type for the `requestBody`. The media type provided in the initial `ISSUE` (Issuance) transaction is the one that will be associated with the transferred additional document in the end.
 
         The receiving platform should check that the transferred document has been declared at the start of the eBL envelope transfer.
         This should be done by verifying that the `documentChecksum` URL path parameter matches either [`EnvelopeManifest.eBLVisualisationByCarrier.documentChecksum`](#/EnvelopeManifest) attribute value (in which case the receiving platform can conclude that the sending platform has transferred the **eBLVisualisationByCarrier document**), or one of the [`DocumentMetadata.documentChecksum`](#/DocumentMetadata) values from the [`EnvelopeManifest.supportingDocuments[]`](#/EnvelopeManifest) list (in which case the receiving platform can conclude that the sending platform has transferred the **supporting document**)
@@ -527,7 +527,7 @@ components:
 
             The receiving platform can reject the envelope with `BENV` [`responseCode`](#/EnvelopeTransferFinishedResponse) if it concludes that the list entries are not correctly ordered by the sending platform, or discovers any other validity-related issue in the list.
 
-            The first [`EnvelopeTransferChainEntry`](#/EnvelopeTransferChainEntry) in the `envelopeTransferChain[]` list should contain the ISSU (issuance) transaction as the first transaction in the [`EnvelopeTransferChainEntry.transactions[]`](#/EnvelopeTransferChainEntry) list. 
+            The first [`EnvelopeTransferChainEntry`](#/EnvelopeTransferChainEntry) in the `envelopeTransferChain[]` list should contain the `ISSUE` (issuance) transaction as the first transaction in the [`EnvelopeTransferChainEntry.transactions[]`](#/EnvelopeTransferChainEntry) list. 
       required:
         - transportDocument
         - envelopeManifestSignedContent
@@ -807,7 +807,7 @@ components:
 
             The `BSIG` `responseCode` is used when the receiving platform could not process the envelope related to a signature and rejects the concrete transfer request. This response code should be used when the receiving platform decides to reject envelope transfer due to the issues with the signature used to create JWS content when starting envelope transfer (`EblEnvelope.envelopeManifestSignedContent`, and/or one or more `EnvelopeTransferChainEntrySignedContentChecksum` entries in the `EblEnvelope.envelopeTransferChain` list). Example use cases: the signature was made by an unknown key, the key or signature expired, the signed content does not match the EnvelopeTransferChainEntrySignedContentChecksum, etc. In this case, the receiving platform makes no assertions about the validity of the envelope contents. The sending platform may attempt to resolve the signature issue and retry with the same EnvelopeTransferChainEntrySignedContentChecksum. The `BSIG` `responseCode` should be used together with a HTTP `422 Unprocessable Content` response status code.
 
-            The `BENV` `responseCode` is used when the receiving platform can not process the envelope and rejects the concrete envelope transfer request. This response code can be used when the receiving platform knows the transfer cannot succeed in the future and the sending platform should retain the eBL. Example use cases could be that the envelope does not list the receiving platform as the intended recipient, the transferee ID is unknown, an invalid action code was used in the transactions for this envelope transfer, etc. In this case, the receiving platform is asserting that the envelope itself is not acceptable. Basically any use case where the receiving platform decides to reject the envelope transfer for technical reasons that are not covered by `BSIG` `responseCode`. The `BENV` `responseCode` should be used together with a HTTP `422 Unprocessable Content` response status code.
+            The `BENV` `responseCode` is used when the receiving platform can not process the envelope and rejects the concrete envelope transfer request. This response code can be used when the receiving platform knows the transfer cannot succeed in the future and the sending platform should retain the eBL. Example use cases could be that the envelope does not list the receiving platform as the intended recipient, the transferee ID is unknown, an invalid `actionCode` was used in the transactions for this envelope transfer, etc. In this case, the receiving platform is asserting that the envelope itself is not acceptable. Basically any use case where the receiving platform decides to reject the envelope transfer for technical reasons that are not covered by `BSIG` `responseCode`. The `BENV` `responseCode` should be used together with a HTTP `422 Unprocessable Content` response status code.
 
             The `INCD` `responseCode` is used when the receiving platform concludes that the transferred additional document's checksum or size does not match the document checksum or size provided either directly in URL path or in `EnvelopeManifest` sent in the start envelope transfer request. The `INCD` `responseCode` does *not* reject the envelope transfer. The sending platform should try to either resend the correct document, or attempt to start new envelope transfer request with changed `EnvelopeManifest` that will contain correct document checksum and/or size for the inconclusive document. The `INCD` `responseCode` is not valid as a response to the start of a envelope transfer.  The `INCD` `responseCode` should be used together with a HTTP `409 Conflict` response status code.
 
@@ -877,16 +877,20 @@ components:
         name:
           type: string
           pattern: ^\S(?:.*\S)?$
+          description: |
+            The name of the document.
           example: Carrier rendered copy of the original B/L document.pdf
         size:
           type: number
           minimum: 1
-          description: the Size of the document in bytes
+          description: |
+            The Size of the document in bytes.
           example: 4194304
         mediaType:
           type: string
           maxLength: 100
-          description: The Media Type (MIME type) of the document
+          description: |
+            The Media Type (MIME type) of the document.
           example: application/pdf
         documentChecksum:
           $ref: '#/components/schemas/DocumentChecksum'
@@ -900,82 +904,101 @@ components:
     Transaction:
       type: object
       title: Transaction
+      description: |
+        An entry in the TransationChain
       properties:
-        action:
+        actionCode:
           type: string
+          maxLength: 50
           description: |
-            Action denotes the transaction type, which can have one of the following values:
-            - `ISSU` (Issuance)
-            - `TRNS` (Transfer of possession)
-            - `ENDO` (Endorsement a.k.a. Transfer of title)
-            - `RESD` (Request to Surrender for Delivery)
-            - `RESA` (Request to Surrender for Amendment)
-            - `SACC` (Surrender accepted)
-            - `SREJ` (Surrender rejected)
+            The action code denotes the transaction type, which can have one of the following values:
 
-            The `ISSU` `action` is used for the eBL issuance transaction from the carrier party to the shipper party, and must appear exactly once in the first transaction of the first [`EnvelopeTransferChainEntry`](#/EnvelopeTransferChainEntry) entry (as JWS payload of [`EnvelopeTransferChainEntrySignedContent`](#/EnvelopeTransferChainEntrySignedContent) entry) in the [`EblEnvelope.envelopeTransferChain`](#/EblEnvelope) list. If the eBL document is issued to the shipper party that resides on the different eBL Platform from the carrier's platform, initial envelope transfer should contain envelope transfer chain where first entry's first transaction has `ISSU` `action` type. 
+            - `ISSUE` (The actor issued the document to the recipient)
+            - `TRANSFER` (The actor transferred the possession of the eBL to the recipient)
+            - `ENDORSE` (The actor endorsed the document to the recipient)
+            - `ENDORSE_TO_ORDER` (The actor endorsed the document to order of the recipient, allowing the recipient to further endorse the eBL to another party)
+            - `BLANK_ENDORSE` (The actor endorsed the document in blank)
+            - `SURRENDER_FOR_DELIVERY` (The actor requested to surrender the eBL to the recipient for delivery)
+            - `SURRENDER_FOR_AMENDMENT` (The actor requested to surrender the eBL to the recipient for amendment)
+            - `SACC` (The surrender request was accepted)
+            - `SREJ` (The surrender request was rejected)
+            - `SIGN` (The actor signed the eBL while it was in the actor's possession)
 
-            The `TRNS` `action` is used for the transfer of possession of the eBL from the current possessor party to the new possessor party.
+            The `ISSUE` action code is used for the eBL issuance transaction from the carrier to the `Issue to` party, meaning the designated recipient of the action (typically the shipper or their on behalf of party). `ISSUE` must appear exactly once in the first transaction of the first [`EnvelopeTransferChainEntry`](#/EnvelopeTransferChainEntry) entry (as JWS payload of [`EnvelopeTransferChainEntrySignedContent`](#/EnvelopeTransferChainEntrySignedContent) entry) in the [`EblEnvelope.envelopeTransferChain`](#/EblEnvelope) list. If the eBL is issued to a party on a different eBL platform than the carrier, the first transfer must show an envelope transfer chain starting with an `ISSUE` action code.
+            
+            The `TRANSFER` action code is used for the transfer of possession of the eBL from the current possessor to a new possessor, meaning the designated recipient of the action.
+            
+            The `ENDORSE` action code is used to endorse a negotiable eBL to a new endorsee, meaning the designated recipient of the action. This recipient CANNOT further endorse the eBL. The endorsement must always take place on the eBL platform of the current endorsee, who also holds possession of the eBL. If the new endorsee is on a different eBL platform than the current endorsee, the envelope transfer process is used to notify them of the `ENDORSE` transaction for non-repudiation purposes. However, this transaction does NOT result in the transfer of possession of the eBL contained in the envelope.
+            
+            The `ENDORSE_TO_ORDER` action code is used to endorse a negotiable eBL to a new endorsee, meaning the designated recipient of the action. This recipient CAN further endorse the eBL to another party. The endorsement must always take place on the eBL platform of the current endorsee, who also holds possession of the eBL. If the new endorsee is on a different eBL platform than the current endorsee, the envelope transfer process is used to notify them of the `ENDORSE_TO_ORDER` transaction for non-repudiation purposes. However, this transaction does NOT result in the transfer of possession of the eBL contained in the envelope.
+            
+            The `BLANK_ENDORSE` action code is used to endorse a negotiable eBL in blank, meaning that the endorsement does not specify a recipient. The endorsement must always take place on the eBL platform of the current possessor of the eBL.
+            
+            The `SURRENDER_FOR_DELIVERY` action code is used when a party requests delivery of the goods.
+            
+            The `SURRENDER_FOR_AMENDMENT` action code is used when a party surrenders an eBL so that the carrier can issue an amended version. If the request is accepted (see the `SACC` action code for details), the exact amendments to the eBL are agreed upon outside the PINT API (for example, through the DCSA EBL API). Once accepted, the original eBL and its envelope transfer chain are voided, and the amended eBL must be reissued with a new envelope transfer chain (see the `ISSUE` action code description above).
+            
+            This action code is also used when switching the eBL to a physical document (“switch to paper”), which is treated as part of the amendment process in the DCSA standard.
+            
+            If a surrender request (`SURRENDER_FOR_DELIVERY` or `SURRENDER_FOR_AMENDMENT` action code) is not addressed to the carrier that issued the eBL or to their legal representative, then the receiving platform should reject the envelope transfer with the [`EnvelopeTransferFinishedResponse`](#/EnvelopeTransferFinishedResponse) containing `BENV` [`responseCode`](#/EnvelopeTransferFinishedResponse).
+            
+            The `SACC` action code is used by the carrier to asynchronously accept a surrender request (initiated with either the `SURRENDER_FOR_DELIVERY` or `SURRENDER_FOR_AMENDMENT` action code). If the surrendering party is on a different platform than the carrier, the envelope transfer process is used to notify them of the `SACC` transaction for non-repudiation purposes. However, this transaction does NOT result in the transfer of possession of the eBL contained in the envelope.
+            
+            Once a `SACC` transaction has been recorded, no further transactions are permitted. Any changes to the envelope transfer chain involving new transactions after a `SACC` transaction are invalid and must be rejected with the [`EnvelopeTransferFinishedResponse`](#/EnvelopeTransferFinishedResponse) containing `BENV` [`responseCode`](#/EnvelopeTransferFinishedResponse).
+            
+            The `SREJ` action code is used by the carrier to asynchronously reject a surrender request (initiated with either the `SURRENDER_FOR_DELIVERY` or `SURRENDER_FOR_AMENDMENT` action code), and return possession of the eBL to the party that submitted the surrender request.
+            
+            The `SIGN` action code is used by an actor to visibly confirm their possession of the eBL within the chain. This action has no designated recipient and can only be performed while the actor is the current possessor of the eBL.
 
-            The `ENDO` `action` is used for the endorsement (a.k.a. transfer of title, or the right to take the delivery of the goods) of To-order eBL documents, where the new endorsee party is not named in the eBL document. The endorsement should always happen on the platform of the user that is not only the current endorsee, but also the current possessor of the eBL document. If the new endorsee party resides on the different eBL Platform from the current endorsee's platform, the envelope transfer process is used to notify the new endorsee of the `ENDO` `action` transaction for non-repudiation purposes, and will NOT result in the transfer of possession of the eBL document contained in the envelope. 
-
-            If the party is the current possessor, and the party is the current consignee/endorsee/shipper (or eBL document is blank-endorsed), the party may request to surrender the eBL to the carrier. This is done by using one of the Request to surrender action types (`RESD` `action` or `RESA` `action`) and with the issuing carrier or the relevant carrier agent as the `recipient` of the action. 
-             
-             The `RESD` `action` is used when the party wants to request the delivery of the goods. If the request is accepted (for details see `SACC` `action`), the carrier and the party submitting the surrender request will negotiate how the goods will be delivered (e.g. via DCSA shipment release API).
-             
-             The `RESA` `action` is used when the party wants to surrender the eBL document, so that the carrier can issue an amended eBL document. If the request is accepted (for details see `SACC` `action` response), the alignment on the exact change(s) that need to be made to the eBL document is done outside of the PINT API (e.g. via the DCSA eBL API). If the request is accepted, the existing eBL document is voided along with its envelope transfer chain, and the amended eBL document must be reissued with a new envelope transfer chain (for details see the `ISSU` `action` type description paragraph above). The `RESA` `action` is also used for switch to paper as the DCSA process flow for switching to paper is part of the amendment process (e.g. to note how many originals and copies with and without charges should be issued).
-
-            If a surrender request (`RESD` `action` or `RESA` `action`) is not addressed to the carrier that issued the eBL document or to their legal representative, then the receiving platform should reject the envelope transfer with the [`EnvelopeTransferFinishedResponse`](#/EnvelopeTransferFinishedResponse) containing `BENV` [`responseCode`](#/EnvelopeTransferFinishedResponse).
-
-            The `SACC` `action` is used by the carrier to asynchronously accept the surrender request initiated via `RESD` `action` or `RESA` `action`. If the party that submitted the surrender request is on the different platform, the envelope transfer process is used to notify the (surrender request submitter) party of the `SACC` `action` transaction for non-repudiation purposes, and will NOT result in the transfer of possession of the eBL document contained in the envelope. No transactions may occur after a `SACC` `action` transaction. Any envelope transfer chain changes with new transactions after a `SACC` `action` transaction are invalid and should be answered with the [`EnvelopeTransferFinishedResponse`](#/EnvelopeTransferFinishedResponse) containing `BENV` [`responseCode`](#/EnvelopeTransferFinishedResponse). 
-
-            The `SREJ` `action` is used by the carrier to asynchronously reject the surrender request initiated via `RESD` `action` or `RESA` `action`, and return the eBL document possession to the party that submitted the surrender request.
-
-            When the transaction recipient is residing on the different platform from the transaction actor's platform, the transaction should be followed by the envelope transfer from the actor's (sending) platform to the recipient's (receiving) platform. If the envelope transfer is caused by either `ENDO` `action` or `SACC` `action` transaction (where the recipient is on the different platform), the envelope transfer process is NOT causing transfer of possession of the eBL document, but is merely used as notification for the non-repudiation purposes.
-          enum:
-            - ISSU
-            - ENDO
-            - TRNS
-            - RESD
-            - RESA
-            - SACC
-            - SREJ
-          example: ISSU
+            When the transaction recipient is residing on the different platform from the transaction actor's platform, the transaction should be followed by the envelope transfer from the actor's (sending) platform to the recipient's (receiving) platform. If the envelope transfer is caused by either `ENDORSE` `actionCode` or `SACC` `actionCode` transaction (where the recipient is on the different platform), the envelope transfer process is NOT causing transfer of possession of the eBL document, but is merely used as notification for the non-repudiation purposes.
+          example: ISSUE
         actor:
           $ref: '#/components/schemas/TransactionParty'
         recipient:
           $ref: '#/components/schemas/TransactionParty'
-        timestamp:
-          type: integer
-          format: int64
-          description: Unix epoch with millisecond precision of when the transaction was created.
-          example: 1713342679531
+        actionDateTime:
+          type: string
+          format: date-time
+          description: |
+            RFC3339 timestamp (UTC) when the transaction was created. Responses MUST be UTC (Z). Precision: milliseconds.
+          example: '2024-04-17T07:11:19.531Z'
         reasonCode:
           type: string
           maxLength: 4
           description: |
-            A code defined by DCSA indicating the reason for `RESA` (Request to Surrender for Amendment). Possible values are:
+            A code defined by DCSA indicating the reason for `SURRENDER_FOR_AMENDMENT` (Surrender for Amendment). Possible values are:
             - `SWTP` (Switch to paper)
             - `COD` (Change of destination)
             - `SWI` (Switch BL)
 
-            **Condition:** on `action` being `RESA`
+            In case no valid `reasonCode` exists for the `SURRENDER_FOR_AMENDMENT` (Surrender for Amendment) - it is possible to use the `comments` property below to add more information.
+
+            **Condition:** on `actionCode` being `SURRENDER_FOR_AMENDMENT`
           example: SWTP
         comments:
           type: string
           pattern: ^\S(?:.*\S)?$
-          description: Free text comment for the party receiving the transaction.
+          description: |
+            Free text comment for the party receiving the transaction. In case no valid `reasonCode` exists - this property can also be used to provide a reason.
           maxLength: 255
           example: The B/L has been issued.
+        signatureHash:
+          type: string
+          minLength: 64
+          maxLength: 64
+          pattern: ^[0-9a-f]+$
+          description: |
+            The SHA-256 hash of the signature applied by the eBL Solution Provider to the endorsement chain action and parameters (`actionDateTime`, `actionCode`, `actor`, `recipient` and `transportDocument`).
+          example: 20a0257b313ae08417e07f6555c4ec829a512c083f3ead16b41158018a22abe9
       required:
-        - action
+        - actionCode
         - actor
-        - timestamp
-        - recipient
+        - actionDateTime
     TransactionParty:
-      description: Refers to a company or a legal entity.
-      title: Transaction Party
       type: object
+      title: Transaction Party
+      description: |
+        Refers to a company or a legal entity.
       properties:
         partyName:
           type: string
@@ -1020,13 +1043,37 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/TaxLegalReference'
+        representedParty:
+          $ref: '#/components/schemas/RepresentedParty'
       required:
         - partyName
         - eblPlatform
         - identifyingCodes
+
+    RepresentedParty:
+      type: object
+      title: Represented Party
+      description: The party allowed to act on behalf of the `Shipper` or `Consignee` for documentation purposes.
+      properties:
+        partyName:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 70
+          description: |
+            Name of the party.
+          example: Globeteam
+        identifyingCodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentifyingCode'
+      required:
+        - partyName
+
     IdentifyingCode:
       type: object
       title: Identifying Code
+      description: |
+        A code and value that uniquely identifies a party.
       properties:
         codeListProvider:
           type: string
@@ -2283,7 +2330,7 @@ components:
         isReportableQuantity:
           type: boolean
           description: |
-            Indicates if a container of hazardous material is at the reportable quantity level. If `TRUE`, a report to the relevant authority must be made in case of spill.
+            Indicates if a container of hazardous material is at the reportable quantity level. If `true`, a report to the relevant authority must be made in case of spill.
           example: false
         inhalationZone:
           type: string
@@ -3481,6 +3528,32 @@ components:
       required:
         - partyName
 
+    OnBehalfOfShipper:
+      type: object
+      title: On Behalf of Shipper
+      description: |
+        The party allowed to act on behalf of the shipper for documentation purposes.
+
+        **Condition:** Either the `address` or a party `identifyingCode` must be provided in the `Shipping Instructions`. If a `displayedAddress` is provided, it must be included in the `Transport Document` instead of the `address`.
+      properties:
+        partyName:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 70
+          description: |
+            Name of the party.
+          example: IKEA Denmark
+        address:
+          $ref: '#/components/schemas/PartyAddress'
+        identifyingCodes:
+          type: array
+          description: |
+            **Condition:** Either the `address` or a party `identifyingCode` must be provided. 
+          items:
+            $ref: '#/components/schemas/IdentifyingCode'
+      required:
+        - partyName
+
     Consignee:
       type: object
       title: Consignee
@@ -3565,6 +3638,31 @@ components:
       required:
         - partyName
         - identifyingCodes
+
+    OnBehalfOfConsignee:
+      type: object
+      title: On Behalf of Consignee
+      description: |
+        The party allowed to act on behalf of the consignee for documentation purposes.
+
+        **Condition:** Either the `address` or a party `identifyingCode` must be provided in the `Shipping Instructions`. If a `displayedAddress` is provided, it must be included in the `Transport Document` instead of the `address`.
+      properties:
+        partyName:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 70
+          description: |
+            Name of the party.
+          example: IKEA Denmark
+        address:
+          $ref: '#/components/schemas/PartyAddress'
+        identifyingCodes:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/IdentifyingCode'
+      required:
+        - partyName
 
     Endorsee:
       type: object
@@ -3890,8 +3988,12 @@ components:
       properties:
         shipper:
           $ref: '#/components/schemas/Shipper'
+        onBehalfOfShipper:
+          $ref: '#/components/schemas/OnBehalfOfShipper'
         consignee:
           $ref: '#/components/schemas/Consignee'
+        onBehalfOfConsignee:
+          $ref: '#/components/schemas/OnBehalfOfConsignee'
         endorsee:
           $ref: '#/components/schemas/Endorsee'
         issuingParty:
