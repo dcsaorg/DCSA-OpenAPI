@@ -145,32 +145,18 @@ components:
       description: |
         An API-Version header **MAY** be added to the request (optional); if added it **MUST** only contain **MAJOR** version. API-Version header **MUST** be aligned with the URI version.
   schemas:
-    TransactionParty:
+    ActorParty:
       type: object
-      title: Transaction Party
+      title: Actor Party
       description: |
         Refers to a company or a legal entity.
-
-        **Note:** In case this object populates the `recipient` property of the `Transaction` object it is possible to use a '**No Party**' placeholder when the `actionCode` is one of the following values: `SIGN`, `BLANK ENDORSE` or `SURRENDERED` (as none of these `actionCodes` require a `recipient`). A '**No Party**' object MUST be populated with the following values:
-        ```
-          {
-            'eblPlatform': 'NONE',
-            'partyName': 'NONE',
-            'identifyingCodes': [
-              {
-                'codeListProvider': 'NONE',
-                'partyCode': 'NONE',
-              }
-            ]
-          }
-        ```
       properties:
         eblPlatform:
           type: string
           pattern: ^\S+$
           maxLength: 4
           description: |
-            The eBL platform of the transaction party. The value **MUST** be one of:
+            The eBL platform of the `Actor Party`. The value **MUST** be one of:
             - `WAVE` (Wave)
             - `CARX` (CargoX)
             - `ESSD` (EssDOCS - This value has been **deprecated**. Please use `IDT`)
@@ -209,16 +195,105 @@ components:
           items:
             $ref: '#/components/schemas/TaxLegalReference'
         representedParty:
-          $ref: '#/components/schemas/RepresentedParty'
+          $ref: '#/components/schemas/RepresentedActorParty'
       required:
         - partyName
         - eblPlatform
         - identifyingCodes
 
-    RepresentedParty:
+    RecipientParty:
+      type: object
+      title: Recipient Party
+      description: |
+        Refers to a company or a legal entity.
+
+        **Note:** It is possible to use a '**No Party**' placeholder when the `actionCode` is one of the following values: `SIGN`, `BLANK ENDORSE` or `SURRENDERED` (as none of these `actionCodes` require a `recipient`). A '**No Party**' object MUST be populated with the following values:
+        ```
+          {
+            'eblPlatform': 'NONE',
+            'partyName': 'NONE',
+            'identifyingCodes': [
+              {
+                'codeListProvider': 'NONE',
+                'partyCode': 'NONE',
+              }
+            ]
+          }
+        ```
+      properties:
+        eblPlatform:
+          type: string
+          pattern: ^\S+$
+          maxLength: 4
+          description: |
+            The eBL platform of the `Recipient Party`. The value **MUST** be one of:
+            - `WAVE` (Wave)
+            - `CARX` (CargoX)
+            - `ESSD` (EssDOCS - This value has been **deprecated**. Please use `IDT`)
+            - `IDT` (ICE Digital Trade)
+            - `BOLE` (Bolero)
+            - `EDOX` (EdoxOnline)
+            - `IQAX` (IQAX)
+            - `SECR` (Secro)
+            - `TRGO` (TradeGO)
+            - `ETEU` (eTEU)
+            - `TRAC` (Enigio trace:original)
+            - `BRIT` (BRITC eBL)
+            - `COVA` (Covantis)
+            - `ETIT` (e-title)
+            - `KTNE` (KTNET)
+            - `CRED` (Credore)
+            - `BLOC` (BlockPeer Technologies)
+            - `NONE` (To be used as part of the '**No Party**' object when `actionCode` is `SIGN`, `BLANK ENDORSE` or `SURRENDERED`)
+          example: BOLE
+        partyName:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 70
+          description: |
+            Name of the party.
+          example: Globeteam
+        identifyingCodes:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/IdentifyingCode'
+        taxLegalReferences:
+          description: |
+            A list of `Tax References` for a `Party`
+          type: array
+          items:
+            $ref: '#/components/schemas/TaxLegalReference'
+        representedParty:
+          $ref: '#/components/schemas/RepresentedRecipientParty'
+      required:
+        - partyName
+        - eblPlatform
+        - identifyingCodes
+
+    RepresentedActorParty:
       type: object
       title: Represented Party
-      description: The party allowed to act on behalf of the `Shipper` or `Consignee` for documentation purposes.
+      description: The party on whose behalf the action was performed.
+      properties:
+        partyName:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 70
+          description: |
+            Name of the party.
+          example: Globeteam
+        identifyingCodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentifyingCode'
+      required:
+        - partyName
+
+    RepresentedRecipientParty:
+      type: object
+      title: Represented Party
+      description: The party on whose behalf the action was directed.
       properties:
         partyName:
           type: string
@@ -263,9 +338,9 @@ components:
             Not all actions are applicable to all surrender requests. The combination and order of endorsement chain entries may differ by eBL Solution Provider, based on their rulebook and/or bilateral agreements with carriers.
           example: ISSUE
         actor:
-          $ref: '#/components/schemas/TransactionParty'
+          $ref: '#/components/schemas/ActorParty'
         recipient:
-          $ref: '#/components/schemas/TransactionParty'
+          $ref: '#/components/schemas/RecipientParty'
       required:
         - actionDateTime
         - actionCode
