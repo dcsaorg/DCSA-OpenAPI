@@ -7,6 +7,15 @@ Publications related to the Booking API:
 - [Booking Process](https://dcsa.org/standards/booking-process/) contains documents and publications
 - [Booking Notification](./notification/) maintained here on GitHub  (**DEPRECATED** - now included as part of Booking API)
 
+<a name="v203"></a>[Release v2.0.3 (TBD)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.3)
+---
+This is a patch release for the DCSA Booking API. A bug in the description of the `shipmentCutOffTimes` was reported. A new codeListProvider has been added (and one deprecated).
+
+- descriptions have been added to objects where they were missing
+- the **mandatory** requirement for `Cut off times` in a Confirmed Booking is no longer a requirement. This is a backward-breaking change but necessary, since it is not always possible to **require** cut-off times already at the Booking stage.
+- `ESSD` (EssDOCS) has been marked as deprecated in codeListProvider
+- `BLOC` (BlockPeer Technologies) added as new codeListProvider
+
 <a name="v202"></a>[Release v2.0.2 (31 July 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.2)
 ---
 This is a patch release for the DCSA Booking API. A bug in the `GET`, `PUT` and `PATCH` description has been fixed (chaning the semantics of the endPoints) and a lot of minor changes have been added to this patch, here is a list of changes
