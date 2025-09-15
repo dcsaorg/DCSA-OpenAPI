@@ -8,6 +8,19 @@ Publications related to the Bill of Lading Issuance API:
 - [Bill of Lading](./../) maintained here on GitHub
 - [Bill of Lading Issuance Response](./../issuance_response/) maintained here on GitHub (the Issuance Response API linked to this API)
 
+<a name="v302"></a>[Release v3.0.2 (TBD)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS/3.0.2)
+---
+This is a patch version for the DCSA Issuance API. eBL Solution Providers updated, `ZZ` allowed as `countryCode`, 2 new DocumentParties added:
+
+- descriptions added to properties and objects that did not have descriptions (`SupportingDocument`, `name` in `SupportingDocument`, `IdentifyingCode`, `Transports`, `IssuanceError` and `IssuanceResponse`)
+- `Issue To Party` description updated
+- `ESSD` as `sendToPlatform` and `codeListProvider` have been deprecated - `IDT` should be used
+- `BLOC` (BlockPeer Technologies) added as a new `sendToPlatform` and `codeListProvider`
+- `countryCode` description in `TaxLegalReference`, `NationalCommodityCode`, `CustomsReference`, `Address`, `PartyAddress`, `City` and `PlaceOfIssue` updated (to align with eBL) to allow the use for `ZZ` in case it is not known
+- clarified conditions for `numberOfOriginalsWithCharges` and `numberOfOriginalsWithoutCharges`
+- 2 new DocumentParties added: `OnBehalfOfShipper` and `OnBehalfOfConsignee`
+- SwaggerHub API Auto Mocking removed
+
 <a name="v301"></a>[Release v3.0.1 (31 July 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS/3.0.1)
 ---
 This is a patch version for the DCSA Issuance API. It only includes minor cosmetic changes. The purpose of the patch is to align with electronic Bill of Lading v3.0.1 API.
