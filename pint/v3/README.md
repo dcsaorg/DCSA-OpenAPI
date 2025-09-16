@@ -21,8 +21,8 @@ Snapshot as of {TBD} for EBL Platform Interoperability 3.0.0 Beta. This Snapshot
 - improved `reason` example
 - on the `Transaction` object:
   - `action` renamed to `actionCode` to align with Surrender API
-  - description updated to align with Surrender API
-  - existing values updated to align with Surrender API:
+  - `actionCode` description updated to align with Surrender API
+  - existing `actionCode` values updated to align with Surrender API:
     - `ISSU` --> `ISSUE`
     - `TRNS` --> `TRANSFER`
     - `ENDO` --> `ENDORSE`
