@@ -9,6 +9,48 @@ Publications related to the PINT API:
 ---
 This is a moving target and will continue to be updated:
 
+<a name="v300B2025{TBD}"></a>[Release v3.0.0 Beta 2025{TBD} (TBD)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_PINT/3.0.0-Beta-2025{TBD})
+---
+Snapshot as of {TBD} for EBL Platform Interoperability 3.0.0 Beta.
+- `OPTION` renamed to `OPTIONS` on the `httpMethod` on Error-object
+- added missing descriptions to objects/properties: `EblEnvelope`, `EnvelopeManifest`, `EnvelopeTransferChainEntry`, `EnvelopeTransferStartedResponse`, `EnvelopeTransferFinishedResponse`, `name` (on `DocumentMetadata`), `Transaction`, `Transports`
+- `ESSD` as `eblPlatform` and `codeListProvider` have been deprecated - `IDT` should be used
+- `BLOC` (BlockPeer Technologies) added as a new `eblPlatform` and `codeListProvider`
+- `previousEnvelopeTransferChainEntrySignedContentChecksum` and `reason`: `nullable: true` removed as the optional property should be left out of the payload if it is `null`
+- improved description formatting
+- improved `reason` example
+- on the `Transaction` object:
+  - `action` renamed to `actionCode` to align with Surrender API
+  - description updated to align with Surrender API
+  - existing values updated to align with Surrender API:
+    - `ISSU` --> `ISSUE`
+    - `TRNS` --> `TRANSFER`
+    - `ENDO` --> `ENDORSE`
+    - `RESD` --> `SURRENDER_FOR_DELIVERY`
+    - `RESA` --> `SURRENDER_FOR_AMENDMENT`
+  - new `actionCode` values added:
+    - `ENDORSE_TO_ORDER`
+    - `BLANK_ENDORSE`
+    - `SIGN`
+  - `actionCode` changed from Enum to PseudoEnum to allow updates in future patches
+  - `actorParty` and `recipientParty` now specialized for better descriptions (the structure is the same)
+  - `timestamp` renamed to `actionDateTime` and type changed from `integer` --> `string` to align with Surrender
+  - `reason` renamed to `reasonCode` to align with Surrender
+  - two new `reasonCodes` added:
+    - `COD` (Change of destination)
+    - `SWI` (Switch BL)
+  - `reasonCode` description updated
+  - `comments` description updated
+  - `recipient` is **no** longer a required property on `Transaction` (it is not needed for `SIGN`, `BLANK_ENDORSE` and `SURRENDER` `actionCodes`)
+- `representedParty` property (equivalent to an `OnBehalfOfParty`) added to `actorParty` and `recipientParty`
+
+## Transport Document changes
+- `countryCode` description in `TaxLegalReference`, `NationalCommodityCode`, `CustomsReference`, `Address`, `PartyAddress`, `City` and `PlaceOfIssue` updated to allow the use of `ZZ` in case it is not known
+- the condition clarified for: `numberOfOriginalsWithCharges` and `numberOfOriginalsWithoutCharges`
+- two new DocumentParties added: `OnBehalfOfShipper` and `OnBehalfOfConsignee`
+- `ESSD` as `eblPlatform` and `codeListProvider` have been deprecated - `IDT` should be used
+- `BLOC` (BlockPeer Technologies) added as a new `eblPlatform` and `codeListProvider`
+
 <a name="v300B20250731"></a>[Release v3.0.0 Beta 20250731 (31 of July 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_PINT/3.0.0-Beta-20250731)
 ---
 Snapshot as of 31 of July 2025 for EBL Platform Interoperability 3.0.0 Beta.
