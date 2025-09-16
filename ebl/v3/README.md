@@ -11,6 +11,17 @@ Publications related to the Bill of Lading API:
 - [Bill of Lading Surrender](./surrender/) maintained here on GitHub
 - [Bill of Lading Surrender Response](./surrender_response/) maintained here on GitHub (**DEPRECATED** - now included as part of EBL Surrender API)
 
+<a name="v302"></a>[Release v3.0.2 (TBD)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.2)
+---
+This is a patch version for the DCSA Bill of Lading API. The primary reason for this patch is adding the `OnBehalfOf` parties, allowing `ZZ` as a countryCode and updating eBL Solution Providers:
+- descriptions added to the following properties/objects: `CancelShippingInstructionsUpdate`, `ApproveTransportDocument`, `IdentifyingCode`, `Transports`
+- condition clarified for: `numberOfOriginalsWithCharges` and `numberOfOriginalsWithoutCharges` 
+- `countryCode` description in `TaxLegalReference`, `NationalCommodityCode`, `CustomsReference`, `Address`, `PartyAddress`, `City`, `PlaceOfIssue`, `AdvanceManifestFiling`, `PlaceOfAcceptance` and `PlaceOfFinalDelivery` updated to allow the use of `ZZ` in case it is not known
+- two new DocumentParties added: `OnBehalfOfShipper` and `OnBehalfOfConsignee`
+- `Issue To Party` description updated
+- `ESSD` as `sendToPlatform` and `codeListProvider` have been deprecated - `IDT` should be used
+- `BLOC` (BlockPeer Technologies) added as a new `sendToPlatform` and `codeListProvider`
+
 <a name="v301"></a>[Release v3.0.1 (31 July 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.1)
 ---
 This is a patch version for the DCSA Bill of Lading API. The primary reason for this patch is the `ShippingInstructionRequestor` party and adding a `transportDocumentReference` by Shipper, but other improvements have been added as well:
