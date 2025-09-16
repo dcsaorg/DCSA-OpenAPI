@@ -11,7 +11,7 @@ This is a moving target and will continue to be updated:
 
 <a name="v300B2025{TBD}"></a>[Release v3.0.0 Beta 2025{TBD} (TBD)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_PINT/3.0.0-Beta-2025{TBD})
 ---
-Snapshot as of {TBD} for EBL Platform Interoperability 3.0.0 Beta.
+Snapshot as of {TBD} for EBL Platform Interoperability 3.0.0 Beta. This Snapshot breaks backward compatibility: changes `actionCodes` in the Transaction chain, changes `recipient` from mandatory to optional, and renames properties to align with Surrender API. The rest of the changes are backward compatible.
 - `OPTION` renamed to `OPTIONS` on the `httpMethod` on Error-object
 - added missing descriptions to objects/properties: `EblEnvelope`, `EnvelopeManifest`, `EnvelopeTransferChainEntry`, `EnvelopeTransferStartedResponse`, `EnvelopeTransferFinishedResponse`, `name` (on `DocumentMetadata`), `Transaction`, `Transports`
 - `ESSD` as `eblPlatform` and `codeListProvider` have been deprecated - `IDT` should be used
