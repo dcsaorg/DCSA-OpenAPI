@@ -17,7 +17,11 @@ This is a patch version for the DCSA Surrender API. eBL Solution Providers updat
 - `NONE` added as `eblPlatform` and `codeListProvider` to be used as "No Party" for the recipient when the `actionCode` is `SIGN`, `BLANK ENDORSE` or `SURRENDERED`
 - added extra property `representedParty` on `ActionParty` and `RecipientParty`
 - added missing description to the following objects: `EndorsementChainLink`, `IdentifyingCode` and `SurrenderRequestAnswer`
-- `actionCode` description updated for almost all values and 4 new codes added: `BLANK_ENDORSE`, `ENDORSE_TO_ORDER`, `TRANSFER` and `SURRENDERED`
+- `actionCode` description updated for almost all values and 4 new codes added:
+  - `BLANK_ENDORSE`
+  - `ENDORSE_TO_ORDER`
+  - `TRANSFER`
+  - `SURRENDERED`
 - new `reasonCode` added:
   - `COD` (Change of destination)
   - `SWI` (Switch BL)
