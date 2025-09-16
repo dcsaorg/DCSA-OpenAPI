@@ -11,10 +11,10 @@ Publications related to the Booking API:
 ---
 This is a patch release for the DCSA Booking API. A bug in the description of the `shipmentCutOffTimes` was reported. A new codeListProvider has been added (and one deprecated).
 
-- descriptions have been added to objects where they were missing
-- the **mandatory** requirement for `Cut off times` in a Confirmed Booking is no longer a requirement. This is a backward-breaking change but necessary, since it is not always possible to **require** cut-off times already at the Booking stage.
+- descriptions have been added to objects where they were missing: `CancelBookingRequest`, `CreateBooking`, `UpdateBooking`, `Booking`, `IdentifyingCode`
 - `ESSD` (EssDOCS) has been marked as deprecated in codeListProvider
 - `BLOC` (BlockPeer Technologies) added as new codeListProvider
+- `ROU` added as `locationTypeCode` on the `ShipmentLocations` - can be used in combination with the  `routingReference` property
 
 <a name="v202"></a>[Release v2.0.2 (31 July 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.2)
 ---
