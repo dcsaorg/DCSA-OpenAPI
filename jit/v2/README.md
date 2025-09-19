@@ -1,10 +1,11 @@
-### Just in Time (JIT)
+### Port Call (JIT)
 
-The DCSA Interface Standard for Just in Time Portcalls is documented on the **[DCSA JIT](https://app.swaggerhub.com/apis/dcsaorg/DCSA_JIT) SwaggerHub**.
+The DCSA Interface Standard for Port Call (JIT) is documented on the **[DCSA JIT](https://app.swaggerhub.com/apis/dcsaorg/DCSA_JIT) SwaggerHub**.
 
 <a name="v200"></a>[Release v2.0.0 (...)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_JIT/2.0.0)
 ---
 This is a moving target and will be updated as soon as the version is published
+- Renamed the standard from "Just in Time Port Calls" -> "Port Call (JIT)"
 
 <a name="v200B20250328"></a>[Release v2.0.0 Beta 20250328 (28 of March 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_JIT/2.0.0-Beta-20250328)
 ---
