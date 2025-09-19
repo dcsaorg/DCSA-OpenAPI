@@ -85,7 +85,16 @@ paths:
         - name: vesselIMONumber
           in: query
           description: |
-            The identifier of a vessel. The result will only return schedules including the vessel with the specified IMO number. It is not a requirement for dummy vessels to have an `IMO Number`. In this case filtering by `vesselName` should be used.
+            The identifier of a vessel via the `vesselIMONumber`. The result will only return schedules including the vessel with the specified `vesselIMONumber`. It is not a requirement for dummy vessels to have an `vesselIMONumber`. In this case filtering by `vesselName` should be used.
+          schema:
+            type: string
+            pattern: ^\d{7}$
+            maxLength: 7
+            example: '9321483'
+        - name: MMSINumber
+          in: query
+          description: |
+            The identifier of a vessel via the `MMSINumber`. The result will only return schedules including the vessel with the specified `MMSINumber`. It is not a requirement for dummy vessels to have an `MMSINumber`. In this case filtering by `vesselName` should be used.
           schema:
             type: string
             pattern: ^\d{7}$
@@ -302,6 +311,8 @@ components:
             The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd's register code, which does not change during the lifetime of the vessel
 
             **Condition:** If `isDummyVessel` is `false` - at least one of `vesselIMONumber` or `MMSINumber` **MUST** be specified in order to identify the `Vessel`. It is also acceptable to provide both properties. If `isDummyVessel` is `true` it is optional to provide this property.
+
+            **Condition:** Please note that if the requester is on a version `3.0.0` (indicated by the `APIVersion` being blank or containing the value `3`) and it is not a dummy vessel (`isDummyVessel: false`) then this property **MUST** be present.
           example: '9321483'
         MMSINumber:
           type: string
@@ -312,6 +323,8 @@ components:
             Maritime Mobile Service Identities (MMSIs) are nine-digit numbers used by maritime digital selective calling (DSC), automatic identification systems (AIS) and certain other equipment to uniquely identify a ship or a coast radio station.
 
             **Condition:** If `isDummyVessel` is `false` - at least one of `vesselIMONumber` or `MMSINumber` **MUST** be specified in order to identify the `Vessel`. It is also acceptable to provide both properties.  If `isDummyVessel` is `true` it is optional to provide this property.
+
+            **Condition:** It is only possible to use this property in case the requester is on version `3.0.1` or later or `vesselIMONumber` is also provided. In case the requester is on version `3.0.0` (indicated by the `APIVersion` header being blank or containing the value `3`) - this property cannot be used unless `vesselIMONumber` is also present.
           example: '278111222'
         vesselName:
           type: string
@@ -782,10 +795,11 @@ components:
         minimum: 0
         type: number
         default: 100
-    APIVersionMajor:
+    APIVersion:
       name: API-Version
       in: header
-      description: An API-Version header **MAY** be added to the request (optional); if added it **MUST** only contain **MAJOR** version. API-Version header **MUST** be aligned with the URI version.
+      description: |
+        From v3.0.1 and onward - every API request and response must contain the API-Version header, set to the full version of the implemented DCSA standard.
       required: false
       schema:
         type: string
