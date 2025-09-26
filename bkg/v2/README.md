@@ -15,6 +15,7 @@ This is a patch release for the DCSA Booking API. A bug in the description of th
 - `ESSD` (EssDOCS) has been marked as deprecated in codeListProvider
 - `BLOC` (BlockPeer Technologies) added as new codeListProvider
 - `ROU` added as `locationTypeCode` on the `ShipmentLocations` - can be used in combination with the  `routingReference` property
+- `Issue To Party` added in `documentParties`
 
 <a name="v202"></a>[Release v2.0.2 (31 July 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.2)
 ---
