@@ -1,0 +1,846 @@
+openapi: 3.0.3
+info:
+  version: 3.0.2
+  title: DCSA eBL Endorsement Chain API
+  description: |
+    <h1>DCSA OpenAPI specification for electronic Bill of Lading (eBL) Endorsement Chain (END)</h1>
+
+    ### Changelog and GitHub
+    For a changelog please click [here](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/end/v1#v100). If you have any questions, feel free to [Contact Us](https://dcsa.org/get-involved/contact-us).
+
+    API specification issued by [DCSA.org](https://dcsa.org/).
+  license:
+    name: Apache 2.0
+    url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
+  contact:
+    name: Digital Container Shipping Association (DCSA)
+    url: 'https://dcsa.org'
+    email: info@dcsa.org
+tags:
+  - name: Endorsement Chain
+    description: Endorsement Chain
+paths:
+  /endorsement-chains/{transportDocumentReference}:
+    get:
+      tags:
+        - Endorsement Chain
+      summary: Gets the Endorsement Chain
+      operationId: getEndorsementChain
+      description: |
+        Gets the EndorsementChain by `transportDocumentReference`. It is possible to filter the result by carrier `SMDG` code and/or by `transportDocumentSubReference`. The result is a list of EndorsementChains matching the filter.
+      parameters:
+        - in: path
+          name: transportDocumentReference
+          description: |
+            The `transportDocumentReference` of the `Transport Document` to get the Endorsement chain from
+          required: true
+          schema:
+            type: string
+            pattern: ^\S(?:.*\S)?$
+            maxLength: 20
+            description: |
+              A unique number allocated by the shipping line to the `Transport Document` and the main number used for the tracking of the status of the shipment.
+            example: HHL71800000
+        - in: query
+          name: transportDocumentSubReference
+          description: |
+            Filter by Transport Document Sub-reference (or version). In case a specific version of the EndorsementChain is requested - adding this filter narrows the result to 1 EndorsementChain.
+          schema:
+            type: string
+            pattern: ^\S(?:.*\S)?$
+            maxLength: 100
+        - in: query
+          name: carrierSMDGCode
+          description: |
+            Filter by carrier `SMDG` code (provided by [SMDG](https://smdg.org/documents/smdg-code-lists/smdg-liner-code-list/)). Adding this will only match Transport Documents from the carrier matching the `carrierSMDGCode` value.
+          required: false
+          schema:
+            type: string
+            pattern: ^\S+$
+            maxLength: 4
+            example: YMLU
+        - in: query
+          name: limit
+          description: |
+            Maximum number of Endorsement Chains to include in each page of the response.
+          schema:
+            type: integer
+            format: int32
+            default: 100
+            example: 100
+            minimum: 1
+        - in: query
+          name: cursor
+          description: |
+            A server-generated value that identifies the next page position in a collection (`Next-Page-Cursor` header of the previous response to retrieve the next). When cursor is provided, it **MUST NOT** be combined with any other query parameters (including limit); such parameters will be ignored and MAY result in a `400` error.
+          schema:
+            type: string
+            maxLength: 1024
+            example: fE9mZnNldHw9MTAmbGltaXQ9MTA
+        - in: header
+          name: API-Version
+          required: false
+          schema:
+            type: string
+            example: '3.0.2'
+          description: |
+            An API-Version header **MAY** be added to the request (optional); if added it **MUST** contain the SemVer of the consumer.
+      responses:
+        '200':
+          description: |
+            All EndorsementChains that match the filter criteria.
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+            Next-Page-Cursor:
+              schema:
+                type: string
+                maxLength: 1024
+                example: fE9mZnNldHw9MTAmbGltaXQ9MTA
+              description: |
+                The `Next-Page-Cursor` header contains a cursor value that points to the next page of results in a paginated API response.
+                When an initial `GET` endpoint request includes the query parameter `limit=...` the API provider limits the number of items in the root array of the response to the specified limit. If the response would contain more items than the specified limit, the API provider includes only the first set of limit items and appends the following response header:
+                `Next-Page-Cursor=fE9mZnNldHw9MTAmbGltaXQ9MTA`, a string that acts as a reference for the next page of results. The cursor value is used in subsequent requests to retrieve the next page by passing it as a query parameter: `?cursor=fE9mZnNldHw9MTAmbGltaXQ9MTA`.
+
+                To retrieve the next page, the API consumer sends a `GET` request to the endpoint URL with only `?cursor=fE9mZnNldHw9MTAmbGltaXQ9MTA` as query parameter. The limit of items per page and any other query parameters may not be altered, therefore it may also not be specified when requesting subsequent pages. The API provider must ignore any query parameters passed along with a cursor, and should return a `400` error if any other query parameter is passed along with the `cursor`.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EndorsementChainX'
+              examples:
+                surrenderedStraightBLExample:
+                  summary: |
+                    Surrendered straight B/L
+                  description: |
+                    EndorsementChain for a surrendered 'Straight Bill of Lading' issued by Yang Ming to Suzano Brasil (who is the Shipper) on the Wave platform. Suzano China is the Consignee. The `Transport Document` contains this information:
+                    -  **Shipper:** Suzano Brazil
+                    -  **Consignee:** Suzano China
+
+                    The EndorsementChain consists of the follow 4 entries:
+                    |Entry|Action Code|Actor|Recipient|
+                    |:--:|:---------:|-----|----------|
+                    |1|`SURRENDERED`|Yang Ming Marine Transport Corporation||
+                    |2|`SURRENDER_FOR_DELIVERY`|Suzano China|Yang Ming Marine Transport Corporation|
+                    |3|`TRANSFER`|Suzano Brazil|Suzano China|
+                    |4|`ISSUE`|Yang Ming Marine Transport Corporation|Suzano Brazil|
+                    
+                    Please note that the 4th entry in the example (`actionCode: 'ISSUE'`) is the first entry in the chain, on which further endorsements are made...
+                  value:
+                    - transportDocumentReference: '62CD536BA8D34C469AFD'
+                      transportDocumentSubReference: 'fc5009a7-25ad-4bb0-9892-4e2dea6bcdd9'
+                      carrierSMDGCode: 'YMLU'
+                      endorsementChain:
+                      - actionDateTime: '2025-09-12T17:23:12Z'
+                        actionCode: 'SURRENDERED'
+                        actor:
+                          partyName: 'Yang Ming Marine Transport Corporation'
+                          eblPlatform: 'WAVE'
+                          identifyingCodes:
+                          - codeListProvider: 'WAVE'
+                            partyCode: '4bd196da-0d8b-436d-bad4-4cc88f04a035'
+                      - actionDateTime: '2025-09-12T17:23:12Z'
+                        actionCode: 'SURRENDER_FOR_DELIVERY'
+                        actor:
+                          partyName: 'Suzano China'
+                          eblPlatform: 'WAVE'
+                          identifyingCodes:
+                          - codeListProvider: 'WAVE'
+                            partyCode: '0665fefb-7c3f-443b-8ccd-73ced178448f'
+                        recipient:
+                          partyName: 'Yang Ming Marine Transport Corporation'
+                          eblPlatform: 'WAVE'
+                          identifyingCodes:
+                          - codeListProvider: 'WAVE'
+                            partyCode: '4bd196da-0d8b-436d-bad4-4cc88f04a035'
+                      - actionDateTime: '2025-09-10T14:35:42Z'
+                        actionCode: 'TRANSFER'
+                        actor:
+                          partyName: 'Suzano Brazil'
+                          eblPlatform: 'WAVE'
+                          identifyingCodes:
+                          - codeListProvider: 'WAVE'
+                            partyCode: 'ee92b6b7-ac27-4537-87df-019c69389346'
+                        recipient:
+                          partyName: 'Suzano China'
+                          eblPlatform: 'WAVE'
+                          identifyingCodes:
+                          - codeListProvider: 'WAVE'
+                            partyCode: '0665fefb-7c3f-443b-8ccd-73ced178448f'
+                      - actionDateTime: '2025-09-09T12:55:31Z'
+                        actionCode: 'ISSUE'
+                        actor:
+                          partyName: 'Yang Ming Marine Transport Corporation'
+                          eblPlatform: 'WAVE'
+                          identifyingCodes:
+                          - codeListProvider: 'WAVE'
+                            partyCode: '4bd196da-0d8b-436d-bad4-4cc88f04a035'
+                        recipient:
+                          partyName: 'Suzano Brazil'
+                          eblPlatform: 'WAVE'
+                          identifyingCodes:
+                          - codeListProvider: 'WAVE'
+                            partyCode: 'ee92b6b7-ac27-4537-87df-019c69389346'
+                surrenderedStraightBLWithOnBehalfOfPartiesExample:
+                  summary: |
+                    Surrendered straight B/L (using 'On Behalf of Parties')
+                  description: |
+                    EndorsementChain for a surrendered 'Straight Bill of Lading' issued by ZIM to a Brazilian local agent (the Issue to Party and mentioned as a `On Behalf of Shipper` on the eBL) on the Bolero platform. Suzano China is the Consignee using China local agent as a `On Behalf of Consignee`. The `Transport Document` contains this information:
+                    -  **Shipper:** Suzano Brazil
+                    -  **On behalf of Shipper:** Brazil local agent
+                    -  **Consignee:** Suzano China
+                    -  **On behalf of Consignee:** China local agent 
+
+
+                    The EndorsementChain consists of the follow 4 entries:
+                    |Entry|Action Code|Actor|Recipient|
+                    |:--:|:---------:|-----|----------|
+                    |1|`SURRENDERED`|Zim Integrated Shipping Services Ltd||
+                    |2|`SURRENDER_FOR_DELIVERY`|China local agent **on Behalf of** Suzano China|Zim Integrated Shipping Services Ltd|
+                    |3|`TRANSFER`|Brazil local agent **on Behalf of** Suzano Brazil|China local agent **on Behalf of** Suzano China|
+                    |4|`ISSUE`|Zim Integrated Shipping Services Ltd|Brazil local agent **on Behalf of** Suzano Brazil|
+                    
+                    Please note that the 4th entry in the example (`actionCode: 'ISSUE'`) is the first entry in the chain, on which further endorsements are made...
+                  value:
+                    - transportDocumentReference: '61572195130255734095'
+                      transportDocumentSubReference: 'c5c6b4a8-3645-4209-96e2-453daebbb961'
+                      carrierSMDGCode: 'ZIMU'
+                      endorsementChain:
+                      - actionDateTime: '2025-09-12T17:23:12Z'
+                        actionCode: 'SURRENDERED'
+                        actor:
+                          partyName: 'Zim Integrated Shipping Services Ltd'
+                          eblPlatform: 'BOLE'
+                          identifyingCodes:
+                          - codeListProvider: 'BOLE'
+                            partyCode: '0bbf18d8-ee73-40a0-baa2-7349fbfafcee'
+                      - actionDateTime: '2025-09-12T17:13:44Z'
+                        actionCode: 'SURRENDER_FOR_DELIVERY'
+                        actor:
+                          partyName: 'China local agent'
+                          eblPlatform: 'BOLE'
+                          identifyingCodes:
+                          - codeListProvider: 'BOLE'
+                            partyCode: '61cb4944-1f36-428b-9d95-2f5539dea06b'
+                          representedParty:
+                            partyName: 'Suzano China'
+                            identifyingCodes:
+                            - codeListProvider: 'BOLE'
+                              partyCode: 'd02751e3-2958-4c18-9e18-4e8ee341a93c'
+                        recipient:
+                          partyName: 'Zim Integrated Shipping Services Ltd'
+                          eblPlatform: 'BOLE'
+                          identifyingCodes:
+                          - codeListProvider: 'BOLE'
+                            partyCode: '0bbf18d8-ee73-40a0-baa2-7349fbfafcee'
+                      - actionDateTime: '2025-09-11T15:45:42Z'
+                        actionCode: 'TRANSFER'
+                        actor:
+                          partyName: 'Brazil local agent'
+                          eblPlatform: 'BOLE'
+                          identifyingCodes:
+                          - codeListProvider: 'BOLE'
+                            partyCode: '4b502cf9-627b-4895-8b1f-df0c42e21e17'
+                          representedParty:
+                            partyName: 'Suzano Brazil'
+                            identifyingCodes:
+                            - codeListProvider: 'BOLE'
+                              partyCode: 'c6880d2f-f0c6-4a59-87b3-9e9284084b60'
+                        recipient:
+                          partyName: 'China local agent'
+                          eblPlatform: 'BOLE'
+                          identifyingCodes:
+                          - codeListProvider: 'BOLE'
+                            partyCode: '61cb4944-1f36-428b-9d95-2f5539dea06b'
+                          representedParty:
+                            partyName: 'Suzano China'
+                            identifyingCodes:
+                            - codeListProvider: 'BOLE'
+                              partyCode: 'd02751e3-2958-4c18-9e18-4e8ee341a93c'
+                      - actionDateTime: '2025-09-09T12:55:31Z'
+                        actionCode: 'ISSUE'
+                        actor:
+                          partyName: 'Zim Integrated Shipping Services Ltd'
+                          eblPlatform: 'BOLE'
+                          identifyingCodes:
+                          - codeListProvider: 'BOLE'
+                            partyCode: '0bbf18d8-ee73-40a0-baa2-7349fbfafcee'
+                        recipient:
+                          partyName: 'Brazil local agent'
+                          eblPlatform: 'BOLE'
+                          identifyingCodes:
+                          - codeListProvider: 'BOLE'
+                            partyCode: '4b502cf9-627b-4895-8b1f-df0c42e21e17'
+                          representedParty:
+                            partyName: 'Suzano Brazil'
+                            identifyingCodes:
+                            - codeListProvider: 'BOLE'
+                              partyCode: 'c6880d2f-f0c6-4a59-87b3-9e9284084b60'
+        '404':
+          description: |
+            In case the consumer is requesting a `transportDocumentReference` that does not exist.
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                notFoundExample:
+                  summary: |
+                    transportDocumentReference not found
+                  description: |
+                    The `transportDocumentReference` does not exist.
+
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: GET
+                    requestUri: /v3/endorsement-chains/td-987
+                    statusCode: 404
+                    statusCodeText: Not Found
+                    statusCodeMessage: transportDocumentReference not found
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2024-09-04T09:41:00Z'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: transportDocumentReference not found
+                        errorCodeMessage: The requested EndorsementChain does not exist
+        '500':
+          description: |
+            In case a server error occurs in provider system a `500` (Internal Server Error) is returned
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                internalServerErrorExample:
+                  summary: |
+                    Internal Server Error while fetching the Transport Document
+                  description: |
+                    An Internal Server Error has occurred - the consumer should contact {provider-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: GET
+                    requestUri: /v3/endorsement-chains/td-987
+                    statusCode: 500
+                    statusCodeText: Internal Server Error
+                    statusCodeMessage: Internal Server Error occurred while fetching the EndorsementChain
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2024-09-04T09:41:00Z'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: Internal Error occurred
+                        errorCodeMessage: Internal Error occurred
+        default:
+          description: |
+            For other errors the error object should be populated with relevant information
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                tooManyRequestsExample:
+                  summary: |
+                    Fetching too many `EndorsementChain` requests
+                  description: |
+                    Calling the endPoint
+                    
+                        GET /v3/endorsement-chains/td-987
+                        
+                    too many times within a time period.
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
+                  value:
+                    httpMethod: GET
+                    requestUri: /v3/endorsement-chains/td-987
+                    statusCode: 429
+                    statusCodeText: Too Many Requests
+                    statusCodeMessage: |
+                      Too many request to fetch an EndorsementChain has been requested. Please try again in 1 hour
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2024-09-04T09:41:00Z'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: Max EndorsementChain requests reached
+                        errorCodeMessage: A maximum of 10 EndorsementChains can be requested per hour
+components:
+  headers:
+    API-Version:
+      description: |
+        SemVer used to indicate the version of the contract (API version) returned.
+      schema:
+        type: string
+        example: 3.0.2
+  schemas:
+    EndorsementChainX:
+      type: object
+      title: Endorsement Chain
+      description: |
+        EndorsementChain entry.
+      properties:
+        transportDocumentReference:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 20
+          description: |
+            A unique number allocated by the shipping line to the `Transport Document` and the main number used for the tracking of the status of the shipment.
+          example: HHL71800000
+        transportDocumentSubReference:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 100
+          description: |
+            Additional reference that can be optionally used alongside the `transportDocumentReference` in order to distinguish between versions of the same `Transport Document`.
+          example: Version_1
+        carrierSMDGCode:
+          type: string
+          maxLength: 4
+          pattern: ^\S+$
+          description: |
+            The carrier code, based on SMDG code (provided by [SMDG](https://smdg.org/documents/smdg-code-lists/smdg-liner-code-list/)), that Issued the `transportDocumentReference`.
+          example: MAEU
+        endorsementChain:
+          type: array
+          description: |
+            A list of one or more actions that affect an eBL, starting from its issuance onward. It is equivalent to the "back side" of a physical Bill of Lading. The type of actions recorded in the endorsement chain as defined by the DCSA standard are listed below:
+
+            - **Issue:** The act of issuing an eBL to the `Issue to` party, meaning the designated recipient of the action (typically the shipper or their on behalf of party). 
+            - **Endorse:** The act of transferring the rights and obligations associated with the eBL to a new endorsee, meaning the designated recipient of the action, allowing them to claim or deal with the goods. The newly appointed endorsee may **NOT** further endorse the eBL to another party. Only applicable to negotiable eBL (`isToOrder=true`).
+            - **Sign:** The act of visibly marking the actor's possession of the eBL within the chain. This action has no designated recipient and can only be performed while the actor is the current possessor of the eBL, similar to how a party may sign a physical Bill of Lading while in their possession.
+            - **Request Surrender for Amendment:** The act of surrendering an eBL so that the carrier can issue an amended version. If the request is accepted, the original eBL is voided, and the amended eBL must be reissued with a new endorsement chain. This action is also used when switching the eBL to a physical document (“switch to paper”), which is treated as part of the amendment process in the DCSA standard.
+            - **Request Surrender for Delivery:** The act of surrendering an eBL to the carrier to request delivery of the goods.
+            - **Blank Endorse:** The act of transferring the rights and obligations associated with the eBL in blank, meaning that the endorsement does not specify a recipient. A party in possession of a blank endorsed eBL is allowed to claim or deal with the goods. Only applicable to negotiable eBL (`isToOrder=true`).
+            - **Endorse to Order:** The act of transferring the rights and obligations associated with the eBL to a new endorsee, meaning the designated recipient of the action, allowing them to claim or deal with the goods. The newly appointed endorsee can further endorse the eBL to another party. Only applicable to negotiable eBL (`isToOrder=true`).
+            - **Transfer:** The act of transferring the possession of the eBL to the recipient.
+            - **Surrendered:** The act of confirming that the eBL has been surrendered, meaning that its lifecycle is completed.
+
+            **Note:** DCSA member carriers have agreed that the name `endorsementChain` is still the correct name for this list of actions.
+          items:
+            $ref: '#/components/schemas/EndorsementChainLink'
+      required:
+        - transportDocumentReference
+    EndorsementChainLink:
+      type: object
+      title: Endorsement Chain Link
+      description: |
+        Entry in the endorsement chain.
+      properties:
+        actionDateTime:
+          type: string
+          format: date-time
+          description: Date time when the action occurred.
+          example: '2024-09-04T09:41:00Z'
+        actionCode:
+          type: string
+          maxLength: 50
+          description: |
+            The action performed by the actor. This should be one of:
+            - `ISSUE` (The actor issued the document to the recipient, who is the first possessor of the eBL, as designated by the `Issue to Party`)
+            - `ENDORSE` (The actor endorsed the document to the recipient)
+            - `SIGN` (The actor signed the eBL while it was in the actor's possession)
+            - `SURRENDER_FOR_DELIVERY` (The actor requested to surrender the eBL to the recipient for delivery)
+            - `SURRENDER_FOR_AMENDMENT` (The actor requested to surrender the eBL to the recipient for amendment)
+            - `BLANK_ENDORSE` (The actor endorsed the document in blank)
+            - `ENDORSE_TO_ORDER` (The actor endorsed the document to order of the recipient, allowing the recipient to further endorse the eBL to another party)
+            - `TRANSFER` (The actor transferred the possession of the eBL to the recipient)
+            - `SURRENDERED` (The actor acknowledged that the eBL has been accepted and the lifecycle of the eBL is accomplished)
+
+            Not all actions are applicable to all surrender requests. The combination and order of endorsement chain entries may differ by eBL Solution Provider, based on their rulebook and/or bilateral agreements with carriers.
+          example: ISSUE
+        actor:
+          $ref: '#/components/schemas/ActorParty'
+        recipient:
+          $ref: '#/components/schemas/RecipientParty'
+      required:
+        - actionDateTime
+        - actionCode
+        - actor
+
+    ActorParty:
+      type: object
+      title: Actor Party
+      description: |
+        Refers to a company or a legal entity.
+      properties:
+        partyName:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 70
+          description: |
+            Name of the party.
+          example: Globeteam
+        eblPlatform:
+          type: string
+          pattern: ^\S+$
+          maxLength: 4
+          description: |
+            The eBL platform of the `Actor Party`. 
+            The value **MUST** be one of:
+            - `WAVE` (Wave)
+            - `CARX` (CargoX)
+            - `ESSD` (EssDOCS - This value has been **deprecated**. Please use `IDT`)
+            - `IDT` (ICE Digital Trade)
+            - `BOLE` (Bolero)
+            - `EDOX` (EdoxOnline)
+            - `IQAX` (IQAX)
+            - `SECR` (Secro)
+            - `TRGO` (TradeGO)
+            - `ETEU` (eTEU)
+            - `TRAC` (Enigio trace:original)
+            - `BRIT` (BRITC eBL)
+            - `COVA` (Covantis)
+            - `ETIT` (e-title)
+            - `KTNE` (KTNET)
+            - `CRED` (Credore)
+            - `BLOC` (BlockPeer Technologies)
+          example: BOLE
+        identifyingCodes:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/IdentifyingCode'
+        taxLegalReferences:
+          description: |
+            A list of `Tax References` for a `Party`
+          type: array
+          items:
+            $ref: '#/components/schemas/TaxLegalReference'
+        representedParty:
+          $ref: '#/components/schemas/RepresentedActorParty'
+      required:
+        - partyName
+        - eblPlatform
+        - identifyingCodes
+
+    RecipientParty:
+      type: object
+      title: Recipient Party
+      description: |
+        Refers to a company or a legal entity.
+      properties:
+        partyName:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 70
+          description: |
+            Name of the party.
+          example: Globeteam
+        eblPlatform:
+          type: string
+          pattern: ^\S+$
+          maxLength: 4
+          description: |
+            The eBL platform of the `Recipient Party`. 
+            The value **MUST** be one of:
+            - `WAVE` (Wave)
+            - `CARX` (CargoX)
+            - `ESSD` (EssDOCS - This value has been **deprecated**. Please use `IDT`)
+            - `IDT` (ICE Digital Trade)
+            - `BOLE` (Bolero)
+            - `EDOX` (EdoxOnline)
+            - `IQAX` (IQAX)
+            - `SECR` (Secro)
+            - `TRGO` (TradeGO)
+            - `ETEU` (eTEU)
+            - `TRAC` (Enigio trace:original)
+            - `BRIT` (BRITC eBL)
+            - `COVA` (Covantis)
+            - `ETIT` (e-title)
+            - `KTNE` (KTNET)
+            - `CRED` (Credore)
+            - `BLOC` (BlockPeer Technologies)
+          example: BOLE
+        identifyingCodes:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/IdentifyingCode'
+        taxLegalReferences:
+          description: |
+            A list of `Tax References` for a `Party`
+          type: array
+          items:
+            $ref: '#/components/schemas/TaxLegalReference'
+        representedParty:
+          $ref: '#/components/schemas/RepresentedRecipientParty'
+      required:
+        - partyName
+        - eblPlatform
+        - identifyingCodes
+
+    RepresentedActorParty:
+      type: object
+      title: Represented Party
+      description: The party on whose behalf the action was performed.
+      properties:
+        partyName:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 70
+          description: |
+            Name of the party.
+          example: Globeteam
+        identifyingCodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentifyingCode'
+      required:
+        - partyName
+
+    RepresentedRecipientParty:
+      type: object
+      title: Represented Party
+      description: The party on whose behalf the action was directed.
+      properties:
+        partyName:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 70
+          description: |
+            Name of the party.
+          example: Globeteam
+        identifyingCodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdentifyingCode'
+      required:
+        - partyName
+
+    IdentifyingCode:
+      type: object
+      title: Identifying Code
+      properties:
+        codeListProvider:
+          type: string
+          maxLength: 100
+          description: |
+            A list of codes identifying a party. Possible values are:
+
+            - `WAVE` (Wave)
+            - `CARX` (CargoX)
+            - `ESSD` (EssDOCS - This value has been **deprecated**. Please use `IDT`)
+            - `IDT` (ICE Digital Trade)
+            - `BOLE` (Bolero)
+            - `EDOX` (EdoxOnline)
+            - `IQAX` (IQAX)
+            - `SECR` (Secro)
+            - `TRGO` (TradeGO)
+            - `ETEU` (eTEU)
+            - `TRAC` (Enigio trace:original)
+            - `BRIT` (BRITC eBL)
+            - `COVA` (Covantis)
+            - `ETIT` (e-title)
+            - `KTNE` (KTNET)
+            - `CRED` (Credore)
+            - `BLOC` (BlockPeer Technologies)
+            - `GSBN` (Global Shipping Business Network)
+            - `WISE` (WiseTech)
+            - `GLEIF` (Global Legal Entity Identifier Foundation)
+            - `W3C` (World Wide Web Consortium)
+            - `DNB` (Dun and Bradstreet)
+            - `FMC` (Federal Maritime Commission)
+            - `DCSA` (Digital Container Shipping Association)
+            - `ZZZ` (Mutually defined)
+
+          example: W3C
+        partyCode:
+          type: string
+          maxLength: 150
+          description: |
+            Code to identify the party as provided by the code list provider
+          example: MSK
+        codeListName:
+          type: string
+          maxLength: 100
+          description: |
+            The name of the code list, code generation mechanism or code authority for the `partyCode`. Example values could be:
+
+            - `DID` (Decentralized Identifier) for `codeListProvider` `W3C`
+            - `LEI` (Legal Entity Identifier) for `codeListProvider` `GLEIF`
+            - `DUNS` (Data Universal Numbering System) for `codeListProvider` `DNB`
+          example: DID
+      required:
+        - codeListProvider
+        - partyCode
+    TaxLegalReference:
+      type: object
+      title: Tax & Legal Reference
+      description: |
+        Reference that uniquely identifies a party for tax and/or legal purposes in accordance with the relevant jurisdiction.
+
+        A small list of **potential** examples:
+
+        | Type  | Country | Description |
+        |-------|:-------:|-------------|
+        |EORI|NL|Economic Operators Registration and Identification|
+        |PAN|IN|Goods and Services Tax Identification Number in India|
+        |GSTIN|IN|Goods and Services Tax Identification Number in India|
+        |IEC|IN|Importer-Exported Code in India|
+        |RUC|EC|Registro Único del Contribuyente in Ecuador|
+        |RUC|PE|Registro Único del Contribuyente in Peru|
+        |NIF|MG|Numéro d'Identification Fiscal in Madagascar|
+        |NIF|DZ|Numéro d'Identification Fiscal in Algeria|
+      properties:
+        type:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 50
+          description: |
+            The reference type code as defined by the relevant tax and/or legal authority.
+          example: PAN
+        countryCode:
+          type: string
+          pattern: ^[A-Z]{2}$
+          minLength: 2
+          maxLength: 2
+          description: |
+            The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+
+            **Note:** In case the `countryCode` is unknown it is possible to use the code `ZZ`.
+          example: IN
+        value:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 35
+          description: |
+            The value of the `taxLegalReference`
+          example: AAAAA0000A
+      required:
+        - type
+        - countryCode
+        - value
+
+
+    #################
+    # Error Responses
+    #################
+    ErrorResponse:
+      title: Error Response
+      type: object
+      description: Unexpected error
+      properties:
+        httpMethod:
+          description: |
+            The HTTP method used to make the request e.g. `GET`, `POST`, etc
+          type: string
+          example: POST
+          enum:
+            - GET
+            - HEAD
+            - POST
+            - PUT
+            - DELETE
+            - OPTIONS
+            - PATCH
+        requestUri:
+          description: |
+            The URI that was requested.
+          type: string
+          example: /v3/endorsement-chains/td-123
+        statusCode:
+          description: |
+            The HTTP status code returned.
+          type: integer
+          format: int32
+          example: 400
+        statusCodeText:
+          description: |
+            A standard short description corresponding to the HTTP status code.
+          type: string
+          maxLength: 50
+          example: Bad Request
+        statusCodeMessage:
+          description: |
+            A long description corresponding to the HTTP status code with additional information.
+          type: string
+          maxLength: 200
+          example: The supplied data could not be accepted
+        providerCorrelationReference:
+          description: |
+            A unique identifier to the HTTP request within the scope of the API provider.
+          type: string
+          maxLength: 100
+          example: 4426d965-0dd8-4005-8c63-dc68b01c4962
+        errorDateTime:
+          description: |
+            The DateTime corresponding to the error occurring.
+          type: string
+          format: date-time
+          example: '2024-09-04T09:41:00Z'
+        errors:
+          type: array
+          description: |
+            An array of errors providing more detail about the root cause.
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/DetailedError'
+      required:
+        - httpMethod
+        - requestUri
+        - statusCode
+        - statusCodeText
+        - errorDateTime
+        - errors
+
+    DetailedError:
+      type: object
+      title: Detailed Error
+      description: |
+        A detailed description of what has caused the error.
+      properties:
+        errorCode:
+          type: integer
+          format: int32
+          description: |
+            The detailed error code returned.
+
+              - `7000-7999` Technical error codes
+              - `8000-8999` Functional error codes
+              - `9000-9999` API provider-specific error codes            
+
+            [Error codes as specified by DCSA](https://developer.dcsa.org/standard-error-codes).
+          minimum: 7000
+          maximum: 9999
+          example: 7003
+        property:
+          type: string
+          maxLength: 100
+          description: |
+            The name of the property causing the error.
+          example: facilityCode
+        value:
+          type: string
+          maxLength: 500
+          description: |
+            The value of the property causing the error serialised as a string exactly as in the original request.
+          example: SG SIN WHS
+        jsonPath:
+          type: string
+          maxLength: 500
+          description: |
+            A path to the property causing the error, formatted according to [JSONpath](https://github.com/json-path/JsonPath).
+          example: $.location.facilityCode
+        errorCodeText:
+          description: |
+            A standard short description corresponding to the `errorCode`.
+          type: string
+          maxLength: 100
+          example: invalidData
+        errorCodeMessage:
+          type: string
+          maxLength: 5000
+          description: |
+            A long description corresponding to the `errorCode` with additional information.
+          example: Spaces not allowed in facility code
+      required:
+        - errorCodeText
+        - errorCodeMessage
