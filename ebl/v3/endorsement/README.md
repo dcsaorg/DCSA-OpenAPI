@@ -10,5 +10,5 @@ Publications related to the Bill of Lading Endorsementchain API:
 
 <a name="v302"></a>[Release v3.0.2 (TBD)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_END/3.0.2)
 ---
-This is the inital release for the Endorsementchain API - it is introduced as v3.0.2 as this aligns it with other Bill of Lading modules.
+This is the inital release for the Endorsement chain API - it is introduced as v3.0.2 as this aligns it with other Bill of Lading modules.
 - Initial version aligned with Bill of Lading Surrender API
