@@ -47,7 +47,7 @@ paths:
                 summary: |
                   Send an `ETA` timestamp not using `transportCallReference`
                 description: |
-                  Send an `ETA` timestamp for the Vessel: `Jacques Saadé` arriving at `Amsterdam Port` on the 18 of August 2025 at 18.00 Zulu time. This example does not include a `transportCallReference`.
+                  Send an `ETA` timestamp for the Vessel: `Jacques Saadé` arriving at `Amsterdam Port` on the 18 of August 2025 at 18.00 Amsterdam time. This example does not include a `transportCallReference`.
                 value:
                   carrierServiceName: 'French Asia Line 3'
                   carrierServiceCode: 'AEU6'
@@ -56,7 +56,6 @@ paths:
                   vesselIMONumber: '9839179'
                   vesselMMSINumber: '228386700'
                   vesselName: 'Jacques Saadé'
-                  terminalCallID: '0342254a-5927-4856-b9c9-aa12e7c00563'
                   carrierImportVoyageNumber: '2508N'
                   carrierExportVoyageNumber: '2508S'
                   universalImportVoyageReference: '2508N'
@@ -66,30 +65,31 @@ paths:
                   timestampClassifierCode: 'EST'
                   timestampTypeCode: 'ARRI'
                   timestampPositionCode: 'PORT'
-                  timestampDateTime: '2025-08-18T18:00:00Z'
+                  timestampDateTime: '2025-08-18T18:00:00+01:00'
               sendETATransportCallExample:
                 summary: |
                   Send an `ETA` timestamp with a `transportCallReference`
                 description: |
-                  Send an `ETA` timestamp for the `transportCallReference: SR11111X-9321483-2107W-NLRTM-HPD2-1-1` as per the 18 of August 2025 at 18.00 Zulu time.
+                  Send an `ETA` timestamp for the `transportCallReference: SR11111X-9321483-2107W-NLRTM-HPD2-1-1` as per the 18 of August 2025 at 18.00 Amsterdam time.
                 value:
                   transportCallReference: 'SR11111X-9321483-2107W-NLRTM-HPD2-1-1'
-                  terminalCallID: '0342254a-5927-4856-b9c9-aa12e7c00563'
+                  vesselOperatorSMDGLinerCode: 'CMA'
                   timestampClassifierCode: 'EST'
                   timestampTypeCode: 'ARRI'
                   timestampPositionCode: 'PORT'
-                  timestampDateTime: '2025-08-18T18:00:00Z'
+                  timestampDateTime: '2025-08-18T18:00:00+01:00'
               sendATDExample:
                 summary: |
                   Send an `ATD` timestamp with a `transportCallReference`
                 description: |
-                  Send an `ATD` timestamp for the `transportCallReference: SR11111X-9321483-2107W-NLRTM-HPD2-1-1`  as per the 20 of August 2025 at 18.00 Zulu time.
+                  Send an `ATD` timestamp for the `transportCallReference: SR11111X-9321483-2107W-NLRTM-HPD2-1-1`  as per the 20 of August 2025 at 18.00 Amsterdam time.
                 value:
                   transportCallReference: 'SR11111X-9321483-2107W-NLRTM-HPD2-1-1'
+                  vesselOperatorSMDGLinerCode: 'CMA'
                   timestampClassifierCode: 'ACT'
                   timestampTypeCode: 'DEPA'
                   timestampPositionCode: 'PORT'
-                  timestampDateTime: '2025-08-20T18:00:00Z'
+                  timestampDateTime: '2025-08-20T18:00:00+01:00'
       responses:
         '200':
           description: |
@@ -206,14 +206,17 @@ components:
       type: object
       title: Terminal Timestamp
       description: |
-        A Timestamp object to provide `ETA`/`ETD`/`ATA`/`ATD` information to the OVS Hub. Either a `transportCallReference` needs to be provided **or** all of the following properties need to be provided:
-          - `carrierServiceCode`
-          - `vesselIMONumber`
-          - `carrierImportVoyageNumber`
-          - `UNLocationCode`
-          - `facilitySMDGCode`
+        A Timestamp object to provide `ETA`/`ETD`/`ATA`/`ATD` information to the OVS Hub. It is necessary to provide either:
+          - `transportCallReference`
 
-        If `transportCallReference` is provided along with other values above - they will be ignored.
+        or
+        - `carrierServiceCode`
+        - `vesselIMONumber`
+        - `carrierImportVoyageNumber`
+        - `UNLocationCode`
+        - `facilitySMDGCode`
+        
+        **Note:** if `transportCallReference` is provided together with any of the other values they will be ignored.
       properties:
         vesselOperatorSMDGLinerCode:
           type: string
@@ -294,12 +297,6 @@ components:
             
             are all not provided. If provided - the above properties **will be** ignored.
           example: SR11111X-9321483-2107W-NLRTM-HPD2-1-1
-        terminalCallID:
-          type: string
-          format: uuid
-          description: |
-            Universal unique identifier for the **Terminal Call** as per defined by the Terminal.
-          example: 0342254a-5927-4856-b9c9-aa12e7c00563
         carrierImportVoyageNumber:
           type: string
           maxLength: 50
@@ -404,7 +401,7 @@ components:
           type: string
           format: date-time
           description: |
-            The local date and time, when the **Vessel** of a **Port Call** is estimated or has happened.
+            The UTC date and time, when the **Vessel** of a **Port Call** is estimated or has happened.
           example: '2025-08-18T17:41:00+08:30'
       required:
         - vesselOperatorSMDGLinerCode
