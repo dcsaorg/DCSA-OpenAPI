@@ -29,7 +29,7 @@ Minor changes:
 - improved layout of the descriptions
 - updated the 'Contact us' link
 - removed the `servers` as it was wrongly added
-- removed `requird=false` on queryParameters as this is default
+- removed `required=false` on queryParameters as this is default
 - added `operationId` to the GET endPoint
 - improved the `limit` query parameter description
 - improved error examples
