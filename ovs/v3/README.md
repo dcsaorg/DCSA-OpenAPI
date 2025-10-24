@@ -9,27 +9,27 @@ The primary purpose of this API is to specify endPoints for schedules shared bet
 A minor update to improve the usage of OVS.
 
 Bigger changes:
-- added a `MMSINumber` filter to the GET endPoint
+- added an `MMSINumber` filter to the GET endPoint
 - added a `vesselOperatorSMDGLinerCode` filter to the GET endPoint
 - removed the `ISO 8601` reference in `startDate` and `endDate` descriptions
 - added a `cursor` query parameter to the GET endPoint for paginated results
-- changed the requirements for the `API-Version` header. Going forward the entire version (SemVer) should be included and not only the major version. This will be used for provider to know consumer version.
+- changed the requirements for the `API-Version` header. Going forward, the entire version (SemVer) should be included - not only the major version. This enables the provider to identify the consumer’s version.
 - `Next-Page-Cursor` header added to `200` (Ok) responses
-- description modified for `vesselIMONumber` in case the `VesselSchedule` refers to a "non-dummy-vessel". The condition has been modified and the `vesselIMONumber` is no longer mandatory - a `MMSINumber` can also be provided.
+- description modified for `vesselIMONumber` in case the `VesselSchedule` refers to a non-dummy-vessel. The condition has been modified and the `vesselIMONumber` is no longer mandatory - a `MMSINumber` can also be provided.
 - `MMSINumber` added next to `vesselIMONumber`
-- `vesselName` description improved to standardize dummyVessel names
-- `isDummyVessel` description improved to mention `vesselName` usage to make dummy vessel unique
-- `9999R` to be used as placeholder when `carrierImportVoyageNumber` is unknown
+- `vesselName` description improved to standardize dummy vessel names
+- `isDummyVessel` description improved to mention `vesselName` usage to make the dummy vessel unique
+- `9999R` is to be used as placeholder when `carrierImportVoyageNumber` is unknown
 - `statusCode` in `TransportCall` object **deprecated** - use `statusCodes` instead
 - `statusCodes` added to `TransportCall` and to be used instead of `statusCode`
 - `delayReasonCode` in `Timestamp` object **deprecated** - use `delayReasonCodes` instead
 - `delayReasonCodes` added to `Timestamp` and to be used instead of `delayReasonCode`
 
 Minor changes:
-- improved layout of the descriptions
+- improved layout of descriptions
 - updated the 'Contact us' link
 - removed the `servers` as it was wrongly added
-- removed `required=false` on queryParameters as this is default
+- removed `required=false` from query parameters, as this is the default
 - added `operationId` to the GET endPoint
 - improved the `limit` query parameter description
 - improved error examples
