@@ -27,7 +27,9 @@ paths:
       summary: Gets the Endorsement Chain
       operationId: getEndorsementChain
       description: |
-        Gets the Endorsement Chain by `transportDocumentReference`. It is possible to filter the result by carrier `SMDG` code and/or by `transportDocumentSubReference`. The result is a list of Endorsement Chains matching the filter.
+        Gets the Endorsement Chain by `transportDocumentReference`. It is possible to filter the result by carrier `SCAC` code and/or by `transportDocumentSubReference`. The result is a list of Endorsement Chains matching the filter.
+        
+        **Note:** It is not possible to limit the result, this endPoint does not support pagination.
       parameters:
         - in: path
           name: transportDocumentReference
@@ -50,33 +52,15 @@ paths:
             pattern: ^\S(?:.*\S)?$
             maxLength: 100
         - in: query
-          name: carrierSMDGCode
+          name: carrierSCACCode
           description: |
-            Filter by carrier `SMDG` code (provided by [SMDG](https://smdg.org/documents/smdg-code-lists/smdg-liner-code-list/)). Adding this will only match Transport Documents from the carrier matching the `carrierSMDGCode` value.
+            Filter by carrier `SCAC` code (provided by [NMFTA](https://nmfta.org/scac/)). Adding this will only match Transport Documents from the carrier matching the `carrierSCACCode` value.
           required: false
           schema:
             type: string
             pattern: ^\S+$
             maxLength: 4
             example: YMLU
-        - in: query
-          name: limit
-          description: |
-            Maximum number of Endorsement Chains to include in each page of the response.
-          schema:
-            type: integer
-            format: int32
-            default: 100
-            example: 100
-            minimum: 1
-        - in: query
-          name: cursor
-          description: |
-            A server-generated value that identifies the next page position in a collection (`Next-Page-Cursor` header of the previous response to retrieve the next). When cursor is provided, it **MUST NOT** be combined with any other query parameters (including limit); such parameters will be ignored and MAY result in a `400` error.
-          schema:
-            type: string
-            maxLength: 1024
-            example: fE9mZnNldHw9MTAmbGltaXQ9MTA
         - in: header
           name: API-Version
           required: false
@@ -92,17 +76,6 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
-            Next-Page-Cursor:
-              schema:
-                type: string
-                maxLength: 1024
-                example: fE9mZnNldHw9MTAmbGltaXQ9MTA
-              description: |
-                The `Next-Page-Cursor` header contains a cursor value that points to the next page of results in a paginated API response.
-                When an initial `GET` endpoint request includes the query parameter `limit=...` the API provider limits the number of items in the root array of the response to the specified limit. If the response would contain more items than the specified limit, the API provider includes only the first set of limit items and appends the following response header:
-                `Next-Page-Cursor=fE9mZnNldHw9MTAmbGltaXQ9MTA`, a string that acts as a reference for the next page of results. The cursor value is used in subsequent requests to retrieve the next page by passing it as a query parameter: `?cursor=fE9mZnNldHw9MTAmbGltaXQ9MTA`.
-
-                To retrieve the next page, the API consumer sends a `GET` request to the endpoint URL with only `?cursor=fE9mZnNldHw9MTAmbGltaXQ9MTA` as query parameter. The limit of items per page and any other query parameters may not be altered, therefore it may also not be specified when requesting subsequent pages. The API provider must ignore any query parameters passed along with a cursor, and should return a `400` error if any other query parameter is passed along with the `cursor`.
           content:
             application/json:
               schema:
@@ -130,7 +103,7 @@ paths:
                   value:
                     - transportDocumentReference: '62CD536BA8D34C469AFD'
                       transportDocumentSubReference: 'fc5009a7-25ad-4bb0-9892-4e2dea6bcdd9'
-                      carrierSMDGCode: 'YMLU'
+                      carrierSCACCode: 'YMLU'
                       endorsementChain:
                         - actionDateTime: '2025-09-12T17:23:12Z'
                           actionCode: 'SURRENDERED'
@@ -204,7 +177,7 @@ paths:
                   value:
                     - transportDocumentReference: '61572195130255734095'
                       transportDocumentSubReference: 'c5c6b4a8-3645-4209-96e2-453daebbb961'
-                      carrierSMDGCode: 'ZIMU'
+                      carrierSCACCode: 'ZIMU'
                       endorsementChain:
                         - actionDateTime: '2025-09-12T17:23:12Z'
                           actionCode: 'SURRENDERED'
@@ -276,6 +249,70 @@ paths:
                               identifyingCodes:
                                 - codeListProvider: 'BOLE'
                                   partyCode: 'c6880d2f-f0c6-4a59-87b3-9e9284084b60'
+                twoTDSRExample:
+                  summary: |
+                    Multiple EndorsementChains for same B/L
+                  description: |
+                    2 endorsement chains for the same `transportDocumentReference`. First entry has only been issued (`ISSUE`). Second entry is the endorsement chain that has been surrendered for amendments.
+                  value:
+                    - transportDocumentReference: '62CD536BA8D34C469AFD'
+                      transportDocumentSubReference: 'v2'
+                      carrierSCACCode: 'YMLU'
+                      endorsementChain:
+                        - actionDateTime: '2025-09-09T12:55:31Z'
+                          actionCode: 'ISSUE'
+                          actor:
+                            partyName: 'Yang Ming Marine Transport Corporation'
+                            eblPlatform: 'WAVE'
+                            identifyingCodes:
+                              - codeListProvider: 'WAVE'
+                                partyCode: '4bd196da-0d8b-436d-bad4-4cc88f04a035'
+                          recipient:
+                            partyName: 'Suzano Brazil'
+                            eblPlatform: 'WAVE'
+                            identifyingCodes:
+                              - codeListProvider: 'WAVE'
+                                partyCode: 'ee92b6b7-ac27-4537-87df-019c69389346'
+                    - transportDocumentReference: '62CD536BA8D34C469AFD'
+                      transportDocumentSubReference: 'v1'
+                      carrierSCACCode: 'YMLU'
+                      endorsementChain:
+                        - actionDateTime: '2025-09-12T17:23:12Z'
+                          actionCode: 'SURRENDERED'
+                          actor:
+                            partyName: 'Yang Ming Marine Transport Corporation'
+                            eblPlatform: 'WAVE'
+                            identifyingCodes:
+                              - codeListProvider: 'WAVE'
+                                partyCode: '4bd196da-0d8b-436d-bad4-4cc88f04a035'
+                        - actionDateTime: '2025-09-12T17:23:12Z'
+                          actionCode: 'SURRENDER_FOR_AMENDMENT'
+                          actor:
+                            partyName: 'Suzano Brazil'
+                            eblPlatform: 'WAVE'
+                            identifyingCodes:
+                              - codeListProvider: 'WAVE'
+                                partyCode: 'ee92b6b7-ac27-4537-87df-019c69389346'
+                          recipient:
+                            partyName: 'Yang Ming Marine Transport Corporation'
+                            eblPlatform: 'WAVE'
+                            identifyingCodes:
+                              - codeListProvider: 'WAVE'
+                                partyCode: '4bd196da-0d8b-436d-bad4-4cc88f04a035'
+                        - actionDateTime: '2025-09-09T12:55:31Z'
+                          actionCode: 'ISSUE'
+                          actor:
+                            partyName: 'Yang Ming Marine Transport Corporation'
+                            eblPlatform: 'WAVE'
+                            identifyingCodes:
+                              - codeListProvider: 'WAVE'
+                                partyCode: '4bd196da-0d8b-436d-bad4-4cc88f04a035'
+                          recipient:
+                            partyName: 'Suzano Brazil'
+                            eblPlatform: 'WAVE'
+                            identifyingCodes:
+                              - codeListProvider: 'WAVE'
+                                partyCode: 'ee92b6b7-ac27-4537-87df-019c69389346'
         '404':
           description: |
             In case the consumer is requesting a `transportDocumentReference` that does not exist.
@@ -384,7 +421,7 @@ components:
       type: object
       title: Endorsement Chain
       description: |
-        Endorsement Chain entry.
+        An endorsement Chain linked to a particular `transportDocumentReference` and potentially a `transportDocumentSubReference`.
       properties:
         transportDocumentReference:
           type: string
@@ -400,12 +437,12 @@ components:
           description: |
             Additional reference that can be optionally used alongside the `transportDocumentReference` in order to distinguish between versions of the same `Transport Document`.
           example: Version_1
-        carrierSMDGCode:
+        carrierSCACCode:
           type: string
           maxLength: 4
           pattern: ^\S+$
           description: |
-            The carrier code, based on SMDG code (provided by [SMDG](https://smdg.org/documents/smdg-code-lists/smdg-liner-code-list/)), that Issued the `transportDocumentReference`.
+            The carrier code, based on SCAC code (provided by [NMFTA](https://nmfta.org/scac/)), that Issued the `transportDocumentReference`.
           example: MAEU
         endorsementChain:
           type: array
