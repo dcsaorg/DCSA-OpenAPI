@@ -1,15 +1,54 @@
 ## DCSA OVS API
 
-The DCSA OVS API is documented on [**OVS SwaggerHub**](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_OVS).
+The DCSA OVS API is documented on [**SwaggerHub**](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_OVS).
 
 The primary purpose of this API is to specify endPoints for schedules shared between Vessel Partners. 
 
-## <a name="v300"></a>[Release v3.0.0 (15 January 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_OVS/3.0.0-Beta-2)
+<a name="v301"></a>[Release v3.0.1 (TBD)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_OVS/3.0.1)
 ---
+A minor update to improve the usage of OVS.
+
+Bigger changes:
+- added a `MMSINumber` filter to the GET endPoint
+- added a `vesselOperatorSMDGLinerCode` filter to the GET endPoint
+- removed the `ISO 8601` reference in `startDate` and `endDate` descriptions
+- added a `cursor` query parameter to the GET endPoint for paginated results
+- changed the requirements for the `API-Version` header. Going forward the entire version (SemVer) should be included and not only the major version. This will be used for provider to know consumer version.
+- `Next-Page-Cursor` header added to `200` (Ok) responses
+- description modified for `vesselIMONumber` in case the `VesselSchedule` refers to a "non-dummy-vessel". The condition has been modified and the `vesselIMONumber` is no longer mandatory - a `MMSINumber` can also be provided.
+- `MMSINumber` added next to `vesselIMONumber`
+- `vesselName` description improved to standardize dummyVessel names
+- `isDummyVessel` description improved to mention `vesselName` usage to make dummy vessel unique
+- `9999R` to be used as placeholder when `carrierImportVoyageNumber` is unknown
+- `statusCode` in `TransportCall` object **deprecated** - use `statusCodes` instead
+- `statusCodes` added to `TransportCall` and to be used instead of `statusCode`
+- `delayReasonCode` in `Timestamp` object **deprecated** - use `delayReasonCodes` instead
+- `delayReasonCodes` added to `Timestamp` and to be used instead of `delayReasonCode`
+
+Minor changes:
+- improved layout of the descriptions
+- updated the 'Contact us' link
+- removed the `servers` as it was wrongly added
+- removed `requird=false` on queryParameters as this is default
+- added `operationId` to the GET endPoint
+- improved the `limit` query parameter description
+- improved error examples
+- description added to `ServiceSchedule`, `VesselSchedule`
+- improved `title` in objects where a space was missing
+- GitHub reference removed from `eventTypeCode` property
+- `eventClassifierCode` description updated
+- `ISO 8601` reference removed from `errorDateTime` property in the `ErrorResponse` object
+- removed unused parameter declarations
+
+
+<a name="v300"></a>[Release v3.0.0 (15 January 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_OVS/3.0.0)
+---
+Release of OVS 3.0.0
 
 - Aligns with v3.0.0 Beta 2.
 
-## <a name="v300B2"></a>[Release v3.0.0 Beta 2 (15 January 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_OVS/3.0.0-Beta-2)
+
+<a name="v300B2"></a>[Release v3.0.0 Beta 2 (15 January 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_OVS/3.0.0-Beta-2)
 ---
 - Description updated.
 -	carrierServiceName added as a queryParameter
@@ -21,8 +60,7 @@ The primary purpose of this API is to specify endPoints for schedules shared bet
 - Error schema updated.
 
 
-
-## <a name="v300B1"></a>[Release v3.0.0 Beta 1 (30 June 2022)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_OVS/3.0.0-Beta-1)
+<a name="v300B1"></a>[Release v3.0.0 Beta 1 (30 June 2022)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_OVS/3.0.0-Beta-1)
 ---
 This API primarily defines endPoints and otherwise uses the following Domains:
 - Event Domain
