@@ -9,7 +9,7 @@ Publications related to the Booking API:
 
 <a name="v203"></a>[Release v2.0.3 (TBD)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.3)
 ---
-This is a patch release for the DCSA Booking API. A bug in the description of the `shipmentCutOffTimes` was reported. A new codeListProvider has been added (and one deprecated).
+This is a patch release for the DCSA Booking API. A new codeListProvider has been added (and one deprecated).
 
 - descriptions have been added to objects where they were missing: `CancelBookingRequest`, `CreateBooking`, `UpdateBooking`, `Booking`, `IdentifyingCode`
 - `ESSD` (EssDOCS) has been marked as deprecated in codeListProvider
