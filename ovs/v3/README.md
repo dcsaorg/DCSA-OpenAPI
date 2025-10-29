@@ -17,7 +17,7 @@ Bigger changes:
 - `Next-Page-Cursor` header added to `200` (Ok) responses
 - description modified for `vesselIMONumber` in case the `VesselSchedule` refers to a non-dummy-vessel. The condition has been modified and the `vesselIMONumber` is no longer mandatory - a `MMSINumber` can also be provided.
 - `MMSINumber` added next to `vesselIMONumber`. This allows carriers to provide an `MMSInumber` when available, whether or not an `vesselIMOnumber` is provided.
-- `vesselName` description improved to standardize dummy vessel names
+- `vesselName` description improved with recommedation to standardize dummy vessels names
 - `isDummyVessel` description improved to mention `vesselName` usage to make the dummy vessel unique
 - `9999R` is to be used as placeholder when `carrierImportVoyageNumber` is unknown
 - `statusCode` in `TransportCall` object **deprecated** - use `statusCodes` instead
