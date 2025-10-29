@@ -19,7 +19,7 @@ Bigger changes:
 - `MMSINumber` added next to `vesselIMONumber`. This allows carriers to provide an `MMSInumber` when available, whether or not an `vesselIMOnumber` is provided.
 - `vesselName` description improved with recommedation to standardize dummy vessels names
 - `isDummyVessel` description improved to mention `vesselName` usage to make the dummy vessel unique
-- `9999R` is to be used as placeholder when `carrierImportVoyageNumber` is unknown
+- `9999R` is to be used as placeholder when `carrierImportVoyageNumber` is unknown or not applicable. This allows carriers to provide a pseudo import voyage number in edge cases (e.g., dry dock) without failing validation on the required field.
 - `statusCode` in `TransportCall` object **deprecated** - use `statusCodes` instead
 - `statusCodes` added to `TransportCall` and to be used instead of `statusCode`. This allows OVS implementers to submit multiple statuses for a transport call, reflecting real-world scenarios where more than one status may apply.
 - `delayReasonCode` in `Timestamp` object **deprecated** - use `delayReasonCodes` instead
