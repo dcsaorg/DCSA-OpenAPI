@@ -16,14 +16,14 @@ Bigger changes:
 - changed the requirements for the `API-Version` header. Going forward, the entire version (SemVer) should be included - not only the major version. This enables the provider to identify the consumer’s version.
 - `Next-Page-Cursor` header added to `200` (Ok) responses
 - description modified for `vesselIMONumber` in case the `VesselSchedule` refers to a non-dummy-vessel. The condition has been modified and the `vesselIMONumber` is no longer mandatory - a `MMSINumber` can also be provided.
-- `MMSINumber` added next to `vesselIMONumber`
+- `MMSINumber` added next to `vesselIMONumber`. This allows carriers to provide an `MMSInumber` when available, whether or not an `vesselIMOnumber` is provided.
 - `vesselName` description improved to standardize dummy vessel names
 - `isDummyVessel` description improved to mention `vesselName` usage to make the dummy vessel unique
 - `9999R` is to be used as placeholder when `carrierImportVoyageNumber` is unknown
 - `statusCode` in `TransportCall` object **deprecated** - use `statusCodes` instead
-- `statusCodes` added to `TransportCall` and to be used instead of `statusCode`
+- `statusCodes` added to `TransportCall` and to be used instead of `statusCode`. This allows OVS implementers to submit multiple statuses for a transport call, reflecting real-world scenarios where more than one status may apply.
 - `delayReasonCode` in `Timestamp` object **deprecated** - use `delayReasonCodes` instead
-- `delayReasonCodes` added to `Timestamp` and to be used instead of `delayReasonCode`
+- `delayReasonCodes` added to `Timestamp` and to be used instead of `delayReasonCode`. This allows OVS implementers to submit multiple delay reasons for a timestamp, reflecting real-world scenarios where more than one cause may apply.
 
 Minor changes:
 - improved layout of descriptions
@@ -36,7 +36,7 @@ Minor changes:
 - description added to `ServiceSchedule`, `VesselSchedule`
 - improved `title` in objects where a space was missing
 - GitHub reference removed from `eventTypeCode` property
-- `eventClassifierCode` description updated
+- `eventClassifierCode` description updated. Additional guidance provided in the API on when to send planned, estimated, and actual timestamps, clarifying semantics so implementers can align expectations with partners.
 - `ISO 8601` reference removed from `errorDateTime` property in the `ErrorResponse` object
 - removed unused parameter declarations
 
