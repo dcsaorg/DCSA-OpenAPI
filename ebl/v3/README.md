@@ -23,6 +23,7 @@ This is a patch version for the DCSA Bill of Lading API. The primary reason for 
 - `BLOC` (BlockPeer Technologies) added as a new `sendToPlatform` and `codeListProvider`
 - add `transportDocumentSubReference` to the Notifications
 - add `feedbacks` object to `TransportDocument`
+- clarify in `latitude` and `longitude` description that the value is expressed using ISO 6709 data interchange numeric format
 
 <a name="v301"></a>[Release v3.0.1 (31 July 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.1)
 ---
