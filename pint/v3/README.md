@@ -43,6 +43,7 @@ Snapshot as of {TBD} for EBL Platform Interoperability 3.0.0 Beta. This Snapshot
   - `comments` description updated
   - `recipient` is **no** longer a required property on `Transaction` (it is not needed for `SIGN`, `BLANK_ENDORSE` and `SURRENDER` `actionCodes`)
 - `representedParty` property (equivalent to an `OnBehalfOfParty`) added to `actorParty` and `recipientParty`
+- improve `size` description in the `DocumentMetaData` object to make it clear it is the size of the decoded file (and not the size of the Base64 encoded file)
 
 ## Transport Document changes
 - `countryCode` description in `TaxLegalReference`, `NationalCommodityCode`, `CustomsReference`, `Address`, `PartyAddress`, `City` and `PlaceOfIssue` updated to allow the use of `ZZ` in case it is not known
