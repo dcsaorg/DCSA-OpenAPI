@@ -50,6 +50,7 @@ Snapshot as of {TBD} for EBL Platform Interoperability 3.0.0 Beta. This Snapshot
 - two new DocumentParties added: `OnBehalfOfShipper` and `OnBehalfOfConsignee`
 - `ESSD` as `eblPlatform` and `codeListProvider` have been deprecated - `IDT` should be used
 - `BLOC` (BlockPeer Technologies) added as a new `eblPlatform` and `codeListProvider`
+- clarify in `latitude` and `longitude` description that the value is expressed using ISO 6709 data interchange numeric format
 
 <a name="v300B20250731"></a>[Release v3.0.0 Beta 20250731 (31 of July 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_PINT/3.0.0-Beta-20250731)
 ---

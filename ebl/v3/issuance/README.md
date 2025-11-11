@@ -20,6 +20,7 @@ This is a patch version for the DCSA Issuance API. eBL Solution Providers update
 - clarified conditions for `numberOfOriginalsWithCharges` and `numberOfOriginalsWithoutCharges`
 - 2 new DocumentParties added: `OnBehalfOfShipper` and `OnBehalfOfConsignee`
 - SwaggerHub API Auto Mocking removed
+- clarify in `latitude` and `longitude` description that the value is expressed using ISO 6709 data interchange numeric format
 
 <a name="v301"></a>[Release v3.0.1 (31 July 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS/3.0.1)
 ---
