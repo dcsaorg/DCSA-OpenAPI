@@ -1,0 +1,116 @@
+openapi: 3.0.0
+info:
+  version: 3.0.0-Beta-1
+  title: DCSA EBL Surrender API
+  description: |
+    This API is intended as an API between a carrier (the client) and a EBL Solution Platform (the server).
+    
+    This API is used to respond to requests that were submitted via the [DCSA_EBL_SUR](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR/3.0.0-Beta-1) API.
+
+    ### Stats API
+    The Stats API offers crucial statistical information for both API providers and consumers to enhance their services and helps DCSA to understand and scale the ecosystem. We expect you to invoke the Stats API for every request made to this API. Further details can be found [here](https://developer.dcsa.org/#/http/guides/api-guides/stats-api)
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  contact:
+    name: Digital Container Shipping Association (DCSA)
+    url: https://dcsa.org
+    email: info@dcsa.org
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/dcsaorg/DCSA_EBL_SUR_RSP/3.0.0-Beta-1
+paths:
+  /v3/ebl-surrender-responses:
+    post:
+      tags:
+        - Surrender Request responses
+      description: |
+        The carrier uses this endpoint to inform the EBL Solution Platform about the verdict for a given surrender request.
+      parameters:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/3.1.0#/components/parameters/Api-Version-Major'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/surrenderRequestAnswer'
+      responses:
+        '204':
+          description: Request successful
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.2#/components/headers/API-Version'
+        '409':
+          description: |
+            A carrier may only answer once to a surrender request. Subsequent attempts to answer are considered an error and should be rejected with a 409 Conflict code.
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.2#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.0#/components/schemas/error'                      
+        default:
+          description: Error
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.3#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.0#/components/schemas/error'
+
+
+components:
+  schemas:
+    
+    ##############
+    # Simple types
+    ##############
+
+    surrenderRequestReference:
+      type: string
+      maxLength: 100
+      example: "Z12345"
+      pattern: "^\\S+(\\s+\\S+)*$"
+      description: |
+        The surrender request provided by the EBL solution in the surrender request.
+
+    comments:
+      type: string
+      description: Free text comment associated with the surrender request transaction.  Must be provided for rejections but should be omitted when accepting the surrender.
+      maxLength: 255
+      pattern: "^\\S+(\\s+\\S+)*$"
+      example: 'Comments...'
+
+    surrenderRequestAction:
+      type: string
+      enum:
+        - SURR
+        - SREJ
+      description: |
+        Action performed:
+        - SURR (Surrendered)
+        - SREJ (Surrender rejected)
+
+        When the carrier accepts the surrender (`SURR`), the platform will inform the party that submitted the surrender request that the surrender has been accepted.  If the surrender is due to an admendment, the carrier will follow up with issuing the admended document to the party that submitted the surrender. The carrier will immediately become the possessor of the bill and can now void it.
+
+        When the carrier rejects the surrender (`SREJ`), the EBL is returned to the party that submitted the surrender request.
+
+    ##############
+    # Objects 
+    ##############
+
+    surrenderRequestAnswer:
+      type: object
+      properties:
+        surrenderRequestReference:
+          $ref: '#/components/schemas/surrenderRequestReference'
+        action:
+          $ref: '#/components/schemas/surrenderRequestAction'
+        comments:
+          $ref: '#/components/schemas/comments'
+      required:
+        - surrenderRequestReference
+        - action

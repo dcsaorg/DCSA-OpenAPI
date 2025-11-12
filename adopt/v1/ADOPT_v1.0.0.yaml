@@ -1,0 +1,311 @@
+openapi: 3.0.3
+info:
+  title: DCSA Adoption API
+  description: |
+    Meta-API with which container shipping organizations can share statistics on their adoption of DCSA standards.
+  contact:
+    name: Digital Container Shipping Association (DCSA)
+    url: https://dcsa.org/
+    email: info@dcsa.org
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+paths:
+  /v1/adoption-stats:
+    get:
+      summary: Retrieve adoption statistics (DCSA to call "Adopter" endPoint)
+      description: |
+        Retrieve the adoption statistics, currently the number of API calls by DCSA standard, version, traffic-direction, endpoint, query parameter set and response status.
+
+        **Note:** This endPoint is to be implemented on "adopter" side and for DCSA to call
+      operationId: get-adoption-stats
+      parameters:
+        - name: interval
+          in: query
+          description: |
+            The type of interval for which to retrieve statistics:
+            - `day` (one day)
+            - `week` (one calendar week)
+            - `month`(one calendar month)
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+            enum:
+              - day
+              - week
+              - month
+            example: week
+        - name: date
+          in: query
+          description: |
+            The date (or any date within the calendar week or month) for which to return the statistics, in YYYY-MM-DD format.
+          required: true
+          schema:
+            type: string
+            format: date
+            example: '2024-06-21'
+        - $ref: '#/components/parameters/Api-Version-Major'
+      responses:
+        '200':
+          description: |
+            A successful response containing the adoption statistics.
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdoptionStats'
+        '400':
+          description: |
+            Invalid request parameters.
+        '500':
+          description: |
+            Internal server error.
+    put:
+      summary: Send (Push) adoption statistics (DCSA endPoint)
+      description: |
+        Send (Push) the adoption statistics, currently the number of API calls by DCSA standard, version, traffic-direction, endpoint, query parameter set and response status.
+
+        **Note:** This endPoint is for DCSA to implement and for the adopter to call
+      operationId: put-adoption-stats
+      parameters:
+        - $ref: '#/components/parameters/Api-Version-Major'
+      requestBody:
+        description: |
+          The adoption statistics being pushed by the adopter to DCSA.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdoptionStats'
+      responses:
+        '204':
+          description: ''
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+        '400':
+          description: |
+            Invalid request.
+        '500':
+          description: |
+            Internal server error.
+
+components:
+  headers:
+    API-Version:
+      schema:
+        type: string
+        example: 1.0.0
+      description: |
+        SemVer used to indicate the version of the contract (API version) returned.
+  parameters:
+    Api-Version-Major:
+      in: header
+      name: API-Version
+      required: false
+      schema:
+        type: string
+        example: '1'
+      description: |
+        An API-Version header **MAY** be added to the request (optional); if added it **MUST** only contain **MAJOR** version. API-Version header **MUST** be aligned with the URI version.
+  schemas:
+    AdoptionStats:
+      type: object
+      properties:
+        lastUpdatedDateTime:
+          type: string
+          format: date-time
+          description: |
+            The DateTime when the stats were last updated. Must be formatted using [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format.
+          example: '2024-06-18T20:44:37+01:00'
+        interval:
+          type: string
+          description: |
+            The type of interval for the statistics are provided (day, week, or month).
+          enum:
+            - day
+            - week
+            - month
+          example: week
+        startDate:
+          type: string
+          format: date
+          description: |
+            The first date of the time interval for which the stats are provided, in YYYY-MM-DD format.
+          example: '2024-06-16'
+        endDate:
+          type: string
+          format: date
+          description: |
+            The last date of the time interval for which the stats are provided, in YYYY-MM-DD format.
+          example: '2024-06-22'
+        apiCallsStatsByStandards:
+          type: array
+          minItems: 1
+          description: |
+            The API call statistics by DCSA standard, version, traffic-direction, endpoint, query parameter set and response HTTP status.
+          items:
+            $ref: '#/components/schemas/ApiCallsStandardStats'
+      required:
+        - lastUpdatedDateTime
+        - interval
+        - startDate
+        - endDate
+        - apiCallsStatsByStandards
+    ApiCallsStandardStats:
+      type: object
+      description: |
+        The API calls statistics for one DCSA standard.
+      properties:
+        standardName:
+          type: string
+          maxLength: 20
+          description: |
+            Name of the DCSA standard.
+            - `AN` (Arrival Notice)
+            - `BKG` (Booking)
+            - `CBF` (Consolidated Booking Forecast)
+            - `CRO` (Container Release Order)
+            - `CS` (Commercial Schedules)
+            - `DI` (Delivery Instruction)
+            - `DO` (Delivery Order)
+            - `EBL` (Electronic Bill of Lading)
+            - `EBL_ISS` (Electronic Bill of Lading Issuance)
+            - `EBL_SUR` (Electronic Bill of Lading Surrender)
+            - `IC` (IoT Commercial)
+            - `IO` (IoT Operations)
+            - `JIT` (Just In Time Portcall)
+            - `OVS` (Operational Vessel Schedules)
+            - `RMC` (Reefer Monitoring Commercial)
+            - `RMO` (Operational Reefer Monitoring)
+            - `TNT` (Track and Trace)
+            - `TO` (Transport Order)
+          example: TNT
+        byVersions:
+          type: array
+          minItems: 1
+          description: |
+            The API calls statistics for each version of this DCSA standard.
+          items:
+            $ref: '#/components/schemas/ApiCallsVersionStats'
+      required:
+        - standardName
+        - byVersions
+    ApiCallsVersionStats:
+      type: object
+      description: |
+        The API calls statistics for each version of a DCSA standard.
+      properties:
+        versionNumber:
+          type: string
+          maxLength: 50
+          description: |
+            The version number of the DCSA standard.
+          example: 2.2.0
+        byInboundEndpoints:
+          type: array
+          description: |
+            The statistics of the API calls received on each inbound endpoint of a standard.
+
+            If no `inbound` traffic has been recorded the empty list should be returned
+          items:
+            $ref: '#/components/schemas/ApiCallsEndpointStats'
+        byOutboundEndpoints:
+          type: array
+          description: |
+            The statistics of the API calls made to each outbound endpoint of a standard.
+
+            If no `outbound` traffic has been recorded the empty list should be returned
+          items:
+            $ref: '#/components/schemas/ApiCallsEndpointStats'
+      required:
+        - versionNumber
+        - byInboundEndpoints
+        - byOutboundEndpoints
+    ApiCallsEndpointStats:
+      type: object
+      properties:
+        httpMethod:
+          description: |
+            The HTTP method used to make the request e.g. `GET`, `POST`, etc
+          type: string
+          example: POST
+          enum:
+            - GET
+            - POST
+            - PUT
+            - DELETE
+            - PATCH
+        endpointUri:
+          type: string
+          description: |
+            The URI of the OpenAPI endpoint on which these calls are made / received.
+          example: /v1/events
+        byQueryParameterSets:
+          type: array
+          minItems: 1
+          description: |
+            The API calls statistics by the request query parameter set.
+          items:
+            $ref: '#/components/schemas/ApiCallsQueryParameterSetStats'
+      required:
+        - httpMethod
+        - endpointUri
+        - byQueryParameterSets
+    ApiCallsQueryParameterSetStats:
+      type: object
+      properties:
+        queryParameterSet:
+          type: array
+          description: |
+            The list of query parameters used for a call. If none have been supplied this property should be omitted.
+          example:
+            - equipmentReference
+            - limit
+          items:
+            type: string
+            description: |
+              Name of a queryParameter
+            maxLength: 50
+        byHttpStatuses:
+          type: array
+          minItems: 1
+          description: |
+            The API calls statistics by the HTTP status with which they were responded.
+          items:
+            $ref: '#/components/schemas/ApiCallsHttpStatusStats'
+      required:
+        - byHttpStatuses
+    ApiCallsHttpStatusStats:
+      type: object
+      properties:
+        httpStatusCode:
+          type: integer
+          description: |
+            The HTTP status code with which these API calls were responded.
+          example: 200
+        apiCallCount:
+          type: integer
+          description: |
+            The number of API calls for this DCSA standard, version, direction, endpoint, query parameter set and response status.
+          example: 5400
+        uniqueCounterpartCount:
+          type: integer
+          description: |
+            The number of unique counterparts with which these calls were exchanged. If the value cannot be provided a `0` should be returned.
+          example: 320
+        averageResponseTime:
+          type: integer
+          description: |
+            The average response time of these calls, in milliseconds. If the value cannot be provided a `0` should be returned.
+          example: 1250
+      required:
+        - httpStatusCode
+        - apiCallCount
+        - uniqueCounterpartCount
+        - averageResponseTime

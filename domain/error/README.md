@@ -4,11 +4,40 @@ The Error Domain is documented on [**Error Domain SwaggerHub**](https://app.swag
 
 The purpose of this Domain is to specify the error object to return in any API endPoint in case an error occurs.
 
-<a name="v201"></a>[Release v2.0.1 (TBD)](https://app.swaggerhub.com/domains-docs/dcsaorg/ERROR_DOMAIN/2.0.1)
+<a name="v400"></a>[Release v4.0.0 (Not released yet)](https://app.swaggerhub.com/domains-docs/dcsaorg/ERROR_DOMAIN/4.0.0)
 ---
-Type fixed
+Typo fixes in property name
 
-- typo fixed in the description of the `value` field in the `Error` list
+- typos fixed in `erorCodeMessage` --> `errorCodeMessage`
+
+<a name="v301"></a>[Release v3.0.1 (Not released yet)](https://app.swaggerhub.com/domains-docs/dcsaorg/ERROR_DOMAIN/3.0.1)
+---
+Typo fixes in descriptions
+
+- typos fixed in `errorDateTime` and `errors` description
+
+<a name="v300"></a>[Release v3.0.0 (28 December 2023)](https://app.swaggerhub.com/domains-docs/dcsaorg/ERROR_DOMAIN/3.0.0)
+---
+Error object aligned with API Design Guides v2
+
+- `DetailedError` updated:
+  - `errorCode` description updated
+  - `field` renamed to `property`, maxLength changed to 100 and is now a single property and cannot contain a JSONPath (the `jsonPath` property should be used for this)
+  - `jsonPath` property added
+  - `reason` renamed to `errorCodeText`
+  - `message` renanmed to `errorCodeMessage`
+- description updated for: `httpMethod`, `requestUri`, `statusCode`, `statusCodeText`, `errorDateTime` and `errors`
+- `errorMessage` renamed to `statusCodeMessage`
+- `providerCorrelationID` renamed to `providerCorrelationReference` in order to comply with API Design Guide rules
+- removed the `allOf` construction in the `errors` items
+
+<a name="v201"></a>[Release v2.0.1 (28 December 2023)](https://app.swaggerhub.com/domains-docs/dcsaorg/ERROR_DOMAIN/2.0.1)
+---
+Minor fixes
+
+- `field` max length changed from 50 --> 500
+- fixed typo in `value` description
+- fixed `reason` example
 
 <a name="v200"></a>[Release v2.0.0 (23 December 2022)](https://app.swaggerhub.com/domains-docs/dcsaorg/ERROR_DOMAIN/2.0.0)
 ---

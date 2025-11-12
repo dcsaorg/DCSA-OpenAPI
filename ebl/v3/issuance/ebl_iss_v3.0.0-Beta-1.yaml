@@ -1,0 +1,246 @@
+openapi: 3.0.0
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/dcsaorg/DCSA_EBL_ISS/3.0.0-Beta-1
+info:
+  version: 3.0.0-Beta-1
+  title: |
+    DCSA OpenAPI specification for Issuance an EBL to an EBL platform.
+  description:  |
+    This API is intended as an API between a carrier (the client) and a EBL Solution Platform (the server).
+    
+    This API is a counter part to the [DCSA_EBL_ISS_RSP](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS_RSP/3.0.0-Beta-1) API.
+    
+    When the document is to be surrendered, it should happen via a version of the [DCSA_EBL_SUR API](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR/3.0.0-Beta-1). 
+  
+    API specification issued by DCSA.org.
+
+    ### Stats API
+    The Stats API offers crucial statistical information for both API providers and consumers to enhance their services and helps DCSA to understand and scale the ecosystem. We expect you to invoke the Stats API for every request made to this API. Further details can be found [here](https://developer.dcsa.org/#/http/guides/api-guides/stats-api)
+
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  contact:
+    name: Digital Container Shipping Association (DCSA)
+    url: https://dcsa.org
+    email: info@dcsa.org
+paths:
+  /v3/ebl-issuance-requests:
+    put:
+      tags:
+       - Issuance EBL
+      summary: Request issuance of an EBL
+      description: |
+        Submit a transport document (EBL) for issuance
+      parameters:
+        - $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.2#/components/parameters/Api-Version-Major'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/issuanceRequest'
+      responses:
+        '204':
+          description: |
+            Platform acknowledges the issuance request and will follow up later with a response via the DCSA_ISS_RSP API. Please see the API description for the concrete link and version.
+            
+            Note that the platform MUST NOT accept an issuance request twice. If the client misbehaves and attempts to complete the same transaction more than once, then the platform must ensure that at most one of these requests sees a successful response.  The rest should an error instead.
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.2#/components/headers/API-Version'
+        '409':
+          $ref: '#/components/responses/documentIssuancePendingOrComplete'
+        default:
+          description: Request failed for some reason.
+          headers:
+            API-Version:
+              $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.2#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.1#/components/schemas/error'
+
+components:
+  responses:
+    'documentIssuancePendingOrComplete':
+      description: |
+        An Issuance Request is made with a Transport Document Reference (TDR), that was used previously to request the issuance of a Transport Document (TD). The document is either already issued or an TD with the same TDR. 
+        
+        The eBL platform will inform the carrier when the carrier needs to act on this document again. If the issuance is pending, then the carrier will be notified via the DCSA_EBL_ISS_RSP API once the issuance process completes. If the issuance has already succeeded, the eBL platform will notify the carrier when there is a surrender request via the DCSA_EBL_SUR API.
+      headers:
+        API-Version:
+          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DCSA_DOMAIN/2.0.2#/components/headers/API-Version'
+      content:
+        application/json:
+          schema:
+            $ref: 'https://api.swaggerhub.com/domains/dcsaorg/ERROR_DOMAIN/2.0.1#/components/schemas/error'
+
+  schemas:
+    ##############
+    # Simple types
+    ##############
+
+    legalName:
+      type: string
+      maxLength: 100
+      pattern: '^\S+(\s+\S+)*$'
+      description: Legal name of the party/user as shown on the endorsement chain
+      example: Digital Container Shipping Association
+
+    registrationNumber: 
+      type: string
+      description: Company registration number of this party. E.g. registration number on the local chamber of commerse. 
+      example: 74567837
+      pattern: '^\S+(\s+\S+)*$'
+      maxLength: 100
+
+    locationOfRegistration:
+      type: string
+      description: Country code of the location of registration according to ISO 3166-1 alpha-2
+      maxLength: 2
+      minLength: 2
+      pattern: '^[A-Z]+$'
+      example: NL
+
+    transactionReference:
+      type: string
+      maxLength: 100
+      example: '4TkP5nvgTly0MwFrDxfIkR2rvOjkUIgzibBoKABU'
+      description: |
+        Opaque server provided identifier for a given transaction.
+
+    ##############
+    # Objects 
+    ##############
+    issuanceRequest:
+      type: object
+      properties:
+        document:
+          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/3.0.0#/components/schemas/TransportDocument'
+        issueTo:
+          $ref: '#/components/schemas/issueToParty'
+        eBLVisualisationByCarrier:
+          $ref: '#/components/schemas/supportingDocument'
+#        supportingDocuments:
+#          type: array
+#          items:
+#            $ref: '#/components/schemas/supportingDocument'
+      required:
+        - document
+        - issueTo
+      description: |
+        Details of the eBL that the carrier requests to have issued.
+        
+        The `eBLVisualisationByCarrier` is an optional document, where the carrier can provide its own visualization of the eBL for the end user.  The carrier is the sole responsible party for ensuring there are no discrepencies between the eBL (the `document` attribute) and the provided visualization (the `eBLVisualisationByCarrier` attribute).
+#        
+#        The `supportingDocuments` array is an optional list of documents that the carrier has been requested to provide in addition to the eBL.
+#
+
+    supportingDocument:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 100
+          example: "Carrier rendered copy of the EBL.pdf"
+        content:
+          type: string
+          format: byte
+          description: The actual contents of the visual rendering.
+      required:
+        - name
+        - content
+
+    issueToParty:
+      type: object
+      properties:
+        sendToPlatform:
+          description: The sendToPlatform is the EBL platform the eBL is issued to/the eBL platform of the shipper. Must be a code from https://github.com/dcsaorg/DCSA-Information-Model/blob/master/datamodel/referencedata.d/eblsolutionproviders.csv.
+          type: string
+          pattern: '\S+'
+          maxLength: 4
+          example: 'BOLE'
+        legalName:
+          $ref: '#/components/schemas/legalName'
+        registrationNumber: 
+          $ref: '#/components/schemas/registrationNumber'
+        locationOfRegistration:
+          $ref: '#/components/schemas/locationOfRegistration'
+        taxReference:
+          type: string
+          description: Tax reference used in the location of registration
+          pattern: ^\S+$
+          example: NL859951480B01
+        partyCodes:
+          $ref: 'https://api.swaggerhub.com/domains/dcsaorg/DOCUMENTATION_DOMAIN/3.0.0#/components/schemas/partyCodes'
+      required:
+        - sendToPlatform
+        - legalName
+
+    # partyCodes:
+    #   type: array
+    #   items:
+    #     type: object
+    #     properties:
+    #       partyCode:
+    #         type: string
+    #         maxLength: 100
+    #         minLength: 1
+    #         pattern: '^\S+(\s+\S+)*$'
+    #       partyCodeListProvider:
+    #         type: string
+    #         enum:
+    #         - GLEIF
+    #         - W3C
+    #         - EPUI
+    #         description: |
+    #           Describes the organisation that provides the party code.
+
+    #           - `EPUI`:The party code is an EBL Platform User Identifier (that is, an identifier provided by a platform, used to transfer eBLs). EPIU should be combined with the `codeListName`, to identify the platform that issued the identifier.
+    #           - `GLEIF`: The party code is issued by Global Legal Entity Identifier Foundation (GLEIF). See https://www.gleif.org/en. The `codeNameList` (if omitted) defaults to `LEI`.
+    #           - `W3C`: The party code is issued by a standard created by World Wide Web Consortium (W3C). See https://www.w3.org/. The `codeNameList` (if omitted) defaults to `DID`.
+
+    #       codeListName:
+    #         type: string
+    #         pattern: '^\S+(\s+\S+)*$'
+    #         maxLength: 100
+    #         description: |
+    #           The name of the code list / code generation mechanism / code authority for the party code.
+              
+    #           For `EPUI`:
+    #           * `Wave`: An identifier provided by Wave BL.
+    #           * `CargoX`: An identifier provided by CargoX
+    #           * `EdoxOnline`: An identifier provided by EdoxOnline
+    #           * `IQAX`: An identifier provided by IQAX
+    #           * `EssDOCS`: An identifier provided by essDOCS
+    #           * `Bolero`: An identifier provided by Bolero
+    #           * `TradeGO`: An identifierprovided by TradeGo
+    #           * `Secro`: An identifier provided by Secro
+    #           * `GSBN`: An identifier provided by GSBN
+    #           * `WiseTech`: An identifier provided by WiseTech
+              
+    #           For `W3C`:
+    #           * `DID`: The party code is a Decentralized Identifier (see https://www.w3.org/TR/did-core/).
+              
+    #           For `GLEIF`:
+    #           * `LEI`: The party code is a Legal Entity Identifier (LEI) as issued by Global Legal Entity Identifier Foundation (GLEIF). See https://www.gleif.org/en
+    #     required:
+    #       - partyCode
+    #       - partyCodeListProvider
+
+  parameters:
+    ##############
+    # Parameters #
+    ##############
+    transactionReference:
+      in: path
+      name: transactionReference
+      schema:
+        $ref: '#/components/schemas/transactionReference'
+      required: true
+      description: |
+        The transaction reference for the issuance transaction.
+      example: '4TkP5nvgTly0MwFrDxfIkR2rvOjkUIgzibBoKABU'
