@@ -4,6 +4,12 @@ The DCSA Domain is documented on [**DCSA Domain SwaggerHub**](https://app.swagge
 
 The primary purpose of this Domain is to specify common components to be reused across DCSA APIs and Domains. This Domain does not define any "complex" objects. Common QueryParameters (limit, cursor) and Headers (Current-Page, Next-Page, ...) are also defined here.
 
+<a name="v311"></a>[Release v3.1.1 (Not released)](https://app.swaggerhub.com/domains-docs/dcsaorg/DCSA_DOMAIN/3.1.1)
+---
+Minor fixes
+
+- `latitude` and `longitude` regEx and example modified
+
 <a name="v310"></a>[Release v3.1.0 (28 December 2023)](https://app.swaggerhub.com/domains-docs/dcsaorg/DCSA_DOMAIN/3.1.0)
 ---
 Released as part of Booking v2.0.0 Beta 1 and EBL v3.0.0 Beta 1 release. Many new properties for DG (Dangerous Goods) have been added. Many properties previously specified with `enum` values have been changed to only be a string in order to be better backward compatible. External links to other standardbodies have been updated. Many descriptions updated in order to be more clear.

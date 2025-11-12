@@ -3,7 +3,7 @@
 The DCSA Interface Standard for Track and Trace is documented on the [**DCSA TNT**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_TNT) SwaggerHub.
 
 The purpose of an Event Hub is to send events and manage subscriptions. Track & Trace is a specialised Hub managing:
-- `TransportEvents` - events regarding transportation (Arival and Departure)
+- `TransportEvents` - events regarding transportation (Arrival and Departure)
 - `EquipmentEvents` - events regarding Equipment (Loading, Discharging, Gated in, Gate out, Stuffing, Stripping)
 - `ShipmentEvents` - events regarding documentation (Booking, Bill of Lading, Arrival Notice, Shipment Release Message)
 

@@ -12,11 +12,10 @@ Data and Interface Standard project workstream is to strengthen the container sh
 #### APIs
 - The DCSA Interface Standard for `Track & Trace` is documented on the [**DCSA TNT**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_TNT) SwaggerHub.
 - The DCSA Interface Standard for `Operational Vessel Schedules` is documented on the [**DCSA OVS**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS) SwaggerHub.
+- The DCSA Interface Standard for `Commercial Schedules` is documented on the [**DCSA CS**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_CS) SwaggerHub.
 - The DCSA Interface Standard for `Just in Time PortCalls` is documented on the [**DCSA JIT**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_JIT) SwaggerHub.
-- The DCSA Interface Standard for `electronic Bill of Lading` is documented on the [**DCSA EBL**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_EBL) SwaggerHub.
 - The DCSA Interface Standard for `Booking` is documented on the [**DCSA BKG**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_BKG) SwaggerHub.
-
-#### Event Hubs (optional to implement but recommended)
-- `Operational Vessel Schedules Event Hub` (recomended to push events from OVS) is documented on the [**OVS_EVENT_HUB**](https://app.swaggerhub.com/apis/dcsaorg/OVS_EVENT_HUB) SwaggerHub.
-- `Documentation Event Hub` (recomended to push events from EBL) is documented on the [**DOCUMENTATION_EVENT_HUB**](https://app.swaggerhub.com/apis/dcsaorg/DOCUMENTATION_EVENT_HUB) SwaggerHub.
-- `Track & Trace` is also an Event Hub - it is documented on the [**TNT**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_TNT) SwaggerHub.
+- The DCSA Interface Standard for `electronic Bill of Lading` is documented on the [**DCSA EBL**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_EBL) SwaggerHub.
+- The DCSA Interface Standard for `Issuance an EBL to an EBL platform` is documented on the [**DCSA EBL ISS**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_EBL_ISS) SwaggerHub.
+- The DCSA Interface Standard for `EBL Surrender` is documented on the [**DCSA EBL SUR**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_EBL_SUR) SwaggerHub.
+- The DCSA Interface Standard for `Platform Interoperability` is documented on the [**DCSA EBL PINT**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_EBL_PINT) SwaggerHub.
