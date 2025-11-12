@@ -11,6 +11,40 @@ Publications related to the Bill of Lading API:
 - [Bill of Lading Surrender](./surrender/) maintained here on GitHub
 - [Bill of Lading Surrender Response](./surrender_response/) maintained here on GitHub (**DEPRECATED** - now included as part of EBL Surrender API)
 
+<a name="v302"></a>[Release v3.0.2 (TBD)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.2)
+---
+This is a patch version for the DCSA Bill of Lading API. The primary reason for this patch is adding the `OnBehalfOf` parties, allowing `ZZ` as a countryCode and updating eBL Solution Providers:
+- descriptions added to the following properties/objects: `CancelShippingInstructionsUpdate`, `ApproveTransportDocument`, `IdentifyingCode`, `Transports`
+- condition clarified for: `numberOfOriginalsWithCharges` and `numberOfOriginalsWithoutCharges` 
+- `countryCode` description in `TaxLegalReference`, `NationalCommodityCode`, `CustomsReference`, `Address`, `PartyAddress`, `City`, `PlaceOfIssue`, `AdvanceManifestFiling`, `PlaceOfAcceptance` and `PlaceOfFinalDelivery` updated to allow the use of `ZZ` in case it is not known
+- two new DocumentParties added: `OnBehalfOfShipper` and `OnBehalfOfConsignee`
+- `Issue To Party` description updated
+- `ESSD` as `sendToPlatform` and `codeListProvider` have been deprecated - `IDT` should be used
+- `BLOC` (BlockPeer Technologies) added as a new `sendToPlatform` and `codeListProvider`
+- add `transportDocumentSubReference` to the Notifications
+- add `feedbacks` object to `TransportDocument`
+- clarify in `latitude` and `longitude` description that the value is expressed using ISO 6709 data interchange numeric format
+
+<a name="v301"></a>[Release v3.0.1 (31 July 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.1)
+---
+This is a patch version for the DCSA Bill of Lading API. The primary reason for this patch is the `ShippingInstructionRequestor` party and adding a `transportDocumentReference` by Shipper, but other improvements have been added as well:
+## Schema changes
+- added `shippingInstructionsRequestor` as an optional party
+- added `transportDocumentReference` as an optional property when creating and updating a `Shipping Instructions`
+- removed `nullable=false` as false is the default
+- updated `partyFunctionCode` for the `TransportDocument` as it was wrongly aligned with `ShippingInstructions` (`CS` (Consolidator), `MF` (Manufacturer) and `WH` (Warehouse Keeper) removed)
+- added `carrierCode` and `carrierCodeListProvider` to identify which carrier a ShippingInstructions should be sent to
+
+## Minor changes
+- removed Servers list that was wrongly added (no Virtual Servers are connected to DCSA APIs)
+- added an extra **Note** on the `displayedAdress` mentioning that some carriers might allow for more than 2 lines for physical Bill of Ladings
+- updated spelling for Jerr**i**cans -> Jerr**y**cans
+- updated some typos
+- removed the reference to `ISO 8601` (all dateTime fields must comply with [RFC 3339, section 5.6](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6))
+- fixed some formatting in the `transportDocumentStatus` description and some places referring to `Transport Document`
+- `codeListProvider` and `sendToPlatform` updated with the following values: `COVA` (Covantis), `ETIT` (e-title), `KTNE` (KTNET) and `CRED` (Credore)
+- clarifies which party `partyContactDetails` refers to
+
 <a name="v300"></a>[Release v3.0.0 (17 December 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.0)
 ---
 This is the final version 3.0.0 for the DCSA Bill of Lading API. Compared to latest snapshot released 8 November the following has changed:

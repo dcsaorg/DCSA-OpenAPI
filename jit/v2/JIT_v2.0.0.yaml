@@ -2,10 +2,10 @@ openapi: 3.0.3
 info:
   version: 2.0.0
   title: |
-    DCSA Just in Time Port Calls API
+    DCSA Port Call (JIT) API
   description: |
-    # DCSA OpenAPI specification for Just in Time Port Call process
-    The DCSA API for **Just In Time Port Call** aims to simplify and standardize the exchange of operational information between carriers, terminals, port authorities, and service providers, to orchestrate and optimize port calls. JIT can be used for negotiating services execution via timestamps, informing timestamps, or informing moves forecasts, between the parties involved in any given location.
+    # DCSA OpenAPI specification for Port Call (JIT) process
+    The DCSA API for **Port Call (JIT)** aims to simplify and standardize the exchange of operational information between carriers, terminals, port authorities, and service providers, to orchestrate and optimize port calls. JIT can be used for negotiating services execution via timestamps, informing timestamps, or informing moves forecasts, between the parties involved in any given location.
 
     The planning and execution of events always follow the same pattern, in which several instances of the estimated (`E`), requested (`R`), and planned (`P`) times (from now on referred to as: `ERP`-pattern) can occur if a new estimated or requested time is given after the initially planned time. Some events, specified in this document, do not need the `ERP`-pattern, as they are informative and reflect actuals (`A`) only (i.e. vessel readiness for cargo operations).
 
@@ -38,7 +38,7 @@ info:
 
     Also in scope:
     - Moves forecast
-    - cancel (by provider) or decline (by consumer) of a Port Call Service
+    - cancel (by **Service Provider**) or decline (by **Service Consumer**) of a **Port Call Service**
     - omission of **Port Call** or **Terminal Call**
 
     ## How to create a Port Call Service
@@ -50,12 +50,12 @@ info:
      - Create a **Terminal Call** and link it to the **Port Call** created above by calling
 
             PUT /terminal-calls/{terminalCallID}
-    
+
      - Create a **Port Call Service** and link it to the **Terminal Call** created above by calling
-    
+
             PUT /port-call-services/{portCallServiceID}
 
-    It is the responsibility of the Provider of the initial **Port Call Service** to create a:
+    It is the responsibility of the **Service Provider** of the initial **Port Call Service** to create a:
     - `portCallID` to identify all communication regarding the **Port Call**
     - `terminalCallID` to identify each **Terminal Call** inside the same `portCallID`. One **Port Call** can contain many **Terminal Calls**
     - `portCallServiceID` to identify each **Port Call Service** inside the same `terminalCallID`. One **Terminal Call** can contain many **Port Call Services**
@@ -75,40 +75,43 @@ info:
     email: info@dcsa.org
 security: []
 tags:
-  - name: Port Call Service - Consumer
+  - name: Port Call Service - Service Consumer
     description: |
-      **Consumer** implemented endPoints
-  - name: Port Call Service - Provider
+      **Service Consumer** implemented endPoints
+  - name: Port Call Service - Service Provider
     description: |
-      **Provider** implemented endPoints
+      **Service Provider** implemented endPoints
   - name: Port Call Service
     description: |
-      **Provider** and **Consumer** implemented endPoints
+      **Service Provider** and **Service Consumer** implemented endPoints
 paths:
   '/port-calls/{portCallID}':
     put:
       parameters:
         - $ref: '#/components/parameters/portCallIDPathParam'
         - $ref: '#/components/parameters/Api-Version-Major'
+        - $ref: '#/components/parameters/Request-Sending-Party'
+        - $ref: '#/components/parameters/Request-Receiving-Party'
       tags:
-        - Port Call Service - Consumer
+        - Port Call Service - Service Consumer
       operationId: put-port-call
       summary: Initiates a new or updates a Port Call
       description: |
         Creates or updates a **Port Call** record. The caller must provide a unique `portCallID` (UUIDv4), which identifies the **Port Call**. The `portCallID` must remain consistent across all subsequent communications and linked **Terminal Calls**. If updating an existing **Port Call**, e.g. including the `portVisitReference`, the provided `portCallID` must match the existing record.
 
         The **Port Call** includes:
-        
+
           - Location information (required): `UNLocationCode`
           - static **Vessel** information (required): `vessel`
-          - an optional business identifier for the port visit: `portVisitReference`
+          - business identifier for the port visit (optional): `portVisitReference`
           - The ability to send the record with informational purpose only, using `isFYI=true`
 
         This call is often provided as the first call from a **Carrier** to a **Terminal** before creating a **Terminal Call** and then sending `ETA-Berth` or `Moves`.
 
         It is not possible to update a **Port Call** that has been `OMITTED`.
       requestBody:
-        description: Initiates a new or updates a Port Call
+        description: |
+          Initiates a new or updates a **Port Call**
         required: true
         content:
           application/json:
@@ -119,7 +122,7 @@ paths:
                 summary: |
                   Create a new Port Call to be used for an ETA
                 description: |
-                  A new **Port Call** for **Port of Amsterdam** for the **YM WHOLESOME**. After this call is accepted by consumer - a **Terminal Call** can be created. In this example no `portVisitReference` has yet been assigned to the **Port Call**.
+                  A new **Port Call** for **Port of Amsterdam** for the **YM WHOLESOME**. After this call is accepted by **Service Consumer** - a **Terminal Call** can be created. In this example no `portVisitReference` has yet been assigned to the **Port Call**.
                 value:
                   portCallID: '0342254a-5927-4856-b9c9-aa12e7c00563'
                   UNLocationCode: 'NLAMS'
@@ -133,9 +136,9 @@ paths:
                     typeCode: 'CONT'
               sendFYI:
                 summary: |
-                  Send a FYI to a consumer
+                  Send a FYI to a Service Consumer
                 description: |
-                  A **Port Call** has already been created - now send the **Port Call** as a FYI to a (secondary) consumer. In this example all properties are the same as the previous example, except for `isFYI`.
+                  A **Port Call** has already been created - now send the **Port Call** as a FYI to a (secondary) **Service Consumer**. In this example all properties are the same as the previous example, except for `isFYI`.
                 value:
                   portCallID: '0342254a-5927-4856-b9c9-aa12e7c00563'
                   UNLocationCode: 'NLAMS'
@@ -151,16 +154,24 @@ paths:
       responses:
         '204':
           description: |
-            A new or updated Port Call successfully accepted by the consumer.
+            A new or updated **Port Call** successfully accepted by the **Service Consumer**.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
         '400':
           description: |
             In case creating a new **Port Call** fails schema validation, a `400` (Bad Request) is returned.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -192,6 +203,10 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -222,6 +237,10 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -252,6 +271,10 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -264,7 +287,7 @@ paths:
                     Calling the endPoint
 
                         PUT /port-calls/{portCallID}
-                    
+
                     too many times within a time period results in an error.
 
                     **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
@@ -285,22 +308,24 @@ paths:
       parameters:
         - $ref: '#/components/parameters/portCallIDPathParam'
         - $ref: '#/components/parameters/Api-Version-Major'
+        - $ref: '#/components/parameters/Request-Sending-Party'
+        - $ref: '#/components/parameters/Request-Receiving-Party'
       tags:
-        - Port Call Service - Consumer
+        - Port Call Service - Service Consumer
       operationId: omit-port-call
       summary: Omits a Port Call
       description: |
-        Allows the provider to `OMIT` a **Port Call**, signaling that the **Port Call** is no longer going to happen.
+        Allows the **Service Provider** to `OMIT` a **Port Call**, signaling that the **Port Call** is no longer going to happen.
 
-        When a consumer receives an `OMIT`, it is their responsibility to propagate this information to any secondary receivers, they previously informed using the `isFYI=true` property, while creating **Port Calls** or sending related updates.
+        When a **Service Consumer** receives an `OMIT`, it is their responsibility to propagate this information to any secondary receivers, they previously informed using the `isFYI=true` property, while creating **Port Calls** or sending related updates.
 
-        The provider is responsible for:
+        The **Service Provider** is responsible for:
           - sending an `OMIT` to all **Terminal Calls** linked to the `portCallID` (including secondary receivers)
           - **Cancel** all **Port Call Services** that are associated with the omitted **Terminal Calls** and **Port Call**
 
-        The consumer is responsible for:
+        The **Service Consumer** is responsible for:
           - propagating the `OMIT` to any secondary receivers
-          - **Cancel** any **Port Call Services** linked to the omitted **Terminal Call** initiated by the consumer
+          - **Cancel** any **Port Call Services** linked to the omitted **Terminal Call** initiated by the **Service Consumer**
 
         Once a **Port Call** has been `OMITTED`, this action **CANNOT** be undone. In case the `OMIT` has to be "undone" a new **Port Call** must be created with new **Terminal Calls** and new **Port Call Services**.
       requestBody:
@@ -334,12 +359,20 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
         '400':
           description: |
             In case omitting a **Port Call** fails schema validation, a `400` (Bad Request) is returned.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -367,10 +400,14 @@ paths:
                         errorCodeMessage: 'isFYI should be a boolean. `12` provided as value'
         '404':
           description: |
-            In case the implementer does not know of the `portCallID` used in the request (this could be because of a `PUT` request that has not finished processing or simply because the resource does not exist), it is possible for the implementer to reject the request by returning a `404` (Not Found).
+            If the implementer does not know the `portCallID` path parameter (e.g. the resource does not exist), it is possible for the implementer to reject the request by returning a `404` (Not Found).
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -380,7 +417,7 @@ paths:
                   summary: |
                     portCallID not Found
                   description: |
-                    The provided `portCallID` cannot be found. This can be because a `PUT` request has not been finished processing or because the `portCallID` does not exist in the implementer system.
+                    The provided `portCallID` cannot be found. This can be because the `portCallID` does not exist in the implementer system.
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7006` is just a "random example".
                   value:
@@ -401,6 +438,10 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -431,6 +472,10 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -443,7 +488,7 @@ paths:
                     Calling the endPoint
 
                         POST /port-calls/{portCallID}/omit
-                    
+
                     too many times within a time period results in an error.
 
                     **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
@@ -464,13 +509,15 @@ paths:
       parameters:
         - $ref: '#/components/parameters/portCallIDQueryParam'
         - $ref: '#/components/parameters/portVisitReferenceQueryParam'
-        - $ref: '#/components/parameters/UNLocationCodeQueryParameter'
+        - $ref: '#/components/parameters/UNLocationCodeQueryParam'
 
         - $ref: '#/components/parameters/vesselIMONumberQueryParam'
         - $ref: '#/components/parameters/vesselNameQueryParam'
         - $ref: '#/components/parameters/MMSINumberQueryParam'
 
         - $ref: '#/components/parameters/Api-Version-Major'
+        - $ref: '#/components/parameters/Request-Sending-Party'
+        - $ref: '#/components/parameters/Request-Receiving-Party'
       tags:
         - Port Call Service
       operationId: get-port-call
@@ -480,15 +527,15 @@ paths:
 
         The result set of this endPoint will always include **Port Calls** that have **not yet been completed**. Definition of a completed **Port Call** is:
         ````
-        A Port Call:
-        - that has a Terminal Call, and
-        - that has a Port Call Service with: `portCallServiceTypeCode=BERTH` AND `portCallServiceEventTypeCode=DEPA`, and
-        - that has a Timestamp with: `classifierCode=PLN` AND `dateTime < {now}`
+        A **Port Call**:
+        - that has a **Terminal Call**, and
+        - that has a **Port Call Service** with: `portCallServiceTypeCode=BERTH` AND `portCallServiceEventTypeCode=DEPA`, and
+        - that has a **Timestamp** with: `classifierCode=PLN` AND `dateTime < {now}`
         ````
         This can potentially result in empty result sets. **Example:** filtering by `portCallID` that has been completed.
 
         Here are some example queries:
-          * To get a specific **Port Call** use the `portCallID` filter with the ID of the **Port Call** to filter by. This results in at most a single object. The response will return an empty array if no **Port Call** known by the consumer having the provided `portCallID`.
+          * To get a specific **Port Call** use the `portCallID` filter with the ID of the **Port Call** to filter by. This results in at most a single object. The response will return an empty array if no **Port Call** known by the **Service Consumer** having the provided `portCallID`.
           * To get a list of not completed **Port Calls** for a specific **VesselIMONumber**, use the `vesselIMONumber` filter with the `vesselIMONumber` of the **Vessel** to filter by. This will result in a list of potentially many **Port Calls** all of which will be visited by the **Vessel** with the `vesselIMONumber` specified.
           * To get a list of  not completed **Port Calls** for a specific **UN Location Code**, use the `UNLocationCode` filter with the `UNLocationCode` of the location to filter by. This will result in a list of potentially many **Port Calls** all of which will be located in the `UNLocationCode` specified.
 
@@ -496,10 +543,14 @@ paths:
       responses:
         '200':
           description: |
-            Retrieve a list of Port Calls
+            Retrieve a list of **Port Calls** that match the specified filter criteria.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -513,7 +564,7 @@ paths:
 
                         GET /port-calls?UNLocationCode=NLAMS
 
-                    **Note:** This will only return **Port Calls** that have not been completed. See endPoint description for a definition of "Completed Port Call".
+                    **Note:** This will only return **Port Calls** that have not been completed. See endPoint description for a definition of "Completed **Port Call**".
                   value:
                     - portCallID: '0342254a-5927-4856-b9c9-aa12e7c00563'
                       UNLocationCode: 'NLAMS'
@@ -553,7 +604,7 @@ paths:
 
                         GET /port-calls?vesselIMONumber=9929429
 
-                    **Note:** This will only return **Port Calls** that have not been completed. See endPoint description for a definition of "Completed Port Call".
+                    **Note:** This will only return **Port Calls** that have not been completed. See endPoint description for a definition of "Completed **Port Call**".
                   value:
                     - portCallID: 'ba78faa2-f50d-49b1-abdf-cecfe4a817da'
                       UNLocationCode: 'NLAMS'
@@ -591,6 +642,10 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -621,6 +676,10 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -633,7 +692,7 @@ paths:
                     Calling the endPoint
 
                         GET /port-calls
-                    
+
                     too many times within a time period results in an error.
 
                     **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
@@ -654,26 +713,29 @@ paths:
       parameters:
         - $ref: '#/components/parameters/terminalCallIDPathParam'
         - $ref: '#/components/parameters/Api-Version-Major'
+        - $ref: '#/components/parameters/Request-Sending-Party'
+        - $ref: '#/components/parameters/Request-Receiving-Party'
       tags:
-        - Port Call Service - Consumer
+        - Port Call Service - Service Consumer
       operationId: put-terminal-call
       summary: Initiates a new or updates a Terminal Call
       description: |
         Creates or updates a **Terminal Call** record. The caller must provide a unique `terminalCallID` (UUIDv4), which identifies the **Terminal Call**. The `terminalCallID` must remain consistent across all subsequent communications and linked **Port Call Services**. If updating an existing **Terminal Call**, e.g. including the `terminalCallReference`, the provided `terminalCallID` must match the existing record.
 
         The **Terminal Call** includes:
-        
+
           - link to the **Port Call** (required): `portCallID`
           - Service information (required): `carrierServiceCode`, `carrierServiceName` (and an optional `universalServiceReference`)
-          - Voyage information: `carrierImportVoyageNumber`, `carrierExportVoyageNumber`, `universalImportVoyageReference` and `universalExportVoyageReference`
-          - terminal information: `terminalCallReference` and `terminalCallSequenceNumber`
+          - Voyage information (optional): `carrierImportVoyageNumber`, `carrierExportVoyageNumber`, `universalImportVoyageReference` and `universalExportVoyageReference`
+          - terminal information (optional): `terminalCallReference` and `terminalCallSequenceNumber`
           - The ability to send the record with informational purpose only, using `isFYI=true`
 
         This call is often provided as the second call from a **Carrier** to a **Terminal** after the creation of the **Port Call** and then sending `ETA-Berth` or `Moves`.
 
         It is not possible to update a **Terminal Call** that has been `OMITTED`.
       requestBody:
-        description: Initiates a new or updates a Terminal Call.
+        description: |
+          Initiates a new or updates a **Terminal Call**.
         required: true
         content:
           application/json:
@@ -684,9 +746,9 @@ paths:
                 summary: |
                   Create a new Terminal Call to be used for an ETA
                 description: |
-                  A new **Terminal Call** linked to a previously created **Port Call** (in this example with `portCallID=0342254a-5927-4856-b9c9-aa12e7c00563`). After this call is accepted by consumer - a **Port Call Service** can be created. In this example no `terminalCallReference` has yet been assigned to the **Terminal Call**.
+                  A new **Terminal Call** linked to a previously created **Port Call** (in this example with `portCallID=0342254a-5927-4856-b9c9-aa12e7c00563`). After this call is accepted by **Service Consumer** - a **Port Call Service** can be created. In this example no `terminalCallReference` has yet been assigned to the **Terminal Call**.
                 value:
-                  terminalCallID: '0342254a-5927-4856-b9c9-aa12e7c00563'
+                  terminalCallID: '085a3207-5e45-49cf-8e1b-f8442beaf545'
                   portCallID: '0342254a-5927-4856-b9c9-aa12e7c00563'
                   terminalCallSequenceNumber: 2
                   carrierServiceName: 'Great Lion Service'
@@ -699,11 +761,11 @@ paths:
                   isFYI: false
               sendFYI:
                 summary: |
-                  Send a FYI to a (secondary) consumer
+                  Send a FYI to a (secondary) Service Consumer
                 description: |
-                  A **Terminal Call** has already been created - now send the **Terminal Call** as a FYI to a (secondary) consumer. In this example all properties are the same as the previous example, except for `isFYI`.
+                  A **Terminal Call** has already been created - now send the **Terminal Call** as a FYI to a (secondary) **Service Consumer**. In this example all properties are the same as the previous example, except for `isFYI`.
                 value:
-                  terminalCallID: '0342254a-5927-4856-b9c9-aa12e7c00563'
+                  terminalCallID: '085a3207-5e45-49cf-8e1b-f8442beaf545'
                   portCallID: '0342254a-5927-4856-b9c9-aa12e7c00563'
                   terminalCallSequenceNumber: 2
                   carrierServiceName: 'Great Lion Service'
@@ -717,16 +779,24 @@ paths:
       responses:
         '204':
           description: |
-            A new or updated Terminal Call successfully accepted by consumer.
+            A new or updated **Terminal Call** successfully accepted by **Service Consumer**.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
         '400':
           description: |
-            In case creating a new **Terminal Call** fails schema validation, a `400` (Bad Request) is returned.
+            In case creating a new **Terminal Call** fails schema validation, or the provided `portCallID` in the payload cannot be found, a `400` (Bad Request) is returned.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -752,28 +822,17 @@ paths:
                         property: 'carrierServiceCode'
                         errorCodeText: 'mandatory property missing'
                         errorCodeMessage: 'carrierServiceCode must be provided as part of a Terminal Call'
-        '404':
-          description: |
-            In case the implementer does not know of the `portCallID` used in the request payload - it is possible for the implementer to reject the request by returning a `404` (Not Found).
-          headers:
-            API-Version:
-              $ref: '#/components/headers/API-Version'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              examples:
                 notFoundExample:
                   summary: |
                     Not Found request
                   description: |
-                    The provided `portCallID` cannot be found.
+                    The provided `portCallID` in the payload cannot be found.
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7006` is just a "random example".
                   value:
                     httpMethod: 'PUT'
                     requestUri: '/terminal-calls/085a3207-5e45-49cf-8e1b-f8442beaf545'
-                    statusCode: 404
+                    statusCode: 400
                     statusCodeText: 'Not Found'
                     statusCodeMessage: 'portCallID not found'
                     providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
@@ -788,6 +847,10 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -818,6 +881,10 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -848,6 +915,10 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -860,7 +931,7 @@ paths:
                     Calling the endPoint
 
                         PUT /terminal-calls/{terminalCallID}
-                    
+
                     too many times within a time period results in an error.
 
                     **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
@@ -881,21 +952,23 @@ paths:
       parameters:
         - $ref: '#/components/parameters/terminalCallIDPathParam'
         - $ref: '#/components/parameters/Api-Version-Major'
+        - $ref: '#/components/parameters/Request-Sending-Party'
+        - $ref: '#/components/parameters/Request-Receiving-Party'
       tags:
-        - Port Call Service - Consumer
+        - Port Call Service - Service Consumer
       operationId: omit-terminal-call
       summary: Omits a Terminal Call
       description: |
-        Allows the provider to `OMIT` a **Terminal Call**, signaling that the **Terminal Call** is no longer going to happen.
+        Allows the **Service Provider** to `OMIT` a **Terminal Call**, signaling that the **Terminal Call** is no longer going to happen.
 
-        When a consumer receives an `OMIT`, it is their responsibility to propagate this information to any secondary receivers, they previously informed using the `isFYI=true` property, while creating **Terminal Calls** or sending related updates. It is also the responsibility of the consumer to **Cancel** any Port Call Services initiated, associated to the **Terminal Call** that is now omitted.
+        When a **Service Consumer** receives an `OMIT`, it is their responsibility to propagate this information to any secondary receivers, they previously informed using the `isFYI=true` property, while creating **Terminal Calls** or sending related updates. It is also the responsibility of the **Service Consumer** to **Cancel** any **Port Call Services** initiated, associated to the **Terminal Call** that is now omitted.
 
-        The provider is responsible for:
+        The **Service Provider** is responsible for:
           - **Cancel** all **Port Call Services** that are associated with the omitted **Terminal Call** (including secondary receivers)
 
-        The consumer is responsible for:
+        The **Service Consumer** is responsible for:
           - propagating the `OMIT` to any secondary receivers
-          - **Cancel** any **Port Call Services** linked to the omitted **Terminal Call** initiated by the consumer
+          - **Cancel** any **Port Call Services** linked to the omitted **Terminal Call** initiated by the **Service Consumer**
 
         Once a **Terminal Call** has been `OMITTED`, this action **CANNOT** be undone. In case the `OMIT` has to be "undone" a new **Terminal Call** must be created with new **Port Call Services**.
       requestBody:
@@ -929,12 +1002,20 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
         '400':
           description: |
             In case omitting a **Terminal Call** does not schema validate, a `400` (Bad Request) is returned.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -962,10 +1043,14 @@ paths:
                         errorCodeMessage: 'isFYI should be a boolean. `12` provided as value'
         '404':
           description: |
-            In case the implementer does not know of the `terminalCallID` used in the request (this could be because of a `PUT` request that has not finished processing or simply because the resource does not exist) - it is possible for the implementer to reject the request by returning a `404` (Not Found).
+            If the implementer does not know the `terminalCallID` path parameter (e.g. the resource does not exist), it is possible for the implementer to reject the request by returning a `404` (Not Found).
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -975,7 +1060,7 @@ paths:
                   summary: |
                     Not Found request
                   description: |
-                    The provided `terminalCallID` cannot be found. This can be because a `PUT` request has not been finished processing or because the `terminalCallID` does not exist in the implementer system.
+                    The provided `terminalCallID` cannot be found. This can be because the `terminalCallID` does not exist in the implementer system.
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7006` is just a "random example".
                   value:
@@ -996,6 +1081,10 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -1026,6 +1115,10 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -1038,7 +1131,7 @@ paths:
                     Calling the endPoint
 
                         POST /terminal-calls/{terminalCallID}/omit
-                    
+
                     too many times within a time period results in an error.
 
                     **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
@@ -1070,6 +1163,8 @@ paths:
         - $ref: '#/components/parameters/universalExportVoyageReferenceQueryParam'
 
         - $ref: '#/components/parameters/Api-Version-Major'
+        - $ref: '#/components/parameters/Request-Sending-Party'
+        - $ref: '#/components/parameters/Request-Receiving-Party'
       tags:
         - Port Call Service
       operationId: get-terminal-call
@@ -1091,15 +1186,15 @@ paths:
 
         The result set of this endPoint will always include **Terminal Calls** that are linked to **Port Calls** that have **not yet been completed**. Definition of a completed **Port Call** is:
         ````
-        A Port Call:
-        - that has a Terminal Call
-        - that has a Port Call Service with: `portCallServiceTypeCode=BERTH` AND `portCallServiceEventTypeCode=DEPA`
-        - that has a Timestamp with: `classifierCode=PLN` AND `dateTime < {now}`
+        A **Port Call**:
+        - that has a **Terminal Call**
+        - that has a **Port Call Service** with: `portCallServiceTypeCode=BERTH` AND `portCallServiceEventTypeCode=DEPA`
+        - that has a **Timestamp** with: `classifierCode=PLN` AND `dateTime < {now}`
         ````
         This can potentially result in empty result sets. **Example:** filtering by `terminalCallID` included in a **Port Call** that has been completed.
 
         Here are some example queries:
-          * To get a specific **Terminal Call** use the `terminalCallID` filter with the ID of the **Terminal Call** to filter by. This results in at most a single object. The response will return an empty array if no **Terminal Call** known by the consumer is linked to the provided `terminalCallID`.
+          * To get a specific **Terminal Call** use the `terminalCallID` filter with the ID of the **Terminal Call** to filter by. This results in at most a single object. The response will return an empty array if no **Terminal Call** known by the **Service Consumer** is linked to the provided `terminalCallID`.
           * To get a list of **Terminal Calls** for a specific Service use the `carrierServiceCode` (or alternatively `carrierServiceName` or `universalServiceReference`) filter with the `carrierServiceCode` of the Service to filter by. This will result in a list of potentially many **Terminal Calls** all of which will be visited by the Vessel with the `vesselIMONumber` specified.
             * If the result set is too large - it is possible to further narrow it down by **also** filtering by a voyage number (`carrierImportVoyageNumber`, `carrierExportVoyageNumber`, `universalImportVoyageReference`, or `universalExportVoyageReference`).
 
@@ -1111,6 +1206,10 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -1155,6 +1254,10 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -1185,6 +1288,10 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -1197,7 +1304,7 @@ paths:
                     Calling the endPoint
 
                         GET /terminal-calls
-                    
+
                     too many times within a time period results in an error.
 
                     **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
@@ -1218,19 +1325,21 @@ paths:
       parameters:
         - $ref: '#/components/parameters/portCallServiceIDPathParam'
         - $ref: '#/components/parameters/Api-Version-Major'
+        - $ref: '#/components/parameters/Request-Sending-Party'
+        - $ref: '#/components/parameters/Request-Receiving-Party'
       tags:
-        - Port Call Service - Consumer
+        - Port Call Service - Service Consumer
       operationId: put-port-call-service
       summary: Initiates a new or updates a Port Call Service
       description: |
         Creates or updates a **Port Call Service** record. The caller must provide a unique `portCallServiceID` (UUIDv4), which identifies the **Port Call Service**. The `portCallServiceID` must remain consistent across all subsequent communications and linked **Timestamps**. If updating an existing **Port Call Service**, e.g. updating the `moves`, the provided `portCallServiceID` must match the existing record.
 
         The **Port Call Service** includes:
-        
+
           - link to the **Terminal Call** (required): `terminalCallID`
           - type of Service (required): `portCallServiceTypeCode` and `portCallServiceEventTypeCode` (and optionally `portCallPhaseTypeCode` and `facilityTypeCode`)
           - a location (required): `portCallServiceLocation`
-          - Moves forecast information: `moves`
+          - Moves forecast information (optional): `moves`
           - The ability to send the record with informational purpose only, using `isFYI=true`
 
         This call is used to initiate a Service linked to a **Terminal Call**. It is used for sending e.g. `ETA-Berth` or `Moves`.
@@ -1244,16 +1353,24 @@ paths:
       responses:
         '204':
           description: |
-            A new Port Call Service accepted
+            A new **Port Call** Service accepted
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
         '400':
           description: |
-            In case creating a new **Port Call Service** fails schema validation, a `400` (Bad Request) is returned.
+            In case creating a new **Port Call Service** fails schema validation, or the referenced `terminalCallID` in the payload does not exist, a `400` (Bad Request) is returned.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -1268,7 +1385,7 @@ paths:
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example".
                   value:
                     httpMethod: 'PUT'
-                    requestUri: '/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545'
+                    requestUri: '/port-call-services/48b971c9-139d-496a-a840-0e07efd46397'
                     statusCode: 400
                     statusCodeText: 'Bad Request'
                     statusCodeMessage: 'portCallServiceTypeCode not found - it is a mandatory property in Port Call Service.'
@@ -1279,28 +1396,17 @@ paths:
                         property: 'portCallServiceTypeCode'
                         errorCodeText: 'mandatory property missing'
                         errorCodeMessage: 'portCallServiceTypeCode must be provided as part of a Port Call Service'
-        '404':
-          description: |
-            In case the implementer does not know of the `terminalCallID` used in the request payload - it is possible for the implementer to reject the request by returning a `404` (Not Found).
-          headers:
-            API-Version:
-              $ref: '#/components/headers/API-Version'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              examples:
                 notFoundExample:
                   summary: |
                     Not Found request
                   description: |
-                    The provided `terminalCallID` cannot be found.
+                    The provided `terminalCallID` in the payload cannot be found.
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7006` is just a "random example".
                   value:
                     httpMethod: 'PUT'
-                    requestUri: '/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545'
-                    statusCode: 404
+                    requestUri: '/port-call-services/48b971c9-139d-496a-a840-0e07efd46397'
+                    statusCode: 400
                     statusCodeText: 'Not Found'
                     statusCodeMessage: 'terminalCallID not found'
                     providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
@@ -1315,6 +1421,10 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -1329,7 +1439,7 @@ paths:
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example".
                   value:
                     httpMethod: 'PUT'
-                    requestUri: '/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545'
+                    requestUri: '/port-call-services/48b971c9-139d-496a-a840-0e07efd46397'
                     statusCode: 409
                     statusCodeText: 'Conflict'
                     statusCodeMessage: 'Trying to update a CANCELLED Port Call Service'
@@ -1345,6 +1455,10 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -1359,7 +1473,7 @@ paths:
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example".
                   value:
                     httpMethod: 'PUT'
-                    requestUri: '/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545'
+                    requestUri: '/port-call-services/48b971c9-139d-496a-a840-0e07efd46397'
                     statusCode: 500
                     statusCodeText: 'Internal Server Error'
                     statusCodeMessage: 'Internal Server Error occurred while processing Port Call Service'
@@ -1375,6 +1489,10 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -1387,13 +1505,13 @@ paths:
                     Calling the endPoint
 
                         PUT /port-call-services/{portCallServiceID}
-                    
+
                     too many times within a time period results in an error.
 
                     **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
                   value:
                     httpMethod: 'PUT'
-                    requestUri: '/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545'
+                    requestUri: '/port-call-services/48b971c9-139d-496a-a840-0e07efd46397'
                     statusCode: 429
                     statusCodeText: 'Too Many Requests'
                     statusCodeMessage: 'Too many requests to create a Port Call Service has been requested. Please try again in 1 hour'
@@ -1407,18 +1525,21 @@ paths:
     post:
       parameters:
         - $ref: '#/components/parameters/portCallServiceIDPathParam'
+        - $ref: '#/components/parameters/Api-Version-Major'
+        - $ref: '#/components/parameters/Request-Sending-Party'
+        - $ref: '#/components/parameters/Request-Receiving-Party'
       tags:
-        - Port Call Service - Consumer
+        - Port Call Service - Service Consumer
       operationId: cancel-port-call-service
       summary: Cancel a Port Call Service
       description: |
-        Provider canceling a **Port Call Service**.
+        **Service Provider** canceling a **Port Call Service**.
 
-        Allows the provider to `CANCEL` a **Port Call Service**, signaling that the **Port Call Service** is no longer going to happen.
+        Allows the **Service Provider** to `CANCEL` a **Port Call Service**, signaling that the **Port Call Service** is no longer going to happen.
 
-        When a consumer receives a `CANCEL`, it is their responsibility to propagate this information to any secondary receivers, they previously informed using the `isFYI=true` property, while creating **Port Call Service** or sending related updates.
+        When a **Service Consumer** receives a `CANCEL`, it is their responsibility to propagate this information to any secondary receivers, they previously informed using the `isFYI=true` property, while creating **Port Call Service** or sending related updates.
 
-        The consumer is responsible for:
+        The **Service Consumer** is responsible for:
           - propagating the `CANCEL` to any secondary receivers
 
         Once a **Port Call Service** has been `CANCELLED`, this action **CANNOT** be undone. In case the `CANCEL` has to be "undone" a new **Port Call Service** must be created.
@@ -1436,12 +1557,20 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
         '400':
           description: |
             In case cancelling a **Port Call Service** fails schema validation, a `400` (Bad Request) is returned.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -1456,7 +1585,7 @@ paths:
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7004` is just a "random example".
                   value:
                     httpMethod: 'POST'
-                    requestUri: '/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545/cancel'
+                    requestUri: '/port-call-services/48b971c9-139d-496a-a840-0e07efd46397/cancel'
                     statusCode: 400
                     statusCodeText: 'Bad Request'
                     statusCodeMessage: 'isFYI has wrong type - boolean expected but integer found'
@@ -1469,10 +1598,14 @@ paths:
                         errorCodeMessage: 'isFYI should be a boolean. `12` provided as value'
         '404':
           description: |
-            In case the implementer does not know of the `portCallServiceID` used in the request (this could be because of a `PUT` request that has not finished processing or simply because the resource does not exist) - it is possible for the implementer to reject the request by returning a `404` (Not Found).
+            If the implementer does not know the `portCallServiceID` path parameter (e.g. the resource does not exist), it is possible for the implementer to reject the request by returning a `404` (Not Found).
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -1482,12 +1615,12 @@ paths:
                   summary: |
                     Not Found request
                   description: |
-                    The provided `portCallServiceID` cannot be found. This can be because a `PUT` request has not been finished processing or because the `portCallServiceID` does not exist in the implementer system.
+                    The provided `portCallServiceID` cannot be found. This can be because the `portCallServiceID` does not exist in the implementer system.
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7006` is just a "random example".
                   value:
                     httpMethod: 'POST'
-                    requestUri: '/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545/cancel'
+                    requestUri: '/port-call-services/48b971c9-139d-496a-a840-0e07efd46397/cancel'
                     statusCode: 404
                     statusCodeText: 'Not Found'
                     statusCodeMessage: 'portCallServiceID not found'
@@ -1503,6 +1636,10 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -1517,7 +1654,7 @@ paths:
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7005` is just a "random example".
                   value:
                     httpMethod: 'POST'
-                    requestUri: '/port-call-services/085a3207-5e45-49cf-8e1b-f8442beaf545/cancel'
+                    requestUri: '/port-call-services/48b971c9-139d-496a-a840-0e07efd46397/cancel'
                     statusCode: 500
                     statusCodeText: 'Internal Server Error'
                     statusCodeMessage: 'Internal Server Error occurred while processing Port Call Service'
@@ -1532,6 +1669,10 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -1544,13 +1685,13 @@ paths:
                     Calling the endPoint
 
                         POST /port-call-services/{portCallServiceID}/cancel
-                    
+
                     too many times within a time period results in an error.
 
                     **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
                   value:
                     httpMethod: 'POST'
-                    requestUri: '/terminal-calls/085a3207-5e45-49cf-8e1b-f8442beaf545/cancel'
+                    requestUri: '/terminal-calls/48b971c9-139d-496a-a840-0e07efd46397/cancel'
                     statusCode: 429
                     statusCodeText: 'Too Many Requests'
                     statusCodeMessage: 'Too many requests to cancel a Port Call Service has been requested. Please try again in 1 hour'
@@ -1569,6 +1710,8 @@ paths:
         - $ref: '#/components/parameters/portCallServiceTypeQueryParam'
 
         - $ref: '#/components/parameters/Api-Version-Major'
+        - $ref: '#/components/parameters/Request-Sending-Party'
+        - $ref: '#/components/parameters/Request-Receiving-Party'
       tags:
         - Port Call Service
       operationId: get-port-call-services
@@ -1582,15 +1725,15 @@ paths:
 
         The result set of this endPoint will always include **Port Call Services** that are linked to **Port Calls** that have **not yet been completed**. Definition of a completed **Port Call** is:
         ````
-        A Port Call:
-        - that has a Terminal Call
-        - that has a Port Call Service with: `portCallServiceTypeCode=BERTH` AND `portCallServiceEventTypeCode=DEPA`
-        - that has a Timestamp with: `classifierCode=PLN` AND `dateTime < {now}`
+        A **Port Call**:
+        - that has a **Terminal Call**
+        - that has a **Port Call Service** with: `portCallServiceTypeCode=BERTH` AND `portCallServiceEventTypeCode=DEPA`
+        - that has a **Timestamp** with: `classifierCode=PLN` AND `dateTime < {now}`
         ````
         This can potentially result in empty result sets. **Example:** filtering by `portCallServiceID` included in a **Port Call** that has been completed.
 
         Here are some example queries:
-          * To get a specific **Port Call Service** use the `portCallServiceID` filter with the ID of the **Port Call Service** to filter by. This results in at most a single object. The response will return an empty array if no **Port Call Service** known by the consumer is linked to the provided `portCallServiceID`.
+          * To get a specific **Port Call Service** use the `portCallServiceID` filter with the ID of the **Port Call Service** to filter by. This results in at most a single object. The response will return an empty array if no **Port Call Service** known by the **Service Consumer** is linked to the provided `portCallServiceID`.
           * To get a list of **Port Call Services** for a specific **Terminal Call** use the `terminalCallID` filter with the `terminalCallID` of the **Terminal Call** to filter by. This will result in a list of potentially many **Port Call Services** all of which will be linked to the **Terminal Call** specified.
 
         **Note:** Beware it is possible to specify filters that exclude all results. Example: if filtering by `portCallServiceID` and a `portCallServiceTypeCode` that does **not** belong to the same `portCallServiceID` - the result set will be an empty list. No error will be reported.
@@ -1601,6 +1744,10 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -1665,6 +1812,10 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -1694,6 +1845,10 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -1706,7 +1861,7 @@ paths:
                     Calling the endPoint
 
                         GET /port-call-services
-                    
+
                     too many times within a time period results in an error.
 
                     **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
@@ -1727,6 +1882,8 @@ paths:
       parameters:
         - $ref: '#/components/parameters/timestampIDPathParam'
         - $ref: '#/components/parameters/Api-Version-Major'
+        - $ref: '#/components/parameters/Request-Sending-Party'
+        - $ref: '#/components/parameters/Request-Receiving-Party'
       tags:
         - Port Call Service
       operationId: put-timestamp
@@ -1735,18 +1892,19 @@ paths:
         Creates or updates a **Timestamp** record. The caller must provide a unique `timestampID` (UUIDv4), which identifies the **Timestamp**. If updating an existing **Timestamp**, e.g. updating the `delayReasonCode`, the provided `timestampID` must match the existing record.
 
         The **Timestamp** includes:
-        
+
           - link to the **Port Call Service** (required): `portCallServiceID`
-          - link to the **Timestamp** it replies to (in case it is not the initial **Timestamp*): `replyToTimestampID`
+          - link to the **Timestamp** it replies to (required in case it is not the initial **Timestamp**): `replyToTimestampID`
           - a `ERP-A` classification (required): `classifierCode`
           - dateTime of the **Timestamp** (required): `dateTime`
           - an updated location (optional only with `REQ`uested **Timestamp**): `portCallServiceLocation`
-          - **Timestamp** information: `delayReasonCode` and `remark`
+          - **Timestamp** information (optional): `delayReasonCode` and `remark`
           - The ability to send the record with informational purpose only, using `isFYI=true`
 
         This call is used to provide a **Timestamp** in an `ERP-A` negotiation (or just an `A` for non-negotiations) for a **Port Call Service**.
       requestBody:
-        description: Any `ERP-A` timestamp
+        description: |
+          Any `ERP-A` **Timestamp**
         required: true
         content:
           application/json:
@@ -1755,16 +1913,24 @@ paths:
       responses:
         '204':
           description: |
-            Timestamp for a **Port Call Service** accepted
+            **Timestamp** for a **Port Call Service** accepted
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
         '400':
           description: |
-            In case creating a new **Timestamp** fails schema validation, a `400` (Bad Request) is returned.
+            In case creating a new **Timestamp** fails schema validation, or the referenced `portCallServiceID` in the payload does not exist, a `400` (Bad Request) is returned.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -1779,7 +1945,7 @@ paths:
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example".
                   value:
                     httpMethod: 'PUT'
-                    requestUri: '/timestamps/085a3207-5e45-49cf-8e1b-f8442beaf545'
+                    requestUri: '/timestamps/d26f740f-9dc3-42af-9277-472f155944e2'
                     statusCode: 400
                     statusCodeText: 'Bad Request'
                     statusCodeMessage: 'classifierCode property not found - it is a mandatory property in Timestamp'
@@ -1790,28 +1956,17 @@ paths:
                         property: 'classifierCode'
                         errorCodeText: 'mandatory property missing'
                         errorCodeMessage: 'classifierCode must be provided as part of a Timestamp'
-        '404':
-          description: |
-            In case the implementer does not know of the `portCallServiceID` used in the request, it is possible for the implementer to reject the request by returning a `404` (Not Found). This could be because of a `PUT` request, for creating/initiating the Port Call Service, that has not finished processing or simply because the resource does not exist.
-          headers:
-            API-Version:
-              $ref: '#/components/headers/API-Version'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              examples:
                 notFoundExample:
                   summary: |
                     Not Found request
                   description: |
-                    The provided `portCallServiceID` cannot be found. This can be because a `PUT` request, for creating/initiating the **Port Call Service**, has not been finished processing or because the `portCallServiceID` does not exist in the implementer system.
+                    The provided `portCallServiceID` cannot be found. This can be because because the `portCallServiceID` does not exist in the implementer system.
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7006` is just a "random example".
                   value:
                     httpMethod: 'PUT'
-                    requestUri: '/timestamps/085a3207-5e45-49cf-8e1b-f8442beaf545'
-                    statusCode: 404
+                    requestUri: '/timestamps/d26f740f-9dc3-42af-9277-472f155944e2'
+                    statusCode: 400
                     statusCodeText: 'Not Found'
                     statusCodeMessage: 'portCallServiceID not found'
                     providerCorrelationReference: '4426d965-0dd8-4005-8c63-dc68b01c4962'
@@ -1826,6 +1981,10 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -1840,7 +1999,7 @@ paths:
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example".
                   value:
                     httpMethod: 'PUT'
-                    requestUri: '/timestamps/085a3207-5e45-49cf-8e1b-f8442beaf545'
+                    requestUri: '/timestamps/d26f740f-9dc3-42af-9277-472f155944e2'
                     statusCode: 409
                     statusCodeText: 'Conflict'
                     statusCodeMessage: 'Trying to link a Timestamp to a CANCELLED Port Call Service'
@@ -1849,13 +2008,17 @@ paths:
                     errors:
                       - errorCode: 7003
                         errorCodeText: 'Linking to a CANCELLED Port Call Service'
-                        errorCodeMessage: Cannot link a Timestamp to a Port Call Service that has been CANCELLED'
+                        errorCodeMessage: 'Cannot link a Timestamp to a Port Call Service that has been CANCELLED'
         '500':
           description: |
             In case a server error occurs in implementer system, a `500` (Internal Server Error) is returned.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -1870,7 +2033,7 @@ paths:
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7005` is just a "random example".
                   value:
                     httpMethod: 'PUT'
-                    requestUri: '/timestamps/085a3207-5e45-49cf-8e1b-f8442beaf545'
+                    requestUri: '/timestamps/d26f740f-9dc3-42af-9277-472f155944e2'
                     statusCode: 500
                     statusCodeText: 'Internal Server Error'
                     statusCodeMessage: 'Internal Server Error occurred while processing Timestamp'
@@ -1886,6 +2049,10 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -1898,13 +2065,13 @@ paths:
                     Calling the endPoint
 
                         PUT /timestamps/{timestampID}
-                    
+
                     too many times within a time period results in an error.
 
                     **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
                   value:
                     httpMethod: 'PUT'
-                    requestUri: '/timestamps/085a3207-5e45-49cf-8e1b-f8442beaf545'
+                    requestUri: '/timestamps/d26f740f-9dc3-42af-9277-472f155944e2'
                     statusCode: 429
                     statusCodeText: 'Too Many Requests'
                     statusCodeMessage: 'Too many requests to create a Timestamp has been requested. Please try again in 1 hour'
@@ -1922,6 +2089,8 @@ paths:
         - $ref: '#/components/parameters/classifierCodeQueryParam'
 
         - $ref: '#/components/parameters/Api-Version-Major'
+        - $ref: '#/components/parameters/Request-Sending-Party'
+        - $ref: '#/components/parameters/Request-Receiving-Party'
       tags:
         - Port Call Service
       operationId: get-timestamp
@@ -1935,15 +2104,15 @@ paths:
 
         The result set of this endPoint will always include **Timestamps** that are linked to **Port Calls** that have **not yet been completed**. Definition of a completed **Port Call** is:
         ````
-        A Port Call:
-        - that has a Terminal Call
-        - that has a Port Call Service with: `portCallServiceTypeCode=BERTH` AND `portCallServiceEventTypeCode=DEPA`
-        - that has a Timestamp with: `classifierCode=PLN` AND `dateTime < {now}`
+        A **Port Call**:
+        - that has a **Terminal Call**
+        - that has a **Port Call Service** with: `portCallServiceTypeCode=BERTH` AND `portCallServiceEventTypeCode=DEPA`
+        - that has a **Timestamp** with: `classifierCode=PLN` AND `dateTime < {now}`
         ````
         This can potentially result in empty result sets. **Example:** filtering by `timestampID` included in a **Port Call** that has been completed.
 
         Here are some example queries:
-          * To get a specific **Timestamp** use the `timestampID` filter with the ID of the **Timestamp** to filter by. This results in at most a single object. The response will return an empty array if no **Timestamp** known by the consumer is linked to the provided `timestampID`.
+          * To get a specific **Timestamp** use the `timestampID` filter with the ID of the **Timestamp** to filter by. This results in at most a single object. The response will return an empty array if no **Timestamp** known by the **Service Consumer** is linked to the provided `timestampID`.
           * To get a list of **Timestamps** for a specific **Port Call Service** use the `portCallServiceID` filter with the `portCallServiceID` of the **Port Call Service** to filter by. This will result in a list of potentially many **Timestamps** all of which will be linked to the **Port Call Service** specified.
 
         **Note:** Beware it is possible to specify filters that exclude all results. Example: if filtering by `timestampID` and a `classifierCode` that does **not** belong to the same `timestampID` - the result set will be an empty list. No error will be reported.
@@ -1954,6 +2123,10 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -1989,6 +2162,10 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -2019,6 +2196,10 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -2031,7 +2212,7 @@ paths:
                     Calling the endPoint
 
                         GET /timestamps
-                    
+
                     too many times within a time period results in an error.
 
                     **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
@@ -2052,17 +2233,19 @@ paths:
       parameters:
         - $ref: '#/components/parameters/portCallServiceIDPathParam'
         - $ref: '#/components/parameters/Api-Version-Major'
+        - $ref: '#/components/parameters/Request-Sending-Party'
+        - $ref: '#/components/parameters/Request-Receiving-Party'
       tags:
-        - Port Call Service - Consumer
+        - Port Call Service - Service Consumer
       operationId: put-vessel-status
       summary: Send Vessel Status for a Port Call Service
       description: |
         Updates a **Vessel Status** record for a **Port Call Service**. The caller must provide a `portCallServiceID` (UUIDv4), which identifies the **Port Call Service** to update.
 
         The **Vessel Status** includes:
-        
+
           - link to the **Port Call Service** (required): `portCallServiceID`
-          - dynamic information about a **Vessel**: `draft`, `airDraft`, `aftDraft`, `forwardDraft`, `vesselPosition` and `milesToDestinationPort` 
+          - dynamic information about a **Vessel** (optional): `draft`, `airDraft`, `aftDraft`, `forwardDraft`, `vesselPosition` and `milesToDestinationPort`
           - The ability to send the record with informational purpose only, using `isFYI=true`
 
         This call is used to provide a **Vessel Status** (dynamic Vessel information) for a Vessel connected to a **Port Call Service**. It is up to the implementer if "new" records are stored every time this endPoint is called or the same record is updated.
@@ -2080,12 +2263,20 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
         '400':
           description: |
             In case updating a **Vessel Status** fails schema validation, a `400` (Bad Request) is returned.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -2113,10 +2304,14 @@ paths:
                         errorCodeMessage: 'portCallServiceID must be provided as part of a Vessel Status'
         '404':
           description: |
-            In case the implementer does not know of the `portCallServiceID` used in the request, it is possible for the implementer to reject the request by returning a `404` (Not Found). This could be because of a `PUT` request, for creating/initiating the Port Call Service, that has not finished processing or simply because the resource does not exist.
+            If the implementer does not know the `portCallServiceID` path parameter (e.g. the resource does not exist), it is possible for the implementer to reject the request by returning a `404` (Not Found).
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -2126,7 +2321,7 @@ paths:
                   summary: |
                     Not Found request
                   description: |
-                    The provided `portCallServiceID` cannot be found. This can be because a `PUT` request, for creating/initiating the **Port Call Service**, has not been finished processing or because the `portCallServiceID` does not exist in the implementer system.
+                    The provided `portCallServiceID` cannot be found. This can be because the `portCallServiceID` does not exist in the implementer system.
 
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7006` is just a "random example".
                   value:
@@ -2147,6 +2342,10 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -2177,6 +2376,10 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -2207,6 +2410,10 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -2219,7 +2426,7 @@ paths:
                     Calling the endPoint
 
                         PUT /vessel-status/{portCallStatusID}
-                    
+
                     too many times within a time period results in an error.
 
                     **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
@@ -2240,6 +2447,8 @@ paths:
       parameters:
         - $ref: '#/components/parameters/portCallServiceIDRequiredQueryParam'
         - $ref: '#/components/parameters/Api-Version-Major'
+        - $ref: '#/components/parameters/Request-Sending-Party'
+        - $ref: '#/components/parameters/Request-Receiving-Party'
       tags:
         - Port Call Service
       operationId: get-vessel-status
@@ -2249,16 +2458,16 @@ paths:
 
         The result set of this endPoint will always include **Vessel Statuses** that are linked to **Port Calls** that have **not yet been completed**. Definition of a completed **Port Call** is:
         ````
-        A Port Call:
-        - that has a Terminal Call
-        - that has a Port Call Service with: `portCallServiceTypeCode=BERTH` AND `portCallServiceEventTypeCode=DEPA`
-        - that has a Timestamp with: `classifierCode=PLN` AND `dateTime < {now}`
+        A **Port Call**:
+        - that has a **Terminal Call**
+        - that has a **Port Call Service** with: `portCallServiceTypeCode=BERTH` AND `portCallServiceEventTypeCode=DEPA`
+        - that has a **Timestamp** with: `classifierCode=PLN` AND `dateTime < {now}`
         ````
         This can potentially result in empty result sets. **Example:** filtering by `portCallServiceID` included in a **Port Call** that has been completed.
 
         Here is an example query:
           * To get a list of **Vessel Statuses** for a specific **Port Call Service** use the `portCallServiceID` filter with the `portCallServiceID` of the **Port Call Service** to filter by. This will result in a list of potentially many **Vessel Statuses** all of which will be linked to the **Port Call Service** specified.
-        
+
         The implementation of the **Vessel Status** allows for two possible approaches: it can either be a list with a single object that is updated each time the **Vessel Status** is sent, or it can be a list of **Vessel Status** updates. If multiple **Vessel Status** updates are included in the response, the result set must be sorted, with the newest update appearing at the top of the list and the oldest at the bottom.
       responses:
         '200':
@@ -2267,6 +2476,10 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -2312,6 +2525,10 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -2342,6 +2559,10 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -2354,7 +2575,7 @@ paths:
                     Calling the endPoint
 
                         GET /vessel-statuses
-                    
+
                     too many times within a time period results in an error.
 
                     **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
@@ -2375,23 +2596,26 @@ paths:
       parameters:
         - $ref: '#/components/parameters/portCallServiceIDPathParam'
         - $ref: '#/components/parameters/Api-Version-Major'
+        - $ref: '#/components/parameters/Request-Sending-Party'
+        - $ref: '#/components/parameters/Request-Receiving-Party'
       tags:
-        - Port Call Service - Provider
+        - Port Call Service - Service Provider
       operationId: decline-port-call-service
       summary: Decline a Port Call service
       description: |
-        Consumer declining a **Port Call Service**.
+        **Service Consumer** declining a **Port Call Service**.
 
-        Allows the consumer to `DECLINE` a **Port Call Service**, signaling that the **Port Call Service** is no longer going to happen.
+        Allows the **Service Consumer** to `DECLINE` a **Port Call Service**, signaling that the **Port Call Service** is no longer going to happen.
 
-        When a provider receives a `DECLINE`, it is their responsibility to propagate this information to any secondary receivers, they previously informed using the `isFYI=true` property, while creating **Port Call Service** or sending related updates.
+        When a **Service Provider** receives a `DECLINE`, it is their responsibility to propagate this information to any secondary receivers, they previously informed using the `isFYI=true` property, while creating **Port Call Service** or sending related updates.
 
-        The provider is responsible for:
+        The **Service Provider** is responsible for:
           - propagating the `DECLINE` to any secondary receivers
 
-        Once a **Port Call Service** has been `DECLINED`, this action **CANNOT** be undone. In case the `DECLINE` has to be "undone" a **provider** must create a new **Port Call Service**.
+        Once a **Port Call Service** has been `DECLINED`, this action **CANNOT** be undone. In case the `DECLINE` has to be "undone" a **Service Provider** must create a new **Port Call Service**.
       requestBody:
-        description: Consumer declining a **Port Call service**
+        description: |
+          **Service Consumer** declining a **Port Call service**
         required: true
         content:
           application/json:
@@ -2404,12 +2628,20 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
         '400':
           description: |
             In case declining a **Port Call Service** fails schema validation, a `400` (Bad Request) is returned.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -2437,10 +2669,14 @@ paths:
                         errorCodeMessage: 'isFYI should be a boolean. `12` provided as value'
         '404':
           description: |
-            In case the implementer does not know of the `portCallServiceID` used in the request (this could be because the resource does not exist) - it is possible for the implementer to reject the request by returning a `404` (Not Found).
+            If the implementer does not know the `portCallServiceID` path parameter (e.g. the resource does not exist), it is possible for the implementer to reject the request by returning a `404` (Not Found).
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -2471,6 +2707,10 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -2500,6 +2740,10 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+            Response-Sending-Party:
+              $ref: '#/components/headers/Response-Sending-Party'
+            Response-Receiving-Party:
+              $ref: '#/components/headers/Response-Receiving-Party'
           content:
             application/json:
               schema:
@@ -2512,7 +2756,7 @@ paths:
                     Calling the endPoint
 
                         POST /port-call-services/{portCallServiceID}/decline
-                    
+
                     too many times within a time period results in an error.
 
                     **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
@@ -2536,6 +2780,23 @@ components:
         example: 2.0.0
       description: |
         SemVer used to indicate the version of the contract (API version) returned.
+      required: true
+    Response-Sending-Party:
+      required: false
+      schema:
+        type: string
+        maxLength: 4096
+        example: 'Terminal-456'
+      description: |
+        When communicating through an optional system that acts as an application level JIT communication proxy, forwarding API calls between JIT **Service Providers** and JIT **Service Consumers**, the API server sets this response header to identify itself to the JIT proxy and to the API client as the original sending party of the API response. The value of this response header must be the same as the value of the request header `Request-Receiving-Party`. The assignment of party identifiers by the JIT proxy and the distribution of identifiers to the parties connecting through the JIT proxy are out of scope.
+    Response-Receiving-Party:
+      required: false
+      schema:
+        type: string
+        maxLength: 4096
+        example: 'Carrier-123'
+      description: |
+        When communicating through an optional system that acts as an application level JIT communication proxy, forwarding API calls between JIT **Service Providers** and JIT **Service Consumers**, the API server sets this response header to identify to the JIT proxy the target receiving party of the API response. The value of this response header must be the same as the value of the request header `Request-Sending-Party`. The assignment of party identifiers by the JIT proxy and the distribution of identifiers to the parties connecting through the JIT proxy are out of scope.
   parameters:
     Api-Version-Major:
       in: header
@@ -2546,6 +2807,26 @@ components:
         example: '2'
       description: |
         An API-Version header **MAY** be added to the request (optional); if added it **MUST** only contain **MAJOR** version. API-Version header **MUST** be aligned with the URI version.
+    Request-Sending-Party:
+      in: header
+      name: Request-Sending-Party
+      required: false
+      schema:
+        type: string
+        maxLength: 4096
+        example: 'Carrier-123'
+      description: |
+         When communicating through an optional system that acts as an application level JIT communication proxy, forwarding API calls between JIT **Service Providers** and JIT **Service Consumers**, the API client sets this request header to identify itself to the JIT proxy and to the API server as the original sending party of the API request. The assignment of party identifiers by the JIT proxy and the distribution of identifiers to the parties connecting through the JIT proxy are out of scope.
+    Request-Receiving-Party:
+      in: header
+      name: Request-Receiving-Party
+      required: false
+      schema:
+        type: string
+        maxLength: 4096
+        example: 'Terminal-456'
+      description: |
+        When communicating through an optional system that acts as an application level JIT communication proxy, forwarding API calls between JIT **Service Providers** and JIT **Service Consumers**, the API client sets this request header to identify to the JIT proxy the target receiving party of the API request. The assignment of party identifiers by the JIT proxy and the distribution of identifiers to the parties connecting through the JIT proxy are out of scope.
     ##############
     # Query params
     ##############
@@ -2556,7 +2837,7 @@ components:
       in: query
       name: portCallID
       description: |
-        The **Port Call Identifier** to filter by. Specifying this filter will ensure that the result set contains only objects where the `portCallID` property is present and its value matches one of the values of the corresponding filter query parameter.
+        The **Port Call Identifier** to filter by. Specifying this filter will ensure that the result set contains only objects matching the `portCallID` filter.
       schema:
         type: string
         format: uuid
@@ -2565,7 +2846,7 @@ components:
       in: query
       name: terminalCallID
       description: |
-        The **Terminal Call Identifier** to filter by. Specifying this filter will ensure that the result set contains only objects where the `terminalCallID` property is present and its value matches one of the values of the corresponding filter query parameter.
+        The **Terminal Call Identifier** to filter by. Specifying this filter will ensure that the result set contains only objects matching the `terminalCallID` filter.
       schema:
         type: string
         format: uuid
@@ -2574,7 +2855,7 @@ components:
       in: query
       name: portCallServiceID
       description: |
-        The **Port Call Service Identifier** to filter by. Specifying this filter will ensure that the result set contains only objects where the `portCallServiceID` property is present and its value matches one of the values of the corresponding filter query parameter.
+        The **Port Call Service Identifier** to filter by. Specifying this filter will ensure that the result set contains only objects matching the `portCallServiceID` filter.
       schema:
         type: string
         format: uuid
@@ -2583,7 +2864,7 @@ components:
       in: query
       name: portCallServiceID
       description: |
-        The **Port Call Service Identifier** to filter by. Specifying this filter will ensure that the result set contains only objects where the `portCallServiceID` property is present and its value matches one of the values of the corresponding filter query parameter.
+        The **Port Call Service Identifier** to filter by. Specifying this filter will ensure that the result set contains only objects matching the `portCallServiceID` filter.
       required: true
       schema:
         type: string
@@ -2592,11 +2873,11 @@ components:
 
     # Port Call query parameters
 
-    UNLocationCodeQueryParameter:
+    UNLocationCodeQueryParam:
       in: query
       name: UNLocationCode
       description: |
-        The **UN Location Code** specifying where a port is located. Specifying this filter will ensure that the result set contains only objects where the `UNLocationCode` property is present and its value matches one of the values of the corresponding filter query parameter.
+        The **UN Location Code** specifying where a port is located. Specifying this filter will ensure that the result set contains only objects matching the `UNLocationCode` filter.
       schema:
         type: string
         pattern: ^[A-Z]{2}[A-Z2-9]{3}$
@@ -2607,7 +2888,7 @@ components:
       in: query
       name: portVisitReference
       description: |
-        The **Port Visit Reference** to filter by. Specifying this filter will ensure that the result set contains only objects where the `portVisitReference` property is present and its value matches one of the values of the corresponding filter query parameter.
+        The **Port Visit Reference** to filter by. Specifying this filter will ensure that the result set contains only objects matching the `portVisitReference` filter.
       schema:
         type: string
         maxLength: 50
@@ -2616,7 +2897,7 @@ components:
       in: query
       name: carrierServiceName
       description: |
-        The **Carrier specific Service Name** to filter by. Specifying this filter will ensure that the result set contains only objects where the `carrierServiceName` property is present and its value matches one of the values of the corresponding filter query parameter.
+        The **Carrier specific Service Name** to filter by. Specifying this filter will ensure that the result set contains only objects matching the `carrierServiceName` filter.
       schema:
         type: string
         maxLength: 50
@@ -2626,7 +2907,7 @@ components:
       in: query
       name: carrierServiceCode
       description: |
-        The **Carrier specific Service Code** to filter by. Specifying this filter will ensure that the result set contains only objects where the `carrierServiceCode` property is present and its value matches one of the values of the corresponding filter query parameter.
+        The **Carrier specific Service Code** to filter by. Specifying this filter will ensure that the result set contains only objects matching the `carrierServiceCode` filter.
       schema:
         type: string
         maxLength: 11
@@ -2636,7 +2917,7 @@ components:
       in: query
       name: universalServiceReference
       description: |
-        The **Universal Service Reference** (`USR`) as defined by DCSA to filter by. Specifying this filter will ensure that the result set contains only objects where the `universalServiceReference` property is present and its value matches one of the values of the corresponding filter query parameter.
+        The **Universal Service Reference** (`USR`) as defined by DCSA to filter by. Specifying this filter will ensure that the result set contains only objects matching the `universalServiceReference` filter.
       schema:
         type: string
         pattern: ^SR\d{5}[A-Z]$
@@ -2650,7 +2931,7 @@ components:
       in: query
       name: terminalCallReference
       description: |
-        The **Terminal Call Reference** to filter by. Specifying this filter will ensure that the result set contains only objects where the `terminalCallReference` property is present and its value matches one of the values of the corresponding filter query parameter.
+        The **Terminal Call Reference** to filter by. Specifying this filter will ensure that the result set contains only objects matching the `terminalCallReference` filter.
       schema:
         type: string
         maxLength: 100
@@ -2659,7 +2940,7 @@ components:
       in: query
       name: carrierImportVoyageNumber
       description: |
-        The **Carrier Import Voyage Number** to filter by. Specifying this filter will ensure that the result set contains only objects where the `carrierImportVoyageNumber` property is present and its value matches one of the values of the corresponding filter query parameter.
+        The **Carrier Import Voyage Number** to filter by. Specifying this filter will ensure that the result set contains only objects matching the `carrierImportVoyageNumber` filter.
       schema:
         type: string
         maxLength: 50
@@ -2669,7 +2950,7 @@ components:
       in: query
       name: carrierExportVoyageNumber
       description: |
-        The **Carrier Export Voyage Number** to filter by. Specifying this filter will ensure that the result set contains only objects where the `carrierExportVoyageNumber` property is present and its value matches one of the values of the corresponding filter query parameter.
+        The **Carrier Export Voyage Number** to filter by. Specifying this filter will ensure that the result set contains only objects matching the `carrierExportVoyageNumber` filter.
       schema:
         type: string
         maxLength: 50
@@ -2679,7 +2960,7 @@ components:
       in: query
       name: universalImportVoyageReference
       description: |
-        The **Universal Import Voyage Reference** to filter by. Specifying this filter will ensure that the result set contains only objects where the `universalImportVoyageReference` property is present and its value matches one of the values of the corresponding filter query parameter.
+        The **Universal Import Voyage Reference** to filter by. Specifying this filter will ensure that the result set contains only objects matching the `universalImportVoyageReference` filter.
       schema:
         type: string
         pattern: ^\d{2}[0-9A-Z]{2}[NEWSR]$
@@ -2690,7 +2971,7 @@ components:
       in: query
       name: universalExportVoyageReference
       description: |
-        The **Universal Export Voyage Reference** to filter by. Specifying this filter will ensure that the result set contains only objects where the `universalExportVoyageReference` property is present and its value matches one of the values of the corresponding filter query parameter.
+        The **Universal Export Voyage Reference** to filter by. Specifying this filter will ensure that the result set contains only objects matching the `universalExportVoyageReference` filter.
       schema:
         type: string
         pattern: ^\d{2}[0-9A-Z]{2}[NEWSR]$
@@ -2704,7 +2985,7 @@ components:
       in: query
       name: portCallServiceTypeCode
       description: |
-        The **Port Call Service Type** to filter by. Specifying this filter will ensure that the result set contains only objects where the `portCallServiceTypeCode` property is present and its value matches one of the values of the corresponding filter query parameter.
+        The **Port Call Service Type** to filter by. Specifying this filter will ensure that the result set contains only objects matching the `portCallServiceTypeCode` filter.
       schema:
         type: string
         maxLength: 50
@@ -2717,7 +2998,7 @@ components:
       in: query
       name: vesselIMONumber
       description: |
-        The **Vessel IMO Number** to filter by. Specifying this filter will ensure that the result set contains only objects where the `vesselIMONumber` property is present and its value matches one of the values of the corresponding filter query parameter.
+        The **Vessel IMO Number** to filter by. Specifying this filter will ensure that the result set contains only objects matching the `vesselIMONumber` filter.
       schema:
         type: string
         pattern: ^\d{7,8}$
@@ -2728,7 +3009,7 @@ components:
       in: query
       name: vesselName
       description: |
-        The **Vessel Name** to filter by. Specifying this filter will ensure that the result set contains only objects where the `vesselName` property is present and its value matches one of the values of the corresponding filter query parameter.
+        The **Vessel Name** to filter by. Specifying this filter will ensure that the result set contains only objects matching the `vesselName` filter.
       schema:
         type: string
         pattern: ^\S(?:.*\S)?$
@@ -2738,7 +3019,7 @@ components:
       in: query
       name: MMSINumber
       description: |
-        The **MMSI Number** to filter by. Specifying this filter will ensure that the result set contains only objects where the `MMSINumber` property is present and its value matches one of the values of the corresponding filter query parameter.
+        The **MMSI Number** to filter by. Specifying this filter will ensure that the result set contains only objects matching the `MMSINumber` filter.
       schema:
         type: string
         pattern: ^\d{9}$
@@ -2751,7 +3032,7 @@ components:
       in: query
       name: timestampID
       description: |
-        The **Timestamp Identifier** to filter by. Specifying this filter will ensure that the result set contains only objects where the `timestampID` property is present and its value matches one of the values of the corresponding filter query parameter.
+        The **Timestamp Identifier** to filter by. Specifying this filter will ensure that the result set contains only objects matching the `timestampID` filter.
       schema:
         type: string
         format: uuid
@@ -2760,7 +3041,7 @@ components:
       in: query
       name: classifierCode
       description: |
-        The **Classifier Code** to filter by. Specifying this filter will ensure that the result set contains only objects where the `classifierCode` property is present and its value matches one of the values of the corresponding filter query parameter.
+        The **Classifier Code** to filter by. Specifying this filter will ensure that the result set contains only objects matching the `classifierCode` filter.
       schema:
         type: string
         enum:
@@ -2777,7 +3058,7 @@ components:
       in: path
       name: portCallServiceID
       description: |
-        The provider created identifier for the **Port Call Service**.
+        The **Service Provider** created identifier for the **Port Call Service**.
       schema:
         type: string
         format: uuid
@@ -2787,7 +3068,7 @@ components:
       in: path
       name: portCallID
       description: |
-        The provider created identifier for the **Port Call**.
+        The **Service Provider** created identifier for the **Port Call**.
       schema:
         type: string
         format: uuid
@@ -2797,7 +3078,7 @@ components:
       in: path
       name: terminalCallID
       description: |
-        The provider created identifier for the **Terminal Call**.
+        The **Service Provider** created identifier for the **Terminal Call**.
       schema:
         type: string
         format: uuid
@@ -2807,7 +3088,7 @@ components:
       in: path
       name: timestampID
       description: |
-        The provider or consumer created identifier for the **Timestamp**.
+        The Service **Service Provider** or **Service Consumer** created identifier for the **Timestamp**.
       schema:
         type: string
         format: uuid
@@ -2834,7 +3115,7 @@ components:
           type: string
           format: uuid
           description: |
-            Universal unique identifier for the **Port call**. The `portCallID` is created by the provider. The `portCallID` **MUST** only be created once per **Port Call**. To be used in all communication regarding the **Port Call**.
+            Universal unique identifier for the **Port call**. The `portCallID` is created by the **Service Provider**. The `portCallID` **MUST** only be created once per **Port Call**. To be used in all communication regarding the **Port Call**.
           example: 0342254a-5927-4856-b9c9-aa12e7c00563
         portVisitReference:
           type: string
@@ -2896,13 +3177,13 @@ components:
           type: string
           format: uuid
           description: |
-            Universal unique identifier for the **Terminal Call**. The `terminalCallID` is created by the provider. The `terminalCallID` **MUST** only be created once per **Terminal Call**. To be used in all communication regarding the **Terminal Call**.
+            Universal unique identifier for the **Terminal Call**. The `terminalCallID` is created by the **Service Provider**. The `terminalCallID` **MUST** only be created once per **Terminal Call**. To be used in all communication regarding the **Terminal Call**.
           example: 0342254a-5927-4856-b9c9-aa12e7c00563
         portCallID:
           type: string
           format: uuid
           description: |
-            Universal unique identifier for the **Port call**. The `portCallID` is created by the provider. The `portCallID` **MUST** only be created once per **Port Call**. To be used in all communication regarding the **Port Call**.
+            Universal unique identifier for the **Port call**. The `portCallID` is created by the **Service Provider**. The `portCallID` **MUST** only be created once per **Port Call**. To be used in all communication regarding the **Port Call**.
           example: 0342254a-5927-4856-b9c9-aa12e7c00563
         terminalCallReference:
           type: string
@@ -3018,13 +3299,13 @@ components:
           type: string
           format: uuid
           description: |
-            Universal unique identifier for the **Terminal Call**. The `terminalCallID` is created by the provider. The `terminalCallID` **MUST** only be created once per **Terminal Call**. To be used in all communication regarding the **Terminal Call**.
+            Universal unique identifier for the **Terminal Call**. The `terminalCallID` is created by the **Service Provider**. The `terminalCallID` **MUST** only be created once per **Terminal Call**. To be used in all communication regarding the **Terminal Call**.
           example: 0342254a-5927-4856-b9c9-aa12e7c00563
         portCallServiceID:
           type: string
           format: uuid
           description: |
-            Universal unique identifier for the **Port Call Service**. The `portCallServiceID` is created by the provider. To be used in all communication regarding the **Port Call Service** (i.e. sending a timestamp with the timestamps endpoint).
+            Universal unique identifier for the **Port Call Service**. The `portCallServiceID` is created by the **Service Provider**. To be used in all communication regarding the **Port Call Service** (i.e. sending a **Timestamp** with the timestamps endpoint).
           example: 0342254a-5927-4856-b9c9-aa12e7c00563
         portCallServiceTypeCode:
           type: string
@@ -3209,14 +3490,14 @@ components:
           readOnly: true
           default: false
           description: |
-            The **Port Call Service** has been `cancelled` by the Provider.
+            The **Port Call Service** has been `cancelled` by the **Service Provider**.
           example: false
         declined:
           type: boolean
           readOnly: true
           default: false
           description: |
-            The **Port Call Service** has been `declined` by the Consumer.
+            The **Port Call Service** has been `declined` by the **Service Consumer**.
           example: false
         isFYI:
           type: boolean
@@ -3268,12 +3549,12 @@ components:
           type: string
           format: uuid
           description: |
-            Links the timestamp to a **Port Call Service**.
+            Links the **Timestamp** to a **Port Call Service**.
           example: 0342254a-5927-4856-b9c9-aa12e7c00563
         classifierCode:
           type: string
           description: |
-            Code for describing the timestamp.
+            Code for describing the **Timestamp**.
 
             Possible values are:
             - `ACT` (Actual)
@@ -3282,8 +3563,8 @@ components:
             - `REQ` (Requested)
 
             **Conditions:**
-            - `EST`, `PLN` and `ACT` can **only** be used by the **provider** when sending a **Timestamp** to the **consumer**.
-            - `REQ` is **only** to be used by the **consumer** when sending a **Timestamp** to the **provider**.
+            - `EST`, `PLN` and `ACT` can **only** be used by the **Service Provider** when sending a **Timestamp** to the **Service Consumer**.
+            - `REQ` is **only** to be used by the **Service Consumer** when sending a **Timestamp** to the **Service Provider**.
             - `ACT` can be used in a **Timestamp** for any **Port Call Service** except `portCallServiceTypeCode='MOVES'`
             - `EST`, `REQ`and `PLN` can be used in a **Timestamp** for any **Port Call Service** with `portCallServiceTypeCode` having one of the following values:
               - `BERTH` (Berth)
@@ -3393,7 +3674,7 @@ components:
             The unit of measure which can be expressed in
             - `MTR` (Meter)
             - `FOT` (Foot)
-            
+
             **Condition:** Mandatory to provide if `lengthOverall` or `width` is provided.
           enum:
             - MTR
@@ -3455,7 +3736,7 @@ components:
           type: string
           format: uuid
           description: |
-            Universal unique identifier for the **Port Call Service**. The `portCallServiceID` is created by the provider. To be used in all communication regarding the **Port Call Service** (i.e. sending a timestamp with the timestamps endpoint).
+            Universal unique identifier for the **Port Call Service**. The `portCallServiceID` is created by the **Service Provider**. To be used in all communication regarding the **Port Call Service** (i.e. sending a **Vessel Status** with the vessel-status endpoint).
           example: 0342254a-5927-4856-b9c9-aa12e7c00563
         draft:
           type: number
@@ -3495,7 +3776,7 @@ components:
             The unit of measure which can be expressed in
             - `MTR` (Meter)
             - `FOT` (Foot)
-            
+
             **Condition:** Mandatory to provide if `draft`, `airDraft`, `aftDraft` or `forwardDraft` is provided.
           enum:
             - MTR
@@ -3621,7 +3902,7 @@ components:
 
         **Conditions:**
         - It is expected that if a location is specified in multiple ways (e.g. both as a `facility` and as a `geoCoordinate`) that both ways point to the same location.
-        - this property is **only** to be used in combination with `classifierCode=REQ` (a requested **Timestamp**) and can only be used by a **consumer**
+        - this property is **only** to be used in combination with `classifierCode=REQ` (a requested **Timestamp**) and can only be used by a **Service Consumer**
       example:
         locationName: CMP Container Terminal Copenhagen
         UNLocationCode: DKCPH
@@ -3679,7 +3960,7 @@ components:
         facilityCodeListProvider:
           type: string
           description: |
-            The provider used for identifying the facility Code. Some facility codes are only defined in combination with an **UN Location Code**
+            The **Service Provider** used for identifying the facility Code. Some facility codes are only defined in combination with an **UN Location Code**
             - `BIC` (Requires a UN Location Code)
             - `SMDG` (Requires a UN Location Code)
           enum:
@@ -3727,7 +4008,7 @@ components:
       type: object
       title: Cancel
       description: |
-        Used by provider to cancel a **Port Call Service**.
+        Used by **Service Provider** to cancel a **Port Call Service**.
       properties:
         reason:
           type: string
@@ -3749,7 +4030,7 @@ components:
       type: object
       title: Decline
       description: |
-        Used by consumer to decline a **Port Call Service**.
+        Used by **Service Consumer** to decline a **Port Call Service**.
       properties:
         reason:
           type: string
@@ -3771,7 +4052,7 @@ components:
       type: object
       title: Omit Port Call
       description: |
-        Used by consumer to omit a **Port Call**.
+        Used by **Service Consumer** to omit a **Port Call**.
       properties:
         reason:
           type: string
@@ -3790,7 +4071,7 @@ components:
       type: object
       title: Omit Terminal Call
       description: |
-        Used by consumer to omit a **Terminal Call**.
+        Used by **Service Consumer** to omit a **Terminal Call**.
       properties:
         reason:
           type: string
@@ -3822,7 +4103,7 @@ components:
 
         ### Multiple Moves Objects with Carrier Codes
         If `carrierCode` and `carrierCodeListProvider` are provided for multiple **Moves** objects, any object without these fields represents the accumulated result of moves for the remaining VSA partners in the vessel.
-        
+
         ### Single Moves Object Without Carrier Codes
         If only one **Moves** object exists and does not include `carrierCode` and `carrierCodeListProvider`, it represents the accumulated result for all VSA partners on the vessel.
 
@@ -3841,7 +4122,7 @@ components:
             **Condition:** Mandatory if `carrierCodeListProvider` is provided.
 
             **Condition:** If there are multiple `moves` objects, there can be a maximum of only one `moves` object without a `carrierCode`.
-            
+
             **Condition:** If there are multiple `moves` objects, a `carrierCode` MUST NOT be repeated.
           maxLength: 4
           pattern: ^\S+$
@@ -3849,7 +4130,7 @@ components:
         carrierCodeListProvider:
           type: string
           description: |
-            Identifies the code list provider used for the `carrierCode`. Possible values are:
+            Identifies the code list **Service Provider** used for the `carrierCode`. Possible values are:
               - `SMDG` (Ship Message Design Group)
               - `NMFTA` (National Motor Freight Traffic Association)
 
@@ -4120,7 +4401,7 @@ components:
             - POST
             - PUT
             - DELETE
-            - OPTION
+            - OPTIONS
             - PATCH
         requestUri:
           description: |
@@ -4185,7 +4466,7 @@ components:
 
               - `7000-7999` Technical error codes
               - `8000-8999` Functional error codes
-              - `9000-9999` API provider-specific error codes            
+              - `9000-9999` API provider-specific error codes
 
             [Error codes as specified by DCSA](https://developer.dcsa.org/standard-error-codes).
           minimum: 7000

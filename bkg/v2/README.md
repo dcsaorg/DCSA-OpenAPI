@@ -7,6 +7,52 @@ Publications related to the Booking API:
 - [Booking Process](https://dcsa.org/standards/booking-process/) contains documents and publications
 - [Booking Notification](./notification/) maintained here on GitHub  (**DEPRECATED** - now included as part of Booking API)
 
+<a name="v203"></a>[Release v2.0.3 (TBD)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.3)
+---
+This is a patch release for the DCSA Booking API. A new codeListProvider has been added (and one deprecated).
+
+- descriptions have been added to objects where they were missing: `CancelBookingRequest`, `CreateBooking`, `UpdateBooking`, `Booking`, `IdentifyingCode`
+- `ESSD` (EssDOCS) has been marked as deprecated in codeListProvider
+- `BLOC` (BlockPeer Technologies) added as new codeListProvider
+- `ROU` added as `locationTypeCode` on the `ShipmentLocations` - can be used in combination with the  `routingReference` property
+- `Issue To Party` added in `documentParties`
+- clarify in `latitude` and `longitude` description that the value is expressed using ISO 6709 data interchange numeric format
+
+<a name="v202"></a>[Release v2.0.2 (31 July 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.2)
+---
+This is a patch release for the DCSA Booking API. A bug in the `GET`, `PUT` and `PATCH` description has been fixed (chaning the semantics of the endPoints) and a lot of minor changes have been added to this patch, here is a list of changes
+
+- allow `countryCode` `ZZ` in case it is not known
+- added `expectedDepartureFromPlaceOfReceiptDate` next to `expectedDepartureDate` for the Shipper to also be able to specify the departure date from `PRE` (Place of Receipt)
+- `transportDocumentReferences` (a list of TDR) to replace `transportDocumentReference` (a single TDR) as a Booking can potentially result in multiple Transport Documents
+- `transportDocumentReference` marked as Deprecated
+- `requestedNumberOfTransportDocuments` added in case the Shipper does not know the TDR(s) but knows how many are needed
+- `requestedPreCarriageModeOfTransport` and `requestedOnCarriageModeOfTransport` added for Shipper to specify the Mode of Transport for `pre`- and `on`-Carriage
+- add `originEmptyContainerPickup` to allow empty container pickups that are not covered by `emptyContainerPickup`
+- and `fullContainerPickupDateTime`
+- `EmptyContainerPickup` marked as Deprecated as `originEmptyContainerPickup` covers all cases
+- `1970-01-01` should be used for `plannedDepartureDate` and `plannedArrivalDate` in case the dates are not know
+- the following (extra) `Modes of Transport` have been added:
+  - `RAIL_TRUCK`(Rail and truck)
+  - `BARGE_TRUCK`(Barge and truck)
+  - `BARGE_RAIL`(Barge and rail)
+- We have removed a constraint that was preventing shippers who don't receive notifications to transition from using the carrier booking request reference (CBRR) to using the carrier booking reference (CBR) when the booking is confirmed
+- `codeListProvider` updated with the following values: `COVA` (Covantis), `ETIT` (e-title), `KTNE` (KTNET) and `CRED` (Credore)
+- clarifies which party `partyContactDetails` refers to
+
+Link to [commits included in this patch](https://github.com/dcsaorg/DCSA-OpenAPI/commits/master/bkg/v2/BKG_v2.0.2.yaml?since=2025-04-25&until=2025-07-04)
+
+<a name="v201"></a>[Release v2.0.1 (25 April 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.1)
+---
+This is a patch release for the DCSA Booking API. The primary purpose of this patch is to include the `routingReference` property in order to reference a route found in [Commercial Schedules](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/cs/v1), it also adds the `NAC` (Named Account Customer) party to `otherDocumentParty`. Here is a list of changes
+
+- `routingReference` property added to the Booking object. When `routingReference` is provided, other properties should be omitted. The conditions for the following properties have changed: `carrierServiceName`, `carrierServiceCode`, `universalServiceReference`, `carrierExportVoyageNumber`, `universalExportVoyageReference`, `expectedDepartureDate`, `expectedArrivalAtPlaceOfDeliveryStartDate`, `expectedArrivalAtPlaceOfDeliveryEndDate`, `Vessel` object and the following `shipmentLocationTypeCodes`: `PRE` (Place of Receipt), `POL` (Port of Loading), `POD` (Port of Discharge) and `PDE` (Place of Delivery)
+- `NAC` (Named Account Customer) added as partyFunctionCode on `otherDocumentParty` object
+- removed Servers list that was wrongly added (no Virtual Servers are connected to DCSA APIs)
+- removed the reference to `ISO 8601` in the `errorDateTime` property in the `Error` object (all dateTime fields must comply with [RFC 3339, section 5.6](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6))
+
+Link to [commits included in this patch](https://github.com/dcsaorg/DCSA-OpenAPI/commits/master/bkg/v2/BKG_v2.0.1.yaml?since=2024-01-15&until=2025-04-25)
+
 <a name="v200"></a>[Release v2.0.0 (17 December 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.0)
 ---
 This is the final version 2.0.0 for the DCSA Booking API. Compared to latest snapshot released 8 November the following has changed:

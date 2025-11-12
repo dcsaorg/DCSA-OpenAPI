@@ -8,6 +8,36 @@ Publications related to the Bill of Lading Surrender API:
 - [Bill of Lading](./../) maintained here on GitHub
 - [Bill of Lading Surrender Response](./../surrender_response/) maintained here on GitHub (the Surrender Response API linked to this API)
 
+<a name="v302"></a>[Release v3.0.2 (TBD)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR/3.0.2)
+---
+This is a patch version for the DCSA Surrender API. eBL Solution Providers updated, `ZZ` allowed as countryCode, `NONE` added to allow for "No Party":
+- `TransactionParty` split into `ActorParty` and `RecipientParty` in order to provide better descriptions
+- `ESSD` as `eblPlatform` and `codeListProvider` have been deprecated - `IDT` should be used
+- `BLOC` (BlockPeer Technologies) added as a new `eblPlatform` and `codeListProvider`
+- `NONE` added as `eblPlatform` and `codeListProvider` to be used as "No Party" for the recipient when the `actionCode` is `SIGN`, `BLANK ENDORSE` or `SURRENDERED`
+- added extra property `representedParty` on `ActorParty` and `RecipientParty`
+- added missing description to the following objects: `EndorsementChainLink`, `IdentifyingCode` and `SurrenderRequestAnswer`
+- `actionCode` description updated for almost all values and 4 new codes added:
+  - `BLANK_ENDORSE`
+  - `ENDORSE_TO_ORDER`
+  - `TRANSFER`
+  - `SURRENDERED`
+- new `reasonCode` added:
+  - `COD` (Change of destination)
+  - `SWI` (Switch BL)
+- description for `comments` updated
+- `endorsementChain` description updated to reflect `actionCode`
+- `countryCode` description in `TaxLegalReference` updated (to align with eBL) to allow the use for `ZZ` in case it is not known
+- SwaggerHub API Auto Mocking removed
+
+<a name="v301"></a>[Release v3.0.1 (31 July 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR/3.0.1)
+---
+This is a patch version for the DCSA Surrender API. It only includes minor cosmetic changes. The purpose of the patch is to align with electronic Bill of Lading v3.0.1 API.
+## Minor changes
+- removed Servers list that was wrongly added (no Virtual Servers are connected to DCSA APIs)
+- removed the reference to `ISO 8601` (all dateTime fields must comply with [RFC 3339, section 5.6](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6))
+- `codeListProvider` and `eblPlatform` updated with the following values: `COVA` (Covantis), `ETIT` (e-title), `KTNE` (KTNET) and `CRED` (Credore)
+
 <a name="v300"></a>[Release v3.0.0 (17 December 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR/3.0.0)
 ---
 This is the final version 3.0.0 for the DCSA Bill of Lading Surrender API. Compared to latest snapshot released 8 November the following has changed:

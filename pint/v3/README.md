@@ -9,6 +9,60 @@ Publications related to the PINT API:
 ---
 This is a moving target and will continue to be updated:
 
+<a name="v300B2025{TBD}"></a>[Release v3.0.0 Beta 2025{TBD} (TBD)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_PINT/3.0.0-Beta-2025{TBD})
+---
+Snapshot as of {TBD} for EBL Platform Interoperability 3.0.0 Beta. This Snapshot breaks backward compatibility: changes `actionCodes` in the Transaction chain, changes `recipient` from mandatory to optional, and renames properties to align with Surrender API. The rest of the changes are backward compatible.
+- `OPTION` renamed to `OPTIONS` on the `httpMethod` on Error-object
+- added missing descriptions to objects/properties: `EblEnvelope`, `EnvelopeManifest`, `EnvelopeTransferChainEntry`, `EnvelopeTransferStartedResponse`, `EnvelopeTransferFinishedResponse`, `name` (on `DocumentMetadata`), `Transaction`, `Transports`
+- `ESSD` as `eblPlatform` and `codeListProvider` have been deprecated - `IDT` should be used
+- `BLOC` (BlockPeer Technologies) added as a new `eblPlatform` and `codeListProvider`
+- `previousEnvelopeTransferChainEntrySignedContentChecksum` and `reason`: `nullable: true` removed as the optional property should be left out of the payload if it is `null`
+- improved description formatting
+- improved `reason` example
+- on the `Transaction` object:
+  - `action` renamed to `actionCode` to align with Surrender API
+  - `actionCode` description updated to align with Surrender API
+  - existing `actionCode` values updated to align with Surrender API:
+    - `ISSU` --> `ISSUE`
+    - `TRNS` --> `TRANSFER`
+    - `ENDO` --> `ENDORSE`
+    - `RESD` --> `SURRENDER_FOR_DELIVERY`
+    - `RESA` --> `SURRENDER_FOR_AMENDMENT`
+  - new `actionCode` values added:
+    - `ENDORSE_TO_ORDER`
+    - `BLANK_ENDORSE`
+    - `SIGN`
+  - `actionCode` changed from Enum to PseudoEnum to allow updates in future patches
+  - `actorParty` and `recipientParty` now specialized for better descriptions (the structure is the same)
+  - `timestamp` renamed to `actionDateTime` and type changed from `integer` --> `string` to align with Surrender
+  - `reason` renamed to `reasonCode` to align with Surrender
+  - two new `reasonCodes` added:
+    - `COD` (Change of destination)
+    - `SWI` (Switch BL)
+  - `reasonCode` description updated
+  - `comments` description updated
+  - `recipient` is **no** longer a required property on `Transaction` (it is not needed for `SIGN`, `BLANK_ENDORSE` and `SURRENDER` `actionCodes`)
+- `representedParty` property (equivalent to an `OnBehalfOfParty`) added to `actorParty` and `recipientParty`
+- improve `size` description in the `DocumentMetaData` object to make it clear it is the size of the decoded file (and not the size of the Base64 encoded file)
+
+## Transport Document changes
+- `countryCode` description in `TaxLegalReference`, `NationalCommodityCode`, `CustomsReference`, `Address`, `PartyAddress`, `City` and `PlaceOfIssue` updated to allow the use of `ZZ` in case it is not known
+- the condition clarified for: `numberOfOriginalsWithCharges` and `numberOfOriginalsWithoutCharges`
+- two new DocumentParties added: `OnBehalfOfShipper` and `OnBehalfOfConsignee`
+- `ESSD` as `eblPlatform` and `codeListProvider` have been deprecated - `IDT` should be used
+- `BLOC` (BlockPeer Technologies) added as a new `eblPlatform` and `codeListProvider`
+- clarify in `latitude` and `longitude` description that the value is expressed using ISO 6709 data interchange numeric format
+
+<a name="v300B20250731"></a>[Release v3.0.0 Beta 20250731 (31 of July 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_PINT/3.0.0-Beta-20250731)
+---
+Snapshot as of 31 of July 2025 for EBL Platform Interoperability 3.0.0 Beta.
+
+## Other changes
+- removed Servers list that was wrongly added (no Virtual Servers are connected to DCSA APIs)
+- removed the reference to `ISO 8601` (all dateTime fields must comply with [RFC 3339, section 5.6](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6))
+- added an extra **Note** on the `displayedAdress` mentioning that some carriers might allow for more than 2 lines for physical Bill of Ladings
+- `codeListProvider` and `eblPlatform` updated with the following values: `COVA` (Covantis), `ETIT` (e-title), `KTNE` (KTNET) and `CRED` (Credore)
+
 <a name="v300B20241217"></a>[Release v3.0.0 Beta 20241217 (17 of December 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_PINT/3.0.0-Beta-20241217)
 ---
 Snapshot as of 17 of December 2024 for EBL Platform Interoperability 3.0.0 Beta.
@@ -29,6 +83,7 @@ Snapshot as of 17 of December 2024 for EBL Platform Interoperability 3.0.0 Beta.
 - `PlaceOfReceipt` and `PlaceOfDelivery` description updated (wrong reference to `Geo Coordinate` removed)
 - description updated for `PlaceOfBLIssue`
 - typo fixed in `reference` (in `ImportLicense`) (athorizes --> a**u**thorizes)
+- clarifies which party `partyContactDetails` refers to
 
 <a name="v300B20241108"></a>[Release v3.0.0 Beta 20241108 (8 of November 2024)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_PINT/3.0.0-Beta-20241108)
 ---
@@ -238,7 +293,7 @@ Snapshot as of 30 of August 2024 for EBL Platform Interoperability 3.0.0 Beta.
   - `street` maxLength changed from 100 --> 70
   - `PObox` added as property
   - `city` maxLength changed from 65 --> 35
-- `partyFunctionCode` values updated (`NofityParty` values removed)
+- `partyFunctionCode` values updated (`NotifyParty` values removed)
 - `Shipper` object changes:
   - `partyName` maxLength changed from 100 --> 70
   - `typeOfPerson` added
