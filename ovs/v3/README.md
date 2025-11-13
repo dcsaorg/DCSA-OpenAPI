@@ -4,7 +4,7 @@ The DCSA OVS API is documented on [**SwaggerHub**](https://app.swaggerhub.com/ap
 
 The primary purpose of this API is to specify endPoints for schedules shared between Vessel Partners. 
 
-<a name="v301"></a>[Release v3.0.1 (TBD)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_OVS/3.0.1)
+<a name="v301"></a>[Release v3.0.1 (14 November 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_OVS/3.0.1)
 ---
 A minor update to improve the usage of OVS.
 
@@ -29,13 +29,11 @@ Minor changes:
 - improved layout of descriptions
 - updated the 'Contact us' link
 - removed the `servers` as it was wrongly added
-- removed `required=false` from query parameters, as this is the default
-- added `operationId` to the GET endPoint
 - improved the `limit` query parameter description
 - improved error examples
 - description added to `ServiceSchedule`, `VesselSchedule`
 - improved `title` in objects where a space was missing
-- GitHub reference removed from `eventTypeCode` property
+- GitHub reference removed from `eventTypeCode` and `statusCode` properties
 - `eventClassifierCode` description updated. Additional guidance provided in the API on when to send planned, estimated, and actual timestamps, clarifying semantics so implementers can align expectations with partners.
 - `ISO 8601` reference removed from `errorDateTime` property in the `ErrorResponse` object
 - removed unused parameter declarations
