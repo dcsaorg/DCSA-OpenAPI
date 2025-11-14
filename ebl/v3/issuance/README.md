@@ -8,7 +8,7 @@ Publications related to the Bill of Lading Issuance API:
 - [Bill of Lading](./../) maintained here on GitHub
 - [Bill of Lading Issuance Response](./../issuance_response/) maintained here on GitHub (the Issuance Response API linked to this API)
 
-<a name="v302"></a>[Release v3.0.2 (TBD)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS/3.0.2)
+<a name="v302"></a>[Release v3.0.2 (14 November 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS/3.0.2)
 ---
 This is a patch version for the DCSA Issuance API. eBL Solution Providers updated, `ZZ` allowed as `countryCode`, 2 new DocumentParties added:
 
