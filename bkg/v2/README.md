@@ -7,12 +7,12 @@ Publications related to the Booking API:
 - [Booking Process](https://dcsa.org/standards/booking-process/) contains documents and publications
 - [Booking Notification](./notification/) maintained here on GitHub  (**DEPRECATED** - now included as part of Booking API)
 
-<a name="v203"></a>[Release v2.0.3 (TBD)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.3)
+<a name="v203"></a>[Release v2.0.3 (14 November 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.3)
 ---
 This is a patch release for the DCSA Booking API. A new codeListProvider has been added (and one deprecated).
 
 - descriptions have been added to objects where they were missing: `CancelBookingRequest`, `CreateBooking`, `UpdateBooking`, `Booking`, `IdentifyingCode`
-- `ESSD` (EssDOCS) has been marked as deprecated in codeListProvider
+- `ESSD` (EssDOCS) has been marked as deprecated in codeListProvider (please use `IDT` instead)
 - `BLOC` (BlockPeer Technologies) added as new codeListProvider
 - `ROU` added as `locationTypeCode` on the `ShipmentLocations` - can be used in combination with the  `routingReference` property
 - `Issue To Party` added in `documentParties`
