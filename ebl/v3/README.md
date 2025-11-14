@@ -11,10 +11,9 @@ Publications related to the Bill of Lading API:
 - [Bill of Lading Surrender](./surrender/) maintained here on GitHub
 - [Bill of Lading Surrender Response](./surrender_response/) maintained here on GitHub (**DEPRECATED** - now included as part of EBL Surrender API)
 
-<a name="v302"></a>[Release v3.0.2 (TBD)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.2)
+<a name="v302"></a>[Release v3.0.2 (14 Nov 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.2)
 ---
 This is a patch version for the DCSA Bill of Lading API. The primary reason for this patch is adding the `OnBehalfOf` parties, allowing `ZZ` as a countryCode and updating eBL Solution Providers:
-- descriptions added to the following properties/objects: `CancelShippingInstructionsUpdate`, `ApproveTransportDocument`, `IdentifyingCode`, `Transports`
 - condition clarified for: `numberOfOriginalsWithCharges` and `numberOfOriginalsWithoutCharges` 
 - `countryCode` description in `TaxLegalReference`, `NationalCommodityCode`, `CustomsReference`, `Address`, `PartyAddress`, `City`, `PlaceOfIssue`, `AdvanceManifestFiling`, `PlaceOfAcceptance` and `PlaceOfFinalDelivery` updated to allow the use of `ZZ` in case it is not known
 - two new DocumentParties added: `OnBehalfOfShipper` and `OnBehalfOfConsignee`
@@ -24,6 +23,10 @@ This is a patch version for the DCSA Bill of Lading API. The primary reason for 
 - add `transportDocumentSubReference` to the Notifications
 - add `feedbacks` object to `TransportDocument`
 - clarify in `latitude` and `longitude` description that the value is expressed using ISO 6709 data interchange numeric format
+
+## Minor changes
+- descriptions added to the following properties/objects: `CancelShippingInstructionsUpdate`, `ApproveTransportDocument`, `IdentifyingCode`, `Transports`
+- updated some examples with `transportDocumentSubReference`
 
 <a name="v301"></a>[Release v3.0.1 (31 July 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.1)
 ---
