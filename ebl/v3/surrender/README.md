@@ -8,7 +8,7 @@ Publications related to the Bill of Lading Surrender API:
 - [Bill of Lading](./../) maintained here on GitHub
 - [Bill of Lading Surrender Response](./../surrender_response/) maintained here on GitHub (the Surrender Response API linked to this API)
 
-<a name="v302"></a>[Release v3.0.2 (TBD)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR/3.0.2)
+<a name="v302"></a>[Release v3.0.2 (14 November 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR/3.0.2)
 ---
 This is a patch version for the DCSA Surrender API. eBL Solution Providers updated, `ZZ` allowed as countryCode, `NONE` added to allow for "No Party":
 - `TransactionParty` split into `ActorParty` and `RecipientParty` in order to provide better descriptions
