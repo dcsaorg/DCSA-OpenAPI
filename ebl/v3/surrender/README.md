@@ -29,6 +29,7 @@ This is a patch version for the DCSA Surrender API. eBL Solution Providers updat
 - `endorsementChain` description updated to reflect `actionCode`
 - `countryCode` description in `TaxLegalReference` updated (to align with eBL) to allow the use for `ZZ` in case it is not known
 - SwaggerHub API Auto Mocking removed
+- `auditReference` property added to the `EndorsementChainLink` object, it can be used as an identifier issued by the eBL Solution Provider
 
 <a name="v301"></a>[Release v3.0.1 (31 July 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR/3.0.1)
 ---
