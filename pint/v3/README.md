@@ -41,6 +41,7 @@ Snapshot as of 14 November 2025 for EBL Platform Interoperability 3.0.0 Beta. Th
     - `SWI` (Switch BL)
   - `reasonCode` description updated
   - `comments` description updated
+  - `auditReference` property added to the `EndorsementChainLink` object, it can be used as an identifier issued by the eBL Solution Provider
   - `recipient` is **no** longer a required property on `Transaction` (it is not needed for `SIGN`, `BLANK_ENDORSE` and `SURRENDER` `actionCodes`)
 - `representedParty` property (equivalent to an `OnBehalfOfParty`) added to `actorParty` and `recipientParty`
 - improve `size` description in the `DocumentMetaData` object to make it clear it is the size of the decoded file (and not the size of the Base64 encoded file)
