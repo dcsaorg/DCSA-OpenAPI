@@ -3065,7 +3065,7 @@ components:
           pattern: ^\S(?:.*\S)?$
           maxLength: 20
           description: |
-            A unique number allocated by the shipping line, for the shipper to indicate which `transportDocumentReference` should be linked with this `Shipping Instructions`.
+            A unique number allocated by the shipping line, for the shipper to indicate which `transportDocumentReference` should be linked with this `Shipping Instructions`. When available, the `transportDocumentReference` should be provided to meet **ICS2** filing requirements.
           example: HHL71800000
         transportDocumentTypeCode:
           type: string
@@ -3386,7 +3386,7 @@ components:
           pattern: ^\S(?:.*\S)?$
           maxLength: 20
           description: |
-            A unique number allocated by the shipping line, for the shipper to indicate which `transportDocumentReference` should be linked with this `Shipping Instructions`.
+            A unique number allocated by the shipping line, for the shipper to indicate which `transportDocumentReference` should be linked with this `Shipping Instructions`. When available, the `transportDocumentReference` should be provided to meet **ICS2** filing requirements.
           example: HHL71800000
         transportDocumentTypeCode:
           type: string
@@ -4225,6 +4225,69 @@ components:
       title: Address
       description: |
         An object for storing address related information
+      properties:
+        street:
+          type: string
+          maxLength: 70
+          description: The name of the street.
+          example: Ruijggoordweg
+        streetNumber:
+          type: string
+          maxLength: 50
+          description: The number of the street.
+          example: '100'
+        floor:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 50
+          description: |
+            The floor of the street number.
+          example: N/A
+        postCode:
+          type: string
+          maxLength: 10
+          description: The post code of the address.
+          example: 1047 HM
+        POBox:
+          type: string
+          maxLength: 20
+          description: A numbered box at a post office where a person or business can have mail or parcels delivered.
+          example: '123'
+        city:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 35
+          description: |
+            The name of the city.
+          example: Amsterdam
+        stateRegion:
+          type: string
+          maxLength: 65
+          description: The name of the state/region.
+          example: North Holland
+        countryCode:
+          type: string
+          pattern: ^[A-Z]{2}$
+          minLength: 2
+          maxLength: 2
+          description: |
+            The 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+
+            **Note:** In case the `countryCode` is unknown it is possible to use the code `ZZ`.
+          example: NL
+      required:
+        - street
+        - city
+        - countryCode
+
+    ###################################################################
+    # House B/L Address object - MUST be the same as the Address object
+    ###################################################################
+    AddressHBL:
+      type: object
+      title: Address House B/L
+      description: |
+        An object for storing address related information. Either **Street number** or **PO Box** should be provided to meet **ICS2** filing requirements.
       properties:
         street:
           type: string
@@ -5210,7 +5273,7 @@ components:
             - `ASSOCIATION_OF_PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
           example: 'NATURAL_PERSON'
         address:
-          $ref: '#/components/schemas/Address'
+          $ref: '#/components/schemas/AddressHBL'
         identifyingCodes:
           type: array
           items:
@@ -5305,7 +5368,7 @@ components:
             - `ASSOCIATION_OF_PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
           example: 'NATURAL_PERSON'
         address:
-          $ref: '#/components/schemas/Address'
+          $ref: '#/components/schemas/AddressHBL'
         identifyingCodes:
           type: array
           items:
@@ -5399,7 +5462,7 @@ components:
             - `ASSOCIATION_OF_PERSONS` (Not a legal person, but recognised under Union or National law as having the capacity to perform legal acts)
           example: 'NATURAL_PERSON'
         address:
-          $ref: '#/components/schemas/Address'
+          $ref: '#/components/schemas/AddressHBL'
         identifyingCodes:
           type: array
           items:
