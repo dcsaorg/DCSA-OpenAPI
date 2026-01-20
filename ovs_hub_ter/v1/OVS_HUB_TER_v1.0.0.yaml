@@ -24,6 +24,8 @@ info:
 tags:
   - name: Terminal Timestamp
     description: Terminal Timestamp endPoint for providing near realtime `ETA`/`ETD`/`ATA` and `ATD` data
+  - name: Terminal Schedules
+    description: Terminal Schedules endPoint for fetching `ETA`/`ETD`/`ATA` and `ATD` data for Services
 paths:
   /v1/terminal-timestamps:
     post:
@@ -192,6 +194,137 @@ paths:
                       - errorCode: 7003
                         errorCodeText: Max sending of Terminal Timestamps reached
                         errorCodeMessage: A maximum of 10 Terminal Timestamp requests can be sent per hour
+  /v1/terminal-schedules:
+    get:
+      tags:
+      - Terminal Schedules
+      summary: |
+        Get a list of Terminal Schedules
+      operationId: get-terminal-schedules
+      description: |
+        Get a list of terminal service schedules.
+      parameters:
+      - name: carrierServiceCode
+        in: query
+        description: |
+          The carrier specific service code to filter by. The result will only return schedules including the service code.
+        schema:
+          type: string
+          maxLength: 11
+          example: FE1
+      - name: startDate
+        in: query
+        description: |
+          The start date of the period for which schedule information is requested. If a date of any Timestamp (ATA, ETA or PTA) inside a Schedule matches a date on or after (≥) the `startDate` the entire Voyage (import- and export-Voyage) matching the PortCall will be included in the result. All matching is done towards local Date at the place of the port call.
+          If this filter is not provided, the default value is **3 months** prior to the request time.
+        schema:
+          type: string
+          format: date
+          example: 2020-04-06
+      - name: endDate
+        in: query
+        description: |
+          The end date of the period for which schedule information is requested. If a date of any Timestamp (ATA, ETA or PTA) inside a Schedule matches a date on or before (≤) the `endDate` the entire Voyage(import- and export-Voyage) matching the PortCall will be included in the result. All matching is done towards local Date at the place of the port call.
+          If this filter is not provided, the default value is **6 months** after the request time.
+        schema:
+          type: string
+          format: date
+          example: 2020-04-10
+      - name: limit
+        in: query
+        description: |
+          Specifies the maximum number of `Terminal Schedule` objects to return.
+        schema:
+          type: integer
+          format: int32
+          minimum: 0
+          default: 100
+          example: 100
+      - name: cursor
+        in: query
+        description: |
+          A server generated value to specify a specific point in a collection result, used for pagination.
+        schema:
+          type: string
+          maxLength: 1024
+          example: fE9mZnNldHw9MTAmbGltaXQ9MTA
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ServiceSchedule'
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+            Next-Page-Cursor:
+              schema:
+                type: string
+                maxLength: 1024
+                example: fE9mZnNldHw9MTAmbGltaXQ9MTA
+              description: |
+                The Next-Page-Cursor header contains a cursor value that points to the next page of results in a paginated API response.
+                When an initial `GET` endpoint request includes the query parameter `limit=...` the API provider limits the number of items in the root array of the response to the specified limit. If the response would contain more items than the specified limit, the API provider includes only the first set of limit items and appends the following response header:
+                `Next-Page-Cursor=fE9mZnNldHw9MTAmbGltaXQ9MTA`, a string that acts as a reference for the next page of results.
+
+                To retrieve the next page, the API consumer sends a `GET` request to the same endpoint URL with the `cursor` query parameter set to the value from the `Next-Page-Cursor` header (e.g., `?cursor=fE9mZnNldHw9MTAmbGltaXQ9MTA`). All other query parameters from the original request (such as `carrierServiceCode`, `startDate`, etc.) MUST be preserved when requesting subsequent pages. The `limit` parameter from the original request is typically encoded within the cursor and should not be sent again.
+        '400':
+          description: Bad Request
+          headers:
+            API-Version:
+              schema:
+                type: string
+                example: 1.0.0
+              description: |
+                SemVer used to indicate the version of the contract (API version) returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                Example 1:
+                  value:
+                    httpMethod: GET
+                    requestUri: /v1/terminal-schedules
+                    statusCode: 400
+                    statusCodeText: Bad Request
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: 2019-11-12T07:41:00+08:30
+                    errors:
+                      - errorCode: 7007
+                        errorCodeText: invalidQuery
+                        errorCodeMessage: UNLocationCode does not exist
+        '500':
+          description: Internal Server Error
+          headers:
+            API-Version:
+              schema:
+                type: string
+                example: 1.0.0
+              description: |
+                SemVer used to indicate the version of the contract (API version) returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                Example 1:
+                  value:
+                    httpMethod: GET
+                    requestUri: /v1/terminal-schedules
+                    statusCode: 500
+                    statusCodeText: Internal Server Error
+                    statusCodeMessage: Cannot process request.
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: 2019-11-12T07:41:00+08:30
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: Internal Server Error
+                        errorCodeMessage: An internal error occurred.
+
 components:
   headers:
     API-Version:
@@ -202,9 +335,264 @@ components:
         SemVer used to indicate the version of the contract (API version) returned.
       required: true
   schemas:
-    TerminalTimestamp:
+    ServiceSchedule:
+      title: Service Schedule
       type: object
+      description: |
+        Schedules for services.
+      properties:
+        carrierServiceName:
+          type: string
+          maxLength: 50
+          pattern: ^\S(?:.*\S)?$
+          description: |
+            The carrier-specific name of the service.
+          example: Great Lion Service
+        carrierServiceCode:
+          type: string
+          maxLength: 11
+          pattern: ^\S(?:.*\S)?$
+          description: |
+            The carrier-specific code of the service.
+          example: FE1
+        universalServiceReference:
+          type: string
+          maxLength: 8
+          minLength: 8
+          pattern: "^SR\\d{5}[A-Z]$"
+          description: |
+            A global unique service reference, as per DCSA standard, agreed by VSA partners for the service. The service reference must match the regular expression pattern: `SR\\d{5}[A-Z]`. The letters `SR` followed by `5 digits`, followed by a checksum-character as a capital letter from `A to Z`.
+          example: SR12345A
+        vesselSchedules:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/VesselSchedule'
+      required:
+      - carrierServiceName
+      - carrierServiceCode
+      - vesselSchedules
+
+    VesselSchedule:
+      title: Vessel Schedule
+      type: object
+      description: |
+        Vessel and its TerminalCalls.
+      properties:
+        vesselOperatorSMDGLinerCode:
+          type: string
+          maxLength: 10
+          description: |
+            The carrier who is in charge of the vessel operation based on the SMDG code.
+            
+            If not available at the moment of sharing the schedule, use `TBD` (To be defined).
+            
+            In the case an operator is still using a code not from SMDG, use the available code.
+          example: HLC
+        vesselIMONumber:
+          type: string
+          pattern: ^\d{7,8}$
+          minLength: 7
+          maxLength: 8
+          description: |
+            The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd&apos;s register code, which does not change during the lifetime of the vessel.
+          example: '9321483'
+        MMSINumber:
+          type: string
+          pattern: ^\d{9}$
+          minLength: 9
+          maxLength: 9
+          description: |
+            Maritime Mobile Service Identities (MMSIs) are nine-digit numbers used by maritime digital selective calling (DSC), automatic identification systems (AIS) and certain other equipment to uniquely identify a ship or a coast radio station.
+          example: '278111222'
+        vesselName:
+          type: string
+          maxLength: 50
+          pattern: ^\S(?:.*\S)?$
+          description: |
+            The name of the Vessel given by the Vessel Operator and registered with IMO.
+          example: King of the Seas
+        vesselCallSign:
+          type: string
+          maxLength: 10
+          pattern: ^\S(?:.*\S)?$
+          description: |
+            A unique alphanumeric identity that belongs to the vessel and is assigned by the International Telecommunication Union (ITU). It consists of a threeletter alphanumeric prefix that indicates nationality, followed by one to four characters to identify the individual vessel. For instance, vessels registered under Denmark are assigned the prefix ranges 5PA-5QZ, OUAOZZ, and XPA-XPZ. The Call Sign changes whenever a vessel changes its flag.
+          example: NCVV
+        transportCalls:
+          type: array
+          description: |
+            **Note:** The order of the list is the sequence of the list.
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/TransportCall'
+      required:
+      - vesselOperatorSMDGLinerCode
+      - transportCalls
+
+    TransportCall:
+      title: Transport Call
+      type: object
+      description: |
+        A transportCall in the schedule. A transportCall can be either just a Port or further specified as a terminalCall.
+      properties:
+        portVisitReference:
+          type: string
+          maxLength: 50
+          description: |
+            The unique reference that can be used to link different `transportCallReferences` to the same port visit. The reference is provided by the port to uniquely identify a port call
+          example: NLAMS1234589
+        transportCallReference:
+          type: string
+          maxLength: 100
+          description: |
+            The unique reference for a transport call. It's the vessel operator's responsibility to provide the Transport Call Reference, other parties are obliged to pick it up and use it. It can take the form of Port Call References as defined in OVS Definitions Document, or alternatively a reference as defined by the vessel operator.
+          example: SR11111X-9321483-2107W-NLAMS-ACT-1-1
+        carrierImportVoyageNumber:
+          type: string
+          maxLength: 50
+          pattern: ^\S(?:.*\S)?$
+          description: |
+            The identifier of an import voyage. The carrier-specific identifier of the import Voyage.
+          example: 2103N
+        carrierExportVoyageNumber:
+          type: string
+          maxLength: 50
+          pattern: ^\S(?:.*\S)?$
+          description: |
+            The identifier of an export voyage. The carrier-specific identifier of the export Voyage.
+          example: 2103S
+        universalImportVoyageReference:
+          type: string
+          minLength: 5
+          maxLength: 5
+          pattern: ^\d{2}[0-9A-Z]{2}[NEWSR]$
+          description: |
+            A global unique voyage reference for the import Voyage, as per DCSA standard, agreed by VSA partners for the voyage. The voyage reference must match the regular expression pattern `\d{2}[0-9A-Z]{2}[NEWSR]`:
+            - `2 digits` for the year
+            - `2 alphanumeric characters` for the sequence number of the voyage
+            - `1 character` for the direction/haul (`N`orth, `E`ast, `W`est, `S`outh or `R`oundtrip)
+          example: 2103N
+        universalExportVoyageReference:
+          type: string
+          minLength: 5
+          maxLength: 5
+          pattern: ^\d{2}[0-9A-Z]{2}[NEWSR]$
+          description: |
+            A global unique voyage reference for the export Voyage, as per DCSA standard, agreed by VSA partners for the voyage. The voyage reference must match the regular expression pattern `\d{2}[0-9A-Z]{2}[NEWSR]`:
+            - `2 digits` for the year
+            - `2 alphanumeric characters` for the sequence number of the voyage
+            - `1 character` for the direction/haul (`N`orth, `E`ast, `W`est, `S`outh or `R`oundtrip)
+          example: 2103N
+        location:
+          type: object    
+          title: 'Location'      
+          description: |
+            An object to capture the location of the timestamp(s).
+
+            The location can be specified in **any** of the following ways: `UN Location Code` or `Facility SMDG Code`.
+
+            **Condition:** It is expected that if a location is specified in multiple ways (e.g. both as an `UN Location Code` and as a `Facility SMDG Code`) that both ways point to the same location.
+          example:
+            locationName: Hamburg
+            UNLocationCode: DEHAM
+          properties:
+            locationName:
+              type: string
+              description: The name of the location.
+              pattern: ^\S(?:.*\S)?$
+              example: Port of Amsterdam
+              maxLength: 100
+            facilityName:
+              maxLength: 100
+              type: string
+              description: The name of the facility.
+              example: Building 123
+            facilitySMDGCode:
+              type: string
+              description: |
+                The code used for identifying the specific facility. This code does not include the UN Location Code.
+
+                The codeList used by SMDG is the [SMDG Terminal Code List](https://smdg.org/wp-content/uploads/Codelists/Terminals/SMDG-Terminal-Code-List-v20210401.xlsx)
+              maxLength: 6
+              example: ACT
+            UNLocationCode:
+              type: string
+              pattern: ^[A-Z]{2}[A-Z2-9]{3}$
+              minLength: 5
+              maxLength: 5
+              description: |
+                The UN Location code specifying where the place is located. The pattern used must be
+
+                - 2 characters for the country code using [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#iso:pub:PUB500001:en)
+                - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used
+
+                More info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)
+              example: NLAMS
+        timestamps:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/Timestamp'
+      required:
+      - carrierImportVoyageNumber
+      - transportCallReference
+      - timestamps
+
+    Timestamp:
+      title: Timestamp
+      type: object
+      description: |
+        A Timestamp object to provide `ETA`/`ETD`/`ATA`/`ATD` information.
+      properties:
+        typeCode:
+          type: string
+          description: |
+            Identifier for type of **Timestamp**. Possible values are:
+
+            - `ARRI` (Arrived)
+            - `DEPA` (Departed)
+          enum:
+            - ARRI
+            - DEPA
+          example: ARRI
+        classifierCode:
+          type: string
+          description: |
+            Code for describing the **Timestamp**.
+
+            Possible values are:
+            - `ACT` (Actual)
+            - `EST` (Estimated)
+          enum:
+            - ACT
+            - EST
+          example: EST
+        positionCode:
+          type: string
+          description: |
+            Specification of the location of the arrival or departure. Options are:
+
+            - `PBPL` (Pilot boarding place)
+            - `BRTH` (Berth)
+            - `ANCH` (Anchorage Location)
+            - `PORT` (Port area)
+          example: BRTH
+        dateTime:
+          type: string
+          format: date-time
+          description: |
+            The UTC date and time, when the **Vessel** of a **Port Call** is estimated or has happened.
+          example: '2025-08-18T17:41:00+08:30'
+      required:
+      - typeCode
+      - classifierCode
+      - positionCode
+      - dateTime
+
+    TerminalTimestamp:
       title: Terminal Timestamp
+      type: object
       description: |
         A Timestamp object to provide `ETA`/`ETD`/`ATA`/`ATD` information to the OVS Hub. It is necessary to provide either:
           - `transportCallReference`
