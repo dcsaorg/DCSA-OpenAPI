@@ -70,7 +70,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/Api-Version-Major'
       description: |
-        Creates a new booking request. This endPoint corresponds with **UseCase 1 - Submit booking request**.
+        Creates a new booking request. This endPoint corresponds with **UseCase 1 - Submit Booking request**.
 
         ## Precondition
         The consumer has information for a `Booking Request`
@@ -598,8 +598,8 @@ paths:
             - send an update to a newly created Booking (precondition: `bookingStatus='RECEIVED'`)
             - send an update to a Booking because of a request from provider via **UseCase 2 - Request to update Booking request** (precondition: `bookingStatus='PENDING_UPDATE'`)
             - send an additional update to a Booking that has already received an update  (precondition: `bookingStatus='UPDATE_RECEIVED'`)
-          - `bookingStatus` will stay as `PENDING_AMENDMENT` but `amendedBookingStatus` will change to `AMENDMENT_RECEIVED` in case this endPoint is being used in response to a request from provider via **UseCase 6 - Request to amend Confirmed Booking** (precondition: `bookingStatus='PENDING_AMENDMENT'`)
-          - `bookingStatus` will stay as `CONFIRMED` but `amendedBookingStatus` will change to `AMENDMENT_RECEIVED` in case this endPoint is being used to update an already confirmed Booking via  **UseCase 7 - Request Amendments to Confirmed Booking** (precondition: `bookingStatus='CONFIRMED'`)
+          - `bookingStatus` will stay as `PENDING_AMENDMENT` but `amendedBookingStatus` will change to `AMENDMENT_RECEIVED` in case this endPoint is being used in response to a request from provider via **UseCase 6 - Request to amend confirmed Booking** (precondition: `bookingStatus='PENDING_AMENDMENT'`)
+          - `bookingStatus` will stay as `CONFIRMED` but `amendedBookingStatus` will change to `AMENDMENT_RECEIVED` in case this endPoint is being used to update an already confirmed Booking via  **UseCase 7 - Request amendments to confirmed Booking** (precondition: `bookingStatus='CONFIRMED'`)
 
         Once processed, the new state will be communicated via a [Booking Notification](#/BookingNotification). In case the consumer does not subscribe to notifications it is necessary for the consumer to poll on the 
 
@@ -615,7 +615,7 @@ paths:
 
         - the provider requests for a new amendment (**UseCase 6: Request to amend confirmed Booking**) in which case the "old update" is no longer accessible
         - the consumer submits a new update (**UseCase 7: Request amendment to confirmed Booking**) in which case the "new amendment" provided **replaces** the "old amendment".
-        - the provider re-confirms the `Booking` (**UseCase 5: Confirm booking request**) in which case the "old update" is no longer accessible.
+        - the provider re-confirms the `Booking` (**UseCase 5: Confirm Booking request**) in which case the "old update" is no longer accessible.
       requestBody:
         description: |
           Parameters used to update the `Booking request`
@@ -1126,15 +1126,19 @@ paths:
             GET /v2/bookings/{bookingReference}?amendedContent=true
 
         The `status` of the "original" `Booking` is included in both payloads as `bookingStatus`. `amendedBookingStatus` and related content is only available after the provider has approved the `Booking` via **UseCase 5: Confirm Booking request** and until:
-        - the provider requests for a new amendment (**UseCase 6: Request to amend confirmed Booking**) in which case the "old update" is no longer accessible.
+        - the provider requests a new amendment (**UseCase 6: Request to amend confirmed Booking**) in which case the "old update" is no longer accessible.
         - the consumer submits a new amendment (**UseCase 7: Request amendment to confirmed Booking**) in which case the "new update" provided **replaces** the "old update".
-        - the provider re-confirms the `Booking` (**UseCase 5: Confirm booking request**) in which case the "old update" is no longer accessible.
+        - the provider re-confirms the `Booking` (**UseCase 5: Confirm Booking request**) in which case the "old update" is no longer accessible.
 
         If `amendedContent=true` is requested but no amendment has yet been provided by the consumer **or** the state of the "original" `Booking` is `PENDING_AMENDMENT`, then a `404` (Not Found) is returned.
 
+        The status of a cancellation of the Booking is included in both payloads as `bookingCancellationStatus` in case an attempt to cancel the booking has been made. It is only available after the provider has approved the `Booking` via **UseCase 5: Confirm Booking request** and until:
+        - the provider requests for a new amendment (**UseCase 6: Request to amend confirmed Booking**) in which case the "old status" is no longer accessible.
+        - the provider re-confirms the `Booking` (**UseCase 5: Confirm Booking request**) in which case the "old status" is not "carried over" and will no longer be accessible.
+
         If the provider is requesting changes to the `Booking`, the `Feedback` object is used to inform the consumer what needs to change.
 
-        In case no subscription (`Notification`) has been set up - it is possible to use this endPoint to poll on in order to detect if `bookingStatus` and/or `amendedBookingStatus` has changed.
+        In case no subscription (`Notification`) has been set up - it is possible to use this endPoint to poll on in order to detect if `bookingStatus` and/or `amendedBookingStatus` (and `bookingCancellationStatus`) has changed.
 
         In case a previous request is being processed by the provider - a `202` (Accepted) with **no payload** can be used as a response until the processing is finished.
       parameters:
@@ -1511,7 +1515,7 @@ paths:
       description: |
         A shipper initiated cancellation of the `Booking` or `Booking Amendment` with the `bookingReference`. The path can contain a `carrierBookingRequestReference` or a `carrierBookingReference`.
 
-        This endPoint corresponds with **UseCase 11 - Cancel Booking Request by shipper**, **UseCase 9 - Cancel amendment to confirmed Booking** or **UseCase 13 - Cancel confirmed Booking by shipper**.
+        This endPoint corresponds with **UseCase 11 - Cancel Booking request by shipper**, **UseCase 9 - Cancel amendment to confirmed Booking** or **UseCase 13 - Cancel confirmed Booking by shipper**.
 
         ## Precondition
         In order to cancel a `Booking`, the `bookingStatus` must be one of
@@ -1540,6 +1544,8 @@ paths:
         3. An empty response is returned and the consumer now awaits further processing by the provider.
         
         Once processed, the `Booking` or `Amended Booking` is cancelled and a [Booking Notification](#/BookingNotification) is sent. In case of a Confirmed Booking - the provider has the opportunity to decline the Cancellation of the Booking (in which case the `bookingCancellationStatus='CANCELLATION_DECLINED'`).
+
+        Re-confirming a Booking or requesting a Booking Amendment (**UseCase 7: Request amendment to confirmed Booking**) "clears" the `bookingCancellationStatus`.
       parameters:
         - $ref: '#/components/parameters/bookingReferencePathParam'
         - $ref: '#/components/parameters/Api-Version-Major'
