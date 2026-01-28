@@ -768,10 +768,48 @@ components:
           example: SURR
         comments:
           type: string
-          description: Free text comment associated with the surrender request transaction.  Must be provided for rejections but should be omitted when accepting the surrender.
+          description: |
+            Free text comment associated with the surrender request transaction.  Must be provided for rejections but should be omitted when accepting the surrender.
           maxLength: 255
           pattern: ^\S(?:.*\S)?$
           example: Comments...
+        feedbackElements:
+          type: array
+          description: |
+            Feedback elements indicating why the Surrender request could not be processed.
+
+            At least one feedback element of severity `ERROR` is expected. Lower severity feedback elements may also be included.
+          items:
+            $ref: '#/components/schemas/FeedbackElement'
       required:
         - surrenderRequestReference
         - action
+
+    FeedbackElement:
+      type: object
+      title: Feedback Element
+      description: |
+        An individual piece of feedback (potentially out of several) providing information on how the Surrender request is processed.
+      properties:
+        severity:
+          type: string
+          maxLength: 50
+          description: |
+            Code denoting the severity of a `FeedbackElement`. Possible values are:
+
+            - `ERROR` - Error that fully or partially prevents the correct processing of the request
+            - `WARN` - Warning about the request being processed in a potentially unexpected way
+            - `INFO` - Informational message about how the request is processed
+          example: ERROR
+        message:
+          type: string
+          maxLength: 5000
+          description: |
+            Human readable feedback message that can be programmatically relayed to a user.
+          example: An unexpected internal error occurred
+        propertyPath:
+          type: string
+          maxLength: 1000
+          description: |
+            [JSONPath](https://github.com/json-path/JsonPath) within the request message of the specific property about which the feedback is provided (if applicable).
+          example: $.endorsementChain[2].actionCode
