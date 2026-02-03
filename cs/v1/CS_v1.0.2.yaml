@@ -1669,7 +1669,7 @@ components:
               type: number
               format: double
               description: |
-                CO<sub>2</sub> (Carbon Dioxide) emissions in metric tonnes (t / Mg).
+                CO<sub>2</sub> (Carbon Dioxide) emissions in metric tonnes (t).
               example: 506.4
             sox:
               type: number
@@ -1699,11 +1699,14 @@ components:
       type: object
       description: |
         The location can be specified using **any** of the nested structures:
-          - `Address` (used to specify the location via an Address)
+          - `address` (used to specify the location via a **structured** Address)
+          - `addressLines` (used to specify a location via an **unstructured** Address)
           - `UNLocationCode`
           - `Facility` (used to specify a location using a `facilityCode` and a `facilityCodeListProvider`)
 
           It is expected that if a location is specified in multiple ways (both as an `Address` and as a `Facility`) that both ways point to the same location.
+
+          **Condition:** Providers **or** consumers on API v1.0.1 (or earlier): `addressLines` cannot be used as the only property to identify the location.
       properties:
         locationName:
           type: string
@@ -1718,6 +1721,19 @@ components:
           example: Building 123
         address:
           $ref: '#/components/schemas/Address'
+        addressLines:
+          type: array
+          maxItems: 5
+          description: |
+            Unstructured address lines, used as a fallback when structured address fields are unavailable.
+
+            **Condition:** Providers **or** consumers on API v1.0.1 (or earlier): `addressLines` cannot be used as the only property to identify the location.
+          items:
+            type: string
+            maxLength: 250
+            description: |
+              One line of an unstructured `Address`.
+            example: "123 Example Rd"
         UNLocationCode:
           type: string
           pattern: ^[A-Z]{2}[A-Z2-9]{3}$
@@ -1738,10 +1754,14 @@ components:
       type: object
       description: |
         General purpose object to capture location-related data, the location can be specified in **any** of the following ways:
-          - `Address` (used to specify the location via an Address)
+          - `address` (used to specify the location via a **structured** Address)
+          - `addressLines` (used to specify a location via an **unstructured** Address)
           - `UNLocationCode`
           - `FacilitySMDGCode` (used to specify a location using a `facilitySMDGCode`)
+
           It is expected that if a location is specified in multiple ways (both as an `Address` and as a `Facility`) that both ways point to the same location.
+
+          **Condition:** Providers **or** consumers on API v1.0.1 (or earlier): `addressLines` cannot be used as the only property to identify the location.
       properties:
         locationName:
           type: string
@@ -1756,6 +1776,19 @@ components:
           example: Building 123
         address:
           $ref: '#/components/schemas/Address'
+        addressLines:
+          type: array
+          maxItems: 5
+          description: |
+            Unstructured address lines, used as a fallback when structured address fields are unavailable.
+
+            **Condition:** Providers **or** consumers on API v1.0.1 (or earlier): `addressLines` cannot be used as the only property to identify the location.
+          items:
+            type: string
+            maxLength: 250
+            description: |
+              One line of an unstructured `Address`.
+            example: "123 Example Rd"
         UNLocationCode:
           type: string
           pattern: ^[A-Z]{2}[A-Z2-9]{3}$
