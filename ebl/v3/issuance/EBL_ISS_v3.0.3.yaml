@@ -1190,7 +1190,7 @@ components:
           maxLength: 3
           description: |
             The reference type codes defined by DCSA. Possible values are:
-            - `CR` (Customer’s Reference)
+            - `CR` (Customer's Reference)
             - `AKG` (Vehicle Identification Number)
           example: CR
         value:
@@ -1215,7 +1215,7 @@ components:
           maxLength: 3
           description: |
             The reference type codes defined by DCSA. Possible values are:
-            - `CR` (Customer’s Reference)
+            - `CR` (Customer's Reference)
             - `AKG` (Vehicle Identification Number)
             - `SPO` (Shipper's Purchase Order)
             - `CPO` (Consignee's Purchase Order)
@@ -2056,7 +2056,7 @@ components:
       type: object
       title: Net Explosive Content
       description: |
-        The total weight of the explosive substances, without the packaging’s, casings, etc.
+        The total weight of the explosive substances, without the packaging's, casings, etc.
       properties:
         value:
           type: number
@@ -2064,7 +2064,7 @@ components:
           minimum: 0
           exclusiveMinimum: true
           description: |
-            The total weight of the explosive substances, without the packaging’s, casings, etc.
+            The total weight of the explosive substances, without the packaging's, casings, etc.
           example: 2.4
         unit:
           type: string
@@ -2596,6 +2596,7 @@ components:
       required:
         - vesselName
         - carrierExportVoyageNumber
+
     PlaceOfReceipt:
       type: object
       title: Place of Receipt
@@ -2604,9 +2605,11 @@ components:
 
         **Condition:** Only when pre-carriage is done by the carrier.
 
-        The location can be specified in **any** of the following ways: `UN Location Code`, `Facility`, `Address` or a `Geo Coordinate`.
+        The location can be specified in **any** of the following ways: `UN Location Code`, `Facility`, `Address` (structured address), `AddressLines` (unstructured address) or a `Geo Coordinate`.
 
         **Condition:** It is expected that if a location is specified in multiple ways (e.g. both as an `Address` and as a `Facility`) that both ways point to the same location.
+
+        **Condition:** When communicating with providers **or** consumers implementing API **v3.0.2 or earlier**, a sender implementing API **v3.0.3 or later MUST NOT** use `addressLines` as the only property to identify the location. Recipients implementing earlier versions **MAY ignore** this property.
       example:
         locationName: Hamburg
         UNLocationCode: DEHAM
@@ -2624,6 +2627,19 @@ components:
           example: Building 123
         address:
           $ref: '#/components/schemas/Address'
+        addressLines:
+          type: array
+          maxItems: 5
+          description: |
+            Unstructured address lines, used as a fallback when structured address fields are unavailable.
+
+            **Condition:** When communicating with providers **or** consumers implementing API **v3.0.2 or earlier**, a sender implementing API **v3.0.3 or later MUST NOT** use `addressLines` as the only property to identify the location. Recipients implementing earlier versions **MAY ignore** this property.
+          items:
+            type: string
+            maxLength: 250
+            description: |
+              One line of an unstructured `Address`.
+            example: "123 Example Rd"
         facility:
           $ref: '#/components/schemas/Facility'
         UNLocationCode:
@@ -2641,6 +2657,7 @@ components:
           example: NLAMS
         geoCoordinate:
           $ref: '#/components/schemas/GeoCoordinate'
+
     PortOfLoading:
       type: object
       title: Port of Loading
@@ -2675,6 +2692,7 @@ components:
 
             More info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)
           example: NLAMS
+
     PortOfDischarge:
       type: object
       title: Port of Discharge
@@ -2709,6 +2727,7 @@ components:
 
             More info can be found here: [UN/LOCODE](https://unece.org/trade/cefact/UNLOCODE-Download)
           example: NLAMS
+
     PlaceOfDelivery:
       type: object
       title: Place of Delivery
@@ -2717,9 +2736,11 @@ components:
 
         **Condition:** Only when onward transport is done by the carrier
 
-        The location can be specified in **any** of the following ways: `UN Location Code`, `Facility`, `Address` or a `Geo Coordinate`.
+        The location can be specified in **any** of the following ways: `UN Location Code`, `Facility`, `Address` (structured address), `AddressLines` (unstructured address) or a `Geo Coordinate`.
 
         **Condition:** It is expected that if a location is specified in multiple ways (e.g. both as an `Address` and as a `Facility`) that both ways point to the same location.
+
+        **Condition:** When communicating with providers **or** consumers implementing API **v3.0.2 or earlier**, a sender implementing API **v3.0.3 or later MUST NOT** use `addressLines` as the only property to identify the location. Recipients implementing earlier versions **MAY ignore** this property.
       example:
         locationName: Hamburg
         UNLocationCode: DEHAM
@@ -2737,6 +2758,19 @@ components:
           example: Building 123
         address:
           $ref: '#/components/schemas/Address'
+        addressLines:
+          type: array
+          maxItems: 5
+          description: |
+            Unstructured address lines, used as a fallback when structured address fields are unavailable.
+
+            **Condition:** When communicating with providers **or** consumers implementing API **v3.0.2 or earlier**, a sender implementing API **v3.0.3 or later MUST NOT** use `addressLines` as the only property to identify the location. Recipients implementing earlier versions **MAY ignore** this property.
+          items:
+            type: string
+            maxLength: 250
+            description: |
+              One line of an unstructured `Address`.
+            example: "123 Example Rd"
         facility:
           $ref: '#/components/schemas/Facility'
         UNLocationCode:
@@ -2754,15 +2788,18 @@ components:
           example: NLAMS
         geoCoordinate:
           $ref: '#/components/schemas/GeoCoordinate'
+
     OnwardInlandRouting:
       type: object
       title: Onward Inland Routing
       description: |
         An object to capture `Onward Inland Routing` location specified as the end location of the inland movement that takes place after the container(s) being delivered to the port of discharge/place of delivery for account and risk of merchant (merchant haulage).
 
-        The location can be specified in **any** of the following ways: `UN Location Code`, `Facility` or an `Address`.
+        The location can be specified in **any** of the following ways: `UN Location Code`, `Facility`, `Address` (structured address) or `AddressLines` (unstructured address).
 
         **Condition:** It is expected that if a location is specified in multiple ways (e.g. both as an `Address` and as a `Facility`) that both ways point to the same location.
+
+        **Condition:** When communicating with providers **or** consumers implementing API **v3.0.2 or earlier**, a sender implementing API **v3.0.3 or later MUST NOT** use `addressLines` as the only property to identify the location. Recipients implementing earlier versions **MAY ignore** this property.
       example:
         locationName: Hamburg
         UNLocationCode: DEHAM
@@ -2780,6 +2817,19 @@ components:
           example: Building 123
         address:
           $ref: '#/components/schemas/Address'
+        addressLines:
+          type: array
+          maxItems: 5
+          description: |
+            Unstructured address lines, used as a fallback when structured address fields are unavailable.
+
+            **Condition:** When communicating with providers **or** consumers implementing API **v3.0.2 or earlier**, a sender implementing API **v3.0.3 or later MUST NOT** use `addressLines` as the only property to identify the location. Recipients implementing earlier versions **MAY ignore** this property.
+          items:
+            type: string
+            maxLength: 250
+            description: |
+              One line of an unstructured `Address`.
+            example: "123 Example Rd"
         facility:
           $ref: '#/components/schemas/Facility'
         UNLocationCode:
@@ -3072,24 +3122,24 @@ components:
       properties:
         street:
           type: string
-          description: The name of the street of the party’s address.
+          description: The name of the street of the party's address.
           maxLength: 70
           example: Ruijggoordweg
         streetNumber:
           type: string
-          description: The number of the street of the party’s address.
+          description: The number of the street of the party's address.
           maxLength: 50
           example: '100'
         floor:
           type: string
           description: |
-            The floor of the party’s street number.
+            The floor of the party's street number.
           pattern: ^\S(?:.*\S)?$
           maxLength: 50
           example: 2nd
         postCode:
           type: string
-          description: The post code of the party’s address.
+          description: The post code of the party's address.
           maxLength: 10
           example: 1047 HM
         POBox:
@@ -3100,7 +3150,7 @@ components:
         city:
           type: string
           description: |
-            The city name of the party’s address.
+            The city name of the party's address.
           pattern: ^\S(?:.*\S)?$
           maxLength: 35
           example: Amsterdam
@@ -3117,7 +3167,7 @@ components:
           example: NLAMS
         stateRegion:
           type: string
-          description: The state/region of the party’s address.
+          description: The state/region of the party's address.
           maxLength: 65
           example: North Holland
         countryCode:
@@ -3141,7 +3191,7 @@ components:
       description: |
         The party by whom or in whose name or on whose behalf a contract of carriage of goods by sea has been concluded with a carrier, or the party by whom or in whose name, or on whose behalf, the goods are actually delivered to the carrier in relation to the contract of carriage by sea.
 
-        **Condition:** If a `displayedAddress` is provided, it must be included in the `Transport Document` instead of the `address`.
+        **Condition:** If a `displayedAddress` is provided, it must be included in the `Transport Document` instead of the `address` or `addressLines`.
       properties:
         partyName:
           type: string
@@ -3162,6 +3212,17 @@ components:
           example: 'NATURAL_PERSON'
         address:
           $ref: '#/components/schemas/PartyAddress'
+        addressLines:
+          type: array
+          maxItems: 5
+          description: |
+            Unstructured address lines, used as a fallback when structured address fields are unavailable.
+          items:
+            type: string
+            maxLength: 250
+            description: |
+              One line of an unstructured `Address`.
+            example: "123 Example Rd"
         displayedAddress:
           type: array
           maxItems: 6
@@ -3221,8 +3282,6 @@ components:
       title: On Behalf of Shipper
       description: |
         The party allowed to act on behalf of the shipper for documentation purposes.
-
-        **Condition:** Either the `address` or a party `identifyingCode` must be provided in the `Shipping Instructions`.
       properties:
         partyName:
           type: string
@@ -3233,6 +3292,17 @@ components:
           example: IKEA Denmark
         address:
           $ref: '#/components/schemas/PartyAddress'
+        addressLines:
+          type: array
+          maxItems: 5
+          description: |
+            Unstructured address lines, used as a fallback when structured address fields are unavailable.
+          items:
+            type: string
+            maxLength: 250
+            description: |
+              One line of an unstructured `Address`.
+            example: "123 Example Rd"
         identifyingCodes:
           type: array
           description: |
@@ -3248,9 +3318,9 @@ components:
       description: |
         The party to which goods are consigned in the `Master Bill of Lading`.
         
-        **Condition:** Mandatory for non-negotiable BL (`isToOrder=false`)
+        **Condition:** Mandatory for non-negotiable BL (`isToOrder=false`). Note `Consignee` and `Endorsee` are mutually exclusive.
 
-        **Condition:** If a `displayedAddress` is provided, it must be included in the `Transport Document` instead of the `address`.
+        **Condition:** If a `displayedAddress` is provided, it must be included in the `Transport Document` instead of the `address` or `addressLines`.
       properties:
         partyName:
           type: string
@@ -3271,6 +3341,17 @@ components:
           example: 'NATURAL_PERSON'
         address:
           $ref: '#/components/schemas/PartyAddress'
+        addressLines:
+          type: array
+          maxItems: 5
+          description: |
+            Unstructured address lines, used as a fallback when structured address fields are unavailable.
+          items:
+            type: string
+            maxLength: 250
+            description: |
+              One line of an unstructured `Address`.
+            example: "123 Example Rd"
         displayedAddress:
           type: array
           maxItems: 6
@@ -3332,8 +3413,6 @@ components:
       title: On Behalf of Consignee
       description: |
         The party allowed to act on behalf of the consignee for documentation purposes.
-
-        **Condition:** Either the `address` or a party `identifyingCode` must be provided in the `Shipping Instructions`.
       properties:
         partyName:
           type: string
@@ -3344,6 +3423,17 @@ components:
           example: IKEA Denmark
         address:
           $ref: '#/components/schemas/PartyAddress'
+        addressLines:
+          type: array
+          maxItems: 5
+          description: |
+            Unstructured address lines, used as a fallback when structured address fields are unavailable.
+          items:
+            type: string
+            maxLength: 250
+            description: |
+              One line of an unstructured `Address`.
+            example: "123 Example Rd"
         identifyingCodes:
           type: array
           minItems: 1
@@ -3360,7 +3450,7 @@ components:
         
         **Condition:** Can only be provided for negotiable BLs (`isToOrder=true`). If a negotiable BL does not have an `Endorsee`, the BL is said to be "blank endorsed". Note `Consignee` and `Endorsee` are mutually exclusive.
 
-        **Condition:** If a `displayedAddress` is provided, it must be included in the `Transport Document` instead of the `address`.
+        **Condition:** If a `displayedAddress` is provided, it must be included in the `Transport Document` instead of the `address` or `addressLines`.
       properties:
         partyName:
           type: string
@@ -3371,6 +3461,17 @@ components:
           example: IKEA Denmark
         address:
           $ref: '#/components/schemas/PartyAddress'
+        addressLines:
+          type: array
+          maxItems: 5
+          description: |
+            Unstructured address lines, used as a fallback when structured address fields are unavailable.
+          items:
+            type: string
+            maxLength: 250
+            description: |
+              One line of an unstructured `Address`.
+            example: "123 Example Rd"
         displayedAddress:
           type: array
           maxItems: 6
@@ -3424,6 +3525,17 @@ components:
           example: IKEA Denmark
         address:
           $ref: '#/components/schemas/Address'
+        addressLines:
+          type: array
+          maxItems: 5
+          description: |
+            Unstructured address lines, used as a fallback when structured address fields are unavailable.
+          items:
+            type: string
+            maxLength: 250
+            description: |
+              One line of an unstructured `Address`.
+            example: "123 Example Rd"
         partyContactDetails:
           type: array
           description: |
@@ -3441,7 +3553,7 @@ components:
       description: |
         The person to be notified when a shipment arrives at its destination.
 
-        **Condition:** If a `displayedAddress` is provided, it must be included in the `Transport Document` instead of the `address`.
+        **Condition:** If a `displayedAddress` is provided, it must be included in the `Transport Document` instead of the `address` or `addressLines`.
       properties:
         partyName:
           type: string
@@ -3462,6 +3574,17 @@ components:
           example: 'NATURAL_PERSON'
         address:
           $ref: '#/components/schemas/PartyAddress'
+        addressLines:
+          type: array
+          maxItems: 5
+          description: |
+            Unstructured address lines, used as a fallback when structured address fields are unavailable.
+          items:
+            type: string
+            maxLength: 250
+            description: |
+              One line of an unstructured `Address`.
+            example: "123 Example Rd"
         displayedAddress:
           type: array
           maxItems: 6
@@ -3520,6 +3643,17 @@ components:
           example: Asseco Denmark
         address:
           $ref: '#/components/schemas/PartyAddress'
+        addressLines:
+          type: array
+          maxItems: 5
+          description: |
+            Unstructured address lines, used as a fallback when structured address fields are unavailable.
+          items:
+            type: string
+            maxLength: 250
+            description: |
+              One line of an unstructured `Address`.
+            example: "123 Example Rd"
         identifyingCodes:
           type: array
           items:
@@ -3561,6 +3695,17 @@ components:
           example: Asseco Denmark
         address:
           $ref: '#/components/schemas/PartyAddress'
+        addressLines:
+          type: array
+          maxItems: 5
+          description: |
+            Unstructured address lines, used as a fallback when structured address fields are unavailable.
+          items:
+            type: string
+            maxLength: 250
+            description: |
+              One line of an unstructured `Address`.
+            example: "123 Example Rd"
         identifyingCodes:
           type: array
           items:
