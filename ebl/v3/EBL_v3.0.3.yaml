@@ -313,7 +313,7 @@ paths:
         The status of `updatedShippingInstructionsStatus` can be anything.
 
         ## Postcondition
-        The provider has received an update to the `Shipping Instructions` (**UseCase 3 - Submit updated Shipping Instructions**). In case this is the first update to the `Shipping Instructions` the update will be called the `Updated Shipping Instructions`. If this is a subsequent update to the `Shipping Instructions` - the update will update the `Updated Shipping Instructions`. In both cases the `updatedShippingInstructionStatus` will be set to `UPDATE_RECEIVED`.
+        The provider has received an update to the `Shipping Instructions` (**UseCase 3 - Submit updated Shipping Instructions**). In case this is the first update to the `Shipping Instructions` the update will be called the `Updated Shipping Instructions`. If this is a subsequent update to the `Shipping Instructions` - the update will update the `Updated Shipping Instructions`. In both cases the `updatedShippingInstructionsStatus` will be set to `UPDATE_RECEIVED`.
 
         The `Updated Shipping Instructions` and the "original" `Shipping Instructions` **co-exist** until a new update is submitted by the consumer (via **UseCase 3: Submit updated Shipping Instructions**) in which case the new update replaces the existing. Or until the provider requests an update (sets the `shippingInstructionsStatus='PENDING_UPDATE'` via **UseCase 2: Request to update Shipping Instructions**). The `Updated Shipping Instructions` always represents the latest version of an update received by the provider.
 
@@ -422,7 +422,7 @@ paths:
                   summary: |
                     Shipping Instructions updated by consumer
                   description: |
-                    An `Updated Shipping Instructions` received and accepted by provider, the `Updated Shipping Instructions` now awaits provider action, the `shippingInstructionStatus` does not change.
+                    An `Updated Shipping Instructions` received and accepted by provider, the `Updated Shipping Instructions` now awaits provider action, the `shippingInstructionsStatus` does not change.
                   value: null
         '400':
           description: |
@@ -954,19 +954,26 @@ paths:
       tags:
         - Shipping Instructions
       summary: |
-        Cancels an update to a Shipping Instructions
+        Cancels an update to or Cancels a Shipping Instructions
       operationId: patch-shipping-instructions
       parameters:
         - $ref: '#/components/parameters/documentReference'
         - $ref: '#/components/parameters/Api-Version-Major'
       description: |
-        A way for the consumer to Cancel an `Updated Shipping Instructions`. This endPoint corresponds with **UseCase 5 - Cancel update to Shipping Instructions**.
+        A shipper initiated cancellation of the `Shipping Instructions` or `Updated Shipping Instructions` with the `documentReference`. The path can contain a `shippingInstrudctionsRefernce` or a `transportDocumentReference`.
+
+        This endPoint corresponds with **UseCase 5 - Cancel update to Shipping Instructions** or **UseCase 15 - Cancel Shipping Instructions**.
 
         ## Precondition
-        In order to cancel an `Updated Shipping Instructions`, the status of the `Updated Shipping Instructions` must be in in status `UPDATE_RECEIVED`. The status of the `Shipping Instructions` can be one of `RECEIVED` or `PENDING_UPDATE`.
+        In order to cancel an `Updated Shipping Instructions`, the status of the `Updated Shipping Instructions` must be
+        - `UPDATE_RECEIVED`.
+
+        In order to cancel a `Shipping Instructions`, the status of the `Shipping Instructions` must be one of
+        - `RECEIVED`.
+        - `PENDING_UPDATE`.
 
         ## Postcondition
-        The provider has received a cancellation from the consumer for an `Updated Shipping Instructions` that is in state `UPDATE_RECEIVED`.
+        The provider has received a cancellation from the consumer for an `Updated Shipping Instructions` or a `Shipping Instructions`.
 
         The consumer will receive a `202` (Accepted) if the payload schema-validates or a `400` (Bad Request) if it does not.
 
@@ -980,7 +987,7 @@ paths:
             - all values provided have correct data type.
         3. An empty response is returned and the consumer now awaits further processing by the provider.
         
-        Once processed, the `Updated Shipping Instructions` is cancelled and a [Shipping Instructions Notification](#/ShippingInstructionsNotification) will be sent. In case the consumer does not subscribe to notifications it is necessary for the consumer to poll on the
+        Once processed, the `Updated Shipping Instructions` or the `Shipping Instructions` is cancelled and a [Shipping Instructions Notification](#/ShippingInstructionsNotification) is sent. In case the consumer does not subscribe to notifications it is necessary for the consumer to poll on the
 
             GET /v3/shipping-instructions/{documentReference}
             
@@ -1001,6 +1008,13 @@ paths:
                   Consumer wants to cancel an update provided to a `Shipping Instructions`. The `updatedShippingInstructionsStatus` is set to `UPDATE_CANCELLED`
                 value:
                   updatedShippingInstructionsStatus: UPDATE_CANCELLED
+              cancelExample:
+                summary: |
+                  Cancel a Shipping Instructions
+                description: |
+                  Consumer wants to cancel a `Shipping Instructions`. The `shippingInstructionsStatus` is set to `CANCELLED`
+                value:
+                  shippingInstructionsStatus: CANCELLED
       responses:
         '202':
           description: |
@@ -1016,6 +1030,12 @@ paths:
                     Cancel a Shipping Instructions update
                   description: |
                     Consumer wants to cancel an update provided to a `Shipping Instructions`.
+                  value: null
+                cancelExample:
+                  summary: |
+                    Cancel a Shipping Instructions
+                  description: |
+                    Consumer wants to cancel a `Shipping Instructions`.
                   value: null
         '400':
           description: |
@@ -2673,18 +2693,36 @@ components:
     #####################################
     CancelShippingInstructionsUpdate:
       type: object
-      title: Cancel Shipping Instructions Update
+      title: Cancel Shipping Instructions and Update
       description: |
-        Cancel the `Shipping Instructions` update
-      properties:
-        updatedShippingInstructionsStatus:
-          type: string
-          maxLength: 50
-          description: |
-            The status of the `Updated Shipping Instructions`. It can only be `UPDATE_CANCELLED`
-          example: UPDATE_CANCELLED
-      required:
-        - updatedShippingInstructionsStatus
+        Cancel the `Shipping Instructions` or the update to the `Shipping Instructions`
+      oneOf:
+        - type: object
+          title: Cancel Updated Shipping Instructions
+          properties:
+            updatedShippingInstructionsStatus:
+              type: string
+              maxLength: 50
+              description: |
+                Setting the `updatedShippingInstructionsStatus` to `UPDATE_CANCELLED` cancels the `Updated Shipping Instructions`. The `Updated Shipping Instructions` will discontinue if the request is accepted by the provider.
+
+                Only possible value to set is `UPDATE_CANCELLED`.
+              example: UPDATE_CANCELLED
+          required:
+            - updatedShippingInstructionsStatus
+        - type: object
+          title: Cancel Shipping Instructions
+          properties:
+            shippingInstructionsStatus:
+              type: string
+              maxLength: 50
+              description: |
+                Setting the `shippingInstructionsStatus` to `CANCELLED` cancels the `Shipping Instructions`. The `Shipping Instructions` will discontinue if the request is accepted by the provider.
+
+                Only possible value to set is `CANCELLED`.
+              example: CANCELLED
+          required:
+            - shippingInstructionsStatus
 
     ############################
     # Approve Transport Document
@@ -2803,6 +2841,8 @@ components:
             - `RECEIVED` (Shipping Instructions has been received)
             - `PENDING_UPDATE` (An update is required to the Shipping Instructions)
             - `COMPLETED` (The Shipping Instructions can no longer be modified - the related Transport Document has been surrendered for delivery)
+            - `CANCELLED` (The Shipping Instructions has been cancelled by Shipper)
+            - `DECLINED` (The Shipping Instructions has been declined by Carrier)
           example: RECEIVED
         updatedShippingInstructionsStatus:
           type: string
@@ -3718,6 +3758,8 @@ components:
             - `RECEIVED` (Shipping Instructions has been received)
             - `PENDING_UPDATE` (An update is required to the Shipping Instructions)
             - `COMPLETED` (The Shipping Instructions can no longer be modified - the related Transport Document has been surrendered for delivery)
+            - `CANCELLED` (The Shipping Instructions has been cancelled by Shipper)
+            - `DECLINED` (The Shipping Instructions has been declined by Carrier)
           example: RECEIVED
         updatedShippingInstructionsStatus:
           type: string
