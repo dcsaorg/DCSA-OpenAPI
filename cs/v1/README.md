@@ -2,11 +2,38 @@
 
 The DCSA Commercial Schedules API is specified on [**SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_CS).
 
+<a name="v102"></a>[Release v1.0.2 (13 February 2026)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_CS/1.0.2)
+---
+This is a patch release for the DCSA Commercial Schedules API. The primary purpose of this patch is to include the emission data in the Point-to-point routings. Here is a list of changes:
+
+- improved the `Next-Page-Cursor` description in all endpoints
+- added `transportCallReference` to both `PlaceOfArrival` and `PlaceOfDeparture` (to be used instead of `transportCallReference` in `VesselTransport` and `BargeTransport`)
+- deprecated `transportCallReference` in `VesselTransport` and `BargeTransport` - use `transportCallReference` in `PlaceOfArrival` and `PlaceOfDeparture` instead
+- added `solutionFootprint` to the Point-to-point routing as a possible indicator of the footprint for the entire route. The footprint includes: `co2`, `sox`, `nox` and `pm10`
+- added `footprint` to the legs of Point-to-point routings as a possible indicator of the footprint per leg. The footprint includes: `co2`, `sox`, `nox` and `pm10`
+- added `cutOffTimes` to each leg
+- `Location` and `TransportCallLocation` objects modified:
+  - added `addressLines` as a new way to provide an **unstructured** address
+  - added `facilityName`
+- `PortScheduleLocation` now also has `facilityName`
+- minor changes:
+  - removed empty parameters `[]` in all endpoints
+  - added a description to objects: `Timestamp`, `VesselSchedule`, `ErrorResponse`, `Vessel` and `Barge`
+  - updated the `errorCode` property:
+    - no longer links to [Error codes as specified by DCSA](https://developer.dcsa.org/standard-error-codes)
+    - does not specify errorCode ranges (this never gained traction)
+  - changed encoding of some description characters
+    - `–` -> `-`
+    - `’` -> `'`
+    - `&apos;` -> `'`
+
+Link to [commits included in this patch](https://github.com/dcsaorg/DCSA-OpenAPI/commits/master/cs/v1/CS_v1.0.1.yaml?since=2025-04-25&until=2026-02-13)
+
 <a name="v101"></a>[Release v1.0.1 (25 April 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_CS/1.0.1)
 ---
-This is a patch release for the DCSA Commercial Schedules API. The primary purpose of this patch is to include the `routingReference` property in the Point-to-point responses in order to be able to reference a route in [Booking](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/bkg/v2). Here is a list of changes
+This is a patch release for the DCSA Commercial Schedules API. The primary purpose of this patch is to include the `routingReference` property in the Point-to-point responses in order to be able to reference a route in [Booking](https://github.com/dcsaorg/DCSA-OpenAPI/tree/master/bkg/v2). Here is a list of changes:
 
-- `routingReference` property added to the PointToPoint object.
+- `routingReference` property added to the Point-to-point object.
 - `maxTranshipment` query parameter description imporved to explain meaning of a "transhipment"
 - remove the reference to `ISO 8601` (all dateTime fields must comply with [RFC 3339, section 5.6](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6)), affecting the following query parameters: `startDate` and `endDate`, the following properties: `dateTime` (in `PlaceOfReceipt`, `PlaceOfDelivery`, `PlaceOfArrival` and `PlaceOfDeparture`), `eventDateTime` (in Timestamp), `cutOffDateTime` (in CutOffTime), `errorDateTime` (in ErrorResponse)
 - typos and punctuation fixed in descriptions
@@ -29,7 +56,7 @@ Link to [commits included in this patch](https://github.com/dcsaorg/DCSA-OpenAPI
 - Added Pagination to all the endpoints
 
 ## All changes
-- Point to Point
+- Point-to-point
   - Filters
     - `departureDateTime` changed to `departureStartDate`,`departureEndDate`
     - `arrivalDateTime` changed to `arrivalStartDate`,`arrivalEndDate`
