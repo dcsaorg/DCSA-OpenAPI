@@ -12,6 +12,7 @@ info:
     - Draft Transport Document publication
     - Draft Transport Document update
     - Draft Transport Document approval
+    - **👉 New in v3.0.3:** **Direct Transport Document** amendments (optional to support)
 
     For explanation of specific values or objects please refer to the [Information Model](https://developer.dcsa.org/documentation/information_models). This API specification does not define the allowable updates and their timing in accordance with the established business rules. **All use cases mentioned in this API specification refer to use cases defined in [DCSA Interface Standard for the Bill of Lading 3.0](https://dcsa.org/standards/bill-of-lading/documentation-bill-of-lading-3)**.
 
@@ -21,12 +22,15 @@ info:
 
     It is possible to use the eBL API as a standalone API. In that case use one of the poll endPoints:
 
-        GET /v3/shipping-instructions/{documentReference}  # For Shipping Instructions status
-        GET /v3/transport-documents/{transportDocumentReference}  # For Transport Document status
+        GET /v3/shipping-instructions/{documentReference}                            # For Shipping Instructions status
+        GET /v3/transport-documents/{transportDocumentReference}                     # For Transport Document status
+        👉 New in v3.0.3: GET /v3/transport-documents/{transportDocumentReference}/amendment  # For Direct Transport Document amendment status
 
     in order to poll information about status changes.
 
-    **Note:** All `/v3/shipping-instructions` and `/v3/transport-documents` endPoints must be implemented by the provider.
+    **Note:** All `/v3/shipping-instructions` and `/v3/transport-documents` endPoints must be implemented by the provider except endPoints supporting **Direct Transport Document** amendments:
+        GET /v3/transport-documents/{transportDocumentReference}/amendment  # For fetching a Transport Document amendment
+        PUT /v3/transport-documents/{transportDocumentReference}/amendment  # For creating a new Transport Document amendment
 
     ### Notifications (Implemented by consumer)
     It is possible to have notifications pushed to you whenever the provider needs input and/or a state change. The format of the notification is defined by the [Shipping Instructions Notification endPoint](#/ShippingInstructionsNotification) or the [Transport Document Notification endPoint](#/TransportDocumentNotification).
@@ -38,7 +42,7 @@ info:
 
     Signing up for notifications is defined outside the scope of this API specification.
 
-    **Note:** All of these endPoint is to be implemented by the consumers of the `Shipping Instructions API` and `Transport Document API` in order to receive push events.
+    **Note:** All of these endPoints are to be implemented by the consumers of the `Shipping Instructions API` and `Transport Document API` in order to receive push events.
 
     ### API Design & Implementation Principles
     This API follows the guidelines defined in version 2.0 of the API Design & Implementation Principles which can be found on the [DCSA Developer Portal](https://developer.dcsa.org/api_design)
@@ -63,6 +67,9 @@ tags:
       The Transport Document endPoints to be implemented by **providers** of the Bill of Lading API
   - name: Notifications
     description: The Notifications to be implemented by the **consumers** of the Bill of Lading API
+  - name: Direct Transport Document Amendments
+    description: |
+      The **Direct Transport Document** amendment endPoints to be implemented by **providers** of the Bill of Lading API in case **Direct Transport Document** amendments is supported (this is optional to implement for the provider)
 paths:
   ##############################
   # Shipping Instructions Request
@@ -193,12 +200,12 @@ paths:
                   summary: |
                     Shipping Instructions received
                   description: |
-                    The `shippingInstructionsReference` has been accepted (no `shippingInstructionsStatus`) and schema validated by provider
+                    The `shippingInstructionsReference` has been accepted (no `shippingInstructionsStatus`) and schema-validated by provider
                   value:
                     shippingInstructionsReference: si-123
         '400':
           description: |
-            In case the `Shipping Instructions` does not schema validate a `400` (Bad Request) is returned
+            In case the `Shipping Instructions` does not validate against the schema a `400` (Bad Request) is returned
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -211,7 +218,7 @@ paths:
                   summary: |
                     Shipping Instructions missing isElectronic
                   description: |
-                    `isElectronic` is a mandatory property in the `Shipping Instructions`. In case this property is missing an error objet is created.
+                    `isElectronic` is a mandatory property in the `Shipping Instructions`. In case this property is missing an error object is created.
 
                     **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
                   value:
@@ -304,7 +311,7 @@ paths:
       description: |
         Updates the `Shipping Instructions` with the `documentReference`. The path can contain one of a `shippingInstructionsReference` or a `transportDocumentReference`. This endPoint corresponds with **UseCase 3 - Submit updated Shipping Instructions**
 
-        ### Precondition
+        ## Precondition
         In order to update a `Shipping Instructions`, the status of the `Shipping Instructions` needs to be in state:
 
         - `RECEIVED` in case the consumer has updated information for the `Shipping Instructions`
@@ -423,10 +430,9 @@ paths:
                     Shipping Instructions updated by consumer
                   description: |
                     An `Updated Shipping Instructions` received and accepted by provider, the `Updated Shipping Instructions` now awaits provider action, the `shippingInstructionsStatus` does not change.
-                  value: null
         '400':
           description: |
-            In case the updated `Shipping Instructions` does not schema validate a `400` (Bad Request) is returned
+            In case the updated `Shipping Instructions` does not validate against the schema a `400` (Bad Request) is returned
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -671,7 +677,7 @@ paths:
                   summary: |
                     Shipping Instructions with reefer cargo
                   description: |
-                    A `Shipping Instructions` with reefer cargo (`Diary products`) with US as destination. The provider requests that the `Advance Manifest Filing` be updated by the consumer.
+                    A `Shipping Instructions` with reefer cargo (`Dairy products`) with US as destination. The provider requests that the `Advance Manifest Filing` be updated by the consumer.
 
                     **Notice** that there are no Reefer info in the `Shipping Instructions`. If any reefer info need to be modified - then a `Booking` amendment must be applied to booking: `CBR_123_REEFER`.
                   value:
@@ -1036,16 +1042,14 @@ paths:
                     Cancel a Shipping Instructions update
                   description: |
                     Consumer wants to cancel an update provided to a `Shipping Instructions`.
-                  value: null
                 cancelExample:
                   summary: |
                     Cancel a Shipping Instructions
                   description: |
                     Consumer wants to cancel a `Shipping Instructions`.
-                  value: null
         '400':
           description: |
-            In case the cancel payload does not schema validate a `400` (Bad Request) is returned
+            In case the cancel payload does not validate against the schema a `400` (Bad Request) is returned
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -1255,7 +1259,7 @@ paths:
                     isToOrder: true
                     shippedOnBoardDate: '2023-12-20'
                     termsAndConditions: |
-                      You agree that this transport document exist is name only for the sake of
+                      You agree that this transport document exist in name only for the sake of
                       testing your conformance with the DCSA eBL API. This transport document is NOT backed
                       by a real shipment with ANY carrier and NONE of the requested services will be
                       carried out in real life.
@@ -1352,7 +1356,7 @@ paths:
                   summary: |
                     Approved Transport Document with reefer cargo
                   description: |
-                    An `APPROVED` Transport Document by the consumer waiting to be Issued by the provider. The cargo is `Diary products` which need to be transported using a `Reefer` container at -18° CEL.
+                    An `APPROVED` Transport Document by the consumer waiting to be Issued by the provider. The cargo is `Dairy products` which need to be transported using a `Reefer` container at -18° CEL.
                   value:
                     transportDocumentReference: D8931B95625E4B339F2A
                     shippingInstructionsReference: 9051da7d-4099-4930-af35-7add4e68c635
@@ -1364,7 +1368,7 @@ paths:
                     isToOrder: true
                     shippedOnBoardDate: '2023-12-20'
                     termsAndConditions: |
-                      You agree that this transport document exist is name only for the sake of
+                      You agree that this transport document exist in name only for the sake of
                       testing your conformance with the DCSA eBL API. This transport document is NOT backed
                       by a real shipment with ANY carrier and NONE of the requested services will be
                       carried out in real life.
@@ -1477,7 +1481,7 @@ paths:
                     isToOrder: true
                     shippedOnBoardDate: '2023-12-20'
                     termsAndConditions: |
-                      You agree that this transport document exist is name only for the sake of
+                      You agree that this transport document exist in name only for the sake of
                       testing your conformance with the DCSA eBL API. This transport document is NOT backed
                       by a real shipment with ANY carrier and NONE of the requested services will be
                       carried out in real life.
@@ -1678,7 +1682,7 @@ paths:
                     errors:
                       - errorCode: 7003
                         errorCodeText: Max Transport Document requests reached
-                        errorCodeMessage: A maximum of 10 Transport Document can be requested per hour
+                        errorCodeMessage: A maximum of 10 Transport Documents can be requested per hour
     patch:
       tags:
         - Transport Document
@@ -1745,10 +1749,9 @@ paths:
                     Approve Draft Transport Document
                   description: |
                     Consumer approves the drafted `Transport Document` and now awaits further processing by provider.
-                  value: null
         '400':
           description: |
-            In case the Approve payload does not schema validate a `400` (Bad Request) is returned
+            In case the Approve payload does not validate against the schema a `400` (Bad Request) is returned
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -1902,7 +1905,1088 @@ paths:
                     errors:
                       - errorCode: 7003
                         errorCodeText: Max Transport Document requests reached
-                        errorCodeMessage: A maximum of 10 Transport Document can be patched per hour
+                        errorCodeMessage: A maximum of 10 Transport Documents can be patched per hour
+  '/v3/transport-documents/{transportDocumentReference}/amendment':
+    get:
+      tags:
+        - Direct Transport Document Amendments
+      summary: |
+        Gets the Transport Document Amendment (optional endpoint)
+      operationId: get-transport-document-amendment
+      description: |
+        Retrieves the `Amended Transport Document` with the `transportDocumentReference` in the path. If no amendment is ongoing or has been submitted - a `404` (Not Found) will be returned.
+
+        The payload when calling this endPoint is the latest "amendment" to the `Transport Document`. If the "original" is wanted - then the 
+        
+            GET /v3/transport-documents/{transportDocumentReference}
+        
+        endPoint should be used instead.
+
+        The `status` of the "original" `Transport Document` is included in the payloads as `transportDocumentStatus`. `amendedTransportDocumentStatus` is the status of the amendment.
+        
+        In case no subscription (`Notification`) has been set up - it is possible to use this endPoint to poll on in order to detect if `transportDocumentStatus` and/or `amendedTransportDocumentStatus` has changed.
+
+        In case a previous request is being processed by the provider - a `202` (Accepted) with **no payload** can be used as a response until the processing is finished.
+
+        **👉 Important:** It is important to verify with the provider of the API if this endpoint is supported. For providers on **v3.0.2 or earlier** this endpoint **MUST NOT** be used. For providers on **v3.0.3 or later** it is optional to implement.
+      parameters:
+        - in: path
+          name: transportDocumentReference
+          description: |
+            The `transportDocumentReference` of the `Transport Document`
+          required: true
+          schema:
+            type: string
+            pattern: ^\S(?:.*\S)?$
+            maxLength: 20
+            description: |
+              A unique number allocated by the shipping line to the `Transport Document` and the main number used for the tracking of the status of the shipment.
+            example: HHL71800000
+        - $ref: '#/components/parameters/Api-Version-Major'
+      responses:
+        '200':
+          description: |
+            The amendment to the `Transport Document`
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransportDocumentAmend'
+              examples:
+                reeferExample:
+                  summary: |
+                    Amended Transport Document with reefer cargo
+                  description: |
+                    An amended Transport Document by the consumer waiting to be approved by the provider. The cargo is `Dairy products` which need to be transported using a `Reefer` container at -5° CEL.
+                  value:
+                    amendedTransportDocumentStatus: AMENDMENT_RECEIVED
+                    amendedTransportDocument:
+                      transportDocumentReference: D8931B95625E4B339F2A
+                      shippingInstructionsReference: 9051da7d-4099-4930-af35-7add4e68c635
+                      transportDocumentStatus: ISSUED
+                      transportDocumentTypeCode: BOL
+                      isShippedOnBoardType: true
+                      freightPaymentTermCode: PRE
+                      isElectronic: true
+                      isToOrder: true
+                      shippedOnBoardDate: '2023-12-20'
+                      termsAndConditions: |
+                        You agree that this transport document exist in name only for the sake of
+                        testing your conformance with the DCSA eBL API. This transport document is NOT backed
+                        by a real shipment with ANY carrier and NONE of the requested services will be
+                        carried out in real life.
+
+                        Unless required by applicable law or agreed to in writing, DCSA provides
+                        this JSON data on an \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
+                        ANY KIND, either express or implied, including, without limitation, any
+                        warranties or conditions of TITLE, NON-INFRINGEMENT, MERCHANTABILITY,
+                        or FITNESS FOR A PARTICULAR PURPOSE. You are solely responsible for
+                        determining the appropriateness of using or redistributing this JSON
+                        data and assume any risks associated with Your usage of this data.
+
+                        In no event and under no legal theory, whether in tort (including negligence),
+                        contract, or otherwise, unless required by applicable law (such as deliberate
+                        and grossly negligent acts) or agreed to in writing, shall DCSA be liable to
+                        You for damages, including any direct, indirect, special, incidental, or
+                        consequential damages of any character arising as a result of this terms or conditions
+                        or out of the use or inability to use the provided JSON data (including but not limited
+                        to damages for loss of goodwill, work stoppage, computer failure or malfunction, or any
+                        and all other commercial damages or losses), even if DCSA has been advised of the
+                        possibility of such damages.
+                      receiptTypeAtOrigin: CY
+                      deliveryTypeAtDestination: CY
+                      cargoMovementTypeAtOrigin: FCL
+                      cargoMovementTypeAtDestination: FCL
+                      serviceContractReference: SCR-1234-REEFER
+                      carrierCode: MSC
+                      carrierCodeListProvider: SMDG
+                      transports:
+                        plannedDepartureDate: '2023-12-20'
+                        plannedArrivalDate: '2023-12-22'
+                        portOfLoading:
+                          UNLocationCode: DKAAR
+                        portOfDischarge:
+                          UNLocationCode: DEBRV
+                        vesselVoyages:
+                          - vesselName: Ever Ace
+                            carrierExportVoyageNumber: 402E
+                      charges:
+                        - chargeName: Fictive transport document fee
+                          currencyAmount: 1
+                          currencyCode: EUR
+                          paymentTermCode: COL
+                          calculationBasis: Per transport document
+                          unitPrice: 1
+                          quantity: 1
+                      invoicePayableAt:
+                        UNLocationCode: DKAAR
+                      partyContactDetails:
+                        - name: DCSA test person
+                          email: no-reply@dcsa.example.org
+                      documentParties:
+                        shipper:
+                          partyName: DCSA CTK
+                          displayedAddress:
+                            - Strawinskylaan 4117
+                          partyContactDetails:
+                            - name: DCSA test person
+                              email: no-reply@dcsa.example.org
+                        issuingParty:
+                          partyName: Mediterranean Shipping Company
+                          address:
+                            street: Chemin Rieu
+                            streetNumber: 12-14
+                            city: Geneva
+                            countryCode: CH
+                          identifyingCodes:
+                            - codeListProvider: GLEIF
+                              codeListName: LEI
+                              partyCode: 529900T8BM49AURSDO55
+                      consignmentItems:
+                        - carrierBookingReference: CBR_123_REEFER
+                          descriptionOfGoods:
+                            - 'Dairy products'
+                          HSCodes:
+                            - '04052090'
+                          cargoItems:
+                            - equipmentReference: KKFU6671914
+                              cargoGrossWeight:
+                                value: 12000
+                                unit: KGM
+                              outerPackaging:
+                                numberOfPackages: 400
+                                packageCode: BQ
+                                description: Bottles
+                      utilizedTransportEquipments:
+                        - isShipperOwned: false
+                          seals:
+                            - number: DCSA-CTK-1234
+                          equipment:
+                            ISOEquipmentCode: 45R1
+                            equipmentReference: KKFU6671914
+                          isNonOperatingReefer: false
+                          activeReeferSettings:
+                            temperatureSetpoint: -5
+                            temperatureUnit: CEL
+                dgExample:
+                  summary: |
+                    Amended Transport Document with DG (Dangerous Goods) cargo that is Confirmed
+                  description: |
+                    A Transport Document containing a DG (Dangerous Goods) amendment that has been confirmed by the provider. The cargo is `Environmentally hazardous substance, liquid, N.O.S (Propiconazole)` which is transported in steel Jerrycans.
+                  value:
+                    amendedTransportDocumentStatus: AMENDMENT_CONFIRMED
+                    amendedTransportDocument:
+                      transportDocumentReference: 4AD3FA470BB541B980CE
+                      shippingInstructionsReference: b36484d0-1115-43c2-93e4-a378823a8386
+                      transportDocumentStatus: ISSUED
+                      transportDocumentTypeCode: BOL
+                      isShippedOnBoardType: true
+                      freightPaymentTermCode: PRE
+                      isElectronic: true
+                      isToOrder: true
+                      shippedOnBoardDate: '2023-12-20'
+                      termsAndConditions: |
+                        You agree that this transport document exist in name only for the sake of
+                        testing your conformance with the DCSA eBL API. This transport document is NOT backed
+                        by a real shipment with ANY carrier and NONE of the requested services will be
+                        carried out in real life.
+
+                        Unless required by applicable law or agreed to in writing, DCSA provides
+                        this JSON data on an \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
+                        ANY KIND, either express or implied, including, without limitation, any
+                        warranties or conditions of TITLE, NON-INFRINGEMENT, MERCHANTABILITY,
+                        or FITNESS FOR A PARTICULAR PURPOSE. You are solely responsible for
+                        determining the appropriateness of using or redistributing this JSON
+                        data and assume any risks associated with Your usage of this data.
+
+                        In no event and under no legal theory, whether in tort (including negligence),
+                        contract, or otherwise, unless required by applicable law (such as deliberate
+                        and grossly negligent acts) or agreed to in writing, shall DCSA be liable to
+                        You for damages, including any direct, indirect, special, incidental, or
+                        consequential damages of any character arising as a result of this terms or conditions
+                        or out of the use or inability to use the provided JSON data (including but not limited
+                        to damages for loss of goodwill, work stoppage, computer failure or malfunction, or any
+                        and all other commercial damages or losses), even if DCSA has been advised of the
+                        possibility of such damages.
+                      receiptTypeAtOrigin: CY
+                      deliveryTypeAtDestination: CY
+                      cargoMovementTypeAtOrigin: FCL
+                      cargoMovementTypeAtDestination: FCL
+                      serviceContractReference: SCR-1234-DG
+                      carrierCode: HLC
+                      carrierCodeListProvider: SMDG
+                      transports:
+                        plannedDepartureDate: '2023-12-20'
+                        plannedArrivalDate: '2023-12-22'
+                        portOfLoading:
+                          UNLocationCode: DKAAR
+                        portOfDischarge:
+                          UNLocationCode: DEBRV
+                        vesselVoyages:
+                          - vesselName: Berlin Express
+                            carrierExportVoyageNumber: 402E
+                      charges:
+                        - chargeName: Fictive transport document fee
+                          currencyAmount: 1
+                          currencyCode: EUR
+                          paymentTermCode: COL
+                          calculationBasis: Per transport document
+                          unitPrice: 1
+                          quantity: 1
+                      invoicePayableAt:
+                        UNLocationCode: DKAAR
+                      partyContactDetails:
+                        - name: DCSA test person
+                          email: no-reply@dcsa.example.org
+                      documentParties:
+                        shipper:
+                          partyName: DCSA CTK
+                          displayedAddress:
+                            - Strawinskylaan 4117
+                          partyContactDetails:
+                            - name: DCSA test person
+                              email: no-reply@dcsa.example.org
+                        issuingParty:
+                          partyName: Hapag Lloyd
+                          address:
+                            street: Ballindamm
+                            streetNumber: '25'
+                            postCode: D-20095
+                            city: Hamburg
+                            countryCode: DE
+                          identifyingCodes:
+                            - codeListProvider: GLEIF
+                              codeListName: LEI
+                              partyCode: 529900T8BM49AURSDO55
+                      consignmentItems:
+                        - carrierBookingReference: RTM1234567
+                          descriptionOfGoods:
+                            - 'Environmentally hazardous substance'
+                            - 'liquid, N.O.S (Propiconazole)'
+                          HSCodes:
+                            - '293499'
+                          cargoItems:
+                            - equipmentReference: HLXU1234567
+                              cargoGrossWeight:
+                                value: 12000
+                                unit: KGM
+                              outerPackaging:
+                                numberOfPackages: 400
+                                imoPackagingCode: 3A1
+                                description: 'Jerrycan, steel'
+                                dangerousGoods:
+                                  - UNNumber: '3082'
+                                    properShippingName: 'Environmentally hazardous substance, liquid, N.O.S'
+                                    imoClass: '9'
+                                    packingGroup: 3
+                                    EMSNumber: F-A S-F
+                      utilizedTransportEquipments:
+                        - isShipperOwned: false
+                          seals:
+                            - number: DCSA-CTK-1234
+                          equipment:
+                            ISOEquipmentCode: 22G1
+                            equipmentReference: HLXU1234567
+        '202':
+          description: |
+            The `Amended Transport Document` is currently being processed by the provider. No payload is returned. A new `GET` request has to be made periodically to check if the provider has finished processing the `Amended Transport Document`.
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+        '404':
+          description: |
+            In case the consumer is requesting the amendment to a `transportDocumentReference` that does not exist or it has no amendment.
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                notFoundExample:
+                  summary: |
+                    DocumentReference not found
+                  description: |
+                    The `transportDocumentReference` does not exist.
+
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: GET
+                    requestUri: /v3/transport-documents/td-987/amendment
+                    statusCode: 404
+                    statusCodeText: Not Found
+                    statusCodeMessage: transportDocumentReference not found
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2024-09-04T09:41:00Z'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: transportDocumentReference not found
+                        errorCodeMessage: The Transport Document does not exist or it does not have an amendment
+        '500':
+          description: |
+            In case a server error occurs in provider system a `500` (Internal Server Error) is returned
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                internalServerErrorExample:
+                  summary: |
+                    Internal Server Error while fetching the Transport Document amendment
+                  description: |
+                    An Internal Server Error has occurred - the consumer should contact {provider-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: GET
+                    requestUri: /v3/transport-documents/td-987/amendment
+                    statusCode: 500
+                    statusCodeText: Internal Server Error
+                    statusCodeMessage: Internal Server Error occurred while fetching the amended Transport Document
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2024-09-04T09:41:00Z'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: Internal Error occurred
+                        errorCodeMessage: Internal Error occurred
+        default:
+          description: |
+            For other errors the error object should be populated with relevant information
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                tooManyRequestsExample:
+                  summary: |
+                    Fetching too many `Transport Document` amendment requests
+                  description: |
+                    Calling the endPoint
+                    
+                        GET /v3/transport-documents/td-987/amendment
+                        
+                    too many times within a time period.
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
+                  value:
+                    httpMethod: GET
+                    requestUri: /v3/transport-documents/td-987/amendment
+                    statusCode: 429
+                    statusCodeText: Too Many Requests
+                    statusCodeMessage: |
+                      Too many requests to fetch an amended Transport Document have been requested. Please try again in 1 hour
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2024-09-04T09:41:00Z'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: Max Transport Document amendment requests reached
+                        errorCodeMessage: A maximum of 10 Transport Document amendments can be requested per hour
+    put:
+      tags:
+        - Direct Transport Document Amendments
+      summary: |
+        Amend the Transport Document (optional endpoint)
+      operationId: put-transport-document-amendment
+      parameters:
+        - in: path
+          name: transportDocumentReference
+          description: |
+            The `transportDocumentReference` of the `Transport Document`
+          required: true
+          schema:
+            type: string
+            pattern: ^\S(?:.*\S)?$
+            maxLength: 20
+            description: |
+              A unique number allocated by the shipping line to the `Transport Document` and the main number used for the tracking of the status of the shipment.
+            example: HHL71800000
+        - $ref: '#/components/parameters/Api-Version-Major'
+      description: |
+        Amends the `Transport Document` with the `transportDocumentReference`. This endPoint corresponds with **UseCase 17: Request Transport Document amendment** and allows a customer to modify a `Transport Document` directly.
+        
+        **👉 Important note:** It is up to the provider to define what is allowed to be modified and/or which properties will be ignored. This endPoint CAN be used as an alternative to creating an amendment to a `Transport Document` via the `PUT /v3/shipping-instructions/{documentReference}` of this API which covers **UseCase 3 - Submit updated Shipping Instructions** and `PUT /v2/bookings/{bookingReference}` of the [Booking API](https://app.swaggerhub.com/apis/dcsaorg/DCSA_BKG) which covers **UseCase 7 - Request amendments to confirmed Booking**.
+
+        ## Precondition
+        To amend a `Transport Document`, the status of the `Transport Document` can be in state: `DRAFT`, `ISSUED` or `PENDING_SURRENDER_FOR_AMENDMENT`!
+        
+        The status of `amendedTransportDocumentStatus` can be anything - using this endPoint will replace any previous ongoing amendment.
+
+        ## Postcondition
+        The provider has received an amendment to the `Transport Document` (**UseCase 17: Request Transport Document amendment**), from now on called the `Amended Transport Document`. The `amendedTransportDocumentStatus` will be set to `AMENDMENT_RECEIVED`.
+
+        The `Amended Transport Document` and the "original" `Transport Document` **co-exist** until a new amendment is submitted by the consumer (via the same endPoint) in which case the new amendment replaces the existing. The `Amended Transport Document` always represents the latest version of an amendment received by the provider.
+
+        The consumer will receive a `202` (Accepted) if the payload schema-validates or a `400` (Bad Request) if it does not.
+
+        ## Flow for the `202` (Accepted) response
+        The following occurs when a provider receives an **amendment** to a `Transport Document`
+        1. The payload (`Amended Transport Document`) is schema-validated. In case the payload **is invalid** a `400` (Bad Request) is returned.
+
+           **The process stops here!**
+        2. The payload is schema-valid which means:
+            - all required properties are provided
+            - all values provided have correct data type.
+        3. An empty response is returned and the consumer now awaits further processing by the provider.
+        
+        For `PUT` `Amended Transport Document` the process ends here. The `Amended Transport Document`:
+          - is now accepted by the provider system
+          - the status of the `Amended Transport Document` is unchanged
+          - a `202` (Accepted) response is sent with an empty payload
+          - awaits further processing by the provider
+        
+        The provider will now start asynchronous processing. Once processed, the state will change to : `amendedTransportDocumentStatus='AMENDMENT_RECEIVED'`
+        
+        The new state will be communicated via a [Transport Document Notification](#/TransportDocumentNotification). In case the consumer does not subscribe to notifications it is necessary for the consumer to poll on the
+
+            GET /v3/transport-documents/{transportDocumentReference}/amendment
+            
+        endPoint to check if the `amendedTransportDocumentStatus` and `transportDocumentStatus` of the `Transport Document` has changed.
+          
+        It is possible to `GET` the content of the `Amended Transport Document` via the example above until the consumer submits a new amendment (**UseCase 17: Request Transport Document amendment**) in which case the "new amendment" provided **replaces** the "old amendment".
+
+        **👉 Important:** It is important to verify with the provider of the API if this endpoint is supported. For providers on **v3.0.2 or earlier** this endpoint **MUST NOT** be used. For providers on **v3.0.3 or later** it is optional to implement.
+      requestBody:
+        description: |
+          Parameters used to amend the `Transport Document`
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransportDocument'
+            examples:
+              reeferExample:
+                summary: |
+                  Amend Reefer Temperature
+                description: |
+                  An amendment for a wrong reefer temperature. The temperature is to be changed to 5° celsius.
+                value:
+                  transportDocumentReference: D8931B95625E4B339F2A
+                  shippingInstructionsReference: 9051da7d-4099-4930-af35-7add4e68c635
+                  transportDocumentStatus: ISSUED
+                  transportDocumentTypeCode: BOL
+                  isShippedOnBoardType: true
+                  freightPaymentTermCode: PRE
+                  isElectronic: true
+                  isToOrder: true
+                  shippedOnBoardDate: '2023-12-20'
+                  termsAndConditions: |
+                    You agree that this transport document exist in name only for the sake of
+                    testing your conformance with the DCSA eBL API. This transport document is NOT backed
+                    by a real shipment with ANY carrier and NONE of the requested services will be
+                    carried out in real life.
+
+                    Unless required by applicable law or agreed to in writing, DCSA provides
+                    this JSON data on an \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
+                    ANY KIND, either express or implied, including, without limitation, any
+                    warranties or conditions of TITLE, NON-INFRINGEMENT, MERCHANTABILITY,
+                    or FITNESS FOR A PARTICULAR PURPOSE. You are solely responsible for
+                    determining the appropriateness of using or redistributing this JSON
+                    data and assume any risks associated with Your usage of this data.
+
+                    In no event and under no legal theory, whether in tort (including negligence),
+                    contract, or otherwise, unless required by applicable law (such as deliberate
+                    and grossly negligent acts) or agreed to in writing, shall DCSA be liable to
+                    You for damages, including any direct, indirect, special, incidental, or
+                    consequential damages of any character arising as a result of this terms or conditions
+                    or out of the use or inability to use the provided JSON data (including but not limited
+                    to damages for loss of goodwill, work stoppage, computer failure or malfunction, or any
+                    and all other commercial damages or losses), even if DCSA has been advised of the
+                    possibility of such damages.
+                  receiptTypeAtOrigin: CY
+                  deliveryTypeAtDestination: CY
+                  cargoMovementTypeAtOrigin: FCL
+                  cargoMovementTypeAtDestination: FCL
+                  serviceContractReference: SCR-1234-REEFER
+                  carrierCode: MSC
+                  carrierCodeListProvider: SMDG
+                  transports:
+                    plannedDepartureDate: '2023-12-20'
+                    plannedArrivalDate: '2023-12-22'
+                    portOfLoading:
+                      UNLocationCode: DKAAR
+                    portOfDischarge:
+                      UNLocationCode: DEBRV
+                    vesselVoyages:
+                      - vesselName: Ever Ace
+                        carrierExportVoyageNumber: 402E
+                  charges:
+                    - chargeName: Fictive transport document fee
+                      currencyAmount: 1
+                      currencyCode: EUR
+                      paymentTermCode: COL
+                      calculationBasis: Per transport document
+                      unitPrice: 1
+                      quantity: 1
+                  invoicePayableAt:
+                    UNLocationCode: DKAAR
+                  partyContactDetails:
+                    - name: DCSA test person
+                      email: no-reply@dcsa.example.org
+                  documentParties:
+                    shipper:
+                      partyName: DCSA CTK
+                      displayedAddress:
+                        - Strawinskylaan 4117
+                      partyContactDetails:
+                        - name: DCSA test person
+                          email: no-reply@dcsa.example.org
+                    issuingParty:
+                      partyName: Mediterranean Shipping Company
+                      address:
+                        street: Chemin Rieu
+                        streetNumber: 12-14
+                        city: Geneva
+                        countryCode: CH
+                      identifyingCodes:
+                        - codeListProvider: GLEIF
+                          codeListName: LEI
+                          partyCode: 529900T8BM49AURSDO55
+                  consignmentItems:
+                    - carrierBookingReference: CBR_123_REEFER
+                      descriptionOfGoods:
+                        - 'Dairy products'
+                      HSCodes:
+                        - '04052090'
+                      cargoItems:
+                        - equipmentReference: KKFU6671914
+                          cargoGrossWeight:
+                            value: 12000
+                            unit: KGM
+                          outerPackaging:
+                            numberOfPackages: 400
+                            packageCode: BQ
+                            description: Bottles
+                  utilizedTransportEquipments:
+                    - isShipperOwned: false
+                      seals:
+                        - number: DCSA-CTK-1234
+                      equipment:
+                        ISOEquipmentCode: 45R1
+                        equipmentReference: KKFU6671914
+                      isNonOperatingReefer: false
+                      activeReeferSettings:
+                        temperatureSetpoint: 5
+                        temperatureUnit: CEL
+              dgExample:
+                summary: |
+                  Amended DG (Dangerous Goods) packing group
+                description: |
+                  An amendment for a wrong packing group provided for Dangerous Goods. Packing group should be 2.
+                value:
+                  transportDocumentReference: 4AD3FA470BB541B980CE
+                  shippingInstructionsReference: b36484d0-1115-43c2-93e4-a378823a8386
+                  transportDocumentStatus: ISSUED
+                  transportDocumentTypeCode: BOL
+                  isShippedOnBoardType: true
+                  freightPaymentTermCode: PRE
+                  isElectronic: true
+                  isToOrder: true
+                  shippedOnBoardDate: '2023-12-20'
+                  termsAndConditions: |
+                    You agree that this transport document exist in name only for the sake of
+                    testing your conformance with the DCSA eBL API. This transport document is NOT backed
+                    by a real shipment with ANY carrier and NONE of the requested services will be
+                    carried out in real life.
+
+                    Unless required by applicable law or agreed to in writing, DCSA provides
+                    this JSON data on an \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
+                    ANY KIND, either express or implied, including, without limitation, any
+                    warranties or conditions of TITLE, NON-INFRINGEMENT, MERCHANTABILITY,
+                    or FITNESS FOR A PARTICULAR PURPOSE. You are solely responsible for
+                    determining the appropriateness of using or redistributing this JSON
+                    data and assume any risks associated with Your usage of this data.
+
+                    In no event and under no legal theory, whether in tort (including negligence),
+                    contract, or otherwise, unless required by applicable law (such as deliberate
+                    and grossly negligent acts) or agreed to in writing, shall DCSA be liable to
+                    You for damages, including any direct, indirect, special, incidental, or
+                    consequential damages of any character arising as a result of this terms or conditions
+                    or out of the use or inability to use the provided JSON data (including but not limited
+                    to damages for loss of goodwill, work stoppage, computer failure or malfunction, or any
+                    and all other commercial damages or losses), even if DCSA has been advised of the
+                    possibility of such damages.
+                  receiptTypeAtOrigin: CY
+                  deliveryTypeAtDestination: CY
+                  cargoMovementTypeAtOrigin: FCL
+                  cargoMovementTypeAtDestination: FCL
+                  serviceContractReference: SCR-1234-DG
+                  carrierCode: HLC
+                  carrierCodeListProvider: SMDG
+                  transports:
+                    plannedDepartureDate: '2023-12-20'
+                    plannedArrivalDate: '2023-12-22'
+                    portOfLoading:
+                      UNLocationCode: DKAAR
+                    portOfDischarge:
+                      UNLocationCode: DEBRV
+                    vesselVoyages:
+                      - vesselName: Berlin Express
+                        carrierExportVoyageNumber: 402E
+                  charges:
+                    - chargeName: Fictive transport document fee
+                      currencyAmount: 1
+                      currencyCode: EUR
+                      paymentTermCode: COL
+                      calculationBasis: Per transport document
+                      unitPrice: 1
+                      quantity: 1
+                  invoicePayableAt:
+                    UNLocationCode: DKAAR
+                  partyContactDetails:
+                    - name: DCSA test person
+                      email: no-reply@dcsa.example.org
+                  documentParties:
+                    shipper:
+                      partyName: DCSA CTK
+                      displayedAddress:
+                        - Strawinskylaan 4117
+                      partyContactDetails:
+                        - name: DCSA test person
+                          email: no-reply@dcsa.example.org
+                    issuingParty:
+                      partyName: Hapag Lloyd
+                      address:
+                        street: Ballindamm
+                        streetNumber: '25'
+                        postCode: D-20095
+                        city: Hamburg
+                        countryCode: DE
+                      identifyingCodes:
+                        - codeListProvider: GLEIF
+                          codeListName: LEI
+                          partyCode: 529900T8BM49AURSDO55
+                  consignmentItems:
+                    - carrierBookingReference: RTM1234567
+                      descriptionOfGoods:
+                        - 'Environmentally hazardous substance'
+                        - 'liquid, N.O.S (Propiconazole)'
+                      HSCodes:
+                        - '293499'
+                      cargoItems:
+                        - equipmentReference: HLXU1234567
+                          cargoGrossWeight:
+                            value: 12000
+                            unit: KGM
+                          outerPackaging:
+                            numberOfPackages: 400
+                            imoPackagingCode: 3A1
+                            description: 'Jerrycan, steel'
+                            dangerousGoods:
+                              - UNNumber: '3082'
+                                properShippingName: 'Environmentally hazardous substance, liquid, N.O.S'
+                                imoClass: '9'
+                                packingGroup: 2
+                                EMSNumber: F-A S-F
+                  utilizedTransportEquipments:
+                    - isShipperOwned: false
+                      seals:
+                        - number: DCSA-CTK-1234
+                      equipment:
+                        ISOEquipmentCode: 22G1
+                        equipmentReference: HLXU1234567
+      responses:
+        '202':
+          description: |
+            The `Transport Document` amendment has been successfully accepted by the provider. `transportDocumentStatus` does not change.
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              examples:
+                receivedExample:
+                  summary: |
+                    Reefer temperature amended by consumer
+                  description: |
+                    An `Amended Transport Document` containing a new reefer temperature received and accepted by provider.
+        '400':
+          description: |
+            In case the amended `Transport Document` does not validate against the schema a `400` (Bad Request) is returned
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                badRequestExample:
+                  summary: |
+                    Transport Document missing isElectronic
+                  description: |
+                    `isElectronic` is a mandatory property in the `Amended Transport Document`. In case this property is missing an error object is created.
+
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: PUT
+                    requestUri: /v3/transport-documents/td-987/amendment
+                    statusCode: 400
+                    statusCodeText: Bad Request
+                    statusCodeMessage: isElectronic not found - it is a mandatory property in Amend Transport Document
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2024-09-04T09:41:00Z'
+                    errors:
+                      - errorCode: 7003
+                        property: isElectronic
+                        errorCodeText: mandatory property missing
+                        errorCodeMessage: isElectronic must be provided as part of a Transport Document amendment
+        '404':
+          description: |
+            In case the provider does not know about the `transportDocumentReference` used in the request (this could be because the `Transport Document` does not exist) - it is possible for the provider to reject the requests by returning a `404` (Not Found)
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                conflictExample:
+                  summary: |
+                    Not found request
+                  description: |
+                    The provided `transportDocumentReference` could not be found. This can be because the `transportDocumentReference` does not exist in the provider system.
+
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: PUT
+                    requestUri: /v3/transport-documents/td-987/amendment
+                    statusCode: 404
+                    statusCodeText: Not Found
+                    statusCodeMessage: transportDocumentReference not found
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2024-09-04T09:41:00Z'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: transportDocumentReference not found
+                        errorCodeMessage: The Transport Document does not exist
+        '409':
+          description: |
+            In case the provider is already processing the `Amended Transport Document` matching `transportDocumentReference='td-987'` or for any other reason cannot process the request, it is possible to reject the `PUT` request with a `409` (Conflict) response
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                conflictExample:
+                  summary: |
+                    Conflicting Transport Document amendment
+                  description: |
+                    The `Transport Document` referenced in the `PUT` request is being processed by the provider. The provider does not support breaking this processing and must complete the amendment processing of the `Transport Document` prior to receiving a new request to amend.
+
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: PUT
+                    requestUri: /v3/transport-documents/td-987/amendment
+                    statusCode: 409
+                    statusCodeText: Conflict
+                    statusCodeMessage: Is being processed
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2024-09-04T09:41:00Z'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: Transport Document is being processed
+                        errorCodeMessage: The Transport Document cannot be amended while it is being processed. Please try again later
+        '500':
+          description: |
+            In case a server error occurs in provider system a `500` (Internal Server Error) is returned
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                internalServerErrorExample:
+                  summary: |
+                    Internal Server Error while processing `Transport Document`
+                  description: |
+                    An Internal Server Error has occurred - the consumer should contact {provider-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: PUT
+                    requestUri: /v3/transport-documents/td-987/amendment
+                    statusCode: 500
+                    statusCodeText: Internal Server Error
+                    statusCodeMessage: Internal Server Error occurred while processing Transport Document
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2024-09-04T09:41:00Z'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: Internal Error occurred
+                        errorCodeMessage: Internal Error occurred
+        default:
+          description: |
+            For other errors the error object should be populated with relevant information
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                tooManyRequestsExample:
+                  summary: |
+                    Amending too many Transport Documents
+                  description: |
+                    Calling the endPoint
+
+                        PUT /v3/transport-documents/td-987/amendment
+                      
+                    too many times within a time period.
+
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: PUT
+                    requestUri: /v3/transport-documents/td-987/amendment
+                    statusCode: 429
+                    statusCodeText: Too Many Requests
+                    statusCodeMessage: Too many requests to amend a Transport Document have been requested. Please try again in 1 hour
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2024-09-04T09:41:00Z'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: Max Transport Document amend requests reached
+                        errorCodeMessage: A maximum of 10 amendments can be requested per hour
+    delete:
+      tags:
+        - Direct Transport Document Amendments
+      summary: |
+        Cancels a Transport Document Amendment (optional endpoint)
+      operationId: patch-transport-document-amendment
+      parameters:
+        - in: path
+          name: transportDocumentReference
+          description: |
+            The `transportDocumentReference` of the `Transport Document`
+          required: true
+          schema:
+            type: string
+            pattern: ^\S(?:.*\S)?$
+            maxLength: 20
+            description: |
+              A unique number allocated by the shipping line to the `Transport Document` and the main number used for the tracking of the status of the shipment.
+            example: HHL71800000
+        - $ref: '#/components/parameters/Api-Version-Major'
+      description: |
+        A shipper initiated cancellation of the `Direct Transport Document` amendment identified by the `transportDocumentReference` path parameter.
+
+        This endPoint corresponds with **UseCase 18 - Cancel Transport Document amendment**.
+
+        ## Precondition
+        In order to cancel a `Direct Transport Document` amendment, the status of the `Amended Transport Document` must be
+        - `AMENDMENT_RECEIVED`.
+
+        ## Postcondition
+        The provider has received a cancellation from the consumer for a `Direct Transport Document` amendment.
+
+        The consumer will receive a `202` (Accepted) if the payload schema-validates or a `400` (Bad Request) if it does not.
+
+        ## Flow for the `202` (Accepted) response
+        The following occurs when a provider receives a cancellation:
+        1. The payload is schema-validated. In case the payload **is invalid** a `400` (Bad Request) is returned.
+
+           **The process stops here!**
+        2. The payload is schema-valid which means:
+            - all required properties are provided.
+            - all values provided have correct data type.
+        3. An empty response is returned and the consumer now awaits further processing by the provider.
+        
+        Once processed, the `Direct Transport Document` amendment is cancelled and a [Transport Document Notification](#/TransportDocumentNotification) is sent. In case the consumer does not subscribe to notifications it is necessary for the consumer to poll on the
+
+            GET /v3/transport-documents/{transportDocumentReference}/amendment
+            
+        endPoint to check if the `amendedTransportDocumentStatus` of the `Amended Transport Document` has changed.
+
+        **👉 Important:** It is important to verify with the provider of the API if this endpoint is supported. For providers on **v3.0.2 or earlier** this endpoint **MUST NOT** be used. For providers on **v3.0.3 or later** it is optional to implement.
+      responses:
+        '202':
+          description: |
+            The cancellation of the `Direct Transport Document` amendment is accepted and is now awaiting further processing by the provider.
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              examples:
+                cancelAmendmentExample:
+                  summary: |
+                    Cancel a Direct Transport Document amendment
+                  description: |
+                    Consumer wants to cancel a Direct Transport Document amendment.
+        '400':
+          description: |
+            In case the cancelation is not possible because the state is wrong a `400` (Bad Request) is returned.
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                badRequestExample:
+                  summary: |
+                    Wrong Direct Transport Document amendment status
+                  description: |
+                    It is not possible to `CANCEL` an `Amended Transport Document` that has been confirmed.
+
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: DELETE
+                    requestUri: /v3/transport-documents/td-987/amendment
+                    statusCode: 400
+                    statusCodeText: Bad Request
+                    statusCodeMessage: Cannot cancel a confirmed amendment
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2024-09-04T09:41:00Z'
+                    errors:
+                      - errorCode: 7003
+                        property: amendedTransportDocumentStatus
+                        errorCodeText: incorrect state
+                        errorCodeMessage: 'Only amendments in state AMENDMENT_RECEIVED can be cancelled'
+        '404':
+          description: |
+            In case the consumer is trying to cancel a `Direct Transport Document` amendment that does not have an ongoing amendment request, a `Direct Transport Document` amendment that is in state `AMENDMENT_RECEIVED`.
+
+            A `404` (Not Found) can also be sent in case the provider does not know of the `transportDocumentReference` used in the request (the resource does not exist)
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                notAmendmentFoundExample:
+                  summary: |
+                    Direct Transport Document amendment not found
+                  description: |
+                    The `Direct Transport Document` amendment does not exist. No amendments have been requested by the consumer.
+
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: DELETE
+                    requestUri: /v3/transport-documents/td-987/amendment
+                    statusCode: 404
+                    statusCodeText: Not Found
+                    statusCodeMessage: No amendment exists
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2024-09-04T09:41:00Z'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: Transport Document does not contain a Direct Transport Document amendment
+                        errorCodeMessage: The Transport Document has no amendment request - nothing to cancel
+        '409':
+          description: |
+            In case the provider is already processing the `Direct Transport Document` amendment matching `transportDocument='td-987'` it is possible to reject the `PATCH` request with a `409` (Conflict) response
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                conflictExample:
+                  summary: |
+                    Conflicting Direct Transport Document amendment cancellation
+                  description: |
+                    The `Transport Document` referenced in the `PATCH` request is being processed by the provider. The provider does not support breaking this processing and must complete the processing of the `Direct Transport Document` amendment. The cancellation will not be possible.
+
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: DELETE
+                    requestUri: /v3/transport-documents/td-987/amendment
+                    statusCode: 409
+                    statusCodeText: Conflict
+                    statusCodeMessage: Is being processed
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2024-09-04T09:41:00Z'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: Transport Document is being processed
+                        errorCodeMessage: The Direct Transport Document amendment cannot be cancelled while it is being processed
+        '500':
+          description: |
+            In case a server error occurs in provider system a `500` (Internal Server Error) is returned
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                internalServerErrorExample:
+                  summary: |
+                    Internal Server Error while cancelling the `Direct Transport Document` amendment
+                  description: |
+                    An Internal Server Error has occurred, the consumer should contact {provider-support} and provide the `providerCorrelationReference` (in the example this is `4426d965-0dd8-4005-8c63-dc68b01c4962`)
+
+                    **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
+                  value:
+                    httpMethod: DELETE
+                    requestUri: /v3/transport-documents/td-987/amendment
+                    statusCode: 500
+                    statusCodeText: Internal Server Error
+                    statusCodeMessage: Internal Server Error occurred while cancelling the Direct Transport Document amendment
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2024-09-04T09:41:00Z'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: Internal Error occurred
+                        errorCodeMessage: Internal Error occurred
+        default:
+          description: |
+            For other errors the error object should be populated with relevant information
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                tooManyRequestsExample:
+                  summary: |
+                    Patching the `Direct Transport Document` amendment too many times
+                  description: |
+                    Calling the endPoint
+                    
+                        PATCH /v3/transport-documents/td-987/amendment
+                    
+                    too many times within a time period.
+
+                    **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
+                  value:
+                    httpMethod: DELETE
+                    requestUri: /v3/transport-documents/td-987/amendment
+                    statusCode: 429
+                    statusCodeText: Too Many Requests
+                    statusCodeMessage: |
+                      Too many requests to patch a Direct Transport Document amendment have been made. Please try again in 1 hour
+                    providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                    errorDateTime: '2024-09-04T09:41:00Z'
+                    errors:
+                      - errorCode: 7003
+                        errorCodeText: Max Direct Transport Document amendment cancellation requests reached
+                        errorCodeMessage: A maximum of 10 Direct Transport Document amendment patches can be requested per hour
   /v3/shipping-instructions-notifications:
     post:
       tags:
@@ -2131,7 +3215,7 @@ paths:
               $ref: '#/components/headers/API-Version'
         '400':
           description: |
-            In case the `Notification` does not schema validate a `400` (Bad Request) is returned
+            In case the `Notification` does not validate against the schema a `400` (Bad Request) is returned
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -2238,6 +3322,8 @@ paths:
         Creates a new [`Transport Document Notification`](#/TransportDocumentNotification). This endPoint is called whenever a `Transport Document` that a consumer has subscribed to changes state or is updated.
 
         **This endPoint is to be implemented by a consumer of the eBL API in order to receive Notifications**
+        
+        **👉 Important:** In case the producer supports the **Direct Transport Document** amendment flow (UseCase 17-19 introduced from eBL v3.0.3) - this endPoint is **also** called whenever an `Amended Transport Document` changes state.
       parameters:
         - $ref: '#/components/parameters/Api-Version-Major'
       requestBody:
@@ -2291,7 +3377,7 @@ paths:
                       isToOrder: true
                       shippedOnBoardDate: '2023-12-20'
                       termsAndConditions: |
-                        You agree that this transport document exist is name only for the sake of
+                        You agree that this transport document exist in name only for the sake of
                         testing your conformance with the DCSA eBL API. This transport document is NOT backed
                         by a real shipment with ANY carrier and NONE of the requested services will be
                         carried out in real life.
@@ -2308,7 +3394,7 @@ paths:
                         contract, or otherwise, unless required by applicable law (such as deliberate
                         and grossly negligent acts) or agreed to in writing, shall DCSA be liable to
                         You for damages, including any direct, indirect, special, incidental, or
-                        consequential damages of any character arising as a result of this terms or conditions
+                        consequential damages of any character arising as a result of these terms or conditions
                         or out of the use or inability to use the provided JSON data (including but not limited
                         to damages for loss of goodwill, work stoppage, computer failure or malfunction, or any
                         and all other commercial damages or losses), even if DCSA has been advised of the
@@ -2430,7 +3516,7 @@ paths:
                       isToOrder: true
                       shippedOnBoardDate: '2023-12-20'
                       termsAndConditions: |
-                        You agree that this transport document exist is name only for the sake of
+                        You agree that this transport document exist in name only for the sake of
                         testing your conformance with the DCSA eBL API. This transport document is NOT backed
                         by a real shipment with ANY carrier and NONE of the requested services will be
                         carried out in real life.
@@ -2523,6 +3609,68 @@ paths:
                           equipment:
                             ISOEquipmentCode: 22G1
                             equipmentReference: NARU3472484
+              amendReceivedLightweightExample:
+                summary: |
+                  Transport Document Amendment has been RECEIVED (Lightweight)
+                description: |
+                  A lightweight notification explaining that an amendment to an issued `Transport Document` has been RECEIVED (`amendedTransportDocumentStatus='AMENDMENT_RECEIVED'`)
+                value:
+                  specversion: '1.0'
+                  id: 3cecb101-7a1a-43a4-9d62-e88a131651e2
+                  source: 'https://member.com/'
+                  type: org.dcsa.transport-document.v3
+                  time: '2018-04-05T17:31:00Z'
+                  datacontenttype: application/json
+                  subscriptionReference: EBL001
+                  data:
+                    transportDocumentStatus: ISSUED
+                    amendedTransportDocumentStatus: AMENDMENT_RECEIVED
+                    transportDocumentReference: HHL71800000
+                    transportDocumentSubReference: v2
+              amendDeclinedLightweightExample:
+                summary: |
+                  Transport Document Amendment has been DECLINED (Lightweight)
+                description: |
+                  A lightweight notification explaining that an amendment to an issued `Transport Document` has been DECLINED (`amendedTransportDocumentStatus='AMENDMENT_DECLINED'`)
+                value:
+                  specversion: '1.0'
+                  id: 3cecb101-7a1a-43a4-9d62-e88a131651e2
+                  source: 'https://member.com/'
+                  type: org.dcsa.transport-document.v3
+                  time: '2018-04-05T17:31:00Z'
+                  datacontenttype: application/json
+                  subscriptionReference: EBL001
+                  data:
+                    transportDocumentStatus: ISSUED
+                    amendedTransportDocumentStatus: AMENDMENT_DECLINED
+                    transportDocumentReference: HHL71800000
+                    transportDocumentSubReference: v2
+                    feedbacks:
+                    - severity: 'INFO'
+                      code: 'INFORMATIONAL_MESSAGE'
+                      message: 'Too late in the process to change imoClass'
+              amendConfirmedLightweightExample:
+                summary: |
+                  Transport Document Amendment has been CONFIRMED (Lightweight)
+                description: |
+                  A lightweight notification explaining that an amendment to a `Transport Document` that is in state `PENDING_SURRENDER_FOR_AMENDMENT` has been CONFIRMED (`amendedTransportDocumentStatus='AMENDMENT_CONFIRMED'`)
+                value:
+                  specversion: '1.0'
+                  id: 3cecb101-7a1a-43a4-9d62-e88a131651e2
+                  source: 'https://member.com/'
+                  type: org.dcsa.transport-document.v3
+                  time: '2018-04-05T17:31:00Z'
+                  datacontenttype: application/json
+                  subscriptionReference: EBL001
+                  data:
+                    transportDocumentStatus: PENDING_SURRENDER_FOR_AMENDMENT
+                    amendedTransportDocumentStatus: AMENDMENT_CONFIRMED
+                    transportDocumentReference: HHL71800000
+                    transportDocumentSubReference: v4
+                    feedbacks:
+                    - severity: 'INFO'
+                      code: 'INFORMATIONAL_MESSAGE'
+                      message: 'Amendment changes have been accepted (the amendment is CONFIRMED). Next step will be to issue the Amended Transport Document'
       responses:
         '204':
           description: |
@@ -2532,7 +3680,7 @@ paths:
               $ref: '#/components/headers/API-Version'
         '400':
           description: |
-            In case the `Notification` does not schema validate a `400` (Bad Request) is returned
+            In case the `Notification` does not validate against the schema a `400` (Bad Request) is returned
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -2634,7 +3782,7 @@ components:
     API-Version:
       schema:
         type: string
-        example: 3.0.2
+        example: 3.0.3
       description: |
         SemVer used to indicate the version of the contract (API version) returned.
   parameters:
@@ -3038,6 +4186,18 @@ components:
             - `PENDING_SURRENDER_FOR_DELIVERY` (The Transport Document has a pending Surrender for Delivery)
             - `SURRENDER_FOR_DELIVERY` (The Transport Document is Surrendered for Delivery)
           example: DRAFT
+        amendedTransportDocumentStatus:
+          type: string
+          maxLength: 50
+          description: |
+            The status of the latest amendment to the `Transport Document`. If no amendments has been requested - then this field is empty. Possible values are:
+            - `AMENDMENT_RECEIVED` (An amendment to a Transport Document is waiting to be processed)
+            - `AMENDMENT_CONFIRMED` (An amendment to a Transport Document has been confirmed)
+            - `AMENDMENT_CANCELLED` (An amendment to a Transport Document is discontinued by consumer)
+            - `AMENDMENT_DECLINED` (An amendment to a Transport Document is discontinued by provider)
+
+            **👉Important note:** When communicating with providers implementing API **v3.0.2 or earlier**, a sender implementing API **v3.0.3 or later MUST NOT** use this property as it will most likely be ignored. Recipients implementing earlier versions **MAY ignore** this property.
+          example: AMENDMENT_RECEIVED
         shippingInstructionsReference:
           type: string
           pattern: ^\S(?:.*\S)?$
@@ -3071,6 +4231,8 @@ components:
             $ref: '#/components/schemas/Feedback'
         transportDocument:
           $ref: '#/components/schemas/TransportDocumentFullNotification'
+        amendedTransportDocument:
+          $ref: '#/components/schemas/AmendedTransportDocumentFullNotification'
       required:
         - transportDocumentStatus
         - transportDocumentReference
@@ -3091,6 +4253,21 @@ components:
             GET /v3/transport-documents/{transportDocumentReference}
 
         payload implemented by the provider of the **Shipping Instructions and Transport Document** API.
+      allOf:
+        - $ref: '#/components/schemas/TransportDocument'
+
+    ##############################################
+    # Amended Transport Document Full Notification
+    ##############################################
+    AmendedTransportDocumentFullNotification:
+      type: object
+      title: Amended Transport Document Full Notification
+      description: |
+        This property contains the `amendedTransportDocument` in case the subscriber is subscribing to the `Full State Transfer` of the `Amended Transport Document` (**and** the provider supports **Direct Transport Document** amendments).
+
+        In case the subscriber does not subscribe to the `Full State Transfer` of the `Amended Transport Document` then the content in this property can be ignored.
+
+        **👉Important note:** When communicating with providers implementing API **v3.0.2 or earlier**, a sender implementing API **v3.0.3 or later MUST NOT** use this object as it will most likely be ignored. Recipients implementing earlier versions **MAY ignore** this object.
       allOf:
         - $ref: '#/components/schemas/TransportDocument'
 
@@ -7244,7 +8421,7 @@ components:
           maxLength: 20
           pattern: ^\S(?:.*\S)?$
           description: |
-            Link to the House Bill of Lading this cargoItem is connected to.
+            Link to the **House Bill of Lading** this `cargoItem` is connected to.
           example: ABC123          
         customsReferences:
           type: array
@@ -7389,6 +8566,7 @@ components:
       required:
         - value
         - unit
+
     ################
     # Outerpackaging
     ################
@@ -7439,6 +8617,7 @@ components:
       required:
         - numberOfPackages
         - description
+
     OuterPackaging:
       type: object
       title: Outer Packaging
@@ -9060,7 +10239,6 @@ components:
             A list of `Charges`
           items:
             $ref: '#/components/schemas/Charge'
-        # New values compared to SI - END
         placeOfIssue:
           $ref: '#/components/schemas/PlaceOfIssue'
         invoicePayableAt:
@@ -9135,6 +10313,27 @@ components:
         - carrierCode
         - carrierCodeListProvider
         - transports
+
+    TransportDocumentAmend:
+      type: object
+      title: Transport Document (Amend)
+      description: |
+        xyz
+      properties:
+        amendedTransportDocumentStatus:
+          type: string
+          maxLength: 50
+          description: |
+            The status of the latest amendment to the `Transport Document`. If no amendments has been requested - then this field is empty. Possible values are:
+            - `AMENDMENT_RECEIVED` (An amendment to a Transport Document is waiting to be processed)
+            - `AMENDMENT_CONFIRMED` (An amendment to a Transport Document has been confirmed)
+            - `AMENDMENT_CANCELLED` (An amendment to a Transport Document is discontinued by consumer)
+            - `AMENDMENT_DECLINED` (An amendment to a Transport Document is discontinued by provider)
+
+            **👉Important note:** When communicating with providers implementing API **v3.0.2 or earlier**, a sender implementing API **v3.0.3 or later MUST NOT** use this property as it will most likely be ignored. Recipients implementing earlier versions **MAY ignore** this property.
+          example: AMENDMENT_RECEIVED
+        amendedTransportDocument:
+          $ref: '#/components/schemas/TransportDocument'
 
     ############
     # Transports
