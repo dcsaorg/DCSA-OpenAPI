@@ -422,14 +422,6 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
-          content:
-            application/json:
-              examples:
-                receivedExample:
-                  summary: |
-                    Shipping Instructions updated by consumer
-                  description: |
-                    An `Updated Shipping Instructions` received and accepted by provider, the `Updated Shipping Instructions` now awaits provider action, the `shippingInstructionsStatus` does not change.
         '400':
           description: |
             In case the updated `Shipping Instructions` does not validate against the schema a `400` (Bad Request) is returned
@@ -1034,19 +1026,6 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
-          content:
-            application/json:
-              examples:
-                cancelUpdateExample:
-                  summary: |
-                    Cancel a Shipping Instructions update
-                  description: |
-                    Consumer wants to cancel an update provided to a `Shipping Instructions`.
-                cancelExample:
-                  summary: |
-                    Cancel a Shipping Instructions
-                  description: |
-                    Consumer wants to cancel a `Shipping Instructions`.
         '400':
           description: |
             In case the cancel payload does not validate against the schema a `400` (Bad Request) is returned
@@ -1741,14 +1720,6 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
-          content:
-            application/json:
-              examples:
-                approveExample:
-                  summary: |
-                    Approve Draft Transport Document
-                  description: |
-                    Consumer approves the drafted `Transport Document` and now awaits further processing by provider.
         '400':
           description: |
             In case the Approve payload does not validate against the schema a `400` (Bad Request) is returned
@@ -2596,18 +2567,10 @@ paths:
       responses:
         '202':
           description: |
-            The `Transport Document` amendment has been successfully accepted by the provider. `transportDocumentStatus` does not change.
+            The `Transport Document` amendment has been successfully accepted by the provider. `amendedtransportDocumentStatus` does not change.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
-          content:
-            application/json:
-              examples:
-                receivedExample:
-                  summary: |
-                    Reefer temperature amended by consumer
-                  description: |
-                    An `Amended Transport Document` containing a new reefer temperature received and accepted by provider.
         '400':
           description: |
             In case the amended `Transport Document` does not validate against the schema a `400` (Bad Request) is returned
@@ -2768,7 +2731,7 @@ paths:
         - Direct Transport Document Amendments
       summary: |
         Cancels a Transport Document Amendment (optional endpoint)
-      operationId: patch-transport-document-amendment
+      operationId: delete-transport-document-amendment
       parameters:
         - in: path
           name: transportDocumentReference
@@ -2821,14 +2784,6 @@ paths:
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
-          content:
-            application/json:
-              examples:
-                cancelAmendmentExample:
-                  summary: |
-                    Cancel a Direct Transport Document amendment
-                  description: |
-                    Consumer wants to cancel a Direct Transport Document amendment.
         '400':
           description: |
             In case the cancelation is not possible because the state is wrong a `400` (Bad Request) is returned.
@@ -2894,7 +2849,7 @@ paths:
                         errorCodeMessage: The Transport Document has no amendment request - nothing to cancel
         '409':
           description: |
-            In case the provider is already processing the `Direct Transport Document` amendment matching `transportDocument='td-987'` it is possible to reject the `PATCH` request with a `409` (Conflict) response
+            In case the provider is already processing the `Direct Transport Document` amendment matching `transportDocument='td-987'` it is possible to reject the `DELETE` request with a `409` (Conflict) response
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -2907,7 +2862,7 @@ paths:
                   summary: |
                     Conflicting Direct Transport Document amendment cancellation
                   description: |
-                    The `Transport Document` referenced in the `PATCH` request is being processed by the provider. The provider does not support breaking this processing and must complete the processing of the `Direct Transport Document` amendment. The cancellation will not be possible.
+                    The `Transport Document` referenced in the `DELETE` request is being processed by the provider. The provider does not support breaking this processing and must complete the processing of the `Direct Transport Document` amendment. The cancellation will not be possible.
 
                     **NB**: The `errorCode` is not yet standardized by DCSA. The value `7003` is just a "random example".
                   value:
@@ -2965,11 +2920,11 @@ paths:
               examples:
                 tooManyRequestsExample:
                   summary: |
-                    Patching the `Direct Transport Document` amendment too many times
+                    Cancelling the `Direct Transport Document` amendment too many times
                   description: |
                     Calling the endPoint
                     
-                        PATCH /v3/transport-documents/td-987/amendment
+                        DELETE /v3/transport-documents/td-987/amendment
                     
                     too many times within a time period.
 
@@ -2980,13 +2935,13 @@ paths:
                     statusCode: 429
                     statusCodeText: Too Many Requests
                     statusCodeMessage: |
-                      Too many requests to patch a Direct Transport Document amendment have been made. Please try again in 1 hour
+                      Too many requests to cancel a Direct Transport Document amendment have been made. Please try again in 1 hour
                     providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
                     errorDateTime: '2024-09-04T09:41:00Z'
                     errors:
                       - errorCode: 7003
                         errorCodeText: Max Direct Transport Document amendment cancellation requests reached
-                        errorCodeMessage: A maximum of 10 Direct Transport Document amendment patches can be requested per hour
+                        errorCodeMessage: A maximum of 10 Direct Transport Document amendment cancellations can be requested per hour
   /v3/shipping-instructions-notifications:
     post:
       tags:
@@ -10318,7 +10273,7 @@ components:
       type: object
       title: Transport Document (Amend)
       description: |
-        xyz
+        The payload for a `Transport Document` amendment request. It contains the status of the amendment and the full amended transport document object.
       properties:
         amendedTransportDocumentStatus:
           type: string
@@ -10329,8 +10284,6 @@ components:
             - `AMENDMENT_CONFIRMED` (An amendment to a Transport Document has been confirmed)
             - `AMENDMENT_CANCELLED` (An amendment to a Transport Document is discontinued by consumer)
             - `AMENDMENT_DECLINED` (An amendment to a Transport Document is discontinued by provider)
-
-            **👉Important note:** When communicating with providers implementing API **v3.0.2 or earlier**, a sender implementing API **v3.0.3 or later MUST NOT** use this property as it will most likely be ignored. Recipients implementing earlier versions **MAY ignore** this property.
           example: AMENDMENT_RECEIVED
         amendedTransportDocument:
           $ref: '#/components/schemas/TransportDocument'
