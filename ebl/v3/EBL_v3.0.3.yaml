@@ -2749,17 +2749,14 @@ paths:
         ## Postcondition
         The provider has received a cancellation from the consumer for a `Direct Transport Document` amendment.
 
-        The consumer will receive a `202` (Accepted) if the payload schema-validates or a `400` (Bad Request) if it does not.
+        The consumer will receive a `202` (Accepted) if the cancellation request is accepted for processing, or a `400` (Bad Request) if the cancellation is not allowed due to the current amendment state.
 
         ## Flow for the `202` (Accepted) response
-        The following occurs when a provider receives a cancellation:
-        1. The payload is schema-validated. In case the payload **is invalid** a `400` (Bad Request) is returned.
+        The following occurs when a provider receives a cancellation request:
+        1. The provider validates that cancellation is allowed in the current state.
 
            **The process stops here!**
-        2. The payload is schema-valid which means:
-            - all required properties are provided.
-            - all values provided have correct data type.
-        3. An empty response is returned and the consumer now awaits further processing by the provider.
+        2. An empty response is returned and the consumer now awaits further processing by the provider.
         
         Once processed, the `Direct Transport Document` amendment is cancelled and a [Transport Document Notification](#/TransportDocumentNotification) is sent. In case the consumer does not subscribe to notifications it is necessary for the consumer to poll on the
 
@@ -2777,7 +2774,7 @@ paths:
               $ref: '#/components/headers/API-Version'
         '400':
           description: |
-            In case the cancelation is not possible because the state is wrong a `400` (Bad Request) is returned.
+            In case the cancellation is not possible because the state is wrong a `400` (Bad Request) is returned.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
@@ -2808,9 +2805,7 @@ paths:
                         errorCodeMessage: 'Only amendments in state AMENDMENT_RECEIVED can be cancelled'
         '404':
           description: |
-            In case the consumer is trying to cancel a `Direct Transport Document` amendment that does not have an ongoing amendment request, a `Direct Transport Document` amendment that is in state `AMENDMENT_RECEIVED`.
-
-            A `404` (Not Found) can also be sent in case the provider does not know of the `transportDocumentReference` used in the request (the resource does not exist)
+            In case the consumer is trying to cancel a `Direct Transport Document` amendment but no amendment exists for the given `transportDocumentReference`, a `404` (Not Found) is returned.
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
