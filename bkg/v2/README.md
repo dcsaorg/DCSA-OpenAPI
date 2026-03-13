@@ -7,6 +7,27 @@ Publications related to the Booking API:
 - [Booking Process](https://dcsa.org/standards/booking-process/) contains documents and publications
 - [Booking Notification](./notification/) maintained here on GitHub  (**DEPRECATED** - now included as part of Booking API)
 
+<a name="v204"></a>[Release v2.0.4 (TBD 2026)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.4)
+---
+This is a patch release for the DCSA Booking API. Updated the `partyFunction` list, allowed for unstructured address (`addressLines`), deprecated `HSCodes`, `nationalCommodityCodes` and `chargeName` in order to allow extended versions and DG can now have an "infinite" level of `innerPackagings`.
+
+- descriptions have been improved (typos, clarifications and improvements)
+  - **GET** endpoint now also mentions the `bookingCancellationStatus`
+  - **PATCH** endpoint now mentions when `bookingCancellationStatus` is cleared
+- `errorCode` description in the `DetailedError` object has been changed to not mention standardization of error codes (this never got traction by the community)
+- new `partyFunction`: `CSR` (Carrier customer service representative)
+- it is now possible to specify an address as unstructured (`addressLines`) for the Party objects.
+- `eblPlatform` added to `Shipper`, `Consignee` and `Endorsee`
+- added 3 new eBL Solution Providers to the `IdentifyingCodes`:
+  - `DOCU` (DocuTrade)
+  - `AEOT` (AEOTrade)
+  - `SGTD` (SGTraDex)
+- added `departingVesselVoyage` to the `ShipmentLocations` in order to better specify Vessel and/or voyage information.
+- `facilityName` and `addressLines` (unstructured address) added to the `Location`, `ContainerPositioningLocation`, `EmptyContainerDepotReleaseLocation`, `LoadLocation`, `DischargeLocation` objects
+- `HSCodes` and `nationalCommodityCodes` marked as deprecated - `extendedHSCodes` and `extendedNationalCommodityCodes` to be used instead in order to support new requirements
+- `innerPackagings` (in DG object) can now have a nested `innerPackagings` structure
+- added `extendedChargeName` and deprecated `chargeName` to allow for longer charge names (now 100 is max)
+
 <a name="v203"></a>[Release v2.0.3 (14 November 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.3)
 ---
 This is a patch release for the DCSA Booking API. A new codeListProvider has been added (and one deprecated).
