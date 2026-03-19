@@ -5,8 +5,19 @@ The DCSA Bill of Lading Surrender API is specified on [**SwaggerHub**](https://a
 Publications related to the Bill of Lading Surrender API:
 - [Glossary of Terms](https://knowledge.dcsa.org/s/glossary) maintained on the [dcsa.org](https://dcsa.org) website
 - [Bill of Lading](https://dcsa.org/standards/ebill-of-lading/) maintained on the [dcsa.org](https://dcsa.org) website (contains documents and publications)
-- [Bill of Lading](./../) maintained here on GitHub
-- [Bill of Lading Surrender Response](./../surrender_response/) maintained here on GitHub (the Surrender Response API linked to this API)
+- [Bill of Lading](./..) maintained here on GitHub
+
+<a name="v303"></a>[Release v3.0.3 (TBD 2026)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR/3.0.3)
+---
+This is a patch version for the DCSA Surrender API. eBL Solution Providers updated:
+- examples on endpoints have been added
+- `eblPlatform` and `codeListProvider` lists updated with platforms that have been onboarded to the DCSA eBL APIs
+  - `DOCU` (DocuTrade)
+  - `AEOT` (AEOTrade)
+  - `SGTD` (SGTraDex)
+- `endorsementChain` description for `Endorsee` updated
+- `errorCode` description updated
+- optional `feedbackElements` property on the Surrender Response
 
 <a name="v302"></a>[Release v3.0.2 (14 November 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR/3.0.2)
 ---
