@@ -10,7 +10,7 @@ Publications related to the Bill of Lading API:
 
 <a name="v303"></a>[Release v3.0.3 (TBD 2026)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.3)
 ---
-This is a patch version for the DCSA Bill of Lading API. The primary reason for this patch is adding the **Direct Transport Document** amendment flow. It is also possible to Cancel a Shipping Instructions.
+This is a patch version for the DCSA Bill of Lading API. The primary reason for this patch is adding the **Direct Transport Document** amendment flow. It is also possible to cancel Shipping Instructions.
 - update API description to include the **Direct Transport Document** amendment flow. Direct Transport Document amendment is optional to support.
   - added 3 new endpoints:
     - `GET /v3/transport-documents/{transportDocumentReference}/amendment` - fetches a Transport Document amendment
@@ -19,34 +19,34 @@ This is a patch version for the DCSA Bill of Lading API. The primary reason for 
 - improved property and endpoint descriptions
 - update Transport Document amendment endpoint
   - added new Direct Transport Document amendment examples
-  - added `amendedTransportDocumentStatus` to the Transport Transport Document Notification and to the amended Transport Document endpoint (the Transport Document object has **NOT** changed). Following states are possible:
+  - added `amendedTransportDocumentStatus` to the Transport Document Notification and to the amended Transport Document endpoint (the Transport Document object has **NOT** changed). The following states are possible:
     - `AMENDMENT_RECEIVED` (An amendment to a Transport Document is waiting to be processed)
     - `AMENDMENT_CONFIRMED` (An amendment to a Transport Document has been confirmed)
     - `AMENDMENT_CANCELLED` (An amendment to a Transport Document is discontinued by consumer)
     - `AMENDMENT_DECLINED` (An amendment to a Transport Document is discontinued by provider)
-- improved the `CancelShippingInstructionsUpdate` description and content. When using this object - it is either possible to cancel an update or the entire Shipping Instructions
+- improved the `CancelShippingInstructionsUpdate` description and content. When using this object, it is possible to cancel either an update or the entire Shipping Instructions.
 - `shippingInstructionsStatus` now has 2 new states:
   - `CANCELLED` (The Shipping Instructions have been cancelled by Shipper)
   - `DECLINED` (The Shipping Instructions have been declined by Carrier)
 - Transport Document Notification object now also contains:
   - `amendedTransportDocumentStatus`
   - `amendedTransportDocument`
-- `Shipping Instruction` updates:
+- `Shipping Instructions` updates:
   - added new `shippingInstructionsRevisionNumber`
   - `transportDocumentReference` description updated to reflect `ICS2` requirements
-  - many description updates (typos and gramatical errors fixed)
+  - many description updates (typos and grammatical errors fixed)
   - `shippingInstructionsStatus` two new status codes added (see above)
 - `errorCode` description updated
 - `AddressHBL` object created to improve the description for House B/L party objects
 - `PartyShipper` object created to improve the description for parties provided by the Shipper (as part of the Shipping Instructions) vs parties provided by the carrier (as part of the Transport Document)
-- Party objects previously shared between SI and TD have now been split into two. Objects created for SI have been prefixed with `Shipper` (as they are provided by the shipper). There are no structural changes - only changes to the descriptrions. This goes for:
+- Party objects previously shared between SI and TD have now been split into two. Objects created for SI have been prefixed with `Shipper` (as they are provided by the shipper). There are no structural changes - only changes to the descriptions. This goes for:
   - `ShipperShipper` object added
   - `OnBehalfOfShipperShipper` object added
   - `OnBehalfOfConsigneeShipper` object added
   - `notifyPartyShipper` object added
   - `partyShipper` object added
 - `eblPlatform` added to: `Shipper`, `Consignee`, `ConsigneeShipper`, `Endorsee` and `EndorseeShipper` party objects
-- an unstructured address object called `addressLines` added to the following party objects: `Shipper`, `OnBehalfOfShipper`, `Consignee`, `ConsigneeShipper`, `OnBehalfOfConsignee`, `Endorsee`, `EndorseeShipper`, `CarriersAgentAtDestination`, `NotifyParty`, `Seller`,`Buyer`, `PartyShipper`, `IssuingParty` and `ShippingInstructionsRequestor`
+- an unstructured address object called `addressLines` added to the following party objects: `Shipper`, `OnBehalfOfShipper`, `Consignee`, `ConsigneeShipper`, `OnBehalfOfConsignee`, `Endorsee`, `EndorseeShipper`, `CarriersAgentAtDestination`, `NotifyParty`, `Seller`, `Buyer`, `PartyShipper`, `IssuingParty` and `ShippingInstructionsRequestor`
 - `sendToPlatform` and `codeListProvider` lists updated with platforms that have been onboarded to the DCSA eBL APIs
   - `DOCU` (DocuTrade)
   - `AEOT` (AEOTrade)
@@ -58,7 +58,7 @@ This is a patch version for the DCSA Bill of Lading API. The primary reason for 
 - `descriptionOfGoodsForCustoms` added as part of the `ConsignmentItem` in the SI (only)
 - `shippingMarksForCustoms` added as part of the `ConsignmentItem` in the SI (only)
 - `innerPackagings` can now have a nested `innerPackagings` to allow multiple innerPackaging-layers
-- `role` added to `VesselVoyage` in order to specify the vessel as being: `FIRST_SEA_GOING` (First sea giong vessel) or `MOTHER` (Mother vessel)
+- `role` added to `VesselVoyage` in order to specify the vessel as being: `FIRST_SEA_GOING` (First sea-going vessel) or `MOTHER` (Mother vessel)
 - the following objects have `addressLines` (an unstructured address object) and `facilityName` added:
   - `PlaceOfReceipt`, `PlaceOfDelivery` and `OnwardInlandRouting`
 - `chargeName` marked as deprecated - use `extendedChargeName` instead which covers 100 characters (instead of 50 characters)
