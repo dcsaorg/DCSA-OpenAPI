@@ -8,7 +8,7 @@ Publications related to the Bill of Lading API:
 - [Bill of Lading Issuance](./issuance) maintained here on GitHub
 - [Bill of Lading Surrender](./surrender) maintained here on GitHub
 
-<a name="v303"></a>[Release v3.0.3 (TBD 2026)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.3)
+<a name="v303"></a>[Release v3.0.3 (14 April 2026)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.3)
 ---
 This is a patch version for the DCSA Bill of Lading API. The primary reason for this patch is adding the **Direct Transport Document** amendment flow. It is also possible to cancel Shipping Instructions.
 - update API description to include the **Direct Transport Document** amendment flow. Direct Transport Document amendment is optional to support.
