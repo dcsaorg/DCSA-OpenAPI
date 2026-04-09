@@ -9,6 +9,29 @@ Publications related to the PINT API:
 ---
 This is a moving target and will continue to be updated:
 
+<a name="v300B20260413"></a>[Release v3.0.0 Beta 20260413 (13 April 2026)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_PINT/3.0.0-Beta-20260413)
+---
+Snapshot as of 13 April 2026 for EBL Platform Interoperability 3.0.0 Beta. Purpose of the snapshot is to align with eBL v3.0.3. Apart from changes to Transport Document, examples on endpoints have been improved and 3 new platforms have been added.
+- examples on endpoints have been added
+- `errorCode` description updated
+- removed `TODO` comments
+- `eblPlatform` and `codeListProvider` lists updated with platforms that have been onboarded to the DCSA eBL APIs
+  - `DOCU` (DocuTrade)
+  - `AEOT` (AEOTrade)
+  - `SGTD` (SGTraDex)
+- **Transport Document** changes:
+  - corrected many descriptions for typos and gramatical errors (`numberOfOriginalsWithCharges`, `numberOfOriginalsWithoutCharges`, Reference and ReferenceConsignmentItem `type`, `OuterPackaging`, `packageCode`, `numberOfPackages`, OuterPackaging `description`, `innerPackagings`, `NetExplosiveContent`, NetExplosiveContent `description`, `InnerPackaging`, `UtilizedTransportEquipment`, `VesselVoyage`, `street`, `streetNumber`, `floor`, `postCode`, `city` and `stateRegion`)
+  - `HSCodes` marked as deprecated everywhere, `extendedHSCodes` to be used instead
+  - `extendedHSCodes` added in order to support 12 character codes
+  - `nationalCommodityCodes` marked as deprecated everywhere, `extendedNationalCommodityCodes` to be used instead
+  - `extendedNationalCommodityCodes` added in order to support 16 character codes
+  - `innerPackagings` can now have a nested `innerPackagings` to allow multiple innerPackaging-layers
+  - `role` added to `VesselVoyage` in order to specify the vessel as being: `FIRST_SEA_GOING` (First sea giong vessel) or `MOTHER` (Mother vessel)
+  - an unstructured address object called `addressLines` added to: `PlaceOfReceipt`, `PlaceOfDelivery` and `OnwardInlandRouting`. Also added to the following party objects: `Shipper`, `OnBehalfOfShipper`, `Consignee`, `OnBehalfOfConsignee`, `Endorsee`, `CarriersAgentAtDestination`, `NotifyParty`, general `Party` and `IssuingParty`
+  - `facilityName` added to the following location objects: `PlaceOfReceipt`, `PlaceOfDelivery`, `OnwardInlandRouting`
+  - `chargeName` marked as deprecated - use `extendedChargeName` instead which covers 100 characters (instead of 50 characters)
+  - `eblPlatform` added to: `Shipper`, `Consignee` and `Endorsee` party objects
+
 <a name="v300B20251114"></a>[Release v3.0.0 Beta 20251114 (14 November 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_PINT/3.0.0-Beta-20251114)
 ---
 Snapshot as of 14 November 2025 for EBL Platform Interoperability 3.0.0 Beta. This Snapshot breaks backward compatibility: changes `actionCodes` in the Transaction chain, changes `recipient` from mandatory to optional, and renames properties to align with Surrender API. The rest of the changes are backward compatible.
