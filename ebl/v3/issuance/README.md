@@ -9,7 +9,7 @@ Publications related to the Bill of Lading Issuance API:
 
 <a name="v303"></a>[Release v3.0.3 (14 April 2026)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS/3.0.3)
 ---
-This is a patch version for the DCSA Issuance API. eBL Solution Providers updated:
+This is a patch version for the DCSA Issuance API including updates to e.g. eBL Solution Provider lists, deprecation of consignmentItem properties and adding addressLines:
 - examples on endpoints have been added
 - `errorCode` description updated
 - removed `TODO` comments
