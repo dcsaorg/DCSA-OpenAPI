@@ -7,7 +7,7 @@ Publications related to the Booking API:
 - [Booking Process](https://dcsa.org/standards/booking-process/) contains documents and publications
 - [Booking Notification](./notification/) maintained here on GitHub  (**DEPRECATED** - now included as part of Booking API)
 
-<a name="v204"></a>[Release v2.0.4 (TBD 2026)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.4)
+<a name="v204"></a>[Release v2.0.4 (14 April 2026)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.4)
 ---
 This is a patch release for the DCSA Booking API. Updated the `partyFunction` list, allowed for unstructured address (`addressLines`), deprecated `HSCodes`, `nationalCommodityCodes` and `chargeName` in order to allow extended versions and DG can now have an "infinite" level of `innerPackagings`.
 
