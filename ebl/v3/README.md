@@ -4,12 +4,64 @@ The DCSA Bill of Lading API is specified on [**SwaggerHub**](https://app.swagger
 
 Publications related to the Bill of Lading API:
 - [Glossary of Terms](https://knowledge.dcsa.org/s/glossary) maintained on the [dcsa.org](https://dcsa.org) website
-- [Bill of Lading](https://dcsa.org/standards/ebill-of-lading/) maintained on the [dcsa.org](https://dcsa.org) website (contains documents and publications)
-- [Bill of Lading Notification](./notification/) maintained here on GitHub (**DEPRECATED** - now included as part of EBL API)
-- [Bill of Lading Issuance](./issuance/) maintained here on GitHub
-- [Bill of Lading Issuance Response](./issuance_response/) maintained here on GitHub (**DEPRECATED** - now included as part of EBL Issuance API)
-- [Bill of Lading Surrender](./surrender/) maintained here on GitHub
-- [Bill of Lading Surrender Response](./surrender_response/) maintained here on GitHub (**DEPRECATED** - now included as part of EBL Surrender API)
+- [Bill of Lading](https://dcsa.org/standards/ebill-of-lading) maintained on the [dcsa.org](https://dcsa.org) website (contains documents and publications)
+- [Bill of Lading Issuance](./issuance) maintained here on GitHub
+- [Bill of Lading Surrender](./surrender) maintained here on GitHub
+
+<a name="v303"></a>[Release v3.0.3 (14 April 2026)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.3)
+---
+This is a patch version for the DCSA Bill of Lading API. The primary reason for this patch is adding the **Direct Transport Document** amendment flow. It is also possible to cancel Shipping Instructions.
+- update API description to include the **Direct Transport Document** amendment flow. Direct Transport Document amendment is optional to support.
+  - added 3 new endpoints:
+    - `GET /v3/transport-documents/{transportDocumentReference}/amendment` - fetches a Transport Document amendment
+    - `PUT /v3/transport-documents/{transportDocumentReference}/amendment` - updates a Transport Document amendment
+    - `DELETE /v3/transport-documents/{transportDocumentReference}/amendment` - cancels a Transport Document amendment
+- improved property and endpoint descriptions
+- update Transport Document amendment endpoint
+  - added new Direct Transport Document amendment examples
+  - added `amendedTransportDocumentStatus` to the Transport Document Notification and to the amended Transport Document endpoint (the Transport Document object has **NOT** changed). The following states are possible:
+    - `AMENDMENT_RECEIVED` (An amendment to a Transport Document is waiting to be processed)
+    - `AMENDMENT_CONFIRMED` (An amendment to a Transport Document has been confirmed)
+    - `AMENDMENT_CANCELLED` (An amendment to a Transport Document is discontinued by consumer)
+    - `AMENDMENT_DECLINED` (An amendment to a Transport Document is discontinued by provider)
+- improved the `CancelShippingInstructionsUpdate` description and content. When using this object, it is possible to cancel either an update or the entire Shipping Instructions.
+- `shippingInstructionsStatus` now has 2 new states:
+  - `CANCELLED` (The Shipping Instructions have been cancelled by Shipper)
+  - `DECLINED` (The Shipping Instructions have been declined by Carrier)
+- Transport Document Notification object now also contains:
+  - `amendedTransportDocumentStatus`
+  - `amendedTransportDocument`
+- `Shipping Instructions` updates:
+  - added new `shippingInstructionsRevisionNumber`
+  - `transportDocumentReference` description updated to reflect `ICS2` requirements
+  - many description updates (typos and grammatical errors fixed)
+  - `shippingInstructionsStatus` two new status codes added (see above)
+- `errorCode` description updated
+- `AddressHBL` object created to improve the description for House B/L party objects
+- `PartyShipper` object created to improve the description for parties provided by the Shipper (as part of the Shipping Instructions) vs parties provided by the carrier (as part of the Transport Document)
+- Party objects previously shared between SI and TD have now been split into two. Objects created for SI have been prefixed with `Shipper` (as they are provided by the shipper). There are no structural changes - only changes to the descriptions. This goes for:
+  - `ShipperShipper` object added
+  - `OnBehalfOfShipperShipper` object added
+  - `OnBehalfOfConsigneeShipper` object added
+  - `notifyPartyShipper` object added
+  - `partyShipper` object added
+- `eblPlatform` added to: `Shipper`, `Consignee`, `ConsigneeShipper`, `Endorsee` and `EndorseeShipper` party objects
+- an unstructured address object called `addressLines` added to the following party objects: `Shipper`, `OnBehalfOfShipper`, `Consignee`, `ConsigneeShipper`, `OnBehalfOfConsignee`, `Endorsee`, `EndorseeShipper`, `CarriersAgentAtDestination`, `NotifyParty`, `Seller`, `Buyer`, `PartyShipper`, `IssuingParty` and `ShippingInstructionsRequestor`
+- `sendToPlatform` and `codeListProvider` lists updated with platforms that have been onboarded to the DCSA eBL APIs
+  - `DOCU` (DocuTrade)
+  - `AEOT` (AEOTrade)
+  - `SGTD` (SGTraDex)
+- `HSCodes` marked as deprecated everywhere, `extendedHSCodes` to be used instead
+- `extendedHSCodes` added in order to support 12 character codes
+- `nationalCommodityCodes` marked as deprecated everywhere, `extendedNationalCommodityCodes` to be used instead
+- `extendedNationalCommodityCodes` added in order to support 16 character codes
+- `descriptionOfGoodsForCustoms` added as part of the `ConsignmentItem` in the SI (only)
+- `shippingMarksForCustoms` added as part of the `ConsignmentItem` in the SI (only)
+- `innerPackagings` can now have a nested `innerPackagings` to allow multiple innerPackaging-layers
+- `role` added to `VesselVoyage` in order to specify the vessel as being: `FIRST_SEA_GOING` (First sea-going vessel) or `MOTHER` (Mother vessel)
+- the following objects have `addressLines` (an unstructured address object) and `facilityName` added:
+  - `PlaceOfReceipt`, `PlaceOfDelivery` and `OnwardInlandRouting`
+- `chargeName` marked as deprecated - use `extendedChargeName` instead which covers 100 characters (instead of 50 characters)
 
 <a name="v302"></a>[Release v3.0.2 (14 Nov 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL/3.0.2)
 ---
