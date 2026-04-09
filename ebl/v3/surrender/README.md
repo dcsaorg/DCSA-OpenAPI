@@ -5,7 +5,7 @@ The DCSA Bill of Lading Surrender API is specified on [**SwaggerHub**](https://a
 Publications related to the Bill of Lading Surrender API:
 - [Glossary of Terms](https://knowledge.dcsa.org/s/glossary) maintained on the [dcsa.org](https://dcsa.org) website
 - [Bill of Lading](https://dcsa.org/standards/ebill-of-lading/) maintained on the [dcsa.org](https://dcsa.org) website (contains documents and publications)
-- [Bill of Lading](./..) maintained here on GitHub
+- [Bill of Lading](./../) maintained here on GitHub
 
 <a name="v303"></a>[Release v3.0.3 (TBD 2026)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_SUR/3.0.3)
 ---
