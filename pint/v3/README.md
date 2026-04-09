@@ -11,7 +11,7 @@ This is a moving target and will continue to be updated:
 
 <a name="v300B20260413"></a>[Release v3.0.0 Beta 20260413 (13 April 2026)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_PINT/3.0.0-Beta-20260413)
 ---
-Snapshot as of TBD 2026 for EBL Platform Interoperability 3.0.0 Beta. Purpose of the snapshot is to align with eBL v3.0.3. Appart from changes to Transport Document, examples on endpoints have been improved and 3 new platforms have been added.
+Snapshot as of 13 April 2026 for EBL Platform Interoperability 3.0.0 Beta. Purpose of the snapshot is to align with eBL v3.0.3. Apart from changes to Transport Document, examples on endpoints have been improved and 3 new platforms have been added.
 - examples on endpoints have been added
 - `errorCode` description updated
 - removed `TODO` comments
