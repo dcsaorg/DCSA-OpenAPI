@@ -18,7 +18,7 @@ This is a patch version for the DCSA Issuance API including updates to e.g. eBL 
   - `AEOT` (AEOTrade)
   - `SGTD` (SGTraDex)
 - **Transport Document** changes:
-  - corrected many descriptions for typos and gramatical errors (`numberOfOriginalsWithCharges`, `numberOfOriginalsWithoutCharges`, Reference and ReferenceConsignmentItem `type`, `OuterPackaging`, `packageCode`, `numberOfPackages`, OuterPackaging `description`, `innerPackagings`, `NetExplosiveContent`, NetExplosiveContent `description`, `InnerPackaging`, `UtilizedTransportEquipment`, `VesselVoyage`, `street`, `streetNumber`, `floor`, `postCode`, `city` and `stateRegion`)
+  - corrected many descriptions for typos and grammatical errors (`numberOfOriginalsWithCharges`, `numberOfOriginalsWithoutCharges`, Reference and ReferenceConsignmentItem `type`, `OuterPackaging`, `packageCode`, `numberOfPackages`, OuterPackaging `description`, `innerPackagings`, `NetExplosiveContent`, NetExplosiveContent `description`, `InnerPackaging`, `UtilizedTransportEquipment`, `VesselVoyage`, `street`, `streetNumber`, `floor`, `postCode`, `city` and `stateRegion`)
   - `HSCodes` marked as deprecated everywhere, `extendedHSCodes` to be used instead
   - `extendedHSCodes` added in order to support 12 character codes
   - `nationalCommodityCodes` marked as deprecated everywhere, `extendedNationalCommodityCodes` to be used instead
