@@ -7,7 +7,7 @@ Publications related to the Bill of Lading Issuance API:
 - [Bill of Lading](https://dcsa.org/standards/ebill-of-lading/) maintained on the [dcsa.org](https://dcsa.org) website (contains documents and publications)
 - [Bill of Lading](./../) maintained here on GitHub
 
-<a name="v303"></a>[Release v3.0.3 (TBD 2026)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS/3.0.3)
+<a name="v303"></a>[Release v3.0.3 (14 April 2026)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS/3.0.3)
 ---
 This is a patch version for the DCSA Issuance API. eBL Solution Providers updated:
 - examples on endpoints have been added
