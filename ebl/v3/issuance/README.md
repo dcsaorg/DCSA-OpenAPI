@@ -6,7 +6,29 @@ Publications related to the Bill of Lading Issuance API:
 - [Glossary of Terms](https://knowledge.dcsa.org/s/glossary) maintained on the [dcsa.org](https://dcsa.org) website
 - [Bill of Lading](https://dcsa.org/standards/ebill-of-lading/) maintained on the [dcsa.org](https://dcsa.org) website (contains documents and publications)
 - [Bill of Lading](./../) maintained here on GitHub
-- [Bill of Lading Issuance Response](./../issuance_response/) maintained here on GitHub (the Issuance Response API linked to this API)
+
+<a name="v303"></a>[Release v3.0.3 (14 April 2026)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS/3.0.3)
+---
+This is a patch version for the DCSA Issuance API including updates to e.g. eBL Solution Provider lists, deprecation of consignmentItem properties and adding addressLines:
+- examples on endpoints have been added
+- `errorCode` description updated
+- removed `TODO` comments
+- `sendToPlatform`, `eblPlatform` and `codeListProvider` lists updated with platforms that have been onboarded to the DCSA eBL APIs
+  - `DOCU` (DocuTrade)
+  - `AEOT` (AEOTrade)
+  - `SGTD` (SGTraDex)
+- **Transport Document** changes:
+  - corrected many descriptions for typos and grammatical errors (`numberOfOriginalsWithCharges`, `numberOfOriginalsWithoutCharges`, Reference and ReferenceConsignmentItem `type`, `OuterPackaging`, `packageCode`, `numberOfPackages`, OuterPackaging `description`, `innerPackagings`, `NetExplosiveContent`, NetExplosiveContent `description`, `InnerPackaging`, `UtilizedTransportEquipment`, `VesselVoyage`, `street`, `streetNumber`, `floor`, `postCode`, `city` and `stateRegion`)
+  - `HSCodes` marked as deprecated everywhere, `extendedHSCodes` to be used instead
+  - `extendedHSCodes` added in order to support 12 character codes
+  - `nationalCommodityCodes` marked as deprecated everywhere, `extendedNationalCommodityCodes` to be used instead
+  - `extendedNationalCommodityCodes` added in order to support 16 character codes
+  - `innerPackagings` can now have a nested `innerPackagings` to allow multiple innerPackaging-layers
+  - `role` added to `VesselVoyage` in order to specify the vessel as being: `FIRST_SEA_GOING` (First sea going vessel) or `MOTHER` (Mother vessel)
+  - an unstructured address object called `addressLines` added to: `PlaceOfReceipt`, `PlaceOfDelivery` and `OnwardInlandRouting`. Also added to the following party objects: `Shipper`, `OnBehalfOfShipper`, `Consignee`, `OnBehalfOfConsignee`, `Endorsee`, `CarriersAgentAtDestination`, `NotifyParty`, general `Party` and `IssuingParty`
+  - `facilityName` added to the following location objects: `PlaceOfReceipt`, `PlaceOfDelivery`, `OnwardInlandRouting`
+  - `chargeName` marked as deprecated - use `extendedChargeName` instead which covers 100 characters (instead of 50 characters)
+  - `eblPlatform` added to: `Shipper`, `Consignee` and `Endorsee` party objects
 
 <a name="v302"></a>[Release v3.0.2 (14 November 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_ISS/3.0.2)
 ---
