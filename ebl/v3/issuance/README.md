@@ -24,7 +24,7 @@ This is a patch version for the DCSA Issuance API including updates to e.g. eBL 
   - `nationalCommodityCodes` marked as deprecated everywhere, `extendedNationalCommodityCodes` to be used instead
   - `extendedNationalCommodityCodes` added in order to support 16 character codes
   - `innerPackagings` can now have a nested `innerPackagings` to allow multiple innerPackaging-layers
-  - `role` added to `VesselVoyage` in order to specify the vessel as being: `FIRST_SEA_GOING` (First sea giong vessel) or `MOTHER` (Mother vessel)
+  - `role` added to `VesselVoyage` in order to specify the vessel as being: `FIRST_SEA_GOING` (First sea going vessel) or `MOTHER` (Mother vessel)
   - an unstructured address object called `addressLines` added to: `PlaceOfReceipt`, `PlaceOfDelivery` and `OnwardInlandRouting`. Also added to the following party objects: `Shipper`, `OnBehalfOfShipper`, `Consignee`, `OnBehalfOfConsignee`, `Endorsee`, `CarriersAgentAtDestination`, `NotifyParty`, general `Party` and `IssuingParty`
   - `facilityName` added to the following location objects: `PlaceOfReceipt`, `PlaceOfDelivery`, `OnwardInlandRouting`
   - `chargeName` marked as deprecated - use `extendedChargeName` instead which covers 100 characters (instead of 50 characters)
