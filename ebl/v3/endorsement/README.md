@@ -8,7 +8,7 @@ Publications related to the Bill of Lading Endorsement Chain API:
 - [Bill of Lading](./..) maintained here on GitHub
 - [Bill of Lading Surrender](./../surrender) maintained here on GitHub (the Surrender API)
 
-<a name="v303"></a>[Release v3.0.3 (TBD 2026)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_END/3.0.3)
+<a name="v303"></a>[Release v3.0.3 (14 April 2026)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_EBL_END/3.0.3)
 ---
 This is a "maintenance" release to align with eBL v3.0.3. This version updates the platform list and improves descriptions.
 - `endorsementChain` description for `Endorsee` updated
