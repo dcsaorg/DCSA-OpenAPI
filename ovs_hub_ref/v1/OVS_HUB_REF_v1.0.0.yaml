@@ -5,7 +5,7 @@ info:
   description: |
     <h1>DCSA Partner Reference API</h1>
 
-    This API is...
+    This API helps users of OVS Hub corelate **Service Codes**, **Voyage Numbers/References** and **TransportCallReferences**. If called with a `carrierSerciceCode` the response is all `carrierServiceCodes` know to OVS Hub that correspond to the provided `carrierServiceCoce`. It is also possible to query using the `unviversalServiceReference`. Similar endpoints exist for **Voyages** and **TransportCallReferences*.
 
     ### API Design & Implementation Principles
     This API follows the guidelines defined in version 2.0 of the API Design & Implementation Principles which can be found on the [DCSA Developer Portal](https://developer.dcsa.org/api_design)
@@ -407,7 +407,7 @@ paths:
           schema:
             type: string
             maxLength: 100
-            example: SR11111X-9321483-2107W-NLRTM-HPD2-1-1
+            example: SR00648D-123456-2095-818B-CNXMN-XHCT-1-1
         - name: carrierSMDGCode
           in: query
           required: false
@@ -507,7 +507,7 @@ paths:
                 Example 1:
                   value:
                     httpMethod: GET
-                    requestUri: /v1/transport-call-references/SR11111X-9321483-2107W-NLAMS-ACT-1-1
+                    requestUri: /v1/transport-call-references/SR11111X-9321483-2107W-NLAMS-ACT-1-1?showAll=true
                     statusCode: 400
                     statusCodeText: Bad Request
                     providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
@@ -515,7 +515,7 @@ paths:
                     errors:
                       - errorCode: 7007
                         errorCodeText: invalidQuery
-                        errorCodeMessage: Unknown transportCallReference
+                        errorCodeMessage: Unknown showAll query parameter
         '500':
           description: Internal Server Error
           headers:
@@ -621,6 +621,7 @@ components:
         - statusCodeText
         - errorDateTime
         - errors
+
     DetailedError:
       type: object
       title: Detailed Error
@@ -759,8 +760,11 @@ components:
           example: 2103N
         carrierVoyages:
           type: array
+          minItems: 1
           items:
             $ref: '#/components/schemas/CarrierVoyage'
+      required:
+        - carrierVoyages
 
     CarrierVoyage:
       type: object
@@ -850,6 +854,8 @@ components:
           minItems: 1
           items:
             $ref: '#/components/schemas/CarrierTransportCall'
+      required:
+        - carrierTransportCalls
 
     CarrierTransportCall:
       type: object
