@@ -201,7 +201,7 @@ paths:
       description: |
         Get a list of partner voyages and their service. When calling this endpoint it is mandatory to provide a service and a voyage. The service MUST be provided using the `carrierServiceCode` or `universalServiceReference` (or both). At least one of the following voyage filters MUST be provided: `carrierImportVoyageNumber`, `carrierExportVoyageNumber`, `universalImportVoyageReference` or `universalExportVoyageReference`.
 
-        If the carrier specific query parameters are used (`carrierServiceCode`, `carrierImportVoyageNumber` and `carrierExportVoyageNumber`) it is possible to further filter the response using the `carrierSMDGCode`.
+        If the carrier specific query parameters are used (`carrierServiceCode`, `carrierImportVoyageNumber` and `carrierExportVoyageNumber`) it is mandatory to use `carrierSMDGCode`.
 
         If a voyage is matched, all partner voyages and service information is included per object in the response. The response is grouped per service.
 
@@ -210,6 +210,7 @@ paths:
         **Condition:** It is mandatory to provide:
           - `carrierServiceCode` or `universalServiceReference` or both
           - `carrierImportVoyageNumber`, `carrierExportVoyageNumber`, `universalImportVoyageReference` or `universalExportVoyageReference` or combinations
+          - `carrierSMDGCode` if "carrier"-specific filters are used (`carrierServiceCode`, `carrierImportVoyageNumber` or `carrierExportVoyageNumber`)
       parameters:
         - name: carrierServiceCode
           in: query
@@ -218,6 +219,8 @@ paths:
             The carrier specific service code to filter by. The result will only include voyages linked to the specified `carrierServiceCode`.
             
             **Condition:** It is mandatory to provide either `carrierServiceCode` or `universalServiceReference` or both when using this endpoint.
+
+            **Condition:** It is mandatory to use `carrierSMDGCode` when `carrierServiceCode` is used
           schema:
             type: string
             maxLength: 11
@@ -242,6 +245,8 @@ paths:
             The carrier specific import voyage number to filter by. The result will only return voyages including the import voyage number.
             
             **Condition:** It is mandatory to provide either `carrierImportVoyageNumber`, `carrierExportVoyageNumber`, `universalImportVoyageReference` or `universalExportVoyageReference` or any combination.
+
+            **Condition:** It is mandatory to use `carrierSMDGCode` when `carrierImportVoyageNumber` is used
           schema:
             type: string
             maxLength: 50
@@ -254,6 +259,8 @@ paths:
             The carrier specific export voyage number to filter by. The result will only return voyages including the export voyage number.
             
             **Condition:** It is mandatory to provide either `carrierImportVoyageNumber`, `carrierExportVoyageNumber`, `universalImportVoyageReference` or `universalExportVoyageReference` or any combination.
+
+            **Condition:** It is mandatory to use `carrierSMDGCode` when `carrierExportVoyageNumber` is used
           schema:
             type: string
             maxLength: 50
@@ -285,7 +292,9 @@ paths:
           in: query
           required: false
           description: |
-            The carrier specific SMDG code related to the `carrierServiceCode`, `carrierImportVoyageNumber` or `carrierExportVoyageNumber` query parameter. The result will be filtered to only include `carrierServiceCode` from the specified `carrierSMDGCode`.
+            The carrier specific SMDG code must be used when using `carrierServiceCode`, `carrierImportVoyageNumber` or `carrierExportVoyageNumber` query parameter.
+
+            **Condition:** If is mandatory to use `carrierSMDGCode` when `carrierServiceCode`, `carrierImportVoyageNumber` or `carrierExportVoyageNumber` is used
           schema:
             type: string
             maxLength: 10
