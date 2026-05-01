@@ -4210,6 +4210,11 @@ components:
             description: |
               A purchase order reference linked to the `Consignee`.
             example: HHL007
+        isNotifyParty:
+          type: boolean
+          description: |
+            Indicates whether the Consignee is also a NotifyParty with identical information. If set to `true` a conceptual 1st notify party identical to the Consignee will exist (any existing 1st NotifyParty conceptually becomes 2nd NotifyParty, any existing 2nd NotifyParty conceptually becomes OtherNotifyParty). The NotifyParty-object will not be affected. Setting this property to `true` does not prescribe what should appear on the printed B/L.
+          example: true
       required:
         - partyName
         - identifyingCodes
@@ -4339,6 +4344,11 @@ components:
             A list of contact details
           items:
             $ref: '#/components/schemas/PartyContactDetail'
+        isNotifyParty:
+          type: boolean
+          description: |
+            Indicates whether the Endorsee is also a NotifyParty with identical information. If set to `true` a conceptual 1st notify party identical to the Endorsee will exist (any existing 1st NotifyParty conceptually becomes 2nd NotifyParty, any existing 2nd NotifyParty conceptually becomes OtherNotifyParty). The NotifyParty-object will not be affected. Setting this property to `true` does not prescribe what should appear on the printed B/L.
+          example: true
       required:
         - partyName
         - identifyingCodes
@@ -4673,8 +4683,10 @@ components:
             List of up to 3 `Notify Parties`. The first item in the list is the **First Notify Party** (`N1`), the second item is the **Second Notify Party** (`N2`) and the last item is the **Other Notify Party** (`NI`).
 
             **Conditions:** If provided:
-              - mandatory for To Order BLs, `isToOrder=true`
-              - the order of the items in this array **MUST** be preserved as by the provider of the API.
+              - Mandatory for To Order BLs, `isToOrder=true`, unless `isNotifyParty` in `Consignee` or `Endorsee` is set to `true`, in which case the `notifyParties` property can be omitted.
+              - The order of the items in this array **MUST** be preserved as by the provider of the API.
+
+            **Note:** If `isNotifyParty` is set in either `Consignee` or `Endorsee` parties, then 1st item in the list conceptually becomes **Second Notify Party** (`N2`) and any other items in the list conceptually becomes **Other Notify Party** (`NI`). The `Consignee` or `Endorsee` conceptually becomes **First Notify Party** (`N1`). Any visual representation (e.g. in a PDF) of the `Consignee` / `Endorsee` as a NotifyParty is not prescribed by the standard (e.g it can be the text: "Same as Consignee/Endorsee" or a copy of the Consignee/Endorsee, etc).
           items:
             $ref: '#/components/schemas/NotifyParty'
         other:
