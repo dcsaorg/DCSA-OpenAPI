@@ -475,6 +475,8 @@ components:
       properties:
         document:
           $ref: '#/components/schemas/TransportDocument'
+        transportDocumentReplacements:
+          $ref: '#/components/schemas/TransportDocumentReplacements'
         issueTo:
           $ref: '#/components/schemas/IssueToParty'
         eBLVisualisationByCarrier:
@@ -489,6 +491,60 @@ components:
         - document
         - issueTo
         - issuanceManifestSignedContent
+
+    TransportDocumentReplacements:
+      type: object
+      title: Transport Document Replacements
+      description: |
+        This object provides the possibility to link the issued `Transport Document` to one or more previously issued `Transport Document(s)`.
+
+        If this issuance request is the result of a previous **Surrender for Amendments** (because of an update to the `Transport Document`), the `oldTransportDocumentReferences` list would contain a single `transportDocumentReference` (and optionally a `transportDocumentSubReference`).
+
+        If the issued `Transport Document` is a "combine" of multiple `Transport Documents`, the `oldTransportDocumentReferences` list would contain the `transportDocumentReferences` being combined into the issued `Transport Document`.
+
+        The issued `Transport Document` can also be part of a split. In this case, the `newTransportDocumentReferences` list would contain all `transportDocumentReferences` that the `Transport Document(s)` specified in `oldTransportDocumentReferences` have been split into.
+        
+        **Note:** If provided it should be considered as metadata and is not part of the `issuanceManifestSignedContent`.
+      properties:
+        oldTransportDocumentReferences:
+          type: array
+          description: |
+            A list of `transportDocumentReference` values and optional `transportDocumentSubReference` values from which the issued `Transport Document` originated.
+            If the list contains more than one item, the issuance is the result of a "combine" of multiple `Transport Documents`.
+            This property is only relevant if a previous **Surrender for Amendments** has been performed.
+          items:
+            $ref: '#/components/schemas/TransportDocumentRelation'
+        newTransportDocumentReferences:
+          type: array
+          description: |
+            A list of `transportDocumentReference` values and optional `transportDocumentSubReference` values into which the issued `Transport Document` has been split.
+            This property is only relevant if a previous **Surrender for Amendments** has resulted in a split of `Transport Documents`.
+          items:
+            $ref: '#/components/schemas/TransportDocumentRelation'
+
+    TransportDocumentRelation:
+      type: object
+      title: Transport Document Relation
+      description: |
+        An object linking a `transportDocumentReference` with an optional `transportDocumentSubReference`.
+      properties:
+        transportDocumentReference:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 20
+          description: |
+            A unique number allocated by the shipping line to the `Transport Document` and the main number used for the tracking of the status of the shipment.
+          example: HHL71800000
+        transportDocumentSubReference:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 100
+          description: |
+            Additional reference that can be optionally used alongside the `transportDocumentReference` in order to distinguish between versions of the same `Transport Document`.
+          example: Version_1
+      required:
+        - transportDocumentReference
+
     SupportingDocument:
       type: object
       title: Supporting Document
