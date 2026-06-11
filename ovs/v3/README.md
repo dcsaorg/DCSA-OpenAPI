@@ -4,6 +4,15 @@ The DCSA OVS API is documented on [**SwaggerHub**](https://app.swaggerhub.com/ap
 
 The primary purpose of this API is to specify endPoints for schedules shared between Vessel Partners. 
 
+<a name="v302"></a>[Release v3.0.2 (12 June 2026)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_OVS/3.0.2)
+---
+An update to allow partial schedules and add `facilityTypeCode`.
+
+- added `responseScope` filter paramter to allow the return of partial voayges (when using this it is not required to respond with FULL voyages which the default is). When not used, FULL voyages are still required in the response
+- improved some descriptions, e.g. removed special characters, highlighted important text
+- added `facilityTypeCode` an optional qualifier which can be added to a **Timestamp** to specify if the time is at `BRTH` (Berth) or `PBPL` (Pilot Boarding Place). If not used, default is `BRTH`
+
+
 <a name="v301"></a>[Release v3.0.1 (14 November 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_OVS/3.0.1)
 ---
 A minor update to improve the usage of OVS.
