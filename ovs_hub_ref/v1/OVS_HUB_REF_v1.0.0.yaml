@@ -767,6 +767,8 @@ components:
             - `2 alphanumeric characters` for the sequence number of the voyage
             - `1 character` for the direction/haul (`N`orth, `E`ast, `W`est, `S`outh or `R`oundtrip).
           example: 2103N
+        vessel:
+          $ref: '#/components/schemas/Vessel'
         carrierVoyages:
           type: array
           minItems: 1
@@ -774,6 +776,49 @@ components:
             $ref: '#/components/schemas/CarrierVoyage'
       required:
         - carrierVoyages
+
+    Vessel:
+      title: Vessel
+      type: object
+      description: |
+        Static vessel information like `IMONumber`, `name`, `callSign` and operator.
+      properties:
+        vesselOperatorSMDGLinerCode:
+          type: string
+          maxLength: 10
+          description: |
+            The carrier who is in charge of the vessel operation based on the SMDG code.
+            
+            If not available at the moment of sharing the schedule, use `TBD` (To be defined).
+            
+            In the case an operator is still using a code not from SMDG, use the available code.
+          example: HLC
+        vesselIMONumber:
+          type: string
+          pattern: ^\d{7,8}$
+          minLength: 7
+          maxLength: 8
+          description: |
+            The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd's register code, which does not change during the lifetime of the vessel.
+          example: '9321483'
+        name:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 50
+          description: |
+            The name of the Vessel given by the Vessel Operator and registered with IMO.
+          example: King of the Seas
+        callSign:
+          type: string
+          pattern: ^\S(?:.*\S)?$
+          maxLength: 10
+          description: |
+            A unique alphanumeric identity that belongs to the vessel and is assigned by the International Telecommunication Union (ITU). It consists of a three letter alphanumeric prefix that indicates nationality, followed by one to four characters to identify the individual vessel. For instance, vessels registered under Denmark are assigned the prefix ranges 5PA-5QZ, OUAOZZ, and XPA-XPZ. The Call Sign changes whenever a vessel changes its flag.
+          example: NCVV
+        isDummyVessel:
+          type: boolean
+          description: |
+            This property can be set to `true` when no vessel has been assigned, indicating that the `vesselIMONumber` does not exist.
 
     CarrierVoyage:
       type: object
