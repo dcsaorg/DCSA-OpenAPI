@@ -5,7 +5,7 @@ info:
   description: |
     <h1>DCSA OpenAPI specification for the Shipping Instructions and Transport Document process</h1>
 
-    This API is intended as an API between a carrier and anyone creating a `Shipping Instructions` and approving a `Transport Document`. The process includes:
+    This API is intended as an API between a provider and anyone creating a `Shipping Instructions` and approving a `Transport Document`. The process includes:
 
     - Shipping Instructions submission
     - Shipping Instructions update
@@ -85,7 +85,7 @@ paths:
         Creates a new `Shipping Instructions`. This endPoint corresponds with **UseCase 1 - Submit Shipping Instructions**.
 
         ## Precondition
-        The consumer has information for a `Shipping Instructions`. The empty equipment has been released to the shipper. The `Booking` is in state `CONFIRMED`.
+        The consumer has information for a `Shipping Instructions`. The empty equipment has been released to the consumer. The `Booking` is in state `CONFIRMED`.
 
         ## Postcondition
         The provider has received the `Shipping Instructions`.
@@ -953,7 +953,7 @@ paths:
         - $ref: '#/components/parameters/documentReference'
         - $ref: '#/components/parameters/Api-Version-Major'
       description: |
-        A shipper initiated cancellation of the `Shipping Instructions` or `Updated Shipping Instructions` identified by the `documentReference` path parameter. The value of `documentReference` may be either a `shippingInstructionsReference` or a `transportDocumentReference`.
+        A consumer initiated cancellation of the `Shipping Instructions` or `Updated Shipping Instructions` identified by the `documentReference` path parameter. The value of `documentReference` may be either a `shippingInstructionsReference` or a `transportDocumentReference`.
 
         This endPoint corresponds with **UseCase 5 - Cancel update to Shipping Instructions** or **UseCase 15 - Cancel Shipping Instructions**.
 
@@ -2738,7 +2738,7 @@ paths:
             example: HHL71800000
         - $ref: '#/components/parameters/Api-Version-Major'
       description: |
-        A shipper initiated cancellation of the `Direct Transport Document` amendment identified by the `transportDocumentReference` path parameter.
+        A consumer initiated cancellation of the `Direct Transport Document` amendment identified by the `transportDocumentReference` path parameter.
 
         This endPoint corresponds with **UseCase 18 - Cancel Transport Document amendment**.
 
@@ -3928,8 +3928,8 @@ components:
             - `RECEIVED` (Shipping Instructions have been received)
             - `PENDING_UPDATE` (An update is required to the Shipping Instructions)
             - `COMPLETED` (The Shipping Instructions can no longer be modified - the related Transport Document has been surrendered for delivery)
-            - `CANCELLED` (The Shipping Instructions have been cancelled by Shipper)
-            - `DECLINED` (The Shipping Instructions have been declined by Carrier)
+            - `CANCELLED` (The Shipping Instructions have been cancelled by shipper)
+            - `DECLINED` (The Shipping Instructions have been declined by carrier)
 
             **Condition:** When communicating with providers **or** consumers implementing API **v3.0.2 or earlier**, a sender implementing API **v3.0.3 or later MUST NOT** use `CANCELLED` or `DECLINED` values. Recipients implementing earlier versions **MAY ignore these values or treat the request as invalid**.
           example: RECEIVED
@@ -3940,8 +3940,8 @@ components:
             The status of the latest update to the `Shipping Instructions`. If no update has been requested - then this property is empty. Possible values are:
             - `UPDATE_RECEIVED` (An update to a Shipping Instructions has been received and is awaiting to be processed)
             - `UPDATE_CONFIRMED` (An update to a Shipping Instructions has been confirmed)
-            - `UPDATE_CANCELLED` (An update to a Shipping Instructions is discontinued by consumer)
-            - `UPDATE_DECLINED` (An update to a Shipping Instructions is discontinued by provider)
+            - `UPDATE_CANCELLED` (An update to a Shipping Instructions is discontinued by shipper)
+            - `UPDATE_DECLINED` (An update to a Shipping Instructions is discontinued by carrier)
           example: UPDATE_RECEIVED
         shippingInstructionsReference:
           type: string
@@ -4110,8 +4110,8 @@ components:
             The status of the `Transport Document`. Possible values are:
 
             - `DRAFT` (The Transport Document is currently a Draft)
-            - `APPROVED` (The Transport Document has been Approved by consumer)
-            - `ISSUED` (The Transport Document has been Issued by provider)
+            - `APPROVED` (The Transport Document has been Approved by shipper)
+            - `ISSUED` (The Transport Document has been Issued by carrier)
             - `PENDING_SURRENDER_FOR_AMENDMENT` (The Transport Document has a pending Surrender for Amendment)
             - `SURRENDER_FOR_AMENDMENT` (The Transport Document is Surrendered for Amendment)
             - `VOID` (The Transport Document has been Voided)
@@ -4125,8 +4125,8 @@ components:
             The status of the latest amendment to the `Transport Document`. If no amendments has been requested - then this field is empty. Possible values are:
             - `AMENDMENT_RECEIVED` (An amendment to a Transport Document is waiting to be processed)
             - `AMENDMENT_CONFIRMED` (An amendment to a Transport Document has been confirmed)
-            - `AMENDMENT_CANCELLED` (An amendment to a Transport Document is discontinued by consumer)
-            - `AMENDMENT_DECLINED` (An amendment to a Transport Document is discontinued by provider)
+            - `AMENDMENT_CANCELLED` (An amendment to a Transport Document is discontinued by shipper)
+            - `AMENDMENT_DECLINED` (An amendment to a Transport Document is discontinued by carrier)
 
             **👉Important note:** When communicating with providers implementing API **v3.0.2 or earlier**, a sender implementing API **v3.0.3 or later MUST NOT** use this property as it will most likely be ignored. Recipients implementing earlier versions **MAY ignore** this property.
           example: AMENDMENT_RECEIVED
@@ -4209,7 +4209,7 @@ components:
     CreateShippingInstructions:
       type: object
       description: |
-        The `Shipping Instructions` is an enrichment to the original booking shared by the Shipper to the Carrier. The information given by the Shipper through the `Shipping Instructions` is the information required to create a `Draft Transport Document`.
+        The `Shipping Instructions` is an enrichment to the original booking shared by the shipper to the carrier. The information given by the shipper through the `Shipping Instructions` is the information required to create a `Draft Transport Document`.
       title: Create Shipping Instructions
       properties:
         shippingInstructionsRevisionNumber:
@@ -4439,7 +4439,7 @@ components:
         advanceManifestFilings:
           type: array
           description: |
-            A list of `Advance Manifest Filings` specified by the Shipper to indicate whom is to do the Filing
+            A list of `Advance Manifest Filings` specified by the shipper to indicate whom is to do the Filing
           items:
             $ref: '#/components/schemas/AdvanceManifestFiling'
         isHouseBillOfLadingsIssued:
@@ -4452,13 +4452,13 @@ components:
         houseBillOfLadings:
           type: array
           description: |
-            A list of `House Bill of Ladings` specified by the Shipper.
+            A list of `House Bill of Ladings` specified by the shipper.
           items:
             $ref: '#/components/schemas/HouseBillOfLading'
         requestedCarrierCertificates:
           type: array
           description: |
-            Certificate(s) requested by the Shipper for the Carrier to include as part of the shipment documentation pack
+            Certificate(s) requested by the shipper for the carrier to include as part of the shipment documentation pack
           items:
             type: string
             maxLength: 100
@@ -4493,7 +4493,7 @@ components:
         requestedCarrierClauses:
           type: array
           description: |
-            Clauses requested by the Shipper for the Carrier to include in the `Transport Document` `Carrier clauses`
+            Clauses requested by the shipper for the carrier to include in the `Transport Document` `Carrier clauses`
           items:
             type: string
             maxLength: 100
@@ -4760,7 +4760,7 @@ components:
         advanceManifestFilings:
           type: array
           description: |
-            A list of `Advance Manifest Filings` specified by the Shipper to indicate whom is to do the Filing
+            A list of `Advance Manifest Filings` specified by the shipper to indicate whom is to do the Filing
           items:
             $ref: '#/components/schemas/AdvanceManifestFiling'
         isHouseBillOfLadingsIssued:
@@ -4773,13 +4773,13 @@ components:
         houseBillOfLadings:
           type: array
           description: |
-            A list of `House Bill of Ladings` specified by the Shipper.
+            A list of `House Bill of Ladings` specified by the shipper.
           items:
             $ref: '#/components/schemas/HouseBillOfLading'
         requestedCarrierCertificates:
           type: array
           description: |
-            Certificate(s) requested by the Shipper for the Carrier to include as part of the shipment documentation pack
+            Certificate(s) requested by the shipper for the carrier to include as part of the shipment documentation pack
           items:
             type: string
             maxLength: 100
@@ -4814,7 +4814,7 @@ components:
         requestedCarrierClauses:
           type: array
           description: |
-            Clauses requested by the Shipper for the Carrier to include in the `Transport Document` `Carrier clauses`
+            Clauses requested by the shipper for the carrier to include in the `Transport Document` `Carrier clauses`
           items:
             type: string
             maxLength: 100
@@ -4844,7 +4844,7 @@ components:
 
     ShippingInstructions:
       description: |
-        The `Shipping Instructions` as provided by the Shipper.
+        The `Shipping Instructions` as provided by the shipper.
       type: object
       title: Shipping Instructions
       properties:
@@ -4875,8 +4875,8 @@ components:
             - `RECEIVED` (Shipping Instructions have been received)
             - `PENDING_UPDATE` (An update is required to the Shipping Instructions)
             - `COMPLETED` (The Shipping Instructions can no longer be modified - the related Transport Document has been surrendered for delivery)
-            - `CANCELLED` (The Shipping Instructions have been cancelled by Shipper)
-            - `DECLINED` (The Shipping Instructions have been declined by Carrier)
+            - `CANCELLED` (The Shipping Instructions have been cancelled by shipper)
+            - `DECLINED` (The Shipping Instructions have been declined by carrier)
 
             **Condition:** When communicating with providers **or** consumers implementing API **v3.0.2 or earlier**, a sender implementing API **v3.0.3 or later MUST NOT** use `CANCELLED` or `DECLINED` values. Recipients implementing earlier versions **MAY ignore these values or treat the request as invalid**.
           example: RECEIVED
@@ -4887,8 +4887,8 @@ components:
             The status of the latest update to the `Shipping Instructions`. If no update has been requested - then this property is empty. Possible values are:
             - `UPDATE_RECEIVED` (An update to a Shipping Instructions has been received and is awaiting to be processed)
             - `UPDATE_CONFIRMED` (An update to a Shipping Instructions has been confirmed)
-            - `UPDATE_CANCELLED` (An update to a Shipping Instructions is discontinued by consumer)
-            - `UPDATE_DECLINED` (An update to a Shipping Instructions is discontinued by provider)
+            - `UPDATE_CANCELLED` (An update to a Shipping Instructions is discontinued by shipper)
+            - `UPDATE_DECLINED` (An update to a Shipping Instructions is discontinued by carrier)
           example: UPDATE_RECEIVED
         transportDocumentTypeCode:
           type: string
@@ -5105,7 +5105,7 @@ components:
         advanceManifestFilings:
           type: array
           description: |
-            A list of `Advance Manifest Filings` specified by the Shipper to indicate whom is to do the Filing
+            A list of `Advance Manifest Filings` specified by the shipper to indicate whom is to do the Filing
           items:
             $ref: '#/components/schemas/AdvanceManifestFiling'
         isHouseBillOfLadingsIssued:
@@ -5117,13 +5117,13 @@ components:
         houseBillOfLadings:
           type: array
           description: |
-            A list of `House Bill of Ladings` specified by the Shipper.
+            A list of `House Bill of Ladings` specified by the shipper.
           items:
             $ref: '#/components/schemas/HouseBillOfLading'
         requestedCarrierCertificates:
           type: array
           description: |
-            Certificate(s) requested by the Shipper for the Carrier to include as part of the shipment documentation pack
+            Certificate(s) requested by the shipper for the carrier to include as part of the shipment documentation pack
           items:
             type: string
             maxLength: 100
@@ -5158,7 +5158,7 @@ components:
         requestedCarrierClauses:
           type: array
           description: |
-            Clauses requested by the Shipper for the Carrier to include in the `Transport Document` `Carrier clauses`
+            Clauses requested by the shipper for the carrier to include in the `Transport Document` `Carrier clauses`
           items:
             type: string
             maxLength: 100
@@ -7650,7 +7650,7 @@ components:
           type: string
           maxLength: 150
           description: |
-            Code to identify the party as provided by the code list provider
+            Code to identify the party as provided by the `codeListProvider`.
           example: MSK
         codeListName:
           type: string
@@ -9671,7 +9671,7 @@ components:
       type: object
       title: House Bill of Lading
       description: |
-        A legal contract between the Ocean Transport Intermediary (OTI), such as a Non-Vessel Operating Common Carrier (NVOCC) or a freight forwarder, and the shipper that acknowledges the receipt of goods and outlines the terms of shipment.
+        A legal contract between the Ocean Transport Intermediary (OTI), such as a Non-Vessel Operating Common carrier (NVOCC) or a freight forwarder, and the shipper that acknowledges the receipt of goods and outlines the terms of shipment.
       properties:
         houseBillOfLadingReference:
           type: string
@@ -9884,8 +9884,8 @@ components:
           description: |
             The status of the `Transport Document`. Possible values are:
             - `DRAFT` (the Transport Document is currently a Draft)
-            - `APPROVED` (the Transport Document has been Approved by consumer)
-            - `ISSUED` (the Transport Document has been Issued by provider)
+            - `APPROVED` (the Transport Document has been Approved by shipper)
+            - `ISSUED` (the Transport Document has been Issued by carrier)
             - `PENDING_SURRENDER_FOR_AMENDMENT` (the Transport Document has a pending Surrender for Amendment)
             - `SURRENDERED_FOR_AMENDMENT` (the Transport Document is Surrendered for Amendment)
             - `PENDING_SURRENDER_FOR_DELIVERY` (the Transport Document has a pending Surrender for Delivery)
@@ -10046,7 +10046,7 @@ components:
           maxLength: 250
           description: |
             The text to be displayed on the `Transport Document` as evidence that the goods have been received for shipment or shipped on board.
-          example: 'Received for Shipment CMA CGM CONCORDE 28-Jul-2022 CMA CGM Agences France SAS As agents for the Carrier'
+          example: 'Received for Shipment CMA CGM CONCORDE 28-Jul-2022 CMA CGM Agences France SAS As agents for the carrier'
         termsAndConditions:
           type: string
           maxLength: 50000
@@ -10291,8 +10291,8 @@ components:
             The status of the latest amendment to the `Transport Document`. If no amendments has been requested - then this field is empty. Possible values are:
             - `AMENDMENT_RECEIVED` (An amendment to a Transport Document is waiting to be processed)
             - `AMENDMENT_CONFIRMED` (An amendment to a Transport Document has been confirmed)
-            - `AMENDMENT_CANCELLED` (An amendment to a Transport Document is discontinued by consumer)
-            - `AMENDMENT_DECLINED` (An amendment to a Transport Document is discontinued by provider)
+            - `AMENDMENT_CANCELLED` (An amendment to a Transport Document is discontinued by shipper)
+            - `AMENDMENT_DECLINED` (An amendment to a Transport Document is discontinued by carrier)
           example: AMENDMENT_RECEIVED
         amendedTransportDocument:
           $ref: '#/components/schemas/TransportDocument'
