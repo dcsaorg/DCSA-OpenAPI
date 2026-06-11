@@ -2,6 +2,25 @@
 
 The DCSA Commercial Schedules API is specified on [**SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_CS).
 
+<a name="v103"></a>[Release v1.0.3 (12 June 2026)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_CS/1.0.3)
+---
+This is a patch release for the DCSA Commercial Schedules API. The primary purpose of this patch is to include 2 new query parameters: `cargoType` and `responseScope` and add **IntermediateCalls** to the legs:
+
+- added `cargoType` query paramter to influence routing solutions returned. Default is `DRY` if not specified
+- added `responseScope` query parameter to indicate if FULL voyages or only partial voyages are returned. Default is FULL if not specified
+- description of the Point to Point endpoint updated to reflect the fact that partial voyages can be returned if `responseScope` is used
+- added `co2e` as a new property when providing emission footprint information
+- added a description to the **Transport Call** object
+- added an **IntermediateCall** object to capture intermediate port information in Point to Point **Legs**, this includes:
+  - `transportCallReference`
+  - `facilityTypeCode`
+  - `location`
+  - `arrivalDateTime`
+  - `departureDateTime`
+- added `intermediateCalls` to the **Leg** object
+
+Link to [commits included in this patch](https://github.com/dcsaorg/DCSA-OpenAPI/commits/master/cs/v1/CS_v1.0.3.yaml?since=2026-02-14&until=2026-06-12)
+
 <a name="v102"></a>[Release v1.0.2 (13 February 2026)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_CS/1.0.2)
 ---
 This is a patch release for the DCSA Commercial Schedules API. The primary purpose of this patch is to include the emission data in the Point-to-point routings. Here is a list of changes:
@@ -27,7 +46,7 @@ This is a patch release for the DCSA Commercial Schedules API. The primary purpo
     - `’` -> `'`
     - `&apos;` -> `'`
 
-Link to [commits included in this patch](https://github.com/dcsaorg/DCSA-OpenAPI/commits/master/cs/v1/CS_v1.0.1.yaml?since=2025-04-25&until=2026-02-13)
+Link to [commits included in this patch](https://github.com/dcsaorg/DCSA-OpenAPI/commits/master/cs/v1/CS_v1.0.2.yaml?since=2025-04-26&until=2026-02-13)
 
 <a name="v101"></a>[Release v1.0.1 (25 April 2025)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_CS/1.0.1)
 ---
