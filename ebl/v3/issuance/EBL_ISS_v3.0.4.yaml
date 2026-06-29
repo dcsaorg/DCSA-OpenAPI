@@ -727,6 +727,71 @@ components:
       required:
         - codeListProvider
         - partyCode
+
+    IdentifyingCodeExtended:
+      type: object
+      title: Identifying Code
+      description: |
+        A code and value that uniquely identifies a party.
+      properties:
+        codeListProvider:
+          type: string
+          maxLength: 100
+          description: |
+            A list of codes identifying a party. Possible values are:
+            - `WAVE` (Wave)
+            - `CARX` (CargoX)
+            - `ESSD` (EssDOCS - This value has been **deprecated**. Please use `IDT`)
+            - `IDT` (ICE Digital Trade)
+            - `BOLE` (Bolero)
+            - `EDOX` (EdoxOnline)
+            - `IQAX` (IQAX)
+            - `SECR` (Secro)
+            - `TRGO` (TradeGO)
+            - `ETEU` (eTEU)
+            - `TRAC` (Enigio trace:original)
+            - `BRIT` (BRITC eBL)
+            - `COVA` (Covantis)
+            - `ETIT` (e-title)
+            - `KTNE` (KTNET)
+            - `CRED` (Credore)
+            - `BLOC` (BlockPeer Technologies)
+            - `DOCU` (DocuTrade)
+            - `AEOT` (AEOTrade)
+            - `SGTD` (SGTraDex)
+            - `GSBN` (Global Shipping Business Network)
+            - `WISE` (WiseTech)
+            - `GLEIF` (Global Legal Entity Identifier Foundation)
+            - `W3C` (World Wide Web Consortium)
+            - `DNB` (Dun and Bradstreet)
+            - `FMC` (Federal Maritime Commission)
+            - `DCSA` (Digital Container Shipping Association)
+            - `ZZZ` (Mutually defined)
+            - `NA` (Not Applicable)
+
+            **Condition:** When `codeListProvider` does not exist or is not applicable then `NA` MUST be used.
+          example: W3C
+        partyCode:
+          type: string
+          maxLength: 150
+          description: |
+            Code to identify the party as provided by the `codeListProvider`.
+
+            **Condtion:** when `codeListProvider='NA'` the corresponding `partyCode` MUST be set to `NO VALUE`.
+          example: MSK
+        codeListName:
+          type: string
+          maxLength: 100
+          description: |
+            The name of the code list, code generation mechanism or code authority for the `partyCode`. Example values could be:
+            - `DID` (Decentralized Identifier) for `codeListProvider` `W3C`
+            - `LEI` (Legal Entity Identifier) for `codeListProvider` `GLEIF`
+            - `DUNS` (Data Universal Numbering System) for `codeListProvider` `DNB`
+          example: DID
+      required:
+        - codeListProvider
+        - partyCode
+
     TaxLegalReference:
       type: object
       title: Tax & Legal Reference
@@ -3500,7 +3565,7 @@ components:
           type: array
           minItems: 1
           items:
-            $ref: '#/components/schemas/IdentifyingCode'
+            $ref: '#/components/schemas/IdentifyingCodeExtended'
         taxLegalReferences:
           description: |
             A list of `Tax References` for a `Party`
@@ -3652,7 +3717,7 @@ components:
           type: array
           minItems: 1
           items:
-            $ref: '#/components/schemas/IdentifyingCode'
+            $ref: '#/components/schemas/IdentifyingCodeExtended'
         taxLegalReferences:
           description: |
             A list of `Tax References` for a `Party`
