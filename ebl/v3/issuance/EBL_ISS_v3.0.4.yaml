@@ -1022,6 +1022,12 @@ components:
 
             **Note:** If both `contractQuotationReference` and `extendedContractQuotationReference` are provided then `extendedContractQuotationReference` takes precedence and `contractQuotationReference` must be ignored.
           example: HHL1401
+        outOfGaugeQuoteReference:
+          type: string
+          maxLength: 70
+          description: |
+            Reference number of the OOG feasibility assessment or commercial quote previously issued by the carrier for this shipment.
+          example: OOG-QUOTE-2026-000123
         declaredValue:
           type: number
           format: float
@@ -2300,6 +2306,8 @@ components:
           example: false
         activeReeferSettings:
           $ref: '#/components/schemas/ActiveReeferSettings'
+        outOfGaugeDetails:
+          $ref: '#/components/schemas/OutOfGaugeDetails'
         shippingMarks:
           type: array
           maxItems: 50
@@ -2527,6 +2535,231 @@ components:
           description: |
             Indicator of whether cargo requires Controlled Atmosphere.
           example: true
+
+    ######################
+    # Out of Gauge Details
+    ######################
+    OutOfGaugeDetails:
+      type: object
+      title: Out of Gauge Details
+      description: |
+        Details related to Out of Gauge cargo for the requested equipment.
+      properties:
+        totalCargoDimensions:
+          $ref: '#/components/schemas/TotalCargoDimensions'
+        outOfGaugeExtensions:
+          $ref: '#/components/schemas/OutOfGaugeExtensions'
+        centerOfGravity:
+          $ref: '#/components/schemas/CenterOfGravity'
+        lashingRequirements:
+          type: string
+          maxLength: 5000
+          description: |
+            Lashing or securing requirements applicable to the OOG cargo.
+          example: Cargo to be secured with chain lashings according to approved lashing plan.
+        handlingInstructions:
+          type: string
+          maxLength: 5000
+          description: |
+            Handling instructions applicable to the OOG cargo.
+          example: Handle with care. Do not stack. Protect exposed components during terminal handling.
+        liftingInstructions:
+          type: string
+          maxLength: 5000
+          description: |
+            Instructions describing how to safely lift the equipment unit. Covers crane type, minimum capacity, lifting configuration, and any operational constraints.
+          example: Lift using certified lifting points only. Spreader beam required.
+        liftingPoints:
+          type: string
+          maxLength: 5000
+          description: |
+            Description of available lifting points on the cargo.
+          example: Four certified lifting points located on top frame, marked in the lifting plan.
+        isOnDeckOnly:
+          type: boolean
+          description: |
+            Indicates whether the cargo must only be stowed on deck.
+          example: false
+
+    ########################
+    # Total Cargo Dimensions
+    ########################
+    TotalCargoDimensions:
+      type: object
+      title: Total Cargo Dimensions
+      description: |
+        Overall outer dimensions of the cargo as placed on the equipment unit, representing the full dimensional envelope, including any projections or overhangs.
+      properties:
+        length:
+          type: object
+          title: Length
+          description: |
+            Overall length of the dimensional envelope, measured parallel to the longitudinal axis of the equipment unit.
+          allOf:
+            - $ref: '#/components/schemas/Measurement'
+        width:
+          type: object
+          title: Width
+          description: |
+            Overall width of the dimensional envelope, measured perpendicular to the longitudinal axis of the equipment unit.
+          allOf:
+            - $ref: '#/components/schemas/Measurement'
+        height:
+          type: object
+          title: Height
+          description: |
+            Overall height of the dimensional envelope, measured from the base of the equipment unit to the highest point of the cargo.
+          allOf:
+            - $ref: '#/components/schemas/Measurement'
+
+    #########################
+    # Out of Gauge Extensions
+    #########################
+    OutOfGaugeExtensions:
+      type: object
+      title: Out of Gauge Extensions
+      description: |
+        Directional measurements describing how far the cargo extends beyond the standard equipment envelope. Each value represents only the excess portion, not the total dimension.
+      properties:
+        overLengthFront:
+          type: object
+          title: Over Length Front
+          description: |
+            Distance by which the cargo protrudes beyond the front end (door end) of the equipment unit, measured from the outer face of the equipment's end wall or bolster.
+          allOf:
+            - $ref: '#/components/schemas/Measurement'
+        overLengthRear:
+          type: object
+          title: Over Length Rear
+          description: |
+            Distance by which the cargo protrudes beyond the rear end (non-door end) of the equipment unit, measured from the outer face of the equipment's end wall or bolster.
+          allOf:
+            - $ref: '#/components/schemas/Measurement'
+        overWidthLeft:
+          type: object
+          title: Over Width Left
+          description: |
+            Distance by which the cargo protrudes beyond the left side of the equipment unit when facing the front (door end), measured from the outer face of the equipment's side wall or rail.
+          allOf:
+            - $ref: '#/components/schemas/Measurement'
+        overWidthRight:
+          type: object
+          title: Over Width Right
+          description: |
+            Distance by which the cargo protrudes beyond the right side of the equipment unit when facing the front (door end), measured from the outer face of the equipment's side wall or rail.
+          allOf:
+            - $ref: '#/components/schemas/Measurement'
+        overHeight:
+          type: object
+          title: Over Height
+          description: |
+            Distance by which the cargo exceeds the standard external height of the equipment unit, measured from the top of the equipment's side rails or top rails to the highest point of the cargo.
+          allOf:
+            - $ref: '#/components/schemas/Measurement'
+
+    ###################
+    # Center of Gravity
+    ###################
+    CenterOfGravity:
+      type: object
+      title: Center of Gravity
+      description: |
+        Position of the combined center of gravity of all cargo placed on the equipment unit, expressed as offsets from a defined reference point.
+      properties:
+        referencePoint:
+          type: string
+          maxLength: 30
+          description: |
+            Reference point from which the center of gravity offsets are measured. Possible values:
+            - `BOTTOM_FRONT_LEFT` (Bottom Front Left)
+            - `BOTTOM_FRONT_CENTER` (Bottom Front Center)
+            - `BOTTOM_FRONT_RIGHT` (Bottom Front Right)
+            - `BOTTOM_CENTER_LEFT` (Bottom Center Left)
+            - `BOTTOM_CENTER_CENTER` (Bottom Center Center)
+            - `BOTTOM_CENTER_RIGHT` (Bottom Center Right)
+            - `BOTTOM_REAR_LEFT` (Bottom Rear Left)
+            - `BOTTOM_REAR_CENTER` (Bottom Rear Center)
+            - `BOTTOM_REAR_RIGHT` (Bottom Rear Right)
+            
+            - `MIDDLE_FRONT_LEFT` (Middle Front Left)
+            - `MIDDLE_FRONT_CENTER` (Middle Front Center)
+            - `MIDDLE_FRONT_RIGHT` (Middle Front Right)
+            - `MIDDLE_CENTER_LEFT` (Middle Center Left)
+            - `MIDDLE_CENTER_CENTER` (Middle Center Center)
+            - `MIDDLE_CENTER_RIGHT` (Middle Center Right)
+            - `MIDDLE_REAR_LEFT` (Middle Rear Left)
+            - `MIDDLE_REAR_CENTER` (Middle Rear Center)
+            - `MIDDLE_REAR_RIGHT` (Middle Rear Right)
+            
+            - `TOP_FRONT_LEFT` (Top Front Left)
+            - `TOP_FRONT_CENTER` (Top Front Center)
+            - `TOP_FRONT_RIGHT` (Top Front Right)
+            - `TOP_CENTER_LEFT` (Top Center Left)
+            - `TOP_CENTER_CENTER` (Top Center Center)
+            - `TOP_CENTER_RIGHT` (Top Center Right)
+            - `TOP_REAR_LEFT` (Top Rear Left)
+            - `TOP_REAR_CENTER` (Top Rear Center)
+            - `TOP_REAR_RIGHT` (Top Rear Right)
+          example: BOTTOM_FRONT_LEFT
+        longitudinalOffset:
+          type: object
+          title: Longitudinal Offset
+          description: |
+            Longitudinal offset of the center of gravity from the defined reference point.
+          allOf:
+            - $ref: '#/components/schemas/Measurement'
+        transverseOffset:
+          type: object
+          title: Transverse Offset
+          description: |
+            Transverse offset of the center of gravity from the defined reference point.
+          allOf:
+            - $ref: '#/components/schemas/Measurement'
+        verticalOffset:
+          type: object
+          title: Vertical Offset
+          description: |
+            Vertical offset of the center of gravity from the defined reference point.
+          allOf:
+            - $ref: '#/components/schemas/Measurement'
+
+    #############
+    # Measurement
+    #############
+    Measurement:
+      type: object
+      title: Measurement
+      description: |
+        A measurement containing value and unit along with an optional classification of the value.
+      properties:
+        value:
+          type: number
+          format: float
+          description: |
+            Measurement value expressed in the unit indicated in the unit field.
+          example: 12500.0
+        unit:
+          type: string
+          maxLength: 3
+          description: |
+            Unit in which the measurement value is expressed. Possible values:
+            - `MTR` (metre)
+            - `CMT` (centimetre)
+            - `FOT` (foot)
+            - `INH` (inch)
+          example: MTR
+        classifier:
+          type: string
+          maxLength: 3
+          description: |
+            Classifier denoting whether a measurement is estimated or confirmed. Possible values:
+
+            - `EST` (Estimated)
+            - `CON` (Confirmed)
+          example: CON
+      required:
+        - value
+        - unit
 
     ############
     # Transports
