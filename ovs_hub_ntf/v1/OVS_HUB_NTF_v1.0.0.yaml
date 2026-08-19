@@ -241,9 +241,9 @@ paths:
           
           Filters that are specified as lists use logical **OR** between list values. So
           
-              carrierServiceCodes = ['FE1','DR02']
+              carrierServices = [{carrierServiceCode: 'FE1'},{carrierServiceCode: 'DR02', carrierSMDGCode: 'YML'}]
           
-          means that notifications sent will match **either** `FE1` **OR** `DR02` carrierServiceCodes.
+          means that notifications sent will match **either** `FE1` carrierServiceCode (from any carrier) **OR** `DR02` carrierServiceCode (belonging to YML).
         required: true
         content:
           application/json:
@@ -647,7 +647,7 @@ components:
       type: object
       title: Subscription
       description: |
-        ...
+        Subscription containing all information (notificationChannel, filters, range, etc) except the `secret`.
       properties:
         subscriptionReference:
           type: string
@@ -685,22 +685,40 @@ components:
           description: |
             Number of weeks into the future for which this subscription will send notifications. If the number is `4` it means that any changes further in the future than 4 weeks from now will **not** be sent.
           example: 4
-        carrierServiceCodes:
+        carrierServices:
           type: array
           description: |
-            An array of **carrier-specific codes** to match with this subscription filter. If the array consists of more than one item - a logical **OR** is used between the values when matching.
+            An array of **carrierServiceCode and an optional carrierSMDGCode** to match with this subscription filter. If the array consists of more than one item - a logical **OR** is used between the objects when matching.
 
-            If this property is empty, you will be notified for all `carrierServiceCodes` that have changes you are authorized to see.
+            If this property is omitted, you will be notified for all `services` that have changes you are authorized to see.
           items:
-            type: string
-            pattern: ^\S(?:.*\S)?$
-            maxLength: 11
+            type: object
             description: |
-              The carrier-specific code of the service for which the schedule details are published.
-            example: FE1
+              It is possible to provide the `carrierServiceCode` with an optional `carrierSMDGCode` (to uniquely identify the `carrierServiceCode`) when specifying the Service.
+
+              If multiple `carrierServiceCode` with optional `carrierSMDGCode` values need to be provided, then they must be specified as separate objects in the `carrierServices` array.
+            properties:
+              carrierServiceCode:
+                type: string
+                pattern: ^\S(?:.*\S)?$
+                maxLength: 11
+                description: |
+                  The carrier-specific code of the service for which the schedule details are published.
+                example: FE1
+              carrierSMDGCode:
+                type: string
+                maxLength: 10
+                description: |
+                  The carrier code based on SMDG Liner Code List.
+                example: MSK
+            required:
+              - carrierServiceCode
           example:
-            - FE1
-            - DR01
+            - carrierServiceCode: AS1
+              carrierSMDGCode: HMM
+            - carrierServiceCode: AS1
+              carrierSMDGCode: YML
+            - carrierServiceCode: FE1
         universalServiceReferences:
           type: array
           description: |
@@ -717,21 +735,6 @@ components:
             - SR12345A
             - SR33322T
             - SR03732R
-        carrierSMDGCodes:
-          type: array
-          description: |
-            An array of **carrier SMDG codes** to match with this subscription filter. If the array consists of more than one item - a logical **OR** is used between the values when matching.
-
-            If this property is empty, you will be notified for all `carrierSMDGCodes` that have changes you are authorized to see.
-          items:
-            type: string
-            maxLength: 10
-            description: |
-              The carrier code based on SMDG Liner Code List.
-            example: MSK
-          example:
-            - MSK
-            - EMC
         vesselNames:
           type: array
           description: |
@@ -846,7 +849,7 @@ components:
       type: object
       title: Subscription with Secret
       description: |
-        ...
+        Subscription containing all information needed in order to create a subscription: notificationChannel, filters, range, etc
       properties:
         notificationChannel:
           type: object
@@ -888,22 +891,40 @@ components:
           description: |
             Number of weeks into the future for which this subscription will send notifications. If the number is `4` it means that any changes further in the future than 4 weeks from now will **not** be sent.
           example: 4
-        carrierServiceCodes:
+        carrierServices:
           type: array
           description: |
-            An array of **carrier-specific codes** to match with this subscription filter. If the array consists of more than one item - a logical **OR** is used between the values when matching.
+            An array of **carrierServiceCode and an optional carrierSMDGCode** to match with this subscription filter. If the array consists of more than one item - a logical **OR** is used between the objects when matching.
 
-            If this property is empty, you will be notified for all `carrierServiceCodes` that have changes you are authorized to see.
+            If this property is omitted, you will be notified for all `services` that have changes you are authorized to see.
           items:
-            type: string
-            pattern: ^\S(?:.*\S)?$
-            maxLength: 11
+            type: object
             description: |
-              The carrier-specific code of the service for which the schedule details are published.
-            example: FE1
+              It is possible to provide the `carrierServiceCode` with an optional `carrierSMDGCode` (to uniquely identify the `carrierServiceCode`) when specifying the Service.
+
+              If multiple `carrierServiceCode` with optional `carrierSMDGCode` values need to be provided, then they must be specified as separate objects in the `carrierServices` array.
+            properties:
+              carrierServiceCode:
+                type: string
+                pattern: ^\S(?:.*\S)?$
+                maxLength: 11
+                description: |
+                  The carrier-specific code of the service for which the schedule details are published.
+                example: FE1
+              carrierSMDGCode:
+                type: string
+                maxLength: 10
+                description: |
+                  The carrier code based on SMDG Liner Code List.
+                example: MSK
+            required:
+              - carrierServiceCode
           example:
-            - FE1
-            - DR01
+            - carrierServiceCode: AS1
+              carrierSMDGCode: HMM
+            - carrierServiceCode: AS1
+              carrierSMDGCode: YML
+            - carrierServiceCode: FE1
         universalServiceReferences:
           type: array
           description: |
@@ -920,21 +941,6 @@ components:
             - SR12345A
             - SR33322T
             - SR03732R
-        carrierSMDGCodes:
-          type: array
-          description: |
-            An array of **carrier SMDG codes** to match with this subscription filter. If the array consists of more than one item - a logical **OR** is used between the values when matching.
-
-            If this property is empty, you will be notified for all `carrierSMDGCodes` that have changes you are authorized to see.
-          items:
-            type: string
-            maxLength: 10
-            description: |
-              The carrier code based on SMDG Liner Code List.
-            example: MSK
-          example:
-            - MSK
-            - EMC
         vesselNames:
           type: array
           description: |
