@@ -2599,7 +2599,7 @@ components:
       type: object
       title: Total Cargo Dimensions
       description: |
-        Overall external dimensions of the cargo envelope in its planned or actual loaded orientation, measured using the longitudinal, transverse and vertical axes of the equipment unit.
+        Overall external dimensions of the cargo in its final packed and secured transport condition. Each provided dimension value must be greater than zero.
       properties:
         length:
           type: object
@@ -2630,7 +2630,7 @@ components:
       type: object
       title: Out of Gauge Extensions
       description: |
-        Directional measurements describing how far the cargo extends beyond the standard equipment envelope. Each value represents only the excess portion, not the total dimension. For equipment with doors, the front is the end opposite the doors and the rear is the door end. Left and right are determined when looking from the rear toward the front. For equipment without doors, use the orientation defined by the equipment provider.
+        Directional measurements describing how far the cargo extends beyond the standard equipment envelope. Each value represents only the excess portion, not the total dimension. Each provided extension value must be greater than zero. If the cargo does not extend beyond the equipment boundary in a particular direction, the corresponding property must be omitted. For equipment with doors, the front is the end opposite the doors and the rear is the door end. Left and right are determined when looking from the rear toward the front. For equipment without doors, use the orientation defined by the equipment provider.
       properties:
         overLengthFront:
           type: object
@@ -2675,62 +2675,54 @@ components:
       type: object
       title: Center of Gravity
       description: |
-        Position of the combined center of gravity of all cargo placed on the equipment unit, expressed as offsets from a defined reference point.
+        Position of the combined center of gravity of all cargo placed on the equipment unit, expressed as offsets from the defined reference point(s).
       properties:
-        referencePoint:
+        longitudinalReferencePoint:
           type: string
-          maxLength: 30
+          maxLength: 10
           description: |
-            Reference point from which the center of gravity offsets are measured. Possible values:
-            - `BOTTOM_FRONT_LEFT` (Bottom Front Left)
-            - `BOTTOM_FRONT_CENTER` (Bottom Front Center)
-            - `BOTTOM_FRONT_RIGHT` (Bottom Front Right)
-            - `BOTTOM_CENTER_LEFT` (Bottom Center Left)
-            - `BOTTOM_CENTER_CENTER` (Bottom Center Center)
-            - `BOTTOM_CENTER_RIGHT` (Bottom Center Right)
-            - `BOTTOM_REAR_LEFT` (Bottom Rear Left)
-            - `BOTTOM_REAR_CENTER` (Bottom Rear Center)
-            - `BOTTOM_REAR_RIGHT` (Bottom Rear Right)
-            
-            - `MIDDLE_FRONT_LEFT` (Middle Front Left)
-            - `MIDDLE_FRONT_CENTER` (Middle Front Center)
-            - `MIDDLE_FRONT_RIGHT` (Middle Front Right)
-            - `MIDDLE_CENTER_LEFT` (Middle Center Left)
-            - `MIDDLE_CENTER_CENTER` (Middle Center Center)
-            - `MIDDLE_CENTER_RIGHT` (Middle Center Right)
-            - `MIDDLE_REAR_LEFT` (Middle Rear Left)
-            - `MIDDLE_REAR_CENTER` (Middle Rear Center)
-            - `MIDDLE_REAR_RIGHT` (Middle Rear Right)
-            
-            - `TOP_FRONT_LEFT` (Top Front Left)
-            - `TOP_FRONT_CENTER` (Top Front Center)
-            - `TOP_FRONT_RIGHT` (Top Front Right)
-            - `TOP_CENTER_LEFT` (Top Center Left)
-            - `TOP_CENTER_CENTER` (Top Center Center)
-            - `TOP_CENTER_RIGHT` (Top Center Right)
-            - `TOP_REAR_LEFT` (Top Rear Left)
-            - `TOP_REAR_CENTER` (Top Rear Center)
-            - `TOP_REAR_RIGHT` (Top Rear Right)
-          example: BOTTOM_FRONT_LEFT
+            Longitudinal reference point from which longitudinalOffset is measured. Required if longitudinalOffset is provided. Possible values:
+              - `FRONT` (Front)
+              - `CENTER` (Center)
+              - `REAR` (Rear)
+          example: FRONT
         longitudinalOffset:
           type: object
           title: Longitudinal Offset
           description: |
-            Longitudinal offset of the center of gravity from the defined reference point.
+            Longitudinal offset of the center of gravity from `longitudinalReferencePoint`. Positive values indicate a position toward the front, negative values indicate a position toward the rear, and zero indicates alignment with the reference position.
           allOf:
             - $ref: '#/components/schemas/Measurement'
+        transverseReferencePoint:
+          type: string
+          maxLength: 10
+          description: |
+            Transverse reference point from which transverseOffset is measured. Required if transverseOffset is provided. Possible values:
+              - `LEFT` (Left)
+              - `CENTER` (Center)
+              - `RIGHT` (Right)
+          example: CENTER
         transverseOffset:
           type: object
           title: Transverse Offset
           description: |
-            Transverse offset of the center of gravity from the defined reference point.
+            Transverse offset of the center of gravity from `transverseReferencePoint`. Positive values indicate a position toward the right, negative values indicate a position toward the left, and zero indicates alignment with the reference position.
           allOf:
             - $ref: '#/components/schemas/Measurement'
+        verticalReferencePoint:
+          type: string
+          maxLength: 10
+          description: |
+            Vertical reference point from which verticalOffset is measured. Required if verticalOffset is provided. Possible values:
+              - `BOTTOM` (Bottom)
+              - `MIDDLE` (Middle)
+              - `TOP` (TOP)
+          example: TOP
         verticalOffset:
           type: object
           title: Vertical Offset
           description: |
-            Vertical offset of the center of gravity from the defined reference point.
+            Vertical offset of the center of gravity from `verticalReferencePoint`. Positive values indicate a position above the reference position, negative values indicate a position below it, and zero indicates alignment with it.
           allOf:
             - $ref: '#/components/schemas/Measurement'
 
