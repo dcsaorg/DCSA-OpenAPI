@@ -3,6 +3,14 @@
 The DCSA Commercial Schedules API is specified on [**SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_CS).
 
 <a name="v104"></a>[Release v1.0.4](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_CS/1.0.4)
+---
+Identify cargo-operational calls in Vessel Schedules.
+
+- Added optional `isCargoOperationalCall` to `TransportCall` in Vessel Schedules to indicate whether cargo loading and/or discharge is applicable at the call.
+  - If omitted, the value **MUST** be interpreted as `true`.
+  - `false` indicates that neither cargo loading nor cargo discharge is applicable, allowing consumers to filter these calls while retaining access to the complete published vessel rotation.
+  - The classification is independent of Planned (`PLN`), Estimated (`EST`) or Actual (`ACT`) timestamps and does not indicate whether cargo was actually loaded or discharged.
+  - Calls combining cargo operations with other activities, such as bunkering, remain cargo-operational.
 
 <a name="v103"></a>[Release v1.0.3 (12 June 2026)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_CS/1.0.3)
 ---
