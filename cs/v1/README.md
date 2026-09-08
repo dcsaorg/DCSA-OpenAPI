@@ -2,6 +2,8 @@
 
 The DCSA Commercial Schedules API is specified on [**SwaggerHub**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_CS).
 
+<a name="v104"></a>[Release v1.0.4](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_CS/1.0.4)
+
 <a name="v103"></a>[Release v1.0.3 (12 June 2026)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_CS/1.0.3)
 ---
 This is a patch release for the DCSA Commercial Schedules API. The primary purpose of this patch is to include 2 new query parameters: `cargoType` and `responseScope` and add **IntermediateCalls** to the legs:
