@@ -4,6 +4,18 @@ The DCSA OVS API is documented on [**SwaggerHub**](https://app.swaggerhub.com/ap
 
 The primary purpose of this API is to specify endPoints for schedules shared between Vessel Partners. 
 
+<a name="v303"></a>[Release v3.0.3 (RELEASE DATE)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_OVS/3.0.3)
+---
+A patch adding support for waterway locations in operational vessel schedules.
+
+- Added `WWAY` as a location discriminator value.
+- Added `WaterwaySMDGLocation`.
+- Added optional `waterwaySMDGEntryPointCode`.
+- Clarified `ARRI` and `DEPA` semantics for waterway locations.
+- Clarified that waterway locations do not represent loading, discharge, or berthing operations.
+- Constrained each location schema's `locationType` using an exact pattern to resolve overlapping `oneOf` validation.
+- Generalized port-only wording to cover all TransportCalls.
+
 <a name="v302"></a>[Release v3.0.2 (12 June 2026)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_OVS/3.0.2)
 ---
 An update to allow partial schedules and add `facilityTypeCode`.

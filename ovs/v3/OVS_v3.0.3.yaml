@@ -40,7 +40,7 @@ paths:
       description: |
         Get a list of service schedules.
         
-        The result is `Vessel-Centric`. This means that the `Vessel` is at the top of the response hierarchy. A service is a heirarchical structure with the following elements:
+        The result is `Vessel-Centric`. This means that the `Vessel` is at the top of the response hierarchy. A service is a hierarchical structure with the following elements:
         - One or more `Services`, which can contain one or more `Vessels`.
         - A `Vessel`, which can call multiple `TransportCalls`.
         - A `TransportCall`, which represents a location in the vessel schedule. It can represent a port, optionally further specified by a terminal, or a waterway, optionally further specified by a waterway entry point.
@@ -60,7 +60,7 @@ paths:
         
         For example, when `&UNLocationCode=DEHAM` is used, only `TransportCalls` with `UNLocationCode=DEHAM` are included.
         
-        Be aware that it is possible to specify mutually filters, resulting in an empty response list. For example:
+        Be aware that it is possible to specify mutually exclusive filters, resulting in an empty response list. For example:
         
         ```
         &vesselIMONumber=9321483&vesselName=King of the Seas
@@ -68,8 +68,8 @@ paths:
         
         If no `Vessel` exists where `vesselIMONumber` is `9321483` and `vesselName` is `King of the Seas`, the result is an empty list.
         
-        If no `startDate` filter is provided, **3 months** before the request data is used. If no `endDate` filters is provided, **6 months** after the request date is used.
-        parameters:
+        If no `startDate` filter is provided, **3 months** before the request date is used. If no `endDate` filter is provided, **6 months** after the request date is used.
+      parameters:
         - name: carrierServiceName
           in: query
           description: |
@@ -721,22 +721,24 @@ components:
           minLength: 5
           maxLength: 5
           description: |
-            The UN Location code specifying where the place is located. The pattern used must be
+            The UN/LOCODE identifying the waterway. The pattern used must be:
 
              - 2 characters for the country code using [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)
              - 3 characters to code a location within that country. Letters A-Z and numbers from 2-9 can be used
 
-            More info can be found here: [UN/LOCODE](https://en.wikipedia.org/wiki/UN/LOCODE)
+            More information is available from [UN/LOCODE](https://en.wikipedia.org/wiki/UN/LOCODE).
           example: PAPCN
         waterwaySMDGEntryPointCode:
           type: string
-          maxLength: 10
+          maxLength: 6
           description: |
-            The **SMDG Waterway Code List** entry-point code. The code is not unique by itself and must be interpreted together with `UNLocationCode`.
+            A waterway location identified using the [**SMDG Waterway Code List**](https://smdg.org/documents/smdg-code-lists/smdg-waterway-code-list/).
 
-            This property is optional. When omitted, the location identifies the waterway but not a specific point.
+            Waterway locations represent locations without loading or discharge operations and without vessel berthing.
 
-            Valid values are published in the [SMDG Waterway Code List](https://smdg.org/documents/smdg-code-lists/smdg-waterway-code-list/).
+            `UNLocationCode` identifies the waterway. When `waterwaySMDGEntryPointCode` is provided, the combination of the two values identifies a specific point on the waterway.
+
+            If `waterwaySMDGEntryPointCode` is omitted, the location identifies only the waterway. No specific waterway point can then be inferred from an `ARRI` or `DEPA` timestamp.
           example: ATL
       required:
         - locationType
@@ -828,13 +830,9 @@ components:
 
             For TransportCalls representing ports or facilities, `BRTH` is the default when this property is omitted.
 
-            This property is not applicable when the containing TransportCall has `location.locationType` equal to `WWAY`. For a WWAY TransportCall:
+            `facilityTypeCode` has no business meaning when the containing **TransportCall** has `location.locationType` equal to `WWAY`. Providers **SHOULD** omit it for `WWAY` **TransportCalls**.
 
-            - the API provider **SHOULD** omit `facilityTypeCode`;
-            - the `BRTH` default does not apply and **MUST NOT** be inferred; and
-            - an API consumer **SHOULD** ignore `facilityTypeCode` if it is nevertheless present.
-
-            Waterway locations represent locations without vessel berthing.
+            The `BRTH` default is retained for backwards compatibility. If schema-driven tooling materializes `BRTH` for a WWAY TransportCall, consumers **MUST** disregard the value and **MUST NOT** interpret it as vessel berthing.
           example: BRTH
       required:
       - eventClassifierCode
