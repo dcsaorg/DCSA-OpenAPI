@@ -8,7 +8,7 @@ Identify cargo-operational calls in Vessel Schedules.
 
 - Added optional `isCargoOperationalCall` to `TransportCall` in Vessel Schedules to indicate whether cargo loading and/or discharge is applicable at the call.
   - If omitted, the value **MUST** be interpreted as `true`.
-  - `false` indicates that neither cargo loading nor discharge is applicable, allowing consumers to filter these calls while retaining access to the complete published vessel rotation.
+  - `false` indicates that neither cargo loading nor cargo discharge is applicable, allowing consumers to filter these calls while retaining access to the complete published vessel rotation.
   - The classification is independent of Planned (`PLN`), Estimated (`EST`) or Actual (`ACT`) timestamps and does not indicate whether cargo was actually loaded or discharged.
   - Calls combining cargo operations with other activities, such as bunkering, remain cargo-operational.
 
