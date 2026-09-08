@@ -4,7 +4,7 @@ The DCSA OVS API is documented on [**SwaggerHub**](https://app.swaggerhub.com/ap
 
 The primary purpose of this API is to specify endPoints for schedules shared between Vessel Partners. 
 
-<a name="v303"></a>[Release v3.0.3 (RELEASE DATE)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_OVS/3.0.3)
+<a name="v303"></a>[Release v3.0.3](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_OVS/3.0.3)
 ---
 A patch adding support for waterway locations in operational vessel schedules.
 

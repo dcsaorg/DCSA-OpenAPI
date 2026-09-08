@@ -40,10 +40,12 @@ paths:
       description: |
         Get a list of service schedules.
         
-        The result is `Vessel-Centric`. This means that the `Vessel` is at the top of the response hierarchy. A service is a hierarchical structure with the following elements:
-        - One or more `Services`, which can contain one or more `Vessels`.
-        - A `Vessel`, which can call multiple `TransportCalls`.
-        - A `TransportCall`, which represents a location in the vessel schedule. It can represent a port, optionally further specified by a terminal, or a waterway, optionally further specified by a waterway entry point.
+        The response is an array of `ServiceSchedule` objects. Each `ServiceSchedule` can contain one or more `VesselSchedules`.
+
+        The response hierarchy is:
+        - One or more `ServiceSchedule`, which can contain one or more `VesselSchedules`.
+        - A `VesselSchedule`, which can contain multiple `TransportCalls`.
+        - A `TransportCall` represents a location in the vessel schedule. It can represent a port, optionally further specified by a terminal, or a waterway, optionally further specified by an SMDG waterway entry point.
         - A `TransportCall` can contain one or more `Timestamps`.
         
         The number of service schedules in the list can be narrowed down by providing filter parameters.
@@ -426,7 +428,7 @@ components:
 
         It can represent a port, which may be further specified by a terminal, or a waterway, which may be further specified by an SMDG waterway entry point.
 
-        One `WWAY` **TransportCall** represents one waterway location. When `waterwaySMDGEntryPointCode` is provided, it represents the specific waterway point identified by the combination of `UNLocationCode` and `waterwaySMDGEntryPointCode`.
+        One **TransportCall** with `location.locationType` set to `WWAY` represents one waterway location. When `waterwaySMDGEntryPointCode` is provided, it represents the specific waterway point identified by the combination of `UNLocationCode` and `waterwaySMDGEntryPointCode`.
 
         The order of the **TransportCalls** in the list defines their sequence in the vessel schedule.
       properties:
@@ -702,6 +704,8 @@ components:
         `UNLocationCode` identifies the waterway. When `waterwaySMDGEntryPointCode` is provided, the combination of the two values identifies a specific point on the waterway.
 
         If `waterwaySMDGEntryPointCode` is omitted, the location identifies only the waterway. No specific waterway point can then be inferred from an `ARRI` or `DEPA` timestamp.
+
+        Waterway locations represent locations without loading or discharge operations and without vessel berthing.
       properties:
         locationName:
           type: string
@@ -732,13 +736,13 @@ components:
           type: string
           maxLength: 6
           description: |
-            A waterway location identified using the [**SMDG Waterway Code List**](https://smdg.org/documents/smdg-code-lists/smdg-waterway-code-list/).
+            The SMDG entry-point code identifying a specific point on the waterway.
 
-            Waterway locations represent locations without loading or discharge operations and without vessel berthing.
+            The code is not unique by itself and must be interpreted together with `UNLocationCode`.
 
-            `UNLocationCode` identifies the waterway. When `waterwaySMDGEntryPointCode` is provided, the combination of the two values identifies a specific point on the waterway.
+            This property is optional. When omitted, the location identifies the waterway but not a specific waterway point.
 
-            If `waterwaySMDGEntryPointCode` is omitted, the location identifies only the waterway. No specific waterway point can then be inferred from an `ARRI` or `DEPA` timestamp.
+            Valid values are published in the [SMDG Waterway Code List](https://smdg.org/documents/smdg-code-lists/smdg-waterway-code-list/).
           example: ATL
       required:
         - locationType
@@ -757,11 +761,11 @@ components:
             - `ARRI` (Arrived)
             - `DEPA` (Departed)
 
-            For a `WWAY` **TransportCall**, `ARRI` means arrival at the waterway location represented by that **TransportCall**, and `DEPA` means departure from the same location.
+            For a **TransportCall** with `location.locationType` set to `WWAY`, `ARRI` means arrival at the waterway location represented by that **TransportCall**, and `DEPA` means departure from the same location.
 
             When `waterwaySMDGEntryPointCode` is provided, both event types refer to that specific waterway point. `DEPA` does not mean that the vessel has exited the complete waterway at the point on the opposite side.
 
-            A carrier may publish the point at the other end as another ordered `WWAY` TransportCall.
+            A carrier may publish the point at the other end as another ordered **TransportCall** with `location.locationType` set to `WWAY`.
           enum:
           - ARRI
           - DEPA
@@ -830,9 +834,9 @@ components:
 
             For TransportCalls representing ports or facilities, `BRTH` is the default when this property is omitted.
 
-            `facilityTypeCode` has no business meaning when the containing **TransportCall** has `location.locationType` equal to `WWAY`. Providers **SHOULD** omit it for `WWAY` **TransportCalls**.
+            `facilityTypeCode` has no business meaning when the containing **TransportCall** has `location.locationType` set to `WWAY`. Providers **SHOULD** omit it for such TransportCalls.
 
-            The `BRTH` default is retained for backwards compatibility. If schema-driven tooling materializes `BRTH` for a WWAY TransportCall, consumers **MUST** disregard the value and **MUST NOT** interpret it as vessel berthing.
+            The `BRTH` default is retained for backwards compatibility. If schema-driven tooling materializes `BRTH` for a **TransportCall** with `location.locationType` set to `WWAY`, consumers **MUST** disregard the value and **MUST NOT** interpret it as vessel berthing.
           example: BRTH
       required:
       - eventClassifierCode
