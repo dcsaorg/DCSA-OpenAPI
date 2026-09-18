@@ -234,7 +234,13 @@ paths:
         - name: API-Version
           in: header
           description: |
-            From v3.0.1 and onward - every API request and response must contain the API-Version header, set to the full version of the implemented DCSA standard.
+            The API version implemented by the consumer.
+
+            From v3.0.1 onward, every API request and response must contain the API-Version header set to the full version of the implemented DCSA standard.
+
+            A provider responding to a consumer version lower than `3.0.2` **MUST NOT** include a `Timestamp` whose `facilityTypeCode` is `PBPL`. The entire `Timestamp` object **MUST** be omitted. The provider **MUST NOT** omit only `facilityTypeCode` or replace `PBPL` with `BRTH`, because an omitted `facilityTypeCode` has the default meaning `BRTH`.
+
+            For this compatibility rule, an absent header or the legacy value `3` **MUST** be treated as version `3.0.0`.
           schema:
             type: string
             example: '3.0.3'
@@ -835,6 +841,8 @@ components:
             `facilityTypeCode` has no business meaning when the containing **TransportCall** has `location.locationType` set to `WWAY`. Providers **SHOULD** omit it for such TransportCalls.
 
             The `BRTH` default is retained for backwards compatibility. If schema-driven tooling materializes `BRTH` for a **TransportCall** with `location.locationType` set to `WWAY`, consumers **MUST** disregard the value and **MUST NOT** interpret it as vessel berthing.
+
+            **Backwards compatibility:** When the request `API-Version` identifies a consumer version lower than `3.0.2`, the provider **MUST omit the entire Timestamp** when this value is `PBPL`.
           example: BRTH
       required:
       - eventClassifierCode
