@@ -719,7 +719,8 @@ paths:
           in: query
           name: startDate
           description: |
-            The start date of the period for which schedule information is requested. If a date of any Timestamp (ATA, ETA or PTA) inside a TransportCall matches a date on or after (≥) the `startDate` the entire Voyage (import- and export-Voyage) matching the PortCall will be included in the result. All matching is done towards local Date at the place of the port call.
+            The start date of the period for which schedule information is requested. If the date of any Timestamp (ATA, ETA or PTA) within a TransportCall is on or after (`>=`) the `startDate`, the entire Voyage (import and export Voyage) containing that TransportCall will be included in the result. Matching is performed using the local date at the TransportCall location.
+
             If this filter is not provided, the default value is **3 months** prior to the request time.
         - schema:
             type: string
@@ -728,7 +729,8 @@ paths:
           in: query
           name: endDate
           description: |
-            The end date of the period for which schedule information is requested. If a date of any Timestamp (ATA, ETA or PTA) inside a TransportCall matches a date on or before (≤) the `endDate` the entire Voyage(import- and export-Voyage) matching the PortCall will be included in the result. All matching is done towards local Date at the place of the port call.  
+            The end date of the period for which schedule information is requested. If the date of any Timestamp (ATA, ETA or PTA) within a TransportCall is on or before (`<=`) the `endDate`, the entire Voyage (import and export Voyage) containing that TransportCall will be included in the result. Matching is performed using the local date at the TransportCall location.
+
             If this filter is not provided, the default value is **6 months** after the request time.
         - schema:
             type: string
@@ -1135,6 +1137,13 @@ components:
         One waterway TransportCall represents one specific waterway point. A point at the other end of the waterway can be represented by another TransportCall.
 
         The order of the TransportCalls in the `transportCalls` array defines their sequence in the vessel schedule.
+
+        **Conditions for a waterway TransportCall:**
+        - `location` **MUST** contain both `UNLocationCode` and `waterwaySMDGEntryPointCode`.
+        - `isCargoOperationalCall` **MUST** be present and **MUST** be set to `false`.
+        - `portVisitReference` **MUST** be omitted.
+
+        A TransportCall that does not satisfy these conditions does not conform to this specification.
       required:
         - transportCallReference
         - carrierImportVoyageNumber
@@ -2042,7 +2051,9 @@ components:
 
           If a location is specified in multiple ways, all supplied properties **MUST** identify the same location.
 
-          `waterwaySMDGEntryPointCode` **MUST** only be used together with `UNLocationCode`. Its presence identifies the location as a waterway location.
+          CS 1.0.4 supports waterway locations only at point-level precision. A waterway location **MUST** therefore contain both `UNLocationCode` and `waterwaySMDGEntryPointCode`.
+
+          The presence of `waterwaySMDGEntryPointCode` identifies the location as a waterway location. A location containing only `UNLocationCode`, without `waterwaySMDGEntryPointCode`, is not interpreted as a waterway location.
 
           For a waterway location, `address`, `addressLines`, `facilityName` and `facilitySMDGCode` **SHOULD** be omitted.
 
@@ -2105,7 +2116,10 @@ components:
             When this property is provided:
             - `UNLocationCode` **MUST** also be provided.
             - The combination of `UNLocationCode` and `waterwaySMDGEntryPointCode` **MUST** be a valid entry in the [SMDG Waterway Code List](https://smdg.org/documents/smdg-code-lists/smdg-waterway-code-list/).
-            - The location represents a waterway point rather than a port, terminal or berth.
+            - The location represents the specific waterway point identified by the combination of the two codes.
+            - The location does not represent a port, terminal or berth.
+
+            CS 1.0.4 does not support identifying a waterway without identifying a specific waterway point.
           example: ATL
 
     PortScheduleLocation:
