@@ -10,6 +10,21 @@ info:
     It is also possible to set up subscriptions. A subscription can be set up to push events to a callbackUrl defined as part of the subscription or by an email. It is not possible to define the email as part of the subscription - the email used is the email address associated with the authenticated user.
 
     Subscriptions support sending notifications for all changes the customer is authorized to see. It is possible to only send notifications for specific events - in order to do so - filters must be used when setting up a subscription. See the [subscription](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS_NTF/1.0.0#/Subscription) section for more info.
+
+    Two kids of authentication are supported:
+      1. Callback authentication configured:
+        - OVS Hub authenticates when calling the callback.
+        - A shared secret is not required.
+        - `Request-Id`, `Signature-Timestamp` and `Notification-Signature` headers are optional.
+
+      2. No callback authentication configured:
+        - A shared secret is required.
+        - HMAC signature verification is required.
+        - `Request-Id`, `Signature-Timestamp` and `Notification-Signature` signature-related headers must be sent.
+    
+    If no `secret` is provided for a subscription - it is assumed authentication method **1** is used.
+
+    **Note:** A subscription with neither callback authentication nor a shared secret must not be active for callback delivery.
   contact:
     name: Digital Container Shipping Association (DCSA)
     url: 'https://dcsa.org'
@@ -23,7 +38,7 @@ tags:
       Endpoints implemented by the OVS Hub for the customer to set up subscriptions
   - name: Secret
     description: |
-      Endpoint implemented by the OVS Hub for the customer to update the secret
+      Endpoint implemented by the OVS Hub for the customer to set, replace, or remove the secret
 paths:
   '/{callbackUrl}':
     post:
@@ -42,27 +57,27 @@ paths:
           description: |
             The endpoint specifying where OVS Hub sends the notification to the customer. The callback can contain customer defined query parameters.
 
-            The `callbackUrl` **MUST** be an open endpoint for OVS Hub to call when sending a notification. OVS Hub does not send any authentication information apart from what is in the `callbackUrl`. The receiver **MUST** validate the authenticity of the notification by looking at the `Notification-Signature` header.
+            The callback endpoint **MAY** require authentication. When callback authentication is configured, OVS Hub authenticates using the configured authentication mechanism. When callback authentication is not configured, the subscription **MUST** contain a shared secret, and the receiver `**MUST** validate `Request-Id`, `Signature-Timestamp`, and `Notification-Signature`.
           schema:
             type: string
             format: uri
             example: https://myserver.com/send/callback/here?myInternalId=123
         - name: Request-Id
           in: header
-          required: true
           description: |
             The `Request-Id` which is included in the encoded `Notification-Signature`.
             
             When receiving a notification the receiver **MUST** validate the "uniqueness" of the `Request-Id`. If a notification has already been sent with the `Request-Id` then the request **MUST** be rejected.
 
             **Note:** It is not necessary to store the `Request-Id` for more than 5 minutes as all other cases are covered by the `Signature-Timestamp` header
+
+            When a shared secret is configured for the subscription, `Request-Id`, `Signature-Timestamp`, and `Notification-Signature` **MUST** all be included. When no shared `secret` is configured, these headers are optional and callback authentication **MUST** be used instead.
           schema:
             type: string
             format: ulid
             example: 01KKH4JGKBPT6J9VJX1WXKWPGK
         - name: Signature-Timestamp
           in: header
-          required: true
           description: |
             The `Signature-Timestamp` which is included in the encoded `Notification-Signature`.
             
@@ -71,13 +86,14 @@ paths:
                 abs(now_utc - timestamp_utc) <= 300 seconds
 
             **Note:** This value is to be used when calculating the `Notification-Signature` on the receiver side.
+
+            When a shared secret is configured for the subscription, `Request-Id`, `Signature-Timestamp`, and `Notification-Signature` **MUST** all be included. When no shared `secret` is configured, these headers are optional and callback authentication **MUST** be used instead.
           schema:
             type: string
             format: date-time
             example: 2025-01-23T01:23:45Z
         - name: Notification-Signature
           in: header
-          required: true
           description: |
             The `Notification-Signature` is used to more confidently verify whether requests from OVS Hub are authentic. The header has the following format: 
 
@@ -108,6 +124,10 @@ paths:
             The `Notification-Signature` header would then look like this:
 
                 Notification-Signature: sha256=8d3a7837713e319d1466139903ffd5b1b8d96f6a769f6d53c03a29dc5c3f3630
+
+            When a shared secret is configured for the subscription, `Request-Id`, `Signature-Timestamp`, and `Notification-Signature` **MUST** all be included. When no shared `secret` is configured, these headers are optional and callback authentication **MUST** be used instead.
+
+            OVS Hub **MUST** calculate and include this header only when the subscription has a shared secret. When no shared secret is configured, OVS Hub **MUST NOT** attempt to calculate the signature and **SHOULD** omit this header.
           schema:
             type: string
             pattern: ^sha256=[A-Fa-f0-9]{64}$
@@ -550,10 +570,10 @@ paths:
     put:
       tags:
         - Secret
-      summary: Resets the Secret on an existing subscription
+      summary: Sets, replaces, or removes the secret on an existing subscription
       operationId: put-secret
       description: |
-        Updates the secret of subscription with `subscriptionReference`.
+        Sets or replaces the subscription's shared secret. Supplying `null` removes the existing secret. When the secret is removed, callback authentication must be configured before callback notifications can be delivered.
       parameters:
         - name: subscriptionReference
           in: path
@@ -577,10 +597,19 @@ paths:
                 secret:
                   type: string
                   format: byte
+                  nullable: true
+                  maxLength: 1024
                   description: |
-                    A Base64 encoded secret sent to the OVS Hub from the customer.
-                    It is used to compute the contents of the `Notification-Signature` header every time a notification is sent.
+                    A Base64-encoded shared secret used to calculate the `Notification-Signature`.
+
+                    Provide a non-null, non-empty value to set or replace the subscription secret.
+
+                    Provide `null` to remove the existing secret.
+
+                    After the secret is removed, OVS Hub does not calculate or send `Notification-Signature`.
                   example: 'MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDM2NTc4NjIzODk3NDY5MDgyNzM0OTg3MTIzNzg2NA=='
+              required:
+                - secret
       responses:
         '204':
           description: Secret updated
@@ -670,9 +699,15 @@ components:
               description: |
                 The endpoint where OVS Hub should send the notification to the customer. The callback can contain query parameters uniquely identifying the originator of the events.
 
-                The `callbackUrl` **MUST** be an open endpoint for OVS Hub to call when sending a notification. The receiver **MUST** validate the authenticity of the notification by looking at the `Notification-Signature` header.
+                The callback endpoint **MAY** require authentication.
 
-                **Condition:** If `callbackUrl` is provided, the `secret` property must also be provided. It can be updated via the [update-secret](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS_NTF/1.0.0#/Secret/put-secret) endpoint.
+                If callback authentication is configured, a shared secret is optional. When no shared secret is associated with the subscription, OVS Hub does not calculate or send the `Notification-Signature` header.
+
+                If callback authentication is not configured, a shared secret **MUST** be associated with the subscription. OVS Hub then sends the `Request-Id`, `Signature-Timestamp`, and `Notification-Signature` headers, and the receiver **MUST** validate them.
+
+                A callback subscription **MUST NOT** be used for delivery unless either callback authentication is configured or a shared secret is associated with the subscription.
+
+                The shared secret can be set, replaced, or removed using the [secret endpoint](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS_NTF/1.0.0#/Secret/put-secret).
               example: https://myserver.com/send/callback/here?shipperRef=myID123
             useEmail:
               type: boolean
@@ -860,28 +895,33 @@ components:
           title: Notification Channel
           description: |
             Defines the channel where a matched notification is sent. At least one of the possible properties **MUST** be provided:
-              - `callbackUrl` and `secret`
+              - `callbackUrl`, together with either callback authentication or a shared `secret`; or
               - `useEmail`
           properties:
             callbackUrl:
               type: string
               format: uri
               description: |
-                The endpoint where OVS Hub should send the notification to the customer. The callback can contain query parameters uniquely identifying the originator of the events.
+                The endpoint where OVS Hub sends notifications to the customer. The callback URL can contain query parameters that uniquely identify the originator of the events.
 
-                The `callbackUrl` **MUST** be an open endpoint for OVS Hub to call when sending a notification. The receiver **MUST** validate the authenticity of the notification by looking at the `Notification-Signature` header.
+                The callback endpoint **MAY** require authentication.
 
-                **Condition:** If `callbackUrl` is provided then `secret` property is mandatory to provide also.
+                If callback authentication is configured, the `secret` property is optional. When `secret` is omitted, OVS Hub does not calculate or send the `Notification-Signature` header.
+
+                If callback authentication is not configured, the `secret` property **MUST** be provided. OVS Hub then sends the `Request-Id`, `Signature-Timestamp`, and `Notification-Signature` headers, and the receiver **MUST** validate them.
+
+                A callback subscription **MUST NOT** be created unless either callback authentication is configured or the `secret` property is provided.
               example: https://myserver.com/send/callback/here?shipperRef=myID123
             secret:
               type: string
               format: byte
               maxLength: 1024
               description: |
-                A Base64 encoded secret sent to the OVS Hub from the customer.
-                It is used to compute the contents of the `Notification-Signature` header every time a notification is sent.
+                A Base64-encoded shared secret used to calculate the `Notification-Signature` header.
 
-                **Condition:** If `callbackUrl` is provided then this property is mandatory to provide.
+                This property is required when `callbackUrl` is provided and callback authentication is not configured (this is defined outside scope of the API).
+
+                When callback authentication is configured, this property may be omitted. In that case, OVS Hub does not calculate or send a `Notification-Signature`.
               example: 'MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDM2NTc4NjIzODk3NDY5MDgyNzM0OTg3MTIzNzg2NA=='
             useEmail:
               type: boolean
