@@ -11,7 +11,7 @@ info:
 
     Subscriptions support sending notifications for all changes the customer is authorized to see. It is possible to only send notifications for specific events - in order to do so - filters must be used when setting up a subscription. See the [subscription](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS_NTF/1.0.0#/Subscription) section for more info.
 
-    Two kids of authentication are supported:
+    Two kinds of authentication are supported:
       1. Callback authentication configured:
         - OVS Hub authenticates when calling the callback.
         - A shared secret is not required.
@@ -20,9 +20,9 @@ info:
       2. No callback authentication configured:
         - A shared secret is required.
         - HMAC signature verification is required.
-        - `Request-Id`, `Signature-Timestamp` and `Notification-Signature` signature-related headers must be sent.
-    
-    If no `secret` is provided for a subscription - it is assumed authentication method **1** is used.
+        - `Request-Id`, `Signature-Timestamp` and `Notification-Signature` headers must be sent.
+
+    If no `secret` is provided for a callback subscription, callback authentication **MUST** already be configured. The absence of a secret does not by itself demonstrate that callback authentication is available.
 
     **Note:** A subscription with neither callback authentication nor a shared secret must not be active for callback delivery.
   contact:
@@ -46,10 +46,7 @@ paths:
         - Notification
       summary: Send notification
       operationId: post-notification
-      description: |
-        Creates a new `Notification`. This endpoint is called whenever a `Service`, `Vessel` or `Location` that a consumer has subscribed to is updated. The `callbackUrl` is defined as part of the subscription.
-
-          **👉 Important:** This endpoint is to be implemented by a **consumer** of the **OVS Hub API** in order to **receive Notifications**.
+      description: "Creates a new `Notification`. This endpoint is called whenever a `Service`, `Vessel` or `Location` that a consumer has subscribed to is updated. The `callbackUrl` is defined as part of the subscription.\n\n  **\U0001F449 Important:** This endpoint is to be implemented by a **consumer** of the **OVS Hub API** in order to **receive Notifications**.\n"
       parameters:
         - name: callbackUrl
           in: path
@@ -57,21 +54,17 @@ paths:
           description: |
             The endpoint specifying where OVS Hub sends the notification to the customer. The callback can contain customer defined query parameters.
 
-            The callback endpoint **MAY** require authentication. When callback authentication is configured, OVS Hub authenticates using the configured authentication mechanism. When callback authentication is not configured, the subscription **MUST** contain a shared secret, and the receiver `**MUST** validate `Request-Id`, `Signature-Timestamp`, and `Notification-Signature`.
+            The callback endpoint **MAY** require authentication. When callback authentication is configured, OVS Hub authenticates using the configured authentication mechanism. When callback authentication is not configured, the subscription **MUST** contain a shared secret, and the receiver **MUST** validate `Request-Id`, `Signature-Timestamp`, and `Notification-Signature`.
           schema:
             type: string
             format: uri
-            example: https://myserver.com/send/callback/here?myInternalId=123
+            example: 'https://myserver.com/send/callback/here?myInternalId=123'
         - name: Request-Id
           in: header
           description: |
-            The `Request-Id` which is included in the encoded `Notification-Signature`.
-            
-            When receiving a notification the receiver **MUST** validate the "uniqueness" of the `Request-Id`. If a notification has already been sent with the `Request-Id` then the request **MUST** be rejected.
+            When a shared secret is configured, this header **MUST** be included, and the receiver **MUST** validate its uniqueness. A request containing a previously received `Request-Id` **MUST** be rejected.
 
-            **Note:** It is not necessary to store the `Request-Id` for more than 5 minutes as all other cases are covered by the `Signature-Timestamp` header
-
-            When a shared secret is configured for the subscription, `Request-Id`, `Signature-Timestamp`, and `Notification-Signature` **MUST** all be included. When no shared `secret` is configured, these headers are optional and callback authentication **MUST** be used instead.
+            When no shared secret is configured, this header is optional. If provided, it may be used for tracing or deduplication, but it does not provide proof of authenticity.
           schema:
             type: string
             format: ulid
@@ -79,19 +72,15 @@ paths:
         - name: Signature-Timestamp
           in: header
           description: |
-            The `Signature-Timestamp` which is included in the encoded `Notification-Signature`.
-            
-            When receiving a notification the receiver **MUST** validate the "freshness" of the timestamp. If it is older than 5 minutes, or too far in the future, it **MUST** be rejected.
+            When a shared secret is configured, this header **MUST** be included, and the receiver **MUST** validate its freshness. A timestamp older than five minutes or too far in the future **MUST** be rejected:
 
                 abs(now_utc - timestamp_utc) <= 300 seconds
 
-            **Note:** This value is to be used when calculating the `Notification-Signature` on the receiver side.
-
-            When a shared secret is configured for the subscription, `Request-Id`, `Signature-Timestamp`, and `Notification-Signature` **MUST** all be included. When no shared `secret` is configured, these headers are optional and callback authentication **MUST** be used instead.
+            When no shared secret is configured, this header is optional. If provided, it does not provide proof of authenticity.
           schema:
             type: string
             format: date-time
-            example: 2025-01-23T01:23:45Z
+            example: '2025-01-23T01:23:45Z'
         - name: Notification-Signature
           in: header
           description: |
@@ -99,24 +88,26 @@ paths:
 
                 Notification-Signature: sha256=<signature>
 
-            When OVS Hub sends a notification, the notification **MUST** be checked to make sure it's authentic. This is done by computing a signature.
+            When a shared secret is configured, the receiver **MUST** verify the authenticity of the notification by calculating the expected signature and comparing it with the supplied `Notification-Signature`.
+
+            When no shared secret is configured, callback authentication provides authenticity. OVS Hub **MUST NOT** calculate or include the `Notification-Signature` header.
 
             The `signature` is calculated by calculating a **HMAC_SHA256** using the `secret` (defined when setting up a subscription) on the `Signature-Timestamp` header (*unredacted*) concatenated with a dot (`.`) concatenated with the `Request-Id` header concatenated with a dot (`.`) concatenated with the `request body`
 
                 signature = HMAC_SHA256(secret, Signature-Timestamp + "." + Request-Id + "." + request-body)
 
             The signature **MUST** cover the entire request body of the request. Before the signature is created the request body **MUST** be in the [RFC 8785](https://datatracker.ietf.org/doc/html/rfc8785) canonical form. The content **MUST** be decoded into bytes using the UTF-8 encoding before computing the signature.
-            
+
             **Note:** None of the HTTP headers nor the request URL is covered by the signature.
 
             ## Example
-            
+
             A concrete example of how the `Notification-Signature` header could look like for:
               * `secret`: OWY4YzdhNGQ=
               * `Signature-Timestamp`: March 12, 2026 at 14:47:00Z
               * `Request-Id`: 01KKH4JGKBPT6J9VJX1WXKWPGK
               * `request-body`: {"lastName":"Doe" , "firstName":"John",  "age":40}
-            
+
             would be:
 
                 signature = HMAC_SHA256(Base64Decode(OWY4YzdhNGQ=), '2026-03-12T14:47:00Z.01KKH4JGKBPT6J9VJX1WXKWPGK.{"age":40,"firstName":"John","lastName":"Doe"}')
@@ -125,12 +116,14 @@ paths:
 
                 Notification-Signature: sha256=8d3a7837713e319d1466139903ffd5b1b8d96f6a769f6d53c03a29dc5c3f3630
 
-            When a shared secret is configured for the subscription, `Request-Id`, `Signature-Timestamp`, and `Notification-Signature` **MUST** all be included. When no shared `secret` is configured, these headers are optional and callback authentication **MUST** be used instead.
+            When a shared secret is configured, the receiver **MUST** verify the authenticity of the notification by validating this signature.
 
-            OVS Hub **MUST** calculate and include this header only when the subscription has a shared secret. When no shared secret is configured, OVS Hub **MUST NOT** attempt to calculate the signature and **SHOULD** omit this header.
+            When no shared secret is configured, callback authentication provides authenticity and this header is omitted.
+
+            OVS Hub **MUST** calculate and include this header only when the subscription has a shared secret. When no shared secret is configured, OVS Hub **MUST NOT** attempt to calculate the signature and **MUST NOT** include this header.
           schema:
             type: string
-            pattern: ^sha256=[A-Fa-f0-9]{64}$
+            pattern: '^sha256=[A-Fa-f0-9]{64}$'
             maxLength: 71
             minLength: 71
             example: sha256=8d3a7837713e319d1466139903ffd5b1b8d96f6a769f6d53c03a29dc5c3f3630
@@ -241,7 +234,7 @@ paths:
         If `callbackUrl` is specified, when setting up a subscription, the notification will be pushed to the
 
             POST {{callbackUrl}}
-        
+
         endpoint of the consumer. If `callbackUrl` is omitted as part of the subscription, a notification will be sent via email to the authenticated user. Email is defined as part of the user-profile.
 
         When a notification is sent, it is the responsibility of the consumer to go to OVS Hub, either via the API or the UI, to get more information.
@@ -250,25 +243,25 @@ paths:
       requestBody:
         description: |
           The parameters used to configure the subscription and send notifications.
-          
+
           All values in the subscription (except: `callbackUrl` and `secret`) will be used as filters when sending notifications. All specified filters must be met in order for a notification to be sent. A logical **AND** is used between filters. So specifying
-          
+
               carrierServiceCode = 'FE1'   //in a carrierService object
               AND
               vesselIMONumbers = '12345678'
-          
+
           means that the notifications sent for this subscription **MUST** be for service `FE1` (*carrierServiceCode='FE1'* inside a *carrierService* object) **and** vessel IMO `12345678` (*vesselIMONumber='12345678'*). If all filters are not fulfilled - then the notification will not be sent.
-          
+
           Filters that are specified as lists use logical **OR** between list values. So
-          
+
               carrierServices = [{carrierServiceCode: 'FE1'},{carrierServiceCode: 'DR02', carrierSMDGCode: 'YML'}]
-          
+
           means that notifications sent will match **either** `FE1` carrierServiceCode (from any carrier) **OR** `DR02` carrierServiceCode (belonging to YML).
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SubscriptionBodyWithSecret'
+              $ref: '#/components/schemas/SubscriptionCreate'
             examples:
               callbackExample:
                 summary: |
@@ -281,12 +274,22 @@ paths:
                   The notification is only triggered when changes occur to `vesselIMONumber`: 9321483 or 9929429 that occur maximum 1 week in the future (`weekRange` = 1)
                 value:
                   notificationChannel:
-                    callbackUrl: https://api.myserver.com/notifications?myId=123
+                    callbackUrl: 'https://api.myserver.com/notifications?myId=123'
                     secret: MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDM2NTc4NjIzODk3NDY5MDgyNzM0OTg3MTIzNzg2NA==
                   weekRange: 1
                   vesselIMONumbers:
                     - '9321483'
                     - '9929429'
+              authenticatedCallbackExample:
+                summary: Authenticated callback without HMAC signing
+                description: |
+                  Callback authentication is configured separately. No shared secret is provided, so signature headers are not sent.
+                value:
+                  notificationChannel:
+                    callbackUrl: 'https://api.myserver.com/notifications'
+                  weekRange: 1
+                  vesselIMONumbers:
+                    - '9321483'
               emailAllExample:
                 summary: |
                   Subscription using emails to be notified about everything
@@ -370,7 +373,7 @@ paths:
                       - errorCode: 7003
                         errorCodeText: Max number of subscriptions created
                         errorCodeMessage: A maximum of 10 subscriptions can be created per hour
-  /subscriptions/{subscriptionReference}:
+  '/subscriptions/{subscriptionReference}':
     get:
       tags:
         - Subscription
@@ -424,7 +427,7 @@ paths:
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
                     httpMethod: GET
-                    requestUri: /subscriptions/{subscriptionReference}
+                    requestUri: '/subscriptions/{subscriptionReference}'
                     statusCode: 429
                     statusCodeText: Too Many Requests
                     statusCodeMessage: |
@@ -484,7 +487,7 @@ paths:
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
                     httpMethod: DELETE
-                    requestUri: /subscriptions/{subscriptionReference}
+                    requestUri: '/subscriptions/{subscriptionReference}'
                     statusCode: 429
                     statusCodeText: Too Many Requests
                     statusCodeMessage: |
@@ -555,7 +558,7 @@ paths:
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
                     httpMethod: PUT
-                    requestUri: /subscriptions/{subscriptionReference}
+                    requestUri: '/subscriptions/{subscriptionReference}'
                     statusCode: 429
                     statusCodeText: Too Many Requests
                     statusCodeMessage: |
@@ -566,14 +569,20 @@ paths:
                       - errorCode: 7003
                         errorCodeText: Maximum number of subscription requests
                         errorCodeMessage: A maximum of 10 subscription update requests can be made per hour
-  /subscriptions/{subscriptionReference}/secret:
+  '/subscriptions/{subscriptionReference}/secret':
     put:
       tags:
         - Secret
-      summary: Sets, replaces, or removes the secret on an existing subscription
+      summary: 'Sets, replaces, or removes the secret on an existing subscription'
       operationId: put-secret
       description: |
-        Sets or replaces the subscription's shared secret. Supplying `null` removes the existing secret. When the secret is removed, callback authentication must be configured before callback notifications can be delivered.
+        Sets, replaces, or removes the subscription's shared secret.
+
+        Supplying a non-null value sets or replaces the shared secret.
+
+        Supplying `null` removes the existing secret. The request **MUST** be rejected with `400 Bad Request` if the subscription uses a `callbackUrl` and callback authentication is not configured.
+
+        After the secret is removed, OVS Hub does not calculate or send `Request-Id`, `Signature-Timestamp`, or `Notification-Signature` for the subscription.
       parameters:
         - name: subscriptionReference
           in: path
@@ -598,6 +607,7 @@ paths:
                   type: string
                   format: byte
                   nullable: true
+                  minLength: 1
                   maxLength: 1024
                   description: |
                     A Base64-encoded shared secret used to calculate the `Notification-Signature`.
@@ -607,15 +617,47 @@ paths:
                     Provide `null` to remove the existing secret.
 
                     After the secret is removed, OVS Hub does not calculate or send `Notification-Signature`.
-                  example: 'MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDM2NTc4NjIzODk3NDY5MDgyNzM0OTg3MTIzNzg2NA=='
+                  example: MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDM2NTc4NjIzODk3NDY5MDgyNzM0OTg3MTIzNzg2NA==
               required:
                 - secret
+            examples:
+              setSecretExample:
+                summary: Set or replace the shared secret
+                value:
+                  secret: MTIzNDU2Nzg5MDEyMzQ1Njc4OTA=
+              removeSecretExample:
+                summary: Remove the shared secret
+                value:
+                  secret: null
       responses:
         '204':
-          description: Secret updated
+          description: 'Secret set, replaced, or removed.'
           headers:
             API-Version:
               $ref: '#/components/headers/API-Version'
+        '400':
+          description: |
+            The secret could not be removed because doing so would leave the callback subscription without an authenticity mechanism.
+          headers:
+            API-Version:
+              $ref: '#/components/headers/API-Version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                httpMethod: PUT
+                requestUri: /subscriptions/01KJZDQ1CC6HQYP8V2NE2MPRNC/secret
+                statusCode: 400
+                statusCodeText: Bad Request
+                statusCodeMessage: |
+                  The shared secret cannot be removed because callback authentication is not configured for this subscription.
+                providerCorrelationReference: 4426d965-0dd8-4005-8c63-dc68b01c4962
+                errorDateTime: '2026-09-23T09:41:00Z'
+                errors:
+                  - errorCodeText: callbackAuthenticationRequired
+                    errorCodeMessage: |
+                      Configure callback authentication before removing the subscription's shared secret.
         default:
           description: |
             For other errors the error object should be populated with relevant information
@@ -640,7 +682,7 @@ paths:
                     **NB**: `errorCode` not yet standardized by DCSA. Value `7003` is just a "random example"
                   value:
                     httpMethod: PUT
-                    requestUri: /subscriptions/{subscriptionReference}/secret
+                    requestUri: '/subscriptions/{subscriptionReference}/secret'
                     statusCode: 429
                     statusCodeText: Too Many Requests
                     statusCodeMessage: |
@@ -651,7 +693,6 @@ paths:
                       - errorCode: 7003
                         errorCodeText: Max number of subscriptions secret requests
                         errorCodeMessage: A maximum of 10 subscription secret update requests can be made per hour
-
 components:
   headers:
     API-Version:
@@ -690,8 +731,8 @@ components:
           type: object
           description: |
             Defines the channel where a matched notification is sent. At least one of the possible properties **MUST** be provided:
-              - `callbackUrl`
-              - `useEmail`
+            - `callbackUrl`, together with either callback authentication or an associated shared secret; or
+            - `useEmail`.
           properties:
             callbackUrl:
               type: string
@@ -708,7 +749,7 @@ components:
                 A callback subscription **MUST NOT** be used for delivery unless either callback authentication is configured or a shared secret is associated with the subscription.
 
                 The shared secret can be set, replaced, or removed using the [secret endpoint](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS_NTF/1.0.0#/Secret/put-secret).
-              example: https://myserver.com/send/callback/here?shipperRef=myID123
+              example: 'https://myserver.com/send/callback/here?shipperRef=myID123'
             useEmail:
               type: boolean
               description: |
@@ -736,7 +777,7 @@ components:
             properties:
               carrierServiceCode:
                 type: string
-                pattern: ^\S(?:.*\S)?$
+                pattern: '^\S(?:.*\S)?$'
                 maxLength: 11
                 description: |
                   The carrier-specific code of the service for which the schedule details are published.
@@ -763,7 +804,7 @@ components:
             If this property is empty, you will be notified for all `universalServiceReferences` that have changes you are authorized to see.
           items:
             type: string
-            pattern: ^SR\d{5}[A-Z]$
+            pattern: '^SR\d{5}[A-Z]$'
             maxLength: 8
             minLength: 8
             example: SR12345A
@@ -784,7 +825,7 @@ components:
               The name of the Vessel given by the Vessel Operator and registered with IMO.
 
               **Note:** In case the vessel is a "dummy vessel" (`isDummyVessel='true'`) then the following recommendations should be followed:
-              
+
               Dummy vessel names should begin with the **SMDG Operating Carrier Code** to ensure uniqueness across carriers.
               The suffix can be **alphanumeric** and up to **10 characters long**, allowing each carrier to use internal naming conventions (e.g., `MSKTBN1`, `CMATEMP01`, `MSCX01A`).
 
@@ -805,7 +846,7 @@ components:
             If this property is empty, you will be notified for all `vesselIMONumbers` that have changes you are authorized to see.
           items:
             type: string
-            pattern: ^\d{7,8}$
+            pattern: '^\d{7,8}$'
             minLength: 7
             maxLength: 8
             description: |
@@ -824,7 +865,7 @@ components:
             If this property is empty, you will be notified for all `MMSINumbers` that have changes you are authorized to see.
           items:
             type: string
-            pattern: ^\d{9}$
+            pattern: '^\d{9}$'
             minLength: 9
             maxLength: 9
             description: |
@@ -851,7 +892,7 @@ components:
             properties:
               UNLocationCode:
                 type: string
-                pattern: ^[A-Z]{2}[A-Z2-9]{3}$
+                pattern: '^[A-Z]{2}[A-Z2-9]{3}$'
                 minLength: 5
                 maxLength: 5
                 description: |
@@ -883,10 +924,9 @@ components:
         - subscriptionReference
         - notificationChannel
         - weekRange
-
-    SubscriptionBodyWithSecret:
+    SubscriptionCreate:
       type: object
-      title: Subscription with Secret
+      title: Subscription Create
       description: |
         Subscription containing all information needed in order to create a subscription: notificationChannel, filters, range, etc
       properties:
@@ -911,10 +951,11 @@ components:
                 If callback authentication is not configured, the `secret` property **MUST** be provided. OVS Hub then sends the `Request-Id`, `Signature-Timestamp`, and `Notification-Signature` headers, and the receiver **MUST** validate them.
 
                 A callback subscription **MUST NOT** be created unless either callback authentication is configured or the `secret` property is provided.
-              example: https://myserver.com/send/callback/here?shipperRef=myID123
+              example: 'https://myserver.com/send/callback/here?shipperRef=myID123'
             secret:
               type: string
               format: byte
+              minLength: 1
               maxLength: 1024
               description: |
                 A Base64-encoded shared secret used to calculate the `Notification-Signature` header.
@@ -922,7 +963,7 @@ components:
                 This property is required when `callbackUrl` is provided and callback authentication is not configured (this is defined outside scope of the API).
 
                 When callback authentication is configured, this property may be omitted. In that case, OVS Hub does not calculate or send a `Notification-Signature`.
-              example: 'MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDM2NTc4NjIzODk3NDY5MDgyNzM0OTg3MTIzNzg2NA=='
+              example: MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDM2NTc4NjIzODk3NDY5MDgyNzM0OTg3MTIzNzg2NA==
             useEmail:
               type: boolean
               description: |
@@ -950,7 +991,7 @@ components:
             properties:
               carrierServiceCode:
                 type: string
-                pattern: ^\S(?:.*\S)?$
+                pattern: '^\S(?:.*\S)?$'
                 maxLength: 11
                 description: |
                   The carrier-specific code of the service for which the schedule details are published.
@@ -980,7 +1021,7 @@ components:
             If this property is empty, you will be notified for all `universalServiceReferences` that have changes you are authorized to see.
           items:
             type: string
-            pattern: ^SR\d{5}[A-Z]$
+            pattern: '^SR\d{5}[A-Z]$'
             maxLength: 8
             minLength: 8
             example: SR12345A
@@ -1001,7 +1042,7 @@ components:
               The name of the Vessel given by the Vessel Operator and registered with IMO.
 
               **Note:** In case the vessel is a "dummy vessel" (`isDummyVessel='true'`) then the following recommendations should be followed:
-              
+
               Dummy vessel names should begin with the **SMDG Operating Carrier Code** to ensure uniqueness across carriers.
               The suffix can be **alphanumeric** and up to **10 characters long**, allowing each carrier to use internal naming conventions (e.g., `MSKTBN1`, `CMATEMP01`, `MSCX01A`).
 
@@ -1022,7 +1063,7 @@ components:
             If this property is empty, you will be notified for all `vesselIMONumbers` that have changes you are authorized to see.
           items:
             type: string
-            pattern: ^\d{7,8}$
+            pattern: '^\d{7,8}$'
             minLength: 7
             maxLength: 8
             description: |
@@ -1041,7 +1082,7 @@ components:
             If this property is empty, you will be notified for all `MMSINumbers` that have changes you are authorized to see.
           items:
             type: string
-            pattern: ^\d{9}$
+            pattern: '^\d{9}$'
             minLength: 9
             maxLength: 9
             description: |
@@ -1067,7 +1108,7 @@ components:
             properties:
               UNLocationCode:
                 type: string
-                pattern: ^[A-Z]{2}[A-Z2-9]{3}$
+                pattern: '^[A-Z]{2}[A-Z2-9]{3}$'
                 minLength: 5
                 maxLength: 5
                 description: |
@@ -1095,20 +1136,19 @@ components:
       required:
         - notificationChannel
         - weekRange
-
-    ######################
-    # Notification
-    ######################
+      ######################
+      # Notification
+      ######################
     Notification:
       type: object
       title: Notification
       description: |
         `CloudEvent` specific properties for the `Notification`.
-        
+
         The `type` property will contain the origin causing the notification to be sent: e.g. if a **Terminal** update is the trigger for a notification then the type will be:
-        
+
             'type': 'org.dcsa.ovs-hub.schedules.terminal'
-        
+
         If the `type` is from a Terminal - then the GET endpoint of the [**Terminal Timestamp API**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS_TER) should be used to get more information.
 
         If the `type` is from a Service - then the GET endpoint of [**Operational Vessel Schedules API**](https://app.swaggerhub.com/apis/dcsaorg/DCSA_OVS) should be used to get more information
@@ -1142,7 +1182,7 @@ components:
             An application MAY assign a unique `source` to each distinct producer, which makes it easy to produce unique IDs since no other producer will have the same source. The application MAY use UUIDs, URNs, DNS authorities or an application-specific scheme to create unique `source` identifiers.
 
             A source MAY include more than one producer. In that case the producers MUST collaborate to ensure that `source` + `id` is unique for each distinct event.
-          example: 'ovs-hub.dcsa.org'
+          example: ovs-hub.dcsa.org
         type:
           type: string
           description: |
@@ -1191,10 +1231,9 @@ components:
         - datacontenttype
         - subscriptionreference
         - data
-
-    ###############################
-    # Data for Notification
-    ###############################
+      ###############################
+      # Data for Notification
+      ###############################
     NotificationData:
       type: object
       title: Data
@@ -1209,7 +1248,7 @@ components:
           - a port is `OMIT` (omitted), `ADHO` (visited ad hoc) or any other `statusCode` has been changed or added.
           - the vessel has changed, or a new flag or vesselOperator has been assigned
           - the location of a port has changed, a new location has been added or a location has been removed from a schedule
-        
+
         The notification will only be sent to authorized parties.
 
         To get more details, fetch the updated schedule data to see what changed. This is done by calling the OVS Hub
@@ -1218,14 +1257,14 @@ components:
       properties:
         carrierServiceCode:
           type: string
-          pattern: ^\S(?:.*\S)?$
+          pattern: '^\S(?:.*\S)?$'
           maxLength: 11
           description: |
             The carrier-specific code of the service for which the schedule details are published. In combination with `carrierSMDGCode` this uniquely identifies the service.
           example: FE1
         universalServiceReference:
           type: string
-          pattern: ^SR\d{5}[A-Z]$
+          pattern: '^SR\d{5}[A-Z]$'
           maxLength: 8
           minLength: 8
           description: |
@@ -1253,14 +1292,14 @@ components:
         carrierImportVoyageNumber:
           type: string
           maxLength: 50
-          pattern: ^\S(?:.*\S)?$
+          pattern: '^\S(?:.*\S)?$'
           description: |
             The identifier of an import voyage. The carrier-specific identifier of the import Voyage. In combination with `carrierSMDGCode` and `carrierServiceCode` this uniquely identifies the import voyage.
           example: 2103N
         carrierExportVoyageNumber:
           type: string
           maxLength: 50
-          pattern: ^\S(?:.*\S)?$
+          pattern: '^\S(?:.*\S)?$'
           description: |
             The identifier of an export voyage. The carrier-specific identifier of the export Voyage. In combination with `carrierSMDGCode` and `carrierServiceCode` this uniquely identifies the export voyage.
           example: 2103S
@@ -1268,23 +1307,22 @@ components:
           type: string
           minLength: 5
           maxLength: 5
-          pattern: ^\d{2}[0-9A-Z]{2}[NEWSR]$
+          pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
           description: |
             A globally unique voyage reference for the import Voyage, as per DCSA standard, agreed by VSA partners for the voyage. The voyage reference must match the regular expression pattern: `\d{2}[0-9A-Z]{2}[NEWSR]`
-            
+
             - `2 digits` for the year
             - `2 alphanumeric characters` for the sequence number of the voyage
             - `1 character` for the direction/haul (`N`orth, `E`ast, `W`est, `S`outh or `R`oundtrip).
-
           example: 2103N
         universalExportVoyageReference:
           type: string
           minLength: 5
           maxLength: 5
-          pattern: ^\d{2}[0-9A-Z]{2}[NEWSR]$
+          pattern: '^\d{2}[0-9A-Z]{2}[NEWSR]$'
           description: |
             A globally unique voyage reference for the export Voyage, as per DCSA standard, agreed by VSA partners for the voyage. The voyage reference must match the regular expression pattern: `\d{2}[0-9A-Z]{2}[NEWSR]`
-            
+
             - `2 digits` for the year
             - `2 alphanumeric characters` for the sequence number of the voyage
             - `1 character` for the direction/haul (`N`orth, `E`ast, `W`est, `S`outh or `R`oundtrip).
@@ -1292,12 +1330,12 @@ components:
         vesselName:
           type: string
           maxLength: 50
-          pattern: ^\S(?:.*\S)?$
+          pattern: '^\S(?:.*\S)?$'
           description: |
             The name of the Vessel given by the Vessel Operator and registered with IMO.
 
             **Note:** In case the vessel is a "dummy vessel" (`isDummyVessel='true'`) then the following recommendations should be followed:
-            
+
             Dummy vessel names should begin with the **SMDG Operating Carrier Code** to ensure uniqueness across carriers.
             The suffix can be **alphanumeric** and up to **10 characters long**, allowing each carrier to use internal naming conventions (e.g., `MSKTBN1`, `CMATEMP01`, `MSCX01A`).
 
@@ -1309,7 +1347,7 @@ components:
           example: King of the Seas
         vesselIMONumber:
           type: string
-          pattern: ^\d{7,8}$
+          pattern: '^\d{7,8}$'
           minLength: 7
           maxLength: 8
           description: |
@@ -1319,7 +1357,7 @@ components:
           example: '9321483'
         MMSINumber:
           type: string
-          pattern: ^\d{9}$
+          pattern: '^\d{9}$'
           minLength: 9
           maxLength: 9
           description: |
@@ -1335,7 +1373,6 @@ components:
             When `true`, the `vesselName` must be used as a unique identifier for the dummy vessel. See the `vesselName` field description for the recommended naming convention.
         location:
           $ref: '#/components/schemas/Location'
-
     Location:
       title: Location
       type: object
@@ -1344,7 +1381,7 @@ components:
       properties:
         UNLocationCode:
           type: string
-          pattern: ^[A-Z]{2}[A-Z2-9]{3}$
+          pattern: '^[A-Z]{2}[A-Z2-9]{3}$'
           minLength: 5
           maxLength: 5
           description: |
@@ -1365,11 +1402,9 @@ components:
           example: ACT
       required:
         - UNLocationCode
-
-
-    #################
-    # Error Responses
-    #################
+      #################
+      # Error Responses
+      #################
     ErrorResponse:
       title: Error Response
       type: object
@@ -1437,7 +1472,6 @@ components:
         - statusCodeText
         - errorDateTime
         - errors
-
     DetailedError:
       type: object
       title: Detailed Error
