@@ -426,6 +426,141 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ServiceSchedule'
+              examples:
+                withoutWaterways:
+                  summary: Vessel schedule containing only port TransportCalls
+                  description: |
+                    A vessel schedule containing ordinary port TransportCalls. The locations do not contain `waterwaySMDGEntryPointCode`, so they are not waterway locations.
+                  value:
+                    - carrierServiceName: Great Lion Service
+                      carrierServiceCode: FE1
+                      universalServiceReference: SR12345A
+                      vesselSchedules:
+                        - vessel:
+                            vesselIMONumber: '9321483'
+                            MMSINumber: '278111222'
+                            name: King of the Seas
+                            flag: NL
+                            callSign: NCVV
+                            operatorCarrierCode: MAEU
+                            operatorCarrierCodeListProvider: SMDG
+                          isDummyVessel: false
+                          transportCalls:
+                            - portVisitReference: NLRTM1234589
+                              transportCallReference: SR12345A-9321483-2103N-NLRTM-1
+                              carrierImportVoyageNumber: 2103N
+                              carrierExportVoyageNumber: 2103S
+                              universalImportVoyageReference: 2603N
+                              universalExportVoyageReference: 2603S
+                              location:
+                                locationName: Port of Rotterdam
+                                UNLocationCode: NLRTM
+                                facilityName: Rotterdam World Gateway
+                                facilitySMDGCode: RWG
+                              isCargoOperationalCall: true
+                              timestamps:
+                                - eventTypeCode: ARRI
+                                  eventClassifierCode: PLN
+                                  eventDateTime: '2026-10-08T08:00:00+02:00'
+                                - eventTypeCode: DEPA
+                                  eventClassifierCode: PLN
+                                  eventDateTime: '2026-10-09T18:00:00+02:00'
+                            - portVisitReference: DEHAM1234590
+                              transportCallReference: SR12345A-9321483-2103N-DEHAM-2
+                              carrierImportVoyageNumber: 2103N
+                              carrierExportVoyageNumber: 2103S
+                              universalImportVoyageReference: 2603N
+                              universalExportVoyageReference: 2603S
+                              location:
+                                locationName: Port of Hamburg
+                                UNLocationCode: DEHAM
+                              isCargoOperationalCall: true
+                              timestamps:
+                                - eventTypeCode: ARRI
+                                  eventClassifierCode: PLN
+                                  eventDateTime: '2026-10-11T07:00:00+02:00'
+                                - eventTypeCode: DEPA
+                                  eventClassifierCode: PLN
+                                  eventDateTime: '2026-10-12T16:00:00+02:00'
+
+                withWaterway:
+                  summary: Vessel schedule containing a waterway TransportCall
+                  description: |
+                    A vessel schedule containing a waterway TransportCall between two port TransportCalls.
+
+                    The waterway is identified by the combination of `UNLocationCode` and `waterwaySMDGEntryPointCode`.
+
+                    The waterway TransportCall has no `portVisitReference` and explicitly sets `isCargoOperationalCall` to `false`.
+                  value:
+                    - carrierServiceName: Great Lion Service
+                      carrierServiceCode: FE1
+                      universalServiceReference: SR12345A
+                      vesselSchedules:
+                        - vessel:
+                            vesselIMONumber: '9321483'
+                            MMSINumber: '278111222'
+                            name: King of the Seas
+                            flag: NL
+                            callSign: NCVV
+                            operatorCarrierCode: MAEU
+                            operatorCarrierCodeListProvider: SMDG
+                          isDummyVessel: false
+                          transportCalls:
+                            - portVisitReference: NLRTM1234589
+                              transportCallReference: SR12345A-9321483-2103N-NLRTM-1
+                              carrierImportVoyageNumber: 2103N
+                              carrierExportVoyageNumber: 2103S
+                              universalImportVoyageReference: 2603N
+                              universalExportVoyageReference: 2603S
+                              location:
+                                locationName: Port of Rotterdam
+                                UNLocationCode: NLRTM
+                                facilityName: Rotterdam World Gateway
+                                facilitySMDGCode: RWG
+                              isCargoOperationalCall: true
+                              timestamps:
+                                - eventTypeCode: ARRI
+                                  eventClassifierCode: PLN
+                                  eventDateTime: '2026-10-08T08:00:00+02:00'
+                                - eventTypeCode: DEPA
+                                  eventClassifierCode: PLN
+                                  eventDateTime: '2026-10-09T18:00:00+02:00'
+
+                            - transportCallReference: SR12345A-9321483-2103N-PAPCN-ATL-2
+                              carrierImportVoyageNumber: 2103N
+                              carrierExportVoyageNumber: 2103S
+                              universalImportVoyageReference: 2603N
+                              universalExportVoyageReference: 2603S
+                              location:
+                                locationName: Panama Canal - Atlantic entrance
+                                UNLocationCode: PAPCN
+                                waterwaySMDGEntryPointCode: ATL
+                              isCargoOperationalCall: false
+                              timestamps:
+                                - eventTypeCode: ARRI
+                                  eventClassifierCode: PLN
+                                  eventDateTime: '2026-10-20T06:00:00-05:00'
+                                - eventTypeCode: DEPA
+                                  eventClassifierCode: PLN
+                                  eventDateTime: '2026-10-20T08:00:00-05:00'
+
+                            - portVisitReference: PAPTY1234590
+                              transportCallReference: SR12345A-9321483-2103N-PAPTY-3
+                              carrierImportVoyageNumber: 2103N
+                              carrierExportVoyageNumber: 2103S
+                              universalImportVoyageReference: 2603N
+                              universalExportVoyageReference: 2603S
+                              location:
+                                locationName: Port of Panama City
+                                UNLocationCode: PAPTY
+                              isCargoOperationalCall: true
+                              timestamps:
+                                - eventTypeCode: ARRI
+                                  eventClassifierCode: PLN
+                                  eventDateTime: '2026-10-21T09:00:00-05:00'
+                                - eventTypeCode: DEPA
+                                  eventClassifierCode: PLN
+                                  eventDateTime: '2026-10-22T17:00:00-05:00'
           headers:
             API-Version:
               schema:
@@ -542,7 +677,7 @@ paths:
             example: 2103S
           in: query
           name: carrierVoyageNumber
-          description: The carrier specific identifier of a Voyage - can be both `importVoyageNumber` and `exportVoyageNumber`. The result will only return schedules including the Ports where `carrierVoyageNumber` is either `carrierImportVoyageNumber` or `carrierExportVoyageNumber`.
+          description: The carrier specific identifier of a Voyage - can be both `importVoyageNumber` and `exportVoyageNumber`. The result will only return schedules including the TransportCalls where `carrierVoyageNumber` is either `carrierImportVoyageNumber` or `carrierExportVoyageNumber`.
         - schema:
             type: string
             pattern: ^\d{2}[0-9A-Z]{2}[NEWSR]$
@@ -550,7 +685,7 @@ paths:
             example: 2201N
           in: query
           name: universalVoyageReference
-          description: The Universal Reference of a Voyage - can be both `importUniversalVoyageReference` and `exportUniversalVoyageReference`. The result will only return schedules including the Ports where `universalVoyageReference` is either `importUniversalVoyageReference` or `exportUniversalVoyageReference`.
+          description: The Universal Reference of a Voyage - can be both `importUniversalVoyageReference` and `exportUniversalVoyageReference`. The result will only return schedules including the TransportCalls where `universalVoyageReference` is either `importUniversalVoyageReference` or `exportUniversalVoyageReference`.
         - schema:
             type: string
             pattern: ^[A-Z]{2}[A-Z2-9]{3}$
@@ -559,7 +694,10 @@ paths:
             example: NLAMS
           in: query
           name: UNLocationCode
-          description: The UN Location Code specifying where a port is located.  Specifying this filter will only return schedules including entire Voyages related to this particular UN Location Code.
+          description: |
+            The UN Location Code identifying a location associated with a TransportCall. The location can, for example, represent a port or a waterway.
+
+            Specifying this filter returns schedules containing TransportCalls with the supplied UN Location Code.
         - schema:
             type: string
             maxLength: 6
@@ -581,7 +719,8 @@ paths:
           in: query
           name: startDate
           description: |
-            The start date of the period for which schedule information is requested. If a date of any Timestamp (ATA, ETA or PTA) inside a PortCall matches a date on or after (≥) the `startDate` the entire Voyage (import- and export-Voyage) matching the PortCall will be included in the result. All matching is done towards local Date at the place of the port call.
+            The start date of the period for which schedule information is requested. If the date of any Timestamp (ATA, ETA or PTA) within a TransportCall is on or after (`>=`) the `startDate`, the entire Voyage (import and export Voyage) containing that TransportCall will be included in the result. Matching is performed using the local date at the TransportCall location.
+
             If this filter is not provided, the default value is **3 months** prior to the request time.
         - schema:
             type: string
@@ -590,7 +729,8 @@ paths:
           in: query
           name: endDate
           description: |
-            The end date of the period for which schedule information is requested. If a date of any Timestamp (ATA, ETA or PTA) inside a PortCall matches a date on or before (≤) the `endDate` the entire Voyage(import- and export-Voyage) matching the PortCall will be included in the result. All matching is done towards local Date at the place of the port call.  
+            The end date of the period for which schedule information is requested. If the date of any Timestamp (ATA, ETA or PTA) within a TransportCall is on or before (`<=`) the `endDate`, the entire Voyage (import and export Voyage) containing that TransportCall will be included in the result. Matching is performed using the local date at the TransportCall location.
+
             If this filter is not provided, the default value is **6 months** after the request time.
         - schema:
             type: string
@@ -624,7 +764,7 @@ paths:
           description: A server generated value to specify a specific point in a collection result, used for pagination.
         - $ref: '#/components/parameters/Api-Version-Major'
       description: |
-        Provides, for a required specific service and/or voyage and/or vessel and/or location, the timetable of estimated departure and arrival times for each port call on the rotation of the vessel(s).
+        Provides, for a required specific service and/or voyage and/or vessel and/or location, the timetable of estimated departure and arrival times for each TransportCall in the rotation of the vessel or vessels.
 
         The list of schedules returned in the response can be tailored to specific needs by combining available query parameters.
 
@@ -646,9 +786,9 @@ paths:
 
         The filter parameters `startDate` and `endDate` MUST always be used in combination with any of the other available parameters.
 
-        The resulting payload returned in the responses will always include **entire voyage(s) being matched**, unless otherwise specified (see `responseScope` query parameter). This means that even though a filter only matches a single `Port` (`UNLocationCode`) in a `Voyage` or a single `Timestamp` within a `Port` in a `Voyage` - **the entire Voyage matched** is returned. If the `carrierImportVoyageNumber` of the `Port` differs from the `carrierExportVoyageNumber` of the `Port` then the **entire Voyage** for both these Voyage numbers are included. An example of this is when `&UNLocationCode=DEHAM` is used as a filter parameter. In this case **entire Voyages** would be listed where `DEHAM` is a `Port`.
+        The resulting payload returned in the responses will always include **entire voyage(s) being matched**, unless otherwise specified (see `responseScope` query parameter). This means that even though a filter only matches a single TransportCall identified by (`UNLocationCode`) in a `Voyage` or a single `Timestamp` within a `Port` in a `Voyage` - **the entire Voyage matched** is returned. If the `carrierImportVoyageNumber` of the `Port` differs from the `carrierExportVoyageNumber` of the `Port` then the **entire Voyage** for both these Voyage numbers are included. An example of this is when `&UNLocationCode=DEHAM` is used as a filter parameter. In this case **entire Voyages** would be listed containing a TransportCall with `UNLocationCode=DEHAM`.
 
-        **Note as of v1.0.3:** If `responseScope` is used with the `MATCHED_CALLS` value then only **partial voyage(s) will potentially be returned**. This means that if a filter only matches a single `Port` (`UNLocationCode`) in a `Voyage` or a single `Timestamp` within a `Port` in a `Voyage` - **only matched transportCalls** are returned. If the `carrierImportVoyageNumber` of the `Port` differs from the `carrierExportVoyageNumber` of the `Port` then the **matched transportCalls** where either one (or both) match the filter are included. An example of this is when `&UNLocationCode=DEHAM` is used as a filter parameter. In this case **transportCalls matching `DEHAM`** would be included.
+        **Note as of v1.0.3:** If `responseScope` is used with the `MATCHED_CALLS` value then only **partial voyage(s) will potentially be returned**. This means that if a filter only matches a single TransportCall identified by (`UNLocationCode`) in a `Voyage` or a single `Timestamp` within a `Port` in a `Voyage` - **only matched transportCalls** are returned. If the `carrierImportVoyageNumber` of the `Port` differs from the `carrierExportVoyageNumber` of the `Port` then the **matched transportCalls** where either one (or both) match the filter are included. An example of this is when `&UNLocationCode=DEHAM` is used as a filter parameter. In this case **transportCalls matching `DEHAM`** would be included.
 
         Be aware that it is possible to specify filters that are mutually exclusive resulting in an empty response list. An example of this could be when both using `vesselIMONumber` and `vesselName` filters at the same time: `&vesselIMONumber=9321483&vesselName=King of the Seas`. If no `Vessel` exists where `vesselIMONumber` is **9321483** and `vesselName` is **King of the Seas** then the result will be an empty list.
 
@@ -990,7 +1130,20 @@ components:
       title: Transport Call
       type: object
       description: |
-        A transportCall in the schedule. A transportCall can be either just a Port or further specified as a terminalCall.
+        A TransportCall represents one location in the vessel schedule.
+
+        A TransportCall can represent a port, optionally further specified by a terminal, or a waterway point identified by the combination of `location.UNLocationCode` and `location.waterwaySMDGEntryPointCode`.
+
+        One waterway TransportCall represents one specific waterway point. A point at the other end of the waterway can be represented by another TransportCall.
+
+        The order of the TransportCalls in the `transportCalls` array defines their sequence in the vessel schedule.
+
+        **Conditions for a waterway TransportCall:**
+        - `location` **MUST** contain both `UNLocationCode` and `waterwaySMDGEntryPointCode`.
+        - `isCargoOperationalCall` **MUST** be present and **MUST** be set to `false`.
+        - `portVisitReference` **MUST** be omitted.
+
+        A TransportCall that does not satisfy these conditions does not conform to this specification.
       required:
         - transportCallReference
         - carrierImportVoyageNumber
@@ -998,13 +1151,21 @@ components:
       properties:
         portVisitReference:
           type: string
-          description: The unique reference that can be used to link different `transportCallReferences` to the same port visit. The reference is provided by the port to uniquely identify a port call.
+          description: |
+            The unique reference used to associate different `transportCallReferences` with the same port visit. The reference is provided by the port to identify the port call.
+
+            This property applies only when the TransportCall represents a port. It MUST be omitted when `location.waterwaySMDGEntryPointCode` is provided.
           maxLength: 50
           example: NLRTM1234589
         transportCallReference:
           type: string
           maxLength: 100
-          description: The unique reference for a transport call. It's the vessel operator's responsibility to provide the Transport Call Reference, other parties are obliged to pick it up and use it. It can take the form of Port Call References as defined in OVS Definitions Document, or alternatively a reference as defined by the vessel operator.
+          description: |
+            The unique reference for a TransportCall. It is the vessel operator's responsibility to provide the `transportCallReference`; other parties are obliged to pick it up and use it. It can take the form of a Port Call Reference as defined in the OVS Definitions Document, or alternatively a reference defined by the vessel operator.
+
+            For a waterway TransportCall, the reference identifies the scheduled call at the specific waterway point identified by `location.UNLocationCode` and `location.waterwaySMDGEntryPointCode`.
+
+            The reference does not identify the complete passage through the waterway.
           example: SR11111X-9321483-2107W-NLRTM-HPD2-1-1
         carrierImportVoyageNumber:
           type: string
@@ -1055,10 +1216,12 @@ components:
           type: boolean
           default: true
           description: |
-            Indicates whether cargo loading and/or discharge is applicable at the transport call.
+            Indicates whether cargo loading and/or discharge is applicable at the TransportCall.
             - `true`: cargo loading and/or discharge is applicable.
             - `false`: cargo loading and/or discharge are not applicable.
             - If omitted, the value **MUST** be interpreted as `true`.
+
+            When `location.waterwaySMDGEntryPointCode` is provided, this property **MUST** explicitly be set to `false`. It **MUST NOT** be omitted, because its default value is `true`.
 
             The property is independent of whether the associated timestamps are Planned (`PLN`), Estimated (`EST`) or Actual (`ACT`). It does not indicate whether cargo was actually loaded or discharged.
 
@@ -1075,7 +1238,7 @@ components:
       title: Timestamp
       type: object
       description: |
-        Timestamp defined by a type (Arrival or Departure), a classifier (Planned, Estimated or Actual) and a date and time.
+        A timestamp for the location represented by the containing TransportCall. It is defined by an event type, an event classifier, and a date and time.
       required:
         - eventTypeCode
         - eventClassifierCode
@@ -1088,10 +1251,14 @@ components:
             - DEPA
           example: ARRI
           description: |
-            Identifier for type of transportEvent.
+            Identifier for the type of transport event.
 
             - `ARRI` (Arrived)
             - `DEPA` (Departed)
+
+            For a waterway TransportCall, `ARRI` means arrival at the waterway point represented by the containing TransportCall and `DEPA` means departure from that same point.
+
+            `DEPA` does not mean that the vessel has exited the complete waterway at the opposite end. The point at the other end can be represented by another ordered TransportCall.
         eventClassifierCode:
           type: string
           enum:
@@ -1875,15 +2042,22 @@ components:
       title: TransportCall Location
       type: object
       description: |
-        General purpose object to capture location-related data, the location can be specified in **any** of the following ways:
+        General purpose object to capture location-related data. The location can be specified using **any** of the following properties:
           - `address` (used to specify the location via a **structured** Address)
           - `addressLines` (used to specify a location via an **unstructured** Address)
           - `UNLocationCode`
-          - `FacilitySMDGCode` (used to specify a location using a `facilitySMDGCode`)
+          - `facilitySMDGCode` (used to specify a location using a `facilitySMDGCode`)
+          - `UNLocationCode` together with `waterwaySMDGEntryPointCode`, for an SMDG waterway entry point
 
-          It is expected that if a location is specified in multiple ways (both as an `Address` and as a `Facility`) that both ways point to the same location.
+          If a location is specified in multiple ways, all supplied properties **MUST** identify the same location.
 
-          **Condition:** Providers **or** consumers on API v1.0.1 (or earlier): `addressLines` cannot be used as the only property to identify the location.
+          CS 1.0.4 supports waterway locations only at point-level precision. A waterway location **MUST** therefore contain both `UNLocationCode` and `waterwaySMDGEntryPointCode`.
+
+          The presence of `waterwaySMDGEntryPointCode` identifies the location as a waterway location. A location containing only `UNLocationCode`, without `waterwaySMDGEntryPointCode`, is not interpreted as a waterway location.
+
+          For a waterway location, `address`, `addressLines`, `facilityName` and `facilitySMDGCode` **SHOULD** be omitted.
+
+          **Condition:** Providers or consumers on API v1.0.1 or earlier cannot use `addressLines` as the only property identifying a location.
       properties:
         locationName:
           type: string
@@ -1931,6 +2105,23 @@ components:
           
             The codeList used by SMDG is the [SMDG Terminal Code List](https://smdg.org/documents/smdg-code-lists/)
           maxLength: 6
+        waterwaySMDGEntryPointCode:
+          type: string
+          maxLength: 6
+          description: |
+            The [SMDG waterway entry-point code](https://smdg.org/documents/smdg-code-lists/smdg-waterway-code-list/) identifying a specific point on a waterway.
+
+            The code is not unique by itself and **MUST** be interpreted together with `UNLocationCode`.
+
+            When this property is provided:
+            - `UNLocationCode` **MUST** also be provided.
+            - The combination of `UNLocationCode` and `waterwaySMDGEntryPointCode` **MUST** be a valid entry in the [SMDG Waterway Code List](https://smdg.org/documents/smdg-code-lists/smdg-waterway-code-list/).
+            - The location represents the specific waterway point identified by the combination of the two codes.
+            - The location does not represent a port, terminal or berth.
+
+            CS 1.0.4 does not support identifying a waterway without identifying a specific waterway point.
+          example: ATL
+
     PortScheduleLocation:
       title: Port Schedule Location
       type: object
