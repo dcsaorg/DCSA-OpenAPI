@@ -7,6 +7,20 @@ Publications related to the Booking API:
 - [Booking Process](https://dcsa.org/standards/booking-process/) contains documents and publications
 - [Booking Notification](./notification/) maintained here on GitHub  (**DEPRECATED** - now included as part of Booking API)
 
+<a name="v205"></a>[Release v2.0.5 (28 September 2026)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.5)
+---
+This is a patch release for the DCSA Booking API. It adds support for additional Booking, equipment, Out of Gauge, reefer, party, and reference information and aligns maintained code-list references and terminology.
+
+- added `isNotifyParty` to `Consignee` and clarified how the Consignee and existing Notify Parties are interpreted when it is set
+- added `extendedContractQuotationReference` with support for up to 70 characters and deprecated `contractQuotationReference`
+- aligned carrier, shipper, provider, and consumer terminology across API and status descriptions
+- replaced embedded eBL platform and party code-list provider values with references to the maintained DCSA registries
+- added Out of Gauge support, including `outOfGaugeQuotationReference`, equipment-level `outOfGaugeDetails`, total cargo dimensions, directional extensions, center of gravity, measurements, and handling information
+- added `equipmentAttributeCodes` to Requested Equipment for SMDG equipment attributes such as plastic pellets (`PLX`), food-grade equipment (`FDG`), and flexitanks (`FLX`)
+- added `specialInstructions` at Booking and Requested Equipment level
+- added `FF` (Freight Forwarder Reference) as a supported reference type
+- added `ventilationOpeningPercentage` to Active Reefer Settings
+
 <a name="v204"></a>[Release v2.0.4 (14 April 2026)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_BKG/2.0.4)
 ---
 This is a patch release for the DCSA Booking API. Updated the `partyFunction` list, allowed for unstructured address (`addressLines`), deprecated `HSCodes`, `nationalCommodityCodes` and `chargeName` in order to allow extended versions and DG can now have an "infinite" level of `innerPackagings`.
