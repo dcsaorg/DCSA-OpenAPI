@@ -64,6 +64,8 @@ paths:
 
         Providers **MUST NOT** substitute another location type, such as `UNLO`, to include a waterway TransportCall in a response to an older consumer. The relative order of the remaining TransportCalls **MUST** be preserved.
 
+        For consumers implementing OVS v3.0.2 or earlier, waterway TransportCalls and their timestamps **MUST** be excluded before evaluating request filters and applying pagination. A waterway TransportCall **MUST NOT** cause a voyage or service schedule to match the request.
+
         If the `carrierImportVoyageNumber` of a `TransportCall` differs from its `carrierExportVoyageNumber`, the `TransportCall` is included when either or both voyage numbers match the filter.
         
         For example, when `&UNLocationCode=DEHAM` is used, only `TransportCalls` with `UNLocationCode=DEHAM` are included.
@@ -250,7 +252,9 @@ paths:
 
             If the consumer version is earlier than `3.0.3`, providers **MUST** omit all TransportCalls whose `location.locationType` is `WWAY`.
 
-            For backward compatibility, an absent header or the value `3` **MUST** be treated as a consumer implementing v3.0.0 for this purpose. Providers **MUST NOT** include waterway TransportCalls unless the consumer version establishes support for them.
+            For both compatibility rules above (`PBPL` timestamps and `WWAY` TransportCalls), an absent `API-Version` request header or the legacy value `3` **MUST** be treated as consumer version `3.0.0`.
+
+            Providers **MUST NOT** include waterway TransportCalls unless the consumer version establishes support for them.
           schema:
             type: string
             example: '3.0.3'
