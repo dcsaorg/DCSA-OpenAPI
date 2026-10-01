@@ -15,6 +15,7 @@ A patch adding support for waterway locations in operational vessel schedules.
 - Clarified that waterway locations do not represent loading, discharge, or berthing operations.
 - Constrained each location schema's `locationType` using an exact pattern to resolve overlapping `oneOf` validation.
 - Generalized port-only wording to cover all TransportCalls.
+- Required providers to omit waterway TransportCalls when responding to consumers implementing v3.0.2 or earlier, including consumers whose API-Version request header is absent or set to `3`. This applies to both FULL_VOYAGE and MATCHED_CALLS responses.
 
 <a name="v302"></a>[Release v3.0.2 (12 June 2026)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_OVS/3.0.2)
 ---

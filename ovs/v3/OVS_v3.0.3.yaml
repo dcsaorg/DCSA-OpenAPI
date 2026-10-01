@@ -57,7 +57,15 @@ paths:
         For example, when `&UNLocationCode=DEHAM` is used as a filter parameter, entire voyages containing a `TransportCall` with `UNLocationCode=DEHAM` are returned.
 
         **Note as of v3.0.2:** If `responseScope` is set to `MATCHED_CALLS`, only **partial voyage(s) may be returned**. If a filter only matches a single `TransportCall` in a voyage, or a single `Timestamp` within a `TransportCall`, **only the matching `TransportCalls`** are returned.
-        
+
+        **Backward compatibility:** When responding to a consumer implementing OVS v3.0.2 or earlier, providers **MUST** omit all `TransportCall` objects whose `location.locationType` is `WWAY` from the `transportCalls` arrays.
+
+        This requirement applies to both `FULL_VOYAGE` and `MATCHED_CALLS` responses. For these consumers, a full voyage includes all applicable non-waterway TransportCalls; waterway TransportCalls are excluded.
+
+        Providers **MUST NOT** substitute another location type, such as `UNLO`, to include a waterway TransportCall in a response to an older consumer. The relative order of the remaining TransportCalls **MUST** be preserved.
+
+        For consumers implementing OVS v3.0.2 or earlier, waterway TransportCalls and their timestamps **MUST** be excluded before evaluating request filters and applying pagination. A waterway TransportCall **MUST NOT** cause a voyage or service schedule to match the request.
+
         If the `carrierImportVoyageNumber` of a `TransportCall` differs from its `carrierExportVoyageNumber`, the `TransportCall` is included when either or both voyage numbers match the filter.
         
         For example, when `&UNLocationCode=DEHAM` is used, only `TransportCalls` with `UNLocationCode=DEHAM` are included.
@@ -240,7 +248,13 @@ paths:
 
             A provider responding to a consumer version lower than `3.0.2` **MUST NOT** include a `Timestamp` whose `facilityTypeCode` is `PBPL`. The entire `Timestamp` object **MUST** be omitted. The provider **MUST NOT** omit only `facilityTypeCode` or replace `PBPL` with `BRTH`, because an omitted `facilityTypeCode` has the default meaning `BRTH`.
 
-            For this compatibility rule, an absent header or the legacy value `3` **MUST** be treated as version `3.0.0`.
+            Providers **MUST** use the consumer version indicated in this request header to determine whether waterway TransportCalls can be included in the response.
+
+            If the consumer version is earlier than `3.0.3`, providers **MUST** omit all TransportCalls whose `location.locationType` is `WWAY`.
+
+            For both compatibility rules above (`PBPL` timestamps and `WWAY` TransportCalls), an absent `API-Version` request header or the legacy value `3` **MUST** be treated as consumer version `3.0.0`.
+
+            Providers **MUST NOT** include waterway TransportCalls unless the consumer version establishes support for them.
           schema:
             type: string
             example: '3.0.3'
@@ -712,6 +726,8 @@ components:
         If `waterwaySMDGEntryPointCode` is omitted, the location identifies only the waterway. No specific waterway point can then be inferred from an `ARRI` or `DEPA` timestamp.
 
         Waterway locations represent locations without loading or discharge operations and without vessel berthing.
+
+        **Backward compatibility:** This location type was introduced in OVS v3.0.3. When responding to consumers implementing v3.0.2 or earlier, providers **MUST** omit the entire containing `TransportCall`, including its timestamps.
       properties:
         locationName:
           type: string
