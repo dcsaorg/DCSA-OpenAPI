@@ -4,13 +4,38 @@ The DCSA Commercial Schedules API is specified on [**SwaggerHub**](https://app.s
 
 <a name="v104"></a>[Release v1.0.4](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_CS/1.0.4)
 ---
-Identify cargo-operational calls in Vessel Schedules.
+This patch adds support for identifying cargo-operational calls and representing SMDG waterway entry points in Vessel Schedules.
 
 - Added optional `isCargoOperationalCall` to `TransportCall` in Vessel Schedules to indicate whether cargo loading and/or discharge is applicable at the call.
   - If omitted, the value **MUST** be interpreted as `true`.
   - `false` indicates that neither cargo loading nor cargo discharge is applicable, allowing consumers to filter these calls while retaining access to the complete published vessel rotation.
   - The classification is independent of Planned (`PLN`), Estimated (`EST`) or Actual (`ACT`) timestamps and does not indicate whether cargo was actually loaded or discharged.
   - Calls combining cargo operations with other activities, such as bunkering, remain cargo-operational.
+  - Waterway TransportCalls **MUST** explicitly set `isCargoOperationalCall` to `false`.
+
+- Added support for SMDG waterway entry points in Vessel Schedules.
+  - Added optional `waterwaySMDGEntryPointCode` to `TransportCallLocation`.
+  - The presence of `waterwaySMDGEntryPointCode` identifies the location as a waterway location.
+  - `waterwaySMDGEntryPointCode` **MUST** only be used together with `UNLocationCode`.
+  - The combination of `UNLocationCode` and `waterwaySMDGEntryPointCode` identifies a specific waterway point and **MUST** be a valid entry in the SMDG Waterway Code List.
+  - Waterways are represented using the existing CS location model with optional properties. No `locationType`, discriminator, `oneOf` or separate waterway-location schema was added.
+  - Consumers that assume every Vessel Schedule TransportCall represents a port may need to be updated before processing waterway TransportCalls.
+  - CS 1.0.4 supports waterway locations only at point-level precision; a plain `UNLocationCode` without `waterwaySMDGEntryPointCode` is not interpreted as a waterway location.
+
+- Clarified the Vessel Schedule semantics for waterway TransportCalls.
+  - One waterway TransportCall represents one specific waterway point.
+  - The order of the TransportCalls defines their sequence in the vessel schedule.
+  - A point at the other end of a waterway can be represented by another ordered TransportCall.
+  - Waterway TransportCalls represent locations without cargo loading or discharge operations and without vessel berthing.
+  - `portVisitReference` does not apply to waterway TransportCalls and **MUST** be omitted.
+  - For a waterway TransportCall, `transportCallReference` identifies the scheduled call at the represented waterway point and does not identify the complete passage through the waterway.
+  - For a waterway TransportCall, `ARRI` means arrival at the represented waterway point and `DEPA` means departure from the same point.
+  - `DEPA` does not mean that the vessel has exited the complete waterway at its opposite end.
+
+- Generalized port-specific wording in the Vessel Schedules endpoint.
+  - Updated the endpoint, filter and response descriptions to refer to `TransportCall` and location where the behavior is not limited to ports.
+  - Clarified that `UNLocationCode` can identify a port or a waterway associated with a TransportCall.
+  - Retained port-specific wording where it applies specifically to ports, terminals or facilities.
 
 <a name="v103"></a>[Release v1.0.3 (12 June 2026)](https://app.swaggerhub.com/apis-docs/dcsaorg/DCSA_CS/1.0.3)
 ---
